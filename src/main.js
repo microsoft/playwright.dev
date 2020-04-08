@@ -16,7 +16,7 @@ window.addEventListener('DOMContentLoaded', async() => {
       'readme': {
         relativePath: 'README.md',
         parser: 'markdown',
-        searchableHeaders: 'h1, h2, h3, h4',
+        searchableHeaders: 'h2, h3, h4',
       },
       'showcase': {
         relativePath: 'docs/showcase.md',
