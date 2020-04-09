@@ -188,6 +188,7 @@ function renderSidebar(markdownFiles) {
   const docs = markdownFiles.filter(file => file !== api && file !== releaseNotes);
   return html`
     <ul>
+      <sidebar-divider>Docs</sidebar-divider>
       ${docs.map(doc => html`
         <li><a href="${doc.url()}">${doc.name()}</a></li>
       `)}
