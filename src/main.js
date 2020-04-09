@@ -15,7 +15,7 @@ window.addEventListener('DOMContentLoaded', async() => {
     name: 'Playwright',
     sections: {
       'readme': {
-        name: 'README',
+        name: 'Introduction',
         relativePath: 'README.md',
         type: MarkdownFile.Type.SIMPLE_MARKDOWN,
         searchableHeaders: 'h2, h3, h4',
@@ -184,9 +184,8 @@ window.addEventListener('DOMContentLoaded', async() => {
 
 function renderSidebar(markdownFiles) {
   const api = markdownFiles.find(file => file.section() === 'api');
-  const readme = markdownFiles.find(file => file.section() === 'readme');
   const releaseNotes = markdownFiles.find(file => file.section() === 'release-notes');
-  const docs = markdownFiles.filter(file => file !== api && file !== releaseNotes && file !== readme);
+  const docs = markdownFiles.filter(file => file !== api && file !== releaseNotes);
   return html`
     <ul>
       ${docs.map(doc => html`
