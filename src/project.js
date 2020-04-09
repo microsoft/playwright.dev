@@ -179,7 +179,7 @@ class GithubProjectVersion {
     const sectionDescription = this._sections[section];
     if (!sectionDescription)
       return null;
-    const {relativePath, parser, searchableHeaders} = sectionDescription;
+    const {name, type, relativePath, parser, searchableHeaders} = sectionDescription;
     return await this._critical.run(section, async () => {
       let markdownFile = this._sectionToMarkdownFile.get(section);
       if (markdownFile)
@@ -191,14 +191,16 @@ class GithubProjectVersion {
       const doc = markdownToHTML(this._project.repositoryName(), markdown);
       const url = GITHUB_URLS.contentURL(this._project.repositoryName(), this._version, relativePath);
       this._resolveMarkdownLinks(url, doc);
-      if (parser === 'playwright-api') {
+      if (type === MarkdownFile.Type.PLAYWRIGHT_API) {
         markdownFile = MarkdownFile.parsePlaywrightAPI({
+          name,
           version: this._version,
           section,
           doc,
         });
       } else {
         markdownFile = MarkdownFile.parseSimpleMarkdown({
+          name,
           version: this._version,
           section,
           doc,
@@ -215,6 +217,7 @@ class GithubProjectVersion {
       const doc = markdownToHTML(this._project.repositoryName(), this._releaseNotes);
       this._resolveMarkdownLinks(GITHUB_URLS.releaseURL(this._project.repositoryName(), this._version), doc);
       this._releaseNotesFile = MarkdownFile.parseSimpleMarkdown({
+        name: 'Release Notes',
         version: this._version,
         section: 'release-notes',
         doc,

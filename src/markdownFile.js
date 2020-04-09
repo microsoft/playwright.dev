@@ -5,7 +5,7 @@ import {html} from './zhtml.js';
 import {newURL} from './urlstate.js';
 
 export class MarkdownFile {
-  static parseSimpleMarkdown({version, section, doc, searchableHeaders}) {
+  static parseSimpleMarkdown({name, version, section, doc, searchableHeaders}) {
     const linkGenerator = new GithubLinkGenerator();
     const articleElement = html`<div></div>`;
     const glossaryItems = cutWithHeaders(doc, 'h1,h2,h3,h4,h5,h6', (header, content) => {
@@ -28,10 +28,10 @@ export class MarkdownFile {
     });
     articleElement.append(...glossaryItems.map(item => item.element()));
     glossaryItems[0]._highlightable = false;
-    return new MarkdownFile(version, section, glossaryItems);
+    return new MarkdownFile(name, MarkdownFile.Type.SIMPLE_MARKDOWN, version, section, glossaryItems);
   }
 
-  static parsePlaywrightAPI({version, section, doc}) {
+  static parsePlaywrightAPI({name, version, section, doc}) {
     const linkGenerator = new GithubLinkGenerator();
 
     const createTitle = (type, name) => {
@@ -91,10 +91,12 @@ export class MarkdownFile {
       articleElement.append(...glossaryItems.map(item => item.element()));
       return glossaryItems;
     }).flat();
-    return new MarkdownFile(version, section, glossaryItems);
+    return new MarkdownFile(name, MarkdownFile.Type.PLAYWRIGHT_API, version, section, glossaryItems);
   }
 
-  constructor(version, section, glossaryItems) {
+  constructor(name, type, version, section, glossaryItems) {
+    this._name = name;
+    this._type = type;
     this._version = version;
     this._section = section;
     /** @type {Map<string, GlossaryItem>} */
@@ -109,13 +111,11 @@ export class MarkdownFile {
     this._firstGlossaryItem = glossaryItems[0];
   }
 
-  version() {
-    return this._version;
-  }
-
-  section() {
-    return this._section;
-  }
+  version() { return this._version; }
+  section() { return this._section; }
+  url() { return newURL({version: this._version, section: this._section}); }
+  name() { return this._name; }
+  type() { return this._type; }
 
   glossaryItems() {
     return [...this._githubLinkToGlossaryItem.values()];
@@ -138,6 +138,11 @@ export class MarkdownFile {
       this._highlightedGlossaryItem.element().classList.add('selected');
   }
 }
+
+MarkdownFile.Type = {
+  SIMPLE_MARKDOWN: Symbol('SIMPLE_MARKDOWN'),
+  PLAYWRIGHT_API: Symbol('PLAYWRIGHT_API'),
+};
 
 class GlossaryItem {
   constructor({parentItem, articleElement, scrollAnchor, element, title, name, url, description, githubLink, highlightable, searchable, type}) {

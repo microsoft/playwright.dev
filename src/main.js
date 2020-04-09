@@ -6,6 +6,7 @@ import {newURL, URLState} from './urlstate.js';
 import {GithubProject} from './project.js';
 import {SearchView} from './searchView.js';
 import {onDOMEvent} from './utils.js';
+import {MarkdownFile} from './markdownFile.js';
 import {scrollIntoView} from './third_party/scroll-into-view-if-needed.js';
 
 window.addEventListener('DOMContentLoaded', async() => {
@@ -14,33 +15,39 @@ window.addEventListener('DOMContentLoaded', async() => {
     name: 'Playwright',
     sections: {
       'readme': {
+        name: 'README',
         relativePath: 'README.md',
-        parser: 'markdown',
+        type: MarkdownFile.Type.SIMPLE_MARKDOWN,
         searchableHeaders: 'h2, h3, h4',
       },
       'showcase': {
+        name: 'Community Showcase',
         relativePath: 'docs/showcase.md',
-        parser: 'markdown',
+        type: MarkdownFile.Type.SIMPLE_MARKDOWN,
         searchableHeaders: 'h1',
       },
       'ci': {
+        name: 'Getting Started on CI',
         relativePath: 'docs/ci.md',
-        parser: 'markdown',
+        type: MarkdownFile.Type.SIMPLE_MARKDOWN,
         searchableHeaders: 'h1,h2',
       },
       'selector-engines': {
+        name: 'Selector Engines',
         relativePath: 'docs/selectors.md',
-        parser: 'markdown',
+        type: MarkdownFile.Type.SIMPLE_MARKDOWN,
         searchableHeaders: 'h1',
       },
       'troubleshooting': {
+        name: 'Troubleshooting',
         relativePath: 'docs/troubleshooting.md',
-        parser: 'markdown',
+        type: MarkdownFile.Type.SIMPLE_MARKDOWN,
         searchableHeaders: 'h1,h3',
       },
       'api': {
+        name: 'API',
         relativePath: 'docs/api.md',
-        parser: 'playwright-api'
+        type: MarkdownFile.Type.PLAYWRIGHT_API,
       },
     },
   });
@@ -116,19 +123,8 @@ window.addEventListener('DOMContentLoaded', async() => {
     // Do not search inside release notes titles.
     searchView.setGlossary(files.filter(file => file.section() !== 'release-notes').map(file => file.glossaryItems()).flat());
 
-    const toplevelGlossaryItems = files.filter(file => file.section() !== 'readme').map(file => {
-      if (file.section() === 'api')
-        return file.glossaryItems().filter(item => !item.parentItem());
-      return file.glossaryItem();
-    }).flat();
     documentationSidebar.textContent = '';
-    documentationSidebar.append(html`
-      <ul>
-        ${toplevelGlossaryItems.map(item => html`
-          <li><a href="${item.url()}">${item.name()}</a></li>
-        `)}
-      </ul>
-    `);
+    documentationSidebar.append(renderSidebar(files));
 
     const toShow = files.find(file => file.section() === (section || 'readme'));
     const glossaryItem = toShow.glossaryItem(q);
@@ -178,6 +174,24 @@ window.addEventListener('DOMContentLoaded', async() => {
     await glossaryItem.highlight();
   });
 }, false);
+
+function renderSidebar(markdownFiles) {
+  const api = markdownFiles.find(file => file.section() === 'api');
+  const readme = markdownFiles.find(file => file.section() === 'readme');
+  const releaseNotes = markdownFiles.find(file => file.section() === 'release-notes');
+  const docs = markdownFiles.filter(file => file !== api && file !== releaseNotes && file !== readme);
+  return html`
+    <ul>
+      ${docs.map(doc => html`
+        <li><a href="${doc.url()}">${doc.name()}</a></li>
+      `)}
+      ${releaseNotes && html`<li><a href="${releaseNotes.url()}">${releaseNotes.name()}</a></li>`}
+      ${api.glossaryItems().filter(item => !item.parentItem()).map(item => html`
+        <li><a href="${item.url()}">${item.name()}</a></li>
+      `)}
+    </ul>
+  `;
+}
 
 // Register service worker only for prod build.
 if (window.__WEBSITE_VERSION__) {
