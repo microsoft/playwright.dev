@@ -65,7 +65,10 @@ window.addEventListener('DOMContentLoaded', async() => {
 
   const documentationHeader = html`
     <documentation-header>
-      <a class=home-navigation href="#">🎭 ${project.name()}</a> ${versionSelector}
+      <a class=home-navigation href="#">
+        🎭<project-name>${project.name()}</project-name>
+      </a>
+      ${versionSelector}
       ${searchView.element}
     </documentation-header>
   `;
@@ -185,6 +188,7 @@ function renderSidebar(markdownFiles) {
       ${docs.map(doc => html`
         <li><a href="${doc.url()}">${doc.name()}</a></li>
       `)}
+      <sidebar-divider>API  ${api.version()}</sidebar-divider>
       ${releaseNotes && html`<li><a href="${releaseNotes.url()}">${releaseNotes.name()}</a></li>`}
       ${api.glossaryItems().filter(item => !item.parentItem()).map(item => html`
         <li><a href="${item.url()}">${item.name()}</a></li>
