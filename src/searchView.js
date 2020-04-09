@@ -5,6 +5,7 @@ import {html} from './zhtml.js';
 import {FuzzySearch} from './fuzzy.js';
 import {onDOMEvent, consumeDOMEvent, disposeAll} from './utils.js';
 import {scrollIntoView} from './third_party/scroll-into-view-if-needed.js';
+import {MarkdownFile} from './markdownFile.js';
 
 // Number of suggestions to render immediately.
 const INSTANT_RENDER_COUNT = 30;
@@ -111,6 +112,11 @@ export class SearchView {
     if (!this._glossaryItems)
       return;
     const suggestions = [];
+    const getIconType = (glossaryItem) => {
+      if (glossaryItem.markdownFile().type() === MarkdownFile.Type.PLAYWRIGHT_API)
+        return 'api';
+      return 'docs';
+    }
     if (query) {
       const fuzzySearch = new FuzzySearch(query);
       for (const item of this._glossaryItems) {
@@ -118,6 +124,7 @@ export class SearchView {
         if (score > 0) {
           suggestions.push({
             name: item.name(),
+            iconType: getIconType(item),
             description: item.description(),
             url: item.url(),
             score,
@@ -138,6 +145,7 @@ export class SearchView {
     } else {
       suggestions.push(...this._glossaryItems.map(item => ({
         name: item.name(),
+        iconType: getIconType(item),
         description: item.description(),
         url: item.url(),
         score: 0,
@@ -156,9 +164,14 @@ export class SearchView {
     }
 
     const renderItem = item => html`
-      <a class="search-item ${item.description ? '' : 'name-only'}" href="${item.url}">
-        <search-name>${renderSearchItemName(item.name, item.matchIndexes)}</search-name>
-        ${item.description && html`<search-description>${item.description}</search-description>`}
+      <a class="search-item " href="${item.url}">
+        <item-icon-container>
+          <item-icon class="${item.iconType}">${item.iconType}</item-icon>
+        </item-icon-container>
+        <item-name-container class="${item.description ? '' : 'name-only'}">
+          <item-name>${renderSearchItemName(item.name, item.matchIndexes)}</item-name>
+          ${item.description && html`<item-description>${item.description}</item-description>`}
+        </item-name-container>
       </a>
     `;
 

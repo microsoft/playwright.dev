@@ -67,6 +67,8 @@ export class MarkdownFile {
       const element = html`<markdown-content>${headerWithLink(header, url)}${content}</markdown-content>`;
       const articleElement = html`<div></div>`;
       const type = header.textContent.startsWith('class: ') ? GlossaryItem.Type.Class : GlossaryItem.Type.Other;
+      const descriptionElement = content.querySelector('p');
+      const description = descriptionElement ? descriptionElement.textContent : name + ' > ' + header.textContent;
       const articleItem = new GlossaryItem({
         parentItem: null,
         highlightable: false,
@@ -76,7 +78,7 @@ export class MarkdownFile {
         scrollAnchor: null, // explicitly set no scroll anchor so that we scroll to the beginning
         url,
         name: header.textContent,
-        description: content.querySelector('p') ? content.querySelector('p').textContent : '',
+        description,
         searchable: true,
         title: createTitle(type, header.textContent),
         type,
