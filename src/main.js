@@ -63,6 +63,9 @@ window.addEventListener('DOMContentLoaded', async() => {
   `;
   onDOMEvent(versionSelector, 'input', event => urlstate.goto({version: event.target.value}));
 
+  const glasspaneElement = html`<glass-pane></glass-pane>`;
+  onDOMEvent(glasspaneElement, 'click', () => searchView.hideSuggestions());
+
   const documentationHeader = html`
     <documentation-header>
       <a class=home-navigation href="#">
@@ -79,6 +82,7 @@ window.addEventListener('DOMContentLoaded', async() => {
     ${documentationHeader}
     ${documentationSidebar}
     ${documentationView}
+    ${glasspaneElement}
   `);
 
   // Setup search input x position on every resize.

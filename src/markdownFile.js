@@ -27,7 +27,10 @@ export class MarkdownFile {
       });
     });
     articleElement.append(...glossaryItems.map(item => item.element()));
-    glossaryItems[0]._highlightable = false;
+    if (glossaryItems.length) {
+      glossaryItems[0]._highlightable = false;
+      glossaryItems[0]._scrollAnchor = null;
+    }
     return new MarkdownFile(name, MarkdownFile.Type.SIMPLE_MARKDOWN, version, section, glossaryItems);
   }
 

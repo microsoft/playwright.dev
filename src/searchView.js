@@ -12,7 +12,7 @@ const INSTANT_RENDER_COUNT = 30;
 export class SearchView {
   constructor() {
     this._input = html`
-      <input type=search autocomplete=off autocapitalize=off spellcheck=false size=1 placeholder='start typing to search...'></input>
+      <input type=search autocomplete=off autocapitalize=off spellcheck=false size=1 placeholder='start typing to search'></input>
     `;
     this.element = html`
       <search-view>
@@ -44,7 +44,7 @@ export class SearchView {
       consumeDOMEvent(event);
       this._input.value = this._originalInputValue;
       this._input.blur();
-      this._hideSuggestions();
+      this.hideSuggestions();
     } else if (event.key === 'Enter') {
       if (this._selectedSearchItem) {
         this._selectedSearchItem.click();
@@ -87,7 +87,7 @@ export class SearchView {
   }
 
   setGlossary(glossaryItems) {
-    this._hideSuggestions();
+    this.hideSuggestions();
     this._glossaryItems = glossaryItems.filter(item => item.searchable());
   }
 
@@ -96,14 +96,15 @@ export class SearchView {
   }
 
   setDocumentation(documentation) {
-    this._hideSuggestions();
+    this.hideSuggestions();
     this._documentation = documentation;
   }
 
-  _hideSuggestions() {
+  hideSuggestions() {
     if (!this._suggestionsElement.isConnected)
       return;
     this._suggestionsElement.remove();
+    document.body.classList.remove('has-search-suggestions');
   }
 
   _doSearch(query) {
@@ -145,8 +146,10 @@ export class SearchView {
     }
 
     this._suggestionsElement.textContent = '';
-    if (!this._suggestionsElement.isConnected)
+    if (!this._suggestionsElement.isConnected) {
       document.body.append(this._suggestionsElement);
+      document.body.classList.add('has-search-suggestions');
+    }
     if (suggestions.length === 0) {
       this._suggestionsElement.append(html`<a class="search-item text-only">No Results</a>`);
       return;
