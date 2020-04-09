@@ -36,7 +36,7 @@ window.addEventListener('DOMContentLoaded', async() => {
         name: 'Selector Engines',
         relativePath: 'docs/selectors.md',
         type: MarkdownFile.Type.SIMPLE_MARKDOWN,
-        searchableHeaders: 'h1',
+        searchableHeaders: 'h1,h2,h3',
       },
       'troubleshooting': {
         name: 'Troubleshooting',

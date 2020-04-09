@@ -8,11 +8,25 @@ export class MarkdownFile {
   static parseSimpleMarkdown({name, version, section, doc, searchableHeaders}) {
     const linkGenerator = new GithubLinkGenerator();
     const articleElement = html`<div></div>`;
+    const headersStack = [];
     const glossaryItems = cutWithHeaders(doc, 'h1,h2,h3,h4,h5,h6', (header, content) => {
+      const tagName = header.tagName;
+      while (headersStack.length && headersStack[headersStack.length - 1].tagName.localeCompare(tagName) !== -1)
+        headersStack.pop();
       const githubLink = linkGenerator.assignLink(header.textContent);
       const url = newURL({version, section, q: githubLink});
-      return new GlossaryItem({
-        parentItem: null,
+      const parentItem = headersStack.length ? headersStack[headersStack.length - 1].item : null;
+      let description = '';
+      if (parentItem) {
+        description = parentItem.description() + ' > ' + header.textContent;
+      } else {
+        if (name.toLowerCase().trim() !== header.textContent.toLowerCase().trim())
+          description = name + ' > ' + header.textContent;
+        else
+          description = name;
+      }
+      const item = new GlossaryItem({
+        parentItem,
         highlightable: true,
         articleElement,
         element: html`<markdown-content>${headerWithLink(header, url)}${content}</markdown-content>`,
@@ -20,11 +34,13 @@ export class MarkdownFile {
         scrollAnchor: header,
         url,
         name: header.textContent,
-        description: '',
+        description,
         title: header.textContent,
         searchable: searchableHeaders && header.matches(searchableHeaders),
         type: GlossaryItem.Type.Other,
       });
+      headersStack.push({tagName, item});
+      return item;
     });
     articleElement.append(...glossaryItems.map(item => item.element()));
     if (glossaryItems.length) {
