@@ -299,14 +299,19 @@ export class MarkdownFile {
   }
 
   async _highlightGlossaryItem(item) {
-    if (this._highlightedGlossaryItem)
+    if (this._highlightedGlossaryItem) {
       this._highlightedGlossaryItem.element().classList.remove('selected');
+      this._highlightedGlossaryItem.element().classList.remove('intense');
+    }
     // We have to wait a RAF if we re-highlight the same item.
     if (this._highlightedGlossaryItem === item)
       await new Promise(x => requestAnimationFrame(x));
     this._highlightedGlossaryItem = item;
-    if (this._highlightedGlossaryItem && this._highlightedGlossaryItem._highlightable)
+    if (this._highlightedGlossaryItem && this._highlightedGlossaryItem._highlightable) {
       this._highlightedGlossaryItem.element().classList.add('selected');
+      if (this._highlightedGlossaryItem.type() === GlossaryItem.Type.Option || this._highlightedGlossaryItem.type() === GlossaryItem.Type.Value)
+        this._highlightedGlossaryItem.element().classList.add('intense');
+    }
   }
 }
 
