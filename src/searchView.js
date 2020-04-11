@@ -169,7 +169,7 @@ export class SearchView {
           <item-icon class="${getIconType(score.item)}">${getIconType(score.item)}</item-icon>
         </item-icon-container>
         <item-name-container class="${score.item.description() ? '' : 'name-only'}">
-          <item-name>${renderSearchItemName(score.item.name(), score.matchIndexes)}</item-name>
+          <item-name>${highlight(score.item.nameElement(), score.matchIndexes)}</item-name>
           ${score.item.description() && html`<item-description>${score.item.description()}</item-description>`}
         </item-name-container>
       </a>
@@ -199,31 +199,60 @@ export class SearchView {
   }
 }
 
-function renderSearchItemName(name, matchIndexes) {
-  const dotIndex = name.indexOf(':');
-  const indexes = new Set(matchIndexes);
-  let lastGroup = {
-    isMethodName: false,
-    isHighlighted: false,
-    fromIndex: 0,
-    toIndex: 0,
-  };
-  const groups = [lastGroup];
-  for (let i = 0; i < name.length; ++i) {
-    const isMethodName = i < dotIndex;
-    const isHighlighted = indexes.has(i);
-    if (lastGroup.isMethodName !== isMethodName || lastGroup.isHighlighted !== isHighlighted) {
-      lastGroup.toIndex = i;
-      lastGroup = {
-        isMethodName, isHighlighted, fromIndex: i
-      };
-      groups.push(lastGroup);
+// Clone element, highlight matching indexes, and return a new DocumentFragment
+// that contains it.
+function highlight(element, matchIndexes) {
+  element = element.cloneNode(true /* deep */);
+  // If `element` is a text node, than result must be a fragment.
+  // Always return fragment in this case.
+  const result = document.createDocumentFragment();
+  result.append(element);
+  const treeWalker = document.createTreeWalker(result, NodeFilter.SHOW_TEXT, null, false);
+  const textNodes = [];
+  for (let textNode = treeWalker.nextNode(); textNode; textNode = treeWalker.nextNode())
+    textNodes.push(textNode);
+  textNodes.reverse();
+
+  const indexes = matchIndexes.slice().reverse();
+  let consumed = 0;
+  while (indexes.length && textNodes.length) {
+    const index = indexes.pop();
+    // Find a text node that contains this character index to highlight.
+    let textNode = textNodes.pop();
+    while (textNodes.length && consumed + textNode.nodeValue.length <= index) {
+      consumed += textNode.nodeValue.length;
+      textNode = textNodes.pop();
     }
+    const text = textNode.nodeValue;
+    // If we didn't find a text node to highlight - bail out.
+    if (consumed + text.length < index)
+      break;
+
+    // Otherwise, add minimum number of <mark> elements to highlight occurrences.
+    const fragment = document.createDocumentFragment();
+    let lastHighlightElement = null;
+    let lastHighlightIndex = 0;
+    const pushHighlight = (index) => {
+      index -= consumed;
+      if (lastHighlightElement && lastHighlightIndex === index) {
+        lastHighlightElement.textContent += text[index];
+        lastHighlightIndex = index + 1;
+        return;
+      }
+      if (lastHighlightIndex < index)
+        fragment.append(text.substring(lastHighlightIndex, index));
+      lastHighlightElement = html`<mark>${text[index]}</mark>`;
+      lastHighlightIndex = index + 1;
+      fragment.append(lastHighlightElement);
+    }
+
+    pushHighlight(index);
+    while (indexes.length && consumed + text.length > indexes[indexes.length - 1])
+      pushHighlight(indexes.pop());
+    if (lastHighlightIndex < text.length)
+      fragment.append(html`${text.substring(lastHighlightIndex)}`);
+    textNode.replaceWith(fragment);
+    consumed += text.length;
   }
-  lastGroup.toIndex = name.length;
-  return html`${groups.map(group => html`
-    <span class="${group.isMethodName ? 'method-name' : ''} ${group.isHighlighted ? 'highlight': ''}">
-      ${name.substring(group.fromIndex, group.toIndex)}
-    </span>
-  `)}`;
+  return result;
 }

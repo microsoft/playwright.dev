@@ -34,6 +34,7 @@ export class MarkdownFile {
         scrollAnchor: header,
         url,
         name: header.textContent,
+        nameElement: html`${header.textContent}`,
         description,
         title: header.textContent,
         searchable: searchableHeaders && header.matches(searchableHeaders),
@@ -58,14 +59,6 @@ export class MarkdownFile {
     const createTitle = (type, name) => {
       if (type === GlossaryItem.Type.Class)
         return name.substring('class: '.length);
-      if (type === GlossaryItem.Type.Method)
-        return name.substring('method: '.length).split('(')[0];
-      if (type === GlossaryItem.Type.Event)
-        return name.substring('event: '.length);
-      if (type === GlossaryItem.Type.Namespace)
-        return name.substring('namespace: '.length);
-      if (type === GlossaryItem.Type.Option)
-        return name.substring('option: '.length);
       return name;
     }
 
@@ -101,6 +94,7 @@ export class MarkdownFile {
         scrollAnchor: null, // explicitly set no scroll anchor so that we scroll to the beginning
         url,
         name: header.textContent,
+        nameElement: html`${header.textContent}`,
         description,
         searchable: true,
         title: createTitle(type, header.textContent),
@@ -113,14 +107,21 @@ export class MarkdownFile {
       let name = header.textContent;
       const description = content.querySelector('p') ? content.querySelector('p').textContent : '';
       let type = GlossaryItem.Type.Other;
+      let nameElement = null;
       if (name.startsWith('event: '))
         type = GlossaryItem.Type.Event;
       else if (name.includes('.'))
         type = name.includes('(') ? GlossaryItem.Type.Method : GlossaryItem.Type.Namespace;
-      if (type === GlossaryItem.Type.Method)
-        name = 'method: ' + name;
-      else if (type === GlossaryItem.Type.Namespace)
-        name = 'namespace: ' + name;
+
+      const [className, methodOrEventOrNamespace] = name.split('.');
+      if (type === GlossaryItem.Type.Method) {
+        const [method, args] = methodOrEventOrNamespace.split('(');
+        nameElement = html`${className}.<strong>${method}</strong>(${args}`;
+      } else if (type === GlossaryItem.Type.Namespace) {
+        nameElement = html`${className}.<strong>${methodOrEventOrNamespace}</strong>`;
+      } else if (type === GlossaryItem.Type.Event) {
+        nameElement = html`${className}.<strong>${methodOrEventOrNamespace}</strong>`;
+      }
       const url = newURL({version, section, q: githubLink});
       return new GlossaryItem({
         parentItem,
@@ -132,6 +133,7 @@ export class MarkdownFile {
         url,
         // name is a full method name with arguments, e.g. `browserContext.waitForEvent(event[, optionsOrPredicate])`
         name,
+        nameElement,
         description,
         searchable: true,
         // title is a method name without arguments, e.g. `browserContext.waitForEvent`
@@ -184,7 +186,19 @@ export class MarkdownFile {
             description = '';
         }
 
-        const title = (methodItem === parentItem) ? methodItem.name() : suboptionPrefix + optionName + suboptionSuffix;
+        let name = '';
+        let nameElement = null;
+        const isTopLevelOption = methodItem === parentItem;
+        if (isTopLevelOption) {
+          // method name includes arguments.
+          name = methodItem.name();
+          const argIndex = name.lastIndexOf(optionName);
+          nameElement = html`${name.substring(0, argIndex)}<strong>${optionName}</strong>${name.substring(argIndex + optionName.length)}`;
+        } else {
+          name = suboptionPrefix + optionName + suboptionSuffix;
+          nameElement = html`${suboptionPrefix}<strong>${optionName}</strong>${suboptionSuffix}`;
+        }
+
         const item = new GlossaryItem({
           parentItem,
           highlightable: true,
@@ -193,18 +207,19 @@ export class MarkdownFile {
           githubLink,
           scrollAnchor: liElement,
           url,
-          name: type === GlossaryItem.Type.Option ? 'option: ' + title : 'value: ' + title,
+          name,
+          nameElement,
           description,
           // We don't want to search across top-level options - they are already
           // in the method signature.
           searchable: parentItem.type() !== GlossaryItem.Type.Method,
-          title,
+          title: name,
           type,
         });
         let newSuboptionPrefix;
         let newSuboptionSuffix;
         if (methodItem === parentItem) {
-          const signatureWithoutOptionals = methodItem.name().substring('method: '.length).replace(/[\[\]]/g, '');
+          const signatureWithoutOptionals = methodItem.name().replace(/[\[\]]/g, '');
           const optionIndex = signatureWithoutOptionals.lastIndexOf(optionName);
           newSuboptionPrefix = signatureWithoutOptionals.substring(0, optionIndex);
           newSuboptionSuffix = signatureWithoutOptionals.substring(optionIndex + optionName.length);
@@ -277,7 +292,7 @@ MarkdownFile.Type = {
 };
 
 class GlossaryItem {
-  constructor({parentItem, articleElement, scrollAnchor, element, title, name, url, description, githubLink, highlightable, searchable, type}) {
+  constructor({parentItem, articleElement, scrollAnchor, element, title, name, nameElement, url, description, githubLink, highlightable, searchable, type}) {
     // This is assigned in MarkdownFile constructor.
     this._markdownFile = null;
     this._articleElement = articleElement;
@@ -285,6 +300,7 @@ class GlossaryItem {
     this._element = element;
     this._title = title;
     this._name = name;
+    this._nameElement = nameElement;
     this._highlightable = highlightable;
     this._description = description;
     this._githubLink = githubLink;
@@ -305,6 +321,7 @@ class GlossaryItem {
   scrollAnchor() { return this._scrollAnchor; }
   element() { return this._element; }
   name() { return this._name; }
+  nameElement() { return this._nameElement; }
   searchable() { return this._searchable; }
   searchWeight() { return this._searchWeight; }
   description() { return this._description; }
