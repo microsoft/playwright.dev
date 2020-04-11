@@ -111,46 +111,46 @@ export class SearchView {
   _doSearch(query) {
     if (!this._glossaryItems)
       return;
-    const suggestions = [];
     const getIconType = (glossaryItem) => {
       if (glossaryItem.markdownFile().type() === MarkdownFile.Type.PLAYWRIGHT_API)
         return 'api';
       return 'docs';
     }
+    let scores = [];
     if (query) {
       const fuzzySearch = new FuzzySearch(query);
       for (const item of this._glossaryItems) {
         const {score, matchIndexes} = fuzzySearch.score(item.name());
         if (score > 0) {
-          suggestions.push({
-            name: item.name(),
-            iconType: getIconType(item),
-            description: item.description(),
-            url: item.url(),
+          scores.push({
+            item,
             score,
             matchIndexes
           });
         }
       }
-      suggestions.sort((a, b) => {
+      scores.sort((a, b) => {
         const scoreDiff = b.score - a.score;
         if (scoreDiff)
           return scoreDiff;
+        // Sort by type
+        const weightDiff = b.item.searchWeight() - a.item.searchWeight();
+        if (weightDiff)
+          return weightDiff;
+
         // Prefer left-most search results.
         const startDiff = a.matchIndexes[0] - b.matchIndexes[0];
         if (startDiff)
           return startDiff;
-        return a.name.length - b.name.length;
+        return a.item.name().length - b.item.name().length;
       });
     } else {
-      suggestions.push(...this._glossaryItems.map(item => ({
-        name: item.name(),
-        iconType: getIconType(item),
-        description: item.description(),
-        url: item.url(),
+      scores.push(...this._glossaryItems.map(item => ({
+        item,
         score: 0,
         matchIndexes: [],
       })));
+      scores.sort((a, b) => b.item.searchWeight() - a.item.searchWeight());
     }
 
     this._suggestionsElement.textContent = '';
@@ -158,28 +158,28 @@ export class SearchView {
       document.body.append(this._suggestionsElement);
       document.body.classList.add('has-search-suggestions');
     }
-    if (suggestions.length === 0) {
+    if (scores.length === 0) {
       this._suggestionsElement.append(html`<a class="search-item text-only">No Results</a>`);
       return;
     }
 
-    const renderItem = item => html`
-      <a class="search-item " href="${item.url}">
+    const renderItem = score => html`
+      <a class="search-item " href="${score.item.url()}">
         <item-icon-container>
-          <item-icon class="${item.iconType}">${item.iconType}</item-icon>
+          <item-icon class="${getIconType(score.item)}">${getIconType(score.item)}</item-icon>
         </item-icon-container>
-        <item-name-container class="${item.description ? '' : 'name-only'}">
-          <item-name>${renderSearchItemName(item.name, item.matchIndexes)}</item-name>
-          ${item.description && html`<item-description>${item.description}</item-description>`}
+        <item-name-container class="${score.item.description() ? '' : 'name-only'}">
+          <item-name>${renderSearchItemName(score.item.name(), score.matchIndexes)}</item-name>
+          ${score.item.description() && html`<item-description>${score.item.description()}</item-description>`}
         </item-name-container>
       </a>
     `;
 
     if (!query.trim().length && this._homeURL)
       this._suggestionsElement.append(html`<a class="search-item text-only" href="${this._homeURL}">Home</a>`);
-    this._suggestionsElement.append(...suggestions.slice(0, INSTANT_RENDER_COUNT).map(renderItem));
+    this._suggestionsElement.append(...scores.slice(0, INSTANT_RENDER_COUNT).map(renderItem));
     this._selectElement(this._suggestionsElement.firstChild);
-    const leftovers = suggestions.slice(INSTANT_RENDER_COUNT);
+    const leftovers = scores.slice(INSTANT_RENDER_COUNT);
     if (leftovers.length) {
       const leftoversElement = html`
         <a class="search-item text-only">
@@ -200,7 +200,7 @@ export class SearchView {
 }
 
 function renderSearchItemName(name, matchIndexes) {
-  const dotIndex = name.indexOf('.');
+  const dotIndex = name.indexOf(':');
   const indexes = new Set(matchIndexes);
   let lastGroup = {
     isMethodName: false,

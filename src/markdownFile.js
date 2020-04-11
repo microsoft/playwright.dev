@@ -51,25 +51,48 @@ export class MarkdownFile {
   }
 
   static parsePlaywrightAPI({name, version, section, doc}) {
+    const TIMESTAMP_LABEL = `Parsing Playwright API ${version}`;
+    console.time(TIMESTAMP_LABEL);
     const linkGenerator = new GithubLinkGenerator();
 
     const createTitle = (type, name) => {
       if (type === GlossaryItem.Type.Class)
         return name.substring('class: '.length);
       if (type === GlossaryItem.Type.Method)
-        return name.split('(')[0];
+        return name.substring('method: '.length).split('(')[0];
+      if (type === GlossaryItem.Type.Event)
+        return name.substring('event: '.length);
+      if (type === GlossaryItem.Type.Namespace)
+        return name.substring('namespace: '.length);
+      if (type === GlossaryItem.Type.Option)
+        return name.substring('option: '.length);
       return name;
     }
 
     const glossaryItems = cutWithHeaders(doc, 'h3', (header, content) => {
+      const articleElement = html`<div></div>`;
+      const classItem = itemForClass(articleElement, header, content);
+      const methodOrEventOrNSItems = cutWithHeaders(classItem.element(), 'h4', (header, content) => itemForMethodOrEventOrNamespace(classItem, header, content));
+      // Create article element with class and methods elements.
+      articleElement.append(classItem.element(), ...methodOrEventOrNSItems.map(item => item.element()));
+      const subitems = methodOrEventOrNSItems.map(item => {
+        if (item.type() !== GlossaryItem.Type.Method)
+          return item;
+        return [item, ...itemsForMethodOptions(item, item, item.element())].flat();
+      }).flat();
+      return [classItem, ...subitems];
+    }).flat();
+    console.timeEnd(TIMESTAMP_LABEL);
+    return new MarkdownFile(name, MarkdownFile.Type.PLAYWRIGHT_API, version, section, glossaryItems);
+
+    function itemForClass(articleElement, header, content) {
       const githubLink = linkGenerator.assignLink(header.textContent);
       const url = newURL({version, section, q: githubLink});
       const element = html`<markdown-content>${headerWithLink(header, url)}${content}</markdown-content>`;
-      const articleElement = html`<div></div>`;
       const type = header.textContent.startsWith('class: ') ? GlossaryItem.Type.Class : GlossaryItem.Type.Other;
-      const descriptionElement = content.querySelector('p');
-      const description = descriptionElement ? descriptionElement.textContent : name + ' > ' + header.textContent;
-      const articleItem = new GlossaryItem({
+      const descriptionElement = element.querySelector('p');
+      const description = descriptionElement && descriptionElement.textContent ? descriptionElement.textContent : name + ' > ' + header.textContent;
+      return new GlossaryItem({
         parentItem: null,
         highlightable: false,
         articleElement,
@@ -83,36 +106,124 @@ export class MarkdownFile {
         title: createTitle(type, header.textContent),
         type,
       });
-      const glossaryItems = [articleItem];
-      glossaryItems.push(...cutWithHeaders(element, 'h4', (subheader, subcontent) => {
-        const subGithubLink = linkGenerator.assignLink(subheader.textContent);
-        const subname = subheader.textContent;
-        const subdescription = subcontent.querySelector('p') ? subcontent.querySelector('p').textContent : '';
-        let subtype = GlossaryItem.Type.Other;
-        if (subname.startsWith('event: '))
-          subtype = GlossaryItem.Type.Event;
-        else if (subname.includes('.'))
-          subtype = subname.includes('(') ? GlossaryItem.Type.Method : GlossaryItem.Type.Namespace;
-        const suburl = newURL({version, section, q: subGithubLink});
-        return new GlossaryItem({
-          parentItem: articleItem,
+    }
+
+    function itemForMethodOrEventOrNamespace(parentItem, header, content) {
+      const githubLink = linkGenerator.assignLink(header.textContent);
+      let name = header.textContent;
+      const description = content.querySelector('p') ? content.querySelector('p').textContent : '';
+      let type = GlossaryItem.Type.Other;
+      if (name.startsWith('event: '))
+        type = GlossaryItem.Type.Event;
+      else if (name.includes('.'))
+        type = name.includes('(') ? GlossaryItem.Type.Method : GlossaryItem.Type.Namespace;
+      if (type === GlossaryItem.Type.Method)
+        name = 'method: ' + name;
+      else if (type === GlossaryItem.Type.Namespace)
+        name = 'namespace: ' + name;
+      const url = newURL({version, section, q: githubLink});
+      return new GlossaryItem({
+        parentItem,
+        highlightable: true,
+        articleElement: parentItem.articleElement(),
+        element: html`<markdown-content>${headerWithLink(header, url)}${content}</markdown-content>`,
+        githubLink,
+        scrollAnchor: header,
+        url,
+        // name is a full method name with arguments, e.g. `browserContext.waitForEvent(event[, optionsOrPredicate])`
+        name,
+        description,
+        searchable: true,
+        // title is a method name without arguments, e.g. `browserContext.waitForEvent`
+        title: createTitle(type, name),
+        type,
+      });
+    }
+
+    function itemsForMethodOptions(methodItem, parentItem, element, suboptionPrefix = '', suboptionSuffix = '') {
+      const codeElements = element.querySelectorAll(':scope > ul > li > code:first-child');
+      if (!codeElements.length)
+        return [];
+      return Array.from(codeElements).map(codeElement => {
+        const optionName = codeElement.textContent.trim();
+        const githubLink = parentItem._githubLink + (parentItem.type() === GlossaryItem.Type.Method ? '--' : '-') + toGithubID(optionName.toLowerCase());
+        const url = newURL({version, section, q: githubLink});
+        const liElement = codeElement.parentElement;
+
+        const firstTypeAnchorElement = liElement.querySelector('a');
+        const secondTypeAnchorElement = liElement.querySelector('a + a');
+        const isArrayType = firstTypeAnchorElement && firstTypeAnchorElement.textContent === 'Array';
+        const isObjectType = firstTypeAnchorElement && firstTypeAnchorElement.textContent === 'Object' ||
+            secondTypeAnchorElement && secondTypeAnchorElement.textContent === 'Object';
+
+        // move elements from LI to wrapper so that we can higlight LI only (without nested
+        // ULs)
+        const wrapper = html`
+          <li-with-link>
+            <a href="${url}">${linkIcon()}</a>
+          </li-with-link>
+        `;
+        let e = liElement.firstChild;
+        while (e && e.nodeName !== 'UL') {
+          const next = e.nextSibling;
+          wrapper.append(e);
+          e = next;
+        }
+        liElement.insertBefore(wrapper, liElement.firstChild);
+        const type = optionName.startsWith(`'`) ? GlossaryItem.Type.OptionValue : GlossaryItem.Type.Option;
+        let description = wrapper.textContent;
+        if (type === GlossaryItem.Type.Option) {
+          const idx = description.lastIndexOf('>');
+          if (idx !== -1)
+            description = description.substring(idx + 1);
+        } else {
+          const idx = description.indexOf('-');
+          if (idx !== -1)
+            description = description.substring(idx + 1);
+          else
+            description = '';
+        }
+
+        const title = (methodItem === parentItem) ? methodItem.name() : suboptionPrefix + optionName + suboptionSuffix;
+        const item = new GlossaryItem({
+          parentItem,
           highlightable: true,
-          articleElement,
-          element: html`<markdown-content>${headerWithLink(subheader, suburl)}${subcontent}</markdown-content>`,
-          githubLink: subGithubLink,
-          scrollAnchor: subheader,
-          url: suburl,
-          name: subname,
-          description: subdescription,
-          searchable: true,
-          title: createTitle(subtype, subname),
-          type: subtype,
+          articleElement: parentItem.articleElement(),
+          element: liElement,
+          githubLink,
+          scrollAnchor: liElement,
+          url,
+          name: type === GlossaryItem.Type.Option ? 'option: ' + title : 'value: ' + title,
+          description,
+          // We don't want to search across top-level options - they are already
+          // in the method signature.
+          searchable: parentItem.type() !== GlossaryItem.Type.Method,
+          title,
+          type,
         });
-      }));
-      articleElement.append(...glossaryItems.map(item => item.element()));
-      return glossaryItems;
-    }).flat();
-    return new MarkdownFile(name, MarkdownFile.Type.PLAYWRIGHT_API, version, section, glossaryItems);
+        let newSuboptionPrefix;
+        let newSuboptionSuffix;
+        if (methodItem === parentItem) {
+          const signatureWithoutOptionals = methodItem.name().substring('method: '.length).replace(/[\[\]]/g, '');
+          const optionIndex = signatureWithoutOptionals.lastIndexOf(optionName);
+          newSuboptionPrefix = signatureWithoutOptionals.substring(0, optionIndex);
+          newSuboptionSuffix = signatureWithoutOptionals.substring(optionIndex + optionName.length);
+        } else {
+          newSuboptionPrefix = suboptionPrefix + optionName + ': ';
+          newSuboptionSuffix = suboptionSuffix;
+        }
+        if (isArrayType) {
+          newSuboptionPrefix += '[';
+          newSuboptionSuffix = ']' + newSuboptionSuffix;
+        }
+        if (isObjectType) {
+          newSuboptionPrefix += '{';
+          newSuboptionSuffix = '}' + newSuboptionSuffix;
+        }
+        const items = itemsForMethodOptions(methodItem, item, liElement, newSuboptionPrefix, newSuboptionSuffix);
+        return [item, ...items];
+      }).flat();
+    }
   }
 
   constructor(name, type, version, section, glossaryItems) {
@@ -178,6 +289,7 @@ class GlossaryItem {
     this._description = description;
     this._githubLink = githubLink;
     this._type = type;
+    this._searchWeight = typeToSearchWeight[type];
     this._url = url;
     this._childItems = [];
     this._parentItem = parentItem;
@@ -194,6 +306,7 @@ class GlossaryItem {
   element() { return this._element; }
   name() { return this._name; }
   searchable() { return this._searchable; }
+  searchWeight() { return this._searchWeight; }
   description() { return this._description; }
   url() { return this._url; }
   type() { return this._type; }
@@ -206,8 +319,24 @@ GlossaryItem.Type = {
   Method: 'method',
   Event: 'event',
   Namespace: 'namespace',
+  Option: 'option',
+  OptionValue: 'optionvalue',
   Other: 'other',
 };
+
+const typeToSearchWeight = {
+  [GlossaryItem.Type.Other]: 10,
+  [GlossaryItem.Type.Class]: 10,
+  [GlossaryItem.Type.Method]: 9,
+  [GlossaryItem.Type.Event]: 8,
+  [GlossaryItem.Type.Namespace]: 7,
+  [GlossaryItem.Type.Option]: 6,
+  [GlossaryItem.Type.OptionValue]: 5,
+};
+
+function toGithubID(text) {
+  return text.trim().toLowerCase().replace(/\s/g, '-').replace(/[^-0-9a-zа-яё]/ig, '');
+}
 
 class GithubLinkGenerator {
   constructor() {
@@ -216,7 +345,7 @@ class GithubLinkGenerator {
   }
 
   assignLink(title) {
-    const id = title.trim().toLowerCase().replace(/\s/g, '-').replace(/[^-0-9a-zа-яё]/ig, '');
+    const id = toGithubID(title);
     let dedupId = id;
     let counter = 0;
     while (this._usedGithubLinks.has(dedupId))
@@ -230,12 +359,18 @@ function headerWithLink(header, url) {
   return html`
     <header-with-link>
       <a class=header-link href=${url}>
-        <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
-          <path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path>
-        </svg>
+        ${linkIcon()}
       </a>
       ${header}
     </header-with-link>
+  `;
+}
+
+function linkIcon() {
+  return html`
+    <svg class="octicon octicon-link" viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
+      <path fill-rule="evenodd" d="M4 9h1v1H4c-1.5 0-3-1.69-3-3.5S2.55 3 4 3h4c1.45 0 3 1.69 3 3.5 0 1.41-.91 2.72-2 3.25V8.59c.58-.45 1-1.27 1-2.09C10 5.22 8.98 4 8 4H4c-.98 0-2 1.22-2 2.5S3 9 4 9zm9-3h-1v1h1c1 0 2 1.22 2 2.5S13.98 12 13 12H9c-.98 0-2-1.22-2-2.5 0-.83.42-1.64 1-2.09V6.25c-1.09.53-2 1.84-2 3.25C6 11.31 7.55 13 9 13h4c1.45 0 3-1.69 3-3.5S14.5 6 13 6z"></path>
+    </svg>
   `;
 }
 
