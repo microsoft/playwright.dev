@@ -59,6 +59,8 @@ export class MarkdownFile {
     const createTitle = (type, name) => {
       if (type === GlossaryItem.Type.Class)
         return name.substring('class: '.length);
+      if (type === GlossaryItem.Type.Method)
+        return name.split('(')[0];
       return name;
     }
 
@@ -113,14 +115,15 @@ export class MarkdownFile {
       else if (name.includes('.'))
         type = name.includes('(') ? GlossaryItem.Type.Method : GlossaryItem.Type.Namespace;
 
-      const [className, methodOrEventOrNamespace] = name.split('.');
       if (type === GlossaryItem.Type.Method) {
-        const [method, args] = methodOrEventOrNamespace.split('(');
-        nameElement = html`${className}.<strong>${method}</strong>(${args}`;
+        const [className, methodWithArgs] = name.split('.');
+        const [method, args] = methodWithArgs.split('(');
+        nameElement = html`<i>${className}.</i><u>${method}</u><i>(${args}</i>`;
       } else if (type === GlossaryItem.Type.Namespace) {
-        nameElement = html`${className}.<strong>${methodOrEventOrNamespace}</strong>`;
+        const [className, namespace] = name.split('.');
+        nameElement = html`<i>${className}.</i><u>${namespace}</u>`;
       } else if (type === GlossaryItem.Type.Event) {
-        nameElement = html`${className}.<strong>${methodOrEventOrNamespace}</strong>`;
+        nameElement = html`<i>event: </i><u>${name.substring('event: '.length)}</u>`;
       }
       const url = newURL({version, section, q: githubLink});
       return new GlossaryItem({
@@ -172,7 +175,7 @@ export class MarkdownFile {
           e = next;
         }
         liElement.insertBefore(wrapper, liElement.firstChild);
-        const type = optionName.startsWith(`'`) ? GlossaryItem.Type.OptionValue : GlossaryItem.Type.Option;
+        const type = optionName.startsWith(`'`) ? GlossaryItem.Type.Value : GlossaryItem.Type.Option;
         let description = wrapper.textContent;
         if (type === GlossaryItem.Type.Option) {
           const idx = description.lastIndexOf('>');
@@ -193,10 +196,10 @@ export class MarkdownFile {
           // method name includes arguments.
           name = methodItem.name();
           const argIndex = name.lastIndexOf(optionName);
-          nameElement = html`${name.substring(0, argIndex)}<strong>${optionName}</strong>${name.substring(argIndex + optionName.length)}`;
+          nameElement = html`<i>${name.substring(0, argIndex)}</i><u>${optionName}</u><i>${name.substring(argIndex + optionName.length)}</i>`;
         } else {
           name = suboptionPrefix + optionName + suboptionSuffix;
-          nameElement = html`${suboptionPrefix}<strong>${optionName}</strong>${suboptionSuffix}`;
+          nameElement = html`<i>${suboptionPrefix}</i><u>${optionName}</u><i>${suboptionSuffix}</i>`;
         }
 
         const item = new GlossaryItem({
@@ -210,9 +213,7 @@ export class MarkdownFile {
           name,
           nameElement,
           description,
-          // We don't want to search across top-level options - they are already
-          // in the method signature.
-          searchable: parentItem.type() !== GlossaryItem.Type.Method,
+          searchable: true,
           title: name,
           type,
         });
@@ -337,7 +338,7 @@ GlossaryItem.Type = {
   Event: 'event',
   Namespace: 'namespace',
   Option: 'option',
-  OptionValue: 'optionvalue',
+  Value: 'value',
   Other: 'other',
 };
 
@@ -348,7 +349,7 @@ const typeToSearchWeight = {
   [GlossaryItem.Type.Event]: 8,
   [GlossaryItem.Type.Namespace]: 7,
   [GlossaryItem.Type.Option]: 6,
-  [GlossaryItem.Type.OptionValue]: 5,
+  [GlossaryItem.Type.Value]: 5,
 };
 
 function toGithubID(text) {

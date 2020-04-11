@@ -111,10 +111,12 @@ export class SearchView {
   _doSearch(query) {
     if (!this._glossaryItems)
       return;
-    const getIconType = (glossaryItem) => {
-      if (glossaryItem.markdownFile().type() === MarkdownFile.Type.PLAYWRIGHT_API)
-        return 'api';
-      return 'docs';
+    const getIconText = (glossaryItem) => {
+      if (glossaryItem.type() === 'namespace')
+        return 'nspace';
+      if (glossaryItem.type() === 'other')
+        return 'docs';
+      return glossaryItem.type();
     }
     let scores = [];
     if (query) {
@@ -166,7 +168,7 @@ export class SearchView {
     const renderItem = score => html`
       <a class="search-item " href="${score.item.url()}">
         <item-icon-container>
-          <item-icon class="${getIconType(score.item)}">${getIconType(score.item)}</item-icon>
+          <item-icon class="${score.item.type()}">${getIconText(score.item)}</item-icon>
         </item-icon-container>
         <item-name-container class="${score.item.description() ? '' : 'name-only'}">
           <item-name>${highlight(score.item.nameElement(), score.matchIndexes)}</item-name>
