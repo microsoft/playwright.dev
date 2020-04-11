@@ -73,7 +73,10 @@ export class MarkdownFile {
       const subitems = methodOrEventOrNSItems.map(item => {
         if (item.type() !== GlossaryItem.Type.Method)
           return item;
-        return [item, ...itemsForMethodOptions(item, item, item.element())].flat();
+        const ulElement = item.element().querySelector('ul');
+        if (!ulElement)
+          return [item];
+        return [item, ...itemsForMethodOptions(item, item, ulElement)].flat();
       }).flat();
       return [classItem, ...subitems];
     }).flat();
@@ -146,8 +149,8 @@ export class MarkdownFile {
       });
     }
 
-    function itemsForMethodOptions(methodItem, parentItem, element, suboptionPrefix = '', suboptionSuffix = '') {
-      const codeElements = element.querySelectorAll(':scope > ul > li > code:first-child');
+    function itemsForMethodOptions(methodItem, parentItem, ulElement, suboptionPrefix = '', suboptionSuffix = '') {
+      const codeElements = ulElement.querySelectorAll(':scope > li > code:first-child');
       if (!codeElements.length)
         return [];
       return Array.from(codeElements).map(codeElement => {
@@ -238,7 +241,10 @@ export class MarkdownFile {
           newSuboptionPrefix += '{';
           newSuboptionSuffix = '}' + newSuboptionSuffix;
         }
-        const items = itemsForMethodOptions(methodItem, item, liElement, newSuboptionPrefix, newSuboptionSuffix);
+        const ulElement = liElement.querySelector(':scope > ul');
+        if (!ulElement)
+          return [item];
+        const items = itemsForMethodOptions(methodItem, item, ulElement, newSuboptionPrefix, newSuboptionSuffix);
         return [item, ...items];
       }).flat();
     }
