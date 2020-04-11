@@ -322,6 +322,10 @@ class GlossaryItem {
     this._highlightable = highlightable;
     this._description = description;
     this._githubLink = githubLink;
+    // Consider all matches important if no specific sweet spots were provided.
+    if (!importantNameIndexes)
+      importantNameIndexes = [...new Array(name.length)].map((a, index) => index);
+
     this._importantNameIndexes = new Set(importantNameIndexes || []);
     this._type = type;
     this._searchWeight = typeToSearchWeight[type];
