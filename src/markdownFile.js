@@ -137,6 +137,7 @@ export class MarkdownFile {
         // name is a full method name with arguments, e.g. `browserContext.waitForEvent(event[, optionsOrPredicate])`
         name,
         nameElement,
+        importantNameIndexes: computeImportantNameIndexes(nameElement),
         description,
         searchable: true,
         // title is a method name without arguments, e.g. `browserContext.waitForEvent`
@@ -212,6 +213,7 @@ export class MarkdownFile {
           url,
           name,
           nameElement,
+          importantNameIndexes: computeImportantNameIndexes(nameElement),
           description,
           searchable: true,
           title: name,
@@ -239,6 +241,21 @@ export class MarkdownFile {
         const items = itemsForMethodOptions(methodItem, item, liElement, newSuboptionPrefix, newSuboptionSuffix);
         return [item, ...items];
       }).flat();
+    }
+
+    function computeImportantNameIndexes(nameElement) {
+      const treeWalker = document.createTreeWalker(nameElement, NodeFilter.SHOW_TEXT, null, false);
+      let offset = 0;
+      let result = [];
+      for (let textNode = treeWalker.nextNode(); textNode; textNode = treeWalker.nextNode()) {
+        const N = textNode.nodeValue.length;
+        if (textNode.parentElement.tagName === 'U') {
+          for (let i = offset; i < offset + N; ++i)
+            result.push(i);
+        }
+        offset += N;
+      }
+      return result;
     }
   }
 
@@ -293,7 +310,7 @@ MarkdownFile.Type = {
 };
 
 class GlossaryItem {
-  constructor({parentItem, articleElement, scrollAnchor, element, title, name, nameElement, url, description, githubLink, highlightable, searchable, type}) {
+  constructor({parentItem, articleElement, scrollAnchor, element, title, name, nameElement, url, description, githubLink, highlightable, searchable, type, importantNameIndexes}) {
     // This is assigned in MarkdownFile constructor.
     this._markdownFile = null;
     this._articleElement = articleElement;
@@ -305,6 +322,7 @@ class GlossaryItem {
     this._highlightable = highlightable;
     this._description = description;
     this._githubLink = githubLink;
+    this._importantNameIndexes = new Set(importantNameIndexes || []);
     this._type = type;
     this._searchWeight = typeToSearchWeight[type];
     this._url = url;
@@ -315,6 +333,7 @@ class GlossaryItem {
       parentItem._childItems.push(this);
   }
 
+  importantNameIndexes() { return this._importantNameIndexes; }
   parentItem() { return this._parentItem; }
   childItems() { return this._childItems.slice(); }
   markdownFile() { return this._markdownFile; }

@@ -122,7 +122,7 @@ export class SearchView {
     if (query) {
       const fuzzySearch = new FuzzySearch(query);
       for (const item of this._glossaryItems) {
-        const {score, matchIndexes} = fuzzySearch.score(item.name());
+        let {score, matchIndexes} = fuzzySearch.score(item.name(), item.importantNameIndexes());
         if (score > 0) {
           scores.push({
             item,

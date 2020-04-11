@@ -42,9 +42,10 @@ export class FuzzySearch {
 
   /**
    * @param {string} data
+   * @param {Set} buffIndexes
    * @return {{score: number, matchIndexes: Array<number>}}
    */
-  score(data) {
+  score(data, buffIndexes = new Set()) {
     if (!data || !this._query || !this._filterRegex.test(data))
       return 0;
     var n = this._query.length;
@@ -61,7 +62,7 @@ export class FuzzySearch {
         var skipCharScore = j === 0 ? 0 : score[i * m + j - 1];
         var prevCharScore = i === 0 || j === 0 ? 0 : score[(i - 1) * m + j - 1];
         var consecutiveMatch = i === 0 || j === 0 ? 0 : sequence[(i - 1) * m + j - 1];
-        var pickCharScore = this._match(this._query, data, i, j, consecutiveMatch);
+        var pickCharScore = this._match(this._query, data, i, j, consecutiveMatch, buffIndexes);
         if (pickCharScore && prevCharScore + pickCharScore >= skipCharScore) {
           sequence[i * m + j] = consecutiveMatch + 1;
           score[i * m + j] = (prevCharScore + pickCharScore);
@@ -105,9 +106,10 @@ export class FuzzySearch {
    * @param {number} i
    * @param {number} j
    * @param {number} consecutiveMatch
+   * @param {Set} buffIndexes
    * @return {number}
    */
-  _match(query, data, i, j, consecutiveMatch) {
+  _match(query, data, i, j, consecutiveMatch, buffIndexes) {
     if (this._queryUpperCase[i] !== this._dataUpperCase[j])
       return 0;
 
@@ -117,6 +119,8 @@ export class FuzzySearch {
       score += 6;
     if (!consecutiveMatch && (!j || /[^\w$]/.test(data[j - 1])))
       score += 2;
+    if (buffIndexes.has(j))
+      score += 1;
     score += consecutiveMatch * 4;
     return score;
   }
