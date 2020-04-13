@@ -140,7 +140,7 @@ export class MarkdownFile {
         // name is a full method name with arguments, e.g. `browserContext.waitForEvent(event[, optionsOrPredicate])`
         name,
         nameElement,
-        importantNameIndexes: computeImportantNameIndexes(nameElement),
+        needleIndexes: computeNeedleIndexes(nameElement),
         description,
         searchable: true,
         // title is a method name without arguments, e.g. `browserContext.waitForEvent`
@@ -216,7 +216,7 @@ export class MarkdownFile {
           url,
           name,
           nameElement,
-          importantNameIndexes: computeImportantNameIndexes(nameElement),
+          needleIndexes: computeNeedleIndexes(nameElement),
           description,
           searchable: true,
           title: name,
@@ -249,7 +249,7 @@ export class MarkdownFile {
       }).flat();
     }
 
-    function computeImportantNameIndexes(nameElement) {
+    function computeNeedleIndexes(nameElement) {
       const treeWalker = document.createTreeWalker(nameElement, NodeFilter.SHOW_TEXT, null, false);
       let offset = 0;
       let result = [];
@@ -321,7 +321,7 @@ MarkdownFile.Type = {
 };
 
 class GlossaryItem {
-  constructor({parentItem, articleElement, scrollAnchor, element, title, name, nameElement, url, description, githubLink, highlightable, searchable, type, importantNameIndexes}) {
+  constructor({parentItem, articleElement, scrollAnchor, element, title, name, nameElement, url, description, githubLink, highlightable, searchable, type, needleIndexes}) {
     // This is assigned in MarkdownFile constructor.
     this._markdownFile = null;
     this._articleElement = articleElement;
@@ -333,11 +333,11 @@ class GlossaryItem {
     this._highlightable = highlightable;
     this._description = description;
     this._githubLink = githubLink;
-    // Consider all matches important if no specific sweet spots were provided.
-    if (!importantNameIndexes)
-      importantNameIndexes = [...new Array(name.length)].map((a, index) => index);
+    // Consider there's no "context" if need indexes are not provided.
+    if (!needleIndexes)
+      needleIndexes = [...new Array(name.length)].map((a, index) => index);
 
-    this._importantNameIndexes = new Set(importantNameIndexes || []);
+    this._needleIndexes = new Set(needleIndexes || []);
     this._type = type;
     this._searchWeight = typeToSearchWeight[type];
     this._url = url;
@@ -348,7 +348,7 @@ class GlossaryItem {
       parentItem._childItems.push(this);
   }
 
-  importantNameIndexes() { return this._importantNameIndexes; }
+  needleIndexes() { return this._needleIndexes; }
   parentItem() { return this._parentItem; }
   childItems() { return this._childItems.slice(); }
   markdownFile() { return this._markdownFile; }

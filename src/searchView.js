@@ -121,16 +121,24 @@ export class SearchView {
     let scores = [];
     if (query) {
       const fuzzySearch = new FuzzySearch(query);
+      let hasAtLeastOneNeedleMatch = false;
       for (const item of this._glossaryItems) {
-        let {score, matchIndexes} = fuzzySearch.score(item.name(), item.importantNameIndexes());
+        let {score, matchIndexes} = fuzzySearch.score(item.name(), item.needleIndexes());
         if (score > 0) {
+          const hasNeedleMatch = matchIndexes.some(index => item.needleIndexes().has(index));
+          hasAtLeastOneNeedleMatch = hasAtLeastOneNeedleMatch || hasNeedleMatch;
           scores.push({
+            hasNeedleMatch,
             item,
             score,
-            matchIndexes
+            matchIndexes,
           });
         }
       }
+      // If we have at least one match that touches "needle", then filter out
+      // all matches that don't touch needles at all.
+      if (hasAtLeastOneNeedleMatch)
+        scores = scores.filter(score => score.hasNeedleMatch);
       scores.sort((a, b) => {
         const scoreDiff = b.score - a.score;
         if (scoreDiff)
