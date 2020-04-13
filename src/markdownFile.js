@@ -25,6 +25,7 @@ export class MarkdownFile {
         else
           description = name;
       }
+      const nameElement = html`<strong>${header.textContent}</strong>`;
       const item = new GlossaryItem({
         parentItem,
         highlightable: true,
@@ -34,7 +35,8 @@ export class MarkdownFile {
         scrollAnchor: header,
         url,
         name: header.textContent,
-        nameElement: html`${header.textContent}`,
+        nameElement,
+        needleIndexes: computeNeedleIndexes(nameElement),
         description,
         title: header.textContent,
         searchable: searchableHeaders && header.matches(searchableHeaders),
@@ -121,12 +123,12 @@ export class MarkdownFile {
       if (type === GlossaryItem.Type.Method) {
         const [className, methodWithArgs] = name.split('.');
         const [method, args] = methodWithArgs.split('(');
-        nameElement = html`<i>${className}.</i><u>${method}</u><i>(${args}</i>`;
+        nameElement = html`${className}.<strong>${method}</strong>(${args}`;
       } else if (type === GlossaryItem.Type.Namespace) {
         const [className, namespace] = name.split('.');
-        nameElement = html`<i>${className}.</i><u>${namespace}</u>`;
+        nameElement = html`${className}.<strong>${namespace}</strong>`;
       } else if (type === GlossaryItem.Type.Event) {
-        nameElement = html`<i>event: </i><u>${name.substring('event: '.length)}</u>`;
+        nameElement = html`event: <strong>${name.substring('event: '.length)}</strong>`;
       }
       const url = newURL({version, section, q: githubLink});
       return new GlossaryItem({
@@ -200,10 +202,10 @@ export class MarkdownFile {
           // method name includes arguments.
           name = methodItem.name();
           const argIndex = name.lastIndexOf(optionName);
-          nameElement = html`<i>${name.substring(0, argIndex)}</i><u>${optionName}</u><i>${name.substring(argIndex + optionName.length)}</i>`;
+          nameElement = html`${name.substring(0, argIndex)}<strong>${optionName}</strong>${name.substring(argIndex + optionName.length)}`;
         } else {
           name = suboptionPrefix + optionName + suboptionSuffix;
-          nameElement = html`<i>${suboptionPrefix}</i><u>${optionName}</u><i>${suboptionSuffix}</i>`;
+          nameElement = html`${suboptionPrefix}<strong>${optionName}</strong>${suboptionSuffix}`;
         }
 
         const item = new GlossaryItem({
@@ -249,20 +251,6 @@ export class MarkdownFile {
       }).flat();
     }
 
-    function computeNeedleIndexes(nameElement) {
-      const treeWalker = document.createTreeWalker(nameElement, NodeFilter.SHOW_TEXT, null, false);
-      let offset = 0;
-      let result = [];
-      for (let textNode = treeWalker.nextNode(); textNode; textNode = treeWalker.nextNode()) {
-        const N = textNode.nodeValue.length;
-        if (textNode.parentElement.tagName === 'U') {
-          for (let i = offset; i < offset + N; ++i)
-            result.push(i);
-        }
-        offset += N;
-      }
-      return result;
-    }
   }
 
   constructor(name, type, version, section, glossaryItems) {
@@ -436,6 +424,21 @@ function cutWithHeaders(doc, tag, callback) {
     results.push(callback(header, content));
   }
   return results;
+}
+
+function computeNeedleIndexes(nameElement) {
+  const treeWalker = document.createTreeWalker(nameElement, NodeFilter.SHOW_TEXT, null, false);
+  let offset = 0;
+  let result = [];
+  for (let textNode = treeWalker.nextNode(); textNode; textNode = treeWalker.nextNode()) {
+    const N = textNode.nodeValue.length;
+    if (textNode.parentElement && textNode.parentElement.tagName === 'STRONG') {
+      for (let i = offset; i < offset + N; ++i)
+        result.push(i);
+    }
+    offset += N;
+  }
+  return result;
 }
 
 /**
