@@ -13,7 +13,6 @@ window.addEventListener('DOMContentLoaded', async() => {
   const project = await GithubProject.create({
     owner: 'microsoft',
     name: 'Playwright',
-    // 'section' is a part of the URL and has to be unique.
     sections: {
       'readme': {
         name: 'Introduction',
@@ -64,6 +63,9 @@ window.addEventListener('DOMContentLoaded', async() => {
   `;
   onDOMEvent(versionSelector, 'input', event => urlstate.goto({version: event.target.value}));
 
+  const glasspaneElement = html`<glass-pane></glass-pane>`;
+  onDOMEvent(glasspaneElement, 'click', () => searchView.hideSuggestions());
+
   const documentationHeader = html`
     <documentation-header>
       <a class=home-navigation href="#">🎭 ${project.name()}</a>
@@ -78,7 +80,7 @@ window.addEventListener('DOMContentLoaded', async() => {
     ${documentationHeader}
     ${documentationSidebar}
     ${documentationView}
-    <glass-pane></glass-pane>
+    ${glasspaneElement}
   `);
 
   // Setup search input x position on every resize.
