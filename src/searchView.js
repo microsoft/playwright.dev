@@ -30,7 +30,12 @@ export class SearchView {
     this._homeURL = null;
     this._originalInputValue = '';
     this._eventListeners = [
-      onDOMEvent(this._input, 'focus', () => this._originalInputValue = this._input.value),
+      onDOMEvent(this._input, 'focus', () => { this._originalInputValue = this._input.value; this._doSearch(this._input.value); }),
+      onDOMEvent(this._input, 'blur', (e) => {
+        if (this._suggestionsElement.contains(e.relatedTarget))
+          return;
+        this._hideSuggestions();
+      }),
       onDOMEvent(this._input, 'input', () => this._doSearch(this._input.value)),
       onDOMEvent(this._input, 'keydown', this._onInputKeydown.bind(this)),
     ];
@@ -45,7 +50,7 @@ export class SearchView {
       consumeDOMEvent(event);
       this._input.value = this._originalInputValue;
       this._input.blur();
-      this.hideSuggestions();
+      this._hideSuggestions();
     } else if (event.key === 'Enter') {
       if (this._selectedSearchItem) {
         this._selectedSearchItem.click();
@@ -88,7 +93,7 @@ export class SearchView {
   }
 
   setGlossary(glossaryItems) {
-    this.hideSuggestions();
+    this._hideSuggestions();
     this._glossaryItems = glossaryItems.filter(item => item.searchable());
   }
 
@@ -97,11 +102,11 @@ export class SearchView {
   }
 
   setDocumentation(documentation) {
-    this.hideSuggestions();
+    this._hideSuggestions();
     this._documentation = documentation;
   }
 
-  hideSuggestions() {
+  _hideSuggestions() {
     if (!this._suggestionsElement.isConnected)
       return;
     this._suggestionsElement.remove();
