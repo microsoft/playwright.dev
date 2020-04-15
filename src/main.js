@@ -66,9 +66,7 @@ window.addEventListener('DOMContentLoaded', async() => {
 
   const documentationHeader = html`
     <documentation-header>
-      <a class=home-navigation href="#">
-        🎭<project-name>${project.name()}</project-name>
-      </a>
+      <a class=home-navigation href="#">🎭 ${project.name()}</a>
       ${versionSelector}
       ${searchView.element}
     </documentation-header>
