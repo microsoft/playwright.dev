@@ -125,12 +125,9 @@ window.addEventListener('DOMContentLoaded', async() => {
     if (!articleElement.isConnected) {
       documentationView.textContent = '';
       documentationView.append(html`
-        <section>
-          <h3 class=documentation-name></h3>
-          <documentation-body>
-            ${articleElement}
-          </documentation-body>
-        </section>
+        <documentation-body>
+          ${articleElement}
+        </documentation-body>
       `);
     }
     if (glossaryItem.scrollAnchor()) {
