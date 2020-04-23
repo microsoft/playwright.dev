@@ -38,12 +38,21 @@ window.addEventListener('DOMContentLoaded', async() => {
   `;
   const documentationSidebar = html`<documentation-sidebar></documentation-sidebar>`;
   const documentationView = html`<documentation-view tabindex=-1></documentation-view>`;
+  const toggleSidebarButton = html`
+    <hamburger-button>
+      <div class="bar1"></div>
+      <div class="bar2"></div>
+      <div class="bar3"></div>
+    </hamburger-button>
+  `;
+  onDOMEvent(toggleSidebarButton, 'click', () => document.body.classList.toggle('show-mobile-sidebar'));
 
   document.body.append(html`
     ${documentationHeader}
     ${documentationSidebar}
     ${documentationView}
     ${glasspaneElement}
+    ${toggleSidebarButton}
   `);
 
   // Setup search input x position on every resize.
@@ -55,8 +64,10 @@ window.addEventListener('DOMContentLoaded', async() => {
   setSearchInputXCSSProperty();
   onDOMEvent(window, 'resize', setSearchInputXCSSProperty);
 
-  // Autofocus search input when typing starts.
   onDOMEvent(document, 'keydown', event => {
+    // Hide sidebar in mobile view, if any.
+    document.body.classList.remove('show-mobile-sidebar');
+    // Autofocus search input when typing starts.
     if (searchView.inputElement() === document.activeElement)
       return;
     // Activate search on backspace.
@@ -77,6 +88,7 @@ window.addEventListener('DOMContentLoaded', async() => {
   });
 
   urlstate.startListening(async ({version, path, q}, {signal}) => {
+    document.body.classList.remove('show-mobile-sidebar');
     const projectVersion = project.version(version) || defaultVersion;
 
     // Start loading.
