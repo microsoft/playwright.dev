@@ -132,7 +132,7 @@ export class MarkdownFile {
         scrollAnchor: null, // explicitly set no scroll anchor so that we scroll to the beginning
         url,
         name: header.textContent,
-        nameElement: html`${header.textContent}`,
+        nameElement: html`<strong>${header.textContent}</strong>`,
         description,
         title: createTitle(type, header.textContent),
         type,
@@ -274,7 +274,7 @@ export class MarkdownFile {
         const ulElement = liElement.querySelector(':scope > ul');
         if (!ulElement)
           return [item];
-        const items = itemsForMethodOptions(methodItem, item, ulElement, newSuboptionPrefix, newSuboptionSuffix);
+        const items = isArrayType || isObjectType ? itemsForMethodOptions(methodItem, item, ulElement, newSuboptionPrefix, newSuboptionSuffix) : [];
         return [item, ...items];
       }).flat();
     }
