@@ -22,10 +22,10 @@ const GITHUB_URLS = {
 };
 
 export class GithubProject {
-  static async create({owner, name, sections}) {
+  static async create({owner, name}) {
     const github = await GithubFetcher.create();
     const project = new GithubProject(github, owner, name);
-    await project._initialize(sections);
+    await project._initialize();
     return project;
   }
 
@@ -57,14 +57,12 @@ export class GithubProject {
       version: release.tag_name,
       isRelease: true,
       releaseNotes: release.body,
-      sections,
       releaseTimestamp: (new Date(release.published_at)).getTime(),
     }));
     this._versions.push(new GithubProjectVersion({
       project: this,
       version: 'master',
       isRelease: false,
-      sections,
     }));
 
     const computePriority = (version) => {
@@ -97,12 +95,10 @@ class GithubProjectVersion {
       isRelease = false,
       releaseNotes = '',
       releaseTimestamp = Date.now(),
-      sections = {},
     } = options;
     this._project = project;
     this._github = project._github;
     this._version = version;
-    this._sections = sections;
     this._isRelease = isRelease;
     this._releaseNotes = releaseNotes;
     this._timestamp = releaseTimestamp;
@@ -110,7 +106,7 @@ class GithubProjectVersion {
     this._maxAge = isRelease ? TIME_100_YEARS : TIME_10_MINUTES;
 
     this._critical = new CriticalSection();
-    this._sectionToMarkdownFile = new Map();
+    this._pathToMarkdownFile = new Map();
   }
 
   _resolveMarkdownLinks(baseURL, element) {
@@ -126,10 +122,9 @@ class GithubProjectVersion {
         const version = match[1];
         const filePath = match[2];
         const q = match[3];
-        const entry = Object.entries(this._sections).find(entry => entry[1].relativePath === filePath);
-        // If this file is one of the files we show, show it inside
-        if (entry)
-          a.href = newURL({version, section: entry[0], q: q && q.startsWith('#') ? q.substring(1) : q});
+        // If this is a markdown file - show it inline.
+        if (filePath.toUpperCase().endsWith('.MD'))
+          a.href = newURL({version, path: filePath, q: q && q.startsWith('#') ? q.substring(1) : q});
         else
           a.href = resolvedHref;
       } else {
@@ -164,55 +159,52 @@ class GithubProjectVersion {
     return this._timestamp;
   }
 
-  async markdownFiles() {
-    const sections = Object.keys(this._sections);
-    const files = [];
-    if (this._releaseNotes)
-      files.push(this._ensureReleaseNotesFile());
-    files.push(...(await Promise.all(sections.map(section => this.markdownFile(section)))));
-    return files.filter(Boolean);
-  }
+  async markdownFile(path) {
+    // Normalize path
+    if (path.startsWith('./'))
+      path = path.substring(2);
 
-  async markdownFile(section) {
-    if (section === 'release-notes')
-      return this._ensureReleaseNotesFile();
-    const sectionDescription = this._sections[section];
-    if (!sectionDescription)
-      return null;
-    const {name, type, relativePath, parser, searchableHeaders} = sectionDescription;
-    return await this._critical.run(section, async () => {
-      let markdownFile = this._sectionToMarkdownFile.get(section);
+    let type = MarkdownFile.Type.SIMPLE_MARKDOWN;
+    if (path === 'docs/api.md')
+      type = MarkdownFile.Type.PLAYWRIGHT_API;
+    else if (path === 'docs/README.md')
+      type = MarkdownFile.Type.DOCUMENTATION_LIST;
+    return await this._critical.run(path, async () => {
+      let markdownFile = this._pathToMarkdownFile.get(path);
       if (markdownFile)
         return markdownFile;
-      const markdown = await this._github.get(GITHUB_URLS.rawContentURL(this._project.repositoryName(), this._version, relativePath), this._maxAge);
+      const markdown = await this._github.get(GITHUB_URLS.rawContentURL(this._project.repositoryName(), this._version, path), this._maxAge);
       // File might not exist in this version.
       if (!markdown)
         return null;
       const doc = markdownToHTML(this._project.repositoryName(), markdown);
-      const url = GITHUB_URLS.contentURL(this._project.repositoryName(), this._version, relativePath);
+      const url = GITHUB_URLS.contentURL(this._project.repositoryName(), this._version, path);
       this._resolveMarkdownLinks(url, doc);
       if (type === MarkdownFile.Type.PLAYWRIGHT_API) {
         markdownFile = MarkdownFile.parsePlaywrightAPI({
-          name,
           version: this._version,
-          section,
+          path,
+          doc,
+        });
+      } else if (type === MarkdownFile.Type.DOCUMENTATION_LIST) {
+        markdownFile = MarkdownFile.parseDocumentationList({
+          version: this._version,
+          path,
           doc,
         });
       } else {
         markdownFile = MarkdownFile.parseSimpleMarkdown({
-          name,
           version: this._version,
-          section,
+          path,
           doc,
-          searchableHeaders,
         });
       }
-      this._sectionToMarkdownFile.set(section, markdownFile);
+      this._pathToMarkdownFile.set(path, markdownFile);
       return markdownFile;
     });
   }
 
-  _ensureReleaseNotesFile() {
+  releaseNotesFile() {
     if (!this._releaseNotesFile && this._releaseNotes) {
       const doc = markdownToHTML(this._project.repositoryName(), this._releaseNotes);
       this._resolveMarkdownLinks(GITHUB_URLS.releaseURL(this._project.repositoryName(), this._version), doc);

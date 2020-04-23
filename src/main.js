@@ -13,43 +13,6 @@ window.addEventListener('DOMContentLoaded', async() => {
   const project = await GithubProject.create({
     owner: 'microsoft',
     name: 'Playwright',
-    sections: {
-      'readme': {
-        name: 'Introduction',
-        relativePath: 'README.md',
-        type: MarkdownFile.Type.SIMPLE_MARKDOWN,
-        searchableHeaders: 'h2, h3, h4',
-      },
-      'showcase': {
-        name: 'Ecosystem',
-        relativePath: 'docs/showcase.md',
-        type: MarkdownFile.Type.SIMPLE_MARKDOWN,
-        searchableHeaders: 'h1',
-      },
-      'ci': {
-        name: 'Getting Started on CI',
-        relativePath: 'docs/ci.md',
-        type: MarkdownFile.Type.SIMPLE_MARKDOWN,
-        searchableHeaders: 'h1,h2',
-      },
-      'selector-engines': {
-        name: 'Selector Engines',
-        relativePath: 'docs/selectors.md',
-        type: MarkdownFile.Type.SIMPLE_MARKDOWN,
-        searchableHeaders: 'h1,h2,h3',
-      },
-      'troubleshooting': {
-        name: 'Troubleshooting',
-        relativePath: 'docs/troubleshooting.md',
-        type: MarkdownFile.Type.SIMPLE_MARKDOWN,
-        searchableHeaders: 'h1,h3',
-      },
-      'api': {
-        name: 'API',
-        relativePath: 'docs/api.md',
-        type: MarkdownFile.Type.PLAYWRIGHT_API,
-      },
-    },
   });
 
   const urlstate = new URLState();
@@ -113,28 +76,37 @@ window.addEventListener('DOMContentLoaded', async() => {
       searchView.inputElement().focus();
   });
 
-  urlstate.startListening(async ({version, section, q}, {signal}) => {
+  urlstate.startListening(async ({version, path, q}, {signal}) => {
     const projectVersion = project.version(version) || defaultVersion;
 
     // Start loading.
-    const files = await Promise.race([
-      projectVersion.markdownFiles(),
+    const [toShow, api, guidesFile, releaseNotes] = await Promise.race([
+      Promise.all([
+        path ? projectVersion.markdownFile(path) : projectVersion.markdownFile('./README.md'),
+        projectVersion.markdownFile('./docs/api.md'),
+        projectVersion.markdownFile('./docs/README.md'),
+        projectVersion.releaseNotesFile(),
+      ]),
       // A promise that will throw when a new navigation comes in.
       new Promise((res, rej) => onDOMEvent(signal, 'abort', () => rej(new Error('New operation scheduled in throttler! Aborting current one.')))),
     ]);
 
     versionSelector.querySelector(`[value="${projectVersion.version()}"]`).selected = true;
     searchView.setHomeURL(newURL({version: projectVersion.version()}));
-    // Do not search inside release notes titles.
-    searchView.setGlossary(files.filter(file => file.section() !== 'release-notes').map(file => file.glossaryItems()).flat());
+    const searchableItems = [...api.glossaryItems()];
+    if (guidesFile)
+      searchableItems.push(...guidesFile.glossaryItems());
+    searchView.setGlossary(searchableItems);
 
     documentationSidebar.textContent = '';
-    documentationSidebar.append(renderSidebar(files));
+    if (guidesFile)
+      documentationSidebar.append(renderDocumentationSidebar(guidesFile));
+    else
+      documentationSidebar.append(renderAPIReferenceSidebar(api));
 
-    const toShow = files.find(file => file.section() === (section || 'readme'));
     const glossaryItem = toShow.glossaryItem(q);
 
-    if (glossaryItem.searchable()) {
+    if (glossaryItem.markdownFile() === api || (guidesFile && guidesFile.glossaryItems().some(item => item.url() === glossaryItem.url()))) {
       // Set input value and put cursor in the end.
       const value = glossaryItem.title();
       const input = searchView.inputElement();
@@ -154,10 +126,7 @@ window.addEventListener('DOMContentLoaded', async() => {
       documentationView.textContent = '';
       documentationView.append(html`
         <section>
-          <h3 class=documentation-name>
-            ${bookIcon()}
-            ${glossaryItem.markdownFile().name()}
-          </h3>
+          <h3 class=documentation-name></h3>
           <documentation-body>
             ${articleElement}
           </documentation-body>
@@ -178,19 +147,34 @@ window.addEventListener('DOMContentLoaded', async() => {
   });
 }, false);
 
-function renderSidebar(markdownFiles) {
-  const api = markdownFiles.find(file => file.section() === 'api');
-  const releaseNotes = markdownFiles.find(file => file.section() === 'release-notes');
-  const docs = markdownFiles.filter(file => file !== api && file !== releaseNotes);
+function renderDocumentationSidebar(guidesFile) {
+  const toplevelGuides = guidesFile.glossaryItems().filter(item => !item.parentItem());
   return html`
     <ul>
-      <sidebar-divider>Docs</sidebar-divider>
-      ${docs.map(doc => html`
-        <li><a href="${doc.url()}">${doc.name()}</a></li>
-      `)}
-      <sidebar-divider>API  ${api.version()}</sidebar-divider>
-      ${releaseNotes && html`<li><a href="${releaseNotes.url()}">${releaseNotes.name()}</a></li>`}
-      ${api.glossaryItems().filter(item => !item.parentItem()).map(item => html`
+      ${toplevelGuides.map(renderGuideItems)}
+    </ul>
+  `;
+
+  function renderGuideItems(guideItem) {
+    const name = guideItem.name().split(' > ').pop();
+    if (!guideItem.childItems())
+      return html`<li><a href="${guideItem.url()}">${name}</a></li>`;
+    return html`
+      <li>
+        <a href="${guideItem.url()}">${name}</a>
+        <ul>
+          ${guideItem.childItems().map(renderGuideItems)}
+        </ul>
+      </li>
+    `;
+  }
+}
+
+function renderAPIReferenceSidebar(api) {
+  const toplevel = api.glossaryItems().filter(item => !item.parentItem());
+  return html`
+    <ul>
+      ${toplevel.map(item => html`
         <li><a href="${item.url()}">${item.name()}</a></li>
       `)}
     </ul>
@@ -200,14 +184,6 @@ function renderSidebar(markdownFiles) {
 function removeAllEmoji(text) {
   return text.replace(/[\u{1f300}-\u{1f5ff}\u{1f900}-\u{1f9ff}\u{1f600}-\u{1f64f}\u{1f680}-\u{1f6ff}\u{2600}-\u{26ff}\u{2700}-\u{27bf}\u{1f1e6}-\u{1f1ff}\u{1f191}-\u{1f251}\u{1f004}\u{1f0cf}\u{1f170}-\u{1f171}\u{1f17e}-\u{1f17f}\u{1f18e}\u{3030}\u{2b50}\u{2b55}\u{2934}-\u{2935}\u{2b05}-\u{2b07}\u{2b1b}-\u{2b1c}\u{3297}\u{3299}\u{303d}\u{00a9}\u{00ae}\u{2122}\u{23f3}\u{24c2}\u{23e9}-\u{23ef}\u{25b6}\u{23f8}-\u{23fa}]/ug, '');
 
-}
-
-function bookIcon() {
-  return html`
-    <svg viewBox="0 0 16 16" version="1.1" width="16" height="16" aria-hidden="true">
-      <path fill-rule="evenodd" d="M3 5h4v1H3V5zm0 3h4V7H3v1zm0 2h4V9H3v1zm11-5h-4v1h4V5zm0 2h-4v1h4V7zm0 2h-4v1h4V9zm2-6v9c0 .55-.45 1-1 1H9.5l-1 1-1-1H2c-.55 0-1-.45-1-1V3c0-.55.45-1 1-1h5.5l1 1 1-1H15c.55 0 1 .45 1 1zm-8 .5L7.5 3H2v9h6V3.5zm7-.5H9.5l-.5.5V12h6V3z"></path>
-    </svg>
-  `;
 }
 
 // Register service worker only for prod build.

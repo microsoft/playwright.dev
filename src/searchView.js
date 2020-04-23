@@ -89,7 +89,7 @@ export class SearchView {
 
   setGlossary(glossaryItems) {
     this.hideSuggestions();
-    this._glossaryItems = glossaryItems.filter(item => item.searchable());
+    this._glossaryItems = glossaryItems;
   }
 
   setHomeURL(homeURL) {

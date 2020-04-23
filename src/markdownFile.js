@@ -5,7 +5,7 @@ import {html} from './zhtml.js';
 import {newURL} from './urlstate.js';
 
 export class MarkdownFile {
-  static parseSimpleMarkdown({name, version, section, doc, searchableHeaders}) {
+  static parseSimpleMarkdown({version, path, doc}) {
     const linkGenerator = new GithubLinkGenerator();
     const articleElement = html`<div></div>`;
     const headersStack = [];
@@ -14,17 +14,13 @@ export class MarkdownFile {
       while (headersStack.length && headersStack[headersStack.length - 1].tagName.localeCompare(tagName) !== -1)
         headersStack.pop();
       const githubLink = linkGenerator.assignLink(header.textContent);
-      const url = newURL({version, section, q: githubLink});
+      const url = newURL({version, path, q: githubLink});
       const parentItem = headersStack.length ? headersStack[headersStack.length - 1].item : null;
       let description = '';
-      if (parentItem) {
+      if (parentItem)
         description = parentItem.description() + ' > ' + header.textContent;
-      } else {
-        if (name.toLowerCase().trim() !== header.textContent.toLowerCase().trim())
-          description = name + ' > ' + header.textContent;
-        else
-          description = name;
-      }
+      else
+        description = header.textContent;
       const nameElement = html`<strong>${header.textContent}</strong>`;
       const item = new GlossaryItem({
         parentItem,
@@ -39,7 +35,6 @@ export class MarkdownFile {
         needleIndexes: computeNeedleIndexes(nameElement),
         description,
         title: header.textContent,
-        searchable: searchableHeaders && header.matches(searchableHeaders),
         type: GlossaryItem.Type.Other,
       });
       headersStack.push({tagName, item});
@@ -50,10 +45,46 @@ export class MarkdownFile {
       glossaryItems[0]._highlightable = false;
       glossaryItems[0]._scrollAnchor = null;
     }
-    return new MarkdownFile(name, MarkdownFile.Type.SIMPLE_MARKDOWN, version, section, glossaryItems);
+    return new MarkdownFile(version, path, MarkdownFile.Type.SIMPLE_MARKDOWN, glossaryItems);
   }
 
-  static parsePlaywrightAPI({name, version, section, doc}) {
+  static parseDocumentationList({version, path, doc}) {
+    const glossaryItems = [];
+    dfs(doc, null);
+    return new MarkdownFile(version, path, MarkdownFile.Type.DOCUMENTATION_LIST, glossaryItems);
+
+    function dfs(element, parentItem) {
+      const lists = element.querySelectorAll(':scope > ul, :scope > ol');
+      for (const list of lists) {
+        for (const li of list.querySelectorAll(':scope > li')) {
+          const a = li.querySelector(':scope > a');
+          if (!a || !a.href)
+            continue;
+          const parentText = parentItem ? parentItem.name() + ' > ' : '';
+          const nameElement = html`${parentText}<strong>${a.textContent}</strong>`;
+          const item = new GlossaryItem({
+            githubLink: a.href,
+            parentItem,
+            highlightable: false,
+            articleElement: null,
+            element: null,
+            scrollAnchor: null,
+            url: a.hash,
+            name: nameElement.textContent,
+            needleIndexes: computeNeedleIndexes(nameElement),
+            nameElement,
+            description: null,
+            title: a.textContent,
+            type: GlossaryItem.Type.Other,
+          });
+          glossaryItems.push(item);
+          dfs(li, item);
+        }
+      }
+    }
+  }
+
+  static parsePlaywrightAPI({version, path, doc}) {
     const TIMESTAMP_LABEL = `Parsing Playwright API ${version}`;
     console.time(TIMESTAMP_LABEL);
     const linkGenerator = new GithubLinkGenerator();
@@ -83,11 +114,11 @@ export class MarkdownFile {
       return [classItem, ...subitems];
     }).flat();
     console.timeEnd(TIMESTAMP_LABEL);
-    return new MarkdownFile(name, MarkdownFile.Type.PLAYWRIGHT_API, version, section, glossaryItems);
+    return new MarkdownFile(version, path, MarkdownFile.Type.PLAYWRIGHT_API, glossaryItems);
 
     function itemForClass(articleElement, header, content) {
       const githubLink = linkGenerator.assignLink(header.textContent);
-      const url = newURL({version, section, q: githubLink});
+      const url = newURL({version, path, q: githubLink});
       const element = html`<markdown-content>${headerWithLink(header, url)}${content}</markdown-content>`;
       const type = header.textContent.startsWith('class: ') ? GlossaryItem.Type.Class : GlossaryItem.Type.Other;
       const descriptionElement = element.querySelector('p');
@@ -103,7 +134,6 @@ export class MarkdownFile {
         name: header.textContent,
         nameElement: html`${header.textContent}`,
         description,
-        searchable: true,
         title: createTitle(type, header.textContent),
         type,
       });
@@ -130,7 +160,7 @@ export class MarkdownFile {
       } else if (type === GlossaryItem.Type.Event) {
         nameElement = html`event: <strong>${name.substring('event: '.length)}</strong>`;
       }
-      const url = newURL({version, section, q: githubLink});
+      const url = newURL({version, path, q: githubLink});
       return new GlossaryItem({
         parentItem,
         highlightable: true,
@@ -144,7 +174,6 @@ export class MarkdownFile {
         nameElement,
         needleIndexes: computeNeedleIndexes(nameElement),
         description,
-        searchable: true,
         // title is a method name without arguments, e.g. `browserContext.waitForEvent`
         title: createTitle(type, name),
         type,
@@ -158,7 +187,7 @@ export class MarkdownFile {
       return Array.from(codeElements).map(codeElement => {
         const optionName = codeElement.textContent.trim();
         const githubLink = parentItem._githubLink + (parentItem.type() === GlossaryItem.Type.Method ? '--' : '-') + toGithubID(optionName.toLowerCase());
-        const url = newURL({version, section, q: githubLink});
+        const url = newURL({version, path, q: githubLink});
         const liElement = codeElement.parentElement;
 
         const firstTypeAnchorElement = liElement.querySelector('a');
@@ -220,7 +249,6 @@ export class MarkdownFile {
           nameElement,
           needleIndexes: computeNeedleIndexes(nameElement),
           description,
-          searchable: true,
           title: name,
           type,
         });
@@ -253,11 +281,10 @@ export class MarkdownFile {
 
   }
 
-  constructor(name, type, version, section, glossaryItems) {
-    this._name = name;
-    this._type = type;
+  constructor(version, path, type, glossaryItems) {
     this._version = version;
-    this._section = section;
+    this._path = path;
+    this._type = type;
     /** @type {Map<string, GlossaryItem>} */
     this._githubLinkToGlossaryItem = new Map();
 
@@ -271,9 +298,8 @@ export class MarkdownFile {
   }
 
   version() { return this._version; }
-  section() { return this._section; }
-  url() { return newURL({version: this._version, section: this._section}); }
-  name() { return this._name; }
+  path() { return this._path; }
+  url() { return newURL({version: this._version, path: this._path}); }
   type() { return this._type; }
 
   glossaryItems() {
@@ -305,11 +331,12 @@ export class MarkdownFile {
 
 MarkdownFile.Type = {
   SIMPLE_MARKDOWN: Symbol('SIMPLE_MARKDOWN'),
+  DOCUMENTATION_LIST: Symbol('DOCUMENTATION_LIST'),
   PLAYWRIGHT_API: Symbol('PLAYWRIGHT_API'),
 };
 
 class GlossaryItem {
-  constructor({parentItem, articleElement, scrollAnchor, element, title, name, nameElement, url, description, githubLink, highlightable, searchable, type, needleIndexes}) {
+  constructor({parentItem, articleElement, scrollAnchor, element, title, name, nameElement, url, description, githubLink, highlightable, type, needleIndexes}) {
     // This is assigned in MarkdownFile constructor.
     this._markdownFile = null;
     this._articleElement = articleElement;
@@ -331,7 +358,6 @@ class GlossaryItem {
     this._url = url;
     this._childItems = [];
     this._parentItem = parentItem;
-    this._searchable = searchable;
     if (parentItem)
       parentItem._childItems.push(this);
   }
@@ -345,7 +371,6 @@ class GlossaryItem {
   element() { return this._element; }
   name() { return this._name; }
   nameElement() { return this._nameElement; }
-  searchable() { return this._searchable; }
   searchWeight() { return this._searchWeight; }
   description() { return this._description; }
   url() { return this._url; }
