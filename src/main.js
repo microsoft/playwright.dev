@@ -88,7 +88,6 @@ window.addEventListener('DOMContentLoaded', async() => {
   });
 
   urlstate.startListening(async ({version, path, q}, {signal}) => {
-    document.body.classList.remove('show-mobile-sidebar');
     const projectVersion = project.version(version) || defaultVersion;
 
     // Start loading.
@@ -102,6 +101,8 @@ window.addEventListener('DOMContentLoaded', async() => {
       // A promise that will throw when a new navigation comes in.
       new Promise((res, rej) => onDOMEvent(signal, 'abort', () => rej(new Error('New operation scheduled in throttler! Aborting current one.')))),
     ]);
+
+    document.body.classList.remove('show-mobile-sidebar');
 
     versionSelector.querySelector(`[value="${projectVersion.version()}"]`).selected = true;
     searchView.setHomeURL(newURL({version: projectVersion.version()}));
