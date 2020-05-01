@@ -31,8 +31,10 @@ window.addEventListener('DOMContentLoaded', async() => {
 
   const documentationHeader = html`
     <documentation-header>
-      <a class=home-navigation href="#">🎭 ${project.name()}</a>
-      ${versionSelector}
+      <div class=header-sidebar>
+        <a class=home-navigation href="#">🎭 ${project.name()}</a>
+        ${versionSelector}
+      </div>
       ${searchView.element}
     </documentation-header>
   `;
@@ -160,22 +162,16 @@ window.addEventListener('DOMContentLoaded', async() => {
 function renderDocumentationSidebar(guidesFile) {
   const toplevelGuides = guidesFile.glossaryItems().filter(item => !item.parentItem());
   return html`
-    <ul>
-      ${toplevelGuides.map(renderGuideItems)}
-    </ul>
+    ${toplevelGuides.map(item => renderGuideItems(item, true))}
   `;
 
-  function renderGuideItems(guideItem) {
+  function renderGuideItems(guideItem, header) {
     const name = guideItem.name().split(' > ').pop();
     if (!guideItem.childItems())
-      return html`<li><a href="${guideItem.url()}">${name}</a></li>`;
+      return html`<a class="${header ? 'header' : ''}" href="${guideItem.url()}">${name}</a>`;
     return html`
-      <li>
-        <a href="${guideItem.url()}">${name}</a>
-        <ul>
-          ${guideItem.childItems().map(renderGuideItems)}
-        </ul>
-      </li>
+      <a class="${header ? 'header' : ''}" href="${guideItem.url()}">${name}</a>
+      ${guideItem.childItems().map(item => renderGuideItems(item, false))}
     `;
   }
 }
@@ -183,11 +179,9 @@ function renderDocumentationSidebar(guidesFile) {
 function renderAPIReferenceSidebar(api) {
   const toplevel = api.glossaryItems().filter(item => !item.parentItem());
   return html`
-    <ul>
-      ${toplevel.map(item => html`
-        <li><a href="${item.url()}">${item.name()}</a></li>
-      `)}
-    </ul>
+    ${toplevel.map(item => html`
+      <a href="${item.url()}">${item.name()}</a>
+    `)}
   `;
 }
 
