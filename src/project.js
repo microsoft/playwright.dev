@@ -224,7 +224,7 @@ function markdownToHTML(context, markdown) {
   element.innerHTML = window.markdownit({
     html: true,
     linkify: true,
-    breaks: true,
+    breaks: false,
     html_inline: true,
     escape: false
   }).use(window.markdownitEmoji).render(markdown);
