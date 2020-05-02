@@ -156,7 +156,13 @@ window.addEventListener('DOMContentLoaded', async() => {
       body.append(articleElement);
     }
     if (glossaryItem.scrollAnchor()) {
-      scrollIntoView(glossaryItem.scrollAnchor(), {
+      if (glossaryItem.scrollAnchor()._shiftedAnchor)
+        glossaryItem.scrollAnchor()._shiftedAnchor.remove();
+      const isMobile = window.matchMedia('only screen and (max-width: 800px)').matches;
+      const offset = isMobile ? 90 : 20;
+      glossaryItem.scrollAnchor()._shiftedAnchor = html`<span style="position:relative; top:-${offset}px"></span>`;
+      glossaryItem.scrollAnchor().appendChild(glossaryItem.scrollAnchor()._shiftedAnchor);
+      scrollIntoView(glossaryItem.scrollAnchor()._shiftedAnchor, {
         block: 'start',
         behavior: 'instant',
         scrollMode: 'if-needed',
