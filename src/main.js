@@ -29,17 +29,14 @@ window.addEventListener('DOMContentLoaded', async() => {
   const glasspaneElement = html`<glass-pane></glass-pane>`;
   onDOMEvent(glasspaneElement, 'click', () => searchView.hideSuggestions());
 
-  const documentationHeader = html`
-    <documentation-header>
-      <div class=header-sidebar>
-        <a class=home-navigation href="#">🎭 ${project.name()}</a>
-        ${versionSelector}
+  const documentationSidebar = html`
+    <div class="vbox sidebar">
+      <div class=sidebar-header>
+          <a class=home-navigation href="#">🎭 ${project.name()}</a>
+          ${versionSelector}
       </div>
-      ${searchView.element}
-    </documentation-header>
-  `;
-  const documentationSidebar = html`<documentation-sidebar></documentation-sidebar>`;
-  const documentationView = html`<documentation-view tabindex=-1></documentation-view>`;
+      <div class="vbox sidebar-body"></div>
+    </div>`;
   const toggleSidebarButton = html`
     <hamburger-button>
       <div class="bar1"></div>
@@ -47,14 +44,22 @@ window.addEventListener('DOMContentLoaded', async() => {
       <div class="bar3"></div>
     </hamburger-button>
   `;
-  onDOMEvent(toggleSidebarButton, 'click', () => document.body.classList.toggle('show-mobile-sidebar'));
+  const documentationView = html`
+    <div class="vbox view" tabindex=-1>
+      <div class=view-header>
+        ${toggleSidebarButton}
+        ${searchView.element}
+      </div>
+      <div class="view-body"></div>
+    </div>`;
+  onDOMEvent(toggleSidebarButton, 'click', () => { searchView.hideSuggestions(); document.body.classList.toggle('show-mobile-sidebar'); });
 
   document.body.append(html`
-    ${documentationHeader}
-    ${documentationSidebar}
-    ${documentationView}
+    <div class="hbox">
+      ${documentationSidebar}
+      ${documentationView}
+    </div>
     ${glasspaneElement}
-    ${toggleSidebarButton}
   `);
 
   // Setup search input x position on every resize.
@@ -113,11 +118,12 @@ window.addEventListener('DOMContentLoaded', async() => {
       searchableItems.push(...guidesFile.glossaryItems());
     searchView.setGlossary(searchableItems);
 
-    documentationSidebar.textContent = '';
+    const body = documentationSidebar.$('.sidebar-body');
+    body.textContent = '';
     if (guidesFile)
-      documentationSidebar.append(renderDocumentationSidebar(guidesFile));
+      body.append(renderDocumentationSidebar(guidesFile));
     else
-      documentationSidebar.append(renderAPIReferenceSidebar(api));
+      body.append(renderAPIReferenceSidebar(api));
 
     const glossaryItem = toShow.glossaryItem(q);
 
@@ -138,12 +144,9 @@ window.addEventListener('DOMContentLoaded', async() => {
     // If we navigate inside shown article - do not re-add.
     const articleElement = glossaryItem.articleElement();
     if (!articleElement.isConnected) {
-      documentationView.textContent = '';
-      documentationView.append(html`
-        <documentation-body>
-          ${articleElement}
-        </documentation-body>
-      `);
+      const body = documentationView.$('.view-body');
+      body.textContent = '';
+      body.append(articleElement);
     }
     if (glossaryItem.scrollAnchor()) {
       scrollIntoView(glossaryItem.scrollAnchor(), {
