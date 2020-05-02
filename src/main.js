@@ -6,7 +6,6 @@ import {newURL, URLState} from './urlstate.js';
 import {GithubProject} from './project.js';
 import {SearchView} from './searchView.js';
 import {onDOMEvent} from './utils.js';
-import {MarkdownFile} from './markdownFile.js';
 import {scrollIntoView} from './third_party/scroll-into-view-if-needed.js';
 
 window.addEventListener('DOMContentLoaded', async() => {
@@ -37,13 +36,7 @@ window.addEventListener('DOMContentLoaded', async() => {
       </div>
       <div class="vbox sidebar-body"></div>
     </div>`;
-  const toggleSidebarButton = html`
-    <hamburger-button>
-      <div class="bar1"></div>
-      <div class="bar2"></div>
-      <div class="bar3"></div>
-    </hamburger-button>
-  `;
+  const toggleSidebarButton = html`<my-button class="menu-button-image" id="menu-button"/>`;
   const documentationView = html`
     <div class="vbox view" tabindex=-1>
       <div class=view-header>
@@ -52,7 +45,10 @@ window.addEventListener('DOMContentLoaded', async() => {
       </div>
       <div class="view-body"></div>
     </div>`;
-  onDOMEvent(toggleSidebarButton, 'click', () => { searchView.hideSuggestions(); document.body.classList.toggle('show-mobile-sidebar'); });
+  onDOMEvent(toggleSidebarButton, 'click', () => {
+    searchView.hideSuggestions();
+    document.body.classList.toggle('show-mobile-sidebar');
+  });
 
   document.body.append(html`
     <div class="hbox">

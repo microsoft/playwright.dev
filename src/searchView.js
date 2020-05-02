@@ -13,16 +13,18 @@ const INSTANT_RENDER_COUNT = 30;
 export class SearchView {
   constructor() {
     this._input = html`
-      <input type=search autocomplete=off autocapitalize=off spellcheck=false size=1 placeholder='start typing to search'></input>
+      <input autocomplete=off autocapitalize=off spellcheck=false size=1 placeholder='start typing to search'></input>
     `;
     this.element = html`
       <search-view>
-        <svg height="16" width="16"  title="Search" aria-label="Search" viewBox="0 0 16 16" version="1.1" role="img">
-          <path fill-rule="evenodd" d="M15.7 13.3l-3.81-3.83A5.93 5.93 0 0013 6c0-3.31-2.69-6-6-6S1 2.69 1 6s2.69 6 6 6c1.3 0 2.48-.41 3.47-1.11l3.83 3.81c.19.2.45.3.7.3.25 0 .52-.09.7-.3a.996.996 0 000-1.41v.01zM7 10.7c-2.59 0-4.7-2.11-4.7-4.7 0-2.59 2.11-4.7 4.7-4.7 2.59 0 4.7 2.11 4.7 4.7 0 2.59-2.11 4.7-4.7 4.7z"></path>
-        </svg>
+        <my-button class="search-button-image" style="position: relative; top: 2px"></my-button>
         ${this._input}
+        <my-button class="clear-button-image"></my-button>
       </search-view>
     `;
+    this._searchButton = this.element.$('.search-button-image');
+    this._clearButton = this.element.$('.clear-button-image');
+    this._clearButton.style.visibility = 'hidden';
     this._suggestionsElement = html`<search-suggestions></search-suggestions>`;
     this._selectedSearchItem = null;
 
@@ -30,9 +32,28 @@ export class SearchView {
     this._homeURL = null;
     this._originalInputValue = '';
     this._eventListeners = [
-      onDOMEvent(this._input, 'focus', () => this._originalInputValue = this._input.value),
-      onDOMEvent(this._input, 'input', () => this._doSearch(this._input.value)),
+      onDOMEvent(this._input, 'focus', () => {
+        this._updateClearElementState();
+        this._originalInputValue = this._input.value;
+        this._searchButton.style.visibility = 'hidden';
+        this._input.select();
+      }),
+      onDOMEvent(this._input, 'blur', () => {
+        this._searchButton.style.visibility = 'visible';
+      }),
+      onDOMEvent(this._input, 'input', () => {
+        this._updateClearElementState();
+        this._doSearch(this._input.value);
+      }),
       onDOMEvent(this._input, 'keydown', this._onInputKeydown.bind(this)),
+      onDOMEvent(this._searchButton, 'click', () => {
+        this._input.focus();
+      }),
+      onDOMEvent(this._clearButton, 'click', () => {
+        this._input.value = '';
+        this._input.focus();
+        this._updateClearElementState('');
+      }),
     ];
   }
 
@@ -106,6 +127,10 @@ export class SearchView {
       return;
     this._suggestionsElement.remove();
     document.body.classList.remove('has-search-suggestions');
+  }
+
+  _updateClearElementState() {
+    this._clearButton.style.visibility = this._input.value ? 'visible' : 'hidden';
   }
 
   _doSearch(query) {
