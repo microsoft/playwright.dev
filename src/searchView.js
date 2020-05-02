@@ -18,10 +18,10 @@ export class SearchView {
     this.element = html`
       <search-view>
         ${this._input}
-        <my-button class="clear-button-image"></my-button>
+        <my-button id="clear-button" class="clear-button-image"></my-button>
       </search-view>
     `;
-    this._clearButton = this.element.$('.clear-button-image');
+    this._clearButton = this.element.$('#clear-button');
     this._clearButton.style.visibility = 'hidden';
     this._suggestionsElement = html`<search-suggestions></search-suggestions>`;
     this._selectedSearchItem = null;
