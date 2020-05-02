@@ -17,12 +17,10 @@ export class SearchView {
     `;
     this.element = html`
       <search-view>
-        <my-button class="search-button-image" style="position: relative; top: 2px"></my-button>
         ${this._input}
         <my-button class="clear-button-image"></my-button>
       </search-view>
     `;
-    this._searchButton = this.element.$('.search-button-image');
     this._clearButton = this.element.$('.clear-button-image');
     this._clearButton.style.visibility = 'hidden';
     this._suggestionsElement = html`<search-suggestions></search-suggestions>`;
@@ -35,20 +33,12 @@ export class SearchView {
       onDOMEvent(this._input, 'focus', () => {
         this._updateClearElementState();
         this._originalInputValue = this._input.value;
-        this._searchButton.style.visibility = 'hidden';
-        this._input.select();
-      }),
-      onDOMEvent(this._input, 'blur', () => {
-        this._searchButton.style.visibility = 'visible';
       }),
       onDOMEvent(this._input, 'input', () => {
         this._updateClearElementState();
         this._doSearch(this._input.value);
       }),
       onDOMEvent(this._input, 'keydown', this._onInputKeydown.bind(this)),
-      onDOMEvent(this._searchButton, 'click', () => {
-        this._input.focus();
-      }),
       onDOMEvent(this._clearButton, 'click', () => {
         this._input.value = '';
         this._input.focus();

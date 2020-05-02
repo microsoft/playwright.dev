@@ -26,28 +26,39 @@ window.addEventListener('DOMContentLoaded', async() => {
   onDOMEvent(versionSelector, 'input', event => urlstate.goto({version: event.target.value}));
 
   const glasspaneElement = html`<glass-pane></glass-pane>`;
-  onDOMEvent(glasspaneElement, 'click', () => searchView.hideSuggestions());
+  onDOMEvent(glasspaneElement, 'click', e => {
+    searchView.hideSuggestions();
+  });
+  onDOMEvent(glasspaneElement, 'touchstart', e => {
+    e.preventDefault();
+  });
 
+  const hideSidebarButton = html`<my-button class="back-button-image" id="back-button"/>`;
   const documentationSidebar = html`
     <div class="vbox sidebar">
       <div class=sidebar-header>
-          <a class=home-navigation href="#">🎭 ${project.name()}</a>
-          ${versionSelector}
+        ${hideSidebarButton}
+        <a class=home-navigation href="#">🎭 ${project.name()}</a>
+        ${versionSelector}
       </div>
       <div class="vbox sidebar-body"></div>
     </div>`;
-  const toggleSidebarButton = html`<my-button class="menu-button-image" id="menu-button"/>`;
+  onDOMEvent(hideSidebarButton, 'click', () => {
+    document.body.classList.remove('show-mobile-sidebar');
+  });
+  
+  const showSidebarButton = html`<my-button class="menu-button-image" id="menu-button"/>`;
   const documentationView = html`
     <div class="vbox view" tabindex=-1>
       <div class=view-header>
-        ${toggleSidebarButton}
+        ${showSidebarButton}
         ${searchView.element}
       </div>
       <div class="view-body"></div>
     </div>`;
-  onDOMEvent(toggleSidebarButton, 'click', () => {
+  onDOMEvent(showSidebarButton, 'click', () => {
     searchView.hideSuggestions();
-    document.body.classList.toggle('show-mobile-sidebar');
+    document.body.classList.add('show-mobile-sidebar');
   });
 
   document.body.append(html`
