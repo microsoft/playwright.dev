@@ -165,10 +165,10 @@ window.addEventListener('DOMContentLoaded', async() => {
       scrollIntoView(glossaryItem.scrollAnchor()._shiftedAnchor, {
         block: 'start',
         behavior: 'instant',
-        scrollMode: 'if-needed',
+        // scrollMode: 'if-needed',
       });
     } else {
-      documentationView.scrollTop = 0;
+      documentationView.$('.view-body').scrollTop = 0;
     }
     documentationView.focus();
     await glossaryItem.highlight();

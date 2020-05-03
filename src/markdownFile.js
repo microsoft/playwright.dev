@@ -290,6 +290,7 @@ export class MarkdownFile {
 
     this._highlightedGlossaryItem = null;
 
+    this._glossaryItems = glossaryItems;
     for (const item of glossaryItems) {
       this._githubLinkToGlossaryItem.set(item._githubLink, item);
       item._markdownFile = this;
@@ -303,7 +304,7 @@ export class MarkdownFile {
   type() { return this._type; }
 
   glossaryItems() {
-    return [...this._githubLinkToGlossaryItem.values()];
+    return [...this._glossaryItems];
   }
 
   glossaryItem(githubLink) {
