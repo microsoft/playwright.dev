@@ -336,7 +336,7 @@ MarkdownFile.Type = {
   PLAYWRIGHT_API: Symbol('PLAYWRIGHT_API'),
 };
 
-class GlossaryItem {
+export class GlossaryItem {
   constructor({parentItem, articleElement, scrollAnchor, element, title, name, nameElement, url, description, githubLink, highlightable, type, needleIndexes}) {
     // This is assigned in MarkdownFile constructor.
     this._markdownFile = null;

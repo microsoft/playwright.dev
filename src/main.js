@@ -5,6 +5,7 @@ import {html} from './zhtml.js';
 import {newURL, URLState} from './urlstate.js';
 import {GithubProject} from './project.js';
 import {SearchView} from './searchView.js';
+import {GlossaryItem} from './markdownFile.js';
 import {onDOMEvent} from './utils.js';
 import {scrollIntoView} from './third_party/scroll-into-view-if-needed.js';
 
@@ -132,6 +133,14 @@ window.addEventListener('DOMContentLoaded', async() => {
     else
       body.append(renderAPIReferenceSidebar(api));
 
+    if (toShow === api && !q) {
+      const body = documentationView.$('.view-body');
+      body.textContent = '';
+      body.append(renderAPIReference(api));
+      documentationView.focus();
+      return;
+    }
+
     const glossaryItem = toShow.glossaryItem(q);
 
     if (glossaryItem.markdownFile() === api || (guidesFile && guidesFile.glossaryItems().some(item => item.url() === glossaryItem.url()))) {
@@ -192,13 +201,31 @@ function renderDocumentationSidebar(guidesFile) {
   }
 }
 
-function renderAPIReferenceSidebar(api) {
+function renderAPIReference(api) {
   const toplevel = api.glossaryItems().filter(item => !item.parentItem());
+  const title = api.version() === 'master' ?
+    `API reference @ master` :
+    `API reference ${api.version()}`;
   return html`
-    ${toplevel.map(item => html`
-      <a href="${item.url()}">${item.name()}</a>
-    `)}
+    <markdown-content>
+      <h1>${title}</h1>
+      <ul>
+        ${toplevel.map(renderItem)}
+      </ul>
+    </markdown-content>
   `;
+
+  function renderItem(item) {
+    if (!item.childItems() || (item.type() !== GlossaryItem.Type.Class && item.type() !== GlossaryItem.Type.Other))
+      return html`<li><a href="${item.url()}">${item.name()}</a></li>`;
+    return html`
+      <li><a href="${item.url()}">${item.name()}</a>
+        <ul>
+          ${item.childItems().map(renderItem)}
+        </ul>
+      </li>
+    `;
+  }
 }
 
 function removeAllEmoji(text) {
