@@ -22,13 +22,14 @@ export class MarkdownFile {
       else
         description = header.textContent;
       const nameElement = html`<strong>${header.textContent}</strong>`;
+      const headerWithLink = renderHeaderWithLink(header, url);
       const item = new GlossaryItem({
         parentItem,
         highlightable: true,
         articleElement,
-        element: html`<markdown-content>${headerWithLink(header, url)}${content}</markdown-content>`,
+        element: html`<markdown-content>${headerWithLink}${content}</markdown-content>`,
         githubLink,
-        scrollAnchor: header,
+        scrollAnchor: headerWithLink,
         url,
         name: header.textContent,
         nameElement,
@@ -120,7 +121,7 @@ export class MarkdownFile {
     function itemForClass(articleElement, header, content) {
       const githubLink = linkGenerator.assignLink(header.textContent);
       const url = newURL({version, path, q: githubLink});
-      const element = html`<markdown-content>${headerWithLink(header, url)}${content}</markdown-content>`;
+      const element = html`<markdown-content>${renderHeaderWithLink(header, url)}${content}</markdown-content>`;
       const type = header.textContent.startsWith('class: ') ? GlossaryItem.Type.Class : GlossaryItem.Type.Other;
       const descriptionElement = element.querySelector('p');
       const description = descriptionElement && descriptionElement.textContent ? descriptionElement.textContent : name + ' > ' + header.textContent;
@@ -162,13 +163,14 @@ export class MarkdownFile {
         nameElement = html`event: <strong>${name.substring('event: '.length)}</strong>`;
       }
       const url = newURL({version, path, q: githubLink});
+      const headerWithLink = renderHeaderWithLink(header, url);
       return new GlossaryItem({
         parentItem,
         highlightable: true,
         articleElement: parentItem.articleElement(),
-        element: html`<markdown-content>${headerWithLink(header, url)}${content}</markdown-content>`,
+        element: html`<markdown-content>${headerWithLink}${content}</markdown-content>`,
         githubLink,
-        scrollAnchor: header,
+        scrollAnchor: headerWithLink,
         url,
         // name is a full method name with arguments, e.g. `browserContext.waitForEvent(event[, optionsOrPredicate])`
         name,
@@ -422,7 +424,7 @@ class GithubLinkGenerator {
   }
 }
 
-function headerWithLink(header, url) {
+function renderHeaderWithLink(header, url) {
   return html`
     <header-with-link>
       <a class=header-link href=${url}>
