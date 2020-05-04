@@ -138,6 +138,7 @@ window.addEventListener('DOMContentLoaded', async() => {
       const body = documentationView.$('.view-body');
       body.textContent = '';
       body.append(renderAPIReference(api));
+      body.scrollTop = 0;
       documentationView.focus();
       return;
     }
