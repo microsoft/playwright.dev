@@ -50,6 +50,7 @@ export class MarkdownFile {
 
   static parseDocumentationList({version, path, doc}) {
     const glossaryItems = [];
+    const articleElement = html`<markdown-content>${doc}</markdown-content>`;
     dfs(doc, null);
     return new MarkdownFile(version, path, MarkdownFile.Type.DOCUMENTATION_LIST, glossaryItems);
 
@@ -66,7 +67,7 @@ export class MarkdownFile {
             githubLink: a.href,
             parentItem,
             highlightable: false,
-            articleElement: null,
+            articleElement,
             element: null,
             scrollAnchor: null,
             url: a.hash,

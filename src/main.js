@@ -133,6 +133,7 @@ window.addEventListener('DOMContentLoaded', async() => {
     else
       body.append(renderAPIReferenceSidebar(api));
 
+    // Custom code-path to show generated API reference.
     if (toShow === api && !q) {
       const body = documentationView.$('.view-body');
       body.textContent = '';
