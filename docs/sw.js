@@ -20,7 +20,7 @@ importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox
 workbox.core.skipWaiting();
 workbox.core.clientsClaim();
 
-workbox.precaching.precacheAndRoute([{"revision":"1b87d6c3cd4f2f133a51cc0eb3d8d025","url":"all.css"},{"revision":"fae6f13919932c7d66d6342f6c38207f","url":"index.html"},{"revision":"253532880b2e3571491b15fed73cc44d","url":"main.js"}]);
+workbox.precaching.precacheAndRoute([{"revision":"1b87d6c3cd4f2f133a51cc0eb3d8d025","url":"all.css"},{"revision":"fae6f13919932c7d66d6342f6c38207f","url":"index.html"},{"revision":"0a7dd124cb1a1f937bfc5dda3cede7d7","url":"main.js"}]);
 
 // This is needed to make SPA to work offline.
 // workbox.routing.registerNavigationRoute("index.html");
