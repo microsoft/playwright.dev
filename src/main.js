@@ -171,6 +171,8 @@ window.addEventListener('DOMContentLoaded', async() => {
         block: 'start',
         behavior: 'instant',
       });
+      // compensate for fixed header.
+      window.scrollBy(0, -60);
     } else {
       documentationView.$('.view-body').scrollTop = 0;
     }
