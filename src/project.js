@@ -19,6 +19,7 @@ const GITHUB_URLS = {
   rawContentURL: (repoName, version, relativePath) => `https://raw.githubusercontent.com/${repoName}/${version}/${relativePath}`,
   releaseURL: (repoName, version) => `https://github.com/${repoName}/releases/tag/${version}`,
   contentURL: (repoName, version, relativePath) => `https://github.com/${repoName}/blob/${version}/${relativePath}`,
+  versionURL: (repoName, version) => `https://github.com/${repoName}/blob/${version}/`,
 };
 
 export class GithubProject {
@@ -109,13 +110,13 @@ class GithubProjectVersion {
     this._pathToMarkdownFile = new Map();
   }
 
-  _resolveMarkdownLinks(baseURL, element) {
+  _resolveMarkdownLinks(absoluteURLBase, relativeURLBase, element) {
     // Translate all links to local links.
     for (const a of element.querySelectorAll('a')) {
       const href = a.getAttribute('href') || '';
       if (!href)
         continue;
-      const resolvedHref = new URL(href, baseURL).href;
+      const resolvedHref = href.startsWith('/') ? new URL('.' + href, absoluteURLBase).href : new URL(href, relativeURLBase).href;
       const match = resolvedHref.match(new RegExp(`https://github.com/${this._project.repositoryName()}/blob/([^/]+)/([^#]+)(.*)$`));
       // If link points to our repository.
       if (match) {
@@ -179,7 +180,7 @@ class GithubProjectVersion {
         return null;
       const doc = markdownToHTML(this._project.repositoryName(), markdown);
       const url = GITHUB_URLS.contentURL(this._project.repositoryName(), this._version, path);
-      this._resolveMarkdownLinks(url, doc);
+      this._resolveMarkdownLinks(GITHUB_URLS.versionURL(this._project.repositoryName(), this._version), url, doc);
       if (type === MarkdownFile.Type.PLAYWRIGHT_API) {
         markdownFile = MarkdownFile.parsePlaywrightAPI({
           version: this._version,
@@ -207,7 +208,10 @@ class GithubProjectVersion {
   releaseNotesFile() {
     if (!this._releaseNotesFile && this._releaseNotes) {
       const doc = markdownToHTML(this._project.repositoryName(), this._releaseNotes);
-      this._resolveMarkdownLinks(GITHUB_URLS.releaseURL(this._project.repositoryName(), this._version), doc);
+      this._resolveMarkdownLinks(
+          GITHUB_URLS.versionURL(this._project.repositoryName(), this._version),
+          GITHUB_URLS.releaseURL(this._project.repositoryName(), this._version),
+          doc);
       this._releaseNotesFile = MarkdownFile.parseSimpleMarkdown({
         name: 'Release Notes',
         version: this._version,
