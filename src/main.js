@@ -9,6 +9,24 @@ import {GlossaryItem} from './markdownFile.js';
 import {onDOMEvent} from './utils.js';
 import {scrollIntoView} from './third_party/scroll-into-view-if-needed.js';
 
+const footerElement = html`
+  <div class="footer-container">
+    <div class="footer">
+      <div>
+        <ul>
+          <li><a href="https://github.com/microsoft/playwright">GitHub</a></li>
+          <li><a href="https://github.com/microsoft/playwright/releases/">Changelog</a></li>
+          <li><a href="https://join.slack.com/t/playwright/shared_invite/enQtOTEyMTUxMzgxMjIwLThjMDUxZmIyNTRiMTJjNjIyMzdmZDA3MTQxZWUwZTFjZjQwNGYxZGM5MzRmNzZlMWI5ZWUyOTkzMjE5Njg1NDg">Slack</a></li>
+          <li><a href="https://stackoverflow.com/tags/playwright">Stack Overflow</a></li>
+        </ul>
+      </div>
+      <div>
+        <img class="microsoft-logo" src="https://code.visualstudio.com/assets/images/microsoft-logo.png" height="20" alt="Microsoft logo">
+      </div>
+    </div>
+  </div>
+`;
+
 window.addEventListener('DOMContentLoaded', async() => {
   const project = await GithubProject.create({
     owner: 'microsoft',
@@ -55,7 +73,10 @@ window.addEventListener('DOMContentLoaded', async() => {
         ${showSidebarButton}
         ${searchView.element}
       </div>
-      <div class="view-body"></div>
+      <div class="content">
+        <div class="view-body"></div>
+        <div class="view-body-toc"></div>
+      </div>
     </div>`;
   onDOMEvent(showSidebarButton, 'click', () => {
     searchView.hideSuggestions();
@@ -67,6 +88,7 @@ window.addEventListener('DOMContentLoaded', async() => {
       ${documentationSidebar}
       ${documentationView}
     </div>
+    ${footerElement}
     ${glasspaneElement}
   `);
 
@@ -157,6 +179,16 @@ window.addEventListener('DOMContentLoaded', async() => {
     } else {
       searchView.inputElement().value = '';
     }
+
+    if (toShow.glossaryItems() && toShow.glossaryItems().length) {
+      const firstItem = toShow.glossaryItems()[0];
+      // Build summary of headings (table of contents) with first item
+      const summaryItems = firstItem.childItems();
+      const tocElement = html`<ul>${summaryItems.map(item => html`<li><a href="${item.url()}">${item.name()}</a></li>`)}</ul>`;
+      documentationView.$('.view-body-toc').textContent = '';
+      documentationView.$('.view-body-toc').append(tocElement);
+    }
+
     document.title = removeAllEmoji(glossaryItem.title());
 
     // If we navigate inside shown article - do not re-add.
