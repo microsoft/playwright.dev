@@ -9,6 +9,24 @@ import {GlossaryItem} from './markdownFile.js';
 import {onDOMEvent} from './utils.js';
 import {scrollIntoView} from './third_party/scroll-into-view-if-needed.js';
 
+const footerElement = html`
+  <div class="footer-container">
+    <div class="footer">
+      <div>
+        <ul>
+          <li><a href="https://github.com/microsoft/playwright">GitHub</a></li>
+          <li><a href="https://github.com/microsoft/playwright/releases/">Changelog</a></li>
+          <li><a href="https://join.slack.com/t/playwright/shared_invite/enQtOTEyMTUxMzgxMjIwLThjMDUxZmIyNTRiMTJjNjIyMzdmZDA3MTQxZWUwZTFjZjQwNGYxZGM5MzRmNzZlMWI5ZWUyOTkzMjE5Njg1NDg">Slack</a></li>
+          <li><a href="https://stackoverflow.com/tags/playwright">Stack Overflow</a></li>
+        </ul>
+      </div>
+      <div>
+        <img class="microsoft-logo" src="https://code.visualstudio.com/assets/images/microsoft-logo.png" height="20" alt="Microsoft logo">
+      </div>
+    </div>
+  </div>
+`;
+
 window.addEventListener('DOMContentLoaded', async() => {
   const project = await GithubProject.create({
     owner: 'microsoft',
@@ -67,6 +85,7 @@ window.addEventListener('DOMContentLoaded', async() => {
       ${documentationSidebar}
       ${documentationView}
     </div>
+    ${footerElement}
     ${glasspaneElement}
   `);
 
