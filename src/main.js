@@ -63,7 +63,7 @@ window.addEventListener('DOMContentLoaded', async() => {
   });
 
   document.body.append(html`
-    <div class="hbox">
+    <div class="hbox container">
       ${documentationSidebar}
       ${documentationView}
     </div>
@@ -174,7 +174,7 @@ window.addEventListener('DOMContentLoaded', async() => {
       // compensate for fixed header.
       window.scrollBy(0, -60);
     } else {
-      documentationView.$('.view-body').scrollTop = 0;
+      window.scrollTo({ top: 0 });
     }
     documentationView.focus();
     await glossaryItem.highlight();
