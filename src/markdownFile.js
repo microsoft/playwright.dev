@@ -52,31 +52,36 @@ export class MarkdownFile {
   static parseDocumentationList({version, path, doc}) {
     const glossaryItems = [];
     const articleElement = html`<markdown-content>${doc}</markdown-content>`;
-    dfs(doc, null);
+    dfs(toc(doc), null);
     return new MarkdownFile(version, path, MarkdownFile.Type.DOCUMENTATION_LIST, glossaryItems);
 
+    function toc(element) {
+      // Table of contents is an `ol` on the page
+      return html`<markdown-content>${element.querySelector(':scope > ol')}</markdown-content>`;
+    }
+
     function dfs(element, parentItem) {
-      const lists = element.querySelectorAll(':scope > ul, :scope > ol');
+      const lists = element.querySelectorAll(':scope > ol, :scope > ul');
       for (const list of lists) {
         for (const li of list.querySelectorAll(':scope > li')) {
-          const a = li.querySelector(':scope > a');
-          if (!a || !a.href)
-            continue;
+          let el = li.querySelector(':scope > a') ? li.querySelector(':scope > a') : li;
           const parentText = parentItem ? parentItem.name() + ' > ' : '';
-          const nameElement = html`${parentText}<strong>${a.textContent}</strong>`;
+          // If el is li, title needs to exclude textContent from child links
+          const title = el.childNodes[0].textContent.trim();
+          const nameElement = html`${parentText}<strong>${title}</strong>`;
           const item = new GlossaryItem({
-            githubLink: a.href,
+            githubLink: el.href,
             parentItem,
             highlightable: false,
             articleElement,
             element: null,
             scrollAnchor: null,
-            url: a.hash,
+            url: el.hash,
             name: nameElement.textContent,
             needleIndexes: computeNeedleIndexes(nameElement),
             nameElement,
             description: null,
-            title: a.textContent,
+            title,
             type: GlossaryItem.Type.Other,
           });
           glossaryItems.push(item);
