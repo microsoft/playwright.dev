@@ -73,7 +73,10 @@ window.addEventListener('DOMContentLoaded', async() => {
         ${showSidebarButton}
         ${searchView.element}
       </div>
-      <div class="view-body"></div>
+      <div class="content">
+        <div class="view-body"></div>
+        <div class="view-body-toc"></div>
+      </div>
     </div>`;
   onDOMEvent(showSidebarButton, 'click', () => {
     searchView.hideSuggestions();
@@ -176,6 +179,16 @@ window.addEventListener('DOMContentLoaded', async() => {
     } else {
       searchView.inputElement().value = '';
     }
+
+    if (toShow.glossaryItems() && toShow.glossaryItems().length) {
+      const firstItem = toShow.glossaryItems()[0];
+      // Build summary of headings (table of contents) with first item
+      const summaryItems = firstItem.childItems();
+      const tocElement = html`<ul>${summaryItems.map(item => html`<li><a href="${item.url()}">${item.name()}</a></li>`)}</ul>`;
+      documentationView.$('.view-body-toc').textContent = '';
+      documentationView.$('.view-body-toc').append(tocElement);
+    }
+
     document.title = removeAllEmoji(glossaryItem.title());
 
     // If we navigate inside shown article - do not re-add.
