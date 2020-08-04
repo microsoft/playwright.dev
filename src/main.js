@@ -210,6 +210,8 @@ window.addEventListener('DOMContentLoaded', async() => {
     }
     documentationView.focus();
     await glossaryItem.highlight();
+
+    // const selectedNav = glossaryItem
   });
 }, false);
 
@@ -221,10 +223,14 @@ function renderDocumentationSidebar(guidesFile) {
 
   function renderGuideItems(guideItem, header) {
     const name = guideItem.name().split(' > ').pop();
+    const className = header ? 'header' : '';
+    const headerElement = guideItem.url() ?
+      html`<a class="${className}" href="${guideItem.url()}">${name}</a>` :
+      html`<span class="header">${name}</span>`;
     if (!guideItem.childItems())
-      return html`<a class="${header ? 'header' : ''}" href="${guideItem.url()}">${name}</a>`;
+      return headerElement;
     return html`
-      <a class="${header ? 'header' : ''}" href="${guideItem.url()}">${name}</a>
+      ${headerElement}
       ${guideItem.childItems().map(item => renderGuideItems(item, false))}
     `;
   }
