@@ -162,6 +162,7 @@ window.addEventListener('DOMContentLoaded', async() => {
       body.append(renderAPIReference(api));
       body.scrollTop = 0;
       documentationView.focus();
+      documentationView.$('.view-body-toc').textContent = '';
       return;
     }
 
@@ -180,10 +181,10 @@ window.addEventListener('DOMContentLoaded', async() => {
       searchView.inputElement().value = '';
     }
 
-    if (toShow.glossaryItems() && toShow.glossaryItems().length) {
-      const firstItem = toShow.glossaryItems()[0];
-      // Build summary of headings (table of contents) with first item
-      const summaryItems = firstItem.childItems();
+    // Generate summary element with table-of-contents (right sidebar)
+    if (glossaryItem) {
+      const item = glossaryItem.parentItem() || glossaryItem;
+      const summaryItems = item.childItems();
       const tocElement = html`<ul>${summaryItems.map(item => html`<li><a href="${item.url()}">${item.name()}</a></li>`)}</ul>`;
       documentationView.$('.view-body-toc').textContent = '';
       documentationView.$('.view-body-toc').append(tocElement);
