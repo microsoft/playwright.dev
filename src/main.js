@@ -139,6 +139,10 @@ window.addEventListener('DOMContentLoaded', async() => {
       new Promise((res, rej) => onDOMEvent(signal, 'abort', () => rej(new Error('New operation scheduled in throttler! Aborting current one.')))),
     ]);
 
+    // For non-default versions, ensure home link does not change selected version
+    const homeLinkElement = document.querySelector('a.home-navigation')
+    homeLinkElement.href = projectVersion === defaultVersion ? "#" : `#version=${projectVersion.version()}`;
+
     document.body.classList.remove('show-mobile-sidebar');
 
     versionSelector.querySelector(`[value="${projectVersion.version()}"]`).selected = true;
