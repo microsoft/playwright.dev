@@ -211,9 +211,6 @@ window.addEventListener('DOMContentLoaded', async() => {
     }
     documentationView.focus();
     await glossaryItem.highlight();
-
-    // Unhide footer after content is loaded
-    footerElement.style.display = 'block';
   });
 }, false);
 
