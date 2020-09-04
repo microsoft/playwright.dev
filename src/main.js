@@ -223,8 +223,10 @@ function renderDocumentationSidebar(guidesFile) {
   function renderGuideItems(guideItem, header) {
     const name = guideItem.name().split(' > ').pop();
     const className = header ? 'header' : '';
-    const headerElement = guideItem.url() ?
-      html`<a class="${className}" href="${guideItem.url()}">${name}</a>` :
+    // .url() for links to other docs pages, .githubLink() for external links
+    const url = guideItem.url() || guideItem.githubLink()
+    const headerElement = url ?
+      html`<a class="${className}" href="${url}">${name}</a>` :
       html`<span class="header">${name}</span>`;
     if (!guideItem.childItems())
       return headerElement;
