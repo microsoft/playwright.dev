@@ -383,6 +383,7 @@ export class GlossaryItem {
   searchWeight() { return this._searchWeight; }
   description() { return this._description; }
   url() { return this._url; }
+  githubLink() { return this._githubLink; }
   type() { return this._type; }
   async highlight() { await this._markdownFile._highlightGlossaryItem(this); }
   title() { return this._title; }
