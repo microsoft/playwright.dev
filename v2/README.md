@@ -1,6 +1,6 @@
 # playwright.dev-v2
 
-This website is built using [Docusaurus v2](https://v2.docusaurus.io/). Content is pulled from the microsoft/playwright repo.
+This website is built using [Docusaurus v2](https://v2.docusaurus.io/). Content is pulled from the microsoft/playwright repo. [Preview link][preview].
 
 ## Development
 
@@ -34,4 +34,6 @@ npm run build
 
 ## Deployment
 
-See [GitHub Action](../.github/workflows/deploy-v2.yml) for deployment to [preview link](https://microsoft.github.io/playwright).
+See [GitHub Action](../.github/workflows/deploy-v2.yml) for deployment to [preview link][preview].
+
+[preview]: https://microsoft.github.io/playwright
