@@ -1,0 +1,58 @@
+name: Deploy v2 preview
+
+on:
+  push:
+    branches:
+    - master
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - uses: actions/checkout@v2
+        with:
+          repository: microsoft/playwright
+          path: v2/content-repo
+          fetch-depth: 0
+          # The same token is used by the commit action later on
+          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '12'
+      - run: npm install
+        working-directory: v2
+
+      - name: Fetch content (master)
+        run: node scripts/fetchContent.js
+        working-directory: v2
+        env:
+          SRC_DIR: content-repo/docs
+      - name: Fetch content (v1.6.1)
+        run: node scripts/fetchContent.js
+        working-directory: v2
+        env:
+          SRC_DIR: content-repo/docs
+          VERSION: '1.6.1'
+      
+      - run: npm run build
+        working-directory: v2
+
+      # Replace gh-pages branch of content-repo
+      # with the new build
+      - run: git checkout gh-pages
+        working-directory: v2/content-repo
+      - name: Clean existing files
+        run: rm -rf *
+        working-directory: v2/content-repo
+      - run: cp -a build/. content-repo/
+      - run: git status
+        working-directory: content-repo
+
+      # Push to gh-pages branch of microsoft/playwright
+      - uses: stefanzweifel/git-auto-commit-action@v4
+        with:
+          branch: gh-pages
+          repository: v2/content-repo
