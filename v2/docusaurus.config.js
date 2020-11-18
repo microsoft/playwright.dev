@@ -102,7 +102,7 @@ module.exports = {
     algolia: {
       apiKey: 'c85f496c6eea71808027d42111ac550c',
       indexName: 'playwright',
-      // contextualSearch: true,
+      contextualSearch: true,
       // searchParameters: {},
     },
   },
