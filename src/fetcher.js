@@ -32,11 +32,12 @@ export class GithubFetcher {
     this._cache = {};
     this._criticalSection = new CriticalSection();
     if (useLocalStorage) {
-      this._cache.set = async (key, value) => localStorage.setItem('github-fetcher-' + key, JSON.stringify(data));
-      this._cache.get = async (key) => JSON.parse(localStorage.getItem('github-fetcher-' + key));
-      this._cache.delete = async (key) => localStorage.removeItem('github-fetcher-' + key);
-      this._cache.keys = async () => Object.keys(localStorage).filter(key => key.startsWith('github-fetcher-'));
-      this._cache.clear = async () => Object.keys(localStorage).filter(key => key.startsWith('github-fetcher-')).forEach(key => localStorage.removeItem(key));
+      const LOCALSTORAGE_KEY_PREFIX = 'github-fetcher-';
+      this._cache.set = async (key, value) => localStorage.setItem(LOCALSTORAGE_KEY_PREFIX + key, JSON.stringify(value));
+      this._cache.get = async (key) => JSON.parse(localStorage.getItem( + key));
+      this._cache.delete = async (key) => localStorage.removeItem(LOCALSTORAGE_KEY_PREFIX + key);
+      this._cache.keys = async () => Object.keys(localStorage).filter(key => key.startsWith(LOCALSTORAGE_KEY_PREFIX)).map(key => key.substr(LOCALSTORAGE_KEY_PREFIX.length));
+      this._cache.clear = async () => Object.keys(localStorage).filter(key => key.startsWith(LOCALSTORAGE_KEY_PREFIX)).forEach(key => localStorage.removeItem(key));
     } else {
       const store = new IDBStore('github-fetcher', 'request-cache')
       this._cache.set = async (key, value) => idbSet(key, value, store);
