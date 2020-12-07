@@ -85,27 +85,41 @@ function keepOnlyMarkdownFiles(dir) {
   });
 }
 
+function overwriteFooterLinks(footerLines) {
+  // Changes 
+  // #class-browsertype -> api.md#class-browsertype
+  return footerLines.map(line => {
+    return line.replace(/(#[^\s]+)/g, 'api.md$1');
+  });
+}
+
 function splitApi(contents) {
   const tokens = md.parse(contents, {});
   const headings = tokens.filter(
     (t) => t.type === "heading_open" && t.tag === "h3"
   );
+  const lines = contents.split("\n");
+  // TODO: also fix the links since we are splitting api.md
+  // e.g., #class-browsertype -> api.md#class-browsertype -> api/class-browsertype.md
+  const tokensWithLineNum = tokens.filter(t => t.map);
+  const lastToken = tokensWithLineNum[tokensWithLineNum.length - 1];
+  const footerStart = lastToken.map[1];
+  const footerLines = overwriteFooterLinks(lines.slice(footerStart));
+
   const lineNums = headings.map((h) => h.map[0]);
   const pairs = lineNums.reduce(function (result, value, index, array) {
     if (index < array.length - 1) {
       result.push(array.slice(index, index + 2));
     } else {
-      result.push([value, contents.split("\n").length]);
+      result.push([value, footerStart]);
     }
     return result;
   }, []);
-  const lines = contents.split("\n");
-  // TODO: copy footnote links to all pages
-  // TODO: also fix the links since we are splitting api.md
 
   pairs.forEach((p) => {
     fse.mkdirpSync(path.join(destDir, "api"));
-    const contents = lines.slice(p[0], p[1]).join("\n");
+    const contentLines = [...lines.slice(p[0], p[1]), ...footerLines];
+    const contents = contentLines.join("\n");
     const title = getTitle(contents);
     const slug = slugger(title);
     const filePath = path.join(destDir, "api", `${slug}.md`);
