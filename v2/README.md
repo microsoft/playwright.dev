@@ -15,16 +15,16 @@ npm start
 1. To setup content from master (`next` version)
 
    ```sh
-   SRC_DIR=path-to-playwright-repo/docs node scripts/fetchContent.js
+   SRC_DIR=path-to-playwright-repo/docs node scripts/fetchVersion.js
    ```
 
 1. To setup content for a particular version (say v1.6.0)
 
    ```sh
-   SRC_DIR=path-to-playwright-repo/docs VERSION=1.6.0 node scripts/fetchContent.js
+   SRC_DIR=path-to-playwright-repo/docs VERSION=1.6.0 node scripts/fetchVersion.js
    ```
 
-The docs are versioned so multiple versions can co-exist.
+The docs are versioned so multiple versions can co-exist. See CI definition for how to fetch all versions.
 
 ## Build
 

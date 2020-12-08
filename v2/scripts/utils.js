@@ -2,6 +2,7 @@
 const fse = require("fs-extra");
 const path = require("path");
 const md = require("markdown-it")({ typographer: true });
+md.use(require("markdown-it-title"), 0);
 const slugify = require("slugify");
 const sh = require("shelljs");
 const semver = require("semver");
@@ -13,7 +14,7 @@ function slugger(text) {
 
 function getTitle(contents) {
   const env = {};
-  md.use(require("markdown-it-title"), 0).render(contents, env);
+  md.render(contents, env);
   return env.title;
 }
 
@@ -25,6 +26,7 @@ function removeHeadingLine(contents) {
 
 function writeFrontmatter(filePath) {
   const contents = fse.readFileSync(filePath).toString();
+  console.log('frontmatter....');
   const title = getTitle(contents);
   const fileName = path.basename(filePath, path.extname(filePath));
   const fm = `---\nid: ${fileName}\ntitle: "${title}"\n---\n\n`;
@@ -119,6 +121,7 @@ function splitApi(contents, destDir) {
     fse.mkdirpSync(path.join(destDir, "api"));
     const contentLines = [...lines.slice(start, end), ...footerLines];
     const contents = contentLines.join("\n");
+    console.log('pairs....')
     const title = getTitle(contents);
     const slug = slugger(title);
     const relativePath = path.join("api", `${slug}.md`);
@@ -133,6 +136,7 @@ function splitApi(contents, destDir) {
     const pairHeadings = headings.filter(
       (t) => t.map[0] >= start && t.map[0] <= end
     );
+    console.log('internal headings....', destDir);
     const internalHeadings = pairHeadings
       .map((t) => getTitle(lines[t.map[0]]))
       .map((t) => slugger(t));
@@ -264,34 +268,32 @@ function writeVersionsFile(version) {
   fse.writeFileSync("versions.json", JSON.stringify(uniqVersions));
 }
 
-function main() {
-  const { VERSION, SRC_DIR } = process.env;
-  if (!SRC_DIR) {
+function main(srcDir, version) {
+  if (!srcDir) {
     console.log(
       "Use SRC_DIR to specify docs location, e.g. path-to-repo/docs."
     );
     process.exit(1);
   }
-  const srcDir = SRC_DIR;
   const destDir = (function () {
-    return VERSION
-      ? path.join("versioned_docs", `version-${VERSION}`)
+    return version
+      ? path.join("versioned_docs", `version-${version}`)
       : "./docs";
   })();
   const sidebarFile = (function () {
-    return VERSION
-      ? path.join("versioned_sidebars", `version-${VERSION}-sidebars.json`)
+    return version
+      ? path.join("versioned_sidebars", `version-${version}-sidebars.json`)
       : "sidebars.js";
   })();
   fse.mkdirpSync(destDir);
   fse.emptyDirSync(destDir);
-  copyFiles(srcDir, destDir, VERSION);
+  copyFiles(srcDir, destDir, version);
   keepOnlyMarkdownFiles(destDir);
 
   // Transform API reference
   const apiContents = fse.readFileSync(path.join(destDir, "api.md")).toString();
   const pagesForAPIHeadings = splitApi(apiContents, destDir);
-  const apiSidebar = generateApiSidebar(apiContents, VERSION);
+  const apiSidebar = generateApiSidebar(apiContents, version);
 
   // Transform markdown files
   const files = markdownFiles(destDir);
@@ -304,12 +306,14 @@ function main() {
   const docsIndex = fse
     .readFileSync(path.join(destDir, "README.md"))
     .toString();
-  const docsSidebar = generateDocsSidebar(docsIndex, VERSION);
-  writeSidebarFile(apiSidebar, docsSidebar, sidebarFile, VERSION);
+  const docsSidebar = generateDocsSidebar(docsIndex, version);
+  writeSidebarFile(apiSidebar, docsSidebar, sidebarFile, version);
 
-  if (VERSION) {
-    writeVersionsFile(VERSION);
+  if (version) {
+    writeVersionsFile(version);
   }
 }
 
-main();
+module.exports = {
+  main
+}
