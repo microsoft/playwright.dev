@@ -26,7 +26,6 @@ function removeHeadingLine(contents) {
 
 function writeFrontmatter(filePath) {
   const contents = fse.readFileSync(filePath).toString();
-  console.log('frontmatter....');
   const title = getTitle(contents);
   const fileName = path.basename(filePath, path.extname(filePath));
   const fm = `---\nid: ${fileName}\ntitle: "${title}"\n---\n\n`;
@@ -121,7 +120,6 @@ function splitApi(contents, destDir) {
     fse.mkdirpSync(path.join(destDir, "api"));
     const contentLines = [...lines.slice(start, end), ...footerLines];
     const contents = contentLines.join("\n");
-    console.log('pairs....')
     const title = getTitle(contents);
     const slug = slugger(title);
     const relativePath = path.join("api", `${slug}.md`);
@@ -136,7 +134,6 @@ function splitApi(contents, destDir) {
     const pairHeadings = headings.filter(
       (t) => t.map[0] >= start && t.map[0] <= end
     );
-    console.log('internal headings....', destDir);
     const internalHeadings = pairHeadings
       .map((t) => getTitle(lines[t.map[0]]))
       .map((t) => slugger(t));
