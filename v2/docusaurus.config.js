@@ -32,9 +32,6 @@ module.exports = {
           position: 'left',
         },
         {
-          to: 'blog', label: 'Blog', position: 'right'
-        },
-        {
           href: 'https://github.com/microsoft/playwright',
           label: 'GitHub',
           position: 'right',
@@ -86,10 +83,6 @@ module.exports = {
         {
           title: 'More',
           items: [
-            {
-              label: 'Blog',
-              to: 'blog',
-            },
             {
               label: 'GitHub',
               href: 'https://github.com/microsoft/playwright',
