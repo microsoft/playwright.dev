@@ -43,13 +43,22 @@ function closeTags(filePath) {
   fse.writeFileSync(filePath, newContents);
 }
 
-function fixLinks(filePath) {
-  // Cases to handle
-  // 1. Non-markdown links (like dockerfile.bionic) will go to the repo
-  // 2. api.md links to land at the right location (after api.md split)
-  const contents = fse.readFileSync(filePath).toString();
-  const newContents = contents;
-  fse.writeFileSync(filePath, newContents);
+function fixLinks(filePath, pagesForAPIHeadings) {
+  // TODO: this does not work when anchors slug is duplicate: e.g., page.$ and page.$$
+  // TODO: handle non-markdown links (e.g. dockerfile.bionic) -- redirect to github
+  const existingContents = fse.readFileSync(filePath).toString();
+  let contents = existingContents;
+  function replaceLink(contents, slug, newSlug) {
+    return contents.replace(slug, newSlug);
+  }
+  Object.keys(pagesForAPIHeadings).forEach((slug) => {
+    const fileName = pagesForAPIHeadings[slug];
+    // For inline links
+    contents = replaceLink(contents, `(#${slug})`, `(${fileName}#${slug})`);
+    // For links in footer
+    contents = replaceLink(contents, `api.md#${slug}`, `${fileName}#${slug}`);
+  });
+  fse.writeFileSync(filePath, contents);
 }
 
 function markdownFiles(dir) {
@@ -85,20 +94,18 @@ function overwriteFooterLinks(footerLines) {
 }
 
 function splitApi(contents, destDir) {
+  const pageForHeading = {};
   const tokens = md.parse(contents, {});
-  const headings = tokens.filter(
-    (t) => t.type === "heading_open" && t.tag === "h3"
-  );
+  const headings = tokens.filter((t) => t.type === "heading_open");
+  const headingsToSplitPages = headings.filter((t) => t.tag === "h3");
   const lines = contents.split("\n");
-  // TODO: also fix the links since we are splitting api.md
-  // e.g., #class-browsertype -> api.md#class-browsertype -> api/class-browsertype.md
   const tokensWithLineNum = tokens.filter((t) => t.map);
   const lastToken = tokensWithLineNum[tokensWithLineNum.length - 1];
   const footerStart = lastToken.map[1];
   const footerLines = overwriteFooterLinks(lines.slice(footerStart));
 
-  const lineNums = headings.map((h) => h.map[0]);
-  const pairs = lineNums.reduce(function (result, value, index, array) {
+  const lineNums = headingsToSplitPages.map((h) => h.map[0]);
+  const pairs = lineNums.reduce((result, value, index, array) => {
     if (index < array.length - 1) {
       result.push(array.slice(index, index + 2));
     } else {
@@ -108,19 +115,32 @@ function splitApi(contents, destDir) {
   }, []);
 
   pairs.forEach((p) => {
+    const [start, end] = p;
     fse.mkdirpSync(path.join(destDir, "api"));
-    const contentLines = [...lines.slice(p[0], p[1]), ...footerLines];
+    const contentLines = [...lines.slice(start, end), ...footerLines];
     const contents = contentLines.join("\n");
     const title = getTitle(contents);
     const slug = slugger(title);
-    const filePath = path.join(destDir, "api", `${slug}.md`);
-    // promote headings by 2 levels
+    const relativePath = path.join("api", `${slug}.md`);
+    const fullPath = path.join(destDir, relativePath);
+    // Promote headings by 2 levels
     const newContents = contents
       .replace(/###/g, "#")
       .replace(/####/g, "##")
       .replace(/#####/g, "###");
-    fse.writeFileSync(filePath, newContents);
+    fse.writeFileSync(fullPath, newContents);
+
+    const pairHeadings = headings.filter(
+      (t) => t.map[0] >= start && t.map[0] <= end
+    );
+    const internalHeadings = pairHeadings
+      .map((t) => getTitle(lines[t.map[0]]))
+      .map((t) => slugger(t));
+    internalHeadings.forEach((h) => {
+      pageForHeading[h] = relativePath;
+    });
   });
+  return pageForHeading;
 }
 
 function generateApiSidebar(contents, version) {
@@ -270,14 +290,14 @@ function main() {
 
   // Transform API reference
   const apiContents = fse.readFileSync(path.join(destDir, "api.md")).toString();
-  splitApi(apiContents, destDir);
+  const pagesForAPIHeadings = splitApi(apiContents, destDir);
   const apiSidebar = generateApiSidebar(apiContents, VERSION);
 
   // Transform markdown files
   const files = markdownFiles(destDir);
   files.forEach((filePath) => {
     writeFrontmatter(filePath);
-    fixLinks(filePath);
+    fixLinks(filePath, pagesForAPIHeadings);
     closeTags(filePath);
   });
   // Build docs sidebar
