@@ -6,22 +6,6 @@ const slugify = require("slugify");
 const sh = require("shelljs");
 const semver = require("semver");
 
-const { VERSION, SRC_DIR } = process.env;
-if (!SRC_DIR) {
-  console.log("Use SRC_DIR to specify docs location, e.g. path-to-repo/docs.");
-  process.exit(1);
-}
-const srcDir = SRC_DIR;
-const destDir = (function () {
-  return VERSION ? path.join("versioned_docs", `version-${VERSION}`) : "./docs";
-})();
-const sidebarFile = (function () {
-  return VERSION
-    ? path.join("versioned_sidebars", `version-${VERSION}-sidebars.json`)
-    : "sidebars.js";
-})();
-const versionsFile = "versions.json";
-
 function slugger(text) {
   //@ts-ignore
   return slugify(text, { lower: true, strict: true });
@@ -59,6 +43,15 @@ function closeTags(filePath) {
   fse.writeFileSync(filePath, newContents);
 }
 
+function fixLinks(filePath) {
+  // Cases to handle
+  // 1. Non-markdown links (like dockerfile.bionic) will go to the repo
+  // 2. api.md links to land at the right location (after api.md split)
+  const contents = fse.readFileSync(filePath).toString();
+  const newContents = contents;
+  fse.writeFileSync(filePath, newContents);
+}
+
 function markdownFiles(dir) {
   let files = [];
   fse.readdirSync(dir).forEach((file) => {
@@ -86,14 +79,12 @@ function keepOnlyMarkdownFiles(dir) {
 }
 
 function overwriteFooterLinks(footerLines) {
-  // Changes 
-  // #class-browsertype -> api.md#class-browsertype
-  return footerLines.map(line => {
-    return line.replace(/(#[^\s]+)/g, 'api.md$1');
-  });
+  // Changes relative to absolute
+  // e.g. #class-browsertype -> api.md#class-browsertype
+  return footerLines.map((line) => line.replace(/(#[^\s]+)/g, "api.md$1"));
 }
 
-function splitApi(contents) {
+function splitApi(contents, destDir) {
   const tokens = md.parse(contents, {});
   const headings = tokens.filter(
     (t) => t.type === "heading_open" && t.tag === "h3"
@@ -101,7 +92,7 @@ function splitApi(contents) {
   const lines = contents.split("\n");
   // TODO: also fix the links since we are splitting api.md
   // e.g., #class-browsertype -> api.md#class-browsertype -> api/class-browsertype.md
-  const tokensWithLineNum = tokens.filter(t => t.map);
+  const tokensWithLineNum = tokens.filter((t) => t.map);
   const lastToken = tokensWithLineNum[tokensWithLineNum.length - 1];
   const footerStart = lastToken.map[1];
   const footerLines = overwriteFooterLinks(lines.slice(footerStart));
@@ -132,7 +123,7 @@ function splitApi(contents) {
   });
 }
 
-function generateApiSidebar(contents) {
+function generateApiSidebar(contents, version) {
   // parse the table of contents
   const tokens = md.parse(contents, {});
   const ul = tokens.find((t) => t.type === "bullet_list_open");
@@ -143,7 +134,7 @@ function generateApiSidebar(contents) {
     .map((li) => li.children.find((c) => c.type === "text"))
     .map((t) => t.content)
     .map(slugger);
-  const prefix = VERSION ? `version-${VERSION}/api/` : "api/";
+  const prefix = version ? `version-${version}/api/` : "api/";
   return [
     {
       type: "category",
@@ -154,7 +145,7 @@ function generateApiSidebar(contents) {
   ];
 }
 
-function generateDocsSidebar(contents) {
+function generateDocsSidebar(contents, version) {
   // For pre-v1.2.0 tags, the sidebar does not have categories
   // and is a flat list of links to docs.
   const tokens = md.parse(contents, {});
@@ -166,7 +157,7 @@ function generateDocsSidebar(contents) {
       t.map[1] <= ol.map[1] &&
       t.level === 3
   );
-  const prefix = VERSION ? `version-${VERSION}/` : "";
+  const prefix = version ? `version-${version}/` : "";
 
   function headingContent(token) {
     return token.children.find((t) => t.type === "text").content;
@@ -203,7 +194,7 @@ function generateDocsSidebar(contents) {
     };
   }
 
-  const hasCategories = !VERSION || !semver.lt(VERSION, "1.3.0");
+  const hasCategories = !version || !semver.lt(version, "1.3.0");
   return hasCategories
     ? headings.map(subList).filter(Boolean)
     : headings.map((h) => ({
@@ -213,23 +204,23 @@ function generateDocsSidebar(contents) {
       }));
 }
 
-function writeSidebarFile(apiSidebar, docsSidebar) {
+function writeSidebarFile(apiSidebar, docsSidebar, sidebarFile, version) {
   const sidebar = {};
-  const docsKey = VERSION ? `version-${VERSION}/docs` : "docs";
-  const apiKey = VERSION ? `version-${VERSION}/api` : "api";
+  const docsKey = version ? `version-${version}/docs` : "docs";
+  const apiKey = version ? `version-${version}/api` : "api";
   sidebar[docsKey] = docsSidebar;
   sidebar[apiKey] = apiSidebar;
-  const content = VERSION
+  const content = version
     ? JSON.stringify(sidebar)
     : `module.exports = ${JSON.stringify(sidebar)};`;
   fse.ensureFileSync(sidebarFile);
   fse.writeFileSync(sidebarFile, content);
 }
 
-function copyFiles() {
+function copyFiles(srcDir, destDir, version) {
   const currentDir = sh.pwd().stdout;
   sh.cd(srcDir);
-  const tag = VERSION ? `tags/v${VERSION}` : `master`;
+  const tag = version ? `tags/v${version}` : `master`;
   const result = sh.exec(`git checkout ${tag}`);
   if (result.code !== 0) {
     console.warn(`git checkout to ${tag} failed. Check source repo.`);
@@ -239,43 +230,66 @@ function copyFiles() {
   fse.copySync(srcDir, destDir);
 }
 
-function writeVersionsFile() {
+function writeVersionsFile(version) {
   let newVersions = [];
+  const versionsFile = "versions.json";
   if (fse.existsSync(versionsFile)) {
     const versions = JSON.parse(fse.readFileSync("versions.json").toString());
-    versions.unshift(VERSION);
+    versions.unshift(version);
     newVersions = versions;
   } else {
-    newVersions = [VERSION];
+    newVersions = [version];
   }
   const uniqVersions = semver.rsort([...new Set(newVersions)]);
   fse.writeFileSync("versions.json", JSON.stringify(uniqVersions));
 }
 
-// Main
-fse.mkdirpSync(destDir);
-fse.emptyDirSync(destDir);
-copyFiles();
-keepOnlyMarkdownFiles(destDir);
+function main() {
+  const { VERSION, SRC_DIR } = process.env;
+  if (!SRC_DIR) {
+    console.log(
+      "Use SRC_DIR to specify docs location, e.g. path-to-repo/docs."
+    );
+    process.exit(1);
+  }
+  const srcDir = SRC_DIR;
+  const destDir = (function () {
+    return VERSION
+      ? path.join("versioned_docs", `version-${VERSION}`)
+      : "./docs";
+  })();
+  const sidebarFile = (function () {
+    return VERSION
+      ? path.join("versioned_sidebars", `version-${VERSION}-sidebars.json`)
+      : "sidebars.js";
+  })();
+  fse.mkdirpSync(destDir);
+  fse.emptyDirSync(destDir);
+  copyFiles(srcDir, destDir, VERSION);
+  keepOnlyMarkdownFiles(destDir);
 
-// Transform API reference
-const api = fse.readFileSync(path.join(destDir, "api.md")).toString();
-splitApi(api);
-const apiSidebar = generateApiSidebar(api);
+  // Transform API reference
+  const apiContents = fse.readFileSync(path.join(destDir, "api.md")).toString();
+  splitApi(apiContents, destDir);
+  const apiSidebar = generateApiSidebar(apiContents, VERSION);
 
-// Transform markdown files
-const files = markdownFiles(destDir);
-files.forEach((filePath) => {
-  writeFrontmatter(filePath);
-  closeTags(filePath);
-});
-const docsSidebar = generateDocsSidebar(
-  fse.readFileSync(path.join(destDir, "README.md")).toString()
-);
+  // Transform markdown files
+  const files = markdownFiles(destDir);
+  files.forEach((filePath) => {
+    writeFrontmatter(filePath);
+    fixLinks(filePath);
+    closeTags(filePath);
+  });
+  // Build docs sidebar
+  const docsIndex = fse
+    .readFileSync(path.join(destDir, "README.md"))
+    .toString();
+  const docsSidebar = generateDocsSidebar(docsIndex, VERSION);
+  writeSidebarFile(apiSidebar, docsSidebar, sidebarFile, VERSION);
 
-// Create sidebar
-writeSidebarFile(apiSidebar, docsSidebar);
-
-if (VERSION) {
-  writeVersionsFile();
+  if (VERSION) {
+    writeVersionsFile(VERSION);
+  }
 }
+
+main();
