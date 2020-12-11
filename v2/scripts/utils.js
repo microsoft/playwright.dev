@@ -40,7 +40,8 @@ function closeTags(filePath) {
   const newContents = contents
     .replace(/(<img("[^"]*"|[^\/">])*)>/gi, "$1/>")
     .replace(/(<br("[^"]*"|[^\/">])*)>/gi, "$1/>")
-    .replace("<br/>\n</details>", "<br/>\n\n</details>");
+    .replace("<br/>\n</details>", "<br/>\n\n</details>")
+    .replace(".\n<!--", ".\n\n<!--");
   fse.writeFileSync(filePath, newContents);
 }
 
@@ -312,5 +313,5 @@ function main(srcDir, version) {
 }
 
 module.exports = {
-  main
-}
+  main,
+};
