@@ -122,4 +122,18 @@ module.exports = {
       },
     ],
   ],
+  plugins: [
+    [
+      '@docusaurus/plugin-client-redirects',
+      {
+        createRedirects: function (existingPath) {
+          // Fix search results till this is merged
+          // https://github.com/algolia/docsearch-configs/pull/3031/files
+          if (existingPath.startsWith('/docs')) {
+            return [`/playwright${existingPath}`];
+          }
+        },
+      },
+    ],
+  ],
 };
