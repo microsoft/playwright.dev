@@ -3,10 +3,10 @@ module.exports = {
   tagline: 'Fast and reliable end-to-end testing for modern web apps',
 
   // Repo config for GitHub Pages
-  url: 'https://microsoft.github.io',
-  baseUrl: '/playwright/',
+  url: 'https://playwright.dev',
+  baseUrl: '/',
   organizationName: 'microsoft',
-  projectName: 'playwright',
+  projectName: 'playwright.dev',
 
   onBrokenLinks: 'log',
   scripts: ['js/redirection.js'],
