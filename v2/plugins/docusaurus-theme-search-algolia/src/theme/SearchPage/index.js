@@ -297,7 +297,7 @@ function Search() {
   return (
     <Layout wrapperClassName="search-page-wrapper">
       <Head>
-        <title>{useTitleFormatter(getTitle())}</title>
+        <title>{getTitle()}</title>
         {/*
          We should not index search pages
           See https://github.com/facebook/docusaurus/pull/3233
