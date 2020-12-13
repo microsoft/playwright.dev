@@ -1,1 +1,0 @@
-Fork of [original search plugin](https://github.com/facebook/docusaurus/tree/915f949c25844c247d03937feb5df72481ce8d46/packages/docusaurus-theme-search-algolia). Modifications in `transformItems` in src/theme/SearchBar/index.js

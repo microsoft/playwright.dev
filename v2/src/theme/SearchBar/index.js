@@ -92,13 +92,12 @@ function DocSearch({contextualSearch, ...props}) {
   );
 
   const navigator = useRef({
-    navigate({itemUrl}) {
-      history.push(itemUrl);
+    navigate({suggestionUrl}) {
+      history.push(suggestionUrl);
     },
   }).current;
 
   const transformItems = useRef((items) => {
-    
     return items.map((item) => {
       // We transform the absolute URL into a relative URL.
       // Alternatively, we can use `new URL(item.url)` but it's not

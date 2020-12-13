@@ -1,5 +1,28 @@
-const path = require('path');
+const path = require("path");
 const isProd = process.env.NODE_ENV === "production";
+
+let plugins = [
+  [
+    require.resolve("@docusaurus/plugin-content-docs"),
+    {
+      sidebarPath: require.resolve("./sidebars.js"),
+      editUrl: "https://github.com/microsoft/playwright/edit/master/docs/",
+    },
+  ],
+  [
+    require.resolve("@docusaurus/plugin-content-blog"),
+    {
+      showReadingTime: true,
+      editUrl:
+        "https://github.com/microsoft/playwright.dev/edit/master/v2/blog/",
+    },
+  ],
+  require.resolve("@docusaurus/plugin-content-pages"),
+];
+
+if (isProd) {
+  plugins.push(require.resolve("@docusaurus/plugin-sitemap"));
+}
 
 module.exports = {
   title: "Playwright",
@@ -108,25 +131,7 @@ module.exports = {
         customCss: require.resolve("./src/css/custom.css"),
       },
     ],
-    path.resolve(__dirname, './plugins/docusaurus-theme-search-algolia')
+    require.resolve("@docusaurus/theme-search-algolia"),
   ],
-  plugins: [
-    [
-      require.resolve("@docusaurus/plugin-content-docs"),
-      {
-        sidebarPath: require.resolve("./sidebars.js"),
-        editUrl: "https://github.com/microsoft/playwright/edit/master/docs/",
-      },
-    ],
-    [
-      require.resolve("@docusaurus/plugin-content-blog"),
-      {
-        showReadingTime: true,
-        editUrl:
-          "https://github.com/microsoft/playwright.dev/edit/master/v2/blog/",
-      },
-    ],
-    [require.resolve("@docusaurus/plugin-content-pages"), {}],
-    isProd && [require.resolve("@docusaurus/plugin-sitemap"), {}],
-  ],
+  plugins
 };
