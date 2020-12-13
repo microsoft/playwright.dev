@@ -17,15 +17,3 @@ if (path) {
   window.location.href = `${param("path").replace(".md", "")}#${param("q")}`;
 }
 
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker
-    .getRegistrations()
-    .then(function (registrations) {
-      for (let registration of registrations) {
-        registration.unregister();
-      }
-    })
-    .catch(function (err) {
-      console.log("Service Worker registration failed: ", err);
-    });
-}
