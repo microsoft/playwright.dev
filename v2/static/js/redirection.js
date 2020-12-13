@@ -17,3 +17,8 @@ if (path) {
   window.location.href = `${param("path").replace(".md", "")}#${param("q")}`;
 }
 
+window.addEventListener("load", () => {
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("/js/sw.js");
+  }
+});
