@@ -36,6 +36,9 @@ module.exports = {
   scripts: ["js/redirection.js"],
   favicon: "img/playwright-logo.svg",
   themeConfig: {
+    colorMode: {
+      defaultMode: 'dark'
+    },
     navbar: {
       title: "Playwright",
       logo: {
@@ -57,8 +60,9 @@ module.exports = {
         },
         {
           href: "https://github.com/microsoft/playwright",
-          label: "GitHub",
           position: "right",
+          className: "header-github-link",
+          "aria-label": "GitHub repository",
         },
         {
           type: "docsVersionDropdown",
@@ -133,5 +137,5 @@ module.exports = {
     ],
     require.resolve("@docusaurus/theme-search-algolia"),
   ],
-  plugins
+  plugins,
 };

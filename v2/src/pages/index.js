@@ -9,25 +9,54 @@ import styles from "./styles.module.css";
 const features = [
   {
     title: "Test across all modern browsers",
-    // imageUrl: "img/undraw_docusaurus_mountain.svg",
-    description: <>Single automation API for Chromium, Firefox and WebKit.</>,
+    description: <>Single API to automate Chromium, Firefox and WebKit.</>,
     link: "docs/why-playwright#support-for-all-browsers",
   },
   {
-    title: "Automation without trade-offs",
-    // imageUrl: "img/undraw_docusaurus_react.svg",
+    title: "Automate without trade-offs",
     description: (
-      <>Automation for single page apps that use the modern web platform.</>
+      <>
+        Capable automation for single page apps that rely on the modern web
+        platform.
+      </>
     ),
     link: "docs/why-playwright#powerful-automation-capabilities",
   },
   {
     title: "Use in your preferred language",
-    // imageUrl: "img/undraw_docusaurus_tree.svg",
     description: (
-      <>Use the API in JavaScript/TypeScript, Python, C# and Java.</>
+      <>
+        Use the Playwright API in JavaScript, TypeScript, Python, C# and Java.
+      </>
     ),
     link: "docs/languages",
+  },
+];
+
+const videoRows = [
+  {
+    title: "Get started instantly",
+    description:
+      "Install Playwright and browsers with a single command – on local and CI environments. Then use the API to launch browsers, create pages, and automate page interactions.",
+    videoUrl: "img/gifs/intro.mp4",
+  },
+  {
+    title: "Reliably automate with auto-waits",
+    description:
+      "Actions, like clicks, auto-wait for UI elements to ensure your scripts are reliable to execute. Wait for precise events for more control and say goodbye to timeouts.",
+    videoUrl: "img/gifs/auto-wait.mp4",
+  },
+  {
+    title: "Intercept network activity",
+    description:
+      "Playwright can intercept network activity to modify or mock network requests during test scenarios.",
+    videoUrl: "img/gifs/network.mp4",
+  },
+  {
+    title: "Run multi-page emulation scenarios",
+    description:
+      "A single browser instance in Playwright can create multiple isolated browser contexts. Each browser context can run multi-page emulation scenarios.",
+    videoUrl: "img/gifs/contexts.mp4",
   },
 ];
 
@@ -43,13 +72,84 @@ function Feature({ imageUrl, title, description, link }) {
       <h3>{title}</h3>
       <p>{description}</p>
       <p>
-        <Link to={useBaseUrl("docs/why-playwright#support-for-all-browsers")}>
-          Learn more
-        </Link>
+        <Link to={useBaseUrl(link)}>Learn more</Link>
       </p>
     </div>
   );
 }
+
+function GitHubStars() {
+  return (
+    <div style={{ height: 30 }}>
+      <iframe
+        className={styles.githubStars}
+        src="https://ghbtns.com/github-btn.html?user=microsoft&amp;repo=playwright&amp;type=star&amp;count=true&amp;size=large"
+        width={160}
+        height={30}
+        title="GitHub Stars"
+      />
+    </div>
+  );
+}
+
+function FeatureRow({ title, description, videoUrl, isImageLeft }) {
+  const textColumn = (
+    <div className={clsx("col col--5")}>
+      <h2>{title}</h2>
+      <p>{description}</p>
+    </div>
+  );
+  const imageColumn = (
+    <div className={clsx("col col--7")}>
+      <video muted controls loop>
+        <source src={videoUrl} type="video/mp4" />
+        Your browser does not support the video tag.
+      </video>
+    </div>
+  );
+  return (
+    <section
+      className={clsx(!isImageLeft ? styles.featureContainerAlt : undefined)}
+    >
+      <div className={clsx("container")}>
+        <div
+          className={clsx(
+            "row",
+            styles.featureRow,
+            !isImageLeft ? styles.featureRowAlt : undefined
+          )}
+        >
+          {imageColumn}
+          {textColumn}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+const logos = [
+  { imageUrl: "img/logos/VSCode.png", href: "https://code.visualstudio.com" },
+  { imageUrl: "img/logos/Bing.png", href: "https://bing.com" },
+  { imageUrl: "img/logos/Outlook.png", href: "https://outlook.com" },
+  { imageUrl: "img/logos/DHotstar.jpg", href: "https://www.hotstar.com/" },
+  {
+    imageUrl: "img/logos/MUI.png",
+    href: "https://github.com/mui-org/material-ui",
+  },
+  { imageUrl: "img/logos/ING.png", href: "https://github.com/ing-bank/lion" },
+  {
+    imageUrl: "img/logos/Adobe2.png",
+    href: "https://github.com/adobe/spectrum-web-components",
+  },
+  {
+    imageUrl: "img/logos/ReactNavigation.png",
+    href: "https://github.com/react-navigation/react-navigation",
+  },
+  {
+    imageUrl: "img/logos/accessibilityinsights.png",
+    href: "https://accessibilityinsights.io/",
+  },
+];
 
 function Home() {
   const context = useDocusaurusContext();
@@ -72,30 +172,43 @@ function Home() {
             >
               Get started
             </Link>
-            <div>
-              <iframe
-                className={styles.githubStars}
-                src="https://ghbtns.com/github-btn.html?user=microsoft&amp;repo=playwright&amp;type=star&amp;count=true&amp;size=large"
-                width={160}
-                height={30}
-                title="GitHub Stars"
-              />
-            </div>
+            <GitHubStars />
           </div>
         </div>
       </header>
       <main>
-        {features && features.length > 0 && (
-          <section className={styles.features}>
-            <div className="container">
-              <div className="row">
-                {features.map((props, idx) => (
-                  <Feature key={idx} {...props} />
-                ))}
+        <section className={styles.features}>
+          <div className="container">
+            <div className="row">
+              {features.map((props, idx) => (
+                <Feature key={idx} {...props} />
+              ))}
+            </div>
+          </div>
+        </section>
+
+        <section className={clsx(styles.logosSection)}>
+          <div className="container">
+            <div className="row">
+              <div className={clsx("col col--12", styles.logosColumn)}>
+                <h2>Chosen by companies and open source projects</h2>
+                <ul className={clsx(styles.logosList)}>
+                  {logos.map(({ imageUrl, href }, idx) => (
+                    <li key={idx}>
+                      <a href={href} target="_blank">
+                        <img src={imageUrl} />
+                      </a>
+                    </li>
+                  ))}
+                </ul>
               </div>
             </div>
-          </section>
-        )}
+          </div>
+        </section>
+
+        {videoRows.map((row, idx) => (
+          <FeatureRow {...row} key={idx} isImageLeft={idx % 2} />
+        ))}
       </main>
     </Layout>
   );
