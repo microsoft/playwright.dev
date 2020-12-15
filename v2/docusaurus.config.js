@@ -6,7 +6,6 @@ let plugins = [
     require.resolve("@docusaurus/plugin-content-docs"),
     {
       sidebarPath: require.resolve("./sidebars.js"),
-      editUrl: "https://github.com/microsoft/playwright/edit/master/docs/",
     },
   ],
   [
