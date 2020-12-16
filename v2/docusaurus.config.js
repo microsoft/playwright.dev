@@ -36,7 +36,7 @@ module.exports = {
   favicon: "img/playwright-logo.svg",
   themeConfig: {
     colorMode: {
-      defaultMode: 'dark'
+      defaultMode: "dark",
     },
     navbar: {
       title: "Playwright",
@@ -134,7 +134,17 @@ module.exports = {
         customCss: require.resolve("./src/css/custom.css"),
       },
     ],
-    require.resolve("@docusaurus/theme-search-algolia"),
+    [
+      require.resolve(
+        "./third_party/docusaurus-search-local/dist/server/server/index"
+      ),
+      {
+        hashed: true,
+        language: ["en"],
+        searchResultLimits: 8,
+        highlightSearchTermsOnTargetPage: true,
+      },
+    ],
   ],
   plugins,
 };
