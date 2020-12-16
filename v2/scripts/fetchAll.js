@@ -3,8 +3,8 @@ const { main } = require("./utils");
 const { SRC_DIR } = process.env;
 const versions = [
   undefined, // master
+  "1.7.0",
   "1.6.2",
-  "1.6.1",
   "1.6.0",
   "1.5.2",
   "1.5.0",
