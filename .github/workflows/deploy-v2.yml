@@ -7,27 +7,24 @@ on:
   pull_request:
     branches:
       - master
-
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
 
-      - uses: actions/checkout@v2
+      - name: Checkout upstream repository
+        uses: actions/checkout@v2
         with:
           repository: microsoft/playwright
           path: v2/content-repo
           fetch-depth: 0
-          # The same token is used by the commit action later on
-          token: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
 
-      - uses: actions/setup-node@v1
+      - uses: actions/setup-node@v2
         with:
-          node-version: '12'
-      - run: npm install
+          node-version: '14'
+
+      - run: npm ci
         working-directory: v2
 
       - name: Fetch docs content
@@ -36,28 +33,23 @@ jobs:
         env:
           SRC_DIR: content-repo/docs
 
-      - run: yarn
+      - name: Install Dependencies (docusaurus-search-local)
+        run: yarn
         working-directory: v2/third_party/docusaurus-search-local
 
-      - run: yarn build
+      - name: Build (docusaurus-search-local)
+        run: yarn build
         working-directory: v2/third_party/docusaurus-search-local
 
-      - run: npm run build
+      - name: Build
+        run: npm run build
         working-directory: v2
 
-      - run: mv build ../../.
-        working-directory: v2
-
-      - run: git checkout gh-pages
-
-      - name: Clean existing files
-        run: rm -rf *
-
-      - name: Move build files to repo dir
-        run: mv ../build/* .
-      
-      - run: git status
-
-      - uses: stefanzweifel/git-auto-commit-action@v4
+      - name: Deploy to GitHub Pages
+        if: github.ref == 'refs/heads/master'
+        uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
-          branch: gh-pages
+          GITHUB_TOKEN: ${{ secrets.PERSONAL_ACCESS_TOKEN }}
+          BRANCH: gh-pages
+          FOLDER: v2/build
+          CLEAN: true
