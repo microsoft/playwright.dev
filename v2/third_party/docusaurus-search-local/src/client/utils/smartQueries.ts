@@ -3,6 +3,24 @@ import { SmartQuery, SmartTerm } from "../../shared/interfaces";
 import { smartTerms } from "./smartTerms";
 import { language, removeDefaultStopWordFilter } from "./proxiedGenerated";
 
+export function smartQueries(
+  tokens: string[],
+  zhDictionary: string[]
+): SmartQuery[] {
+  // arjun27: Trimming original smartQueries to support searching for `goto`
+  // which should return `page.goto`
+  return [
+    {
+      tokens,
+      term: tokens.map((value) => ({
+        value,
+        presence: lunr.Query.presence.REQUIRED,
+        wildcard: lunr.Query.wildcard.LEADING | lunr.Query.wildcard.TRAILING,
+      })),
+    },
+  ];
+}
+
 /**
  * Get all possible queries for a list of tokens consists of words mixed English and Chinese,
  * by a Chinese words dictionary.
@@ -12,7 +30,7 @@ import { language, removeDefaultStopWordFilter } from "./proxiedGenerated";
  *
  * @returns A smart query list.
  */
-export function smartQueries(
+export function smartQueriesOld(
   tokens: string[],
   zhDictionary: string[]
 ): SmartQuery[] {
