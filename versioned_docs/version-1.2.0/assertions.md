@@ -124,5 +124,5 @@ assert(length === 3);
 - [frame.evaluate(pageFunction[, arg])](api/class-frame.md#frameevaluatepagefunction-arg)
 - [frame.$eval(selector, pageFunction[, arg])]api/class-frame.md#frameevalselector-pagefunction-arg)
 - [frame.$$eval(selector, pageFunction[, arg])]api/class-frame.md#frameevalselector-pagefunction-arg-1)
-- [elementHandle.$eval(selector, pageFunction[, arg])](api.md#elementhandleevalselector-pagefunction-arg)
-- [elementHandle.$$eval(selector, pageFunction[, arg])](api.md#elementhandleevalselector-pagefunction-arg-1)
+- [elementHandle.$eval(selector, pageFunction[, arg])](api/class-elementhandle.md#elementhandleevalselector-pagefunction-arg)
+- [elementHandle.$$eval(selector, pageFunction[, arg])](api/class-elementhandle.md#elementhandleevalselector-pagefunction-arg-1)

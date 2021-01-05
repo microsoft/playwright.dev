@@ -64,7 +64,7 @@ Note that handling the event forks the control flow and makes script harder to f
 
 - [Download](https://github.com/microsoft/playwright/blob/master/docs/class-download.md)
 - [page.on('download')](api/class-page.md#event-download)
-- [page.waitForEvent(event)](https://github.com/microsoft/playwright/blob/master/docs/api.md##pagewaitforeventevent-optionsorpredicate)
+- [page.waitForEvent(event)](api/class-page.md#pagewaitforeventevent-optionsorpredicate)
 
 <br/>
 
