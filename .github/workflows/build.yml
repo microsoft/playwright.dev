@@ -1,0 +1,30 @@
+name: Build
+on:
+  push:
+    branches: [ master ]
+  pull_request:
+    branches: [ master ]
+jobs:
+
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+        with:
+          repository: microsoft/playwright
+          path: content-repo
+          fetch-depth: 0
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - run: npm ci
+
+      - name: npm ci (docusaurus-search-local)
+        run: npm ci
+        working-directory: third_party/docusaurus-search-local
+      - name: npm run build (npm ci (docusaurus-search-local))
+        run: yarn build
+        working-directory: third_party/docusaurus-search-local
+
+      - run: npm run build
