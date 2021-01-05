@@ -1,0 +1,90 @@
+---
+id: class-consolemessage
+title: "class: ConsoleMessage"
+---
+
+
+[ConsoleMessage] objects are dispatched by page via the ['console'](api/class-page.md#event-console) event.
+
+<!-- GEN:toc -->
+- [consoleMessage.args()](api/class-consolemessage.md#consolemessageargs)
+- [consoleMessage.location()](api/class-consolemessage.md#consolemessagelocation)
+- [consoleMessage.text()](api/class-consolemessage.md#consolemessagetext)
+- [consoleMessage.type()](api/class-consolemessage.md#consolemessagetype)
+<!-- GEN:stop -->
+
+## consoleMessage.args()
+- returns: <[Array]<[JSHandle]>>
+
+## consoleMessage.location()
+- returns: <[Object]>
+  - `url` <[string]> URL of the resource if available.
+  - `lineNumber` <[number]> 0-based line number in the resource if available.
+  - `columnNumber` <[number]> 0-based column number in the resource if available.
+
+## consoleMessage.text()
+- returns: <[string]>
+
+## consoleMessage.type()
+- returns: <[string]>
+
+One of the following values: `'log'`, `'debug'`, `'info'`, `'error'`, `'warning'`, `'dir'`, `'dirxml'`, `'table'`, `'trace'`, `'clear'`, `'startGroup'`, `'startGroupCollapsed'`, `'endGroup'`, `'assert'`, `'profile'`, `'profileEnd'`, `'count'`, `'timeEnd'`.
+
+
+
+[AXNode]: api/class-accessibility.md#accessibilitysnapshotoptions "AXNode"
+[Accessibility]: api/class-accessibility.md#class-accessibility "Accessibility"
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[Body]: api.md#class-body  "Body"
+[BrowserServer]: api/class-browser.md#class-browserserver  "BrowserServer"
+[BrowserContext]: api/class-browsercontext.md#class-browsercontext  "BrowserContext"
+[BrowserType]: api/class-browsertype.md#class-browsertype "BrowserType"
+[Browser]: api.md#class-browser  "Browser"
+[Buffer]: https://nodejs.org/api/buffer.htmlapi.md#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[ChromiumBrowser]: api/class-chromiumbrowser.md#class-chromiumbrowser "ChromiumBrowser"
+[ChromiumBrowserContext]: api/class-chromiumbrowsercontext.md#class-chromiumbrowsercontext "ChromiumBrowserContext"
+[ChromiumCoverage]: api/class-chromiumcoverage.md#class-chromiumcoverage "ChromiumCoverage"
+[CDPSession]: api/class-cdpsession.md#class-cdpsession  "CDPSession"
+[ConsoleMessage]: api/class-consolemessage.md#class-consolemessage "ConsoleMessage"
+[Dialog]: api/class-dialog.md#class-dialog "Dialog"
+[Download]: api/class-download.md#class-download "Download"
+[ElementHandle]: api/class-elementhandle.md#class-elementhandle "ElementHandle"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[Error]: https://nodejs.org/api/errors.htmlapi.md#errors_class_error "Error"
+[File]: api.md#class-file "https://developer.mozilla.org/en-US/docs/Web/API/File"
+[FileChooser]: api/class-filechooser.md#class-filechooser "FileChooser"
+[FirefoxBrowser]: api/class-firefoxbrowser.md#class-firefoxbrowser "FirefoxBrowser"
+[Frame]: api/class-frame.md#class-frame "Frame"
+[JSHandle]: api/class-jshandle.md#class-jshandle "JSHandle"
+[Keyboard]: api/class-keyboard.md#class-keyboard "Keyboard"
+[Logger]: api/class-logger.md#class-logger "Logger"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[Mouse]: api/class-mouse.md#class-mouse "Mouse"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Page]: api/class-page.md#class-page "Page"
+[Playwright]: api.md#class-playwright "Playwright"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
+[Request]: api/class-request.md#class-request  "Request"
+[Response]: api/class-response.md#class-response  "Response"
+[Route]: api/class-route.md#class-route  "Route"
+[Selectors]: api/class-selectors.md#class-selectors  "Selectors"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringifyapi.md#Description "Serializable"
+[TimeoutError]: api/class-timeouterror.md#class-timeouterror "TimeoutError"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[URL]: https://nodejs.org/api/url.html
+[USKeyboardLayout]: ../src/usKeyboardLayout.ts "USKeyboardLayout"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[WebKitBrowser]: api/class-webkitbrowser.md#class-webkitbrowser "WebKitBrowser"
+[WebSocket]: api.md#class-websocket "WebSocket"
+[Worker]: api/class-worker.md#class-worker "Worker"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structuresapi.md#Boolean_type "Boolean"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structuresapi.md#Number_type "Number"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Readable]: https://nodejs.org/api/stream.htmlapi.md#stream_class_stream_readable "Readable"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structuresapi.md#String_type "String"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
