@@ -233,8 +233,8 @@ function writeSidebarFile(apiSidebar, docsSidebar, sidebarFile, version) {
   sidebar[docsKey] = docsSidebar;
   sidebar[apiKey] = apiSidebar;
   const content = version
-    ? JSON.stringify(sidebar)
-    : `module.exports = ${JSON.stringify(sidebar)};`;
+    ? JSON.stringify(sidebar, undefined, 2)
+    : `module.exports = ${JSON.stringify(sidebar, undefined, 2)};`;
   fse.ensureFileSync(sidebarFile);
   fse.writeFileSync(sidebarFile, content);
 }
