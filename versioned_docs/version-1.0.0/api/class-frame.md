@@ -82,13 +82,13 @@ An example of getting text from an iframe element:
 - `selector` <[string]> A selector to query frame for
 - returns: <[Promise]<?[ElementHandle]>> Promise which resolves to ElementHandle pointing to the frame element.
 
-The method finds an element matching the specified selector within the frame. See [Working with selectors](api/working-with-selectors.md#working-with-selectors) for more details. If no elements match the selector, the return value resolves to `null`.
+The method finds an element matching the specified selector within the frame. See [Working with selectors](/api/working-with-selectors.md)) for more details. If no elements match the selector, the return value resolves to `null`.
 
 ## frame.$$(selector)
 - `selector` <[string]> A selector to query frame for
 - returns: <[Promise]<[Array]<[ElementHandle]>>> Promise which resolves to ElementHandles pointing to the frame elements.
 
-The method finds all elements matching the specified selector within the frame. See [Working with selectors](#working-with-selectors) for more details. If no elements match the selector, the return value resolves to `[]`.
+The method finds all elements matching the specified selector within the frame. See [Working with selectors](/api/working-with-selectors.md) for more details. If no elements match the selector, the return value resolves to `[]`.
 
 ## frame.$eval(selector, pageFunction[, arg])
 - `selector` <[string]> A selector to query frame for
@@ -96,7 +96,7 @@ The method finds all elements matching the specified selector within the frame. 
 - `arg` <[Serializable]|[JSHandle]> Optional argument to pass to `pageFunction`
 - returns: <[Promise]<[Serializable]>> Promise which resolves to the return value of `pageFunction`
 
-The method finds an element matching the specified selector within the frame and passes it as a first argument to `pageFunction`. See [Working with selectors](#working-with-selectors) for more details. If no elements match the selector, the method throws an error.
+The method finds an element matching the specified selector within the frame and passes it as a first argument to `pageFunction`. See [Working with selectors](/api/working-with-selectors.md) for more details. If no elements match the selector, the method throws an error.
 
 If `pageFunction` returns a [Promise], then `frame.$eval` would wait for the promise to resolve and return its value.
 
@@ -113,7 +113,7 @@ const html = await frame.$eval('.main-container', (e, suffix) => e.outerHTML + s
 - `arg` <[Serializable]|[JSHandle]> Optional argument to pass to `pageFunction`
 - returns: <[Promise]<[Serializable]>> Promise which resolves to the return value of `pageFunction`
 
-The method finds all elements matching the specified selector within the frame and passes an array of matched elements as a first argument to `pageFunction`. See [Working with selectors](#working-with-selectors) for more details.
+The method finds all elements matching the specified selector within the frame and passes an array of matched elements as a first argument to `pageFunction`. See [Working with selectors](/api/working-with-selectors.md) for more details.
 
 If `pageFunction` returns a [Promise], then `frame.$$eval` would wait for the promise to resolve and return its value.
 
@@ -617,11 +617,10 @@ Note that `frame.waitForTimeout()` should only be used for debugging. Tests usin
 [AXNode]: api/class-accessibility.md#accessibilitysnapshotoptions "AXNode"
 [Accessibility]: api/class-accessibility.md#class-accessibility "Accessibility"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[Body]: api.md#class-body  "Body"
 [BrowserServer]: api/class-browser.md#class-browserserver  "BrowserServer"
 [BrowserContext]: api/class-browsercontext.md#class-browsercontext  "BrowserContext"
 [BrowserType]: api/class-browsertype.md#class-browsertype "BrowserType"
-[Browser]: api.md#class-browser  "Browser"
+[Browser]: api/class-browser.md  "Browser"
 [Buffer]: https://nodejs.org/api/buffer.htmlapi.md#buffer_class_buffer "Buffer"
 [ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
 [ChromiumBrowser]: api/class-chromiumbrowser.md#class-chromiumbrowser "ChromiumBrowser"
@@ -634,7 +633,7 @@ Note that `frame.waitForTimeout()` should only be used for debugging. Tests usin
 [ElementHandle]: api/class-elementhandle.md#class-elementhandle "ElementHandle"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [Error]: https://nodejs.org/api/errors.htmlapi.md#errors_class_error "Error"
-[File]: api.md#class-file "https://developer.mozilla.org/en-US/docs/Web/API/File"
+[File]: https://developer.mozilla.org/en-US/docs/Web/API/File "File"
 [FileChooser]: api/class-filechooser.md#class-filechooser "FileChooser"
 [FirefoxBrowser]: api/class-firefoxbrowser.md#class-firefoxbrowser "FirefoxBrowser"
 [Frame]: api/class-frame.md#class-frame "Frame"
@@ -645,7 +644,7 @@ Note that `frame.waitForTimeout()` should only be used for debugging. Tests usin
 [Mouse]: api/class-mouse.md#class-mouse "Mouse"
 [Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
 [Page]: api/class-page.md#class-page "Page"
-[Playwright]: api.md#class-playwright "Playwright"
+[Playwright]: api/playwright-module.md "Playwright"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
 [Request]: api/class-request.md#class-request  "Request"
@@ -659,7 +658,6 @@ Note that `frame.waitForTimeout()` should only be used for debugging. Tests usin
 [USKeyboardLayout]: ../src/usKeyboardLayout.ts "USKeyboardLayout"
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [WebKitBrowser]: api/class-webkitbrowser.md#class-webkitbrowser "WebKitBrowser"
-[WebSocket]: api.md#class-websocket "WebSocket"
 [Worker]: api/class-worker.md#class-worker "Worker"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structuresapi.md#Boolean_type "Boolean"
 [function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"

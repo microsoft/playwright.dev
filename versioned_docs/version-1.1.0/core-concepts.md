@@ -43,7 +43,7 @@ maximize what a single instance can do through multiple browser contexts.
 
 #### API reference
 
-- [class `Browser`](./api.md#class-browser)
+- [class `Browser`](api/class-browser.md)
 
 <br/>
 
@@ -76,7 +76,7 @@ const context = await browser.newContext({
 
 #### API reference
 
-- [class `BrowserContext`](./api.md#class-browsercontext)
+- [class `BrowserContext`](api/class-browsercontext.md)
 
 <br/>
 
@@ -124,8 +124,8 @@ await frame.fill('#username-input', 'John');
 
 #### API reference
 
-- [class `Page`](./api.md#class-page)
-- [class `Frame`](./api.md#class-frame)
+- [class `Page`](api/class-page.md)
+- [class `Frame`](api/class-frame.md)
 
 To learn more about navigation and loading, read [this document](loading.md).
 
@@ -278,12 +278,12 @@ There are two types of handles:
 - [`ElementHandle`](./api/class-elementhandle.md#class-elementhandle) to reference DOM elements in the page
 
 Note that since any DOM element in the page is also a javascript object,
-Playwright's [`ElementHandle`](./api.md#class-elementhandle) extends
-[`JSHandle`](./api.md#class-jshandle).
+Playwright's [`ElementHandle`](api/class-elementhandle.md) extends
+[`JSHandle`](api/class-jshandle.md).
 
 Handles Lifetime:
-- Handles can be acquired using the page methods [`page.evaluteHandle`](./api/class-page.md#pageevaluatehandlepagefunction-arg), [`page.$`](./api.md#pageselector) or [`page.$$`](./api.md#pageselector-1) or
-  their frame counterparts [`frame.evaluateHandle`](./api/class-frame.md#frameevaluatehandlepagefunction-arg), [`frame.$`](./api.md#frameselector) or [`frame.$$`](./api.md#frameselector-1).
+- Handles can be acquired using the page methods [`page.evaluteHandle`](./api/class-page.md#pageevaluatehandlepagefunction-arg), [`page.$`](api/class-page.md#pageselector) or [`page.$$`](api/class-page.md#pageselector-1) or
+  their frame counterparts [`frame.evaluateHandle`](./api/class-frame.md#frameevaluatehandlepagefunction-arg), [`frame.$`](api/class-frame.md#frameselector) or [`frame.$$`](api/class-frame.md#frameselector-1).
 - Once created, handles will retain object from [garbage collection](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_Management)
 - Handles will be **automatically disposed** once the page or frame they belong to navigates or closes.
 - Handles can be **manually disposed** using [`jsHandle.dispose`](./api/class-jshandle.md#jshandledispose) method.
@@ -296,7 +296,7 @@ const ulElementHandle = await page.$('ul');
 await ulElementHandle.evaluate(ulElement => getComputedStyle(ulElement).getPropertyValue('display'));
 ```
 
-Alternatively, handles can be passed as arguments to [`page.evaluate`](./api.md#pageevaluatepagefunction-arg) function:
+Alternatively, handles can be passed as arguments to [`page.evaluate`](api/class-page.md#pageevaluatepagefunction-arg) function:
 
 ```js
 // In the page API, you can pass handle as a parameter.
@@ -305,11 +305,11 @@ await page.evaluate(uiElement => getComputedStyle(uiElement).getPropertyValue('d
 ```
 
 #### API reference
-- [class `JSHandle`](./api.md#class-jshandle)
-- [class `ElementHandle`](./api.md#class-elementhandle)
-- [`page.evaluteHandle`](./api.md#pageevaluatehandlepagefunction-arg)
-- [`page.$`](./api.md#pageselector)
-- [`page.$$`](./api.md#pageselector-1)
+- [class `JSHandle`](api/class-jshandle.md)
+- [class `ElementHandle`](api/class-elementhandle.md)
+- [`page.evaluteHandle`](api/class-page.md#pageevaluatehandlepagefunction-arg)
+- [`page.$`](api/class-page.md#pageselector)
+- [`page.$$`](api/class-page.md#pageselector-1)
 - [`jsHandle.evaluate`](./api/class-jshandle.md#jshandleevaluatepagefunction-arg)
 
 <br/>

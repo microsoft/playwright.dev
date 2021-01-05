@@ -73,4 +73,3 @@ title: "Documentation"
 1. [Selector engines](./selectors.md)
 1. [Extensibility](./extensibility.md)
     - [Custom selector engines](./extensibility.md#custom-selector-engines)
-1. [API Reference](./api.md)

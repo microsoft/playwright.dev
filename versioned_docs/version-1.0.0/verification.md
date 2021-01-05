@@ -57,10 +57,10 @@ await myArrayHandle.dispose();
 
 #### API reference
 
-- [page.$(selector)](./api.md#pageselector)
-- [page.$$(selector)](./api.md#pageselector-1)
-- [page.$eval(selector, pageFunction[, arg])](./api.md#pageevalselector-pagefunction-arg)
-- [page.$$eval(selector, pageFunction[, arg])](./api.md#pageevalselector-pagefunction-arg-1)
+- [page.$(selector)](api/class-page.md#pageselector)
+- [page.$$(selector)](api/class-page.md#pageselector-1)
+- [page.$eval(selector, pageFunction[, arg])](api/class-page.md#pageevalselector-pagefunction-arg)
+- [page.$$eval(selector, pageFunction[, arg])](api/class-page.md#pageevalselector-pagefunction-arg-1)
 - [page.evaluate(pageFunction[, arg])](./api/class-page.md#pageevaluatepagefunction-arg)
 - [page.evaluateHandle(pageFunction[, arg])](./api/class-page.md#pageevaluatehandlepagefunction-arg)
 

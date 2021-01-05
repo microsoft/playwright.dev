@@ -56,4 +56,4 @@ await searchPage.search('search query');
 ```
 
 ### API reference
-- [class `Page`](./api.md#class-page)
+- [class `Page`](api/class-page.md)

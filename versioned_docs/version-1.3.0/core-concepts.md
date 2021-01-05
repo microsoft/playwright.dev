@@ -43,7 +43,7 @@ maximize what a single instance can do through multiple browser contexts.
 
 #### API reference
 
-- [class `Browser`](./api.md#class-browser)
+- [class `Browser`](api/class-browser.md)
 
 <br/>
 
@@ -80,7 +80,7 @@ const context = await browser.newContext({
 
 #### API reference
 
-- [class `BrowserContext`](./api.md#class-browsercontext)
+- [class `BrowserContext`](api/class-browsercontext.md)
 - [browser.newContext([options])](./api/class-browser.md#browsernewcontextoptions)
 
 <br/>
@@ -134,8 +134,8 @@ await frame.fill('#username-input', 'John');
 
 #### API reference
 
-- [class `Page`](./api.md#class-page)
-- [class `Frame`](./api.md#class-frame)
+- [class `Page`](api/class-page.md)
+- [class `Frame`](api/class-frame.md)
 - [page.frame(options)](./api/class-page.md#pageframeoptions)
 
 <br/>
@@ -287,7 +287,7 @@ const result = await page.evaluate(() => {
 
 #### API reference
 
-- [`page.evaluate(pageFunction[, arg])`](api.md#pageevaluatepagefunction-arg)
+- [`page.evaluate(pageFunction[, arg])`]api/class-page.md#pageevaluatepagefunction-arg)
 - [`frame.evaluate(pageFunction[, arg])`](api/class-frame.md#frameevaluatepagefunction-arg)
 - Evaluation argument [examples](api/evaluationargument.md#evaluationargument)
 
@@ -302,12 +302,12 @@ There are two types of handles:
 - [`ElementHandle`](./api/class-elementhandle.md#class-elementhandle) to reference DOM elements in the page
 
 Note that since any DOM element in the page is also a JavaScript object,
-Playwright's [`ElementHandle`](./api.md#class-elementhandle) extends
-[`JSHandle`](./api.md#class-jshandle).
+Playwright's [`ElementHandle`](api/class-elementhandle.md) extends
+[`JSHandle`](api/class-jshandle.md).
 
 ### Handles Lifecycle
-- Handles can be acquired using the page methods [`page.evaluateHandle`](./api/class-page.md#pageevaluatehandlepagefunction-arg), [`page.$`](./api.md#pageselector) or [`page.$$`](./api.md#pageselector-1) or
-  their frame counterparts [`frame.evaluateHandle`](./api/class-frame.md#frameevaluatehandlepagefunction-arg), [`frame.$`](./api.md#frameselector) or [`frame.$$`](./api.md#frameselector-1).
+- Handles can be acquired using the page methods [`page.evaluateHandle`](./api/class-page.md#pageevaluatehandlepagefunction-arg), [`page.$`](api/class-page.md#pageselector) or [`page.$$`](api/class-page.md#pageselector-1) or
+  their frame counterparts [`frame.evaluateHandle`](./api/class-frame.md#frameevaluatehandlepagefunction-arg), [`frame.$`](api/class-frame.md#frameselector) or [`frame.$$`](api/class-frame.md#frameselector-1).
 - Once created, handles will retain object from [garbage collection](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_Management).
 - Handles will be **automatically disposed** once the page or frame they belong to navigates or closes.
 - Handles can be **manually disposed** using [`jsHandle.dispose`](./api/class-jshandle.md#jshandledispose) method.
@@ -320,7 +320,7 @@ const ulElementHandle = await page.$('ul');
 await ulElementHandle.evaluate(ulElement => getComputedStyle(ulElement).getPropertyValue('display'));
 ```
 
-Handles can also be passed as arguments to [`page.evaluate`](./api.md#pageevaluatepagefunction-arg) function:
+Handles can also be passed as arguments to [`page.evaluate`](api/class-page.md#pageevaluatepagefunction-arg) function:
 
 ```js
 // In the page API, you can pass handle as a parameter.
@@ -358,9 +358,9 @@ await myArrayHandle.dispose();
 ```
 
 #### API reference
-- [class `JSHandle`](./api.md#class-jshandle)
-- [class `ElementHandle`](./api.md#class-elementhandle)
-- [`page.evaluateHandle`](./api.md#pageevaluatehandlepagefunction-arg)
-- [`page.$`](./api.md#pageselector)
-- [`page.$$`](./api.md#pageselector-1)
+- [class `JSHandle`](api/class-jshandle.md)
+- [class `ElementHandle`](api/class-elementhandle.md)
+- [`page.evaluateHandle`](api/class-page.md#pageevaluatehandlepagefunction-arg)
+- [`page.$`](api/class-page.md#pageselector)
+- [`page.$$`](api/class-page.md#pageselector-1)
 - [`jsHandle.evaluate`](./api/class-jshandle.md#jshandleevaluatepagefunction-arg)

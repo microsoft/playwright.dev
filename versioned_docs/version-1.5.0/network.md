@@ -62,8 +62,8 @@ Note that handling the event forks the control flow and makes script harder to f
 
 #### API reference
 
-- [`Download`](https://github.com/microsoft/playwright/blob/master/docs/api.md#class-download)
-- [`page.on('download')`](https://github.com/microsoft/playwright/blob/master/docs/api.md#event-download)
+- [`Download`](https://github.com/microsoft/playwright/blob/master/docs/class-download.md)
+- [`page.on('download')`](api/page.md#event-download)
 - [`page.waitForEvent(event)`](https://github.com/microsoft/playwright/blob/master/docs/api.md##pagewaitforeventevent-optionsorpredicate)
 
 <br/>
@@ -192,8 +192,8 @@ await page.route('**/*', route => {
 
 #### API reference
 
-- [`page.route(url, handler)`](./api.md#pagerouteurl-handler)
-- [`browserContext.route(url, handler)`](./api.md#browsercontextrouteurl-handler)
+- [`page.route(url, handler)`](api/class-page.md#pagerouteurl-handler)
+- [`browserContext.route(url, handler)`](api/class-browsercontext.md#browsercontextrouteurl-handler)
 - [`route.abort([errorCode])`](./api/class-route.md#routeaborterrorcode)
 
 <br/>

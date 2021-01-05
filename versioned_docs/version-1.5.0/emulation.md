@@ -59,7 +59,7 @@ const context = await browser.newContext({
 
 #### API reference
 
-- [`browser.newContext([options])`](./api.md#browsernewcontextoptions)
+- [`browser.newContext([options])`](api/class-browser.md#browsernewcontextoptions)
 
 <br/>
 
@@ -85,7 +85,7 @@ const context = await browser.newContext({
 
 #### API reference
 
-- [`browser.newContext([options])`](./api.md#browsernewcontextoptions)
+- [`browser.newContext([options])`](api/class-browser.md#browsernewcontextoptions)
 - [`page.setViewportSize(viewportSize)`](./api/class-page.md#pagesetviewportsizeviewportsize)
 
 <br/>
@@ -102,7 +102,7 @@ const context = await browser.newContext({
 
 #### API reference
 
-- [`browser.newContext([options])`](./api.md#browsernewcontextoptions)
+- [`browser.newContext([options])`](api/class-browser.md#browsernewcontextoptions)
 
 <br/>
 
@@ -132,7 +132,7 @@ await context.clearPermissions();
 
 #### API reference
 
-- [`browser.newContext([options])`](./api.md#browsernewcontextoptions)
+- [`browser.newContext([options])`](api/class-browser.md#browsernewcontextoptions)
 - [`browserContext.grantPermissions(permissions[][, options])`](./api/class-browsercontext.md#browsercontextgrantpermissionspermissions-options)
 - [`browserContext.clearPermissions()`](./api/class-browsercontext.md#browsercontextclearpermissions)
 
@@ -156,7 +156,7 @@ await context.setGeolocation({ longitude: 29.979097, latitude: 31.134256 });
 
 #### API reference
 
-- [`browser.newContext([options])`](./api.md#browsernewcontextoptions)
+- [`browser.newContext([options])`](api/class-browser.md#browsernewcontextoptions)
 - [`browserContext.setGeolocation(geolocation)`](./api/class-browser.md#browsercontextsetgeolocationgeolocation)
 
 <br/>
@@ -186,5 +186,5 @@ await page.emulateMedia({ media: 'print' });
 
 #### API reference
 
-- [`browser.newContext([options])`](./api.md#browsernewcontextoptions)
+- [`browser.newContext([options])`](api/class-browser.md#browsernewcontextoptions)
 - [`page.emulateMedia([options])`](./api/class-page.md#pageemulatemediaoptions)

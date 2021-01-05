@@ -59,7 +59,7 @@ const context = await browser.newContext({
 
 #### API reference
 
-- [`browser.newContext()`](./api.md#browsernewcontextoptions)
+- [`browser.newContext()`](api/class-browser.md#browsernewcontextoptions)
 
 <br/>
 
@@ -85,7 +85,7 @@ const context = await browser.newContext({
 
 #### API reference
 
-- [`browser.newContext()`](./api.md#browsernewcontextoptions)
+- [`browser.newContext()`](api/class-browser.md#browsernewcontextoptions)
 - [`page.setViewportSize()`](./api/class-page.md#pagesetviewportsizeviewportsize)
 
 <br/>
@@ -102,7 +102,7 @@ const context = await browser.newContext({
 
 #### API reference
 
-- [`browser.newContext()`](./api.md#browsernewcontextoptions)
+- [`browser.newContext()`](api/class-browser.md#browsernewcontextoptions)
 
 <br/>
 
@@ -132,7 +132,7 @@ await context.clearPermissions();
 
 #### API reference
 
-- [`browser.newContext()`](./api.md#browsernewcontextoptions)
+- [`browser.newContext()`](api/class-browser.md#browsernewcontextoptions)
 - [`browserContext.grantPermissions()`](./api/class-browsercontext.md#browsercontextgrantpermissionspermissions-options)
 - [`browserContext.clearPermissions()`](./api/class-browsercontext.md#browsercontextclearpermissions)
 
@@ -156,7 +156,7 @@ await context.setGeolocation({ longitude: 29.979097, latitude: 31.134256 });
 
 #### API reference
 
-- [`browser.newContext()`](./api.md#browsernewcontextoptions)
+- [`browser.newContext()`](api/class-browser.md#browsernewcontextoptions)
 - [`browserContext.setGeolocation()`](./api/class-browser.md#browsercontextsetgeolocationgeolocation)
 
 <br/>
@@ -186,5 +186,5 @@ await page.emulateMedia({ media: 'print' });
 
 #### API reference
 
-- [`browser.newContext()`](./api.md#browsernewcontextoptions)
+- [`browser.newContext()`](api/class-browser.md#browsernewcontextoptions)
 - [`page.emulateMedia()`](./api/class-page.md#pageemulatemediaparams)

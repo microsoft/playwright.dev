@@ -281,7 +281,7 @@ Emitted when <[WebSocket]> request is sent.
 Emitted when a dedicated [WebWorker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) is spawned by the page.
 
 ## page.$(selector)
-- `selector` <[string]> A selector to query page for. See [working with selectors](api/working-with-selectors.md#working-with-selectors) for more details.
+- `selector` <[string]> A selector to query page for. See [working with selectors](/api/working-with-selectors.md)) for more details.
 - returns: <[Promise]<[null]|[ElementHandle]>>
 
 The method finds an element matching the specified selector within the page. If no elements match the selector, the return value resolves to `null`.
@@ -289,7 +289,7 @@ The method finds an element matching the specified selector within the page. If 
 Shortcut for [page.mainFrame().$(selector)](#frameselector).
 
 ## page.$$(selector)
-- `selector` <[string]> A selector to query page for. See [working with selectors](#working-with-selectors) for more details.
+- `selector` <[string]> A selector to query page for. See [working with selectors](/api/working-with-selectors.md) for more details.
 - returns: <[Promise]<[Array]<[ElementHandle]>>>
 
 The method finds all elements matching the specified selector within the page. If no elements match the selector, the return value resolves to `[]`.
@@ -297,7 +297,7 @@ The method finds all elements matching the specified selector within the page. I
 Shortcut for [page.mainFrame().$$(selector)](#frameselector-1).
 
 ## page.$eval(selector, pageFunction[, arg])
-- `selector` <[string]> A selector to query page for. See [working with selectors](#working-with-selectors) for more details.
+- `selector` <[string]> A selector to query page for. See [working with selectors](/api/working-with-selectors.md) for more details.
 - `pageFunction` <[function]\([Element]\)> Function to be evaluated in browser context
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
 - returns: <[Promise]<[Serializable]>> Promise which resolves to the return value of `pageFunction`
@@ -316,7 +316,7 @@ const html = await page.$eval('.main-container', (e, suffix) => e.outerHTML + su
 Shortcut for [page.mainFrame().$eval(selector, pageFunction)](#frameevalselector-pagefunction-arg).
 
 ## page.$$eval(selector, pageFunction[, arg])
-- `selector` <[string]> A selector to query page for. See [working with selectors](#working-with-selectors) for more details.
+- `selector` <[string]> A selector to query page for. See [working with selectors](/api/working-with-selectors.md) for more details.
 - `pageFunction` <[function]\([Array]<[Element]>\)> Function to be evaluated in browser context
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
 - returns: <[Promise]<[Serializable]>> Promise which resolves to the return value of `pageFunction`
@@ -391,7 +391,7 @@ Brings page to front (activates tab).
 
 
 ## page.check(selector, [options])
-- `selector` <[string]> A selector to search for checkbox or radio button to check. If there are multiple elements satisfying the selector, the first will be checked. See [working with selectors](#working-with-selectors) for more details.
+- `selector` <[string]> A selector to search for checkbox or radio button to check. If there are multiple elements satisfying the selector, the first will be checked. See [working with selectors](/api/working-with-selectors.md) for more details.
 - `options` <[Object]>
   - `force` <[boolean]> Whether to bypass the [actionability](./actionability.md) checks. Defaults to `false`.
   - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
@@ -412,7 +412,7 @@ When all steps combined have not finished during the specified `timeout`, this m
 Shortcut for [page.mainFrame().check(selector[, options])](api/class-frame.md#framecheckselector-options).
 
 ## page.click(selector[, options])
-- `selector` <[string]> A selector to search for element to click. If there are multiple elements satisfying the selector, the first will be clicked. See [working with selectors](#working-with-selectors) for more details.
+- `selector` <[string]> A selector to search for element to click. If there are multiple elements satisfying the selector, the first will be clicked. See [working with selectors](/api/working-with-selectors.md) for more details.
 - `options` <[Object]>
   - `button` <"left"|"right"|"middle"> Defaults to `left`.
   - `clickCount` <[number]> defaults to 1. See [UIEvent.detail].
@@ -469,7 +469,7 @@ Get the browser context that the page belongs to.
 Browser-specific Coverage implementation, only available for Chromium atm. See [ChromiumCoverage](api/class-chromiumcoverage.md#class-chromiumcoverage) for more details.
 
 ## page.dblclick(selector[, options])
-- `selector` <[string]> A selector to search for element to double click. If there are multiple elements satisfying the selector, the first will be double clicked. See [working with selectors](#working-with-selectors) for more details.
+- `selector` <[string]> A selector to search for element to double click. If there are multiple elements satisfying the selector, the first will be double clicked. See [working with selectors](/api/working-with-selectors.md) for more details.
 - `options` <[Object]>
   - `button` <"left"|"right"|"middle"> Defaults to `left`.
   - `delay` <[number]> Time to wait between `mousedown` and `mouseup` in milliseconds. Defaults to 0.
@@ -497,7 +497,7 @@ Shortcut for [page.mainFrame().dblclick(selector[, options])](api/class-frame.md
 
 
 ## page.dispatchEvent(selector, type[, eventInit, options])
-- `selector` <[string]> A selector to search for element to use. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](#working-with-selectors) for more details.
+- `selector` <[string]> A selector to search for element to use. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](/api/working-with-selectors.md) for more details.
 - `type` <[string]> DOM event type: `"click"`, `"dragstart"`, etc.
 - `eventInit` <[EvaluationArgument]> event-specific initialization properties.
 - `options` <[Object]>
@@ -739,7 +739,7 @@ const fs = require('fs');
 ```
 
 ## page.fill(selector, value[, options])
-- `selector` <[string]> A selector to query page for. See [working with selectors](#working-with-selectors) for more details.
+- `selector` <[string]> A selector to query page for. See [working with selectors](/api/working-with-selectors.md) for more details.
 - `value` <[string]> Value to fill for the `<input>`, `<textarea>` or `[contenteditable]` element.
 - `options` <[Object]>
   - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
@@ -755,7 +755,7 @@ To send fine-grained keyboard events, use [`page.type`](#pagetypeselector-text-o
 Shortcut for [page.mainFrame().fill()](api/class-frame.md#framefillselector-value-options)
 
 ## page.focus(selector[, options])
-- `selector` <[string]> A selector of an element to focus. If there are multiple elements satisfying the selector, the first will be focused. See [working with selectors](#working-with-selectors) for more details.
+- `selector` <[string]> A selector of an element to focus. If there are multiple elements satisfying the selector, the first will be focused. See [working with selectors](/api/working-with-selectors.md) for more details.
 - `options` <[Object]>
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](#pagesetdefaulttimeouttimeout) methods.
 - returns: <[Promise]> Promise which resolves when the element matching `selector` is successfully focused. The promise will be rejected if there is no element matching `selector`.
@@ -785,7 +785,7 @@ Returns frame matching the specified criteria. Either `name` or `url` must be sp
 - returns: <[Array]<[Frame]>> An array of all frames attached to the page.
 
 ## page.getAttribute(selector, name[, options])
-- `selector` <[string]> A selector to search for an element. If there are multiple elements satisfying the selector, the first will be picked. See [working with selectors](#working-with-selectors) for more details.
+- `selector` <[string]> A selector to search for an element. If there are multiple elements satisfying the selector, the first will be picked. See [working with selectors](/api/working-with-selectors.md) for more details.
 - `name` <[string]> Attribute name to get the value for.
 - `options` <[Object]>
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](#pagesetdefaulttimeouttimeout) methods.
@@ -844,7 +844,7 @@ Navigate to the next page in history.
 Shortcut for [page.mainFrame().goto(url[, options])](api/class-frame.md#framegotourl-options)
 
 ## page.hover(selector[, options])
-- `selector` <[string]> A selector to search for element to hover. If there are multiple elements satisfying the selector, the first will be hovered. See [working with selectors](#working-with-selectors) for more details.
+- `selector` <[string]> A selector to search for element to hover. If there are multiple elements satisfying the selector, the first will be hovered. See [working with selectors](/api/working-with-selectors.md) for more details.
 - `options` <[Object]>
   - `position` <[Object]> A point to hover relative to the top-left corner of element padding box. If not specified, hovers over some visible point of the element.
     - `x` <[number]>
@@ -866,7 +866,7 @@ When all steps combined have not finished during the specified `timeout`, this m
 Shortcut for [page.mainFrame().hover(selector[, options])](api/class-frame.md#framehoverselector-options).
 
 ## page.innerHTML(selector[, options])
-- `selector` <[string]> A selector to search for an element. If there are multiple elements satisfying the selector, the first will be picked. See [working with selectors](#working-with-selectors) for more details.
+- `selector` <[string]> A selector to search for an element. If there are multiple elements satisfying the selector, the first will be picked. See [working with selectors](/api/working-with-selectors.md) for more details.
 - `options` <[Object]>
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](#pagesetdefaulttimeouttimeout) methods.
 - returns: <[Promise]<[string]>>
@@ -874,7 +874,7 @@ Shortcut for [page.mainFrame().hover(selector[, options])](api/class-frame.md#fr
 Resolves to the `element.innerHTML`.
 
 ## page.innerText(selector[, options])
-- `selector` <[string]> A selector to search for an element. If there are multiple elements satisfying the selector, the first will be picked. See [working with selectors](#working-with-selectors) for more details.
+- `selector` <[string]> A selector to search for an element. If there are multiple elements satisfying the selector, the first will be picked. See [working with selectors](/api/working-with-selectors.md) for more details.
 - `options` <[Object]>
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](#pagesetdefaulttimeouttimeout) methods.
 - returns: <[Promise]<[string]>>
@@ -973,7 +973,7 @@ The `format` options are:
 > 2. Page styles are not visible inside templates.
 
 ## page.press(selector, key[, options])
-- `selector` <[string]> A selector of an element to type into. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](#working-with-selectors) for more details.
+- `selector` <[string]> A selector of an element to type into. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](/api/working-with-selectors.md) for more details.
 - `key` <[string]> Name of the key to press or a character to generate, such as `ArrowLeft` or `a`.
 - `options` <[Object]>
   - `delay` <[number]> Time to wait between `keydown` and `keyup` in milliseconds. Defaults to 0.
@@ -1067,7 +1067,7 @@ Page routes take precedence over browser context routes (set up with [browserCon
 > **NOTE** Screenshots take at least 1/6 second on Chromium OS X and Chromium Windows. See https://crbug.com/741689 for discussion.
 
 ## page.selectOption(selector, values[, options])
-- `selector` <[string]> A selector to query page for. See [working with selectors](#working-with-selectors) for more details.
+- `selector` <[string]> A selector to query page for. See [working with selectors](/api/working-with-selectors.md) for more details.
 - `values` <[null]|[string]|[ElementHandle]|[Array]<[string]>|[Object]|[Array]<[ElementHandle]>|[Array]<[Object]>> Options to select. If the `<select>` has the `multiple` attribute, all matching options are selected, otherwise only the first option matching one of the passed options is selected. String values are equivalent to `{value:'string'}`. Option is considered matching if all specified properties match.
   - `value` <[string]> Matches by `option.value`.
   - `label` <[string]> Matches by `option.label`.
@@ -1134,7 +1134,7 @@ The extra HTTP headers will be sent with every request the page initiates.
 > **NOTE** page.setExtraHTTPHeaders does not guarantee the order of headers in the outgoing requests.
 
 ## page.setInputFiles(selector, files[, options])
-- `selector` <[string]> A selector to search for element to click. If there are multiple elements satisfying the selector, the first will be clicked. See [working with selectors](#working-with-selectors) for more details.
+- `selector` <[string]> A selector to search for element to click. If there are multiple elements satisfying the selector, the first will be clicked. See [working with selectors](/api/working-with-selectors.md) for more details.
 - `files` <[string]|[Array]<[string]>|[Object]|[Array]<[Object]>>
   - `name` <[string]> [File] name **required**
   - `mimeType` <[string]> [File] type **required**
@@ -1169,7 +1169,7 @@ await page.goto('https://example.com');
 ```
 
 ## page.tap(selector[, options])
-- `selector` <[string]> A selector to search for element to tap. If there are multiple elements satisfying the selector, the first will be tapped. See [working with selectors](#working-with-selectors) for more details.
+- `selector` <[string]> A selector to search for element to tap. If there are multiple elements satisfying the selector, the first will be tapped. See [working with selectors](/api/working-with-selectors.md) for more details.
 - `options` <[Object]>
   - `position` <[Object]> A point to tap relative to the top-left corner of element padding box. If not specified, taps some visible point of the element.
     - `x` <[number]>
@@ -1194,7 +1194,7 @@ When all steps combined have not finished during the specified `timeout`, this m
 Shortcut for [page.mainFrame().tap()](api/class-frame.md#framename).
 
 ## page.textContent(selector[, options])
-- `selector` <[string]> A selector to search for an element. If there are multiple elements satisfying the selector, the first will be picked. See [working with selectors](#working-with-selectors) for more details.
+- `selector` <[string]> A selector to search for an element. If there are multiple elements satisfying the selector, the first will be picked. See [working with selectors](/api/working-with-selectors.md) for more details.
 - `options` <[Object]>
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](#pagesetdefaulttimeouttimeout) methods.
 - returns: <[Promise]<[null]|[string]>>
@@ -1211,7 +1211,7 @@ Shortcut for [page.mainFrame().title()](api/class-frame.md#frametitle).
 - returns: <[Touchscreen]>
 
 ## page.type(selector, text[, options])
-- `selector` <[string]> A selector of an element to type into. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](#working-with-selectors) for more details.
+- `selector` <[string]> A selector of an element to type into. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](/api/working-with-selectors.md) for more details.
 - `text` <[string]> A text to type into a focused element.
 - `options` <[Object]>
   - `delay` <[number]> Time to wait between key presses in milliseconds. Defaults to 0.
@@ -1231,7 +1231,7 @@ await page.type('#mytextarea', 'World', {delay: 100}); // Types slower, like a u
 Shortcut for [page.mainFrame().type(selector, text[, options])](api/class-frame.md#frametypeselector-text-options).
 
 ## page.uncheck(selector, [options])
-- `selector` <[string]> A selector to search for uncheckbox to check. If there are multiple elements satisfying the selector, the first will be checked. See [working with selectors](#working-with-selectors) for more details.
+- `selector` <[string]> A selector to search for uncheckbox to check. If there are multiple elements satisfying the selector, the first will be checked. See [working with selectors](/api/working-with-selectors.md) for more details.
 - `options` <[Object]>
   - `force` <[boolean]> Whether to bypass the [actionability](./actionability.md) checks. Defaults to `false`.
   - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
@@ -1394,7 +1394,7 @@ return finalResponse.ok();
 ```
 
 ## page.waitForSelector(selector[, options])
-- `selector` <[string]> A selector of an element to wait for. See [working with selectors](#working-with-selectors) for more details.
+- `selector` <[string]> A selector of an element to wait for. See [working with selectors](/api/working-with-selectors.md) for more details.
 - `options` <[Object]>
   - `state` <"attached"|"detached"|"visible"|"hidden"> Defaults to `'visible'`. Can be either:
     - `'attached'` - wait for element to be present in DOM.
@@ -1451,11 +1451,10 @@ This method returns all of the dedicated [WebWorkers](https://developer.mozilla.
 [AXNode]: api/class-accessibility.md#accessibilitysnapshotoptions "AXNode"
 [Accessibility]: api/class-accessibility.md#class-accessibility "Accessibility"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[Body]: api.md#class-body  "Body"
 [BrowserServer]: api/class-browser.md#class-browserserver  "BrowserServer"
 [BrowserContext]: api/class-browsercontext.md#class-browsercontext  "BrowserContext"
 [BrowserType]: api/class-browsertype.md#class-browsertype "BrowserType"
-[Browser]: api.md#class-browser  "Browser"
+[Browser]: api/class-browser.md  "Browser"
 [Buffer]: https://nodejs.org/api/buffer.htmlapi.md#buffer_class_buffer "Buffer"
 [ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
 [ChromiumBrowser]: api/class-chromiumbrowser.md#class-chromiumbrowser "ChromiumBrowser"
@@ -1469,7 +1468,7 @@ This method returns all of the dedicated [WebWorkers](https://developer.mozilla.
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [Error]: https://nodejs.org/api/errors.htmlapi.md#errors_class_error "Error"
 [EvaluationArgument]: api/evaluationargument.md#evaluationargument "Evaluation Argument"
-[File]: api.md#class-file "https://developer.mozilla.org/en-US/docs/Web/API/File"
+[File]: https://developer.mozilla.org/en-US/docs/Web/API/File "File"
 [FileChooser]: api/class-filechooser.md#class-filechooser "FileChooser"
 [FirefoxBrowser]: api/class-firefoxbrowser.md#class-firefoxbrowser "FirefoxBrowser"
 [Frame]: api/class-frame.md#class-frame "Frame"
@@ -1480,7 +1479,7 @@ This method returns all of the dedicated [WebWorkers](https://developer.mozilla.
 [Mouse]: api/class-mouse.md#class-mouse "Mouse"
 [Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
 [Page]: api/class-page.md#class-page "Page"
-[Playwright]: api.md#class-playwright "Playwright"
+[Playwright]: api/playwright-module.md "Playwright"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
 [Request]: api/class-request.md#class-request  "Request"

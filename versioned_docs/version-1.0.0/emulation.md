@@ -70,7 +70,7 @@ await page.emulateMedia({ colorScheme: 'dark' });
 
 #### API reference
 
-- [`browser.newContext([options])`](./api.md#browsernewcontextoptions)
+- [`browser.newContext([options])`](api/class-browser.md#browsernewcontextoptions)
 - [`page.emulateMedia([options])`](./api/class-page.md#pageemulatemediaoptions)
 - [`page.setViewportSize(viewportSize)`](./api/class-page.md#pagesetviewportsizeviewportsize)
 
@@ -96,7 +96,7 @@ All pages created in the context above will share the same device parameters.
 #### API reference
 
 - [`playwright.devices`](./api/playwright-module.md#playwrightdevices)
-- [`browser.newContext([options])`](./api.md#browsernewcontextoptions)
+- [`browser.newContext([options])`](api/class-browser.md#browsernewcontextoptions)
 
 <br/>
 
@@ -112,7 +112,7 @@ const context = await browser.newContext({
 
 #### API reference
 
-- [`browser.newContext([options])`](./api.md#browsernewcontextoptions)
+- [`browser.newContext([options])`](api/class-browser.md#browsernewcontextoptions)
 
 <br/>
 
@@ -142,7 +142,7 @@ await context.clearPermissions();
 
 #### API reference
 
-- [`browser.newContext([options])`](./api.md#browsernewcontextoptions)
+- [`browser.newContext([options])`](api/class-browser.md#browsernewcontextoptions)
 - [`browserContext.grantPermissions(permissions[][, options])`](./api/class-browsercontext.md#browsercontextgrantpermissionspermissions-options)
 - [`browserContext.clearPermissions()`](./api/class-browsercontext.md#browsercontextclearpermissions)
 
@@ -166,7 +166,7 @@ await context.setGeolocation({ longitude: 29.979097, latitude: 31.134256 };
 
 #### API reference
 
-- [`browser.newContext([options])`](./api.md#browsernewcontextoptions)
+- [`browser.newContext([options])`](api/class-browser.md#browsernewcontextoptions)
 - [`browserContext.setGeolocation(geolocation)`](./api/class-browser.md#browsercontextsetgeolocationgeolocation)
 
 <br/>

@@ -122,7 +122,7 @@ await page.goto('data:text/html,<script>throw new Error("Test")</script>');
 
 #### API reference
 
-- [class: Page](./api.md#class-page)
+- [class: Page](api/class-page.md)
 - [event: 'pageerror'](./api/class-browsercontext.md#event-pageerror)
 
 <br/>
@@ -156,7 +156,7 @@ const [popup] = await Promise.all([
 
 #### API reference
 
-- [class: Page](./api.md#class-page)
+- [class: Page](api/class-page.md)
 - [event: 'requestfailed'](./api/class-page.md#event-requestfailed)
 - [event: 'dialog'](./api/class-page.md#event-dialog)
 - [event: 'popup'](./api/class-page.md#event-popup)

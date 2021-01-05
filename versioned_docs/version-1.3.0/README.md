@@ -40,7 +40,6 @@ Playwright is a library to automate [Chromium](https://www.chromium.org/Home), [
     - [Docker](./docker/README.md)
     - [Continuous integration](./ci.md)
 1. Reference
-    - [API Reference](./api.md)
     - [Actionability](./actionability.md)
     - [Advanced installation](./installation.md)
     - [Extensibility](./extensibility.md)

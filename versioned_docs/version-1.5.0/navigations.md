@@ -89,7 +89,7 @@ await page.waitForLoadState('networkidle'); // This resolves after 'networkidle'
 ```
 
 ### Wait for element
-In lazy-loaded pages, it can be useful to wait until an element is visible with [`page.waitForSelector`](./api.md#pagewaitforselectorselector-options). Alternatively, page interactions like [`page.click`](./api.md#pageclickselector-options) auto-wait for elements.
+In lazy-loaded pages, it can be useful to wait until an element is visible with [`page.waitForSelector`](api/class-page.md#pagewaitforselectorselector-options). Alternatively, page interactions like [`page.click`](api/class-page.md#pageclickselector-options) auto-wait for elements.
 
 ```js
 // Click triggers navigation
@@ -118,7 +118,7 @@ await Promise.all([
 The `Promise.all` pattern prevents a race condition between `page.click` and `page.waitForNavigation` when navigation happens quickly.
 
 ### Multiple navigations
-Clicking an element could trigger multiple navigations. In these cases, it is recommended to explicitly [`page.waitForNavigation`](api.md#pagewaitfornavigationoptions) to a specific url. For example:
+Clicking an element could trigger multiple navigations. In these cases, it is recommended to explicitly [`page.waitForNavigation`]api/class-page.md#pagewaitfornavigationoptions) to a specific url. For example:
 * Client-side redirects issued after the `load` event
 * Multiple pushes to history state
 
@@ -132,7 +132,7 @@ await Promise.all([
 The `Promise.all` pattern prevents a race condition between `page.click` and `page.waitForNavigation` when navigation happens quickly.
 
 ### Loading a popup
-When popup is opened, explicitly calling [`page.waitForLoadState`](api.md#pagewaitforloadstatestate-options) ensures that popup is loaded to the desired state.
+When popup is opened, explicitly calling [`page.waitForLoadState`]api/class-page.md#pagewaitforloadstatestate-options) ensures that popup is loaded to the desired state.
 
 ```js
 const [ popup ] = await Promise.all([
@@ -143,14 +143,14 @@ await popup.waitForLoadState('load');
 ```
 
 #### API reference
-- [`page.click(selector[, options])`](./api.md#pageclickselector-options)
-- [`page.waitForLoadState([state[, options]])`](./api.md#pagewaitforloadstatestate-options)
-- [`page.waitForSelector(selector[, options])`](./api.md#pagewaitforselectorselector-options)
-- [`page.waitForNavigation([options])`](./api.md#pagewaitfornavigationoptions)
+- [`page.click(selector[, options])`](api/class-page.md#pageclickselector-options)
+- [`page.waitForLoadState([state[, options]])`](api/class-page.md#pagewaitforloadstatestate-options)
+- [`page.waitForSelector(selector[, options])`](api/class-page.md#pagewaitforselectorselector-options)
+- [`page.waitForNavigation([options])`](api/class-page.md#pagewaitfornavigationoptions)
 - [`page.waitForFunction(pageFunction[, arg, options])`](./api/class-page.md#pagewaitforfunctionpagefunction-arg-options)
 
 ## Advanced patterns
-For pages that have complicated loading patterns, [`page.waitForFunction`](./api.md#pagewaitforfunctionpagefunction-arg-options) is a powerful and extensible approach to define a custom wait criteria.
+For pages that have complicated loading patterns, [`page.waitForFunction`](api/class-page.md#pagewaitforfunctionpagefunction-arg-options) is a powerful and extensible approach to define a custom wait criteria.
 
 ```js
 await page.goto('http://example.com');
@@ -160,4 +160,4 @@ await page.screenshot();
 ```
 
 #### API reference
-- [`page.waitForFunction(pageFunction[, arg, options])`](./api.md#pagewaitforfunctionpagefunction-arg-options)
+- [`page.waitForFunction(pageFunction[, arg, options])`](api/class-page.md#pagewaitforfunctionpagefunction-arg-options)

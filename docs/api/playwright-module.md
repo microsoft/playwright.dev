@@ -84,7 +84,7 @@ This object can be used to launch or connect to Firefox, returning instances of 
 ## playwright.selectors
 - returns: <[Selectors]>
 
-Selectors can be used to install custom selector engines. See [Working with selectors](api/working-with-selectors.md#working-with-selectors) for more information.
+Selectors can be used to install custom selector engines. See [Working with selectors](/api/working-with-selectors.md)) for more information.
 
 ## playwright.webkit
 - returns: <[BrowserType]>
@@ -98,11 +98,10 @@ This object can be used to launch or connect to WebKit, returning instances of [
 [AXNode]: api/class-accessibility.md#accessibilitysnapshotoptions "AXNode"
 [Accessibility]: api/class-accessibility.md#class-accessibility "Accessibility"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[Body]: api.md#class-body  "Body"
 [BrowserServer]: api/class-browser.md#class-browserserver  "BrowserServer"
 [BrowserContext]: api/class-browsercontext.md#class-browsercontext  "BrowserContext"
 [BrowserType]: api/class-browsertype.md#class-browsertype "BrowserType"
-[Browser]: api.md#class-browser  "Browser"
+[Browser]: api/class-browser.md  "Browser"
 [Buffer]: https://nodejs.org/api/buffer.htmlapi.md#buffer_class_buffer "Buffer"
 [ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
 [ChromiumBrowser]: api/class-chromiumbrowser.md#class-chromiumbrowser "ChromiumBrowser"
@@ -116,7 +115,7 @@ This object can be used to launch or connect to WebKit, returning instances of [
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [Error]: https://nodejs.org/api/errors.htmlapi.md#errors_class_error "Error"
 [EvaluationArgument]: api/evaluationargument.md#evaluationargument "Evaluation Argument"
-[File]: api.md#class-file "https://developer.mozilla.org/en-US/docs/Web/API/File"
+[File]: https://developer.mozilla.org/en-US/docs/Web/API/File "File"
 [FileChooser]: api/class-filechooser.md#class-filechooser "FileChooser"
 [FirefoxBrowser]: api/class-firefoxbrowser.md#class-firefoxbrowser "FirefoxBrowser"
 [Frame]: api/class-frame.md#class-frame "Frame"
@@ -127,7 +126,7 @@ This object can be used to launch or connect to WebKit, returning instances of [
 [Mouse]: api/class-mouse.md#class-mouse "Mouse"
 [Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
 [Page]: api/class-page.md#class-page "Page"
-[Playwright]: api.md#class-playwright "Playwright"
+[Playwright]: api/playwright-module.md "Playwright"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
 [Request]: api/class-request.md#class-request  "Request"

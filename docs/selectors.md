@@ -4,7 +4,7 @@ title: "Element selectors"
 ---
 
 
-Selectors query elements on the web page for interactions, like [page.click](api/class-page.md#pageclickselector-options), and to obtain `ElementHandle` through [page.$](api.md#pageselector). Built-in selectors auto-pierce [shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM).
+Selectors query elements on the web page for interactions, like [page.click](api/class-page.md#pageclickselector-options), and to obtain `ElementHandle` through [page.$]api/class-page.md#pageselector). Built-in selectors auto-pierce [shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM).
 
 <!-- GEN:toc-top-level -->
 - [Syntax](#syntax)

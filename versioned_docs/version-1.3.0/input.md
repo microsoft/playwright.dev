@@ -62,7 +62,7 @@ await page.uncheck('#subscribe-label');
 - [frame.check(selector[, options])](./api/class-frame.md#framecheckselector-options) — given frame
 - [frame.uncheck(selector[, options])](./api/class-frame.md#frameuncheckselector-options) — given frame
 - [elementHandle.check(value[, options])](./api/class-elementhandle.md#elementhandleuncheckoptions) — given element
-- [elementHandle.uncheck(value[, options])](./api.md#elementhandleuncheckoptions) — given element
+- [elementHandle.uncheck(value[, options])](api/class-elementhandle.md#elementhandleuncheckoptions) — given element
 
 <br/>
 
@@ -261,8 +261,8 @@ You can select input files for upload using the `page.setInputFiles` method. It 
 
 #### API reference
 
-- [page.setInputFiles(selector, files[, options])](https://github.com/microsoft/playwright/blob/master/docs/api.md#pagesetinputfilesselector-value-options)
-- [frame.setInputFiles(selector, files[, options])](https://github.com/microsoft/playwright/blob/master/docs/api.md#framesetinputfilesselector-value-options)
+- [page.setInputFiles(selector, files[, options])](https://github.com/microsoft/playwright/blob/master/docs/class-page.md#pagesetinputfilesselector-value-options)
+- [frame.setInputFiles(selector, files[, options])](https://github.com/microsoft/playwright/blob/master/docs/class-frame.md#framesetinputfilesselector-value-options)
 - [elementHandle.setInputFiles(files[, options])](https://github.com/microsoft/playwright/blob/master/docs/api/class-elementhandle.md#elementhandlesetinputfilesfiles-options)
 
 <br/>

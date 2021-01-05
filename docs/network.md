@@ -48,7 +48,7 @@ const [ download ] = await Promise.all([
 const path = await download.path();
 ```
 
-For every attachment downloaded by the page, [`"download"`](https://github.com/microsoft/playwright/blob/master/docs/api.md#event-download) event is emitted. If you create a browser context with the `acceptDownloads: true`, all these attachments are going to be downloaded into a temporary folder. You can obtain the download url, file system path and payload stream using the [`Download`](https://github.com/microsoft/playwright/blob/master/docs/api/class-download.md#class-download) object from the event.
+For every attachment downloaded by the page, [`"download"`](api/class-page.md#event-download) event is emitted. If you create a browser context with the `acceptDownloads: true`, all these attachments are going to be downloaded into a temporary folder. You can obtain the download url, file system path and payload stream using the [`Download`](https://github.com/microsoft/playwright/blob/master/docs/api/class-download.md#class-download) object from the event.
 
 #### Variations
 
@@ -62,8 +62,8 @@ Note that handling the event forks the control flow and makes script harder to f
 
 #### API reference
 
-- [Download](https://github.com/microsoft/playwright/blob/master/docs/api.md#class-download)
-- [page.on('download')](https://github.com/microsoft/playwright/blob/master/docs/api.md#event-download)
+- [Download](https://github.com/microsoft/playwright/blob/master/docs/class-download.md)
+- [page.on('download')](api/class-page.md#event-download)
 - [page.waitForEvent(event)](https://github.com/microsoft/playwright/blob/master/docs/api.md##pagewaitforeventevent-optionsorpredicate)
 
 <br/>
@@ -192,8 +192,8 @@ await page.route('**/*', route => {
 
 #### API reference
 
-- [page.route(url, handler)](./api.md#pagerouteurl-handler)
-- [browserContext.route(url, handler)](./api.md#browsercontextrouteurl-handler)
+- [page.route(url, handler)](api/class-page.md#pagerouteurl-handler)
+- [browserContext.route(url, handler)](api/class-browsercontext.md#browsercontextrouteurl-handler)
 - [route.abort([errorCode])](./api/class-route.md#routeaborterrorcode)
 
 <br/>

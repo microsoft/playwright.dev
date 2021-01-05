@@ -92,7 +92,7 @@ Notice the `Promise.all` to click and wait for navigation. Awaiting these method
 
 ### Click triggers navigation after a timeout
 
-When `onclick` handler triggers a navigation from a `setTimeout`, use an explicit [`waitForNavigation()`](api.md#pagewaitfornavigationoptions) call as a last resort.
+When `onclick` handler triggers a navigation from a `setTimeout`, use an explicit [`waitForNavigation()`]api/class-page.md#pagewaitfornavigationoptions) call as a last resort.
 ```js
 await Promise.all([
   page.waitForNavigation(), // Waits for the next navigation.
@@ -112,7 +112,7 @@ await page.waitForFunction(() => window.amILoadedYet());
 await page.screenshot();
 ```
 
-When clicking on a button triggers some asynchronous processing, issues a couple GET requests and pushes a new history state multiple times, explicit [`waitForNavigation()`](api.md#pagewaitfornavigationoptions) to a specific url is the most reliable option.
+When clicking on a button triggers some asynchronous processing, issues a couple GET requests and pushes a new history state multiple times, explicit [`waitForNavigation()`]api/class-page.md#pagewaitfornavigationoptions) to a specific url is the most reliable option.
 ```js
 await Promise.all([
   page.waitForNavigation({ url: '**/invoice#processed' }),
