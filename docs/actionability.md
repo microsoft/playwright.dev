@@ -11,26 +11,26 @@ Some actions like [page.click(selector[, options])](api/class-page.md#pageclicks
 
 | Action | [Attached] | [Visible] | [Stable] | [Receiving Events] | [Enabled] | [Editable] |
 | :- | :-: | :-: | :-: | :-: | :-: | :-: |
-| [elementHandle.check([options])](api/class-elementhandle.md#elementhandlecheckoptions) | Yes | Yes | Yes | Yes | Yes | - |
-| [elementHandle.click([options])](api/class-elementhandle.md#elementhandleclickoptions) | Yes | Yes | Yes | Yes | Yes | - |
-| [elementHandle.dblclick([options])](api/class-elementhandle.md#elementhandledblclickoptions) | Yes | Yes | Yes | Yes | Yes | - |
-| [elementHandle.tap([options])](api/class-elementhandle.md#elementhandletapoptions) | Yes | Yes | Yes | Yes | Yes | - |
-| [elementHandle.uncheck([options])](api/class-elementhandle.md#elementhandleuncheckoptions) | Yes | Yes | Yes | Yes | Yes | - |
-| [elementHandle.hover([options])](api/class-elementhandle.md#elementhandlehoveroptions) | Yes | Yes | Yes | Yes | - | - |
-| [elementHandle.scrollIntoViewIfNeeded([options])](api/class-elementhandle.md#elementhandlescrollintoviewifneededoptions) | Yes | Yes | Yes | - | - | - |
-| [elementHandle.screenshot([options])](api/class-elementhandle.md#elementhandlescreenshotoptions) | Yes | Yes | Yes | - | - | - |
-| [elementHandle.fill(value[, options])](api/class-elementhandle.md#elementhandlefillvalue-options) | Yes | Yes | - | - | Yes | Yes |
-| [elementHandle.selectText([options])](api/class-elementhandle.md#elementhandleselecttextoptions) | Yes | Yes | - | - | - | - |
-| [elementHandle.getAttribute(name)](api/class-elementhandle.md#elementhandlegetattributename) | Yes | - | - | - | - | - |
-| [elementHandle.dispatchEvent(type[, eventInit])](api/class-elementhandle.md#elementhandledispatcheventtype-eventinit) | Yes | - | - | - | - | - |
-| [elementHandle.focus()](api/class-elementhandle.md#elementhandlefocus) | Yes | - | - | - | - | - |
-| [elementHandle.innerText()](api/class-elementhandle.md#elementhandleinnertext) | Yes | - | - | - | - | - |
-| [elementHandle.innerHTML()](api/class-elementhandle.md#elementhandleinnerhtml) | Yes | - | - | - | - | - |
-| [elementHandle.press(key[, options])](api/class-elementhandle.md#elementhandlepresskey-options) | Yes | - | - | - | - | - |
-| [elementHandle.setInputFiles(files[, options])](api/class-elementhandle.md#elementhandlesetinputfilesfiles-options) | Yes | - | - | - | - | - |
-| [elementHandle.selectOption(values[, options])](api/class-elementhandle.md#elementhandleselectoptionvalues-options) | Yes | - | - | - | - | - |
-| [elementHandle.textContent()](api/class-elementhandle.md#elementhandletextcontent) | Yes | - | - | - | - | - |
-| [elementHandle.type(text[, options])](api/class-elementhandle.md#elementhandletypetext-options) | Yes | - | - | - | - | - |
+| check | Yes | Yes | Yes | Yes | Yes | - |
+| click | Yes | Yes | Yes | Yes | Yes | - |
+| dblclick | Yes | Yes | Yes | Yes | Yes | - |
+| tap | Yes | Yes | Yes | Yes | Yes | - |
+| uncheck | Yes | Yes | Yes | Yes | Yes | - |
+| hover | Yes | Yes | Yes | Yes | - | - |
+| scrollIntoViewIfNeeded | Yes | Yes | Yes | - | - | - |
+| screenshot | Yes | Yes | Yes | - | - | - |
+| fill | Yes | Yes | - | - | Yes | Yes |
+| selectText | Yes | Yes | - | - | - | - |
+| dispatchEvent | Yes | - | - | - | - | - |
+| focus | Yes | - | - | - | - | - |
+| getAttribute | Yes | - | - | - | - | - |
+| innerText | Yes | - | - | - | - | - |
+| innerHTML | Yes | - | - | - | - | - |
+| press | Yes | - | - | - | - | - |
+| setInputFiles | Yes | - | - | - | - | - |
+| selectOption | Yes | - | - | - | - | - |
+| textContent | Yes | - | - | - | - | - |
+| type | Yes | - | - | - | - | - |
 
 <br/>
 
