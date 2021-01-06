@@ -31,7 +31,8 @@ module.exports = {
   baseUrl: "/",
   organizationName: "microsoft",
   projectName: "playwright.dev",
-  onBrokenLinks: "log",
+  onBrokenLinks: "throw",
+  onBrokenMarkdownLinks: "throw",
   scripts: ["js/redirection.js"],
   favicon: "img/playwright-logo.svg",
   themeConfig: {
