@@ -3,8 +3,6 @@ id: input
 title: "Input"
 ---
 
-
-<!-- GEN:toc-top-level -->
 - [Text input](#text-input)
 - [Checkboxes and radio buttons](#checkboxes-and-radio-buttons)
 - [Select options](#select-options)
@@ -13,9 +11,6 @@ title: "Input"
 - [Keys and shortcuts](#keys-and-shortcuts)
 - [Upload files](#upload-files)
 - [Focus element](#focus-element)
-<!-- GEN:stop -->
-
-<br/>
 
 ## Text input
 
@@ -39,10 +34,9 @@ await page.fill('text=First Name', 'Peter');
 ```
 
 #### API reference
-
-- [page.fill(selector, value[, options])](./api/class-page.md#pagefillselector-value-options) — main frame
-- [frame.fill(selector, value[, options])](./api/class-frame.md#framefillselector-value-options) — given frame
-- [elementHandle.fill(value[, options])](./api/class-elementhandle.md#elementhandlefillvalue-options) — given element
+- [page.fill(selector, value[, options])](api/class-page.md#pagefillselector-value-options)
+- [frame.fill(selector, value[, options])](api/class-frame.md#framefillselector-value-options)
+- [elementHandle.fill(value[, options])](api/class-elementhandle.md#elementhandlefillvalue-options)
 
 <br/>
 
@@ -62,20 +56,18 @@ await page.check('text=XL');
 ```
 
 #### API reference
-
-- [page.check(selector[, options])](./api/class-page.md#pagecheckselector-options) — main frame
-- [page.uncheck(selector[, options])](./api/class-page.md#pageuncheckselector-options) — main frame
-- [frame.check(selector[, options])](./api/class-frame.md#framecheckselector-options) — given frame
-- [frame.uncheck(selector[, options])](./api/class-frame.md#frameuncheckselector-options) — given frame
-- [elementHandle.check(value[, options])](./api/class-elementhandle.md#elementhandleuncheckoptions) — given element
-- [elementHandle.uncheck(value[, options])](api/class-elementhandle.md#elementhandleuncheckoptions) — given element
+- [page.check(selector[, options])](api/class-page.md#pagecheckselector-options)
+- [page.uncheck(selector[, options])](api/class-page.md#pageuncheckselector-options)
+- [frame.check(selector[, options])](api/class-frame.md#framecheckselector-options)
+- [frame.uncheck(selector[, options])](api/class-frame.md#frameuncheckselector-options)
+- [elementHandle.check([options])](api/class-elementhandle.md#elementhandlecheckoptions)
+- [elementHandle.uncheck([options])](api/class-elementhandle.md#elementhandleuncheckoptions)
 
 <br/>
 
 ## Select options
 
-Selects one or multiple options in the `<select>` element.
-You can specify option `value`, `label` or `elementHandle` to select. Multiple options can be selected.
+Selects one or multiple options in the `<select>` element. You can specify option `value`, `label` or `elementHandle` to select. Multiple options can be selected.
 
 ```js
 // Single selection matching the value
@@ -93,10 +85,9 @@ await page.selectOption('select#colors', option);
 ```
 
 #### API reference
-
-- [page.selectOption(selector, values[, options])](./api/class-page.md#pageselectoptionselector-values-options) — main frame
-- [frame.selectOption(selector, values[, options])](./api/class-frame.md#frameselectoptionselector-values-options) — given frame
-- [elementHandle.selectOption(values[, options])](./api/class-elementhandle.md#elementhandleselectoptionvalues-options) — given element
+- [page.selectOption(selector, values[, options])](api/class-page.md#pageselectoptionselector-values-options)
+- [frame.selectOption(selector, values[, options])](api/class-frame.md#frameselectoptionselector-values-options)
+- [elementHandle.selectOption(values[, options])](api/class-elementhandle.md#elementhandleselectoptionvalues-options)
 
 <br/>
 
@@ -125,7 +116,6 @@ await page.click('#item', { position: { x: 0, y: 0} });
 ```
 
 Under the hood, this and other pointer-related methods:
-
 - wait for element with given selector to be in DOM
 - wait for it to become displayed, i.e. not empty, no `display:none`, no `visibility:hidden`
 - wait for it to stop moving, for example, until css transition finishes
@@ -149,21 +139,19 @@ If you are not interested in testing your app under the real conditions and want
 await page.dispatchEvent('button#submit', 'click');
 ```
 
-
 #### API reference
-
-- [page.click(selector[, options])](./api/class-page.md#pageclickselector-options) — main frame
-- [frame.click(selector[, options])](./api/class-frame.md#frameclickselector-options) — given frame
-- [elementHandle.click([options])](./api/class-elementhandle.md#elementhandleclickoptions) — given element
-- [page.dblclick(selector[, options])](./api/class-page.md#pagedblclickselector-options) — main frame
-- [frame.dblclick(selector[, options])](./api/class-frame.md#framedblclickselector-options) — given frame
-- [elementHandle.dblclick([options])](./api/class-elementhandle.md#elementhandledblclickoptions) — given element
-- [page.hover(selector[, options])](./api/class-page.md#pagehoverselector-options) — main frame
-- [frame.hover(selector[, options])](./api/class-frame.md#framehoverselector-options) — given frame
-- [elementHandle.hover([options])](./api/class-elementhandle.md#elementhandlehoveroptions) — given element
-- [page.dispatchEvent(selector, type)](./api/class-page.md#pagedispatcheventselector-type-eventinit-options) — main frame
-- [frame.dispatchEvent(selector, type)](./api/class-frame.md#framedispatcheventselector-type-eventinit-options) — given frame
-- [elementHandle.dispatchEvent(type)](./api/class-elementhandle.md#elementhandledispatcheventtype-eventinit) — given element
+- [page.click(selector[, options])](api/class-page.md#pageclickselector-options)
+- [frame.click(selector[, options])](api/class-frame.md#frameclickselector-options)
+- [elementHandle.click([options])](api/class-elementhandle.md#elementhandleclickoptions)
+- [page.dblclick(selector[, options])](api/class-page.md#pagedblclickselector-options)
+- [frame.dblclick(selector[, options])](api/class-frame.md#framedblclickselector-options)
+- [elementHandle.dblclick([options])](api/class-elementhandle.md#elementhandledblclickoptions)
+- [page.hover(selector[, options])](api/class-page.md#pagehoverselector-options)
+- [frame.hover(selector[, options])](api/class-frame.md#framehoverselector-options)
+- [elementHandle.hover([options])](api/class-elementhandle.md#elementhandlehoveroptions)
+- [page.dispatchEvent(selector, type[, eventInit, options])](api/class-page.md#pagedispatcheventselector-type-eventinit-options)
+- [frame.dispatchEvent(selector, type[, eventInit, options])](api/class-frame.md#framedispatcheventselector-type-eventinit-options)
+- [elementHandle.dispatchEvent(type[, eventInit])](api/class-elementhandle.md#elementhandledispatcheventtype-eventinit)
 
 <br/>
 
@@ -181,11 +169,10 @@ This method will emit all the necessary keyboard events, with all the `keydown`,
 > **NOTE** that most of the time, [`page.fill`](#text-input) will just work. You only need to type characters if there is special keyboard handling on the page.
 
 #### API reference
-
-- [page.type(selector, text[, options])](./api/class-page.md#pagetypeselector-text-options) — main frame
-- [frame.type(selector, text[, options])](./api/class-frame.md#frametypeselector-text-options) — given frame
-- [elementHandle.type(text[, options])](./api/class-elementhandle.md#elementhandletypetext-options) — given element
-- [keyboard.type(text[, options])](./api/class-keyboard.md#keyboardtypetext-options) — focused element
+- [page.type(selector, text[, options])](api/class-page.md#pagetypeselector-text-options)
+- [frame.type(selector, text[, options])](api/class-frame.md#frametypeselector-text-options)
+- [elementHandle.type(text[, options])](api/class-elementhandle.md#elementhandletypetext-options)
+- [keyboard.type(text[, options])](api/class-keyboard.md#keyboardtypetext-options)
 
 <br/>
 
@@ -211,11 +198,9 @@ ArrowUp, F1 - F12, Digit0 - Digit9, KeyA - KeyZ, etc.
 ```
 
 - You can alternatively specify a single character you'd like to produce such as `"a"` or `"#"`.
-
 - Following modification shortcuts are also supported: `Shift, Control, Alt, Meta`.
 
 Simple version produces a single character. This character is case-sensitive, so `"a"` and `"A"` will produce different results.
-
 
 ```js
 // <input id=name>
@@ -229,13 +214,11 @@ Shortcuts such as `"Control+o"` or `"Control+Shift+T"` are supported as well. Wh
 
 Note that you still need to specify the capital `A` in `Shift-A` to produce the capital character. `Shift-a` produces a lower-case one as if you had the `CapsLock` toggled.
 
-
 #### API reference
-
-- [page.press(selector, key[, options])](./api/class-page.md#pagepressselector-key-options) — main frame
-- [frame.press(selector, key[, options])](./api/class-frame.md#framepressselector-key-options) — given frame
-- [elementHandle.press(key[, options])](./api/class-elementhandle.md#elementhandlepresskey-options) — given element
-- [keyboard.press(key[, options])](./api/class-keyboard.md#keyboardpresskey-options) — focused element
+- [page.press(selector, key[, options])](api/class-page.md#pagepressselector-key-options)
+- [frame.press(selector, key[, options])](api/class-frame.md#framepressselector-key-options)
+- [elementHandle.press(key[, options])](api/class-elementhandle.md#elementhandlepresskey-options)
+- [keyboard.press(key[, options])](api/class-keyboard.md#keyboardpresskey-options)
 
 <br/>
 
@@ -263,13 +246,12 @@ You can select input files for upload using the `page.setInputFiles` method. It 
 
 #### Example
 
-[This script](examples/upload.js) uploads a file to an `input` element that accepts file uploads.
+[This script](https://github.com/microsoft/playwright/blob/master/utils/docs/examples/upload.js) uploads a file to an `input` element that accepts file uploads.
 
 #### API reference
-
-- [page.setInputFiles(selector, files[, options])](https://github.com/microsoft/playwright/blob/master/docs/class-page.md#pagesetinputfilesselector-value-options)
-- [frame.setInputFiles(selector, files[, options])](https://github.com/microsoft/playwright/blob/master/docs/class-frame.md#framesetinputfilesselector-value-options)
-- [elementHandle.setInputFiles(files[, options])](https://github.com/microsoft/playwright/blob/master/docs/api/class-elementhandle.md#elementhandlesetinputfilesfiles-options)
+- [page.setInputFiles(selector, files[, options])](api/class-page.md#pagesetinputfilesselector-files-options)
+- [frame.setInputFiles(selector, files[, options])](api/class-frame.md#framesetinputfilesselector-files-options)
+- [elementHandle.setInputFiles(files[, options])](api/class-elementhandle.md#elementhandlesetinputfilesfiles-options)
 
 <br/>
 
@@ -282,9 +264,66 @@ await page.focus('input#name');
 ```
 
 #### API reference
-
-- [page.focus(selector, [options])](https://github.com/microsoft/playwright/blob/master/docs/api/class-page.md#pagefocusselector-options)
-- [frame.focus(selector, [options])](https://github.com/microsoft/playwright/blob/master/docs/api/class-frame.md#framefocusselector-options)
-- [elementHandle.focus([options])](https://github.com/microsoft/playwright/blob/master/docs/api/class-elementhandle.md#elementhandlefocus-options)
+- [page.focus(selector[, options])](api/class-page.md#pagefocusselector-options)
+- [frame.focus(selector[, options])](api/class-frame.md#framefocusselector-options)
+- [elementHandle.focus()](api/class-elementhandle.md#elementhandlefocus)
 
 <br/>
+
+[Playwright]: api/class-playwright.md "Playwright"
+[Browser]: api/class-browser.md "Browser"
+[BrowserContext]: api/class-browsercontext.md "BrowserContext"
+[Page]: api/class-page.md "Page"
+[Frame]: api/class-frame.md "Frame"
+[ElementHandle]: api/class-elementhandle.md "ElementHandle"
+[JSHandle]: api/class-jshandle.md "JSHandle"
+[ConsoleMessage]: api/class-consolemessage.md "ConsoleMessage"
+[Dialog]: api/class-dialog.md "Dialog"
+[Download]: api/class-download.md "Download"
+[Video]: api/class-video.md "Video"
+[FileChooser]: api/class-filechooser.md "FileChooser"
+[Keyboard]: api/class-keyboard.md "Keyboard"
+[Mouse]: api/class-mouse.md "Mouse"
+[Touchscreen]: api/class-touchscreen.md "Touchscreen"
+[Request]: api/class-request.md "Request"
+[Response]: api/class-response.md "Response"
+[Selectors]: api/class-selectors.md "Selectors"
+[Route]: api/class-route.md "Route"
+[WebSocket]: api/class-websocket.md "WebSocket"
+[TimeoutError]: api/class-timeouterror.md "TimeoutError"
+[Accessibility]: api/class-accessibility.md "Accessibility"
+[Worker]: api/class-worker.md "Worker"
+[BrowserServer]: api/class-browserserver.md "BrowserServer"
+[BrowserType]: api/class-browsertype.md "BrowserType"
+[Logger]: api/class-logger.md "Logger"
+[ChromiumBrowser]: api/class-chromiumbrowser.md "ChromiumBrowser"
+[ChromiumBrowserContext]: api/class-chromiumbrowsercontext.md "ChromiumBrowserContext"
+[ChromiumCoverage]: api/class-chromiumcoverage.md "ChromiumCoverage"
+[CDPSession]: api/class-cdpsession.md "CDPSession"
+[FirefoxBrowser]: api/class-firefoxbrowser.md "FirefoxBrowser"
+[WebKitBrowser]: api/class-webkitbrowser.md "WebKitBrowser"
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[Evaluation Argument]: ./core-concepts.md#evaluationargument "Evaluation Argument"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[URL]: https://nodejs.org/api/url.html "URL"
+[USKeyboardLayout]: ../src/usKeyboardLayout.ts "USKeyboardLayout"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"

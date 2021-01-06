@@ -1,6 +1,6 @@
 ---
-id: playwright-module
-title: "Playwright module"
+id: class-playwright
+title: "Playwright"
 ---
 
 
@@ -21,12 +21,12 @@ const { chromium, firefox, webkit } = require('playwright');
 By default, the `playwright` NPM package automatically downloads browser executables during installation. The `playwright-core` NPM package can be used to skip automatic downloads.
 
 <!-- GEN:toc -->
-- [playwright.chromium](api/playwright-module.md#playwrightchromium)
-- [playwright.devices](api/playwright-module.md#playwrightdevices)
-- [playwright.errors](api/playwright-module.md#playwrighterrors)
-- [playwright.firefox](api/playwright-module.md#playwrightfirefox)
-- [playwright.selectors](api/playwright-module.md#playwrightselectors)
-- [playwright.webkit](api/playwright-module.md#playwrightwebkit)
+- [playwright.chromium](api/class-playwright.md#playwrightchromium)
+- [playwright.devices](api/class-playwright.md#playwrightdevices)
+- [playwright.errors](api/class-playwright.md#playwrighterrors)
+- [playwright.firefox](api/class-playwright.md#playwrightfirefox)
+- [playwright.selectors](api/class-playwright.md#playwrightselectors)
+- [playwright.webkit](api/class-playwright.md#playwrightwebkit)
 <!-- GEN:stop -->
 
 ## playwright.chromium
@@ -37,7 +37,7 @@ This object can be used to launch or connect to Chromium, returning instances of
 ## playwright.devices
 - returns: <[Object]>
 
-Returns a list of devices to be used with [`browser.newContext([options])`](api/class-browser.md#browsernewcontextoptions) or [`browser.newPage([options])`](api/class-browser.md#browsernewpageoptions). Actual list of devices can be found in [src/deviceDescriptors.ts](https://github.com/Microsoft/playwright/blob/master/src/deviceDescriptors.ts).
+Returns a list of devices to be used with [`browser.newContext([options])`](api/class-browser.md#browsernewcontextoptions) or [`browser.newPage([options])`](api/class-browser.md#browsernewpageoptions). Actual list of devices can be found in [src/server/deviceDescriptors.ts](https://github.com/Microsoft/playwright/blob/master/src/server/deviceDescriptors.ts).
 
 ```js
 const { webkit, devices } = require('playwright');
@@ -113,6 +113,7 @@ This object can be used to launch or connect to WebKit, returning instances of [
 [ElementHandle]: api/class-elementhandle.md#class-elementhandle "ElementHandle"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [Error]: https://nodejs.org/api/errors.htmlapi.md#errors_class_error "Error"
+[EvaluationArgument]: api/evaluationargument.md#evaluationargument "Evaluation Argument"
 [File]: https://developer.mozilla.org/en-US/docs/Web/API/File "File"
 [FileChooser]: api/class-filechooser.md#class-filechooser "FileChooser"
 [FirefoxBrowser]: api/class-firefoxbrowser.md#class-firefoxbrowser "FirefoxBrowser"
@@ -124,7 +125,7 @@ This object can be used to launch or connect to WebKit, returning instances of [
 [Mouse]: api/class-mouse.md#class-mouse "Mouse"
 [Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
 [Page]: api/class-page.md#class-page "Page"
-[Playwright]: api/playwright-module.md "Playwright"
+[Playwright]: api/class-playwright.md "Playwright"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
 [Request]: api/class-request.md#class-request  "Request"
@@ -142,6 +143,7 @@ This object can be used to launch or connect to WebKit, returning instances of [
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structuresapi.md#Boolean_type "Boolean"
 [function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null
 [number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structuresapi.md#Number_type "Number"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
 [selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"

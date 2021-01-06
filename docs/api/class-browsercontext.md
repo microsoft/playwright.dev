@@ -1,6 +1,6 @@
 ---
 id: class-browsercontext
-title: "class: BrowserContext"
+title: "BrowserContext"
 ---
 
 * extends: [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter)
@@ -21,7 +21,7 @@ await page.goto('https://example.com');
 await context.close();
 ```
 
-<!-- GEN:toc -->
+
 - [browserContext.on('close')](api/class-browsercontext.md#browsercontextonclose)
 - [browserContext.on('page')](api/class-browsercontext.md#browsercontextonpage)
 - [browserContext.addCookies(cookies)](api/class-browsercontext.md#browsercontextaddcookiescookies)
@@ -31,8 +31,8 @@ await context.close();
 - [browserContext.clearPermissions()](api/class-browsercontext.md#browsercontextclearpermissions)
 - [browserContext.close()](api/class-browsercontext.md#browsercontextclose)
 - [browserContext.cookies([urls])](api/class-browsercontext.md#browsercontextcookiesurls)
-- [browserContext.exposeBinding(name, playwrightBinding[, options])](api/class-browsercontext.md#browsercontextexposebindingname-playwrightbinding-options)
-- [browserContext.exposeFunction(name, playwrightFunction)](api/class-browsercontext.md#browsercontextexposefunctionname-playwrightfunction)
+- [browserContext.exposeBinding(name, callback[, options])](api/class-browsercontext.md#browsercontextexposebindingname-callback-options)
+- [browserContext.exposeFunction(name, callback)](api/class-browsercontext.md#browsercontextexposefunctionname-callback)
 - [browserContext.grantPermissions(permissions[, options])](api/class-browsercontext.md#browsercontextgrantpermissionspermissions-options)
 - [browserContext.newPage()](api/class-browsercontext.md#browsercontextnewpage)
 - [browserContext.pages()](api/class-browsercontext.md#browsercontextpages)
@@ -46,17 +46,16 @@ await context.close();
 - [browserContext.storageState([options])](api/class-browsercontext.md#browsercontextstoragestateoptions)
 - [browserContext.unroute(url[, handler])](api/class-browsercontext.md#browsercontextunrouteurl-handler)
 - [browserContext.waitForEvent(event[, optionsOrPredicate])](api/class-browsercontext.md#browsercontextwaitforeventevent-optionsorpredicate)
-<!-- GEN:stop -->
 
 ## browserContext.on('close')
 
 Emitted when Browser context gets closed. This might happen because of one of the following:
 * Browser context is closed.
 * Browser application is closed or crashed.
-* The [`browser.close()`](api/class-browser.md#browserclose) method was called.
+* The [browser.close()](api/class-browser.md#browserclose) method was called.
 
 ## browserContext.on('page')
-- <[Page]>
+- type: <[Page]>
 
 The event is emitted when a new Page is created in the BrowserContext. The page may still be loading. The event will also fire for popup pages. See also [page.on('popup')](api/class-page.md#pageonpopup) to receive events about popups relevant to a specific page.
 
@@ -70,22 +69,22 @@ const [page] = await Promise.all([
 console.log(await page.evaluate('location.href'));
 ```
 
-> **NOTE** Use [`page.waitForLoadState([state, options])`](api/class-page.md#pagewaitforloadstatestate-options) to wait until the page gets to a particular state (you should not need it in most cases).
+> **NOTE** Use [page.waitForLoadState([state, options])](api/class-page.md#pagewaitforloadstatestate-options) to wait until the page gets to a particular state (you should not need it in most cases).
 
 ## browserContext.addCookies(cookies)
 - `cookies` <[Array]<[Object]>>
   - `name` <[string]> **required**
   - `value` <[string]> **required**
-  - `url` <[string]> either url or domain / path are required
-  - `domain` <[string]> either url or domain / path are required
-  - `path` <[string]> either url or domain / path are required
-  - `expires` <[number]> Unix time in seconds.
-  - `httpOnly` <[boolean]>
-  - `secure` <[boolean]>
-  - `sameSite` <"Strict"|"Lax"|"None">
+  - `url` <[string]> either url or domain / path are required. Optional.
+  - `domain` <[string]> either url or domain / path are required Optional.
+  - `path` <[string]> either url or domain / path are required Optional.
+  - `expires` <[number]> Unix time in seconds. Optional.
+  - `httpOnly` <[boolean]> Optional.
+  - `secure` <[boolean]> Optional.
+  - `sameSite` <"Strict"|"Lax"|"None"> Optional.
 - returns: <[Promise]>
 
-Adds cookies into this browser context. All pages within this context will have these cookies installed. Cookies can be obtained via [`browserContext.cookies([urls])`](#browsercontextcookiesurls).
+Adds cookies into this browser context. All pages within this context will have these cookies installed. Cookies can be obtained via [browserContext.cookies([urls])](api/class-browsercontext.md#browsercontextcookiesurls).
 
 ```js
 await browserContext.addCookies([cookieObject1, cookieObject2]);
@@ -93,8 +92,8 @@ await browserContext.addCookies([cookieObject1, cookieObject2]);
 
 ## browserContext.addInitScript(script[, arg])
 - `script` <[function]|[string]|[Object]> Script to be evaluated in all pages in the browser context.
-  - `path` <[string]> Path to the JavaScript file. If `path` is a relative path, then it is resolved relative to the current working directory.
-  - `content` <[string]> Raw script content.
+  - `path` <[string]> Path to the JavaScript file. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
+  - `content` <[string]> Raw script content. Optional.
 - `arg` <[Serializable]> Optional argument to pass to `script` (only supported when passing a function).
 - returns: <[Promise]>
 
@@ -118,7 +117,7 @@ await browserContext.addInitScript({
 });
 ```
 
-> **NOTE** The order of evaluation of multiple scripts installed via [`browserContext.addInitScript(script[, arg])`](#browsercontextaddinitscriptscript-arg) and [`page.addInitScript(script[, arg])`](api/class-page.md#pageaddinitscriptscript-arg) is not defined.
+> **NOTE** The order of evaluation of multiple scripts installed via [browserContext.addInitScript(script[, arg])](api/class-browsercontext.md#browsercontextaddinitscriptscript-arg) and [page.addInitScript(script[, arg])](api/class-page.md#pageaddinitscriptscript-arg) is not defined.
 
 ## browserContext.browser()
 - returns: <[null]|[Browser]>
@@ -163,18 +162,18 @@ Closes the browser context. All the pages that belong to the browser context wil
 
 If no URLs are specified, this method returns all cookies. If URLs are specified, only cookies that affect those URLs are returned.
 
-## browserContext.exposeBinding(name, playwrightBinding[, options])
+## browserContext.exposeBinding(name, callback[, options])
 - `name` <[string]> Name of the function on the window object.
-- `playwrightBinding` <[function]> Callback function that will be called in the Playwright's context.
+- `callback` <[function]> Callback function that will be called in the Playwright's context.
 - `options` <[Object]>
   - `handle` <[boolean]> Whether to pass the argument as a handle, instead of passing by value. When passing a handle, only one argument is supported. When passing by value, multiple arguments are supported.
 - returns: <[Promise]>
 
-The method adds a function called `name` on the `window` object of every frame in every page in the context. When called, the function executes `playwrightBinding` and returns a [Promise] which resolves to the return value of `playwrightBinding`. If the `playwrightBinding` returns a [Promise], it will be awaited.
+The method adds a function called `name` on the `window` object of every frame in every page in the context. When called, the function executes `callback` and returns a [Promise] which resolves to the return value of `callback`. If the `callback` returns a [Promise], it will be awaited.
 
-The first argument of the `playwrightBinding` function contains information about the caller: `{ browserContext: BrowserContext, page: Page, frame: Frame }`.
+The first argument of the `callback` function contains information about the caller: `{ browserContext: BrowserContext, page: Page, frame: Frame }`.
 
-See [`page.exposeBinding(name, playwrightBinding[, options])`](api/class-page.md#pageexposebindingname-playwrightbinding-options) for page-only version.
+See [page.exposeBinding(name, callback[, options])](api/class-page.md#pageexposebindingname-callback-options) for page-only version.
 
 An example of exposing page URL to all frames in all pages in the context:
 
@@ -214,16 +213,16 @@ await page.setContent(`
 `);
 ```
 
-## browserContext.exposeFunction(name, playwrightFunction)
+## browserContext.exposeFunction(name, callback)
 - `name` <[string]> Name of the function on the window object.
-- `playwrightFunction` <[function]> Callback function that will be called in the Playwright's context.
+- `callback` <[function]> Callback function that will be called in the Playwright's context.
 - returns: <[Promise]>
 
-The method adds a function called `name` on the `window` object of every frame in every page in the context. When called, the function executes `playwrightFunction` and returns a [Promise] which resolves to the return value of `playwrightFunction`.
+The method adds a function called `name` on the `window` object of every frame in every page in the context. When called, the function executes `callback` and returns a [Promise] which resolves to the return value of `callback`.
 
-If the `playwrightFunction` returns a [Promise], it will be awaited.
+If the `callback` returns a [Promise], it will be awaited.
 
-See [`page.exposeFunction(name, playwrightFunction)`](api/class-page.md#pageexposefunctionname-playwrightfunction) for page-only version.
+See [page.exposeFunction(name, callback)](api/class-page.md#pageexposefunctionname-callback) for page-only version.
 
 An example of adding an `md5` function to all pages in the context:
 
@@ -251,22 +250,22 @@ const crypto = require('crypto');
 
 ## browserContext.grantPermissions(permissions[, options])
 - `permissions` <[Array]<[string]>> A permission or an array of permissions to grant. Permissions can be one of the following values:
-  - `'geolocation'`
-  - `'midi'`
-  - `'midi-sysex'` (system-exclusive midi)
-  - `'notifications'`
-  - `'push'`
-  - `'camera'`
-  - `'microphone'`
-  - `'background-sync'`
-  - `'ambient-light-sensor'`
-  - `'accelerometer'`
-  - `'gyroscope'`
-  - `'magnetometer'`
-  - `'accessibility-events'`
-  - `'clipboard-read'`
-  - `'clipboard-write'`
-  - `'payment-handler'`
+  * `'geolocation'`
+  * `'midi'`
+  * `'midi-sysex'` (system-exclusive midi)
+  * `'notifications'`
+  * `'push'`
+  * `'camera'`
+  * `'microphone'`
+  * `'background-sync'`
+  * `'ambient-light-sensor'`
+  * `'accelerometer'`
+  * `'gyroscope'`
+  * `'magnetometer'`
+  * `'accessibility-events'`
+  * `'clipboard-read'`
+  * `'clipboard-write'`
+  * `'payment-handler'`
 - `options` <[Object]>
   - `origin` <[string]> The [origin] to grant permissions to, e.g. "https://example.com".
 - returns: <[Promise]>
@@ -281,7 +280,7 @@ Creates a new page in the browser context.
 ## browserContext.pages()
 - returns: <[Array]<[Page]>>
 
-Returns all open pages in the context. Non visible pages, such as `"background_page"`, will not be listed here. You can find them using [`chromiumBrowserContext.backgroundPages()`](api/class-chromiumbrowsercontext.md#chromiumbrowsercontextbackgroundpages).
+Returns all open pages in the context. Non visible pages, such as `"background_page"`, will not be listed here. You can find them using [chromiumBrowserContext.backgroundPages()](api/class-chromiumbrowsercontext.md#chromiumbrowsercontextbackgroundpages).
 
 ## browserContext.route(url, handler)
 - `url` <[string]|[RegExp]|[function]\([URL]\):[boolean]> A glob pattern, regex pattern or predicate receiving [URL] to match while routing.
@@ -310,7 +309,7 @@ await page.goto('https://example.com');
 await browser.close();
 ```
 
-Page routes (set up with [`page.route(url, handler)`](api/class-page.md#pagerouteurl-handler)) take precedence over browser context routes when request matches both handlers.
+Page routes (set up with [page.route(url, handler)](api/class-page.md#pagerouteurl-handler)) take precedence over browser context routes when request matches both handlers.
 
 > **NOTE** Enabling routing disables http cache.
 
@@ -318,27 +317,27 @@ Page routes (set up with [`page.route(url, handler)`](api/class-page.md#pagerout
 - `timeout` <[number]> Maximum navigation time in milliseconds
 
 This setting will change the default maximum navigation time for the following methods and related shortcuts:
-* [`page.goBack([options])`](api/class-page.md#pagegobackoptions)
-* [`page.goForward([options])`](api/class-page.md#pagegoforwardoptions)
-* [`page.goto(url[, options])`](api/class-page.md#pagegotourl-options)
-* [`page.reload([options])`](api/class-page.md#pagereloadoptions)
-* [`page.setContent(html[, options])`](api/class-page.md#pagesetcontenthtml-options)
-* [`page.waitForNavigation([options])`](api/class-page.md#pagewaitfornavigationoptions)
+* [page.goBack([options])](api/class-page.md#pagegobackoptions)
+* [page.goForward([options])](api/class-page.md#pagegoforwardoptions)
+* [page.goto(url[, options])](api/class-page.md#pagegotourl-options)
+* [page.reload([options])](api/class-page.md#pagereloadoptions)
+* [page.setContent(html[, options])](api/class-page.md#pagesetcontenthtml-options)
+* [page.waitForNavigation([options])](api/class-page.md#pagewaitfornavigationoptions)
 
-> **NOTE** [`page.setDefaultNavigationTimeout(timeout)`](api/class-page.md#pagesetdefaultnavigationtimeouttimeout) and [`page.setDefaultTimeout(timeout)`](api/class-page.md#pagesetdefaulttimeouttimeout) take priority over [`browserContext.setDefaultNavigationTimeout(timeout)`](#browsercontextsetdefaultnavigationtimeouttimeout).
+> **NOTE** [page.setDefaultNavigationTimeout(timeout)](api/class-page.md#pagesetdefaultnavigationtimeouttimeout) and [page.setDefaultTimeout(timeout)](api/class-page.md#pagesetdefaulttimeouttimeout) take priority over [browserContext.setDefaultNavigationTimeout(timeout)](api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout).
 
 ## browserContext.setDefaultTimeout(timeout)
 - `timeout` <[number]> Maximum time in milliseconds
 
 This setting will change the default maximum time for all the methods accepting `timeout` option.
 
-> **NOTE** [`page.setDefaultNavigationTimeout(timeout)`](#pagesetdefaultnavigationtimeouttimeout), [`page.setDefaultTimeout(timeout)`](#pagesetdefaulttimeouttimeout) and [`browserContext.setDefaultNavigationTimeout(timeout)`](#browsercontextsetdefaultnavigationtimeouttimeout) take priority over [`browserContext.setDefaultTimeout(timeout)`](#browsercontextsetdefaulttimeouttimeout).
+> **NOTE** [page.setDefaultNavigationTimeout(timeout)](api/class-page.md#pagesetdefaultnavigationtimeouttimeout), [page.setDefaultTimeout(timeout)](api/class-page.md#pagesetdefaulttimeouttimeout) and [browserContext.setDefaultNavigationTimeout(timeout)](api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout) take priority over [browserContext.setDefaultTimeout(timeout)](api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
 
 ## browserContext.setExtraHTTPHeaders(headers)
 - `headers` <[Object]<[string], [string]>> An object containing additional HTTP headers to be sent with every request. All header values must be strings.
 - returns: <[Promise]>
 
-The extra HTTP headers will be sent with every request initiated by any page in the context. These headers are merged with page-specific extra HTTP headers set with [`page.setExtraHTTPHeaders(headers)`](api/class-page.md#pagesetextrahttpheadersheaders). If page overrides a particular header, page-specific header value will be used instead of the browser context header value.
+The extra HTTP headers will be sent with every request initiated by any page in the context. These headers are merged with page-specific extra HTTP headers set with [page.setExtraHTTPHeaders(headers)](api/class-page.md#pagesetextrahttpheadersheaders). If page overrides a particular header, page-specific header value will be used instead of the browser context header value.
 
 > **NOTE** `browserContext.setExtraHTTPHeaders` does not guarantee the order of headers in the outgoing requests.
 
@@ -355,7 +354,7 @@ Sets the context's geolocation. Passing `null` or `undefined` emulates position 
 await browserContext.setGeolocation({latitude: 59.95, longitude: 30.31667});
 ```
 
-> **NOTE** Consider using [`browserContext.grantPermissions(permissions[, options])`](#browsercontextgrantpermissionspermissions-options) to grant permissions for the browser context pages to read its geolocation.
+> **NOTE** Consider using [browserContext.grantPermissions(permissions[, options])](api/class-browsercontext.md#browsercontextgrantpermissionspermissions-options) to grant permissions for the browser context pages to read its geolocation.
 
 ## browserContext.setHTTPCredentials(httpCredentials)
 - `httpCredentials` <[null]|[Object]>
@@ -393,17 +392,17 @@ Provide credentials for [HTTP authentication](https://developer.mozilla.org/en-U
 Returns storage state for this browser context, contains current cookies and local storage snapshot.
 
 ## browserContext.unroute(url[, handler])
-- `url` <[string]|[RegExp]|[function]\([URL]\):[boolean]> A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with [`browserContext.route(url, handler)`](#browsercontextrouteurl-handler).
-- `handler` <[function]\([Route], [Request]\)> Optional handler function used to register a routing with [`browserContext.route(url, handler)`](#browsercontextrouteurl-handler).
+- `url` <[string]|[RegExp]|[function]\([URL]\):[boolean]> A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with [browserContext.route(url, handler)](api/class-browsercontext.md#browsercontextrouteurl-handler).
+- `handler` <[function]\([Route], [Request]\)> Optional handler function used to register a routing with [browserContext.route(url, handler)](api/class-browsercontext.md#browsercontextrouteurl-handler).
 - returns: <[Promise]>
 
-Removes a route created with [`browserContext.route(url, handler)`](#browsercontextrouteurl-handler). When `handler` is not specified, removes all routes for the `url`.
+Removes a route created with [browserContext.route(url, handler)](api/class-browsercontext.md#browsercontextrouteurl-handler). When `handler` is not specified, removes all routes for the `url`.
 
 ## browserContext.waitForEvent(event[, optionsOrPredicate])
 - `event` <[string]> Event name, same one would pass into `browserContext.on(event)`.
 - `optionsOrPredicate` <[Function]|[Object]> Either a predicate that receives an event or an options object. Optional.
   - `predicate` <[Function]> receives the event data and resolves to truthy value when the waiting should resolve.
-  - `timeout` <[number]> maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](#browsercontextsetdefaulttimeouttimeout).
+  - `timeout` <[number]> maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
 - returns: <[Promise]<[Object]>>
 
 Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the context closes before the event is fired. Returns the event data value.
@@ -414,63 +413,60 @@ await context.grantPermissions(['geolocation']);
 ```
 
 
-
-[AXNode]: api/class-accessibility.md#accessibilitysnapshotoptions "AXNode"
-[Accessibility]: api/class-accessibility.md#class-accessibility "Accessibility"
+[Playwright]: api/class-playwright.md "Playwright"
+[Browser]: api/class-browser.md "Browser"
+[BrowserContext]: api/class-browsercontext.md "BrowserContext"
+[Page]: api/class-page.md "Page"
+[Frame]: api/class-frame.md "Frame"
+[ElementHandle]: api/class-elementhandle.md "ElementHandle"
+[JSHandle]: api/class-jshandle.md "JSHandle"
+[ConsoleMessage]: api/class-consolemessage.md "ConsoleMessage"
+[Dialog]: api/class-dialog.md "Dialog"
+[Download]: api/class-download.md "Download"
+[Video]: api/class-video.md "Video"
+[FileChooser]: api/class-filechooser.md "FileChooser"
+[Keyboard]: api/class-keyboard.md "Keyboard"
+[Mouse]: api/class-mouse.md "Mouse"
+[Touchscreen]: api/class-touchscreen.md "Touchscreen"
+[Request]: api/class-request.md "Request"
+[Response]: api/class-response.md "Response"
+[Selectors]: api/class-selectors.md "Selectors"
+[Route]: api/class-route.md "Route"
+[WebSocket]: api/class-websocket.md "WebSocket"
+[TimeoutError]: api/class-timeouterror.md "TimeoutError"
+[Accessibility]: api/class-accessibility.md "Accessibility"
+[Worker]: api/class-worker.md "Worker"
+[BrowserServer]: api/class-browserserver.md "BrowserServer"
+[BrowserType]: api/class-browsertype.md "BrowserType"
+[Logger]: api/class-logger.md "Logger"
+[ChromiumBrowser]: api/class-chromiumbrowser.md "ChromiumBrowser"
+[ChromiumBrowserContext]: api/class-chromiumbrowsercontext.md "ChromiumBrowserContext"
+[ChromiumCoverage]: api/class-chromiumcoverage.md "ChromiumCoverage"
+[CDPSession]: api/class-cdpsession.md "CDPSession"
+[FirefoxBrowser]: api/class-firefoxbrowser.md "FirefoxBrowser"
+[WebKitBrowser]: api/class-webkitbrowser.md "WebKitBrowser"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[BrowserServer]: api/class-browser.md#class-browserserver  "BrowserServer"
-[BrowserContext]: api/class-browsercontext.md#class-browsercontext  "BrowserContext"
-[BrowserType]: api/class-browsertype.md#class-browsertype "BrowserType"
-[Browser]: api/class-browser.md  "Browser"
-[Buffer]: https://nodejs.org/api/buffer.htmlapi.md#buffer_class_buffer "Buffer"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
 [ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
-[ChromiumBrowser]: api/class-chromiumbrowser.md#class-chromiumbrowser "ChromiumBrowser"
-[ChromiumBrowserContext]: api/class-chromiumbrowsercontext.md#class-chromiumbrowsercontext "ChromiumBrowserContext"
-[ChromiumCoverage]: api/class-chromiumcoverage.md#class-chromiumcoverage "ChromiumCoverage"
-[CDPSession]: api/class-cdpsession.md#class-cdpsession  "CDPSession"
-[ConsoleMessage]: api/class-consolemessage.md#class-consolemessage "ConsoleMessage"
-[Dialog]: api/class-dialog.md#class-dialog "Dialog"
-[Download]: api/class-download.md#class-download "Download"
-[ElementHandle]: api/class-elementhandle.md#class-elementhandle "ElementHandle"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[Error]: https://nodejs.org/api/errors.htmlapi.md#errors_class_error "Error"
-[EvaluationArgument]: api/evaluationargument.md#evaluationargument "Evaluation Argument"
-[File]: https://developer.mozilla.org/en-US/docs/Web/API/File "File"
-[FileChooser]: api/class-filechooser.md#class-filechooser "FileChooser"
-[FirefoxBrowser]: api/class-firefoxbrowser.md#class-firefoxbrowser "FirefoxBrowser"
-[Frame]: api/class-frame.md#class-frame "Frame"
-[JSHandle]: api/class-jshandle.md#class-jshandle "JSHandle"
-[Keyboard]: api/class-keyboard.md#class-keyboard "Keyboard"
-[Logger]: api/class-logger.md#class-logger "Logger"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[Evaluation Argument]: ./core-concepts.md#evaluationargument "Evaluation Argument"
 [Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Mouse]: api/class-mouse.md#class-mouse "Mouse"
 [Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Page]: api/class-page.md#class-page "Page"
-[Playwright]: api/playwright-module.md "Playwright"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
-[Request]: api/class-request.md#class-request  "Request"
-[Response]: api/class-response.md#class-response  "Response"
-[Route]: api/class-route.md#class-route  "Route"
-[Selectors]: api/class-selectors.md#class-selectors  "Selectors"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringifyapi.md#Description "Serializable"
-[TimeoutError]: api/class-timeouterror.md#class-timeouterror "TimeoutError"
-[Touchscreen]: api/class-touchscreen.md#class-touchscreen "Touchscreen"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
 [UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[URL]: https://nodejs.org/api/url.html
+[URL]: https://nodejs.org/api/url.html "URL"
 [USKeyboardLayout]: ../src/usKeyboardLayout.ts "USKeyboardLayout"
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[Video]: api/class-video.md#class-video "Video"
-[WebKitBrowser]: api/class-webkitbrowser.md#class-webkitbrowser "WebKitBrowser"
-[WebSocket]: api/class-websocket.md#class-websocket "WebSocket"
-[Worker]: api/class-worker.md#class-worker "Worker"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structuresapi.md#Boolean_type "Boolean"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
 [function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structuresapi.md#Number_type "Number"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
 [selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Readable]: https://nodejs.org/api/stream.htmlapi.md#stream_class_stream_readable "Readable"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structuresapi.md#String_type "String"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"

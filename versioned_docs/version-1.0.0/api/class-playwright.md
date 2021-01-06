@@ -1,55 +1,96 @@
 ---
-id: working-with-selectors
-title: "Working with selectors"
+id: class-playwright
+title: "Playwright"
 ---
 
 
-Selector describes an element in the page. It can be used to obtain `ElementHandle` (see [page.$()](#pageselector) for example) or shortcut element operations to avoid intermediate handle (see [page.click()](api/class-page.md#pageclickselector-options) for example).
+Playwright module provides a method to launch a browser instance.
+The following is a typical example of using Playwright to drive automation:
+```js
+const { chromium, firefox, webkit } = require('playwright');
 
-Selector has the following format: `engine=body [>> engine=body]*`. Here `engine` is one of the supported [selector engines](selectors.md) (e.g. `css` or `xpath`), and `body` is a selector body in the format of the particular engine. When multiple `engine=body` clauses are present (separated by `>>`), next one is queried relative to the previous one's result.
+(async () => {
+  const browser = await chromium.launch();  // Or 'firefox' or 'webkit'.
+  const page = await browser.newPage();
+  await page.goto('http://example.com');
+  // other actions...
+  await browser.close();
+})();
+```
 
-Playwright also supports the following CSS extensions:
-* `:text("string")` - Matches elements that contain specific text node. Learn more about [text selector](./selectors.md#css-extension-text).
-* `:visible` - Matches only visible elements. Learn more about [visible selector](./selectors.md#css-extension-visible).
-* `:light(selector)` - Matches in the light DOM only as opposite to piercing open shadow roots. Learn more about [shadow piercing](./selectors.md#shadow-piercing).
+By default, the `playwright` NPM package automatically downloads browser executables during installation. The `playwright-core` NPM package can be used to skip automatic downloads.
 
-<!--
-* `:right-of(selector)`, `:left-of(selector)`, `:above(selector)`, `:below(selector)`, `:near(selector)`, `:within(selector)` - Match elements based on their relative position to another element. Learn more about [proximity selectors](./selectors.md#css-extension-proximity).
--->
+<!-- GEN:toc -->
+- [playwright.chromium](api/class-playwright.md#playwrightchromium)
+- [playwright.devices](api/class-playwright.md#playwrightdevices)
+- [playwright.errors](api/class-playwright.md#playwrighterrors)
+- [playwright.firefox](api/class-playwright.md#playwrightfirefox)
+- [playwright.selectors](api/class-playwright.md#playwrightselectors)
+- [playwright.webkit](api/class-playwright.md#playwrightwebkit)
+<!-- GEN:stop -->
 
-For convenience, selectors in the wrong format are heuristically converted to the right format:
-- selector starting with `//` or `..` is assumed to be `xpath=selector`;
-- selector starting and ending with a quote (either `"` or `'`) is assumed to be `text=selector`;
-- otherwise selector is assumed to be `css=selector`.
+## playwright.chromium
+- returns: <[BrowserType]>
+
+This object can be used to launch or connect to Chromium, returning instances of [ChromiumBrowser].
+
+## playwright.devices
+- returns: <[Object]>
+
+Returns a list of devices to be used with [`browser.newContext([options])`](api/class-browser.md#browsernewcontextoptions) or [`browser.newPage([options])`](api/class-browser.md#browsernewpageoptions). Actual list of devices can be found in [src/deviceDescriptors.ts](https://github.com/Microsoft/playwright/blob/master/src/deviceDescriptors.ts).
 
 ```js
-// queries 'div' css selector
-const handle = await page.$('css=div');
+const { webkit, devices } = require('playwright');
+const iPhone = devices['iPhone 6'];
 
-// queries '//html/body/div' xpath selector
-const handle = await page.$('xpath=//html/body/div');
-
-// queries '"foo"' text selector
-const handle = await page.$('text="foo"');
-
-// queries 'span' css selector inside the result of '//html/body/div' xpath selector
-const handle = await page.$('xpath=//html/body/div >> css=span');
-
-// converted to 'css=div'
-const handle = await page.$('div');
-
-// converted to 'xpath=//html/body/div'
-const handle = await page.$('//html/body/div');
-
-// converted to 'text="foo"'
-const handle = await page.$('"foo"');
-
-// queries '../span' xpath selector starting with the result of 'div' css selector
-const handle = await page.$('div >> ../span');
-
-// queries 'span' css selector inside the div handle
-const handle = await divHandle.$('css=span');
+(async () => {
+  const browser = await webkit.launch();
+  const context = await browser.newContext({
+    ...iPhone
+  });
+  const page = await context.newPage();
+  await page.goto('http://example.com');
+  // other actions...
+  await browser.close();
+})();
 ```
+
+## playwright.errors
+- returns: <[Object]>
+  - `TimeoutError` <[function]> A class of [TimeoutError].
+
+Playwright methods might throw errors if they are unable to fulfill a request. For example, [page.waitForSelector(selector[, options])](api/class-page.md#pagewaitforselectorselector-options)
+might fail if the selector doesn't match any nodes during the given timeframe.
+
+For certain types of errors Playwright uses specific error classes.
+These classes are available via [`playwright.errors`](#playwrighterrors).
+
+An example of handling a timeout error:
+```js
+try {
+  await page.waitForSelector('.foo');
+} catch (e) {
+  if (e instanceof playwright.errors.TimeoutError) {
+    // Do something if this is a timeout.
+  }
+}
+```
+
+## playwright.firefox
+- returns: <[BrowserType]>
+
+This object can be used to launch or connect to Firefox, returning instances of [FirefoxBrowser].
+
+## playwright.selectors
+- returns: <[Selectors]>
+
+Selectors can be used to install custom selector engines. See [Working with selectors](/api/working-with-selectors.md)) for more information.
+
+## playwright.webkit
+- returns: <[BrowserType]>
+
+This object can be used to launch or connect to WebKit, returning instances of [WebKitBrowser].
+
 
 
 
@@ -72,7 +113,6 @@ const handle = await divHandle.$('css=span');
 [ElementHandle]: api/class-elementhandle.md#class-elementhandle "ElementHandle"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [Error]: https://nodejs.org/api/errors.htmlapi.md#errors_class_error "Error"
-[EvaluationArgument]: api/evaluationargument.md#evaluationargument "Evaluation Argument"
 [File]: https://developer.mozilla.org/en-US/docs/Web/API/File "File"
 [FileChooser]: api/class-filechooser.md#class-filechooser "FileChooser"
 [FirefoxBrowser]: api/class-firefoxbrowser.md#class-firefoxbrowser "FirefoxBrowser"
@@ -84,7 +124,7 @@ const handle = await divHandle.$('css=span');
 [Mouse]: api/class-mouse.md#class-mouse "Mouse"
 [Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
 [Page]: api/class-page.md#class-page "Page"
-[Playwright]: api/playwright-module.md "Playwright"
+[Playwright]: api/class-playwright.md "Playwright"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
 [Request]: api/class-request.md#class-request  "Request"
@@ -93,19 +133,15 @@ const handle = await divHandle.$('css=span');
 [Selectors]: api/class-selectors.md#class-selectors  "Selectors"
 [Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringifyapi.md#Description "Serializable"
 [TimeoutError]: api/class-timeouterror.md#class-timeouterror "TimeoutError"
-[Touchscreen]: api/class-touchscreen.md#class-touchscreen "Touchscreen"
 [UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
 [URL]: https://nodejs.org/api/url.html
 [USKeyboardLayout]: ../src/usKeyboardLayout.ts "USKeyboardLayout"
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[Video]: api/class-video.md#class-video "Video"
 [WebKitBrowser]: api/class-webkitbrowser.md#class-webkitbrowser "WebKitBrowser"
-[WebSocket]: api/class-websocket.md#class-websocket "WebSocket"
 [Worker]: api/class-worker.md#class-worker "Worker"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structuresapi.md#Boolean_type "Boolean"
 [function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null
 [number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structuresapi.md#Number_type "Number"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
 [selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"

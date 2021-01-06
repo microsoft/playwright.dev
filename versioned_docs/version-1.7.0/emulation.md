@@ -42,7 +42,7 @@ All pages created in the context above will share the same device parameters.
 
 #### API reference
 
-- [`playwright.devices`](./api/playwright-module.md#playwrightdevices)
+- [`playwright.devices`](./api/class-playwright.md#playwrightdevices)
 - [`browser.newContext()`](./api/class-browser.md#browsernewcontextoptions)
 
 <br/>

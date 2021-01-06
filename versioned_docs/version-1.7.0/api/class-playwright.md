@@ -1,34 +1,98 @@
 ---
-id: working-with-chrome-extensions
-title: "Working with Chrome Extensions"
+id: class-playwright
+title: "Playwright"
 ---
 
 
-Playwright can be used for testing Chrome Extensions.
-
-> **NOTE** Extensions in Chrome / Chromium currently only work in non-headless mode.
-
-The following is code for getting a handle to the [background page](https://developer.chrome.com/extensions/background_pages) of an extension whose source is located in `./my-extension`:
+Playwright module provides a method to launch a browser instance.
+The following is a typical example of using Playwright to drive automation:
 ```js
-const { chromium } = require('playwright');
+const { chromium, firefox, webkit } = require('playwright');
 
 (async () => {
-  const pathToExtension = require('path').join(__dirname, 'my-extension');
-  const userDataDir = '/tmp/test-user-data-dir';
-  const browserContext = await chromium.launchPersistentContext(userDataDir,{
-    headless: false,
-    args: [
-      `--disable-extensions-except=${pathToExtension}`,
-      `--load-extension=${pathToExtension}`
-    ]
-  });
-  const backgroundPage = browserContext.backgroundPages()[0];
-  // Test the background page as you would any other page.
-  await browserContext.close();
+  const browser = await chromium.launch();  // Or 'firefox' or 'webkit'.
+  const page = await browser.newPage();
+  await page.goto('http://example.com');
+  // other actions...
+  await browser.close();
 })();
 ```
 
-> **NOTE** It is not yet possible to test extension popups or content scripts.
+By default, the `playwright` NPM package automatically downloads browser executables during installation. The `playwright-core` NPM package can be used to skip automatic downloads.
+
+<!-- GEN:toc -->
+- [playwright.chromium](api/class-playwright.md#playwrightchromium)
+- [playwright.devices](api/class-playwright.md#playwrightdevices)
+- [playwright.errors](api/class-playwright.md#playwrighterrors)
+- [playwright.firefox](api/class-playwright.md#playwrightfirefox)
+- [playwright.selectors](api/class-playwright.md#playwrightselectors)
+- [playwright.webkit](api/class-playwright.md#playwrightwebkit)
+<!-- GEN:stop -->
+
+## playwright.chromium
+- returns: <[BrowserType]>
+
+This object can be used to launch or connect to Chromium, returning instances of [ChromiumBrowser].
+
+## playwright.devices
+- returns: <[Object]>
+
+Returns a list of devices to be used with [`browser.newContext([options])`](api/class-browser.md#browsernewcontextoptions) or [`browser.newPage([options])`](api/class-browser.md#browsernewpageoptions). Actual list of devices can be found in [src/server/deviceDescriptors.ts](https://github.com/Microsoft/playwright/blob/master/src/server/deviceDescriptors.ts).
+
+```js
+const { webkit, devices } = require('playwright');
+const iPhone = devices['iPhone 6'];
+
+(async () => {
+  const browser = await webkit.launch();
+  const context = await browser.newContext({
+    ...iPhone
+  });
+  const page = await context.newPage();
+  await page.goto('http://example.com');
+  // other actions...
+  await browser.close();
+})();
+```
+
+## playwright.errors
+- returns: <[Object]>
+  - `TimeoutError` <[function]> A class of [TimeoutError].
+
+Playwright methods might throw errors if they are unable to fulfill a request. For example, [page.waitForSelector(selector[, options])](api/class-page.md#pagewaitforselectorselector-options)
+might fail if the selector doesn't match any nodes during the given timeframe.
+
+For certain types of errors Playwright uses specific error classes.
+These classes are available via [`playwright.errors`](#playwrighterrors).
+
+An example of handling a timeout error:
+```js
+try {
+  await page.waitForSelector('.foo');
+} catch (e) {
+  if (e instanceof playwright.errors.TimeoutError) {
+    // Do something if this is a timeout.
+  }
+}
+```
+
+## playwright.firefox
+- returns: <[BrowserType]>
+
+This object can be used to launch or connect to Firefox, returning instances of [FirefoxBrowser].
+
+## playwright.selectors
+- returns: <[Selectors]>
+
+Selectors can be used to install custom selector engines. See [Working with selectors](/api/working-with-selectors.md)) for more information.
+
+## playwright.webkit
+- returns: <[BrowserType]>
+
+This object can be used to launch or connect to WebKit, returning instances of [WebKitBrowser].
+
+
+
 
 
 [AXNode]: api/class-accessibility.md#accessibilitysnapshotoptions "AXNode"
@@ -62,7 +126,7 @@ const { chromium } = require('playwright');
 [Mouse]: api/class-mouse.md#class-mouse "Mouse"
 [Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
 [Page]: api/class-page.md#class-page "Page"
-[Playwright]: api/playwright-module.md "Playwright"
+[Playwright]: api/class-playwright.md "Playwright"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
 [Request]: api/class-request.md#class-request  "Request"

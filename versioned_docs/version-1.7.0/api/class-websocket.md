@@ -1,6 +1,6 @@
 ---
 id: class-websocket
-title: "class: WebSocket"
+title: "WebSocket"
 ---
 
 
@@ -92,7 +92,7 @@ value. Will throw an error if the webSocket is closed before the event is fired.
 [Mouse]: api/class-mouse.md#class-mouse "Mouse"
 [Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
 [Page]: api/class-page.md#class-page "Page"
-[Playwright]: api/playwright-module.md "Playwright"
+[Playwright]: api/class-playwright.md "Playwright"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
 [Request]: api/class-request.md#class-request  "Request"

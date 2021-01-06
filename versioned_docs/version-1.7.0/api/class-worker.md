@@ -1,6 +1,6 @@
 ---
 id: class-worker
-title: "class: Worker"
+title: "Worker"
 ---
 
 
@@ -94,7 +94,7 @@ the promise to resolve and return its value.
 [Mouse]: api/class-mouse.md#class-mouse "Mouse"
 [Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
 [Page]: api/class-page.md#class-page "Page"
-[Playwright]: api/playwright-module.md "Playwright"
+[Playwright]: api/class-playwright.md "Playwright"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
 [Request]: api/class-request.md#class-request  "Request"

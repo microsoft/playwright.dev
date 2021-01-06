@@ -1,6 +1,6 @@
 ---
-id: playwright-module
-title: "Playwright module"
+id: class-playwright
+title: "Playwright"
 ---
 
 
@@ -21,12 +21,12 @@ const { chromium, firefox, webkit } = require('playwright');
 By default, the `playwright` NPM package automatically downloads browser executables during installation. The `playwright-core` NPM package can be used to skip automatic downloads.
 
 <!-- GEN:toc -->
-- [playwright.chromium](api/playwright-module.md#playwrightchromium)
-- [playwright.devices](api/playwright-module.md#playwrightdevices)
-- [playwright.errors](api/playwright-module.md#playwrighterrors)
-- [playwright.firefox](api/playwright-module.md#playwrightfirefox)
-- [playwright.selectors](api/playwright-module.md#playwrightselectors)
-- [playwright.webkit](api/playwright-module.md#playwrightwebkit)
+- [playwright.chromium](api/class-playwright.md#playwrightchromium)
+- [playwright.devices](api/class-playwright.md#playwrightdevices)
+- [playwright.errors](api/class-playwright.md#playwrighterrors)
+- [playwright.firefox](api/class-playwright.md#playwrightfirefox)
+- [playwright.selectors](api/class-playwright.md#playwrightselectors)
+- [playwright.webkit](api/class-playwright.md#playwrightwebkit)
 <!-- GEN:stop -->
 
 ## playwright.chromium
@@ -94,7 +94,6 @@ This object can be used to launch or connect to WebKit, returning instances of [
 
 
 
-
 [AXNode]: api/class-accessibility.md#accessibilitysnapshotoptions "AXNode"
 [Accessibility]: api/class-accessibility.md#class-accessibility "Accessibility"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
@@ -126,7 +125,7 @@ This object can be used to launch or connect to WebKit, returning instances of [
 [Mouse]: api/class-mouse.md#class-mouse "Mouse"
 [Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
 [Page]: api/class-page.md#class-page "Page"
-[Playwright]: api/playwright-module.md "Playwright"
+[Playwright]: api/class-playwright.md "Playwright"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
 [Request]: api/class-request.md#class-request  "Request"
@@ -135,14 +134,11 @@ This object can be used to launch or connect to WebKit, returning instances of [
 [Selectors]: api/class-selectors.md#class-selectors  "Selectors"
 [Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringifyapi.md#Description "Serializable"
 [TimeoutError]: api/class-timeouterror.md#class-timeouterror "TimeoutError"
-[Touchscreen]: api/class-touchscreen.md#class-touchscreen "Touchscreen"
 [UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
 [URL]: https://nodejs.org/api/url.html
 [USKeyboardLayout]: ../src/usKeyboardLayout.ts "USKeyboardLayout"
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[Video]: api/class-video.md#class-video "Video"
 [WebKitBrowser]: api/class-webkitbrowser.md#class-webkitbrowser "WebKitBrowser"
-[WebSocket]: api/class-websocket.md#class-websocket "WebSocket"
 [Worker]: api/class-worker.md#class-worker "Worker"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structuresapi.md#Boolean_type "Boolean"
 [function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"

@@ -1,55 +1,96 @@
 ---
-id: evaluationargument
-title: "EvaluationArgument"
+id: class-playwright
+title: "Playwright"
 ---
 
 
-Playwright evaluation methods like [page.evaluate(pageFunction[, arg])](api/class-page.md#pageevaluatepagefunction-arg) take a single optional argument. This argument can be a mix of [Serializable] values and [JSHandle] or [ElementHandle] instances. Handles are automatically converted to the value they represent.
+Playwright module provides a method to launch a browser instance.
+The following is a typical example of using Playwright to drive automation:
+```js
+const { chromium, firefox, webkit } = require('playwright');
 
-See examples for various scenarios:
+(async () => {
+  const browser = await chromium.launch();  // Or 'firefox' or 'webkit'.
+  const page = await browser.newPage();
+  await page.goto('http://example.com');
+  // other actions...
+  await browser.close();
+})();
+```
+
+By default, the `playwright` NPM package automatically downloads browser executables during installation. The `playwright-core` NPM package can be used to skip automatic downloads.
+
+<!-- GEN:toc -->
+- [playwright.chromium](api/class-playwright.md#playwrightchromium)
+- [playwright.devices](api/class-playwright.md#playwrightdevices)
+- [playwright.errors](api/class-playwright.md#playwrighterrors)
+- [playwright.firefox](api/class-playwright.md#playwrightfirefox)
+- [playwright.selectors](api/class-playwright.md#playwrightselectors)
+- [playwright.webkit](api/class-playwright.md#playwrightwebkit)
+<!-- GEN:stop -->
+
+## playwright.chromium
+- returns: <[BrowserType]>
+
+This object can be used to launch or connect to Chromium, returning instances of [ChromiumBrowser].
+
+## playwright.devices
+- returns: <[Object]>
+
+Returns a list of devices to be used with [`browser.newContext([options])`](api/class-browser.md#browsernewcontextoptions) or [`browser.newPage([options])`](api/class-browser.md#browsernewpageoptions). Actual list of devices can be found in [src/deviceDescriptors.ts](https://github.com/Microsoft/playwright/blob/master/src/deviceDescriptors.ts).
 
 ```js
-// A primitive value.
-await page.evaluate(num => num, 42);
+const { webkit, devices } = require('playwright');
+const iPhone = devices['iPhone 6'];
 
-// An array.
-await page.evaluate(array => array.length, [1, 2, 3]);
-
-// An object.
-await page.evaluate(object => object.foo, { foo: 'bar' });
-
-// A single handle.
-const button = await page.$('button');
-await page.evaluate(button => button.textContent, button);
-
-// Alternative notation using elementHandle.evaluate.
-await button.evaluate((button, from) => button.textContent.substring(from), 5);
-
-// Object with multiple handles.
-const button1 = await page.$('.button1');
-const button2 = await page.$('.button2');
-await page.evaluate(
-    o => o.button1.textContent + o.button2.textContent,
-    { button1, button2 });
-
-// Obejct destructuring works. Note that property names must match
-// between the destructured object and the argument.
-// Also note the required parenthesis.
-await page.evaluate(
-    ({ button1, button2 }) => button1.textContent + button2.textContent,
-    { button1, button2 });
-
-// Array works as well. Arbitrary names can be used for destructuring.
-// Note the required parenthesis.
-await page.evaluate(
-    ([b1, b2]) => b1.textContent + b2.textContent,
-    [button1, button2]);
-
-// Any non-cyclic mix of serializables and handles works.
-await page.evaluate(
-    x => x.button1.textContent + x.list[0].textContent + String(x.foo),
-    { button1, list: [button2], foo: null });
+(async () => {
+  const browser = await webkit.launch();
+  const context = await browser.newContext({
+    ...iPhone
+  });
+  const page = await context.newPage();
+  await page.goto('http://example.com');
+  // other actions...
+  await browser.close();
+})();
 ```
+
+## playwright.errors
+- returns: <[Object]>
+  - `TimeoutError` <[function]> A class of [TimeoutError].
+
+Playwright methods might throw errors if they are unable to fulfill a request. For example, [page.waitForSelector(selector[, options])](api/class-page.md#pagewaitforselectorselector-options)
+might fail if the selector doesn't match any nodes during the given timeframe.
+
+For certain types of errors Playwright uses specific error classes.
+These classes are available via [`playwright.errors`](#playwrighterrors).
+
+An example of handling a timeout error:
+```js
+try {
+  await page.waitForSelector('.foo');
+} catch (e) {
+  if (e instanceof playwright.errors.TimeoutError) {
+    // Do something if this is a timeout.
+  }
+}
+```
+
+## playwright.firefox
+- returns: <[BrowserType]>
+
+This object can be used to launch or connect to Firefox, returning instances of [FirefoxBrowser].
+
+## playwright.selectors
+- returns: <[Selectors]>
+
+Selectors can be used to install custom selector engines. See [Working with selectors](/api/working-with-selectors.md)) for more information.
+
+## playwright.webkit
+- returns: <[BrowserType]>
+
+This object can be used to launch or connect to WebKit, returning instances of [WebKitBrowser].
+
 
 
 
@@ -72,7 +113,6 @@ await page.evaluate(
 [ElementHandle]: api/class-elementhandle.md#class-elementhandle "ElementHandle"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [Error]: https://nodejs.org/api/errors.htmlapi.md#errors_class_error "Error"
-[EvaluationArgument]: api/evaluationargument.md#evaluationargument "Evaluation Argument"
 [File]: https://developer.mozilla.org/en-US/docs/Web/API/File "File"
 [FileChooser]: api/class-filechooser.md#class-filechooser "FileChooser"
 [FirefoxBrowser]: api/class-firefoxbrowser.md#class-firefoxbrowser "FirefoxBrowser"
@@ -84,7 +124,7 @@ await page.evaluate(
 [Mouse]: api/class-mouse.md#class-mouse "Mouse"
 [Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
 [Page]: api/class-page.md#class-page "Page"
-[Playwright]: api/playwright-module.md "Playwright"
+[Playwright]: api/class-playwright.md "Playwright"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
 [Request]: api/class-request.md#class-request  "Request"
@@ -93,19 +133,15 @@ await page.evaluate(
 [Selectors]: api/class-selectors.md#class-selectors  "Selectors"
 [Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringifyapi.md#Description "Serializable"
 [TimeoutError]: api/class-timeouterror.md#class-timeouterror "TimeoutError"
-[Touchscreen]: api/class-touchscreen.md#class-touchscreen "Touchscreen"
 [UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
 [URL]: https://nodejs.org/api/url.html
 [USKeyboardLayout]: ../src/usKeyboardLayout.ts "USKeyboardLayout"
 [UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[Video]: api/class-video.md#class-video "Video"
 [WebKitBrowser]: api/class-webkitbrowser.md#class-webkitbrowser "WebKitBrowser"
-[WebSocket]: api/class-websocket.md#class-websocket "WebSocket"
 [Worker]: api/class-worker.md#class-worker "Worker"
 [boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structuresapi.md#Boolean_type "Boolean"
 [function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null
 [number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structuresapi.md#Number_type "Number"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
 [selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
