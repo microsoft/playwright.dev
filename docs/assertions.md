@@ -35,14 +35,14 @@ assert(checked);
 ```
 
 #### API reference
-- [page.textContent(selector[, options])](api/class-page.md#pagetextcontentselector-options)
-- [page.innerText(selector[, options])](api/class-page.md#pageinnertextselector-options)
-- [page.innerHTML(selector[, options])](api/class-page.md#pageinnerhtmlselector-options)
-- [page.getAttribute(selector, name[, options])](api/class-page.md#pagegetattributeselector-name-options)
-- [frame.textContent(selector[, options])](api/class-frame.md#frametextcontentselector-options)
-- [frame.innerText(selector[, options])](api/class-frame.md#frameinnertextselector-options)
-- [frame.innerHTML(selector[, options])](api/class-frame.md#frameinnerhtmlselector-options)
-- [frame.getAttribute(selector, name[, options])](api/class-frame.md#framegetattributeselector-name-options)
+- [page.textContent(selector[, options])](./class-page.md#pagetextcontentselector-options)
+- [page.innerText(selector[, options])](./class-page.md#pageinnertextselector-options)
+- [page.innerHTML(selector[, options])](./class-page.md#pageinnerhtmlselector-options)
+- [page.getAttribute(selector, name[, options])](./class-page.md#pagegetattributeselector-name-options)
+- [frame.textContent(selector[, options])](./class-frame.md#frametextcontentselector-options)
+- [frame.innerText(selector[, options])](./class-frame.md#frameinnertextselector-options)
+- [frame.innerHTML(selector[, options])](./class-frame.md#frameinnerhtmlselector-options)
+- [frame.getAttribute(selector, name[, options])](./class-frame.md#framegetattributeselector-name-options)
 
 <br/>
 
@@ -50,7 +50,7 @@ assert(checked);
 
 [ElementHandle] objects represent in-page DOM elements. They can be used to assert for multiple properties of the element.
 
-It is recommended to fetch the [ElementHandle] object with [page.waitForSelector(selector[, options])](api/class-page.md#pagewaitforselectorselector-options) or [frame.waitForSelector(selector[, options])](api/class-frame.md#framewaitforselectorselector-options). These APIs wait for the element to be visible and then return an `ElementHandle`.
+It is recommended to fetch the [ElementHandle] object with [page.waitForSelector(selector[, options])](./class-page.md#pagewaitforselectorselector-options) or [frame.waitForSelector(selector[, options])](./class-frame.md#framewaitforselectorselector-options). These APIs wait for the element to be visible and then return an `ElementHandle`.
 
 ```js
 // Get the element handle
@@ -66,11 +66,11 @@ assert(classNames.includes('highlighted'));
 ```
 
 #### API reference
-- [elementHandle.textContent()](api/class-elementhandle.md#elementhandletextcontent)
-- [elementHandle.innerText()](api/class-elementhandle.md#elementhandleinnertext)
-- [elementHandle.innerHTML()](api/class-elementhandle.md#elementhandleinnerhtml)
-- [elementHandle.getAttribute(name)](api/class-elementhandle.md#elementhandlegetattributename)
-- [elementHandle.boundingBox()](api/class-elementhandle.md#elementhandleboundingbox)
+- [elementHandle.textContent()](./class-elementhandle.md#elementhandletextcontent)
+- [elementHandle.innerText()](./class-elementhandle.md#elementhandleinnertext)
+- [elementHandle.innerHTML()](./class-elementhandle.md#elementhandleinnerhtml)
+- [elementHandle.getAttribute(name)](./class-elementhandle.md#elementhandlegetattributename)
+- [elementHandle.boundingBox()](./class-elementhandle.md#elementhandleboundingbox)
 
 <br/>
 
@@ -78,7 +78,7 @@ assert(classNames.includes('highlighted'));
 
 With Playwright, you can also write custom JavaScript to run in the context of the browser. This is useful in situations where you want to assert for values that are not covered by the convenience APIs above.
 
-The following APIs do not auto-wait for the element. It is recommended to use [page.waitForSelector(selector[, options])](api/class-page.md#pagewaitforselectorselector-options) or [frame.waitForSelector(selector[, options])](api/class-frame.md#framewaitforselectorselector-options).
+The following APIs do not auto-wait for the element. It is recommended to use [page.waitForSelector(selector[, options])](./class-page.md#pagewaitforselectorselector-options) or [frame.waitForSelector(selector[, options])](./class-frame.md#framewaitforselectorselector-options).
 
 ```js
 // Assert local storage value
@@ -100,48 +100,48 @@ assert(length === 3);
 ```
 
 #### API reference
-- [page.evaluate(pageFunction[, arg])](api/class-page.md#pageevaluatepagefunction-arg)
-- [page.$eval(selector, pageFunction[, arg])](api/class-page.md#pageevalselector-pagefunction-arg)
-- [page.$$eval(selector, pageFunction[, arg])](api/class-page.md#pageevalselector-pagefunction-arg-1)
-- [frame.evaluate(pageFunction[, arg])](api/class-frame.md#frameevaluatepagefunction-arg)
-- [frame.$eval(selector, pageFunction[, arg])](api/class-frame.md#frameevalselector-pagefunction-arg)
-- [frame.$$eval(selector, pageFunction[, arg])](api/class-frame.md#frameevalselector-pagefunction-arg-1)
-- [elementHandle.$eval(selector, pageFunction[, arg])](api/class-elementhandle.md#elementhandleevalselector-pagefunction-arg)
-- [elementHandle.$$eval(selector, pageFunction[, arg])](api/class-elementhandle.md#elementhandleevalselector-pagefunction-arg-1)
+- [page.evaluate(pageFunction[, arg])](./class-page.md#pageevaluatepagefunction-arg)
+- [page.$eval(selector, pageFunction[, arg])](./class-page.md#pageevalselector-pagefunction-arg)
+- [page.$$eval(selector, pageFunction[, arg])](./class-page.md#pageevalselector-pagefunction-arg-1)
+- [frame.evaluate(pageFunction[, arg])](./class-frame.md#frameevaluatepagefunction-arg)
+- [frame.$eval(selector, pageFunction[, arg])](./class-frame.md#frameevalselector-pagefunction-arg)
+- [frame.$$eval(selector, pageFunction[, arg])](./class-frame.md#frameevalselector-pagefunction-arg-1)
+- [elementHandle.$eval(selector, pageFunction[, arg])](./class-elementhandle.md#elementhandleevalselector-pagefunction-arg)
+- [elementHandle.$$eval(selector, pageFunction[, arg])](./class-elementhandle.md#elementhandleevalselector-pagefunction-arg-1)
 - [EvaluationArgument]
 
-[Playwright]: api/class-playwright.md "Playwright"
-[Browser]: api/class-browser.md "Browser"
-[BrowserContext]: api/class-browsercontext.md "BrowserContext"
-[Page]: api/class-page.md "Page"
-[Frame]: api/class-frame.md "Frame"
-[ElementHandle]: api/class-elementhandle.md "ElementHandle"
-[JSHandle]: api/class-jshandle.md "JSHandle"
-[ConsoleMessage]: api/class-consolemessage.md "ConsoleMessage"
-[Dialog]: api/class-dialog.md "Dialog"
-[Download]: api/class-download.md "Download"
-[Video]: api/class-video.md "Video"
-[FileChooser]: api/class-filechooser.md "FileChooser"
-[Keyboard]: api/class-keyboard.md "Keyboard"
-[Mouse]: api/class-mouse.md "Mouse"
-[Touchscreen]: api/class-touchscreen.md "Touchscreen"
-[Request]: api/class-request.md "Request"
-[Response]: api/class-response.md "Response"
-[Selectors]: api/class-selectors.md "Selectors"
-[Route]: api/class-route.md "Route"
-[WebSocket]: api/class-websocket.md "WebSocket"
-[TimeoutError]: api/class-timeouterror.md "TimeoutError"
-[Accessibility]: api/class-accessibility.md "Accessibility"
-[Worker]: api/class-worker.md "Worker"
-[BrowserServer]: api/class-browserserver.md "BrowserServer"
-[BrowserType]: api/class-browsertype.md "BrowserType"
-[Logger]: api/class-logger.md "Logger"
-[ChromiumBrowser]: api/class-chromiumbrowser.md "ChromiumBrowser"
-[ChromiumBrowserContext]: api/class-chromiumbrowsercontext.md "ChromiumBrowserContext"
-[ChromiumCoverage]: api/class-chromiumcoverage.md "ChromiumCoverage"
-[CDPSession]: api/class-cdpsession.md "CDPSession"
-[FirefoxBrowser]: api/class-firefoxbrowser.md "FirefoxBrowser"
-[WebKitBrowser]: api/class-webkitbrowser.md "WebKitBrowser"
+[Playwright]: ./class-playwright.md "Playwright"
+[Browser]: ./class-browser.md "Browser"
+[BrowserContext]: ./class-browsercontext.md "BrowserContext"
+[Page]: ./class-page.md "Page"
+[Frame]: ./class-frame.md "Frame"
+[ElementHandle]: ./class-elementhandle.md "ElementHandle"
+[JSHandle]: ./class-jshandle.md "JSHandle"
+[ConsoleMessage]: ./class-consolemessage.md "ConsoleMessage"
+[Dialog]: ./class-dialog.md "Dialog"
+[Download]: ./class-download.md "Download"
+[Video]: ./class-video.md "Video"
+[FileChooser]: ./class-filechooser.md "FileChooser"
+[Keyboard]: ./class-keyboard.md "Keyboard"
+[Mouse]: ./class-mouse.md "Mouse"
+[Touchscreen]: ./class-touchscreen.md "Touchscreen"
+[Request]: ./class-request.md "Request"
+[Response]: ./class-response.md "Response"
+[Selectors]: ./class-selectors.md "Selectors"
+[Route]: ./class-route.md "Route"
+[WebSocket]: ./class-websocket.md "WebSocket"
+[TimeoutError]: ./class-timeouterror.md "TimeoutError"
+[Accessibility]: ./class-accessibility.md "Accessibility"
+[Worker]: ./class-worker.md "Worker"
+[BrowserServer]: ./class-browserserver.md "BrowserServer"
+[BrowserType]: ./class-browsertype.md "BrowserType"
+[Logger]: ./class-logger.md "Logger"
+[ChromiumBrowser]: ./class-chromiumbrowser.md "ChromiumBrowser"
+[ChromiumBrowserContext]: ./class-chromiumbrowsercontext.md "ChromiumBrowserContext"
+[ChromiumCoverage]: ./class-chromiumcoverage.md "ChromiumCoverage"
+[CDPSession]: ./class-cdpsession.md "CDPSession"
+[FirefoxBrowser]: ./class-firefoxbrowser.md "FirefoxBrowser"
+[WebKitBrowser]: ./class-webkitbrowser.md "WebKitBrowser"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
 [ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"

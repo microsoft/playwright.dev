@@ -51,7 +51,7 @@ class Generator {
       const links = fs.readFileSync(path.join(DIR_SRC, 'links.md')).toString();
       const localLinks = [];
       for (const clazz of this.outline.classesArray)
-        localLinks.push(`[${clazz.name}]: api/class-${clazz.name.toLowerCase()}.md "${clazz.name}"`);
+        localLinks.push(`[${clazz.name}]: ./class-${clazz.name.toLowerCase()}.md "${clazz.name}"`);
         this.generatedLinksSuffix = '\n' + localLinks.join('\n') + '\n' + links;
     }
 
@@ -119,8 +119,8 @@ title: "${clazz.name}"
       memberNode.children.push(...(member.spec || []).map(c => md.clone(c)));
       result.push(memberNode);
     }
-    fs.mkdirSync(path.join(DIR_OUT, 'api'), { recursive: true });
-    fs.writeFileSync(path.join(DIR_OUT, 'api', `class-${clazz.name.toLowerCase()}.md`), [md.render(result), this.generatedLinksSuffix].join('\n'));
+    fs.mkdirSync(DIR_OUT, { recursive: true });
+    fs.writeFileSync(path.join(DIR_OUT, `class-${clazz.name.toLowerCase()}.md`), [md.render(result), this.generatedLinksSuffix].join('\n'));
   }
 
   /**
@@ -162,7 +162,7 @@ title: "${clazz.name}"
    * @return {string}
    */
   createMemberLink(member) {
-    const file = `api/class-${member.clazz.name.toLowerCase()}.md`;
+    const file = `./class-${member.clazz.name.toLowerCase()}.md`;
     if (member.kind === 'property')
       return this.createLink(file, `${member.clazz.varName}.${member.name}`);
 

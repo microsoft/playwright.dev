@@ -23,7 +23,7 @@ Page objects **simplify maintenance**. They capture element selectors in one pla
 and create reusable code to avoid repetition.
 
 ## Implementation
-Page object models wrap over a Playwright [`page`](./api/class-page.md#class-page).
+Page object models wrap over a Playwright [`page`](./class-page.md#class-page).
 
 ```js
 // models/Search.js
@@ -56,4 +56,4 @@ await searchPage.search('search query');
 ```
 
 ### API reference
-- [class `Page`](api/class-page.md)
+- [class `Page`](./class-page.md)

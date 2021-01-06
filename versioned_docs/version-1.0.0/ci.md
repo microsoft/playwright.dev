@@ -29,10 +29,10 @@ We run [our tests](https://github.com/microsoft/playwright/blob/master/.github/w
 
 ## Docker
 
-We have a [pre-built Docker image](docker/README.md) which can either be used directly, or as a reference to update your existing Docker definitions.
+We have a [pre-built Docker image](./docker.md) which can either be used directly, or as a reference to update your existing Docker definitions.
 
 ## Azure Pipelines
 
 For Windows or macOS agents, no additional configuration required, just install Playwright and run your tests.
 
-For Linux agents, refer to [our Docker setup](docker/README.md) to see additional dependencies that need to be installed.
+For Linux agents, refer to [our Docker setup](./docker.md) to see additional dependencies that need to be installed.

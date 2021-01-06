@@ -37,9 +37,9 @@ await page.fill('#local', '2020-03-02T05:15');
 
 #### API reference
 
-- [page.fill(selector, value[, options])](./api/class-page.md#pagefillselector-value-options) — main frame
-- [frame.fill(selector, value[, options])](./api/class-frame.md#framefillselector-value-options) — given frame
-- [elementHandle.fill(value[, options])](./api/class-elementhandle.md#elementhandlefillvalue-options) — given element
+- [page.fill(selector, value[, options])](./class-page.md#pagefillselector-value-options) — main frame
+- [frame.fill(selector, value[, options])](./class-frame.md#framefillselector-value-options) — given frame
+- [elementHandle.fill(value[, options])](./class-elementhandle.md#elementhandlefillvalue-options) — given element
 
 <br/>
 
@@ -57,12 +57,12 @@ await page.uncheck('#subscribe-label');
 
 #### API reference
 
-- [page.check(selector[, options])](./api/class-page.md#pagecheckselector-options) — main frame
-- [page.uncheck(selector[, options])](./api/class-page.md#pageuncheckselector-options) — main frame
-- [frame.check(selector[, options])](./api/class-frame.md#framecheckselector-options) — given frame
-- [frame.uncheck(selector[, options])](./api/class-frame.md#frameuncheckselector-options) — given frame
-- [elementHandle.check(value[, options])](./api/class-elementhandle.md#elementhandleuncheckoptions) — given element
-- [elementHandle.uncheck(value[, options])](api/class-elementhandle.md#elementhandleuncheckoptions) — given element
+- [page.check(selector[, options])](./class-page.md#pagecheckselector-options) — main frame
+- [page.uncheck(selector[, options])](./class-page.md#pageuncheckselector-options) — main frame
+- [frame.check(selector[, options])](./class-frame.md#framecheckselector-options) — given frame
+- [frame.uncheck(selector[, options])](./class-frame.md#frameuncheckselector-options) — given frame
+- [elementHandle.check(value[, options])](./class-elementhandle.md#elementhandleuncheckoptions) — given element
+- [elementHandle.uncheck(value[, options])](./class-elementhandle.md#elementhandleuncheckoptions) — given element
 
 <br/>
 
@@ -88,9 +88,9 @@ await page.selectOption('select#colors', option);
 
 #### API reference
 
-- [page.selectOption(selector, values[, options])](./api/class-page.md#pageselectoptionselector-values-options) — main frame
-- [frame.selectOption(selector, values[, options])](./api/class-frame.md#frameselectoptionselector-values-options) — given frame
-- [elementHandle.selectOption(values[, options])](./api/class-elementhandle.md#elementhandleselectoptionvalues-options) — given element
+- [page.selectOption(selector, values[, options])](./class-page.md#pageselectoptionselector-values-options) — main frame
+- [frame.selectOption(selector, values[, options])](./class-frame.md#frameselectoptionselector-values-options) — given frame
+- [elementHandle.selectOption(values[, options])](./class-elementhandle.md#elementhandleselectoptionvalues-options) — given element
 
 <br/>
 
@@ -146,18 +146,18 @@ await page.dispatchEvent('button#submit', 'click');
 
 #### API reference
 
-- [page.click(selector[, options])](./api/class-page.md#pageclickselector-options) — main frame
-- [frame.click(selector[, options])](./api/class-frame.md#frameclickselector-options) — given frame
-- [elementHandle.click([options])](./api/class-elementhandle.md#elementhandleclickoptions) — given element
-- [page.dblclick(selector[, options])](./api/class-page.md#pagedblclickselector-options) — main frame
-- [frame.dblclick(selector[, options])](./api/class-frame.md#framedblclickselector-options) — given frame
-- [elementHandle.dblclick([options])](./api/class-elementhandle.md#elementhandledblclickoptions) — given element
-- [page.hover(selector[, options])](./api/class-page.md#pagehoverselector-options) — main frame
-- [frame.hover(selector[, options])](./api/class-frame.md#framehoverselector-options) — given frame
-- [elementHandle.hover([options])](./api/class-elementhandle.md#elementhandlehoveroptions) — given element
-- [page.dispatchEvent(selector, type)](./api/class-page.md#pagedispatcheventselector-type-eventinit-options) — main frame
-- [frame.dispatchEvent(selector, type)](./api/class-frame.md#framedispatcheventselector-type-eventinit-options) — given frame
-- [elementHandle.dispatchEvent(type)](./api/class-elementhandle.md#elementhandledispatcheventtype-eventinit) — given element
+- [page.click(selector[, options])](./class-page.md#pageclickselector-options) — main frame
+- [frame.click(selector[, options])](./class-frame.md#frameclickselector-options) — given frame
+- [elementHandle.click([options])](./class-elementhandle.md#elementhandleclickoptions) — given element
+- [page.dblclick(selector[, options])](./class-page.md#pagedblclickselector-options) — main frame
+- [frame.dblclick(selector[, options])](./class-frame.md#framedblclickselector-options) — given frame
+- [elementHandle.dblclick([options])](./class-elementhandle.md#elementhandledblclickoptions) — given element
+- [page.hover(selector[, options])](./class-page.md#pagehoverselector-options) — main frame
+- [frame.hover(selector[, options])](./class-frame.md#framehoverselector-options) — given frame
+- [elementHandle.hover([options])](./class-elementhandle.md#elementhandlehoveroptions) — given element
+- [page.dispatchEvent(selector, type)](./class-page.md#pagedispatcheventselector-type-eventinit-options) — main frame
+- [frame.dispatchEvent(selector, type)](./class-frame.md#framedispatcheventselector-type-eventinit-options) — given frame
+- [elementHandle.dispatchEvent(type)](./class-elementhandle.md#elementhandledispatcheventtype-eventinit) — given element
 
 <br/>
 
@@ -176,10 +176,10 @@ This method will emit all the necessary keyboard events, with all the `keydown`,
 
 #### API reference
 
-- [page.type(selector, text[, options])](./api/class-page.md#pagetypeselector-text-options) — main frame
-- [frame.type(selector, text[, options])](./api/class-frame.md#frametypeselector-text-options) — given frame
-- [elementHandle.type(text[, options])](./api/class-elementhandle.md#elementhandletypetext-options) — given element
-- [keyboard.type(text[, options])](./api/class-keyboard.md#keyboardtypetext-options) — focused element
+- [page.type(selector, text[, options])](./class-page.md#pagetypeselector-text-options) — main frame
+- [frame.type(selector, text[, options])](./class-frame.md#frametypeselector-text-options) — given frame
+- [elementHandle.type(text[, options])](./class-elementhandle.md#elementhandletypetext-options) — given element
+- [keyboard.type(text[, options])](./class-keyboard.md#keyboardtypetext-options) — focused element
 
 <br/>
 
@@ -226,10 +226,10 @@ Note that you still need to specify the capital `A` in `Shift-A` to produce the 
 
 #### API reference
 
-- [page.press(selector, key[, options])](./api/class-page.md#pagepressselector-key-options) — main frame
-- [frame.press(selector, key[, options])](./api/class-frame.md#framepressselector-key-options) — given frame
-- [elementHandle.press(key[, options])](./api/class-elementhandle.md#elementhandlepresskey-options) — given element
-- [keyboard.press(key[, options])](./api/class-keyboard.md#keyboardpresskey-options) — focused element
+- [page.press(selector, key[, options])](./class-page.md#pagepressselector-key-options) — main frame
+- [frame.press(selector, key[, options])](./class-frame.md#framepressselector-key-options) — given frame
+- [elementHandle.press(key[, options])](./class-elementhandle.md#elementhandlepresskey-options) — given element
+- [keyboard.press(key[, options])](./class-keyboard.md#keyboardpresskey-options) — focused element
 
 <br/>
 

@@ -142,11 +142,11 @@ on any external state.
 Chromium, and then reuses the logged in cookie state in WebKit.
 
 ### API reference
-- [class `BrowserContext`](./api/class-browser.md#class-browsercontext)
-- [`browserContext.cookies`](./api/class-browsercontext.md#browsercontextcookiesurls)
-- [`browserContext.addCookies`](./api/class-browsercontext.md#browsercontextaddcookiescookies)
-- [`page.evaluate`](./api/class-page.md#pageevaluatepagefunction-arg)
-- [`browserContext.addInitScript`](./api/class-browsercontext.md#browsercontextaddinitscriptscript-arg)
+- [class `BrowserContext`](./class-browser.md#class-browsercontext)
+- [`browserContext.cookies`](./class-browsercontext.md#browsercontextcookiesurls)
+- [`browserContext.addCookies`](./class-browsercontext.md#browsercontextaddcookiescookies)
+- [`page.evaluate`](./class-page.md#pageevaluatepagefunction-arg)
+- [`browserContext.addInitScript`](./class-browsercontext.md#browsercontextaddinitscriptscript-arg)
 
 ## Multi-factor authentication
 Accounts with multi-factor authentication (MFA) cannot be fully automated, and need
@@ -178,5 +178,5 @@ const context = await chromium.launchPersistentContext(userDataDir, { headless: 
 3. Reuse user data directory to run automation scenarios.
 
 ### API reference
-- [class `BrowserContext`](./api/class-browsercontext.md#class-browsercontext)
-- [`browserType.launchPersistentContext`](./api/class-browsertype.md#browsertypelaunchpersistentcontextuserdatadir-options)
+- [class `BrowserContext`](./class-browsercontext.md#class-browsercontext)
+- [`browserType.launchPersistentContext`](./class-browsertype.md#browsertypelaunchpersistentcontextuserdatadir-options)

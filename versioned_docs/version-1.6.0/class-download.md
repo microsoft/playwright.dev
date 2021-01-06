@@ -1,0 +1,133 @@
+---
+id: class-download
+title: "Download"
+---
+
+
+[Download] objects are dispatched by page via the ['download'](./class-page.md#event-download) event.
+
+All the downloaded files belonging to the browser context are deleted when the browser context is closed. All downloaded files are deleted when the browser closes.
+
+Download event is emitted once the download starts. Download path becomes available
+once download completes:
+
+```js
+const [ download ] = await Promise.all([
+  page.waitForEvent('download'), // wait for download to start
+  page.click('a')
+]);
+// wait for download to complete
+const path = await download.path();
+...
+```
+
+> **NOTE** Browser context **must** be created with the `acceptDownloads` set to `true` when user needs access to the downloaded content. If `acceptDownloads` is not set or set to `false`, download events are emitted, but the actual download is not performed and user has no access to the downloaded files.
+
+<!-- GEN:toc -->
+- [download.createReadStream()](./class-download.md#downloadcreatereadstream)
+- [download.delete()](./class-download.md#downloaddelete)
+- [download.failure()](./class-download.md#downloadfailure)
+- [download.path()](./class-download.md#downloadpath)
+- [download.saveAs(path)](./class-download.md#downloadsaveaspath)
+- [download.suggestedFilename()](./class-download.md#downloadsuggestedfilename)
+- [download.url()](./class-download.md#downloadurl)
+<!-- GEN:stop -->
+
+## download.createReadStream()
+- returns: <[Promise]<[null]|[Readable]>>
+
+Returns readable stream for current download or `null` if download failed.
+
+## download.delete()
+- returns: <[Promise]>
+
+Deletes the downloaded file.
+
+## download.failure()
+- returns: <[Promise]<[null]|[string]>>
+
+Returns download error if any.
+
+## download.path()
+- returns: <[Promise]<[null]|[string]>>
+
+Returns path to the downloaded file in case of successful download.
+
+## download.saveAs(path)
+- `path` <[string]> Path where the download should be saved.
+- returns: <[Promise]>
+
+Saves the download to a user-specified path.
+
+## download.suggestedFilename()
+- returns: <[string]>
+
+Returns suggested filename for this download. It is typically computed by the browser from the [`Content-Disposition`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition) response header or the `download` attribute. See the spec on [whatwg](https://html.spec.whatwg.org/#downloading-resources). Different browsers can use different logic for computing it.
+
+## download.url()
+- returns: <[string]>
+
+Returns downloaded url.
+
+
+
+
+[AXNode]: ./class-accessibility.md#accessibilitysnapshotoptions "AXNode"
+[Accessibility]: ./class-accessibility.md#class-accessibility "Accessibility"
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[BrowserServer]: ./class-browser.md#class-browserserver  "BrowserServer"
+[BrowserContext]: ./class-browsercontext.md#class-browsercontext  "BrowserContext"
+[BrowserType]: ./class-browsertype.md#class-browsertype "BrowserType"
+[Browser]: ./class-browser.md  "Browser"
+[Buffer]: https://nodejs.org/api/buffer.htmlapi.md#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[ChromiumBrowser]: ./class-chromiumbrowser.md#class-chromiumbrowser "ChromiumBrowser"
+[ChromiumBrowserContext]: ./class-chromiumbrowsercontext.md#class-chromiumbrowsercontext "ChromiumBrowserContext"
+[ChromiumCoverage]: ./class-chromiumcoverage.md#class-chromiumcoverage "ChromiumCoverage"
+[CDPSession]: ./class-cdpsession.md#class-cdpsession  "CDPSession"
+[ConsoleMessage]: ./class-consolemessage.md#class-consolemessage "ConsoleMessage"
+[Dialog]: ./class-dialog.md#class-dialog "Dialog"
+[Download]: ./class-download.md#class-download "Download"
+[ElementHandle]: ./class-elementhandle.md#class-elementhandle "ElementHandle"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[Error]: https://nodejs.org/api/errors.htmlapi.md#errors_class_error "Error"
+[EvaluationArgument]: ./evaluationargument.md#evaluationargument "Evaluation Argument"
+[File]: https://developer.mozilla.org/en-US/docs/Web/API/File "File"
+[FileChooser]: ./class-filechooser.md#class-filechooser "FileChooser"
+[FirefoxBrowser]: ./class-firefoxbrowser.md#class-firefoxbrowser "FirefoxBrowser"
+[Frame]: ./class-frame.md#class-frame "Frame"
+[JSHandle]: ./class-jshandle.md#class-jshandle "JSHandle"
+[Keyboard]: ./class-keyboard.md#class-keyboard "Keyboard"
+[Logger]: ./class-logger.md#class-logger "Logger"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[Mouse]: ./class-mouse.md#class-mouse "Mouse"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Page]: ./class-page.md#class-page "Page"
+[Playwright]: ./class-playwright.md "Playwright"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
+[Request]: ./class-request.md#class-request  "Request"
+[Response]: ./class-response.md#class-response  "Response"
+[Route]: ./class-route.md#class-route  "Route"
+[Selectors]: ./class-selectors.md#class-selectors  "Selectors"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringifyapi.md#Description "Serializable"
+[TimeoutError]: ./class-timeouterror.md#class-timeouterror "TimeoutError"
+[Touchscreen]: ./class-touchscreen.md#class-touchscreen "Touchscreen"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[URL]: https://nodejs.org/api/url.html
+[USKeyboardLayout]: ../src/usKeyboardLayout.ts "USKeyboardLayout"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[Video]: ./class-video.md#class-video "Video"
+[WebKitBrowser]: ./class-webkitbrowser.md#class-webkitbrowser "WebKitBrowser"
+[WebSocket]: ./class-websocket.md#class-websocket "WebSocket"
+[Worker]: ./class-worker.md#class-worker "Worker"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structuresapi.md#Boolean_type "Boolean"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structuresapi.md#Number_type "Number"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Readable]: https://nodejs.org/api/stream.htmlapi.md#stream_class_stream_readable "Readable"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structuresapi.md#String_type "String"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"

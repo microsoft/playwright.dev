@@ -34,7 +34,7 @@ await page.goto('https://example.com');
 
 #### API reference
 
-- [browser.newContext([options])](./api/class-browser.md#browsernewcontextoptions)
+- [browser.newContext([options])](./class-browser.md#browsernewcontextoptions)
 
 <br/>
 
@@ -48,7 +48,7 @@ const [ download ] = await Promise.all([
 const path = await download.path();
 ```
 
-For every attachment downloaded by the page, [`"download"`](api/class-page.md#event-download) event is emitted. If you create a browser context with the `acceptDownloads: true`, all these attachments are going to be downloaded into a temporary folder. You can obtain the download url, file system path and payload stream using the [`Download`](https://github.com/microsoft/playwright/blob/master/docs/api/class-download.md#class-download) object from the event.
+For every attachment downloaded by the page, [`"download"`](./class-page.md#event-download) event is emitted. If you create a browser context with the `acceptDownloads: true`, all these attachments are going to be downloaded into a temporary folder. You can obtain the download url, file system path and payload stream using the [`Download`](./class-download.md) object from the event.
 
 #### Variations
 
@@ -63,8 +63,8 @@ Note that handling the event forks the control flow and makes script harder to f
 #### API reference
 
 - [Download](https://github.com/microsoft/playwright/blob/master/docs/class-download.md)
-- [page.on('download')](api/class-page.md#event-download)
-- [page.waitForEvent(event)](api/class-page.md#pagewaitforeventevent-optionsorpredicate)
+- [page.on('download')](./class-page.md#event-download)
+- [page.waitForEvent(event)](./class-page.md#pagewaitforeventevent-optionsorpredicate)
 
 <br/>
 
@@ -118,12 +118,12 @@ const [response] = await Promise.all([
 
 #### API reference
 
-- [class `Request`](./api/class-request.md#class-request)
-- [class `Response`](./api/class-response.md#class-response)
-- [page.on('request')](./api/class-page.md#pageonrequest)
-- [page.on('response')](./api/class-page.md#pageonresponse)
-- [page.waitForRequest(urlOrPredicate[, options])](./api/class-page.md#pagewaitforrequesturlorpredicate-options)
-- [page.waitForResponse(urlOrPredicate[, options])](./api/class-page.md#pagewaitforresponseurlorpredicate-options)
+- [class `Request`](./class-request.md#class-request)
+- [class `Response`](./class-response.md#class-response)
+- [page.on('request')](./class-page.md#pageonrequest)
+- [page.on('response')](./class-page.md#pageonresponse)
+- [page.waitForRequest(urlOrPredicate[, options])](./class-page.md#pagewaitforrequesturlorpredicate-options)
+- [page.waitForResponse(urlOrPredicate[, options])](./class-page.md#pagewaitforresponseurlorpredicate-options)
 
 <br/>
 
@@ -154,11 +154,11 @@ await page.goto('https://example.com');
 
 #### API reference
 
-- [browserContext.route(url, handler)](./api/class-browsercontext.md#browsercontextrouteurl-handler)
-- [browserContext.unroute(url[, handler])](./api/class-browsercontext.md#browsercontextunrouteurl-handler)
-- [page.route(url, handler)](./api/class-page.md#pagerouteurl-handler)
-- [page.unroute(url[, handler])](./api/class-page.md#pageunrouteurl-handler)
-- [Route](./api/class-route.md#class-route)
+- [browserContext.route(url, handler)](./class-browsercontext.md#browsercontextrouteurl-handler)
+- [browserContext.unroute(url[, handler])](./class-browsercontext.md#browsercontextunrouteurl-handler)
+- [page.route(url, handler)](./class-page.md#pagerouteurl-handler)
+- [page.unroute(url[, handler])](./class-page.md#pageunrouteurl-handler)
+- [Route](./class-route.md#class-route)
 
 <br/>
 
@@ -192,8 +192,8 @@ await page.route('**/*', route => {
 
 #### API reference
 
-- [page.route(url, handler)](api/class-page.md#pagerouteurl-handler)
-- [browserContext.route(url, handler)](api/class-browsercontext.md#browsercontextrouteurl-handler)
-- [route.abort([errorCode])](./api/class-route.md#routeaborterrorcode)
+- [page.route(url, handler)](./class-page.md#pagerouteurl-handler)
+- [browserContext.route(url, handler)](./class-browsercontext.md#browsercontextrouteurl-handler)
+- [route.abort([errorCode])](./class-route.md#routeaborterrorcode)
 
 <br/>

@@ -17,11 +17,11 @@ Playwright splits the process of showing a new document in a page into **navigat
 **Navigations** can be initiated by changing the page URL or by interacting with the page (e.g., clicking a link). Navigation ends when response headers have been parsed and session history is updated. The navigation intent may be canceled, for example, on hitting an unresolved DNS address or transformed into a file download. Only after the navigation succeeds, page starts **loading** the document.
 
 **Loading** covers getting the remaining response body over the network, parsing, executing the scripts and firing load events:
-- [page.url()](api/class-page.md#pageurl) is set to the new url
+- [page.url()](./class-page.md#pageurl) is set to the new url
 - document content is loaded over network and parsed
-- [page.on('domcontentloaded')](api/class-page.md#pageondomcontentloaded) event is fired
+- [page.on('domcontentloaded')](./class-page.md#pageondomcontentloaded) event is fired
 - page executes some scripts and loads resources like stylesheets and images
-- [page.on('load')](api/class-page.md#pageonload) event is fired
+- [page.on('load')](./class-page.md#pageonload) event is fired
 - page executes dynamically loaded scripts
 - `networkidle` is fired when no new network requests are made for 500 ms
 
@@ -49,7 +49,7 @@ await page.goto('https://example.com', { waitUntil: 'networkidle' });
 
 ### Wait for element
 
-In lazy-loaded pages, it can be useful to wait until an element is visible with [page.waitForSelector(selector[, options])](api/class-page.md#pagewaitforselectorselector-options). Alternatively, page interactions like [page.click(selector[, options])](api/class-page.md#pageclickselector-options) auto-wait for elements.
+In lazy-loaded pages, it can be useful to wait until an element is visible with [page.waitForSelector(selector[, options])](./class-page.md#pagewaitforselectorselector-options). Alternatively, page interactions like [page.click(selector[, options])](./class-page.md#pageclickselector-options) auto-wait for elements.
 
 ```js
 // Navigate and wait for element
@@ -63,10 +63,10 @@ await page.click('text=Example Domain');
 ```
 
 #### API reference
-- [page.goto(url[, options])](api/class-page.md#pagegotourl-options)
-- [page.reload([options])](api/class-page.md#pagereloadoptions)
-- [page.goBack([options])](api/class-page.md#pagegobackoptions)
-- [page.goForward([options])](api/class-page.md#pagegoforwardoptions)
+- [page.goto(url[, options])](./class-page.md#pagegotourl-options)
+- [page.reload([options])](./class-page.md#pagereloadoptions)
+- [page.goBack([options])](./class-page.md#pagegobackoptions)
+- [page.goForward([options])](./class-page.md#pagegoforwardoptions)
 
 ## Scenarios initiated by page interaction
 
@@ -85,7 +85,7 @@ await page.fill('#username', 'John Doe');
 
 ### Custom wait
 
-`page.click` can be combined with [page.waitForLoadState([state, options])](api/class-page.md#pagewaitforloadstatestate-options) to wait for a loading event.
+`page.click` can be combined with [page.waitForLoadState([state, options])](./class-page.md#pagewaitforloadstatestate-options) to wait for a loading event.
 
 ```js
 await page.click('button'); // Click triggers navigation
@@ -94,7 +94,7 @@ await page.waitForLoadState('networkidle'); // This resolves after 'networkidle'
 
 ### Wait for element
 
-In lazy-loaded pages, it can be useful to wait until an element is visible with [page.waitForSelector(selector[, options])](api/class-page.md#pagewaitforselectorselector-options). Alternatively, page interactions like [page.click(selector[, options])](api/class-page.md#pageclickselector-options) auto-wait for elements.
+In lazy-loaded pages, it can be useful to wait until an element is visible with [page.waitForSelector(selector[, options])](./class-page.md#pagewaitforselectorselector-options). Alternatively, page interactions like [page.click(selector[, options])](./class-page.md#pageclickselector-options) auto-wait for elements.
 
 ```js
 // Click triggers navigation
@@ -110,7 +110,7 @@ await page.fill('#username', 'John Doe');
 
 ### Asynchronous navigation
 
-Clicking an element could trigger asychronous processing before initiating the navigation. In these cases, it is recommended to explicitly call [page.waitForNavigation([options])](api/class-page.md#pagewaitfornavigationoptions). For example:
+Clicking an element could trigger asychronous processing before initiating the navigation. In these cases, it is recommended to explicitly call [page.waitForNavigation([options])](./class-page.md#pagewaitfornavigationoptions). For example:
 * Navigation is triggered from a `setTimeout`
 * Page waits for network requests before navigation
 
@@ -125,7 +125,7 @@ The `Promise.all` pattern prevents a race condition between `page.click` and `pa
 
 ### Multiple navigations
 
-Clicking an element could trigger multiple navigations. In these cases, it is recommended to explicitly [page.waitForNavigation([options])](api/class-page.md#pagewaitfornavigationoptions) to a specific url. For example:
+Clicking an element could trigger multiple navigations. In these cases, it is recommended to explicitly [page.waitForNavigation([options])](./class-page.md#pagewaitfornavigationoptions) to a specific url. For example:
 * Client-side redirects issued after the `load` event
 * Multiple pushes to history state
 
@@ -140,7 +140,7 @@ The `Promise.all` pattern prevents a race condition between `page.click` and `pa
 
 ### Loading a popup
 
-When popup is opened, explicitly calling [page.waitForLoadState([state, options])](api/class-page.md#pagewaitforloadstatestate-options) ensures that popup is loaded to the desired state.
+When popup is opened, explicitly calling [page.waitForLoadState([state, options])](./class-page.md#pagewaitforloadstatestate-options) ensures that popup is loaded to the desired state.
 
 ```js
 const [ popup ] = await Promise.all([
@@ -151,15 +151,15 @@ await popup.waitForLoadState('load');
 ```
 
 #### API reference
-- [page.click(selector[, options])](api/class-page.md#pageclickselector-options)
-- [page.waitForLoadState([state, options])](api/class-page.md#pagewaitforloadstatestate-options)
-- [page.waitForSelector(selector[, options])](api/class-page.md#pagewaitforselectorselector-options)
-- [page.waitForNavigation([options])](api/class-page.md#pagewaitfornavigationoptions)
-- [page.waitForFunction(pageFunction[, arg, options])](api/class-page.md#pagewaitforfunctionpagefunction-arg-options)
+- [page.click(selector[, options])](./class-page.md#pageclickselector-options)
+- [page.waitForLoadState([state, options])](./class-page.md#pagewaitforloadstatestate-options)
+- [page.waitForSelector(selector[, options])](./class-page.md#pagewaitforselectorselector-options)
+- [page.waitForNavigation([options])](./class-page.md#pagewaitfornavigationoptions)
+- [page.waitForFunction(pageFunction[, arg, options])](./class-page.md#pagewaitforfunctionpagefunction-arg-options)
 
 ## Advanced patterns
 
-For pages that have complicated loading patterns, [page.waitForFunction(pageFunction[, arg, options])](api/class-page.md#pagewaitforfunctionpagefunction-arg-options) is a powerful and extensible approach to define a custom wait criteria.
+For pages that have complicated loading patterns, [page.waitForFunction(pageFunction[, arg, options])](./class-page.md#pagewaitforfunctionpagefunction-arg-options) is a powerful and extensible approach to define a custom wait criteria.
 
 ```js
 await page.goto('http://example.com');
@@ -169,40 +169,40 @@ await page.screenshot();
 ```
 
 #### API reference
-- [page.waitForFunction(pageFunction[, arg, options])](api/class-page.md#pagewaitforfunctionpagefunction-arg-options)
+- [page.waitForFunction(pageFunction[, arg, options])](./class-page.md#pagewaitforfunctionpagefunction-arg-options)
 
-[Playwright]: api/class-playwright.md "Playwright"
-[Browser]: api/class-browser.md "Browser"
-[BrowserContext]: api/class-browsercontext.md "BrowserContext"
-[Page]: api/class-page.md "Page"
-[Frame]: api/class-frame.md "Frame"
-[ElementHandle]: api/class-elementhandle.md "ElementHandle"
-[JSHandle]: api/class-jshandle.md "JSHandle"
-[ConsoleMessage]: api/class-consolemessage.md "ConsoleMessage"
-[Dialog]: api/class-dialog.md "Dialog"
-[Download]: api/class-download.md "Download"
-[Video]: api/class-video.md "Video"
-[FileChooser]: api/class-filechooser.md "FileChooser"
-[Keyboard]: api/class-keyboard.md "Keyboard"
-[Mouse]: api/class-mouse.md "Mouse"
-[Touchscreen]: api/class-touchscreen.md "Touchscreen"
-[Request]: api/class-request.md "Request"
-[Response]: api/class-response.md "Response"
-[Selectors]: api/class-selectors.md "Selectors"
-[Route]: api/class-route.md "Route"
-[WebSocket]: api/class-websocket.md "WebSocket"
-[TimeoutError]: api/class-timeouterror.md "TimeoutError"
-[Accessibility]: api/class-accessibility.md "Accessibility"
-[Worker]: api/class-worker.md "Worker"
-[BrowserServer]: api/class-browserserver.md "BrowserServer"
-[BrowserType]: api/class-browsertype.md "BrowserType"
-[Logger]: api/class-logger.md "Logger"
-[ChromiumBrowser]: api/class-chromiumbrowser.md "ChromiumBrowser"
-[ChromiumBrowserContext]: api/class-chromiumbrowsercontext.md "ChromiumBrowserContext"
-[ChromiumCoverage]: api/class-chromiumcoverage.md "ChromiumCoverage"
-[CDPSession]: api/class-cdpsession.md "CDPSession"
-[FirefoxBrowser]: api/class-firefoxbrowser.md "FirefoxBrowser"
-[WebKitBrowser]: api/class-webkitbrowser.md "WebKitBrowser"
+[Playwright]: ./class-playwright.md "Playwright"
+[Browser]: ./class-browser.md "Browser"
+[BrowserContext]: ./class-browsercontext.md "BrowserContext"
+[Page]: ./class-page.md "Page"
+[Frame]: ./class-frame.md "Frame"
+[ElementHandle]: ./class-elementhandle.md "ElementHandle"
+[JSHandle]: ./class-jshandle.md "JSHandle"
+[ConsoleMessage]: ./class-consolemessage.md "ConsoleMessage"
+[Dialog]: ./class-dialog.md "Dialog"
+[Download]: ./class-download.md "Download"
+[Video]: ./class-video.md "Video"
+[FileChooser]: ./class-filechooser.md "FileChooser"
+[Keyboard]: ./class-keyboard.md "Keyboard"
+[Mouse]: ./class-mouse.md "Mouse"
+[Touchscreen]: ./class-touchscreen.md "Touchscreen"
+[Request]: ./class-request.md "Request"
+[Response]: ./class-response.md "Response"
+[Selectors]: ./class-selectors.md "Selectors"
+[Route]: ./class-route.md "Route"
+[WebSocket]: ./class-websocket.md "WebSocket"
+[TimeoutError]: ./class-timeouterror.md "TimeoutError"
+[Accessibility]: ./class-accessibility.md "Accessibility"
+[Worker]: ./class-worker.md "Worker"
+[BrowserServer]: ./class-browserserver.md "BrowserServer"
+[BrowserType]: ./class-browsertype.md "BrowserType"
+[Logger]: ./class-logger.md "Logger"
+[ChromiumBrowser]: ./class-chromiumbrowser.md "ChromiumBrowser"
+[ChromiumBrowserContext]: ./class-chromiumbrowsercontext.md "ChromiumBrowserContext"
+[ChromiumCoverage]: ./class-chromiumcoverage.md "ChromiumCoverage"
+[CDPSession]: ./class-cdpsession.md "CDPSession"
+[FirefoxBrowser]: ./class-firefoxbrowser.md "FirefoxBrowser"
+[WebKitBrowser]: ./class-webkitbrowser.md "WebKitBrowser"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
 [ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"

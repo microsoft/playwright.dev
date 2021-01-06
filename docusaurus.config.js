@@ -54,7 +54,7 @@ module.exports = {
         },
         {
           type: "doc",
-          docId: "api/class-playwright",
+          docId: "class-playwright",
           label: "API",
           position: "left",
         },
@@ -87,7 +87,7 @@ module.exports = {
             },
             {
               label: "API reference",
-              to: "docs/api/class-playwright",
+              to: "docs/class-playwright",
             },
           ],
         },

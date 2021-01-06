@@ -6,7 +6,7 @@ title: "Selector engines"
 
 Playwright supports multiple selector engines used to query elements in the web page.
 
-Selector can be used to obtain `ElementHandle` (see [page.$()](api/class-page.md#pageselector) for example) or shortcut element operations to avoid intermediate handle (see [page.click()](api/class-page.md#pageclickselector-options) for example).
+Selector can be used to obtain `ElementHandle` (see [page.$()](./class-page.md#pageselector) for example) or shortcut element operations to avoid intermediate handle (see [page.click()](./class-page.md#pageclickselector-options) for example).
 
 <!-- GEN:toc-top-level -->
 - [Selector syntax](#selector-syntax)

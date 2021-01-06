@@ -42,8 +42,8 @@ All pages created in the context above will share the same device parameters.
 
 #### API reference
 
-- [`playwright.devices`](./api/class-playwright.md#playwrightdevices)
-- [`browser.newContext()`](./api/class-browser.md#browsernewcontextoptions)
+- [`playwright.devices`](./class-playwright.md#playwrightdevices)
+- [`browser.newContext()`](./class-browser.md#browsernewcontextoptions)
 
 <br/>
 
@@ -59,7 +59,7 @@ const context = await browser.newContext({
 
 #### API reference
 
-- [`browser.newContext()`](api/class-browser.md#browsernewcontextoptions)
+- [`browser.newContext()`](./class-browser.md#browsernewcontextoptions)
 
 <br/>
 
@@ -85,8 +85,8 @@ const context = await browser.newContext({
 
 #### API reference
 
-- [`browser.newContext()`](api/class-browser.md#browsernewcontextoptions)
-- [`page.setViewportSize()`](./api/class-page.md#pagesetviewportsizeviewportsize)
+- [`browser.newContext()`](./class-browser.md#browsernewcontextoptions)
+- [`page.setViewportSize()`](./class-page.md#pagesetviewportsizeviewportsize)
 
 <br/>
 
@@ -102,7 +102,7 @@ const context = await browser.newContext({
 
 #### API reference
 
-- [`browser.newContext()`](api/class-browser.md#browsernewcontextoptions)
+- [`browser.newContext()`](./class-browser.md#browsernewcontextoptions)
 
 <br/>
 
@@ -132,9 +132,9 @@ await context.clearPermissions();
 
 #### API reference
 
-- [`browser.newContext()`](api/class-browser.md#browsernewcontextoptions)
-- [`browserContext.grantPermissions()`](./api/class-browsercontext.md#browsercontextgrantpermissionspermissions-options)
-- [`browserContext.clearPermissions()`](./api/class-browsercontext.md#browsercontextclearpermissions)
+- [`browser.newContext()`](./class-browser.md#browsernewcontextoptions)
+- [`browserContext.grantPermissions()`](./class-browsercontext.md#browsercontextgrantpermissionspermissions-options)
+- [`browserContext.clearPermissions()`](./class-browsercontext.md#browsercontextclearpermissions)
 
 <br/>
 
@@ -156,8 +156,8 @@ await context.setGeolocation({ longitude: 29.979097, latitude: 31.134256 });
 
 #### API reference
 
-- [`browser.newContext()`](api/class-browser.md#browsernewcontextoptions)
-- [`browserContext.setGeolocation()`](./api/class-browser.md#browsercontextsetgeolocationgeolocation)
+- [`browser.newContext()`](./class-browser.md#browsernewcontextoptions)
+- [`browserContext.setGeolocation()`](./class-browser.md#browsercontextsetgeolocationgeolocation)
 
 <br/>
 
@@ -186,5 +186,5 @@ await page.emulateMedia({ media: 'print' });
 
 #### API reference
 
-- [`browser.newContext()`](api/class-browser.md#browsernewcontextoptions)
-- [`page.emulateMedia()`](./api/class-page.md#pageemulatemediaparams)
+- [`browser.newContext()`](./class-browser.md#browsernewcontextoptions)
+- [`page.emulateMedia()`](./class-page.md#pageemulatemediaparams)

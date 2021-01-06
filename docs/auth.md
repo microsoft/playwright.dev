@@ -7,7 +7,7 @@ Playwright can be used to automate scenarios that require authentication.
 
 Tests written with Playwright execute in isolated clean-slate environments called [browser contexts](./core-concepts.md#browser-contexts). This isolation model improves reproducibility and prevents cascading test failures. New browser contexts can load existing authentication state. This eliminates the need to login in every context and speeds up test execution.
 
-> Note: This guide covers cookie/token-based authentication (logging in via the app UI). For [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication) use [browser.newContext([options])](api/class-browser.md#browsernewcontextoptions).
+> Note: This guide covers cookie/token-based authentication (logging in via the app UI). For [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication) use [browser.newContext([options])](./class-browser.md#browsernewcontextoptions).
 
 - [Automate logging in](#automate-logging-in)
 - [Reuse authentication state](#reuse-authentication-state)
@@ -111,10 +111,10 @@ This approach will also **work in CI environments**, since it does not rely on a
 
 ### API reference
 - [BrowserContext]
-- [browserContext.cookies([urls])](api/class-browsercontext.md#browsercontextcookiesurls)
-- [browserContext.addCookies(cookies)](api/class-browsercontext.md#browsercontextaddcookiescookies)
-- [page.evaluate(pageFunction[, arg])](api/class-page.md#pageevaluatepagefunction-arg)
-- [browserContext.addInitScript(script[, arg])](api/class-browsercontext.md#browsercontextaddinitscriptscript-arg)
+- [browserContext.cookies([urls])](./class-browsercontext.md#browsercontextcookiesurls)
+- [browserContext.addCookies(cookies)](./class-browsercontext.md#browsercontextaddcookiescookies)
+- [page.evaluate(pageFunction[, arg])](./class-page.md#pageevaluatepagefunction-arg)
+- [browserContext.addInitScript(script[, arg])](./class-browsercontext.md#browsercontextaddinitscriptscript-arg)
 
 ## Multi-factor authentication
 
@@ -126,7 +126,7 @@ Web browsers use a directory on disk to store user history, cookies, IndexedDB a
 
 Note that persistent authentication is not suited for CI environments since it relies on a disk location. User data directories are specific to browser types and cannot be shared across browser types.
 
-User data directories can be used with the [browserType.launchPersistentContext(userDataDir[, options])](api/class-browsertype.md#browsertypelaunchpersistentcontextuserdatadir-options) API.
+User data directories can be used with the [browserType.launchPersistentContext(userDataDir[, options])](./class-browsertype.md#browsertypelaunchpersistentcontextuserdatadir-options) API.
 
 ```js
 const { chromium } = require('playwright');
@@ -141,40 +141,40 @@ const context = await chromium.launchPersistentContext(userDataDir, { headless: 
 
 ### API reference
 - [BrowserContext]
-- [browserType.launchPersistentContext(userDataDir[, options])](api/class-browsertype.md#browsertypelaunchpersistentcontextuserdatadir-options)
+- [browserType.launchPersistentContext(userDataDir[, options])](./class-browsertype.md#browsertypelaunchpersistentcontextuserdatadir-options)
 
-[Playwright]: api/class-playwright.md "Playwright"
-[Browser]: api/class-browser.md "Browser"
-[BrowserContext]: api/class-browsercontext.md "BrowserContext"
-[Page]: api/class-page.md "Page"
-[Frame]: api/class-frame.md "Frame"
-[ElementHandle]: api/class-elementhandle.md "ElementHandle"
-[JSHandle]: api/class-jshandle.md "JSHandle"
-[ConsoleMessage]: api/class-consolemessage.md "ConsoleMessage"
-[Dialog]: api/class-dialog.md "Dialog"
-[Download]: api/class-download.md "Download"
-[Video]: api/class-video.md "Video"
-[FileChooser]: api/class-filechooser.md "FileChooser"
-[Keyboard]: api/class-keyboard.md "Keyboard"
-[Mouse]: api/class-mouse.md "Mouse"
-[Touchscreen]: api/class-touchscreen.md "Touchscreen"
-[Request]: api/class-request.md "Request"
-[Response]: api/class-response.md "Response"
-[Selectors]: api/class-selectors.md "Selectors"
-[Route]: api/class-route.md "Route"
-[WebSocket]: api/class-websocket.md "WebSocket"
-[TimeoutError]: api/class-timeouterror.md "TimeoutError"
-[Accessibility]: api/class-accessibility.md "Accessibility"
-[Worker]: api/class-worker.md "Worker"
-[BrowserServer]: api/class-browserserver.md "BrowserServer"
-[BrowserType]: api/class-browsertype.md "BrowserType"
-[Logger]: api/class-logger.md "Logger"
-[ChromiumBrowser]: api/class-chromiumbrowser.md "ChromiumBrowser"
-[ChromiumBrowserContext]: api/class-chromiumbrowsercontext.md "ChromiumBrowserContext"
-[ChromiumCoverage]: api/class-chromiumcoverage.md "ChromiumCoverage"
-[CDPSession]: api/class-cdpsession.md "CDPSession"
-[FirefoxBrowser]: api/class-firefoxbrowser.md "FirefoxBrowser"
-[WebKitBrowser]: api/class-webkitbrowser.md "WebKitBrowser"
+[Playwright]: ./class-playwright.md "Playwright"
+[Browser]: ./class-browser.md "Browser"
+[BrowserContext]: ./class-browsercontext.md "BrowserContext"
+[Page]: ./class-page.md "Page"
+[Frame]: ./class-frame.md "Frame"
+[ElementHandle]: ./class-elementhandle.md "ElementHandle"
+[JSHandle]: ./class-jshandle.md "JSHandle"
+[ConsoleMessage]: ./class-consolemessage.md "ConsoleMessage"
+[Dialog]: ./class-dialog.md "Dialog"
+[Download]: ./class-download.md "Download"
+[Video]: ./class-video.md "Video"
+[FileChooser]: ./class-filechooser.md "FileChooser"
+[Keyboard]: ./class-keyboard.md "Keyboard"
+[Mouse]: ./class-mouse.md "Mouse"
+[Touchscreen]: ./class-touchscreen.md "Touchscreen"
+[Request]: ./class-request.md "Request"
+[Response]: ./class-response.md "Response"
+[Selectors]: ./class-selectors.md "Selectors"
+[Route]: ./class-route.md "Route"
+[WebSocket]: ./class-websocket.md "WebSocket"
+[TimeoutError]: ./class-timeouterror.md "TimeoutError"
+[Accessibility]: ./class-accessibility.md "Accessibility"
+[Worker]: ./class-worker.md "Worker"
+[BrowserServer]: ./class-browserserver.md "BrowserServer"
+[BrowserType]: ./class-browsertype.md "BrowserType"
+[Logger]: ./class-logger.md "Logger"
+[ChromiumBrowser]: ./class-chromiumbrowser.md "ChromiumBrowser"
+[ChromiumBrowserContext]: ./class-chromiumbrowsercontext.md "ChromiumBrowserContext"
+[ChromiumCoverage]: ./class-chromiumcoverage.md "ChromiumCoverage"
+[CDPSession]: ./class-cdpsession.md "CDPSession"
+[FirefoxBrowser]: ./class-firefoxbrowser.md "FirefoxBrowser"
+[WebKitBrowser]: ./class-webkitbrowser.md "WebKitBrowser"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
 [ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"

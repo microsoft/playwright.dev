@@ -58,12 +58,12 @@ await myArrayHandle.dispose();
 
 #### API reference
 
-- [page.$(selector)](api/class-page.md#pageselector)
-- [page.$$(selector)](api/class-page.md#pageselector-1)
-- [page.$eval(selector, pageFunction[, arg])](api/class-page.md#pageevalselector-pagefunction-arg)
-- [page.$$eval(selector, pageFunction[, arg])](api/class-page.md#pageevalselector-pagefunction-arg-1)
-- [page.evaluate(pageFunction[, arg])](./api/class-page.md#pageevaluatepagefunction-arg)
-- [page.evaluateHandle(pageFunction[, arg])](./api/class-page.md#pageevaluatehandlepagefunction-arg)
+- [page.$(selector)](./class-page.md#pageselector)
+- [page.$$(selector)](./class-page.md#pageselector-1)
+- [page.$eval(selector, pageFunction[, arg])](./class-page.md#pageevalselector-pagefunction-arg)
+- [page.$$eval(selector, pageFunction[, arg])](./class-page.md#pageevalselector-pagefunction-arg-1)
+- [page.evaluate(pageFunction[, arg])](./class-page.md#pageevaluatepagefunction-arg)
+- [page.evaluateHandle(pageFunction[, arg])](./class-page.md#pageevaluatehandlepagefunction-arg)
 
 <br/>
 
@@ -87,8 +87,8 @@ await elementHandle.screenshot({ path: 'screenshot.png' });
 
 #### API reference
 
-- [page.screenshot([options])](./api/class-page.md#pagescreenshotoptions)
-- [elementHandle.screenshot([options])](./api/class-elementhandle.md#elementhandlescreenshotoptions)
+- [page.screenshot([options])](./class-page.md#pagescreenshotoptions)
+- [elementHandle.screenshot([options])](./class-elementhandle.md#elementhandlescreenshotoptions)
 
 <br/>
 
@@ -126,11 +126,11 @@ const [popup] = await Promise.all([
 
 #### API reference
 
-- [class: ConsoleMessage](./api/class-consolemessage.md#class-consolemessage)
-- [class: Page](./api/class-page.md#class-page)
-- [event: 'console'](./api/class-page.md#event-console)
-- [event: 'dialog'](./api/class-page.md#event-dialog)
-- [event: 'popup'](./api/class-page.md#event-popup)
+- [class: ConsoleMessage](./class-consolemessage.md#class-consolemessage)
+- [class: Page](./class-page.md#class-page)
+- [event: 'console'](./class-page.md#event-console)
+- [event: 'dialog'](./class-page.md#event-dialog)
+- [event: 'popup'](./class-page.md#event-popup)
 
 <br/>
 
@@ -150,6 +150,6 @@ await page.goto('data:text/html,<script>throw new Error("Test")</script>');
 
 #### API reference
 
-- [event: 'pageerror'](./api/class-browsercontext.md#event-pageerror)
+- [event: 'pageerror'](./class-browsercontext.md#event-pageerror)
 
 <br/>

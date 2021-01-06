@@ -21,7 +21,7 @@ Use npm or Yarn to install Playwright in your Node.js project. See [system requi
 npm i -D playwright
 ```
 
-This single command downloads the Playwright NPM package and browser binaries for Chromium, Firefox and WebKit. To modify this behavior see [installation parameters](installation.md).
+This single command downloads the Playwright NPM package and browser binaries for Chromium, Firefox and WebKit. To modify this behavior see [installation parameters](./installation.md).
 
 ## Usage
 

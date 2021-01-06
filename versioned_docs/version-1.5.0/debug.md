@@ -63,7 +63,7 @@ You can use browser developer tools in Chromium, Firefox and WebKit while runnin
 a Playwright script. Developer tools help to:
 
 * Inspect the DOM tree and **find element selectors**
-* **See console logs** during execution (or learn how to [read logs via API](verification.md#console-logs))
+* **See console logs** during execution (or learn how to [read logs via API](./verification.md#console-logs))
 * Check **network activity** and other developer tools features
 
 <a href="https://user-images.githubusercontent.com/284612/77234134-5f21a500-6b69-11ea-92ec-1c146e1333ec.png"><img src="https://user-images.githubusercontent.com/284612/77234134-5f21a500-6b69-11ea-92ec-1c146e1333ec.png" width="500" alt="Chromium Developer Tools"/></a>
@@ -105,7 +105,7 @@ With PWDEBUG, the following defaults are configured for you:
 ### Debugging Selectors
 
 PWDEBUG configures a `playwright` object in the browser to highlight
-[Playwright selectors](selectors.md). This can be used to verify text or
+[Playwright selectors](./selectors.md). This can be used to verify text or
 composite selectors. To use this:
 
 1. Setup a breakpoint to pause the execution
@@ -122,7 +122,7 @@ composite selectors. To use this:
 
 ### Evaluate Source Maps
 
-PWDEBUG also enables source maps for [`page.evaluate` executions](core-concepts.md#evaluation).
+PWDEBUG also enables source maps for [`page.evaluate` executions](./core-concepts.md#evaluation).
 This improves the debugging experience for JavaScript executions in the page context.
 
 <a href="https://user-images.githubusercontent.com/284612/86857568-a6c63100-c073-11ea-82a4-bfd531a4ec87.png"><img src="https://user-images.githubusercontent.com/284612/86857568-a6c63100-c073-11ea-82a4-bfd531a4ec87.png" width="500" alt="Highlight selectors"/></a>

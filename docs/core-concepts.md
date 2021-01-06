@@ -62,7 +62,7 @@ const context = await browser.newContext({
 
 #### API reference
 - [BrowserContext]
-- [browser.newContext([options])](api/class-browser.md#browsernewcontextoptions)
+- [browser.newContext([options])](./class-browser.md#browsernewcontextoptions)
 
 <br/>
 
@@ -112,7 +112,7 @@ await frame.fill('#username-input', 'John');
 #### API reference
 - [Page]
 - [Frame]
-- [page.frame(frameSelector)](api/class-page.md#pageframeframeselector)
+- [page.frame(frameSelector)](./class-page.md#pageframeframeselector)
 
 <br/>
 
@@ -171,7 +171,7 @@ const sectionText = await page.$eval('*css=section >> text=Selectors', e => e.te
 
 ## Auto-waiting
 
-Actions like [page.click(selector[, options])](api/class-page.md#pageclickselector-options) and [page.fill(selector, value[, options])](api/class-page.md#pagefillselector-value-options) auto-wait for the element to be visible and [actionable](./actionability.md). For example, click will:
+Actions like [page.click(selector[, options])](./class-page.md#pageclickselector-options) and [page.fill(selector, value[, options])](./class-page.md#pagefillselector-value-options) auto-wait for the element to be visible and [actionable](./actionability.md). For example, click will:
 - wait for an element with the given selector to appear in the DOM
 - wait for it to become visible: have non-empty bounding box and no `visibility:hidden`
 - wait for it to stop moving: for example, wait until css transition finishes
@@ -209,9 +209,9 @@ await page.waitForSelector('#promo', { state: 'detached' });
 ```
 
 #### API reference
-- [page.click(selector[, options])](api/class-page.md#pageclickselector-options)
-- [page.fill(selector, value[, options])](api/class-page.md#pagefillselector-value-options)
-- [page.waitForSelector(selector[, options])](api/class-page.md#pagewaitforselectorselector-options)
+- [page.click(selector[, options])](./class-page.md#pageclickselector-options)
+- [page.fill(selector, value[, options])](./class-page.md#pagefillselector-value-options)
+- [page.waitForSelector(selector[, options])](./class-page.md#pagewaitforselectorselector-options)
 
 <br/>
 
@@ -219,7 +219,7 @@ await page.waitForSelector('#promo', { state: 'detached' });
 
 Playwright scripts run in your Node.js environment. Your page scripts run in the browser page environment. Those environments don't intersect, they are running in different virtual machines in different processes and even potentially on different computers.
 
-The [page.evaluate(pageFunction[, arg])](api/class-page.md#pageevaluatepagefunction-arg) API can run a JavaScript function in the context of the web page and bring results back to the Node.js environment. Browser globals like `window` and `document` can be used in `evaluate`.
+The [page.evaluate(pageFunction[, arg])](./class-page.md#pageevaluatepagefunction-arg) API can run a JavaScript function in the context of the web page and bring results back to the Node.js environment. Browser globals like `window` and `document` can be used in `evaluate`.
 
 ```js
 const href = await page.evaluate(() => document.location.href);
@@ -236,7 +236,7 @@ const status = await page.evaluate(async () => {
 
 ## Evaluation Argument
 
-Playwright evaluation methods like [page.evaluate(pageFunction[, arg])](api/class-page.md#pageevaluatepagefunction-arg) take a single optional argument. This argument can be a mix of [Serializable] values and [JSHandle] or [ElementHandle] instances. Handles are automatically converted to the value they represent.
+Playwright evaluation methods like [page.evaluate(pageFunction[, arg])](./class-page.md#pageevaluatepagefunction-arg) take a single optional argument. This argument can be a mix of [Serializable] values and [JSHandle] or [ElementHandle] instances. Handles are automatically converted to the value they represent.
 
 ```js
 // A primitive value.
@@ -302,8 +302,8 @@ const result = await page.evaluate(() => {
 ```
 
 #### API reference
-- [page.evaluate(pageFunction[, arg])](api/class-page.md#pageevaluatepagefunction-arg)
-- [frame.evaluate(pageFunction[, arg])](api/class-frame.md#frameevaluatepagefunction-arg)
+- [page.evaluate(pageFunction[, arg])](./class-page.md#pageevaluatepagefunction-arg)
+- [frame.evaluate(pageFunction[, arg])](./class-frame.md#frameevaluatepagefunction-arg)
 - [EvaluationArgument]
 
 <br/>
@@ -319,10 +319,10 @@ There are two types of handles:
 Note that since any DOM element in the page is also a JavaScript object, Playwright's [ElementHandle] extends [JSHandle].
 
 ### Handles Lifecycle
-- Handles can be acquired using the page methods [page.evaluateHandle(pageFunction[, arg])](api/class-page.md#pageevaluatehandlepagefunction-arg), [page.$(selector)](api/class-page.md#pageselector) or [page.$$(selector)](api/class-page.md#pageselector-1) or their frame counterparts [frame.evaluateHandle(pageFunction[, arg])](api/class-frame.md#frameevaluatehandlepagefunction-arg), [frame.$(selector)](api/class-frame.md#frameselector) or [frame.$$(selector)](api/class-frame.md#frameselector-1).
+- Handles can be acquired using the page methods [page.evaluateHandle(pageFunction[, arg])](./class-page.md#pageevaluatehandlepagefunction-arg), [page.$(selector)](./class-page.md#pageselector) or [page.$$(selector)](./class-page.md#pageselector-1) or their frame counterparts [frame.evaluateHandle(pageFunction[, arg])](./class-frame.md#frameevaluatehandlepagefunction-arg), [frame.$(selector)](./class-frame.md#frameselector) or [frame.$$(selector)](./class-frame.md#frameselector-1).
 - Once created, handles will retain object from [garbage collection](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_Management).
 - Handles will be **automatically disposed** once the page or frame they belong to navigates or closes.
-- Handles can be **manually disposed** using [jsHandle.dispose()](api/class-jshandle.md#jshandledispose) method.
+- Handles can be **manually disposed** using [jsHandle.dispose()](./class-jshandle.md#jshandledispose) method.
 
 ### Example: ElementHandle
 
@@ -332,7 +332,7 @@ const ulElementHandle = await page.$('ul');
 await ulElementHandle.evaluate(ulElement => getComputedStyle(ulElement).getPropertyValue('display'));
 ```
 
-Handles can also be passed as arguments to [page.evaluate(pageFunction[, arg])](api/class-page.md#pageevaluatepagefunction-arg) function:
+Handles can also be passed as arguments to [page.evaluate(pageFunction[, arg])](./class-page.md#pageevaluatepagefunction-arg) function:
 
 ```js
 // In the page API, you can pass handle as a parameter.
@@ -372,43 +372,43 @@ await myArrayHandle.dispose();
 #### API reference
 - [JSHandle]
 - [ElementHandle]
-- [page.evaluateHandle(pageFunction[, arg])](api/class-page.md#pageevaluatehandlepagefunction-arg)
-- [page.$(selector)](api/class-page.md#pageselector)
-- [page.$$(selector)](api/class-page.md#pageselector-1)
-- [jsHandle.evaluate(pageFunction[, arg])](api/class-jshandle.md#jshandleevaluatepagefunction-arg)
+- [page.evaluateHandle(pageFunction[, arg])](./class-page.md#pageevaluatehandlepagefunction-arg)
+- [page.$(selector)](./class-page.md#pageselector)
+- [page.$$(selector)](./class-page.md#pageselector-1)
+- [jsHandle.evaluate(pageFunction[, arg])](./class-jshandle.md#jshandleevaluatepagefunction-arg)
 
-[Playwright]: api/class-playwright.md "Playwright"
-[Browser]: api/class-browser.md "Browser"
-[BrowserContext]: api/class-browsercontext.md "BrowserContext"
-[Page]: api/class-page.md "Page"
-[Frame]: api/class-frame.md "Frame"
-[ElementHandle]: api/class-elementhandle.md "ElementHandle"
-[JSHandle]: api/class-jshandle.md "JSHandle"
-[ConsoleMessage]: api/class-consolemessage.md "ConsoleMessage"
-[Dialog]: api/class-dialog.md "Dialog"
-[Download]: api/class-download.md "Download"
-[Video]: api/class-video.md "Video"
-[FileChooser]: api/class-filechooser.md "FileChooser"
-[Keyboard]: api/class-keyboard.md "Keyboard"
-[Mouse]: api/class-mouse.md "Mouse"
-[Touchscreen]: api/class-touchscreen.md "Touchscreen"
-[Request]: api/class-request.md "Request"
-[Response]: api/class-response.md "Response"
-[Selectors]: api/class-selectors.md "Selectors"
-[Route]: api/class-route.md "Route"
-[WebSocket]: api/class-websocket.md "WebSocket"
-[TimeoutError]: api/class-timeouterror.md "TimeoutError"
-[Accessibility]: api/class-accessibility.md "Accessibility"
-[Worker]: api/class-worker.md "Worker"
-[BrowserServer]: api/class-browserserver.md "BrowserServer"
-[BrowserType]: api/class-browsertype.md "BrowserType"
-[Logger]: api/class-logger.md "Logger"
-[ChromiumBrowser]: api/class-chromiumbrowser.md "ChromiumBrowser"
-[ChromiumBrowserContext]: api/class-chromiumbrowsercontext.md "ChromiumBrowserContext"
-[ChromiumCoverage]: api/class-chromiumcoverage.md "ChromiumCoverage"
-[CDPSession]: api/class-cdpsession.md "CDPSession"
-[FirefoxBrowser]: api/class-firefoxbrowser.md "FirefoxBrowser"
-[WebKitBrowser]: api/class-webkitbrowser.md "WebKitBrowser"
+[Playwright]: ./class-playwright.md "Playwright"
+[Browser]: ./class-browser.md "Browser"
+[BrowserContext]: ./class-browsercontext.md "BrowserContext"
+[Page]: ./class-page.md "Page"
+[Frame]: ./class-frame.md "Frame"
+[ElementHandle]: ./class-elementhandle.md "ElementHandle"
+[JSHandle]: ./class-jshandle.md "JSHandle"
+[ConsoleMessage]: ./class-consolemessage.md "ConsoleMessage"
+[Dialog]: ./class-dialog.md "Dialog"
+[Download]: ./class-download.md "Download"
+[Video]: ./class-video.md "Video"
+[FileChooser]: ./class-filechooser.md "FileChooser"
+[Keyboard]: ./class-keyboard.md "Keyboard"
+[Mouse]: ./class-mouse.md "Mouse"
+[Touchscreen]: ./class-touchscreen.md "Touchscreen"
+[Request]: ./class-request.md "Request"
+[Response]: ./class-response.md "Response"
+[Selectors]: ./class-selectors.md "Selectors"
+[Route]: ./class-route.md "Route"
+[WebSocket]: ./class-websocket.md "WebSocket"
+[TimeoutError]: ./class-timeouterror.md "TimeoutError"
+[Accessibility]: ./class-accessibility.md "Accessibility"
+[Worker]: ./class-worker.md "Worker"
+[BrowserServer]: ./class-browserserver.md "BrowserServer"
+[BrowserType]: ./class-browsertype.md "BrowserType"
+[Logger]: ./class-logger.md "Logger"
+[ChromiumBrowser]: ./class-chromiumbrowser.md "ChromiumBrowser"
+[ChromiumBrowserContext]: ./class-chromiumbrowsercontext.md "ChromiumBrowserContext"
+[ChromiumCoverage]: ./class-chromiumcoverage.md "ChromiumCoverage"
+[CDPSession]: ./class-cdpsession.md "CDPSession"
+[FirefoxBrowser]: ./class-firefoxbrowser.md "FirefoxBrowser"
+[WebKitBrowser]: ./class-webkitbrowser.md "WebKitBrowser"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
 [ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"

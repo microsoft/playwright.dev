@@ -16,7 +16,7 @@ title: "Verification"
 
 ## Videos
 
-Playwright can record videos for all pages in a [browser context](core-concepts.md#browser-contexts). Videos are saved upon context closure, so make sure to await `browserContext.close()`.
+Playwright can record videos for all pages in a [browser context](./core-concepts.md#browser-contexts). Videos are saved upon context closure, so make sure to await `browserContext.close()`.
 
 ```js
 // With browser.newContext()
@@ -40,10 +40,10 @@ const context = await browser.newContext({
 
 #### API reference
 
-- [class `BrowserContext`](./api/class-browser.md#class-browsercontext)
-- [browser.newContext([options])](./api/class-browser.md#browsernewcontextoptions)
-- [browser.newPage([options])](./api/class-browser.md#browsernewpageoptions)
-- [browserContext.close()](./api/class-browsercontext.md#browsercontextclose)
+- [class `BrowserContext`](./class-browser.md#class-browsercontext)
+- [browser.newContext([options])](./class-browser.md#browsernewcontextoptions)
+- [browser.newPage([options])](./class-browser.md#browsernewpageoptions)
+- [browserContext.close()](./class-browsercontext.md#browsercontextclose)
 
 ## Screenshots
 
@@ -65,8 +65,8 @@ await elementHandle.screenshot({ path: 'screenshot.png' });
 
 #### API reference
 
-- [page.screenshot([options])](./api/class-page.md#pagescreenshotoptions)
-- [elementHandle.screenshot([options])](./api/class-elementhandle.md#elementhandlescreenshotoptions)
+- [page.screenshot([options])](./class-page.md#pagescreenshotoptions)
+- [elementHandle.screenshot([options])](./class-elementhandle.md#elementhandlescreenshotoptions)
 
 <br/>
 
@@ -100,9 +100,9 @@ await msg.args[1].jsonValue() // 42
 
 #### API reference
 
-- [class: ConsoleMessage](./api/class-consolemessage.md#class-consolemessage)
-- [class: Page](./api/class-page.md#class-page)
-- [page.on('console')](./api/class-page.md#pageonconsole)
+- [class: ConsoleMessage](./class-consolemessage.md#class-consolemessage)
+- [class: Page](./class-page.md#class-page)
+- [page.on('console')](./class-page.md#pageonconsole)
 
 <br/>
 
@@ -122,8 +122,8 @@ await page.goto('data:text/html,<script>throw new Error("Test")</script>');
 
 #### API reference
 
-- [class: Page](api/class-page.md)
-- [page.on('pageerror')](./api/class-page.md#pageonpageerror)
+- [class: Page](./class-page.md)
+- [page.on('pageerror')](./class-page.md#pageonpageerror)
 
 <br/>
 
@@ -156,7 +156,7 @@ const [popup] = await Promise.all([
 
 #### API reference
 
-- [class: Page](api/class-page.md)
-- [page.on('requestfailed')](./api/class-page.md#pageonrequestfailed)
-- [page.on('dialog')](./api/class-page.md#pageondialog)
-- [page.on('popup')](./api/class-page.md#pageonpopup)
+- [class: Page](./class-page.md)
+- [page.on('requestfailed')](./class-page.md#pageonrequestfailed)
+- [page.on('dialog')](./class-page.md#pageondialog)
+- [page.on('popup')](./class-page.md#pageonpopup)

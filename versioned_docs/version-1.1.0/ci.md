@@ -36,7 +36,7 @@ We run [our tests](https://github.com/microsoft/playwright/blob/master/.github/w
 
 ### Docker
 
-We have a [pre-built Docker image](docker/README.md) which can either be used directly, or as a reference to update your existing Docker definitions.
+We have a [pre-built Docker image](./docker.md) which can either be used directly, or as a reference to update your existing Docker definitions.
 
 Suggested configuration
 1. By default, Docker runs a container with a `/dev/shm` shared memory space 64MB.
@@ -67,13 +67,13 @@ Suggested configuration
 
 For Windows or macOS agents, no additional configuration required, just install Playwright and run your tests.
 
-For Linux agents, refer to [our Docker setup](docker/README.md) to see additional dependencies that need to be installed.
+For Linux agents, refer to [our Docker setup](./docker.md) to see additional dependencies that need to be installed.
 
 ## Caching browsers
 
 By default, Playwright downloads browser binaries when the Playwright NPM package
 is installed. The NPM packages have a `postinstall` hook that downloads the browser
-binaries. This behavior can be [customized with environment variables](installation.md).
+binaries. This behavior can be [customized with environment variables](./installation.md).
 
 Caching browsers on CI is **strictly optional**: The `postinstall` hooks should
 execute and download the browser binaries on every run.
@@ -94,7 +94,7 @@ This behavior can be fixed with one of the following approaches:
    behavior in most CI providers.)
 1. Set `PLAYWRIGHT_BROWSERS_PATH=0` as the environment variable before running
    `npm install`. This will download the browser binaries in the `node_modules`
-   directory and cache them with the package code. See [installation docs](installation.md).
+   directory and cache them with the package code. See [installation docs](./installation.md).
 1. Cache the browser binaries, with the steps below.
 
 #### Directories to cache

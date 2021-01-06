@@ -28,7 +28,7 @@ await page.goto('https://example.com');
 ```
 
 #### API reference
-- [browser.newContext([options])](api/class-browser.md#browsernewcontextoptions)
+- [browser.newContext([options])](./class-browser.md#browsernewcontextoptions)
 
 <br/>
 
@@ -42,7 +42,7 @@ const [ download ] = await Promise.all([
 const path = await download.path();
 ```
 
-For every attachment downloaded by the page, [page.on('download')](api/class-page.md#pageondownload) event is emitted. If you create a browser context with the `acceptDownloads: true`, all these attachments are going to be downloaded into a temporary folder. You can obtain the download url, file system path and payload stream using the [Download] object from the event.
+For every attachment downloaded by the page, [page.on('download')](./class-page.md#pageondownload) event is emitted. If you create a browser context with the `acceptDownloads: true`, all these attachments are going to be downloaded into a temporary folder. You can obtain the download url, file system path and payload stream using the [Download] object from the event.
 
 #### Variations
 
@@ -56,8 +56,8 @@ Note that handling the event forks the control flow and makes script harder to f
 
 #### API reference
 - [Download]
-- [page.on('download')](api/class-page.md#pageondownload)
-- [page.waitForEvent(event[, optionsOrPredicate])](api/class-page.md#pagewaitforeventevent-optionsorpredicate)
+- [page.on('download')](./class-page.md#pageondownload)
+- [page.waitForEvent(event[, optionsOrPredicate])](./class-page.md#pagewaitforeventevent-optionsorpredicate)
 
 <br/>
 
@@ -112,10 +112,10 @@ const [response] = await Promise.all([
 #### API reference
 - [Request]
 - [Response]
-- [page.on('request')](api/class-page.md#pageonrequest)
-- [page.on('response')](api/class-page.md#pageonresponse)
-- [page.waitForRequest(urlOrPredicate[, options])](api/class-page.md#pagewaitforrequesturlorpredicate-options)
-- [page.waitForResponse(urlOrPredicate[, options])](api/class-page.md#pagewaitforresponseurlorpredicate-options)
+- [page.on('request')](./class-page.md#pageonrequest)
+- [page.on('response')](./class-page.md#pageonresponse)
+- [page.waitForRequest(urlOrPredicate[, options])](./class-page.md#pagewaitforrequesturlorpredicate-options)
+- [page.waitForResponse(urlOrPredicate[, options])](./class-page.md#pagewaitforresponseurlorpredicate-options)
 
 <br/>
 
@@ -145,10 +145,10 @@ await page.goto('https://example.com');
 ```
 
 #### API reference
-- [browserContext.route(url, handler)](api/class-browsercontext.md#browsercontextrouteurl-handler)
-- [browserContext.unroute(url[, handler])](api/class-browsercontext.md#browsercontextunrouteurl-handler)
-- [page.route(url, handler)](api/class-page.md#pagerouteurl-handler)
-- [page.unroute(url[, handler])](api/class-page.md#pageunrouteurl-handler)
+- [browserContext.route(url, handler)](./class-browsercontext.md#browsercontextrouteurl-handler)
+- [browserContext.unroute(url[, handler])](./class-browsercontext.md#browsercontextunrouteurl-handler)
+- [page.route(url, handler)](./class-page.md#pagerouteurl-handler)
+- [page.unroute(url[, handler])](./class-page.md#pageunrouteurl-handler)
 - [Route]
 
 <br/>
@@ -182,44 +182,44 @@ await page.route('**/*', route => {
 ```
 
 #### API reference
-- [page.route(url, handler)](api/class-page.md#pagerouteurl-handler)
-- [browserContext.route(url, handler)](api/class-browsercontext.md#browsercontextrouteurl-handler)
-- [route.abort([errorCode])](api/class-route.md#routeaborterrorcode)
+- [page.route(url, handler)](./class-page.md#pagerouteurl-handler)
+- [browserContext.route(url, handler)](./class-browsercontext.md#browsercontextrouteurl-handler)
+- [route.abort([errorCode])](./class-route.md#routeaborterrorcode)
 
 <br/>
 
-[Playwright]: api/class-playwright.md "Playwright"
-[Browser]: api/class-browser.md "Browser"
-[BrowserContext]: api/class-browsercontext.md "BrowserContext"
-[Page]: api/class-page.md "Page"
-[Frame]: api/class-frame.md "Frame"
-[ElementHandle]: api/class-elementhandle.md "ElementHandle"
-[JSHandle]: api/class-jshandle.md "JSHandle"
-[ConsoleMessage]: api/class-consolemessage.md "ConsoleMessage"
-[Dialog]: api/class-dialog.md "Dialog"
-[Download]: api/class-download.md "Download"
-[Video]: api/class-video.md "Video"
-[FileChooser]: api/class-filechooser.md "FileChooser"
-[Keyboard]: api/class-keyboard.md "Keyboard"
-[Mouse]: api/class-mouse.md "Mouse"
-[Touchscreen]: api/class-touchscreen.md "Touchscreen"
-[Request]: api/class-request.md "Request"
-[Response]: api/class-response.md "Response"
-[Selectors]: api/class-selectors.md "Selectors"
-[Route]: api/class-route.md "Route"
-[WebSocket]: api/class-websocket.md "WebSocket"
-[TimeoutError]: api/class-timeouterror.md "TimeoutError"
-[Accessibility]: api/class-accessibility.md "Accessibility"
-[Worker]: api/class-worker.md "Worker"
-[BrowserServer]: api/class-browserserver.md "BrowserServer"
-[BrowserType]: api/class-browsertype.md "BrowserType"
-[Logger]: api/class-logger.md "Logger"
-[ChromiumBrowser]: api/class-chromiumbrowser.md "ChromiumBrowser"
-[ChromiumBrowserContext]: api/class-chromiumbrowsercontext.md "ChromiumBrowserContext"
-[ChromiumCoverage]: api/class-chromiumcoverage.md "ChromiumCoverage"
-[CDPSession]: api/class-cdpsession.md "CDPSession"
-[FirefoxBrowser]: api/class-firefoxbrowser.md "FirefoxBrowser"
-[WebKitBrowser]: api/class-webkitbrowser.md "WebKitBrowser"
+[Playwright]: ./class-playwright.md "Playwright"
+[Browser]: ./class-browser.md "Browser"
+[BrowserContext]: ./class-browsercontext.md "BrowserContext"
+[Page]: ./class-page.md "Page"
+[Frame]: ./class-frame.md "Frame"
+[ElementHandle]: ./class-elementhandle.md "ElementHandle"
+[JSHandle]: ./class-jshandle.md "JSHandle"
+[ConsoleMessage]: ./class-consolemessage.md "ConsoleMessage"
+[Dialog]: ./class-dialog.md "Dialog"
+[Download]: ./class-download.md "Download"
+[Video]: ./class-video.md "Video"
+[FileChooser]: ./class-filechooser.md "FileChooser"
+[Keyboard]: ./class-keyboard.md "Keyboard"
+[Mouse]: ./class-mouse.md "Mouse"
+[Touchscreen]: ./class-touchscreen.md "Touchscreen"
+[Request]: ./class-request.md "Request"
+[Response]: ./class-response.md "Response"
+[Selectors]: ./class-selectors.md "Selectors"
+[Route]: ./class-route.md "Route"
+[WebSocket]: ./class-websocket.md "WebSocket"
+[TimeoutError]: ./class-timeouterror.md "TimeoutError"
+[Accessibility]: ./class-accessibility.md "Accessibility"
+[Worker]: ./class-worker.md "Worker"
+[BrowserServer]: ./class-browserserver.md "BrowserServer"
+[BrowserType]: ./class-browsertype.md "BrowserType"
+[Logger]: ./class-logger.md "Logger"
+[ChromiumBrowser]: ./class-chromiumbrowser.md "ChromiumBrowser"
+[ChromiumBrowserContext]: ./class-chromiumbrowsercontext.md "ChromiumBrowserContext"
+[ChromiumCoverage]: ./class-chromiumcoverage.md "ChromiumCoverage"
+[CDPSession]: ./class-cdpsession.md "CDPSession"
+[FirefoxBrowser]: ./class-firefoxbrowser.md "FirefoxBrowser"
+[WebKitBrowser]: ./class-webkitbrowser.md "WebKitBrowser"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
 [ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"

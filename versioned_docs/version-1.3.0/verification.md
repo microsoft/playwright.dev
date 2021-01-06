@@ -33,8 +33,8 @@ await elementHandle.screenshot({ path: 'screenshot.png' });
 
 #### API reference
 
-- [page.screenshot([options])](./api/class-page.md#pagescreenshotoptions)
-- [elementHandle.screenshot([options])](./api/class-elementhandle.md#elementhandlescreenshotoptions)
+- [page.screenshot([options])](./class-page.md#pagescreenshotoptions)
+- [elementHandle.screenshot([options])](./class-elementhandle.md#elementhandlescreenshotoptions)
 
 <br/>
 
@@ -68,9 +68,9 @@ await msg.args[1].jsonValue() // 42
 
 #### API reference
 
-- [class: ConsoleMessage](./api/class-consolemessage.md#class-consolemessage)
-- [class: Page](./api/class-page.md#class-page)
-- [event: 'console'](./api/class-page.md#event-console)
+- [class: ConsoleMessage](./class-consolemessage.md#class-consolemessage)
+- [class: Page](./class-page.md#class-page)
+- [event: 'console'](./class-page.md#event-console)
 
 <br/>
 
@@ -90,8 +90,8 @@ await page.goto('data:text/html,<script>throw new Error("Test")</script>');
 
 #### API reference
 
-- [class: Page](api/class-page.md)
-- [event: 'pageerror'](./api/class-browsercontext.md#event-pageerror)
+- [class: Page](./class-page.md)
+- [event: 'pageerror'](./class-browsercontext.md#event-pageerror)
 
 <br/>
 
@@ -124,7 +124,7 @@ const [popup] = await Promise.all([
 
 #### API reference
 
-- [class: Page](api/class-page.md)
-- [event: 'requestfailed'](./api/class-page.md#event-requestfailed)
-- [event: 'dialog'](./api/class-page.md#event-dialog)
-- [event: 'popup'](./api/class-page.md#event-popup)
+- [class: Page](./class-page.md)
+- [event: 'requestfailed'](./class-page.md#event-requestfailed)
+- [event: 'dialog'](./class-page.md#event-dialog)
+- [event: 'popup'](./class-page.md#event-popup)

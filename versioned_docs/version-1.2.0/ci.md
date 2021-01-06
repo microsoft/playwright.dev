@@ -26,7 +26,7 @@ configurations for common CI providers.
 
 3 steps to get your tests running on CI:
 
-1. **Ensure CI agent can run browsers**: Use [our Docker image](docker/README.md)
+1. **Ensure CI agent can run browsers**: Use [our Docker image](./docker.md)
    in Linux agents. Windows and macOS agents do not require any additional dependencies.
 1. **Install Playwright**: In most projects, this would be done with `npm ci`
    (or `npm install`). Playwright would install the relevant browsers automatically.
@@ -49,7 +49,7 @@ We run [our tests](https://github.com/microsoft/playwright/blob/master/.github/w
 
 ### Docker
 
-We have a [pre-built Docker image](docker/README.md) which can either be used directly, or as a reference to update your existing Docker definitions.
+We have a [pre-built Docker image](./docker.md) which can either be used directly, or as a reference to update your existing Docker definitions.
 
 Suggested configuration
 1. By default, Docker runs a container with a `/dev/shm` shared memory space 64MB.
@@ -80,7 +80,7 @@ Suggested configuration
 
 For Windows or macOS agents, no additional configuration required, just install Playwright and run your tests.
 
-For Linux agents, you can use [our Docker container](docker/README.md) with Azure Pipelines support for [running containerized jobs](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/container-phases?view=azure-devops). Alternatively, you can refer to the [Dockerfile](docker/README.md) to see additional dependencies that need to be installed on a Ubuntu agent.
+For Linux agents, you can use [our Docker container](./docker.md) with Azure Pipelines support for [running containerized jobs](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/container-phases?view=azure-devops). Alternatively, you can refer to the [Dockerfile](./docker.md) to see additional dependencies that need to be installed on a Ubuntu agent.
 
 ```yml
 pool:
@@ -95,7 +95,7 @@ steps:
 
 ### Bitbucket Pipelines
 
-Bitbucket Pipelines can use public [Docker images as build environments](https://confluence.atlassian.com/bitbucket/use-docker-images-as-build-environments-792298897.html). To run Playwright tests on Bitbucket, use our public Docker image ([see Dockerfile](docker/README.md)).
+Bitbucket Pipelines can use public [Docker images as build environments](https://confluence.atlassian.com/bitbucket/use-docker-images-as-build-environments-792298897.html). To run Playwright tests on Bitbucket, use our public Docker image ([see Dockerfile](./docker.md)).
 
 ```yml
 image: mcr.microsoft.com/playwright:bionic
@@ -110,7 +110,7 @@ const browser = await chromium.launch({ args: ['--no-sandbox'] });
 
 ### GitLab CI
 
-To run Playwright tests on GitLab, use our public Docker image ([see Dockerfile](docker/README.md)).
+To run Playwright tests on GitLab, use our public Docker image ([see Dockerfile](./docker.md)).
 
 ```yml
 stages:
@@ -128,7 +128,7 @@ tests:
 
 By default, Playwright downloads browser binaries when the Playwright NPM package
 is installed. The NPM packages have a `postinstall` hook that downloads the browser
-binaries. This behavior can be [customized with environment variables](installation.md).
+binaries. This behavior can be [customized with environment variables](./installation.md).
 
 Caching browsers on CI is **strictly optional**: The `postinstall` hooks should
 execute and download the browser binaries on every run.
@@ -149,7 +149,7 @@ This behavior can be fixed with one of the following approaches:
    behavior in most CI providers.)
 1. Set `PLAYWRIGHT_BROWSERS_PATH=0` as the environment variable before running
    `npm install`. This will download the browser binaries in the `node_modules`
-   directory and cache them with the package code. See [installation docs](installation.md).
+   directory and cache them with the package code. See [installation docs](./installation.md).
 1. Use `npm ci` (instead of `npm install`) which forces a clean install: by
    removing the existing `node_modules` directory. See [npm docs](https://docs.npmjs.com/cli/ci.html).
 1. Cache the browser binaries, with the steps below.
@@ -184,7 +184,7 @@ const { chromium } = require('playwright');
 const browser = await chromium.launch({ headless: false });
 ```
 
-On Linux agents, headful execution requires [Xvfb](https://en.wikipedia.org/wiki/Xvfb) to be installed. Our [Docker image](docker/README.md) and GitHub Action have Xvfb pre-installed. To run browsers in headful mode with Xvfb, add `xvfb-run` before the Node.js command.
+On Linux agents, headful execution requires [Xvfb](https://en.wikipedia.org/wiki/Xvfb) to be installed. Our [Docker image](./docker.md) and GitHub Action have Xvfb pre-installed. To run browsers in headful mode with Xvfb, add `xvfb-run` before the Node.js command.
 
 ```
 xvfb-run node index.js

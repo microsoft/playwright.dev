@@ -43,11 +43,11 @@ Navigation intent may result in being canceled, for example transformed into a d
 ## Loading
 
 Page load takes time retrieving the response body over the network, parsing, executing the scripts and firing the events. Typical load scenario goes through the following load states:
-- [`page.url()`](api/class-page.md#pageurl) is set to the new url
+- [`page.url()`](./class-page.md#pageurl) is set to the new url
 - document content is loaded over network and parsed
-- [`domcontentloaded`](api/class-page.md#event-domcontentloaded) event is fired
+- [`domcontentloaded`](./class-page.md#event-domcontentloaded) event is fired
 - page executes some scripts and loads resources like stylesheets and images
-- [`load`](api/class-page.md#event-load) event is fired
+- [`load`](./class-page.md#event-load) event is fired
 - page executes dynamically loaded scripts
 - `networkidle` is fired - no new network requests made for at least `500` ms
 
@@ -75,7 +75,7 @@ Explicit loading handling may be required for more complicated scenarios though.
 
 ## Loading a popup
 
-When popup is opened, explicitly calling [`page.waitForLoadState()`](api/class-page.md#pagewaitforloadstatestate-options) ensures that popup is loaded to the desired state.
+When popup is opened, explicitly calling [`page.waitForLoadState()`](./class-page.md#pagewaitforloadstatestate-options) ensures that popup is loaded to the desired state.
 ```js
 const [ popup ] = await Promise.all([
   page.waitForEvent('popup'),
@@ -87,7 +87,7 @@ await popup.evaluate(() => window.globalVariableInitializedByOnLoadHandler);
 
 ### Unusual client-side redirects
 
-Usually, the client-side redirect happens before the `load` event, and `page.goto()` method automatically waits for the redirect. However, when redirecting from a link click or after the `load` event, it would be easier to explicitly [`waitForNavigation()`](api/class-page.md#pagewaitfornavigationoptions) to a specific url.
+Usually, the client-side redirect happens before the `load` event, and `page.goto()` method automatically waits for the redirect. However, when redirecting from a link click or after the `load` event, it would be easier to explicitly [`waitForNavigation()`](./class-page.md#pagewaitfornavigationoptions) to a specific url.
 ```js
 await Promise.all([
   page.waitForNavigation({ url: '**/login' }),
@@ -99,7 +99,7 @@ Notice the `Promise.all` to click and wait for navigation. Awaiting these method
 
 ### Click triggers navigation after a timeout
 
-When `onclick` handler triggers a navigation from a `setTimeout`, use an explicit [`waitForNavigation()`](api/class-page.md#pagewaitfornavigationoptions) call as a last resort.
+When `onclick` handler triggers a navigation from a `setTimeout`, use an explicit [`waitForNavigation()`](./class-page.md#pagewaitfornavigationoptions) call as a last resort.
 ```js
 await Promise.all([
   page.waitForNavigation(), // Waits for the next navigation.
@@ -119,7 +119,7 @@ await page.waitForFunction(() => window.amILoadedYet());
 await page.screenshot();
 ```
 
-When clicking on a button triggers some asynchronous processing, issues a couple GET requests and pushes a new history state multiple times, explicit [`waitForNavigation()`](api/class-page.md#pagewaitfornavigationoptions) to a specific url is the most reliable option.
+When clicking on a button triggers some asynchronous processing, issues a couple GET requests and pushes a new history state multiple times, explicit [`waitForNavigation()`](./class-page.md#pagewaitfornavigationoptions) to a specific url is the most reliable option.
 ```js
 await Promise.all([
   page.waitForNavigation({ url: '**/invoice#processed' }),

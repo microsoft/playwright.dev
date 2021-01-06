@@ -38,8 +38,8 @@ const context = await browser.newContext({
 All pages created in the context above will share the same device parameters.
 
 #### API reference
-- [playwright.devices](api/class-playwright.md#playwrightdevices)
-- [browser.newContext([options])](api/class-browser.md#browsernewcontextoptions)
+- [playwright.devices](./class-playwright.md#playwrightdevices)
+- [browser.newContext([options])](./class-browser.md#browsernewcontextoptions)
 
 <br/>
 
@@ -54,7 +54,7 @@ const context = await browser.newContext({
 ```
 
 #### API reference
-- [browser.newContext([options])](api/class-browser.md#browsernewcontextoptions)
+- [browser.newContext([options])](./class-browser.md#browsernewcontextoptions)
 
 <br/>
 
@@ -79,8 +79,8 @@ const context = await browser.newContext({
 ```
 
 #### API reference
-- [browser.newContext([options])](api/class-browser.md#browsernewcontextoptions)
-- [page.setViewportSize(viewportSize)](api/class-page.md#pagesetviewportsizeviewportsize)
+- [browser.newContext([options])](./class-browser.md#browsernewcontextoptions)
+- [page.setViewportSize(viewportSize)](./class-page.md#pagesetviewportsizeviewportsize)
 
 <br/>
 
@@ -95,7 +95,7 @@ const context = await browser.newContext({
 ```
 
 #### API reference
-- [browser.newContext([options])](api/class-browser.md#browsernewcontextoptions)
+- [browser.newContext([options])](./class-browser.md#browsernewcontextoptions)
 
 <br/>
 
@@ -128,9 +128,9 @@ await context.clearPermissions();
 ```
 
 #### API reference
-- [browser.newContext([options])](api/class-browser.md#browsernewcontextoptions)
-- [browserContext.grantPermissions(permissions[, options])](api/class-browsercontext.md#browsercontextgrantpermissionspermissions-options)
-- [browserContext.clearPermissions()](api/class-browsercontext.md#browsercontextclearpermissions)
+- [browser.newContext([options])](./class-browser.md#browsernewcontextoptions)
+- [browserContext.grantPermissions(permissions[, options])](./class-browsercontext.md#browsercontextgrantpermissionspermissions-options)
+- [browserContext.clearPermissions()](./class-browsercontext.md#browsercontextclearpermissions)
 
 <br/>
 
@@ -152,8 +152,8 @@ await context.setGeolocation({ longitude: 29.979097, latitude: 31.134256 });
 **Note** you can only change geolocation for all pages in the context.
 
 #### API reference
-- [browser.newContext([options])](api/class-browser.md#browsernewcontextoptions)
-- [browserContext.setGeolocation(geolocation)](api/class-browsercontext.md#browsercontextsetgeolocationgeolocation)
+- [browser.newContext([options])](./class-browser.md#browsernewcontextoptions)
+- [browserContext.setGeolocation(geolocation)](./class-browsercontext.md#browsercontextsetgeolocationgeolocation)
 
 <br/>
 
@@ -180,41 +180,41 @@ await page.emulateMedia({ media: 'print' });
 ```
 
 #### API reference
-- [browser.newContext([options])](api/class-browser.md#browsernewcontextoptions)
-- [page.emulateMedia(params)](api/class-page.md#pageemulatemediaparams)
+- [browser.newContext([options])](./class-browser.md#browsernewcontextoptions)
+- [page.emulateMedia(params)](./class-page.md#pageemulatemediaparams)
 
-[Playwright]: api/class-playwright.md "Playwright"
-[Browser]: api/class-browser.md "Browser"
-[BrowserContext]: api/class-browsercontext.md "BrowserContext"
-[Page]: api/class-page.md "Page"
-[Frame]: api/class-frame.md "Frame"
-[ElementHandle]: api/class-elementhandle.md "ElementHandle"
-[JSHandle]: api/class-jshandle.md "JSHandle"
-[ConsoleMessage]: api/class-consolemessage.md "ConsoleMessage"
-[Dialog]: api/class-dialog.md "Dialog"
-[Download]: api/class-download.md "Download"
-[Video]: api/class-video.md "Video"
-[FileChooser]: api/class-filechooser.md "FileChooser"
-[Keyboard]: api/class-keyboard.md "Keyboard"
-[Mouse]: api/class-mouse.md "Mouse"
-[Touchscreen]: api/class-touchscreen.md "Touchscreen"
-[Request]: api/class-request.md "Request"
-[Response]: api/class-response.md "Response"
-[Selectors]: api/class-selectors.md "Selectors"
-[Route]: api/class-route.md "Route"
-[WebSocket]: api/class-websocket.md "WebSocket"
-[TimeoutError]: api/class-timeouterror.md "TimeoutError"
-[Accessibility]: api/class-accessibility.md "Accessibility"
-[Worker]: api/class-worker.md "Worker"
-[BrowserServer]: api/class-browserserver.md "BrowserServer"
-[BrowserType]: api/class-browsertype.md "BrowserType"
-[Logger]: api/class-logger.md "Logger"
-[ChromiumBrowser]: api/class-chromiumbrowser.md "ChromiumBrowser"
-[ChromiumBrowserContext]: api/class-chromiumbrowsercontext.md "ChromiumBrowserContext"
-[ChromiumCoverage]: api/class-chromiumcoverage.md "ChromiumCoverage"
-[CDPSession]: api/class-cdpsession.md "CDPSession"
-[FirefoxBrowser]: api/class-firefoxbrowser.md "FirefoxBrowser"
-[WebKitBrowser]: api/class-webkitbrowser.md "WebKitBrowser"
+[Playwright]: ./class-playwright.md "Playwright"
+[Browser]: ./class-browser.md "Browser"
+[BrowserContext]: ./class-browsercontext.md "BrowserContext"
+[Page]: ./class-page.md "Page"
+[Frame]: ./class-frame.md "Frame"
+[ElementHandle]: ./class-elementhandle.md "ElementHandle"
+[JSHandle]: ./class-jshandle.md "JSHandle"
+[ConsoleMessage]: ./class-consolemessage.md "ConsoleMessage"
+[Dialog]: ./class-dialog.md "Dialog"
+[Download]: ./class-download.md "Download"
+[Video]: ./class-video.md "Video"
+[FileChooser]: ./class-filechooser.md "FileChooser"
+[Keyboard]: ./class-keyboard.md "Keyboard"
+[Mouse]: ./class-mouse.md "Mouse"
+[Touchscreen]: ./class-touchscreen.md "Touchscreen"
+[Request]: ./class-request.md "Request"
+[Response]: ./class-response.md "Response"
+[Selectors]: ./class-selectors.md "Selectors"
+[Route]: ./class-route.md "Route"
+[WebSocket]: ./class-websocket.md "WebSocket"
+[TimeoutError]: ./class-timeouterror.md "TimeoutError"
+[Accessibility]: ./class-accessibility.md "Accessibility"
+[Worker]: ./class-worker.md "Worker"
+[BrowserServer]: ./class-browserserver.md "BrowserServer"
+[BrowserType]: ./class-browsertype.md "BrowserType"
+[Logger]: ./class-logger.md "Logger"
+[ChromiumBrowser]: ./class-chromiumbrowser.md "ChromiumBrowser"
+[ChromiumBrowserContext]: ./class-chromiumbrowsercontext.md "ChromiumBrowserContext"
+[ChromiumCoverage]: ./class-chromiumcoverage.md "ChromiumCoverage"
+[CDPSession]: ./class-cdpsession.md "CDPSession"
+[FirefoxBrowser]: ./class-firefoxbrowser.md "FirefoxBrowser"
+[WebKitBrowser]: ./class-webkitbrowser.md "WebKitBrowser"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
 [ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"

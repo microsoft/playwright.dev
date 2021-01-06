@@ -26,7 +26,7 @@ the following primitives.
 
 ## Browser
 
-A [`Browser`](api/class-browser.md#class-browser) refers to an instance of Chromium, Firefox
+A [`Browser`](./class-browser.md#class-browser) refers to an instance of Chromium, Firefox
 or WebKit. Playwright scripts generally start with launching a browser instance
 and end with closing the browser. Browser instances can be launched in headless
 (without a GUI) or headful mode.
@@ -43,13 +43,13 @@ maximize what a single instance can do through multiple browser contexts.
 
 #### API reference
 
-- [class `Browser`](api/class-browser.md)
+- [class `Browser`](./class-browser.md)
 
 <br/>
 
 ## Browser contexts
 
-A [`BrowserContext`](api/class-browsercontext.md#class-browsercontext) is an isolated incognito-alike
+A [`BrowserContext`](./class-browsercontext.md#class-browsercontext) is an isolated incognito-alike
 session within a browser instance. Browser contexts are fast and cheap to create.
 Browser contexts can be used to parallelize isolated test executions.
 
@@ -80,14 +80,14 @@ const context = await browser.newContext({
 
 #### API reference
 
-- [class `BrowserContext`](api/class-browsercontext.md)
-- [browser.newContext([options])](./api/class-browser.md#browsernewcontextoptions)
+- [class `BrowserContext`](./class-browsercontext.md)
+- [browser.newContext([options])](./class-browser.md#browsernewcontextoptions)
 
 <br/>
 
 ## Pages and frames
 
-A Browser context can have multiple pages. A [`Page`](api/class-page.md#class-page)
+A Browser context can have multiple pages. A [`Page`](./class-page.md#class-page)
 refers to a single tab or a popup window within a browser context. It should be used to navigate to URLs and interact with the page content.
 
 ```js
@@ -108,9 +108,9 @@ console.log(page.url());
 window.location.href = 'https://example.com';
 ```
 
-> Read more on [page navigation and loading](loading.md).
+> Read more on [page navigation and loading](./loading.md).
 
-A page can have one or more [Frame](api/class-frame.md#class-frame) objects attached to
+A page can have one or more [Frame](./class-frame.md#class-frame) objects attached to
 it. Each page has a main frame and page-level interactions (like `click`) are
 assumed to operate in the main frame.
 
@@ -134,9 +134,9 @@ await frame.fill('#username-input', 'John');
 
 #### API reference
 
-- [class `Page`](api/class-page.md)
-- [class `Frame`](api/class-frame.md)
-- [page.frame(options)](./api/class-page.md#pageframeoptions)
+- [class `Page`](./class-page.md)
+- [class `Frame`](./class-frame.md)
+- [page.frame(options)](./class-page.md#pageframeoptions)
 
 <br/>
 
@@ -234,9 +234,9 @@ await page.waitForSelector('#promo', { state: 'detached' });
 
 #### API reference
 
-- [page.click(selector[, options])](./api/class-page.md#pageclickselector-options)
-- [page.fill(selector, value[, options])](./api/class-page.md#pagefillselector-value-options)
-- [page.waitForSelector(selector[, options])](./api/class-page.md#pagewaitforselectorselector-options)
+- [page.click(selector[, options])](./class-page.md#pageclickselector-options)
+- [page.fill(selector, value[, options])](./class-page.md#pagefillselector-value-options)
+- [page.waitForSelector(selector[, options])](./class-page.md#pagewaitforselectorselector-options)
 
 <br/>
 
@@ -287,9 +287,9 @@ const result = await page.evaluate(() => {
 
 #### API reference
 
-- [`page.evaluate(pageFunction[, arg])`](api/class-page.md#pageevaluatepagefunction-arg)
-- [`frame.evaluate(pageFunction[, arg])`](api/class-frame.md#frameevaluatepagefunction-arg)
-- Evaluation argument [examples](api/evaluationargument.md#evaluationargument)
+- [`page.evaluate(pageFunction[, arg])`](./class-page.md#pageevaluatepagefunction-arg)
+- [`frame.evaluate(pageFunction[, arg])`](./class-frame.md#frameevaluatepagefunction-arg)
+- Evaluation argument [examples](./evaluationargument.md#evaluationargument)
 
 <br/>
 
@@ -298,19 +298,19 @@ const result = await page.evaluate(() => {
 Playwright can create Node-side handles to the page DOM elements or any other objects inside the page. These handles live in the Node.js process, whereas the actual objects reside in browser.
 
 There are two types of handles:
-- [`JSHandle`](./api/class-jshandle.md#class-jshandle) to reference any JavaScript objects in the page
-- [`ElementHandle`](./api/class-elementhandle.md#class-elementhandle) to reference DOM elements in the page
+- [`JSHandle`](./class-jshandle.md#class-jshandle) to reference any JavaScript objects in the page
+- [`ElementHandle`](./class-elementhandle.md#class-elementhandle) to reference DOM elements in the page
 
 Note that since any DOM element in the page is also a JavaScript object,
-Playwright's [`ElementHandle`](api/class-elementhandle.md) extends
-[`JSHandle`](api/class-jshandle.md).
+Playwright's [`ElementHandle`](./class-elementhandle.md) extends
+[`JSHandle`](./class-jshandle.md).
 
 ### Handles Lifecycle
-- Handles can be acquired using the page methods [`page.evaluateHandle`](./api/class-page.md#pageevaluatehandlepagefunction-arg), [`page.$`](api/class-page.md#pageselector) or [`page.$$`](api/class-page.md#pageselector-1) or
-  their frame counterparts [`frame.evaluateHandle`](./api/class-frame.md#frameevaluatehandlepagefunction-arg), [`frame.$`](api/class-frame.md#frameselector) or [`frame.$$`](api/class-frame.md#frameselector-1).
+- Handles can be acquired using the page methods [`page.evaluateHandle`](./class-page.md#pageevaluatehandlepagefunction-arg), [`page.$`](./class-page.md#pageselector) or [`page.$$`](./class-page.md#pageselector-1) or
+  their frame counterparts [`frame.evaluateHandle`](./class-frame.md#frameevaluatehandlepagefunction-arg), [`frame.$`](./class-frame.md#frameselector) or [`frame.$$`](./class-frame.md#frameselector-1).
 - Once created, handles will retain object from [garbage collection](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_Management).
 - Handles will be **automatically disposed** once the page or frame they belong to navigates or closes.
-- Handles can be **manually disposed** using [`jsHandle.dispose`](./api/class-jshandle.md#jshandledispose) method.
+- Handles can be **manually disposed** using [`jsHandle.dispose`](./class-jshandle.md#jshandledispose) method.
 
 ### Example: ElementHandle
 
@@ -320,7 +320,7 @@ const ulElementHandle = await page.$('ul');
 await ulElementHandle.evaluate(ulElement => getComputedStyle(ulElement).getPropertyValue('display'));
 ```
 
-Handles can also be passed as arguments to [`page.evaluate`](api/class-page.md#pageevaluatepagefunction-arg) function:
+Handles can also be passed as arguments to [`page.evaluate`](./class-page.md#pageevaluatepagefunction-arg) function:
 
 ```js
 // In the page API, you can pass handle as a parameter.
@@ -358,9 +358,9 @@ await myArrayHandle.dispose();
 ```
 
 #### API reference
-- [class `JSHandle`](api/class-jshandle.md)
-- [class `ElementHandle`](api/class-elementhandle.md)
-- [`page.evaluateHandle`](api/class-page.md#pageevaluatehandlepagefunction-arg)
-- [`page.$`](api/class-page.md#pageselector)
-- [`page.$$`](api/class-page.md#pageselector-1)
-- [`jsHandle.evaluate`](./api/class-jshandle.md#jshandleevaluatepagefunction-arg)
+- [class `JSHandle`](./class-jshandle.md)
+- [class `ElementHandle`](./class-elementhandle.md)
+- [`page.evaluateHandle`](./class-page.md#pageevaluatehandlepagefunction-arg)
+- [`page.$`](./class-page.md#pageselector)
+- [`page.$$`](./class-page.md#pageselector-1)
+- [`jsHandle.evaluate`](./class-jshandle.md#jshandleevaluatepagefunction-arg)

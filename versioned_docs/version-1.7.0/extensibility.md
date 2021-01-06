@@ -10,7 +10,7 @@ title: "Extensibility"
 
 ## Custom selector engines
 
-Playwright supports custom selector engines, registered with [selectors.register(name, script[, options])](api/class-selectors.md#selectorsregistername-script-options).
+Playwright supports custom selector engines, registered with [selectors.register(name, script[, options])](./class-selectors.md#selectorsregistername-script-options).
 
 Selector engine should have the following properties:
 

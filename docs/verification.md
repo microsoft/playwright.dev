@@ -11,7 +11,7 @@ title: "Verification"
 
 ## Videos
 
-Playwright can record videos for all pages in a [browser context](core-concepts.md#browser-contexts). Videos are saved upon context closure, so make sure to await [browserContext.close()](api/class-browsercontext.md#browsercontextclose).
+Playwright can record videos for all pages in a [browser context](./core-concepts.md#browser-contexts). Videos are saved upon context closure, so make sure to await [browserContext.close()](./class-browsercontext.md#browsercontextclose).
 
 ```js
 // With browser.newContext()
@@ -35,9 +35,9 @@ const context = await browser.newContext({
 
 #### API reference
 - [BrowserContext]
-- [browser.newContext([options])](api/class-browser.md#browsernewcontextoptions)
-- [browser.newPage([options])](api/class-browser.md#browsernewpageoptions)
-- [browserContext.close()](api/class-browsercontext.md#browsercontextclose)
+- [browser.newContext([options])](./class-browser.md#browsernewcontextoptions)
+- [browser.newPage([options])](./class-browser.md#browsernewpageoptions)
+- [browserContext.close()](./class-browsercontext.md#browsercontextclose)
 
 ## Screenshots
 
@@ -58,8 +58,8 @@ await elementHandle.screenshot({ path: 'screenshot.png' });
 ```
 
 #### API reference
-- [page.screenshot([options])](api/class-page.md#pagescreenshotoptions)
-- [elementHandle.screenshot([options])](api/class-elementhandle.md#elementhandlescreenshotoptions)
+- [page.screenshot([options])](./class-page.md#pagescreenshotoptions)
+- [elementHandle.screenshot([options])](./class-elementhandle.md#elementhandlescreenshotoptions)
 
 <br/>
 
@@ -94,7 +94,7 @@ await msg.args[1].jsonValue() // 42
 #### API reference
 - [ConsoleMessage]
 - [Page]
-- [page.on('console')](api/class-page.md#pageonconsole)
+- [page.on('console')](./class-page.md#pageonconsole)
 
 <br/>
 
@@ -114,7 +114,7 @@ await page.goto('data:text/html,<script>throw new Error("Test")</script>');
 
 #### API reference
 - [Page]
-- [page.on('pageerror')](api/class-page.md#pageonpageerror)
+- [page.on('pageerror')](./class-page.md#pageonpageerror)
 
 <br/>
 
@@ -147,42 +147,42 @@ const [popup] = await Promise.all([
 
 #### API reference
 - [Page]
-- [page.on('requestfailed')](api/class-page.md#pageonrequestfailed)
-- [page.on('dialog')](api/class-page.md#pageondialog)
-- [page.on('popup')](api/class-page.md#pageonpopup)
+- [page.on('requestfailed')](./class-page.md#pageonrequestfailed)
+- [page.on('dialog')](./class-page.md#pageondialog)
+- [page.on('popup')](./class-page.md#pageonpopup)
 
-[Playwright]: api/class-playwright.md "Playwright"
-[Browser]: api/class-browser.md "Browser"
-[BrowserContext]: api/class-browsercontext.md "BrowserContext"
-[Page]: api/class-page.md "Page"
-[Frame]: api/class-frame.md "Frame"
-[ElementHandle]: api/class-elementhandle.md "ElementHandle"
-[JSHandle]: api/class-jshandle.md "JSHandle"
-[ConsoleMessage]: api/class-consolemessage.md "ConsoleMessage"
-[Dialog]: api/class-dialog.md "Dialog"
-[Download]: api/class-download.md "Download"
-[Video]: api/class-video.md "Video"
-[FileChooser]: api/class-filechooser.md "FileChooser"
-[Keyboard]: api/class-keyboard.md "Keyboard"
-[Mouse]: api/class-mouse.md "Mouse"
-[Touchscreen]: api/class-touchscreen.md "Touchscreen"
-[Request]: api/class-request.md "Request"
-[Response]: api/class-response.md "Response"
-[Selectors]: api/class-selectors.md "Selectors"
-[Route]: api/class-route.md "Route"
-[WebSocket]: api/class-websocket.md "WebSocket"
-[TimeoutError]: api/class-timeouterror.md "TimeoutError"
-[Accessibility]: api/class-accessibility.md "Accessibility"
-[Worker]: api/class-worker.md "Worker"
-[BrowserServer]: api/class-browserserver.md "BrowserServer"
-[BrowserType]: api/class-browsertype.md "BrowserType"
-[Logger]: api/class-logger.md "Logger"
-[ChromiumBrowser]: api/class-chromiumbrowser.md "ChromiumBrowser"
-[ChromiumBrowserContext]: api/class-chromiumbrowsercontext.md "ChromiumBrowserContext"
-[ChromiumCoverage]: api/class-chromiumcoverage.md "ChromiumCoverage"
-[CDPSession]: api/class-cdpsession.md "CDPSession"
-[FirefoxBrowser]: api/class-firefoxbrowser.md "FirefoxBrowser"
-[WebKitBrowser]: api/class-webkitbrowser.md "WebKitBrowser"
+[Playwright]: ./class-playwright.md "Playwright"
+[Browser]: ./class-browser.md "Browser"
+[BrowserContext]: ./class-browsercontext.md "BrowserContext"
+[Page]: ./class-page.md "Page"
+[Frame]: ./class-frame.md "Frame"
+[ElementHandle]: ./class-elementhandle.md "ElementHandle"
+[JSHandle]: ./class-jshandle.md "JSHandle"
+[ConsoleMessage]: ./class-consolemessage.md "ConsoleMessage"
+[Dialog]: ./class-dialog.md "Dialog"
+[Download]: ./class-download.md "Download"
+[Video]: ./class-video.md "Video"
+[FileChooser]: ./class-filechooser.md "FileChooser"
+[Keyboard]: ./class-keyboard.md "Keyboard"
+[Mouse]: ./class-mouse.md "Mouse"
+[Touchscreen]: ./class-touchscreen.md "Touchscreen"
+[Request]: ./class-request.md "Request"
+[Response]: ./class-response.md "Response"
+[Selectors]: ./class-selectors.md "Selectors"
+[Route]: ./class-route.md "Route"
+[WebSocket]: ./class-websocket.md "WebSocket"
+[TimeoutError]: ./class-timeouterror.md "TimeoutError"
+[Accessibility]: ./class-accessibility.md "Accessibility"
+[Worker]: ./class-worker.md "Worker"
+[BrowserServer]: ./class-browserserver.md "BrowserServer"
+[BrowserType]: ./class-browsertype.md "BrowserType"
+[Logger]: ./class-logger.md "Logger"
+[ChromiumBrowser]: ./class-chromiumbrowser.md "ChromiumBrowser"
+[ChromiumBrowserContext]: ./class-chromiumbrowsercontext.md "ChromiumBrowserContext"
+[ChromiumCoverage]: ./class-chromiumcoverage.md "ChromiumCoverage"
+[CDPSession]: ./class-cdpsession.md "CDPSession"
+[FirefoxBrowser]: ./class-firefoxbrowser.md "FirefoxBrowser"
+[WebKitBrowser]: ./class-webkitbrowser.md "WebKitBrowser"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
 [ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"

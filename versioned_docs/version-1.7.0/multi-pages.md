@@ -16,7 +16,7 @@ tabs in a browser window.
 
 ## Multiple contexts
 
-[Browser contexts](core-concepts.md#browser-contexts) are isolated environments
+[Browser contexts](./core-concepts.md#browser-contexts) are isolated environments
 on a single browser instance. Playwright can create multiple browser contexts
 within a single scenario. This is useful when you want to test for
 multi-user functionality, like chat.
@@ -38,9 +38,9 @@ await adminContext.addCookies(adminCookies);
 
 #### API reference
 
-- [class `BrowserContext`](./api/class-browser.md#class-browsercontext)
-- [`browser.newContext([options])`](./api/class-browser.md#browsernewcontextoptions)
-- [`browserContext.addCookies(cookies)`](api/class-browsercontext.md#browsercontextaddcookiescookies)
+- [class `BrowserContext`](./class-browser.md#class-browsercontext)
+- [`browser.newContext([options])`](./class-browser.md#browsernewcontextoptions)
+- [`browserContext.addCookies(cookies)`](./class-browsercontext.md#browsercontextaddcookiescookies)
 
 ## Multiple pages
 
@@ -62,9 +62,9 @@ const allPages = context.pages();
 
 #### API reference
 
-- [class `Page`](./api/class-page.md#class-page)
-- [`browserContext.newPage()`](./api/class-browsercontext.md#browsercontextnewpage)
-- [`browserContext.pages()`](./api/class-browsercontext.md#browsercontextpages)
+- [class `Page`](./class-page.md#class-page)
+- [`browserContext.newPage()`](./class-browsercontext.md#browsercontextnewpage)
+- [`browserContext.pages()`](./class-browsercontext.md#browsercontextpages)
 
 ## Handling new pages
 
@@ -94,7 +94,7 @@ context.on('page', async page => {
 
 #### API reference
 
-- [browserContext.on('page')](./api/class-browsercontext.md#browsercontextonpage)
+- [browserContext.on('page')](./class-browsercontext.md#browsercontextonpage)
 
 ## Handling popups
 
@@ -126,4 +126,4 @@ page.on('popup', async popup => {
 
 #### API reference
 
-- [page.on('popup')](./api/class-page.md#pageonpopup)
+- [page.on('popup')](./class-page.md#pageonpopup)
