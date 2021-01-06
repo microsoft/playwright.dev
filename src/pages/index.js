@@ -1,9 +1,12 @@
-import React from "react";
+import React, { useEffect, useRef, useState } from "react";
 import clsx from "clsx";
 import Layout from "@theme/Layout";
 import Link from "@docusaurus/Link";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import useBaseUrl from "@docusaurus/useBaseUrl";
+
+import useOnScreen from "../hooks/useOnScreen";
+
 import styles from "./styles.module.css";
 
 const features = [
@@ -93,15 +96,27 @@ function GitHubStars() {
 }
 
 function FeatureRow({ title, description, videoUrl, isImageLeft }) {
+  const [videoWasStarted, setVideoWasStarted] = useState(false)
+  const videoSourceRef = useRef()
+  const sectionRef = useRef()
+  const isSectionVisible = useOnScreen(sectionRef)
+  useEffect(() => {
+    if (isSectionVisible && videoSourceRef.current && !videoWasStarted) {
+      setVideoWasStarted(true)
+      setTimeout(() => {
+        videoSourceRef.current.play()
+      }, 100)
+    }
+  }, [isSectionVisible, videoSourceRef, videoWasStarted])
   const textColumn = (
-    <div className={clsx("col col--5")}>
+    <div className={"col col--5"}>
       <h2>{title}</h2>
       <p>{description}</p>
     </div>
   );
   const imageColumn = (
-    <div className={clsx("col col--7")}>
-      <video muted controls loop>
+    <div className={"col col--7"}>
+      <video ref={videoSourceRef} muted controls loop>
         <source src={videoUrl} type="video/mp4" />
         Your browser does not support the video tag.
       </video>
@@ -109,9 +124,12 @@ function FeatureRow({ title, description, videoUrl, isImageLeft }) {
   );
   return (
     <section
-      className={clsx(!isImageLeft ? styles.featureContainerAlt : undefined)}
+      className={clsx({
+        [!isImageLeft]: styles.featureContainerAlt
+      })}
+      ref={sectionRef}
     >
-      <div className={clsx("container")}>
+      <div className={"container"}>
         <div
           className={clsx(
             "row",
@@ -162,12 +180,12 @@ function Home() {
       <header className={clsx("hero hero--primary", styles.heroBanner)}>
         <div className="container">
           <h1 className={clsx("hero__title", styles.heroTitle)}>
-            <span className={clsx(styles.highlight)}>Playwright</span> enables
+            <span className={styles.highlight}>Playwright</span> enables
             reliable end-to-end testing for modern web apps.
           </h1>
           <div className={styles.buttons}>
             <Link
-              className={clsx(styles.getStarted)}
+              className={styles.getStarted}
               to={useBaseUrl("docs/intro")}
             >
               Get started
@@ -187,12 +205,12 @@ function Home() {
           </div>
         </section>
 
-        <section className={clsx(styles.logosSection)}>
+        <section className={styles.logosSection}>
           <div className="container">
             <div className="row">
               <div className={clsx("col col--12", styles.logosColumn)}>
                 <h2>Chosen by companies and open source projects</h2>
-                <ul className={clsx(styles.logosList)}>
+                <ul className={styles.logosList}>
                   {logos.map(({ imageUrl, href }, idx) => (
                     <li key={idx}>
                       <a href={href} target="_blank">
