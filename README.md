@@ -4,13 +4,11 @@ This website is built using [Docusaurus v2](https://v2.docusaurus.io/). Content 
 
 ## Development
 
-#### Setup the repo
+### Setup the repo
 
 ```sh
 npm install
 ```
-
-#### Build local search plugin
 
 The project uses a fork of the [docusaurus-search-local](https://github.com/easyops-cn/docusaurus-search-local) plugin for search. Install dependencies and build the plugin.
 
@@ -20,7 +18,13 @@ The project uses a fork of the [docusaurus-search-local](https://github.com/easy
    npm run build
    ```
 
-#### Run dev server
+### Roll docs
+
+```sh
+SRC_DIR=~/code/playwright npm run roll
+```
+
+### Run dev server
 
 ```sh
 npm run start
@@ -28,7 +32,7 @@ npm run start
 
 Note that search indexes are only populated for prod build.
 
-#### Run prod build and serve
+### Run prod build and serve
 
 ```sh
 npm run build

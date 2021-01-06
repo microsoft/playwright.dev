@@ -5,19 +5,34 @@ title: "Actionability"
 
 Playwright does a range of actionability checks on the elements before performing certain actions. These checks ensure that action behaves as expected, for example Playwright does not click on a disabled button.
 
-Playwright waits until all the relevant actionability checks pass before performing an action. This means that action will fail with `TimeoutError` if checks do not pass within the specified `timeout`.
+Playwright waits until all the relevant actionability checks pass before performing an action. This means that action will fail with the `TimeoutError` if checks do not pass within the specified `timeout`.
 
-Some actions like `page.click()` support `{force: true}` option that disable non-essential actionability checks, for example passing `force` to `click()` method will not check that the target element actually receives click events.
+Some actions like [page.click(selector[, options])](api/class-page.md#pageclickselector-options) support `force` option that disables non-essential actionability checks, for example passing truthy `force` to [page.click(selector[, options])](api/class-page.md#pageclickselector-options) method will not check that the target element actually receives click events.
 
-| Actions | Performed checks |
-| ------ | ------- |
-| `check()`<br></br>`click()`<br></br>`dblclick()`<br></br>`tap()`<br></br>`uncheck()` | [Visible]<br></br>[Stable]<br></br>[Enabled]<br></br>[Receiving Events]<br></br>[Attached] |
-| `hover()` | [Visible]<br></br>[Stable]<br></br>[Receiving Events]<br></br>[Attached] |
-| `fill()` | [Visible]<br></br>[Enabled]<br></br>[Editable]<br></br>[Attached] |
-| `dispatchEvent()`<br></br>`focus()`<br></br>`press()`<br></br>`setInputFiles()`<br></br>`selectOption()`<br></br>`type()` | [Attached] |
-| `scrollIntoViewIfNeeded()`<br></br>`screenshot()` | [Visible]<br></br>[Stable]<br></br>[Attached] |
-| `selectText()` | [Visible]<br></br>[Attached] |
-| `getAttribute()`<br></br>`innerText()`<br></br>`innerHTML()`<br></br>`textContent()` | [Attached] |
+| Action | [Attached] | [Visible] | [Stable] | [Receiving Events] | [Enabled] | [Editable] |
+| :- | :-: | :-: | :-: | :-: | :-: | :-: |
+| [elementHandle.check([options])](api/class-elementhandle.md#elementhandlecheckoptions) | Yes | Yes | Yes | Yes | Yes | - |
+| [elementHandle.click([options])](api/class-elementhandle.md#elementhandleclickoptions) | Yes | Yes | Yes | Yes | Yes | - |
+| [elementHandle.dblclick([options])](api/class-elementhandle.md#elementhandledblclickoptions) | Yes | Yes | Yes | Yes | Yes | - |
+| [elementHandle.tap([options])](api/class-elementhandle.md#elementhandletapoptions) | Yes | Yes | Yes | Yes | Yes | - |
+| [elementHandle.uncheck([options])](api/class-elementhandle.md#elementhandleuncheckoptions) | Yes | Yes | Yes | Yes | Yes | - |
+| [elementHandle.hover([options])](api/class-elementhandle.md#elementhandlehoveroptions) | Yes | Yes | Yes | Yes | - | - |
+| [elementHandle.scrollIntoViewIfNeeded([options])](api/class-elementhandle.md#elementhandlescrollintoviewifneededoptions) | Yes | Yes | Yes | - | - | - |
+| [elementHandle.screenshot([options])](api/class-elementhandle.md#elementhandlescreenshotoptions) | Yes | Yes | Yes | - | - | - |
+| [elementHandle.fill(value[, options])](api/class-elementhandle.md#elementhandlefillvalue-options) | Yes | Yes | - | - | Yes | Yes |
+| [elementHandle.selectText([options])](api/class-elementhandle.md#elementhandleselecttextoptions) | Yes | Yes | - | - | - | - |
+| [elementHandle.getAttribute(name)](api/class-elementhandle.md#elementhandlegetattributename) | Yes | - | - | - | - | - |
+| [elementHandle.dispatchEvent(type[, eventInit])](api/class-elementhandle.md#elementhandledispatcheventtype-eventinit) | Yes | - | - | - | - | - |
+| [elementHandle.focus()](api/class-elementhandle.md#elementhandlefocus) | Yes | - | - | - | - | - |
+| [elementHandle.innerText()](api/class-elementhandle.md#elementhandleinnertext) | Yes | - | - | - | - | - |
+| [elementHandle.innerHTML()](api/class-elementhandle.md#elementhandleinnerhtml) | Yes | - | - | - | - | - |
+| [elementHandle.press(key[, options])](api/class-elementhandle.md#elementhandlepresskey-options) | Yes | - | - | - | - | - |
+| [elementHandle.setInputFiles(files[, options])](api/class-elementhandle.md#elementhandlesetinputfilesfiles-options) | Yes | - | - | - | - | - |
+| [elementHandle.selectOption(values[, options])](api/class-elementhandle.md#elementhandleselectoptionvalues-options) | Yes | - | - | - | - | - |
+| [elementHandle.textContent()](api/class-elementhandle.md#elementhandletextcontent) | Yes | - | - | - | - | - |
+| [elementHandle.type(text[, options])](api/class-elementhandle.md#elementhandletypetext-options) | Yes | - | - | - | - | - |
+
+<br/>
 
 ### Visible
 
@@ -43,11 +58,11 @@ Element is considered receiving pointer events when it is the hit target of the 
 
 Element is considered attached when it is [connected](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) to a Document or a ShadowRoot.
 
-Attached check differs between selector-based and handle-based actions, like `page.click(selector, options)` as opposite to `elementHandle.click(options)`:
+Attached check differs between selector-based and handle-based actions, like [page.click(selector[, options])](api/class-page.md#pageclickselector-options) as opposite to [elementHandle.click([options])](api/class-elementhandle.md#elementhandleclickoptions):
 - For selector-based actions, Playwright first waits for an element matching `selector` to be attached to the DOM, and then checks that element is still attached before performing the action. If element was detached, the action is retried from the start.
 - For handle-based actions, Playwright throws if the element is not attached.
 
-For example, consider a scenario where Playwright will click `Sign Up` button regardless of when the `page.click()` call was made:
+For example, consider a scenario where Playwright will click `Sign Up` button regardless of when the [page.click(selector[, options])](api/class-page.md#pageclickselector-options) call was made:
 - page is checking that user name is unique and `Sign Up` button is disabled;
 - after checking with the server, the disabled `Sign Up` button is replaced with another one that is now enabled.
 

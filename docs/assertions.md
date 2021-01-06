@@ -5,8 +5,6 @@ title: "Assertions"
 
 The Playwright API can be used to read element contents and properties for test assertions. These values are fetched from the browser page and asserted in Node.js.
 
-The examples in this guide use the built-in [`assert` module](https://nodejs.org/api/assert.html), but they can be used with any assertion library (like [Expect](https://www.npmjs.com/package/expect) or [Chai](https://www.npmjs.com/package/chai)). See [Test runners](test-runners.md) for more info.
-
 - [Common patterns](#common-patterns)
 - [Element Handles](#element-handles)
 - [Custom assertions](#custom-assertions)
@@ -16,6 +14,9 @@ The examples in this guide use the built-in [`assert` module](https://nodejs.org
 Playwright provides convenience APIs for common assertion tasks, like finding the text content of an element. These APIs require a [selector](./selectors.md) to locate the element.
 
 ```js
+// This example uses the Node.js's built-in `assert` module,
+// but any assertion library (Expect, Chai, etc.) will work.
+
 // Assert text content
 const content = await page.textContent('nav:first-child');
 assert(content === 'home');
@@ -49,7 +50,7 @@ assert(checked);
 
 [ElementHandle] objects represent in-page DOM elements. They can be used to assert for multiple properties of the element.
 
-It is recommended to fetch the `ElementHandle` object with [page.waitForSelector(selector[, options])](api/class-page.md#pagewaitforselectorselector-options) or [frame.waitForSelector(selector[, options])](api/class-frame.md#framewaitforselectorselector-options). These APIs wait for the element to be visible and then return an `ElementHandle`.
+It is recommended to fetch the [ElementHandle] object with [page.waitForSelector(selector[, options])](api/class-page.md#pagewaitforselectorselector-options) or [frame.waitForSelector(selector[, options])](api/class-frame.md#framewaitforselectorselector-options). These APIs wait for the element to be visible and then return an `ElementHandle`.
 
 ```js
 // Get the element handle

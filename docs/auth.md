@@ -7,7 +7,7 @@ Playwright can be used to automate scenarios that require authentication.
 
 Tests written with Playwright execute in isolated clean-slate environments called [browser contexts](./core-concepts.md#browser-contexts). This isolation model improves reproducibility and prevents cascading test failures. New browser contexts can load existing authentication state. This eliminates the need to login in every context and speeds up test execution.
 
-> Note: This guide covers cookie/token-based authentication (logging in via the app UI). For [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication) use [`browser.newContext`](./network.md#http-authentication).
+> Note: This guide covers cookie/token-based authentication (logging in via the app UI). For [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication) use [browser.newContext([options])](api/class-browser.md#browsernewcontextoptions).
 
 - [Automate logging in](#automate-logging-in)
 - [Reuse authentication state](#reuse-authentication-state)
@@ -126,7 +126,7 @@ Web browsers use a directory on disk to store user history, cookies, IndexedDB a
 
 Note that persistent authentication is not suited for CI environments since it relies on a disk location. User data directories are specific to browser types and cannot be shared across browser types.
 
-User data directories can be used with the `launchPersistentContext` API.
+User data directories can be used with the [browserType.launchPersistentContext(userDataDir[, options])](api/class-browsertype.md#browsertypelaunchpersistentcontextuserdatadir-options) API.
 
 ```js
 const { chromium } = require('playwright');

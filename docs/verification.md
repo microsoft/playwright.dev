@@ -11,7 +11,7 @@ title: "Verification"
 
 ## Videos
 
-Playwright can record videos for all pages in a [browser context](core-concepts.md#browser-contexts). Videos are saved upon context closure, so make sure to await `browserContext.close()`.
+Playwright can record videos for all pages in a [browser context](core-concepts.md#browser-contexts). Videos are saved upon context closure, so make sure to await [browserContext.close()](api/class-browsercontext.md#browsercontextclose).
 
 ```js
 // With browser.newContext()
