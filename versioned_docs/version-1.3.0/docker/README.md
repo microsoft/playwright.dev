@@ -4,7 +4,7 @@ title: "Running Playwright in Docker"
 ---
 
 
-[Dockerfile.bionic](Dockerfile.bionic) is a playwright-ready image of playwright.
+[Dockerfile.bionic](https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.bionic) is a playwright-ready image of playwright.
 This image includes all the dependencies needed to run browsers in a Docker
 container, including browsers.
 
@@ -38,7 +38,7 @@ $ docker pull mcr.microsoft.com/playwright:bionic
 $ docker container run -it --rm --ipc=host --security-opt seccomp=seccomp_profile.json mcr.microsoft.com/playwright:bionic /bin/bash
 ```
 
-[`seccomp_profile.json`](seccomp_profile.json) is needed to run Chromium with sandbox. This is
+[`seccomp_profile.json`](https://github.com/microsoft/playwright/blob/master/utils/docker/seccomp_profile.json) is needed to run Chromium with sandbox. This is
 a [default Docker seccomp profile](https://github.com/docker/engine/blob/d0d99b04cf6e00ed3fc27e81fc3d94e7eda70af3/profiles/seccomp/default.json) with extra user namespace cloning permissions:
 
 ```json
@@ -68,7 +68,7 @@ See our [Continuous Integration guides](../ci.md) for sample configs.
 
 ### Build the image
 
-Use [`//docs/docker/build.sh`](build.sh) to build the image.
+Use [`//docs/docker/build.sh`](https://github.com/microsoft/playwright/blob/master/utils/docker/build.sh) to build the image.
 
 ```
 $ ./docs/docker/build.sh
@@ -79,8 +79,6 @@ The image will be tagged as `playwright:localbuild` and could be run as:
 ```
 $ docker run --rm -it playwright:localbuild /bin/bash
 ```
-
-> **NOTE**: any commit that changes docker image should also update [`//docs/docker/CURRENT_DOCKER_IMAGE_SIZE`](CURRENT_DOCKER_IMAGE_SIZE). Please run [`//docs/docker/docker-image-size.sh`](docker-image-size.sh) locally and commit updated number.
 
 ### Push
 

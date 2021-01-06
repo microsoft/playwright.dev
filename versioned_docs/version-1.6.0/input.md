@@ -263,7 +263,7 @@ You can select input files for upload using the `page.setInputFiles` method. It 
 
 #### Example
 
-[This script](examples/upload.js) uploads a file to an `input` element that accepts file uploads.
+[This script](https://github.com/microsoft/playwright/blob/master/docs/examples/upload.js) uploads a file to an `input` element that accepts file uploads.
 
 #### API reference
 

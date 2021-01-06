@@ -11,9 +11,6 @@ Playwright tests can be executed to run on your CI environments. To simplify thi
   * [GitHub Actions](#github-actions)
   * [Docker](#docker)
   * [Azure Pipelines](#azure-pipelines)
-  * [Travis CI](#travis-ci)
-  * [CircleCI](#circleci)
-  * [AppVeyor](#appveyor)
 - [Caching browsers](#caching-browsers)
     - [Exception: `node_modules` are cached](#exception-nodemodules-are-cached)
     - [Directories to cache](#directories-to-cache)
@@ -35,7 +32,7 @@ steps:
     run: npm test
 ```
 
-We run [our tests](/.github/workflows/tests.yml) on GitHub Actions, across a matrix of 3 platforms (Windows, Linux, macOS) and 3 browsers (Chromium, Firefox, WebKit).
+We run [our tests](https://github.com/microsoft/playwright/blob/master/.github/workflows/tests.yml) on GitHub Actions, across a matrix of 3 platforms (Windows, Linux, macOS) and 3 browsers (Chromium, Firefox, WebKit).
 
 ### Docker
 
@@ -71,84 +68,6 @@ Suggested configuration
 For Windows or macOS agents, no additional configuration required, just install Playwright and run your tests.
 
 For Linux agents, refer to [our Docker setup](docker/README.md) to see additional dependencies that need to be installed.
-
-### Travis CI
-
-We run our tests on Travis CI over a Linux agent (Ubuntu 18.04). Use our [Travis configuration](/.travis.yml) to see list of additional dependencies to be installed.
-
-Suggested configuration
-1. [User namespace cloning](http://man7.org/linux/man-pages/man7/user_namespaces.7.html)
-   should be enabled to support proper sandboxing
-1. [xvfb](https://en.wikipedia.org/wiki/Xvfb) should be launched in order to run
-   Chromium in non-headless mode (e.g. to test Chrome Extensions)
-1. If your project does not have `package-lock.json`, Travis would be auto-caching
-   `node_modules` directory. If you run `npm install` (instead of `npm ci`), it is
-   possible that the browser binaries are not downloaded. Fix this with [these steps](#exception-nodemodules-are-cached) outlined below.
-
-To sum up, your `.travis.yml` might look like this:
-
-```yml
-language: node_js
-dist: bionic
-addons:
-  apt:
-    packages:
-    # This is required to run chromium
-    - libgbm1
-    # These are required to run webkit
-    - libwoff1
-    - libopus0
-    - libwebp6
-    - libwebpdemux2
-    - libenchant1c2a
-    - libgudev-1.0-0
-    - libsecret-1-0
-    - libhyphen0
-    - libgdk-pixbuf2.0-0
-    - libegl1
-    - libgles2
-    - libevent-2.1-6
-    - libnotify4
-    - libxslt1.1
-    - libvpx5
-    # For headful execution
-    - xvfb
-
-# allow headful tests
-before_install:
-  # Enable user namespace cloning
-  - "sysctl kernel.unprivileged_userns_clone=1"
-  # Launch XVFB
-  - "export DISPLAY=:99.0"
-  - "sh -e /etc/init.d/xvfb start"
-```
-
-### CircleCI
-
-We run our tests on CircleCI, with our [pre-built Docker image](docker/README.md). Use our [CircleCI configuration](/.circleci/config.yml) to create your own. Running Playwright smoothly on CircleCI requires the following steps:
-
-1. Use the pre-built [Docker image](docker/README.md) in your config like so:
-
-   ```yaml
-   docker:
-     - image: aslushnikov/playwright:bionic
-       environment:
-         NODE_ENV: development # Needed if playwright is in `devDependencies`
-   ```
-
-1. If you’re using Playwright through Jest, then you may encounter an error spawning child processes:
-
-   ```
-   [00:00.0]  jest args: --e2e --spec --max-workers=36
-   Error: spawn ENOMEM
-      at ChildProcess.spawn (internal/child_process.js:394:11)
-   ```
-
-   This is likely caused by Jest autodetecting the number of processes on the entire machine (`36`) rather than the number allowed to your container (`2`). To fix this, set `jest --maxWorkers=2` in your test command.
-
-### AppVeyor
-
-We run our tests on Windows agents in AppVeyor. Use our [AppVeyor configuration](/.appveyor.yml) to create your own.
 
 ## Caching browsers
 

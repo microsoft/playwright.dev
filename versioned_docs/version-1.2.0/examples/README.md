@@ -4,11 +4,11 @@ title: "Example recipes"
 ---
 
 
-### [Authentication](authentication.js)
+### [Authentication](https://github.com/microsoft/playwright/blob/master/docs/examples/authentication.js)
 
 This script logs in on GitHub.com through Chromium, and then reuses the login cookies state in WebKit. This recipe can be used to speed up tests by logging in once and reusing login state.
 
-### [File uploads](upload.js)
+### [File uploads](https://github.com/microsoft/playwright/blob/master/docs/examples/upload.js)
 
 This script uploads a file to an `input` element that accepts file uploads.
 

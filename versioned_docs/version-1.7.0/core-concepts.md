@@ -283,7 +283,7 @@ const result = await page.evaluate(() => {
 
 #### API reference
 
-- [`page.evaluate()`]api/class-page.md#pageevaluatepagefunction-arg)
+- [`page.evaluate()`](api/class-page.md#pageevaluatepagefunction-arg)
 - [`frame.evaluate()`](api/class-frame.md#frameevaluatepagefunction-arg)
 - Evaluation argument [examples](api/evaluationargument.md#evaluationargument)
 

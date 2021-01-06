@@ -107,7 +107,7 @@ This approach will also **work in CI environments**, since it does not rely on a
 
 ### Example
 
-[This example script](examples/authentication.js) logs in on GitHub.com with Chromium, and then reuses the logged in cookie state in WebKit.
+[This example script](https://github.com/microsoft/playwright/blob/master/docs/examples/authentication.js) logs in on GitHub.com with Chromium, and then reuses the logged in cookie state in WebKit.
 
 ### API reference
 - [BrowserContext]

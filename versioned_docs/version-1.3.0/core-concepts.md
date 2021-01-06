@@ -76,7 +76,7 @@ const context = await browser.newContext({
 
 #### Example
 
-[This script](examples/authentication.js) logs in on GitHub.com through Chromium, and then reuses the login cookies state in WebKit. This recipe can be used to speed up tests by logging in once and reusing login state.
+[This script](https://github.com/microsoft/playwright/blob/master/docs/examples/authentication.js) logs in on GitHub.com through Chromium, and then reuses the login cookies state in WebKit. This recipe can be used to speed up tests by logging in once and reusing login state.
 
 #### API reference
 
@@ -287,7 +287,7 @@ const result = await page.evaluate(() => {
 
 #### API reference
 
-- [`page.evaluate(pageFunction[, arg])`]api/class-page.md#pageevaluatepagefunction-arg)
+- [`page.evaluate(pageFunction[, arg])`](api/class-page.md#pageevaluatepagefunction-arg)
 - [`frame.evaluate(pageFunction[, arg])`](api/class-frame.md#frameevaluatepagefunction-arg)
 - Evaluation argument [examples](api/evaluationargument.md#evaluationargument)
 

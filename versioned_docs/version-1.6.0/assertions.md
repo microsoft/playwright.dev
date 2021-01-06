@@ -94,8 +94,8 @@ the browser. This is useful in situations where you want to assert for values
 that are not covered by the convenience APIs above.
 
 The following APIs do not auto-wait for the element. It is recommended to use
-[`page.waitForSelector`]api/class-page.md#pagewaitforselectorselector-options) or
-[`frame.waitForSelector`]api/class-frame.md#framewaitforselectorselector-options).
+[`page.waitForSelector`](api/class-page.md#pagewaitforselectorselector-options) or
+[`frame.waitForSelector`](api/class-frame.md#framewaitforselectorselector-options).
 
 ```js
 // Assert local storage value
@@ -119,11 +119,11 @@ assert(length === 3);
 #### API reference
 
 - [page.evaluate(pageFunction[, arg])](api/class-page.md#pageevaluatepagefunction-arg)
-- [page.$eval(selector, pageFunction[, arg])]api/class-page.md#pageevalselector-pagefunction-arg)
-- [page.$$eval(selector, pageFunction[, arg])]api/class-page.md#pageevalselector-pagefunction-arg-1)
+- [page.$eval(selector, pageFunction[, arg])](api/class-page.md#pageevalselector-pagefunction-arg)
+- [page.$$eval(selector, pageFunction[, arg])](api/class-page.md#pageevalselector-pagefunction-arg-1)
 - [frame.evaluate(pageFunction[, arg])](api/class-frame.md#frameevaluatepagefunction-arg)
-- [frame.$eval(selector, pageFunction[, arg])]api/class-frame.md#frameevalselector-pagefunction-arg)
-- [frame.$$eval(selector, pageFunction[, arg])]api/class-frame.md#frameevalselector-pagefunction-arg-1)
+- [frame.$eval(selector, pageFunction[, arg])](api/class-frame.md#frameevalselector-pagefunction-arg)
+- [frame.$$eval(selector, pageFunction[, arg])](api/class-frame.md#frameevalselector-pagefunction-arg-1)
 - [elementHandle.$eval(selector, pageFunction[, arg])](api/class-elementhandle.md#elementhandleevalselector-pagefunction-arg)
 - [elementHandle.$$eval(selector, pageFunction[, arg])](api/class-elementhandle.md#elementhandleevalselector-pagefunction-arg-1)
 - Evaluation argument [examples](api/evaluationargument.md#evaluationargument)

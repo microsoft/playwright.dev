@@ -4,7 +4,7 @@ title: "Running Playwright in Docker"
 ---
 
 
-[Dockerfile.bionic](Dockerfile.bionic) is a playwright-ready image of playwright.
+[Dockerfile.bionic](https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.bionic) is a playwright-ready image of playwright.
 This image includes all the dependencies needed to run browsers in a Docker
 container.
 

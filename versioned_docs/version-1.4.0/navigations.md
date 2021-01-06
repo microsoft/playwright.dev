@@ -118,7 +118,7 @@ await Promise.all([
 The `Promise.all` pattern prevents a race condition between `page.click` and `page.waitForNavigation` when navigation happens quickly.
 
 ### Multiple navigations
-Clicking an element could trigger multiple navigations. In these cases, it is recommended to explicitly [`page.waitForNavigation`]api/class-page.md#pagewaitfornavigationoptions) to a specific url. For example:
+Clicking an element could trigger multiple navigations. In these cases, it is recommended to explicitly [`page.waitForNavigation`](api/class-page.md#pagewaitfornavigationoptions) to a specific url. For example:
 * Client-side redirects issued after the `load` event
 * Multiple pushes to history state
 
@@ -132,7 +132,7 @@ await Promise.all([
 The `Promise.all` pattern prevents a race condition between `page.click` and `page.waitForNavigation` when navigation happens quickly.
 
 ### Loading a popup
-When popup is opened, explicitly calling [`page.waitForLoadState`]api/class-page.md#pagewaitforloadstatestate-options) ensures that popup is loaded to the desired state.
+When popup is opened, explicitly calling [`page.waitForLoadState`](api/class-page.md#pagewaitforloadstatestate-options) ensures that popup is loaded to the desired state.
 
 ```js
 const [ popup ] = await Promise.all([

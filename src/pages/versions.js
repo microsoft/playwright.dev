@@ -32,7 +32,7 @@ function Version() {
                 <tr>
                   <th>{stableVersion.name}</th>
                   <td>
-                    <Link to={stableVersion.path}>Documentation</Link>
+                    <Link to={stableVersion.path + '/api/class-playwright'}>Documentation</Link>
                   </td>
                   <td>
                     <a href={`${repoUrl}/releases/tag/v${stableVersion.name}`}>
@@ -53,7 +53,7 @@ function Version() {
                 <tr>
                   <th>master</th>
                   <td>
-                    <Link to={currentVersion.path}>Documentation</Link>
+                    <Link to={currentVersion.path + '/api/class-playwright'}>Documentation</Link>
                   </td>
                   <td>
                     <a href={repoUrl}>Source Code</a>
@@ -72,7 +72,7 @@ function Version() {
                   <tr key={version.name}>
                     <th>{version.label}</th>
                     <td>
-                      <Link to={version.path}>Documentation</Link>
+                      <Link to={version.path + '/api/class-playwright'}>Documentation</Link>
                     </td>
                     <td>
                       <a href={`${repoUrl}/releases/tag/v${version.name}`}>

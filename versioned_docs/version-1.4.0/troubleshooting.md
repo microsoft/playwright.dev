@@ -40,7 +40,7 @@ const browser = await playwright.chromium.launch({
 ### Chrome headless doesn't launch on Linux/WSL
 
 Make sure all the necessary dependencies are installed. You can run `ldd chrome | grep not` on a Linux
-machine to check which dependencies are missing. For dependencies on Ubuntu, please refer to [Dockerfile](https://github.com/microsoft/playwright/blob/master/docs/docker/Dockerfile.bionic) which is used to run our tests.
+machine to check which dependencies are missing. For dependencies on Ubuntu, please refer to [Dockerfile](https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.bionic) which is used to run our tests.
 
 The common ones for Debian and CentOS are provided below.
 
@@ -165,7 +165,7 @@ sudo sysctl -w kernel.unprivileged_userns_clone=1
 ```
 
 In case of Docker, containers need to be run with a custom [security profile](https://docs.docker.com/engine/security/seccomp/) that enables
-user namespace cloning. You can download this profile here: [`seccomp_profile.json`](docker/seccomp_profile.json)
+user namespace cloning. You can download this profile here: [`seccomp_profile.json`](https://github.com/microsoft/playwright/blob/master/utils/docker/seccomp_profile.json)
 
 With the downloaded profile, docker container could be run like this:
 
@@ -179,14 +179,14 @@ docker run --rm --security-opt seccomp=/path/to/seccomp/profile.json -it my-imag
 ### Firefox headless doesn't launch on Linux/WSL
 
 Make sure all the necessary dependencies are installed. You can run `ldd chrome | grep not` on a Linux
-machine to check which dependencies are missing. For dependencies on Ubuntu, please refer to [Dockerfile](https://github.com/microsoft/playwright/blob/master/docs/docker/Dockerfile.bionic) which is used to run our tests.
+machine to check which dependencies are missing. For dependencies on Ubuntu, please refer to [Dockerfile](https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.bionic) which is used to run our tests.
 
 ## WebKit
 
 ### WebKit headless doesn't launch on Linux/WSL
 
 Make sure all the necessary dependencies are installed. You can run `ldd chrome | grep not` on a Linux
-machine to check which dependencies are missing. For dependencies on Ubuntu, please refer to [Dockerfile](https://github.com/microsoft/playwright/blob/master/docs/docker/Dockerfile.bionic) which is used to run our tests.
+machine to check which dependencies are missing. For dependencies on Ubuntu, please refer to [Dockerfile](https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.bionic) which is used to run our tests.
 
 ## Code transpilation issues
 

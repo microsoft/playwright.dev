@@ -84,7 +84,7 @@ Firefox and WebKit work across the 3 platforms (Windows, macOS, Linux):
 * **macOS**: Requires 10.14 or above.
 * **Linux**: Depending on your Linux distribution, you might need to install additional
   dependencies to run the browsers.
-  * For Ubuntu 18.04, the additional dependencies are defined in [our Docker image](docker/Dockerfile.bionic),
+  * For Ubuntu 18.04, the additional dependencies are defined in [our Docker image](https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.bionic),
     which is based on Ubuntu.
 
 <br/>

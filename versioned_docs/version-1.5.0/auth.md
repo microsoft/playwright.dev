@@ -138,7 +138,7 @@ on any external state.
 
 ### Example
 
-[This example script](examples/authentication.js) logs in on GitHub.com with
+[This example script](https://github.com/microsoft/playwright/blob/master/docs/examples/authentication.js) logs in on GitHub.com with
 Chromium, and then reuses the logged in cookie state in WebKit.
 
 ### API reference

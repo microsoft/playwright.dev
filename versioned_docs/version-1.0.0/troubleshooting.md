@@ -47,7 +47,7 @@ const browser = await playwright.chromium.launch({
 ### Chrome headless doesn't launch on Linux/WSL
 
 Make sure all the necessary dependencies are installed. You can run `ldd chrome | grep not` on a Linux
-machine to check which dependencies are missing. For dependencies on Ubuntu, please refer to [Dockerfile](https://github.com/microsoft/playwright/blob/master/docs/docker/Dockerfile.bionic) which is used to run our tests.
+machine to check which dependencies are missing. For dependencies on Ubuntu, please refer to [Dockerfile](https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.bionic) which is used to run our tests.
 
 The common ones for Debian and CentOS are provided below.
 
@@ -199,14 +199,14 @@ export CHROME_DEVEL_SANDBOX=/usr/local/sbin/chrome-devel-sandbox
 ### Firefox headless doesn't launch on Linux/WSL
 
 Make sure all the necessary dependencies are installed. You can run `ldd chrome | grep not` on a Linux
-machine to check which dependencies are missing. For dependencies on Ubuntu, please refer to [Dockerfile](https://github.com/microsoft/playwright/blob/master/docs/docker/Dockerfile.bionic) which is used to run our tests.
+machine to check which dependencies are missing. For dependencies on Ubuntu, please refer to [Dockerfile](https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.bionic) which is used to run our tests.
 
 ## WebKit
 
 ### WebKit headless doesn't launch on Linux/WSL
 
 Make sure all the necessary dependencies are installed. You can run `ldd chrome | grep not` on a Linux
-machine to check which dependencies are missing. For dependencies on Ubuntu, please refer to [Dockerfile](https://github.com/microsoft/playwright/blob/master/docs/docker/Dockerfile.bionic) which is used to run our tests.
+machine to check which dependencies are missing. For dependencies on Ubuntu, please refer to [Dockerfile](https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.bionic) which is used to run our tests.
 
 ## Running Playwright on CI
 
