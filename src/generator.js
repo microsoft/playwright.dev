@@ -40,7 +40,7 @@ class Generator {
     this.outDir = outDir;
     this.formatMember = formatMember;
     this.formatArgument = formatArgument;
-    this.outline = new MDOutline(path.join(DIR_SRC, 'api-body.md'), path.join(DIR_SRC, 'api-params.md'));
+    this.outline = new MDOutline(path.join(DIR_SRC, 'api'));
 
     this.outline.setLinkRenderer(item => {
       const { clazz, member, param, option } = item;
@@ -66,7 +66,7 @@ class Generator {
       this.generateClassDoc(clazz);
 
     for (const name of fs.readdirSync(path.join(DIR_SRC))) {
-      if (name === 'links.md' || name.startsWith('api-'))
+      if (name === 'links.md' || name === 'api')
         continue;
       this.generateDoc(name);
     }
@@ -231,6 +231,8 @@ function renderType(type) {
     return '[number]';
   if (type.name === 'path')
     return '[string]';
+  if (type.name === 'any')
+    return '[Object]';
   return `[${type.name}]`;
 }
 
