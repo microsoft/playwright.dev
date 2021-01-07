@@ -19,7 +19,7 @@
 const fs = require('fs');
 const path = require('path');
 const md = require('./markdown');
-const { MDOutline } = require('./md_builder');
+const { parseApi } = require('./api_parser');
 const Documentation = require('./documentation');
 
 /** @typedef {import('./documentation').Type} Type */
@@ -32,17 +32,18 @@ class Generator {
   rLinks = new Map();
 
   /**
+   * @param {string} lang
    * @param {string} outDir
    * @param {function(Documentation.Member): { text: string, args: Documentation.Member[] }} formatMember
    * @param {function(Documentation.Member): string} formatArgument
    */
-  constructor(outDir, formatMember, formatArgument) {
+  constructor(lang, outDir, formatMember, formatArgument) {
     this.outDir = outDir;
     this.formatMember = formatMember;
     this.formatArgument = formatArgument;
-    this.outline = new MDOutline(path.join(DIR_SRC, 'api'));
-
-    this.outline.setLinkRenderer(item => {
+    this.documentation = parseApi(path.join(DIR_SRC, 'api'));
+    this.documentation.filterForLanguage(lang);
+    this.documentation.setLinkRenderer(item => {
       const { clazz, member, param, option } = item;
       if (param)
         return `\`${param}\``;
@@ -57,12 +58,12 @@ class Generator {
     {
       const links = fs.readFileSync(path.join(DIR_SRC, 'links.md')).toString();
       const localLinks = [];
-      for (const clazz of this.outline.classesArray)
+      for (const clazz of this.documentation.classesArray)
         localLinks.push(`[${clazz.name}]: ./api/class-${clazz.name.toLowerCase()}.md "${clazz.name}"`);
         this.generatedLinksSuffix = '\n' + localLinks.join('\n') + '\n' + links;
     }
 
-    for (const clazz of this.outline.classesArray)
+    for (const clazz of this.documentation.classesArray)
       this.generateClassDoc(clazz);
 
     for (const name of fs.readdirSync(path.join(DIR_SRC))) {
@@ -92,7 +93,7 @@ title: "${clazz.name}"
     });
     result.push(...this.generateClassToc(clazz));
     if (clazz.extends && clazz.extends !== 'EventEmitter' && clazz.extends !== 'Error') {
-      const superClass = this.outline.documentation.classes.get(clazz.extends);
+      const superClass = this.documentation.classes.get(clazz.extends);
       result.push(...this.generateClassToc(superClass));
     }
 
@@ -129,7 +130,7 @@ title: "${clazz.name}"
   generateDoc(name) {
     const content = fs.readFileSync(path.join(DIR_SRC, name)).toString();
     const nodes = md.parse(content);
-    this.outline.renderLinksInText(nodes);
+    this.documentation.renderLinksInText(nodes);
     for (const node of nodes) {
       if (node.text === '<!-- TOC -->')
         node.text = md.generateToc(nodes);
@@ -236,7 +237,7 @@ function renderType(type) {
   return `[${type.name}]`;
 }
 
-new Generator(path.join(__dirname, '..', 'nodejs', 'docs'), member => {
+new Generator('js', path.join(__dirname, '..', 'nodejs', 'docs'), member => {
   let text;
   let args = [];
   if (member.kind === 'property')
@@ -253,7 +254,7 @@ new Generator(path.join(__dirname, '..', 'nodejs', 'docs'), member => {
   return { text, args };
 }, p => p.name);
 
-new Generator(path.join(__dirname, '..', 'python', 'docs'), member => {
+new Generator('python', path.join(__dirname, '..', 'python', 'docs'), member => {
   let text;
   const args = [];
   if (member.kind === 'property')
