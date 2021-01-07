@@ -26,13 +26,20 @@ const Documentation = require('./documentation');
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
 
 const DIR_SRC = path.join(process.env.SRC_DIR, 'docs', 'src');
-const DIR_OUT = path.join(__dirname, '..', 'docs');
 
 class Generator {
   links = new Map();
   rLinks = new Map();
 
-  constructor() {
+  /**
+   * @param {string} outDir
+   * @param {function(Documentation.Member): { text: string, args: Documentation.Member[] }} formatMember
+   * @param {function(Documentation.Member): string} formatArgument
+   */
+  constructor(outDir, formatMember, formatArgument) {
+    this.outDir = outDir;
+    this.formatMember = formatMember;
+    this.formatArgument = formatArgument;
     this.outline = new MDOutline(path.join(DIR_SRC, 'api-body.md'), path.join(DIR_SRC, 'api-params.md'));
 
     this.outline.setLinkRenderer(item => {
@@ -51,7 +58,7 @@ class Generator {
       const links = fs.readFileSync(path.join(DIR_SRC, 'links.md')).toString();
       const localLinks = [];
       for (const clazz of this.outline.classesArray)
-        localLinks.push(`[${clazz.name}]: api/class-${clazz.name.toLowerCase()}.md "${clazz.name}"`);
+        localLinks.push(`[${clazz.name}]: ./api/class-${clazz.name.toLowerCase()}.md "${clazz.name}"`);
         this.generatedLinksSuffix = '\n' + localLinks.join('\n') + '\n' + links;
     }
 
@@ -93,16 +100,9 @@ title: "${clazz.name}"
       // Iterate members
       /** @type {MarkdownNode} */
       const memberNode = { type: 'h2', children: [] };
-      if (member.kind === 'event') {
-        memberNode.text = `${clazz.varName}.on('${member.name}')`;
-      } else if (member.kind === 'property') {
-        memberNode.text = `${clazz.varName}.${member.name}`;
-      } else if (member.kind === 'method') {
-        // Patch method signatures
-        memberNode.text = `${clazz.varName}.${member.name}(${member.signature})`;
-        for (const arg of member.argsArray)
-          memberNode.children.push(renderProperty(`\`${arg.name}\``, arg.type, arg.spec));
-      }
+      const { text, args } = this.formatMember(member);
+      memberNode.text = text;
+      memberNode.children.push(...args.map(a => this.renderProperty(`\`${this.formatArgument(a)}\``, a.type, a.spec)));
 
       // Append type
       if (member.type && member.type.name !== 'void') {
@@ -112,15 +112,15 @@ title: "${clazz.name}"
           case 'property': name = 'type:'; break;
           case 'method': name = 'returns:'; break;
         }
-        memberNode.children.push(renderProperty(name, member.type));
+        memberNode.children.push(this.renderProperty(name, member.type));
       }
 
       // Append member doc
       memberNode.children.push(...(member.spec || []).map(c => md.clone(c)));
       result.push(memberNode);
     }
-    fs.mkdirSync(path.join(DIR_OUT, 'api'), { recursive: true });
-    fs.writeFileSync(path.join(DIR_OUT, 'api', `class-${clazz.name.toLowerCase()}.md`), [md.render(result), this.generatedLinksSuffix].join('\n'));
+    fs.mkdirSync(path.join(this.outDir, 'api'), { recursive: true });
+    fs.writeFileSync(path.join(this.outDir, 'api', `class-${clazz.name.toLowerCase()}.md`), [md.render(result), this.generatedLinksSuffix].join('\n'));
   }
 
   /**
@@ -134,8 +134,8 @@ title: "${clazz.name}"
       if (node.text === '<!-- TOC -->')
         node.text = md.generateToc(nodes);
     }
-    fs.mkdirSync(DIR_OUT, { recursive: true });
-    fs.writeFileSync(path.join(DIR_OUT, name), [md.render(nodes), this.generatedLinksSuffix].join('\n'));
+    fs.mkdirSync(this.outDir, { recursive: true });
+    fs.writeFileSync(path.join(this.outDir, name), [md.render(nodes), this.generatedLinksSuffix].join('\n'));
   }
 
   /**
@@ -162,15 +162,8 @@ title: "${clazz.name}"
    * @return {string}
    */
   createMemberLink(member) {
-    const file = `api/class-${member.clazz.name.toLowerCase()}.md`;
-    if (member.kind === 'property')
-      return this.createLink(file, `${member.clazz.varName}.${member.name}`);
-
-    if (member.kind === 'event')
-      return this.createLink(file, `${member.clazz.varName}.on('${member.name}')`);
-
-    if (member.kind === 'method')
-      return this.createLink(file, `${member.clazz.varName}.${member.name}(${member.signature})`);
+    const file = `./api/class-${member.clazz.name.toLowerCase()}.md`;
+    return this.createLink(file, this.formatMember(member).text);
   }
 
   /**
@@ -189,36 +182,37 @@ title: "${clazz.name}"
     }
     return result;
   }
-}
 
-/**
- * @param {string} name
- * @param {Type} type
- * @param {MarkdownNode[]} [spec]
- */
-function renderProperty(name, type, spec) {
-  let comment = '';
-  if (spec && spec.length)
-    comment = spec[0].text;
-  let children;
-  const properties = type.deepProperties();
-  if (properties && properties.length)
-    children = properties.map(p => renderProperty(`\`${p.name}\``, p.type, p.spec))
-  else if (spec && spec.length > 1)
-    children = spec.slice(1).map(s => md.clone(s));
+  /**
+   * @param {string} name
+   * @param {Type} type
+   * @param {MarkdownNode[]} [spec]
+   */
+  renderProperty(name, type, spec) {
+    let comment = '';
+    if (spec && spec.length)
+      comment = spec[0].text;
+    let children;
+    const properties = type.deepProperties();
+    if (properties && properties.length)
+      children = properties.map(p => this.renderProperty(`\`${this.formatArgument(p)}\``, p.type, p.spec))
+    else if (spec && spec.length > 1)
+      children = spec.slice(1).map(s => md.clone(s));
 
-  let typeText = renderType(type);
-  if (typeText === '[Promise]<[void]>')
-    typeText = '[Promise]';
+    let typeText = renderType(type);
+    if (typeText === '[Promise]<[void]>')
+      typeText = '[Promise]';
 
-  /** @type {MarkdownNode} */
-  const result = {
-    type: 'li',
-    liType: 'default',
-    text: `${name} <${typeText}>${comment ? ' ' + comment : ''}`,
-    children
-  };
-  return result;
+    /** @type {MarkdownNode} */
+    const result = {
+      type: 'li',
+      liType: 'default',
+      text: `${name} <${typeText}>${comment ? ' ' + comment : ''}`,
+      children
+    };
+    return result;
+  }
+
 }
 
 /**
@@ -240,4 +234,112 @@ function renderType(type) {
   return `[${type.name}]`;
 }
 
-new Generator();
+new Generator(path.join(__dirname, '..', 'nodejs', 'docs'), member => {
+  let text;
+  let args = [];
+  if (member.kind === 'property')
+    text = `${member.clazz.varName}.${member.name}`;
+
+  if (member.kind === 'event')
+    text = `${member.clazz.varName}.on('${member.name}')`;
+
+  if (member.kind === 'method') {
+    args = member.argsArray;
+    const signature = renderJSSignature(args);
+    text = `${member.clazz.varName}.${member.name}(${signature})`;
+  }
+  return { text, args };
+}, p => p.name);
+
+new Generator(path.join(__dirname, '..', 'python', 'docs'), member => {
+  let text;
+  const args = [];
+  if (member.kind === 'property')
+    text = `${toSnakeCase(member.clazz.varName)}.${toSnakeCase(member.name)}`;
+
+  if (member.kind === 'event')
+    text = `${toSnakeCase(member.clazz.varName)}.on("${toSnakeCase(member.name)}")`;
+
+  if (member.kind === 'method') {
+    for (const arg of member.argsArray)
+      args.push(...expandPythonArgument(member.name, arg));
+    text = `${toSnakeCase(member.clazz.varName)}.${toSnakeCase(member.name)}(${renderPythonSignature(args)})`;
+  }
+  return { text, args };
+}, p => toSnakeCase(p.name));
+
+/**
+ * @param {string} name
+ */
+function toSnakeCase(name) {
+  const toSnakeCaseRegex = /((?<=[a-z0-9])[A-Z]|(?!^)[A-Z](?=[a-z]))/g;
+  return name.replace(toSnakeCaseRegex, `_$1`).toLowerCase();
+}
+
+/**
+ * @param {Documentation.Member[]} args
+ * @return {string}
+ */
+function renderJSSignature(args) {
+  const tokens = [];
+  let hasOptional = false;
+  for (const arg of args) {
+    const name = arg.name;
+    const optional = !arg.required;
+    if (tokens.length) {
+      if (optional && !hasOptional)
+        tokens.push(`[, ${name}`);
+      else
+        tokens.push(`, ${name}`);
+    } else {
+      if (optional && !hasOptional)
+        tokens.push(`[${name}`);
+      else
+        tokens.push(`${name}`);
+    }
+    hasOptional = hasOptional || optional;
+  }
+  if (hasOptional)
+    tokens.push(']');
+  return tokens.join('');
+}
+
+/**
+ * @param {Documentation.Member[]} args
+ * @return {string}
+ */
+function renderPythonSignature(args) {
+  const argNames = args.filter(a => a.required).map(a => toSnakeCase(a.name));
+  if (args.find(a => !a.required))
+    argNames.push('**options');
+  return argNames.join(', ');
+}
+
+/**
+ * @param {string} methodName
+ * @param {Documentation.Member} arg
+ * @return {Documentation.Member[]}
+ */
+function expandPythonArgument(methodName, arg) {
+  let expandType;
+  const argName = arg.name;
+  if (argName == 'options')
+    expandType = arg.type;
+  if (argName == 'optionsOrPredicate')
+    expandType = arg.type.union[1];
+  if (argName == 'params' && arg.type.properties)
+    expandType = arg.type;
+  if (methodName == 'emulateMedia' && argName == 'params')
+    expandType = arg.type;
+  if (methodName == 'fulfill' && argName == 'response')
+    expandType = arg.type;
+  if (methodName == 'continue' && argName == 'overrides')
+    expandType = arg.type;
+  if (methodName == 'setViewportSize' && argName == 'viewportSize')
+    expandType = arg.type;
+  if (argName == 'geolocation')
+    expandType = arg.type.union[1];
+  if (argName == 'frameSelector')
+    expandType = arg.type.union[1]; 
+  return expandType ? expandType.properties : [arg];
+}
