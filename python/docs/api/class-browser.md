@@ -116,10 +116,10 @@ Indicates that the browser is connected.
       - `value` <[string]>
 - `timezone_id` <[string]> Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.
 - `user_agent` <[string]> Specific user agent to use in this context.
-- `video_size` <[Object]> **NOTE** Use `recordVideo` instead, it takes precedence over `videoSize`. Specifies dimensions of the automatically recorded video. Can only be used if `videosPath` is set. If not specified the size will be equal to `viewport`. If `viewport` is not configured explicitly the video size defaults to 1280x720. Actual picture of the page will be scaled down if necessary to fit specified size.
+- `video_size` <[Object]> **DEPRECATED** Use `recordVideo` instead.
   - `width` <[number]> Video frame width.
   - `height` <[number]> Video frame height.
-- `videos_path` <[string]> **NOTE** Use `recordVideo` instead, it takes precedence over `videosPath`. Enables video recording for all pages to `videosPath` directory. If not specified, videos are not recorded. Make sure to await [browser_context.close()](./api/class-browsercontext.md#browsercontextclose) for videos to be saved.
+- `videos_path` <[string]> **DEPRECATED** Use `recordVideo` instead.
 - `viewport` <[null]|[Object]> Sets a consistent viewport for each page. Defaults to an 1280x720 viewport. `null` disables the default viewport.
   - `width` <[number]> page width in pixels.
   - `height` <[number]> page height in pixels.
@@ -190,10 +190,10 @@ Creates a new browser context. It won't share cookies/cache with other browser c
       - `value` <[string]>
 - `timezone_id` <[string]> Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.
 - `user_agent` <[string]> Specific user agent to use in this context.
-- `video_size` <[Object]> **NOTE** Use `recordVideo` instead, it takes precedence over `videoSize`. Specifies dimensions of the automatically recorded video. Can only be used if `videosPath` is set. If not specified the size will be equal to `viewport`. If `viewport` is not configured explicitly the video size defaults to 1280x720. Actual picture of the page will be scaled down if necessary to fit specified size.
+- `video_size` <[Object]> **DEPRECATED** Use `recordVideo` instead.
   - `width` <[number]> Video frame width.
   - `height` <[number]> Video frame height.
-- `videos_path` <[string]> **NOTE** Use `recordVideo` instead, it takes precedence over `videosPath`. Enables video recording for all pages to `videosPath` directory. If not specified, videos are not recorded. Make sure to await [browser_context.close()](./api/class-browsercontext.md#browsercontextclose) for videos to be saved.
+- `videos_path` <[string]> **DEPRECATED** Use `recordVideo` instead.
 - `viewport` <[null]|[Object]> Sets a consistent viewport for each page. Defaults to an 1280x720 viewport. `null` disables the default viewport.
   - `width` <[number]> page width in pixels.
   - `height` <[number]> page height in pixels.
@@ -208,38 +208,38 @@ This is a convenience API that should only be used for the single-page scenarios
 
 Returns the browser version.
 
-[Playwright]: ./api/class-playwright.md "Playwright"
+[Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"
-[Page]: ./api/class-page.md "Page"
-[Frame]: ./api/class-frame.md "Frame"
-[ElementHandle]: ./api/class-elementhandle.md "ElementHandle"
-[JSHandle]: ./api/class-jshandle.md "JSHandle"
-[ConsoleMessage]: ./api/class-consolemessage.md "ConsoleMessage"
-[Dialog]: ./api/class-dialog.md "Dialog"
-[Download]: ./api/class-download.md "Download"
-[Video]: ./api/class-video.md "Video"
-[FileChooser]: ./api/class-filechooser.md "FileChooser"
-[Keyboard]: ./api/class-keyboard.md "Keyboard"
-[Mouse]: ./api/class-mouse.md "Mouse"
-[Touchscreen]: ./api/class-touchscreen.md "Touchscreen"
-[Request]: ./api/class-request.md "Request"
-[Response]: ./api/class-response.md "Response"
-[Selectors]: ./api/class-selectors.md "Selectors"
-[Route]: ./api/class-route.md "Route"
-[WebSocket]: ./api/class-websocket.md "WebSocket"
-[TimeoutError]: ./api/class-timeouterror.md "TimeoutError"
-[Accessibility]: ./api/class-accessibility.md "Accessibility"
-[Worker]: ./api/class-worker.md "Worker"
 [BrowserServer]: ./api/class-browserserver.md "BrowserServer"
 [BrowserType]: ./api/class-browsertype.md "BrowserType"
-[Logger]: ./api/class-logger.md "Logger"
+[CDPSession]: ./api/class-cdpsession.md "CDPSession"
 [ChromiumBrowser]: ./api/class-chromiumbrowser.md "ChromiumBrowser"
 [ChromiumBrowserContext]: ./api/class-chromiumbrowsercontext.md "ChromiumBrowserContext"
 [ChromiumCoverage]: ./api/class-chromiumcoverage.md "ChromiumCoverage"
-[CDPSession]: ./api/class-cdpsession.md "CDPSession"
+[ConsoleMessage]: ./api/class-consolemessage.md "ConsoleMessage"
+[Dialog]: ./api/class-dialog.md "Dialog"
+[Download]: ./api/class-download.md "Download"
+[ElementHandle]: ./api/class-elementhandle.md "ElementHandle"
+[FileChooser]: ./api/class-filechooser.md "FileChooser"
 [FirefoxBrowser]: ./api/class-firefoxbrowser.md "FirefoxBrowser"
+[Frame]: ./api/class-frame.md "Frame"
+[JSHandle]: ./api/class-jshandle.md "JSHandle"
+[Keyboard]: ./api/class-keyboard.md "Keyboard"
+[Logger]: ./api/class-logger.md "Logger"
+[Mouse]: ./api/class-mouse.md "Mouse"
+[Page]: ./api/class-page.md "Page"
+[Playwright]: ./api/class-playwright.md "Playwright"
+[Request]: ./api/class-request.md "Request"
+[Response]: ./api/class-response.md "Response"
+[Route]: ./api/class-route.md "Route"
+[Selectors]: ./api/class-selectors.md "Selectors"
+[TimeoutError]: ./api/class-timeouterror.md "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.md "Touchscreen"
+[Video]: ./api/class-video.md "Video"
 [WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
+[WebSocket]: ./api/class-websocket.md "WebSocket"
+[Worker]: ./api/class-worker.md "Worker"
 [Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
 [ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
