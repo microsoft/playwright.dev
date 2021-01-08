@@ -27,6 +27,7 @@ By default, the `playwright` NPM package automatically downloads browser executa
 - [playwright.firefox](./api/class-playwright.md#playwrightfirefox)
 - [playwright.selectors](./api/class-playwright.md#playwrightselectors)
 - [playwright.webkit](./api/class-playwright.md#playwrightwebkit)
+- [playwright.stop()](./api/class-playwright.md#playwrightstop)
 
 ## playwright.chromium
 - type: <[BrowserType]>
@@ -88,6 +89,26 @@ Selectors can be used to install custom selector engines. See [Working with sele
 - type: <[BrowserType]>
 
 This object can be used to launch or connect to WebKit, returning instances of [WebKitBrowser].
+
+## playwright.stop()
+- returns: <[Promise]>
+
+Terminates this instance of Playwright in case it was created bypassing the Python context manager. This is useful in REPL applications.
+
+```py
+>>> from playwright import sync_playwright
+
+>>> playwright = sync_playwright().start()
+
+>>> browser = playwright.chromium.launch()
+>>> page = browser.newPage()
+>>> page.goto("http://whatsmyuseragent.org/")
+>>> page.screenshot(path="example.png")
+>>> browser.close()
+
+>>> playwright.stop()
+```
+
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
