@@ -114,7 +114,7 @@ This approach will also **work in CI environments**, since it does not rely on a
 - [browser_context.cookies(**options)](./api/class-browsercontext.md#browsercontextcookiesoptions)
 - [browser_context.add_cookies(cookies)](./api/class-browsercontext.md#browsercontextaddcookiescookies)
 - [page.evaluate(page_function, **options)](./api/class-page.md#pageevaluatepagefunction-options)
-- [browser_context.add_init_script(script, **options)](./api/class-browsercontext.md#browsercontextaddinitscriptscript-options)
+- [browser_context.add_init_script(**options)](./api/class-browsercontext.md#browsercontextaddinitscriptoptions)
 
 ## Multi-factor authentication
 
@@ -146,12 +146,9 @@ const context = await chromium.launchPersistentContext(userDataDir, { headless: 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"
-[BrowserServer]: ./api/class-browserserver.md "BrowserServer"
 [BrowserType]: ./api/class-browsertype.md "BrowserType"
 [CDPSession]: ./api/class-cdpsession.md "CDPSession"
-[ChromiumBrowser]: ./api/class-chromiumbrowser.md "ChromiumBrowser"
 [ChromiumBrowserContext]: ./api/class-chromiumbrowsercontext.md "ChromiumBrowserContext"
-[ChromiumCoverage]: ./api/class-chromiumcoverage.md "ChromiumCoverage"
 [ConsoleMessage]: ./api/class-consolemessage.md "ConsoleMessage"
 [Dialog]: ./api/class-dialog.md "Dialog"
 [Download]: ./api/class-download.md "Download"
@@ -161,7 +158,6 @@ const context = await chromium.launchPersistentContext(userDataDir, { headless: 
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
-[Logger]: ./api/class-logger.md "Logger"
 [Mouse]: ./api/class-mouse.md "Mouse"
 [Page]: ./api/class-page.md "Page"
 [Playwright]: ./api/class-playwright.md "Playwright"

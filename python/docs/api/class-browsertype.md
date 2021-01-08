@@ -19,21 +19,10 @@ const { chromium } = require('playwright');  // Or 'firefox' or 'webkit'.
 ```
 
 
-- [browser_type.connect(ws_endpoint, **options)](./api/class-browsertype.md#browsertypeconnectwsendpoint-options)
 - [browser_type.executable_path()](./api/class-browsertype.md#browsertypeexecutablepath)
 - [browser_type.launch(**options)](./api/class-browsertype.md#browsertypelaunchoptions)
 - [browser_type.launch_persistent_context(user_data_dir, **options)](./api/class-browsertype.md#browsertypelaunchpersistentcontextuserdatadir-options)
-- [browser_type.launch_server(**options)](./api/class-browsertype.md#browsertypelaunchserveroptions)
 - [browser_type.name()](./api/class-browsertype.md#browsertypename)
-
-## browser_type.connect(ws_endpoint, **options)
-- `ws_endpoint` <[string]> A browser websocket endpoint to connect to. **required**
-- `slow_mo` <[number]> Slows down Playwright operations by the specified amount of milliseconds. Useful so that you can see what is going on. Defaults to 0.
-- `logger` <[Logger]> Logger sink for Playwright logging. Optional.
-- `timeout` <[number]> Maximum time in milliseconds to wait for the connection to be established. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
-- returns: <[Promise]<[Browser]>>
-
-This methods attaches Playwright to an existing browser instance.
 
 ## browser_type.executable_path()
 - returns: <[string]>
@@ -144,46 +133,6 @@ Returns the persistent browser context instance.
 
 Launches browser that uses persistent storage located at `userDataDir` and returns the only context. Closing this context will automatically close the browser.
 
-## browser_type.launch_server(**options)
-- `args` <[Array]<[string]>> Additional arguments to pass to the browser instance. The list of Chromium flags can be found [here](http://peter.sh/experiments/chromium-command-line-switches/).
-- `chromium_sandbox` <[boolean]> Enable Chromium sandboxing. Defaults to `true`.
-- `devtools` <[boolean]> **Chromium-only** Whether to auto-open a Developer Tools panel for each tab. If this option is `true`, the `headless` option will be set `false`.
-- `downloads_path` <[string]> If specified, accepted downloads are downloaded into this directory. Otherwise, temporary directory is created and is deleted when browser is closed.
-- `env` <[Object]<[string], [string]|[number]|[boolean]>> Specify environment variables that will be visible to the browser. Defaults to `process.env`.
-- `executable_path` <[string]> Path to a browser executable to run instead of the bundled one. If `executablePath` is a relative path, then it is resolved relative to the current working directory. **BEWARE**: Playwright is only guaranteed to work with the bundled Chromium, Firefox or WebKit, use at your own risk.
-- `firefox_user_prefs` <[Object]<[string], [string]|[number]|[boolean]>> Firefox user preferences. Learn more about the Firefox user preferences at [`about:config`](https://support.mozilla.org/en-US/kb/about-config-editor-firefox).
-- `handle_sighup` <[boolean]> Close the browser process on SIGHUP. Defaults to `true`.
-- `handle_sigint` <[boolean]> Close the browser process on Ctrl-C. Defaults to `true`.
-- `handle_sigterm` <[boolean]> Close the browser process on SIGTERM. Defaults to `true`.
-- `headless` <[boolean]> Whether to run browser in headless mode. More details for [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) and [Firefox](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode). Defaults to `true` unless the `devtools` option is `true`.
-- `ignore_default_args` <[boolean]|[Array]<[string]>> If `true`, then do not use any of the default arguments. If an array is given, then filter out the given default arguments. Dangerous option; use with care. Defaults to `false`.
-- `logger` <[Logger]> Logger sink for Playwright logging.
-- `port` <[number]> Port to use for the web socket. Defaults to 0 that picks any available port.
-- `proxy` <[Object]> Network proxy settings.
-  - `server` <[string]> Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
-  - `bypass` <[string]> Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
-  - `username` <[string]> Optional username to use if HTTP proxy requires authentication.
-  - `password` <[string]> Optional password to use if HTTP proxy requires authentication.
-- `timeout` <[number]> Maximum time in milliseconds to wait for the browser instance to start. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
-- returns: <[Promise]<[BrowserServer]>>
-
-Returns the browser app instance.
-
-Launches browser server that client can connect to. An example of launching a browser executable and connecting to it later:
-
-```js
-const { chromium } = require('playwright');  // Or 'webkit' or 'firefox'.
-
-(async () => {
-  const browserServer = await chromium.launchServer();
-  const wsEndpoint = browserServer.wsEndpoint();
-  // Use web socket endpoint later to establish a connection.
-  const browser = await chromium.connect({ wsEndpoint });
-  // Close browser instance.
-  await browserServer.close();
-})();
-```
-
 ## browser_type.name()
 - returns: <[string]>
 
@@ -192,12 +141,9 @@ Returns browser name. For example: `'chromium'`, `'webkit'` or `'firefox'`.
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"
-[BrowserServer]: ./api/class-browserserver.md "BrowserServer"
 [BrowserType]: ./api/class-browsertype.md "BrowserType"
 [CDPSession]: ./api/class-cdpsession.md "CDPSession"
-[ChromiumBrowser]: ./api/class-chromiumbrowser.md "ChromiumBrowser"
 [ChromiumBrowserContext]: ./api/class-chromiumbrowsercontext.md "ChromiumBrowserContext"
-[ChromiumCoverage]: ./api/class-chromiumcoverage.md "ChromiumCoverage"
 [ConsoleMessage]: ./api/class-consolemessage.md "ConsoleMessage"
 [Dialog]: ./api/class-dialog.md "Dialog"
 [Download]: ./api/class-download.md "Download"
@@ -207,7 +153,6 @@ Returns browser name. For example: `'chromium'`, `'webkit'` or `'firefox'`.
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
-[Logger]: ./api/class-logger.md "Logger"
 [Mouse]: ./api/class-mouse.md "Mouse"
 [Page]: ./api/class-page.md "Page"
 [Playwright]: ./api/class-playwright.md "Playwright"

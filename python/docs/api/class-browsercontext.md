@@ -25,7 +25,7 @@ await context.close();
 - [browser_context.on("close")](./api/class-browsercontext.md#browsercontextonclose)
 - [browser_context.on("page")](./api/class-browsercontext.md#browsercontextonpage)
 - [browser_context.add_cookies(cookies)](./api/class-browsercontext.md#browsercontextaddcookiescookies)
-- [browser_context.add_init_script(script, **options)](./api/class-browsercontext.md#browsercontextaddinitscriptscript-options)
+- [browser_context.add_init_script(**options)](./api/class-browsercontext.md#browsercontextaddinitscriptoptions)
 - [browser_context.browser()](./api/class-browsercontext.md#browsercontextbrowser)
 - [browser_context.clear_cookies()](./api/class-browsercontext.md#browsercontextclearcookies)
 - [browser_context.clear_permissions()](./api/class-browsercontext.md#browsercontextclearpermissions)
@@ -90,11 +90,9 @@ Adds cookies into this browser context. All pages within this context will have 
 await browserContext.addCookies([cookieObject1, cookieObject2]);
 ```
 
-## browser_context.add_init_script(script, **options)
-- `script` <[function]|[string]|[Object]> Script to be evaluated in all pages in the browser context.
-  - `path` <[string]> Path to the JavaScript file. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
-  - `content` <[string]> Raw script content. Optional.
-- `arg` <[Serializable]> Optional argument to pass to `script` (only supported when passing a function).
+## browser_context.add_init_script(**options)
+- `path` <[string]> Path to the JavaScript file. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
+- `script` <[string]> Script to be evaluated in all pages in the browser context. Optional.
 - returns: <[Promise]>
 
 Adds a script which would be evaluated in one of the following scenarios:
@@ -117,7 +115,7 @@ await browserContext.addInitScript({
 });
 ```
 
-> **NOTE** The order of evaluation of multiple scripts installed via [browser_context.add_init_script(script, **options)](./api/class-browsercontext.md#browsercontextaddinitscriptscript-options) and [page.add_init_script(script, **options)](./api/class-page.md#pageaddinitscriptscript-options) is not defined.
+> **NOTE** The order of evaluation of multiple scripts installed via [browser_context.add_init_script(**options)](./api/class-browsercontext.md#browsercontextaddinitscriptoptions) and [page.add_init_script(**options)](./api/class-page.md#pageaddinitscriptoptions) is not defined.
 
 ## browser_context.browser()
 - returns: <[null]|[Browser]>
@@ -409,12 +407,9 @@ await context.grantPermissions(['geolocation']);
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"
-[BrowserServer]: ./api/class-browserserver.md "BrowserServer"
 [BrowserType]: ./api/class-browsertype.md "BrowserType"
 [CDPSession]: ./api/class-cdpsession.md "CDPSession"
-[ChromiumBrowser]: ./api/class-chromiumbrowser.md "ChromiumBrowser"
 [ChromiumBrowserContext]: ./api/class-chromiumbrowsercontext.md "ChromiumBrowserContext"
-[ChromiumCoverage]: ./api/class-chromiumcoverage.md "ChromiumCoverage"
 [ConsoleMessage]: ./api/class-consolemessage.md "ConsoleMessage"
 [Dialog]: ./api/class-dialog.md "Dialog"
 [Download]: ./api/class-download.md "Download"
@@ -424,7 +419,6 @@ await context.grantPermissions(['geolocation']);
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
-[Logger]: ./api/class-logger.md "Logger"
 [Mouse]: ./api/class-mouse.md "Mouse"
 [Page]: ./api/class-page.md "Page"
 [Playwright]: ./api/class-playwright.md "Playwright"

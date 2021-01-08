@@ -23,7 +23,6 @@ By default, the `playwright` NPM package automatically downloads browser executa
 
 - [playwright.chromium](./api/class-playwright.md#playwrightchromium)
 - [playwright.devices](./api/class-playwright.md#playwrightdevices)
-- [playwright.errors](./api/class-playwright.md#playwrighterrors)
 - [playwright.firefox](./api/class-playwright.md#playwrightfirefox)
 - [playwright.selectors](./api/class-playwright.md#playwrightselectors)
 - [playwright.webkit](./api/class-playwright.md#playwrightwebkit)
@@ -53,26 +52,6 @@ const iPhone = devices['iPhone 6'];
   // other actions...
   await browser.close();
 })();
-```
-
-## playwright.errors
-- type: <[Object]>
-  - `timeout_error` <[function]> A class of [TimeoutError].
-
-Playwright methods might throw errors if they are unable to fulfill a request. For example, [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewaitforselectorselector-options) might fail if the selector doesn't match any nodes during the given timeframe.
-
-For certain types of errors Playwright uses specific error classes. These classes are available via [`playwright.errors`](#playwrighterrors).
-
-An example of handling a timeout error:
-
-```js
-try {
-  await page.waitForSelector('.foo');
-} catch (e) {
-  if (e instanceof playwright.errors.TimeoutError) {
-    // Do something if this is a timeout.
-  }
-}
 ```
 
 ## playwright.firefox
@@ -113,12 +92,9 @@ Terminates this instance of Playwright in case it was created bypassing the Pyth
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"
-[BrowserServer]: ./api/class-browserserver.md "BrowserServer"
 [BrowserType]: ./api/class-browsertype.md "BrowserType"
 [CDPSession]: ./api/class-cdpsession.md "CDPSession"
-[ChromiumBrowser]: ./api/class-chromiumbrowser.md "ChromiumBrowser"
 [ChromiumBrowserContext]: ./api/class-chromiumbrowsercontext.md "ChromiumBrowserContext"
-[ChromiumCoverage]: ./api/class-chromiumcoverage.md "ChromiumCoverage"
 [ConsoleMessage]: ./api/class-consolemessage.md "ConsoleMessage"
 [Dialog]: ./api/class-dialog.md "Dialog"
 [Download]: ./api/class-download.md "Download"
@@ -128,7 +104,6 @@ Terminates this instance of Playwright in case it was created bypassing the Pyth
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
-[Logger]: ./api/class-logger.md "Logger"
 [Mouse]: ./api/class-mouse.md "Mouse"
 [Page]: ./api/class-page.md "Page"
 [Playwright]: ./api/class-playwright.md "Playwright"

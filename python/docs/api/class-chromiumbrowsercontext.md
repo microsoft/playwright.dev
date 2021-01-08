@@ -20,7 +20,7 @@ const backgroundPage = await context.waitForEvent('backgroundpage');
 - [browser_context.on("close")](./api/class-browsercontext.md#browsercontextonclose)
 - [browser_context.on("page")](./api/class-browsercontext.md#browsercontextonpage)
 - [browser_context.add_cookies(cookies)](./api/class-browsercontext.md#browsercontextaddcookiescookies)
-- [browser_context.add_init_script(script, **options)](./api/class-browsercontext.md#browsercontextaddinitscriptscript-options)
+- [browser_context.add_init_script(**options)](./api/class-browsercontext.md#browsercontextaddinitscriptoptions)
 - [browser_context.browser()](./api/class-browsercontext.md#browsercontextbrowser)
 - [browser_context.clear_cookies()](./api/class-browsercontext.md#browsercontextclearcookies)
 - [browser_context.clear_permissions()](./api/class-browsercontext.md#browsercontextclearpermissions)
@@ -73,12 +73,9 @@ All existing service workers in the context.
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"
-[BrowserServer]: ./api/class-browserserver.md "BrowserServer"
 [BrowserType]: ./api/class-browsertype.md "BrowserType"
 [CDPSession]: ./api/class-cdpsession.md "CDPSession"
-[ChromiumBrowser]: ./api/class-chromiumbrowser.md "ChromiumBrowser"
 [ChromiumBrowserContext]: ./api/class-chromiumbrowsercontext.md "ChromiumBrowserContext"
-[ChromiumCoverage]: ./api/class-chromiumcoverage.md "ChromiumCoverage"
 [ConsoleMessage]: ./api/class-consolemessage.md "ConsoleMessage"
 [Dialog]: ./api/class-dialog.md "Dialog"
 [Download]: ./api/class-download.md "Download"
@@ -88,7 +85,6 @@ All existing service workers in the context.
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
-[Logger]: ./api/class-logger.md "Logger"
 [Mouse]: ./api/class-mouse.md "Mouse"
 [Page]: ./api/class-page.md "Page"
 [Playwright]: ./api/class-playwright.md "Playwright"

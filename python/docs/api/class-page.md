@@ -66,7 +66,7 @@ page.removeListener('request', logRequest);
 - [page.$eval(selector, page_function, **options)](./api/class-page.md#pageevalselector-pagefunction-options)
 - [page.$$eval(selector, page_function, **options)](./api/class-page.md#pageevalselector-pagefunction-options-1)
 - [page.accessibility](./api/class-page.md#pageaccessibility)
-- [page.add_init_script(script, **options)](./api/class-page.md#pageaddinitscriptscript-options)
+- [page.add_init_script(**options)](./api/class-page.md#pageaddinitscriptoptions)
 - [page.add_script_tag(**options)](./api/class-page.md#pageaddscripttagoptions)
 - [page.add_style_tag(**options)](./api/class-page.md#pageaddstyletagoptions)
 - [page.bring_to_front()](./api/class-page.md#pagebringtofront)
@@ -75,7 +75,6 @@ page.removeListener('request', logRequest);
 - [page.close(**options)](./api/class-page.md#pagecloseoptions)
 - [page.content()](./api/class-page.md#pagecontent)
 - [page.context()](./api/class-page.md#pagecontext)
-- [page.coverage](./api/class-page.md#pagecoverage)
 - [page.dblclick(selector, **options)](./api/class-page.md#pagedblclickselector-options)
 - [page.dispatch_event(selector, type, **options)](./api/class-page.md#pagedispatcheventselector-type-options)
 - [page.emulate_media(**options)](./api/class-page.md#pageemulatemediaoptions)
@@ -104,7 +103,7 @@ page.removeListener('request', logRequest);
 - [page.reload(**options)](./api/class-page.md#pagereloadoptions)
 - [page.route(url, handler)](./api/class-page.md#pagerouteurl-handler)
 - [page.screenshot(**options)](./api/class-page.md#pagescreenshotoptions)
-- [page.select_option(selector, values, **options)](./api/class-page.md#pageselectoptionselector-values-options)
+- [page.select_option(selector, **options)](./api/class-page.md#pageselectoptionselector-options)
 - [page.set_content(html, **options)](./api/class-page.md#pagesetcontenthtml-options)
 - [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout)
 - [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout)
@@ -336,11 +335,9 @@ const divsCounts = await page.$$eval('div', (divs, min) => divs.length >= min, 1
 ## page.accessibility
 - type: <[Accessibility]>
 
-## page.add_init_script(script, **options)
-- `script` <[function]|[string]|[Object]> Script to be evaluated in the page.
-  - `path` <[string]> Path to the JavaScript file. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
-  - `content` <[string]> Raw script content. Optional.
-- `arg` <[Serializable]> Optional argument to pass to `script` (only supported when passing a function).
+## page.add_init_script(**options)
+- `path` <[string]> Path to the JavaScript file. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
+- `script` <[string]> Script to be evaluated in all pages in the browser context. Optional.
 - returns: <[Promise]>
 
 Adds a script which would be evaluated in one of the following scenarios:
@@ -360,7 +357,7 @@ const preloadFile = fs.readFileSync('./preload.js', 'utf8');
 await page.addInitScript(preloadFile);
 ```
 
-> **NOTE** The order of evaluation of multiple scripts installed via [browser_context.add_init_script(script, **options)](./api/class-browsercontext.md#browsercontextaddinitscriptscript-options) and [page.add_init_script(script, **options)](./api/class-page.md#pageaddinitscriptscript-options) is not defined.
+> **NOTE** The order of evaluation of multiple scripts installed via [browser_context.add_init_script(**options)](./api/class-browsercontext.md#browsercontextaddinitscriptoptions) and [page.add_init_script(**options)](./api/class-page.md#pageaddinitscriptoptions) is not defined.
 
 ## page.add_script_tag(**options)
 - `url` <[string]> URL of a script to be added. Optional.
@@ -453,11 +450,6 @@ Gets the full HTML contents of the page, including the doctype.
 - returns: <[BrowserContext]>
 
 Get the browser context that the page belongs to.
-
-## page.coverage
-- type: <[null]|[ChromiumCoverage]>
-
-Browser-specific Coverage implementation, only available for Chromium atm. See [ChromiumCoverage](#class-chromiumcoverage) for more details.
 
 ## page.dblclick(selector, **options)
 - `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -1052,14 +1044,14 @@ Returns the buffer with the captured screenshot.
 
 > **NOTE** Screenshots take at least 1/6 second on Chromium OS X and Chromium Windows. See https://crbug.com/741689 for discussion.
 
-## page.select_option(selector, values, **options)
+## page.select_option(selector, **options)
 - `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `values` <[null]|[string]|[ElementHandle]|[Array]<[string]>|[Object]|[Array]<[ElementHandle]>|[Array]<[Object]>> Options to select. If the `<select>` has the `multiple` attribute, all matching options are selected, otherwise only the first option matching one of the passed options is selected. String values are equivalent to `{value:'string'}`. Option is considered matching if all specified properties match.
-  - `value` <[string]> Matches by `option.value`. Optional.
-  - `label` <[string]> Matches by `option.label`. Optional.
-  - `index` <[number]> Matches by the index. Optional.
 - `no_wait_after` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
 - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `element` <[ElementHandle]|[Array]<[ElementHandle]>> Option elements to select. Optional.
+- `index` <[number]|[Array]<[number]>> Options to select by index. Optional.
+- `value` <[string]|[Array]<[string]>> Options to select by value. If the `<select>` has the `multiple` attribute, all given options are selected, otherwise only the first option matching one of the passed options is selected. Optional.
+- `label` <[string]|[Array]<[string]>> Options to select by label. If the `<select>` has the `multiple` attribute, all given options are selected, otherwise only the first option matching one of the passed options is selected. Optional.
 - returns: <[Promise]<[Array]<[string]>>>
 
 Returns the array of option values that have been successfully selected.
@@ -1078,7 +1070,7 @@ page.selectOption('select#colors', ['red', 'green', 'blue']);
 
 ```
 
-Shortcut for main frame's [frame.select_option(selector, values, **options)](./api/class-frame.md#frameselectoptionselector-values-options)
+Shortcut for main frame's [frame.select_option(selector, **options)](./api/class-frame.md#frameselectoptionselector-options)
 
 ## page.set_content(html, **options)
 - `html` <[string]> HTML markup to assign to the page.
@@ -1432,12 +1424,9 @@ This method returns all of the dedicated [WebWorkers](https://developer.mozilla.
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"
-[BrowserServer]: ./api/class-browserserver.md "BrowserServer"
 [BrowserType]: ./api/class-browsertype.md "BrowserType"
 [CDPSession]: ./api/class-cdpsession.md "CDPSession"
-[ChromiumBrowser]: ./api/class-chromiumbrowser.md "ChromiumBrowser"
 [ChromiumBrowserContext]: ./api/class-chromiumbrowsercontext.md "ChromiumBrowserContext"
-[ChromiumCoverage]: ./api/class-chromiumcoverage.md "ChromiumCoverage"
 [ConsoleMessage]: ./api/class-consolemessage.md "ConsoleMessage"
 [Dialog]: ./api/class-dialog.md "Dialog"
 [Download]: ./api/class-download.md "Download"
@@ -1447,7 +1436,6 @@ This method returns all of the dedicated [WebWorkers](https://developer.mozilla.
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
-[Logger]: ./api/class-logger.md "Logger"
 [Mouse]: ./api/class-mouse.md "Mouse"
 [Page]: ./api/class-page.md "Page"
 [Playwright]: ./api/class-playwright.md "Playwright"

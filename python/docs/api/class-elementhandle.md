@@ -45,7 +45,7 @@ ElementHandle instances can be used as an argument in [page.$eval(selector, page
 - [element_handle.press(key, **options)](./api/class-elementhandle.md#elementhandlepresskey-options)
 - [element_handle.screenshot(**options)](./api/class-elementhandle.md#elementhandlescreenshotoptions)
 - [element_handle.scroll_into_view_if_needed(**options)](./api/class-elementhandle.md#elementhandlescrollintoviewifneededoptions)
-- [element_handle.select_option(values, **options)](./api/class-elementhandle.md#elementhandleselectoptionvalues-options)
+- [element_handle.select_option(**options)](./api/class-elementhandle.md#elementhandleselectoptionoptions)
 - [element_handle.select_text(**options)](./api/class-elementhandle.md#elementhandleselecttextoptions)
 - [element_handle.set_input_files(files, **options)](./api/class-elementhandle.md#elementhandlesetinputfilesfiles-options)
 - [element_handle.tap(**options)](./api/class-elementhandle.md#elementhandletapoptions)
@@ -334,13 +334,13 @@ This method waits for [actionability](./actionability.md) checks, then tries to 
 
 Throws when `elementHandle` does not point to an element [connected](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) to a Document or a ShadowRoot.
 
-## element_handle.select_option(values, **options)
-- `values` <[null]|[string]|[ElementHandle]|[Array]<[string]>|[Object]|[Array]<[ElementHandle]>|[Array]<[Object]>> Options to select. If the `<select>` has the `multiple` attribute, all matching options are selected, otherwise only the first option matching one of the passed options is selected. String values are equivalent to `{value:'string'}`. Option is considered matching if all specified properties match.
-  - `value` <[string]> Matches by `option.value`. Optional.
-  - `label` <[string]> Matches by `option.label`. Optional.
-  - `index` <[number]> Matches by the index. Optional.
+## element_handle.select_option(**options)
 - `no_wait_after` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
 - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `element` <[ElementHandle]|[Array]<[ElementHandle]>> Option elements to select. Optional.
+- `index` <[number]|[Array]<[number]>> Options to select by index. Optional.
+- `value` <[string]|[Array]<[string]>> Options to select by value. If the `<select>` has the `multiple` attribute, all given options are selected, otherwise only the first option matching one of the passed options is selected. Optional.
+- `label` <[string]|[Array]<[string]>> Options to select by label. If the `<select>` has the `multiple` attribute, all given options are selected, otherwise only the first option matching one of the passed options is selected. Optional.
 - returns: <[Promise]<[Array]<[string]>>>
 
 Returns the array of option values that have been successfully selected.
@@ -491,12 +491,9 @@ const span = await div.waitForSelector('span', { state: 'attached' });
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"
-[BrowserServer]: ./api/class-browserserver.md "BrowserServer"
 [BrowserType]: ./api/class-browsertype.md "BrowserType"
 [CDPSession]: ./api/class-cdpsession.md "CDPSession"
-[ChromiumBrowser]: ./api/class-chromiumbrowser.md "ChromiumBrowser"
 [ChromiumBrowserContext]: ./api/class-chromiumbrowsercontext.md "ChromiumBrowserContext"
-[ChromiumCoverage]: ./api/class-chromiumcoverage.md "ChromiumCoverage"
 [ConsoleMessage]: ./api/class-consolemessage.md "ConsoleMessage"
 [Dialog]: ./api/class-dialog.md "Dialog"
 [Download]: ./api/class-download.md "Download"
@@ -506,7 +503,6 @@ const span = await div.waitForSelector('span', { state: 'attached' });
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
-[Logger]: ./api/class-logger.md "Logger"
 [Mouse]: ./api/class-mouse.md "Mouse"
 [Page]: ./api/class-page.md "Page"
 [Playwright]: ./api/class-playwright.md "Playwright"

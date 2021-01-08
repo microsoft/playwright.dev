@@ -8,7 +8,6 @@ The Playwright API is available in multiple languages.
 - [JavaScript and TypeScript](#javascript-and-typescript)
 - [Python](#python)
 - [C#](#c)
-- [Go](#go)
 
 ## JavaScript and TypeScript
 
@@ -44,26 +43,12 @@ dotnet add package PlaywrightSharp
 * [Playwright on NuGet](https://www.nuget.org/packages/PlaywrightSharp/)
 * [GitHub repo](https://github.com/microsoft/playwright-sharp)
 
-## Go
-
-Playwright for Go is available in preview.
-
-```
-go get github.com/mxschmitt/playwright-go
-```
-
-* [GitHub repo](https://github.com/mxschmitt/playwright-go)
-* [Documentation](https://pkg.go.dev/github.com/mxschmitt/playwright-go?tab=doc)
-
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"
-[BrowserServer]: ./api/class-browserserver.md "BrowserServer"
 [BrowserType]: ./api/class-browsertype.md "BrowserType"
 [CDPSession]: ./api/class-cdpsession.md "CDPSession"
-[ChromiumBrowser]: ./api/class-chromiumbrowser.md "ChromiumBrowser"
 [ChromiumBrowserContext]: ./api/class-chromiumbrowsercontext.md "ChromiumBrowserContext"
-[ChromiumCoverage]: ./api/class-chromiumcoverage.md "ChromiumCoverage"
 [ConsoleMessage]: ./api/class-consolemessage.md "ConsoleMessage"
 [Dialog]: ./api/class-dialog.md "Dialog"
 [Download]: ./api/class-download.md "Download"
@@ -73,7 +58,6 @@ go get github.com/mxschmitt/playwright-go
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
-[Logger]: ./api/class-logger.md "Logger"
 [Mouse]: ./api/class-mouse.md "Mouse"
 [Page]: ./api/class-page.md "Page"
 [Playwright]: ./api/class-playwright.md "Playwright"
