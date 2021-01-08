@@ -16,6 +16,9 @@ title: "Community Showcase"
 * Playwright for Go
   * [GitHub repo](https://github.com/mxschmitt/playwright-go)
   * [Documentation](https://pkg.go.dev/github.com/mxschmitt/playwright-go?tab=doc)
+* Playwright for Crystal
+  * [GitHub repo](https://github.com/naqvis/playwright-cr)
+  * [Documentation](https://naqvis.github.io/playwright-cr/)
 
 ## Tools
 * [CodeceptJS](https://github.com/Codeception/CodeceptJS): Write scenario-driven Playwright tests with synchronous code
@@ -88,6 +91,7 @@ Did we miss something in this list? Send us a PR!
 [Worker]: ./api/class-worker.md "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [Evaluation Argument]: ./core-concepts.md#evaluationargument "Evaluation Argument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
 [selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
