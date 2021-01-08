@@ -62,8 +62,8 @@ class Generator {
 
     this.generatedLinksSuffix = '';
     {
-      const links = fs.readFileSync(path.join(DIR_SRC, 'links.md')).toString();
-      const langLinks = fs.readFileSync(path.join(DIR_SRC, `links-${lang}.md`)).toString();
+      const links = fs.readFileSync(path.join(__dirname, '..', 'common', 'links.md')).toString();
+      const langLinks = fs.readFileSync(path.join(__dirname, '..', 'common', `links-${lang}.md`)).toString();
       const localLinks = [];
       for (const clazz of this.documentation.classesArray)
         localLinks.push(`[${clazz.name}]: ./api/class-${clazz.name.toLowerCase()}.md "${clazz.name}"`);

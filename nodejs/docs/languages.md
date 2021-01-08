@@ -8,6 +8,7 @@ The Playwright API is available in multiple languages.
 - [JavaScript and TypeScript](#javascript-and-typescript)
 - [Python](#python)
 - [C#](#c)
+- [Java](#java)
 
 ## JavaScript and TypeScript
 
@@ -43,6 +44,11 @@ dotnet add package PlaywrightSharp
 * [Playwright on NuGet](https://www.nuget.org/packages/PlaywrightSharp/)
 * [GitHub repo](https://github.com/microsoft/playwright-sharp)
 
+## Java
+
+Playwright for Java is available in preview.
+* [GitHub repo](https://github.com/microsoft/playwright-java)
+
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"
@@ -77,6 +83,7 @@ dotnet add package PlaywrightSharp
 [Worker]: ./api/class-worker.md "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [Evaluation Argument]: ./core-concepts.md#evaluationargument "Evaluation Argument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
 [selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
