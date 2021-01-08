@@ -1,22 +1,14 @@
----
-id: class-video
-title: "Video"
----
-
-
-When browser context is created with the `videosPath` option, each page has a video object associated with it.
-
-```js
-console.log(await page.video().path());
-```
-
-
-- [video.path()](./api/class-video.md#videopath)
-
-## video.path()
-- returns: <[Promise]<[string]>>
-
-Returns the file system path this video will be recorded to. The video is guaranteed to be written to the filesystem upon closing the browser context.
+[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
+[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
+[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
+[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
+[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
+[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
+[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
+[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"

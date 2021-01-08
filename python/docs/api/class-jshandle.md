@@ -6,11 +6,6 @@ title: "JSHandle"
 
 JSHandle represents an in-page JavaScript object. JSHandles can be created with the [page.evaluate_handle(page_function, **options)](./api/class-page.md#pageevaluatehandlepagefunction-options) method.
 
-```js
-const windowHandle = await page.evaluateHandle(() => window);
-// ...
-```
-
 JSHandle prevents the referenced JavaScript object being garbage collected unless the handle is exposed with [js_handle.dispose()](./api/class-jshandle.md#jshandledispose). JSHandles are auto-disposed when their origin frame gets navigated or the parent context gets destroyed.
 
 JSHandle instances can be used as an argument in [page.$eval(selector, page_function, **options)](./api/class-page.md#pageevalselector-pagefunction-options), [page.evaluate(page_function, **options)](./api/class-page.md#pageevaluatepagefunction-options) and [page.evaluate_handle(page_function, **options)](./api/class-page.md#pageevaluatehandlepagefunction-options) methods.
@@ -25,19 +20,18 @@ JSHandle instances can be used as an argument in [page.$eval(selector, page_func
 - [js_handle.json_value()](./api/class-jshandle.md#jshandlejsonvalue)
 
 ## js_handle.as_element()
-- returns: <[null]|[ElementHandle]>
+- returns: <[NoneType]|[ElementHandle]>
 
 Returns either `null` or the object handle itself, if the object handle is an instance of [ElementHandle].
 
 ## js_handle.dispose()
-- returns: <[Promise]>
 
 The `jsHandle.dispose` method stops referencing the element handle.
 
 ## js_handle.evaluate(page_function, **options)
-- `page_function` <[function]> Function to be evaluated in browser context
+- `page_function` <[Callable]> Function to be evaluated in browser context
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
-- returns: <[Promise]<[Serializable]>>
+- returns: <[Serializable]>
 
 Returns the return value of `pageFunction`
 
@@ -47,15 +41,10 @@ If `pageFunction` returns a [Promise], then `handle.evaluate` would wait for the
 
 Examples:
 
-```js
-const tweetHandle = await page.$('.tweet .retweets');
-expect(await tweetHandle.evaluate((node, suffix) => node.innerText, ' retweets')).toBe('10 retweets');
-```
-
 ## js_handle.evaluate_handle(page_function, **options)
-- `page_function` <[function]|[string]> Function to be evaluated
+- `page_function` <[Callable]|[str]> Function to be evaluated
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
-- returns: <[Promise]<[JSHandle]>>
+- returns: <[JSHandle]>
 
 Returns the return value of `pageFunction` as in-page object (JSHandle).
 
@@ -68,26 +57,18 @@ If the function passed to the `jsHandle.evaluateHandle` returns a [Promise], the
 See [page.evaluate_handle(page_function, **options)](./api/class-page.md#pageevaluatehandlepagefunction-options) for more details.
 
 ## js_handle.get_properties()
-- returns: <[Promise]<[Map]<[string], [JSHandle]>>>
+- returns: <[Map]\[[str], [JSHandle]\]>
 
 The method returns a map with **own property names** as keys and JSHandle instances for the property values.
 
-```js
-const handle = await page.evaluateHandle(() => ({window, document}));
-const properties = await handle.getProperties();
-const windowHandle = properties.get('window');
-const documentHandle = properties.get('document');
-await handle.dispose();
-```
-
 ## js_handle.get_property(property_name)
-- `property_name` <[string]> property to get
-- returns: <[Promise]<[JSHandle]>>
+- `property_name` <[str]> property to get
+- returns: <[JSHandle]>
 
 Fetches a single property from the referenced object.
 
 ## js_handle.json_value()
-- returns: <[Promise]<[Serializable]>>
+- returns: <[Serializable]>
 
 Returns a JSON representation of the object. If the object has a `toJSON` function, it **will not be called**.
 
@@ -121,28 +102,24 @@ Returns a JSON representation of the object. If the object has a `toJSON` functi
 [WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.md "WebSocket"
 [Worker]: ./api/class-worker.md "Worker"
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
 [Evaluation Argument]: ./core-concepts.md#evaluationargument "Evaluation Argument"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[URL]: https://nodejs.org/api/url.html "URL"
-[USKeyboardLayout]: ../src/usKeyboardLayout.ts "USKeyboardLayout"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
 [selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
+[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
+[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
+[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
+[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
+[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
+[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
+[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"

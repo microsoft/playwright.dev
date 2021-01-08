@@ -13,30 +13,18 @@ Useful links:
 * Documentation on DevTools Protocol can be found here: [DevTools Protocol Viewer](https://chromedevtools.github.io/devtools-protocol/).
 * Getting Started with DevTools Protocol: https://github.com/aslushnikov/getting-started-with-cdp/blob/master/README.md
 
-```js
-const client = await page.context().newCDPSession(page);
-await client.send('Animation.enable');
-client.on('Animation.animationCreated', () => console.log('Animation created!'));
-const response = await client.send('Animation.getPlaybackRate');
-console.log('playback rate is ' + response.playbackRate);
-await client.send('Animation.setPlaybackRate', {
-  playbackRate: response.playbackRate / 2
-});
-```
-
 
 - [cdp_session.detach()](./api/class-cdpsession.md#cdpsessiondetach)
 - [cdp_session.send(method, **options)](./api/class-cdpsession.md#cdpsessionsendmethod-options)
 
 ## cdp_session.detach()
-- returns: <[Promise]>
 
 Detaches the CDPSession from the target. Once detached, the CDPSession object won't emit any events and can't be used to send messages.
 
 ## cdp_session.send(method, **options)
-- `method` <[string]> protocol method name
-- `params` <[Object]> Optional method parameters
-- returns: <[Promise]<[Object]>>
+- `method` <[str]> protocol method name
+- `params` <[Dict]> Optional method parameters
+- returns: <[Dict]>
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
@@ -66,28 +54,24 @@ Detaches the CDPSession from the target. Once detached, the CDPSession object wo
 [WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.md "WebSocket"
 [Worker]: ./api/class-worker.md "Worker"
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
 [Evaluation Argument]: ./core-concepts.md#evaluationargument "Evaluation Argument"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[URL]: https://nodejs.org/api/url.html "URL"
-[USKeyboardLayout]: ../src/usKeyboardLayout.ts "USKeyboardLayout"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
 [selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
+[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
+[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
+[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
+[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
+[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
+[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
+[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"

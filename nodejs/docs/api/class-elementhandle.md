@@ -145,7 +145,6 @@ await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
   - `force` <[boolean]> Whether to bypass the [actionability](./actionability.md) checks. Defaults to `false`.
   - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
 
 This method checks the element by performing the following steps:
 1. Ensure that element is a checkbox or a radio input. If not, this method rejects. If the element is already checked, this method returns immediately.
@@ -171,7 +170,6 @@ When all steps combined have not finished during the specified `timeout`, this m
     - `x` <[number]>
     - `y` <[number]>
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
 
 This method clicks the element by performing the following steps:
 1. Wait for [actionability](./actionability.md) checks on the element, unless `force` option is set.
@@ -199,7 +197,6 @@ Returns the content frame for element handles referencing iframe nodes, or `null
     - `x` <[number]>
     - `y` <[number]>
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
 
 This method double clicks the element by performing the following steps:
 1. Wait for [actionability](./actionability.md) checks on the element, unless `force` option is set.
@@ -216,7 +213,6 @@ When all steps combined have not finished during the specified `timeout`, this m
 ## elementHandle.dispatchEvent(type[, eventInit])
 - `type` <[string]> DOM event type: `"click"`, `"dragstart"`, etc.
 - `eventInit` <[EvaluationArgument]> Optional event-specific initialization properties.
-- returns: <[Promise]>
 
 The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the elment, `click` is dispatched. This is equivalend to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
 
@@ -248,12 +244,10 @@ await elementHandle.dispatchEvent('dragstart', { dataTransfer });
 - `options` <[Object]>
   - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
 
 This method waits for [actionability](./actionability.md) checks, focuses the element, fills it and triggers an `input` event after filling. If the element is not an `<input>`, `<textarea>` or `[contenteditable]` element, this method throws an error. Note that you can pass an empty string to clear the input field.
 
 ## elementHandle.focus()
-- returns: <[Promise]>
 
 Calls [focus](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus) on the element.
 
@@ -271,7 +265,6 @@ Returns element attribute value.
     - `x` <[number]>
     - `y` <[number]>
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
 
 This method hovers over the element by performing the following steps:
 1. Wait for [actionability](./actionability.md) checks on the element, unless `force` option is set.
@@ -304,7 +297,6 @@ Returns the frame containing the given element.
   - `delay` <[number]> Time to wait between `keydown` and `keyup` in milliseconds. Defaults to 0.
   - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
 
 Focuses the element, and then uses [keyboard.down(key)](./api/class-keyboard.md#keyboarddownkey) and [keyboard.up(key)](./api/class-keyboard.md#keyboardupkey).
 
@@ -336,7 +328,6 @@ This method waits for the [actionability](./actionability.md) checks, then scrol
 ## elementHandle.scrollIntoViewIfNeeded([options])
 - `options` <[Object]>
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
 
 This method waits for [actionability](./actionability.md) checks, then tries to scroll element into view, unless it is completely visible as defined by [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)'s ```ratio```.
 
@@ -373,7 +364,6 @@ handle.selectOption({ value: 'blue' }, { index: 2 }, 'red');
 ## elementHandle.selectText([options])
 - `options` <[Object]>
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
 
 This method waits for [actionability](./actionability.md) checks, then focuses the element and selects all its text content.
 
@@ -385,7 +375,6 @@ This method waits for [actionability](./actionability.md) checks, then focuses t
 - `options` <[Object]>
   - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
 
 This method expects `elementHandle` to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input).
 
@@ -400,7 +389,6 @@ Sets the value of the file input to these file paths or files. If some of the `f
     - `x` <[number]>
     - `y` <[number]>
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
 
 This method taps the element by performing the following steps:
 1. Wait for [actionability](./actionability.md) checks on the element, unless `force` option is set.
@@ -425,7 +413,6 @@ Returns the `node.textContent`.
   - `delay` <[number]> Time to wait between key presses in milliseconds. Defaults to 0.
   - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
 
 Focuses the element, and then sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in the text.
 
@@ -449,7 +436,6 @@ await elementHandle.press('Enter');
   - `force` <[boolean]> Whether to bypass the [actionability](./actionability.md) checks. Defaults to `false`.
   - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
 
 This method checks the element by performing the following steps:
 1. Ensure that element is a checkbox or a radio input. If not, this method rejects. If the element is already unchecked, this method returns immediately.
@@ -467,7 +453,6 @@ When all steps combined have not finished during the specified `timeout`, this m
 - `state` <"visible"|"hidden"|"stable"|"enabled"|"disabled"> A state to wait for, see below for more details.
 - `options` <[Object]>
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
 
 Returns when the element satisfies the `state`.
 
@@ -536,28 +521,28 @@ const span = await div.waitForSelector('span', { state: 'attached' });
 [WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.md "WebSocket"
 [Worker]: ./api/class-worker.md "Worker"
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
 [Evaluation Argument]: ./core-concepts.md#evaluationargument "Evaluation Argument"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[URL]: https://nodejs.org/api/url.html "URL"
-[USKeyboardLayout]: ../src/usKeyboardLayout.ts "USKeyboardLayout"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
 [selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[URL]: https://nodejs.org/api/url.html "URL"

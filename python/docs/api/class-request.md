@@ -32,18 +32,12 @@ If request gets a 'redirect' response, the request is successfully finished with
 - [request.url()](./api/class-request.md#requesturl)
 
 ## request.failure()
-- returns: <[null]|[Object]>
-  - `error_text` <[string]> Human-readable error message, e.g. `'net::ERR_FAILED'`.
+- returns: <[NoneType]|[Dict]>
+  - `error_text` <[str]> Human-readable error message, e.g. `'net::ERR_FAILED'`.
 
 The method returns `null` unless this request has failed, as reported by `requestfailed` event.
 
 Example of logging of all the failed requests:
-
-```js
-page.on('requestfailed', request => {
-  console.log(request.url() + ' ' + request.failure().errorText);
-});
-```
 
 ## request.frame()
 - returns: <[Frame]>
@@ -51,39 +45,39 @@ page.on('requestfailed', request => {
 Returns the [Frame] that initiated this request.
 
 ## request.headers()
-- returns: <[Object]<[string], [string]>>
+- returns: <[Dict]\[[str], [str]\]>
 
 An object with HTTP headers associated with the request. All header names are lower-case.
 
 ## request.is_navigation_request()
-- returns: <[boolean]>
+- returns: <[bool]>
 
 Whether this request is driving frame's navigation.
 
 ## request.method()
-- returns: <[string]>
+- returns: <[str]>
 
 Request's method (GET, POST, etc.)
 
 ## request.post_data()
-- returns: <[null]|[string]>
+- returns: <[NoneType]|[str]>
 
 Request's post body, if any.
 
 ## request.post_data_buffer()
-- returns: <[null]|[Buffer]>
+- returns: <[NoneType]|[Buffer]>
 
 Request's post body in a binary form, if any.
 
 ## request.post_data_json()
-- returns: <[null]|[Object]>
+- returns: <[NoneType]|[Any]>
 
 Returns parsed request's body for `form-urlencoded` and JSON as a fallback if any.
 
 When the response is `application/x-www-form-urlencoded` then a key/value object of the values will be returned. Otherwise it will be parsed as JSON.
 
 ## request.redirected_from()
-- returns: <[null]|[Request]>
+- returns: <[NoneType]|[Request]>
 
 Request that was redirected by the server to this one, if any.
 
@@ -91,63 +85,41 @@ When the server responds with a redirect, Playwright creates a new [Request] obj
 
 For example, if the website `http://example.com` redirects to `https://example.com`:
 
-```js
-const response = await page.goto('http://example.com');
-console.log(response.request().redirectedFrom().url()); // 'http://example.com'
-```
-
 If the website `https://google.com` has no redirects:
 
-```js
-const response = await page.goto('https://google.com');
-console.log(response.request().redirectedFrom()); // null
-```
-
 ## request.redirected_to()
-- returns: <[null]|[Request]>
+- returns: <[NoneType]|[Request]>
 
 New request issued by the browser if the server responded with redirect.
 
 This method is the opposite of [request.redirected_from()](./api/class-request.md#requestredirectedfrom):
 
-```js
-console.log(request.redirectedFrom().redirectedTo() === request); // true
-```
-
 ## request.resource_type()
-- returns: <[string]>
+- returns: <[str]>
 
 Contains the request's resource type as it was perceived by the rendering engine. ResourceType will be one of the following: `document`, `stylesheet`, `image`, `media`, `font`, `script`, `texttrack`, `xhr`, `fetch`, `eventsource`, `websocket`, `manifest`, `other`.
 
 ## request.response()
-- returns: <[Promise]<[null]|[Response]>>
+- returns: <[NoneType]|[Response]>
 
 Returns the matching [Response] object, or `null` if the response was not received due to error.
 
 ## request.timing()
-- returns: <[Object]>
-  - `start_time` <[number]> Request start time in milliseconds elapsed since January 1, 1970 00:00:00 UTC
-  - `domain_lookup_start` <[number]> Time immediately before the browser starts the domain name lookup for the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
-  - `domain_lookup_end` <[number]> Time immediately after the browser starts the domain name lookup for the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
-  - `connect_start` <[number]> Time immediately before the user agent starts establishing the connection to the server to retrieve the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
-  - `secure_connection_start` <[number]> Time immediately before the browser starts the handshake process to secure the current connection. The value is given in milliseconds relative to `startTime`, -1 if not available.
-  - `connect_end` <[number]> Time immediately before the user agent starts establishing the connection to the server to retrieve the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
-  - `request_start` <[number]> Time immediately before the browser starts requesting the resource from the server, cache, or local resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
-  - `response_start` <[number]> Time immediately after the browser starts requesting the resource from the server, cache, or local resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
-  - `response_end` <[number]> Time immediately after the browser receives the last byte of the resource or immediately before the transport connection is closed, whichever comes first. The value is given in milliseconds relative to `startTime`, -1 if not available.
+- returns: <[Dict]>
+  - `start_time` <[float]> Request start time in milliseconds elapsed since January 1, 1970 00:00:00 UTC
+  - `domain_lookup_start` <[float]> Time immediately before the browser starts the domain name lookup for the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `domain_lookup_end` <[float]> Time immediately after the browser starts the domain name lookup for the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `connect_start` <[float]> Time immediately before the user agent starts establishing the connection to the server to retrieve the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `secure_connection_start` <[float]> Time immediately before the browser starts the handshake process to secure the current connection. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `connect_end` <[float]> Time immediately before the user agent starts establishing the connection to the server to retrieve the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `request_start` <[float]> Time immediately before the browser starts requesting the resource from the server, cache, or local resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `response_start` <[float]> Time immediately after the browser starts requesting the resource from the server, cache, or local resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `response_end` <[float]> Time immediately after the browser receives the last byte of the resource or immediately before the transport connection is closed, whichever comes first. The value is given in milliseconds relative to `startTime`, -1 if not available.
 
 Returns resource timing information for given request. Most of the timing values become available upon the response, `responseEnd` becomes available when request finishes. Find more information at [Resource Timing API](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceResourceTiming).
 
-```js
-const [request] = await Promise.all([
-  page.waitForEvent('requestfinished'),
-  page.goto(httpsServer.EMPTY_PAGE)
-]);
-console.log(request.timing());
-```
-
 ## request.url()
-- returns: <[string]>
+- returns: <[str]>
 
 URL of the request.
 
@@ -179,28 +151,24 @@ URL of the request.
 [WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.md "WebSocket"
 [Worker]: ./api/class-worker.md "Worker"
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
 [Evaluation Argument]: ./core-concepts.md#evaluationargument "Evaluation Argument"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[URL]: https://nodejs.org/api/url.html "URL"
-[USKeyboardLayout]: ../src/usKeyboardLayout.ts "USKeyboardLayout"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
 [selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
+[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
+[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
+[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
+[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
+[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
+[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
+[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"

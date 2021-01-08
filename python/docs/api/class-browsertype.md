@@ -6,18 +6,6 @@ title: "BrowserType"
 
 BrowserType provides methods to launch a specific browser instance or connect to an existing one. The following is a typical example of using Playwright to drive automation:
 
-```js
-const { chromium } = require('playwright');  // Or 'firefox' or 'webkit'.
-
-(async () => {
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
-  await page.goto('https://example.com');
-  // other actions...
-  await browser.close();
-})();
-```
-
 
 - [browser_type.executable_path()](./api/class-browsertype.md#browsertypeexecutablepath)
 - [browser_type.launch(**options)](./api/class-browsertype.md#browsertypelaunchoptions)
@@ -25,42 +13,36 @@ const { chromium } = require('playwright');  // Or 'firefox' or 'webkit'.
 - [browser_type.name()](./api/class-browsertype.md#browsertypename)
 
 ## browser_type.executable_path()
-- returns: <[string]>
+- returns: <[str]>
 
 A path where Playwright expects to find a bundled browser executable.
 
 ## browser_type.launch(**options)
-- `args` <[Array]<[string]>> Additional arguments to pass to the browser instance. The list of Chromium flags can be found [here](http://peter.sh/experiments/chromium-command-line-switches/).
-- `chromium_sandbox` <[boolean]> Enable Chromium sandboxing. Defaults to `false`.
-- `devtools` <[boolean]> **Chromium-only** Whether to auto-open a Developer Tools panel for each tab. If this option is `true`, the `headless` option will be set `false`.
-- `downloads_path` <[string]> If specified, accepted downloads are downloaded into this directory. Otherwise, temporary directory is created and is deleted when browser is closed.
-- `env` <[Object]<[string], [string]|[number]|[boolean]>> Specify environment variables that will be visible to the browser. Defaults to `process.env`.
-- `executable_path` <[string]> Path to a browser executable to run instead of the bundled one. If `executablePath` is a relative path, then it is resolved relative to the current working directory. Note that Playwright only works with the bundled Chromium, Firefox or WebKit, use at your own risk.
-- `firefox_user_prefs` <[Object]<[string], [string]|[number]|[boolean]>> Firefox user preferences. Learn more about the Firefox user preferences at [`about:config`](https://support.mozilla.org/en-US/kb/about-config-editor-firefox).
-- `handle_sighup` <[boolean]> Close the browser process on SIGHUP. Defaults to `true`.
-- `handle_sigint` <[boolean]> Close the browser process on Ctrl-C. Defaults to `true`.
-- `handle_sigterm` <[boolean]> Close the browser process on SIGTERM. Defaults to `true`.
-- `headless` <[boolean]> Whether to run browser in headless mode. More details for [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) and [Firefox](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode). Defaults to `true` unless the `devtools` option is `true`.
-- `ignore_default_args` <[boolean]|[Array]<[string]>> If `true`, Playwright does not pass its own configurations args and only uses the ones from `args`. If an array is given, then filters out the given default arguments. Dangerous option; use with care. Defaults to `false`.
+- `args` <[List]\[[str]\]> Additional arguments to pass to the browser instance. The list of Chromium flags can be found [here](http://peter.sh/experiments/chromium-command-line-switches/).
+- `chromium_sandbox` <[bool]> Enable Chromium sandboxing. Defaults to `false`.
+- `devtools` <[bool]> **Chromium-only** Whether to auto-open a Developer Tools panel for each tab. If this option is `true`, the `headless` option will be set `false`.
+- `downloads_path` <[Union]\[[str], [pathlib.Path]\]> If specified, accepted downloads are downloaded into this directory. Otherwise, temporary directory is created and is deleted when browser is closed.
+- `env` <[Dict]\[[str], [str]|[float]|[bool]\]> Specify environment variables that will be visible to the browser. Defaults to `process.env`.
+- `executable_path` <[Union]\[[str], [pathlib.Path]\]> Path to a browser executable to run instead of the bundled one. If `executablePath` is a relative path, then it is resolved relative to the current working directory. Note that Playwright only works with the bundled Chromium, Firefox or WebKit, use at your own risk.
+- `firefox_user_prefs` <[Dict]\[[str], [str]|[float]|[bool]\]> Firefox user preferences. Learn more about the Firefox user preferences at [`about:config`](https://support.mozilla.org/en-US/kb/about-config-editor-firefox).
+- `handle_sighup` <[bool]> Close the browser process on SIGHUP. Defaults to `true`.
+- `handle_sigint` <[bool]> Close the browser process on Ctrl-C. Defaults to `true`.
+- `handle_sigterm` <[bool]> Close the browser process on SIGTERM. Defaults to `true`.
+- `headless` <[bool]> Whether to run browser in headless mode. More details for [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) and [Firefox](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode). Defaults to `true` unless the `devtools` option is `true`.
+- `ignore_default_args` <[bool]|[List]\[[str]\]> If `true`, Playwright does not pass its own configurations args and only uses the ones from `args`. If an array is given, then filters out the given default arguments. Dangerous option; use with care. Defaults to `false`.
 - `logger` <[Logger]> Logger sink for Playwright logging.
-- `proxy` <[Object]> Network proxy settings.
-  - `server` <[string]> Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
-  - `bypass` <[string]> Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
-  - `username` <[string]> Optional username to use if HTTP proxy requires authentication.
-  - `password` <[string]> Optional password to use if HTTP proxy requires authentication.
-- `slow_mo` <[number]> Slows down Playwright operations by the specified amount of milliseconds. Useful so that you can see what is going on.
-- `timeout` <[number]> Maximum time in milliseconds to wait for the browser instance to start. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
-- returns: <[Promise]<[Browser]>>
+- `proxy` <[Dict]> Network proxy settings.
+  - `server` <[str]> Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
+  - `bypass` <[str]> Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
+  - `username` <[str]> Optional username to use if HTTP proxy requires authentication.
+  - `password` <[str]> Optional password to use if HTTP proxy requires authentication.
+- `slow_mo` <[float]> Slows down Playwright operations by the specified amount of milliseconds. Useful so that you can see what is going on.
+- `timeout` <[float]> Maximum time in milliseconds to wait for the browser instance to start. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
+- returns: <[Browser]>
 
 Returns the browser instance.
 
 You can use `ignoreDefaultArgs` to filter out `--mute-audio` from default arguments:
-
-```js
-const browser = await chromium.launch({  // Or 'firefox' or 'webkit'.
-  ignoreDefaultArgs: ['--mute-audio']
-});
-```
 
 > **Chromium-only** Playwright can also be used to control the Chrome browser, but it works best with the version of Chromium it is bundled with. There is no guarantee it will work with any other version. Use `executablePath` option with extreme caution.
 >
@@ -71,70 +53,70 @@ const browser = await chromium.launch({  // Or 'firefox' or 'webkit'.
 > See [`this article`](https://www.howtogeek.com/202825/what%E2%80%99s-the-difference-between-chromium-and-chrome/) for a description of the differences between Chromium and Chrome. [`This article`](https://chromium.googlesource.com/chromium/src/+/lkgr/docs/chromium_browser_vs_google_chrome.md) describes some differences for Linux users.
 
 ## browser_type.launch_persistent_context(user_data_dir, **options)
-- `user_data_dir` <[string]> Path to a User Data Directory, which stores browser session data like cookies and local storage. More details for [Chromium](https://chromium.googlesource.com/chromium/src/+/master/docs/user_data_dir.md) and [Firefox](https://developer.mozilla.org/en-US/docs/Mozilla/Command_Line_Options#User_Profile).
-- `accept_downloads` <[boolean]> Whether to automatically download all the attachments. Defaults to `false` where all the downloads are canceled.
-- `args` <[Array]<[string]>> Additional arguments to pass to the browser instance. The list of Chromium flags can be found [here](http://peter.sh/experiments/chromium-command-line-switches/).
-- `bypass_csp` <[boolean]> Toggles bypassing page's Content-Security-Policy.
-- `chromium_sandbox` <[boolean]> Enable Chromium sandboxing. Defaults to `true`.
+- `user_data_dir` <[Union]\[[str], [pathlib.Path]\]> Path to a User Data Directory, which stores browser session data like cookies and local storage. More details for [Chromium](https://chromium.googlesource.com/chromium/src/+/master/docs/user_data_dir.md) and [Firefox](https://developer.mozilla.org/en-US/docs/Mozilla/Command_Line_Options#User_Profile).
+- `accept_downloads` <[bool]> Whether to automatically download all the attachments. Defaults to `false` where all the downloads are canceled.
+- `args` <[List]\[[str]\]> Additional arguments to pass to the browser instance. The list of Chromium flags can be found [here](http://peter.sh/experiments/chromium-command-line-switches/).
+- `bypass_csp` <[bool]> Toggles bypassing page's Content-Security-Policy.
+- `chromium_sandbox` <[bool]> Enable Chromium sandboxing. Defaults to `true`.
 - `color_scheme` <"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [page.emulate_media(**options)](./api/class-page.md#pageemulatemediaoptions) for more details. Defaults to '`light`'.
-- `device_scale_factor` <[number]> Specify device scale factor (can be thought of as dpr). Defaults to `1`.
-- `devtools` <[boolean]> **Chromium-only** Whether to auto-open a Developer Tools panel for each tab. If this option is `true`, the `headless` option will be set `false`.
-- `downloads_path` <[string]> If specified, accepted downloads are downloaded into this directory. Otherwise, temporary directory is created and is deleted when browser is closed.
-- `env` <[Object]<[string], [string]|[number]|[boolean]>> Specify environment variables that will be visible to the browser. Defaults to `process.env`.
-- `executable_path` <[string]> Path to a browser executable to run instead of the bundled one. If `executablePath` is a relative path, then it is resolved relative to the current working directory. **BEWARE**: Playwright is only guaranteed to work with the bundled Chromium, Firefox or WebKit, use at your own risk.
-- `extra_http_headers` <[Object]<[string], [string]>> An object containing additional HTTP headers to be sent with every request. All header values must be strings.
-- `geolocation` <[Object]>
-  - `latitude` <[number]> Latitude between -90 and 90.
-  - `longitude` <[number]> Longitude between -180 and 180.
-  - `accuracy` <[number]> Non-negative accuracy value. Defaults to `0`.
-- `handle_sighup` <[boolean]> Close the browser process on SIGHUP. Defaults to `true`.
-- `handle_sigint` <[boolean]> Close the browser process on Ctrl-C. Defaults to `true`.
-- `handle_sigterm` <[boolean]> Close the browser process on SIGTERM. Defaults to `true`.
-- `has_touch` <[boolean]> Specifies if viewport supports touch events. Defaults to false.
-- `headless` <[boolean]> Whether to run browser in headless mode. More details for [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) and [Firefox](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode). Defaults to `true` unless the `devtools` option is `true`.
-- `http_credentials` <[Object]> Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).
-  - `username` <[string]>
-  - `password` <[string]>
-- `ignore_default_args` <[boolean]|[Array]<[string]>> If `true`, then do not use any of the default arguments. If an array is given, then filter out the given default arguments. Dangerous option; use with care. Defaults to `false`.
-- `ignore_https_errors` <[boolean]> Whether to ignore HTTPS errors during navigation. Defaults to `false`.
-- `is_mobile` <[boolean]> Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.
-- `java_script_enabled` <[boolean]> Whether or not to enable JavaScript in the context. Defaults to `true`.
-- `locale` <[string]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
+- `device_scale_factor` <[float]> Specify device scale factor (can be thought of as dpr). Defaults to `1`.
+- `devtools` <[bool]> **Chromium-only** Whether to auto-open a Developer Tools panel for each tab. If this option is `true`, the `headless` option will be set `false`.
+- `downloads_path` <[Union]\[[str], [pathlib.Path]\]> If specified, accepted downloads are downloaded into this directory. Otherwise, temporary directory is created and is deleted when browser is closed.
+- `env` <[Dict]\[[str], [str]|[float]|[bool]\]> Specify environment variables that will be visible to the browser. Defaults to `process.env`.
+- `executable_path` <[Union]\[[str], [pathlib.Path]\]> Path to a browser executable to run instead of the bundled one. If `executablePath` is a relative path, then it is resolved relative to the current working directory. **BEWARE**: Playwright is only guaranteed to work with the bundled Chromium, Firefox or WebKit, use at your own risk.
+- `extra_http_headers` <[Dict]\[[str], [str]\]> An object containing additional HTTP headers to be sent with every request. All header values must be strings.
+- `geolocation` <[Dict]>
+  - `latitude` <[float]> Latitude between -90 and 90.
+  - `longitude` <[float]> Longitude between -180 and 180.
+  - `accuracy` <[float]> Non-negative accuracy value. Defaults to `0`.
+- `handle_sighup` <[bool]> Close the browser process on SIGHUP. Defaults to `true`.
+- `handle_sigint` <[bool]> Close the browser process on Ctrl-C. Defaults to `true`.
+- `handle_sigterm` <[bool]> Close the browser process on SIGTERM. Defaults to `true`.
+- `has_touch` <[bool]> Specifies if viewport supports touch events. Defaults to false.
+- `headless` <[bool]> Whether to run browser in headless mode. More details for [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) and [Firefox](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode). Defaults to `true` unless the `devtools` option is `true`.
+- `http_credentials` <[Dict]> Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).
+  - `username` <[str]>
+  - `password` <[str]>
+- `ignore_default_args` <[bool]|[List]\[[str]\]> If `true`, then do not use any of the default arguments. If an array is given, then filter out the given default arguments. Dangerous option; use with care. Defaults to `false`.
+- `ignore_https_errors` <[bool]> Whether to ignore HTTPS errors during navigation. Defaults to `false`.
+- `is_mobile` <[bool]> Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.
+- `java_script_enabled` <[bool]> Whether or not to enable JavaScript in the context. Defaults to `true`.
+- `locale` <[str]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
 - `logger` <[Logger]> Logger sink for Playwright logging.
-- `offline` <[boolean]> Whether to emulate network being offline. Defaults to `false`.
-- `permissions` <[Array]<[string]>> A list of permissions to grant to all pages in this context. See [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browsercontextgrantpermissionspermissions-options) for more details.
-- `proxy` <[Object]> Network proxy settings.
-  - `server` <[string]> Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
-  - `bypass` <[string]> Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
-  - `username` <[string]> Optional username to use if HTTP proxy requires authentication.
-  - `password` <[string]> Optional password to use if HTTP proxy requires authentication.
-- `record_har` <[Object]> Enables [HAR](http://www.softwareishard.com/blog/har-12-spec) recording for all pages into `recordHar.path` file. If not specified, the HAR is not recorded. Make sure to await [browser_context.close()](./api/class-browsercontext.md#browsercontextclose) for the HAR to be saved.
-  - `omit_content` <[boolean]> Optional setting to control whether to omit request content from the HAR. Defaults to `false`.
-  - `path` <[string]> Path on the filesystem to write the HAR file to.
-- `record_video` <[Object]> Enables video recording for all pages into `recordVideo.dir` directory. If not specified videos are not recorded. Make sure to await [browser_context.close()](./api/class-browsercontext.md#browsercontextclose) for videos to be saved.
-  - `dir` <[string]> Path to the directory to put videos into.
-  - `size` <[Object]> Optional dimensions of the recorded videos. If not specified the size will be equal to `viewport`. If `viewport` is not configured explicitly the video size defaults to 1280x720. Actual picture of each page will be scaled down if necessary to fit the specified size.
-    - `width` <[number]> Video frame width.
-    - `height` <[number]> Video frame height.
-- `slow_mo` <[number]> Slows down Playwright operations by the specified amount of milliseconds. Useful so that you can see what is going on. Defaults to 0.
-- `timeout` <[number]> Maximum time in milliseconds to wait for the browser instance to start. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
-- `timezone_id` <[string]> Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.
-- `user_agent` <[string]> Specific user agent to use in this context.
-- `video_size` <[Object]> **DEPRECATED** Use `recordVideo` instead.
-  - `width` <[number]> Video frame width.
-  - `height` <[number]> Video frame height.
-- `videos_path` <[string]> **DEPRECATED** Use `recordVideo` instead.
-- `viewport` <[null]|[Object]> Sets a consistent viewport for each page. Defaults to an 1280x720 viewport. `null` disables the default viewport.
-  - `width` <[number]> page width in pixels.
-  - `height` <[number]> page height in pixels.
-- returns: <[Promise]<[BrowserContext]>>
+- `offline` <[bool]> Whether to emulate network being offline. Defaults to `false`.
+- `permissions` <[List]\[[str]\]> A list of permissions to grant to all pages in this context. See [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browsercontextgrantpermissionspermissions-options) for more details.
+- `proxy` <[Dict]> Network proxy settings.
+  - `server` <[str]> Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
+  - `bypass` <[str]> Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
+  - `username` <[str]> Optional username to use if HTTP proxy requires authentication.
+  - `password` <[str]> Optional password to use if HTTP proxy requires authentication.
+- `record_har` <[Dict]> Enables [HAR](http://www.softwareishard.com/blog/har-12-spec) recording for all pages into `recordHar.path` file. If not specified, the HAR is not recorded. Make sure to await [browser_context.close()](./api/class-browsercontext.md#browsercontextclose) for the HAR to be saved.
+  - `omit_content` <[bool]> Optional setting to control whether to omit request content from the HAR. Defaults to `false`.
+  - `path` <[Union]\[[str], [pathlib.Path]\]> Path on the filesystem to write the HAR file to.
+- `record_video` <[Dict]> Enables video recording for all pages into `recordVideo.dir` directory. If not specified videos are not recorded. Make sure to await [browser_context.close()](./api/class-browsercontext.md#browsercontextclose) for videos to be saved.
+  - `dir` <[Union]\[[str], [pathlib.Path]\]> Path to the directory to put videos into.
+  - `size` <[Dict]> Optional dimensions of the recorded videos. If not specified the size will be equal to `viewport`. If `viewport` is not configured explicitly the video size defaults to 1280x720. Actual picture of each page will be scaled down if necessary to fit the specified size.
+    - `width` <[int]> Video frame width.
+    - `height` <[int]> Video frame height.
+- `slow_mo` <[float]> Slows down Playwright operations by the specified amount of milliseconds. Useful so that you can see what is going on. Defaults to 0.
+- `timeout` <[float]> Maximum time in milliseconds to wait for the browser instance to start. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
+- `timezone_id` <[str]> Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.
+- `user_agent` <[str]> Specific user agent to use in this context.
+- `video_size` <[Dict]> **DEPRECATED** Use `recordVideo` instead.
+  - `width` <[int]> Video frame width.
+  - `height` <[int]> Video frame height.
+- `videos_path` <[Union]\[[str], [pathlib.Path]\]> **DEPRECATED** Use `recordVideo` instead.
+- `viewport` <[NoneType]|[Dict]> Sets a consistent viewport for each page. Defaults to an 1280x720 viewport. `null` disables the default viewport.
+  - `width` <[int]> page width in pixels.
+  - `height` <[int]> page height in pixels.
+- returns: <[BrowserContext]>
 
 Returns the persistent browser context instance.
 
 Launches browser that uses persistent storage located at `userDataDir` and returns the only context. Closing this context will automatically close the browser.
 
 ## browser_type.name()
-- returns: <[string]>
+- returns: <[str]>
 
 Returns browser name. For example: `'chromium'`, `'webkit'` or `'firefox'`.
 
@@ -166,28 +148,24 @@ Returns browser name. For example: `'chromium'`, `'webkit'` or `'firefox'`.
 [WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.md "WebSocket"
 [Worker]: ./api/class-worker.md "Worker"
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
 [Evaluation Argument]: ./core-concepts.md#evaluationargument "Evaluation Argument"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[URL]: https://nodejs.org/api/url.html "URL"
-[USKeyboardLayout]: ../src/usKeyboardLayout.ts "USKeyboardLayout"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
 [selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
+[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
+[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
+[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
+[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
+[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
+[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
+[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"
