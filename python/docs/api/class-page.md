@@ -35,10 +35,10 @@ To unsubscribe from events use the `removeListener` method:
 - [page.on("response")](./api/class-page.md#pageonresponse)
 - [page.on("websocket")](./api/class-page.md#pageonwebsocket)
 - [page.on("worker")](./api/class-page.md#pageonworker)
-- [page.$(selector)](./api/class-page.md#pageselector)
-- [page.$$(selector)](./api/class-page.md#pageselector-1)
-- [page.$eval(selector, page_function, **options)](./api/class-page.md#pageevalselector-pagefunction-options)
-- [page.$$eval(selector, page_function, **options)](./api/class-page.md#pageevalselector-pagefunction-options-1)
+- [page.query_selector(selector)](./api/class-page.md#pagequeryselectorselector)
+- [page.query_selector_all(selector)](./api/class-page.md#pagequeryselectorallselector)
+- [page.eval_on_selector(selector, page_function, **options)](./api/class-page.md#pageevalonselectorselector-pagefunction-options)
+- [page.eval_on_selector_all(selector, page_function, **options)](./api/class-page.md#pageevalonselectorallselector-pagefunction-options)
 - [page.accessibility](./api/class-page.md#pageaccessibility)
 - [page.add_init_script(**options)](./api/class-page.md#pageaddinitscriptoptions)
 - [page.add_script_tag(**options)](./api/class-page.md#pageaddscripttagoptions)
@@ -211,23 +211,23 @@ Emitted when <[WebSocket]> request is sent.
 
 Emitted when a dedicated [WebWorker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) is spawned by the page.
 
-## page.$(selector)
+## page.query_selector(selector)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - returns: <[NoneType]|[ElementHandle]>
 
 The method finds an element matching the specified selector within the page. If no elements match the selector, the return value resolves to `null`.
 
-Shortcut for main frame's [frame.$(selector)](./api/class-frame.md#frameselector).
+Shortcut for main frame's [frame.query_selector(selector)](./api/class-frame.md#framequeryselectorselector).
 
-## page.$$(selector)
+## page.query_selector_all(selector)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - returns: <[List]\[[ElementHandle]\]>
 
 The method finds all elements matching the specified selector within the page. If no elements match the selector, the return value resolves to `[]`.
 
-Shortcut for main frame's [frame.$$(selector)](./api/class-frame.md#frameselector-1).
+Shortcut for main frame's [frame.query_selector_all(selector)](./api/class-frame.md#framequeryselectorallselector).
 
-## page.$eval(selector, page_function, **options)
+## page.eval_on_selector(selector, page_function, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - `page_function` <[Callable]\[[Element]\]> Function to be evaluated in browser context
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
@@ -235,13 +235,13 @@ Shortcut for main frame's [frame.$$(selector)](./api/class-frame.md#frameselecto
 
 The method finds an element matching the specified selector within the page and passes it as a first argument to `pageFunction`. If no elements match the selector, the method throws an error. Returns the value of `pageFunction`.
 
-If `pageFunction` returns a [Promise], then [page.$eval(selector, page_function, **options)](./api/class-page.md#pageevalselector-pagefunction-options) would wait for the promise to resolve and return its value.
+If `pageFunction` returns a [Promise], then [page.eval_on_selector(selector, page_function, **options)](./api/class-page.md#pageevalonselectorselector-pagefunction-options) would wait for the promise to resolve and return its value.
 
 Examples:
 
-Shortcut for main frame's [frame.$eval(selector, page_function, **options)](./api/class-frame.md#frameevalselector-pagefunction-options).
+Shortcut for main frame's [frame.eval_on_selector(selector, page_function, **options)](./api/class-frame.md#frameevalonselectorselector-pagefunction-options).
 
-## page.$$eval(selector, page_function, **options)
+## page.eval_on_selector_all(selector, page_function, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - `page_function` <[Callable]\[[List]\[[Element]\]\]> Function to be evaluated in browser context
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
@@ -249,7 +249,7 @@ Shortcut for main frame's [frame.$eval(selector, page_function, **options)](./ap
 
 The method finds all elements matching the specified selector within the page and passes an array of matched elements as a first argument to `pageFunction`. Returns the result of `pageFunction` invocation.
 
-If `pageFunction` returns a [Promise], then [page.$$eval(selector, page_function, **options)](./api/class-page.md#pageevalselector-pagefunction-options-1) would wait for the promise to resolve and return its value.
+If `pageFunction` returns a [Promise], then [page.eval_on_selector_all(selector, page_function, **options)](./api/class-page.md#pageevalonselectorallselector-pagefunction-options) would wait for the promise to resolve and return its value.
 
 Examples:
 

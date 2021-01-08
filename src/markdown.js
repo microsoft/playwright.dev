@@ -124,8 +124,12 @@ function buildTree(lines) {
       };
       line = lines[++i];
       while (!line.trim().startsWith('```')) {
-        if (!line.startsWith(indent))
-          throw new Error('Bad code block ' + line);
+        if (!line.startsWith(indent)) {
+          const from = Math.max(0, i - 5)
+          const to = Math.min(lines.length, from + 10);
+          const snippet = lines.slice(from, to);
+          throw new Error(`Bad code block: ${snippet.join('\n')}`);
+        }
         node.lines.push(line.substring(indent.length));
         line = lines[++i];
       }
@@ -159,7 +163,7 @@ function buildTree(lines) {
         node.liType = 'ordinal';
       else if (content.startsWith('*'))
         node.liType = 'bullet';
-      else 
+      else
         node.liType = 'default';
     }
     appendNode(indent, node);

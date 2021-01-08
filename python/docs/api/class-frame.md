@@ -16,10 +16,10 @@ An example of dumping frame tree:
 An example of getting text from an iframe element:
 
 
-- [frame.$(selector)](./api/class-frame.md#frameselector)
-- [frame.$$(selector)](./api/class-frame.md#frameselector-1)
-- [frame.$eval(selector, page_function, **options)](./api/class-frame.md#frameevalselector-pagefunction-options)
-- [frame.$$eval(selector, page_function, **options)](./api/class-frame.md#frameevalselector-pagefunction-options-1)
+- [frame.query_selector(selector)](./api/class-frame.md#framequeryselectorselector)
+- [frame.query_selector_all(selector)](./api/class-frame.md#framequeryselectorallselector)
+- [frame.eval_on_selector(selector, page_function, **options)](./api/class-frame.md#frameevalonselectorselector-pagefunction-options)
+- [frame.eval_on_selector_all(selector, page_function, **options)](./api/class-frame.md#frameevalonselectorallselector-pagefunction-options)
 - [frame.add_script_tag(**options)](./api/class-frame.md#frameaddscripttagoptions)
 - [frame.add_style_tag(**options)](./api/class-frame.md#frameaddstyletagoptions)
 - [frame.check(selector, **options)](./api/class-frame.md#framecheckselector-options)
@@ -58,7 +58,7 @@ An example of getting text from an iframe element:
 - [frame.wait_for_selector(selector, **options)](./api/class-frame.md#framewaitforselectorselector-options)
 - [frame.wait_for_timeout(timeout)](./api/class-frame.md#framewaitfortimeouttimeout)
 
-## frame.$(selector)
+## frame.query_selector(selector)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - returns: <[NoneType]|[ElementHandle]>
 
@@ -66,7 +66,7 @@ Returns the ElementHandle pointing to the frame element.
 
 The method finds an element matching the specified selector within the frame. See [Working with selectors](./selectors.md#working-with-selectors) for more details. If no elements match the selector, returns `null`.
 
-## frame.$$(selector)
+## frame.query_selector_all(selector)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - returns: <[List]\[[ElementHandle]\]>
 
@@ -74,7 +74,7 @@ Returns the ElementHandles pointing to the frame elements.
 
 The method finds all elements matching the specified selector within the frame. See [Working with selectors](./selectors.md#working-with-selectors) for more details. If no elements match the selector, returns empty array.
 
-## frame.$eval(selector, page_function, **options)
+## frame.eval_on_selector(selector, page_function, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - `page_function` <[Callable]\[[Element]\]> Function to be evaluated in browser context
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
@@ -88,7 +88,7 @@ If `pageFunction` returns a [Promise], then `frame.$eval` would wait for the pro
 
 Examples:
 
-## frame.$$eval(selector, page_function, **options)
+## frame.eval_on_selector_all(selector, page_function, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - `page_function` <[Callable]\[[List]\[[Element]\]\]> Function to be evaluated in browser context
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`

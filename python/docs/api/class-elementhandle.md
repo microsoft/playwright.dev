@@ -5,11 +5,11 @@ title: "ElementHandle"
 
 * extends: [JSHandle]
 
-ElementHandle represents an in-page DOM element. ElementHandles can be created with the [page.$(selector)](./api/class-page.md#pageselector) method.
+ElementHandle represents an in-page DOM element. ElementHandles can be created with the [page.query_selector(selector)](./api/class-page.md#pagequeryselectorselector) method.
 
 ElementHandle prevents DOM element from garbage collection unless the handle is disposed with [js_handle.dispose()](./api/class-jshandle.md#jshandledispose). ElementHandles are auto-disposed when their origin frame gets navigated.
 
-ElementHandle instances can be used as an argument in [page.$eval(selector, page_function, **options)](./api/class-page.md#pageevalselector-pagefunction-options) and [page.evaluate(page_function, **options)](./api/class-page.md#pageevaluatepagefunction-options) methods.
+ElementHandle instances can be used as an argument in [page.eval_on_selector(selector, page_function, **options)](./api/class-page.md#pageevalonselectorselector-pagefunction-options) and [page.evaluate(page_function, **options)](./api/class-page.md#pageevaluatepagefunction-options) methods.
 
 
 - [element_handle.$(selector)](./api/class-elementhandle.md#elementhandleselector)

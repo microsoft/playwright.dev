@@ -160,11 +160,11 @@ assert length == 3
 
 #### API reference
 - [page.evaluate(page_function, **options)](./api/class-page.md#pageevaluatepagefunction-options)
-- [page.$eval(selector, page_function, **options)](./api/class-page.md#pageevalselector-pagefunction-options)
-- [page.$$eval(selector, page_function, **options)](./api/class-page.md#pageevalselector-pagefunction-options-1)
+- [page.eval_on_selector(selector, page_function, **options)](./api/class-page.md#pageevalonselectorselector-pagefunction-options)
+- [page.eval_on_selector_all(selector, page_function, **options)](./api/class-page.md#pageevalonselectorallselector-pagefunction-options)
 - [frame.evaluate(page_function, **options)](./api/class-frame.md#frameevaluatepagefunction-options)
-- [frame.$eval(selector, page_function, **options)](./api/class-frame.md#frameevalselector-pagefunction-options)
-- [frame.$$eval(selector, page_function, **options)](./api/class-frame.md#frameevalselector-pagefunction-options-1)
+- [frame.eval_on_selector(selector, page_function, **options)](./api/class-frame.md#frameevalonselectorselector-pagefunction-options)
+- [frame.eval_on_selector_all(selector, page_function, **options)](./api/class-frame.md#frameevalonselectorallselector-pagefunction-options)
 - [element_handle.$eval(selector, page_function, **options)](./api/class-elementhandle.md#elementhandleevalselector-pagefunction-options)
 - [element_handle.$$eval(selector, page_function, **options)](./api/class-elementhandle.md#elementhandleevalselector-pagefunction-options-1)
 - [EvaluationArgument]
