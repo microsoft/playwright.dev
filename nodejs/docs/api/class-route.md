@@ -8,8 +8,8 @@ Whenever a network route is set up with [page.route(url, handler)](./api/class-p
 
 
 - [route.abort([errorCode])](./api/class-route.md#routeaborterrorcode)
-- [route.continue([overrides])](./api/class-route.md#routecontinueoverrides)
-- [route.fulfill(response)](./api/class-route.md#routefulfillresponse)
+- [route.continue([options])](./api/class-route.md#routecontinueoptions)
+- [route.fulfill([options])](./api/class-route.md#routefulfilloptions)
 - [route.request()](./api/class-route.md#routerequest)
 
 ## route.abort([errorCode])
@@ -31,12 +31,12 @@ Whenever a network route is set up with [page.route(url, handler)](./api/class-p
 
 Aborts the route's request.
 
-## route.continue([overrides])
-- `overrides` <[Object]> Optional request overrides, can override following properties:
-  - `url` <[string]> If set changes the request URL. New URL must have same protocol as original one.
+## route.continue([options])
+- `options` <[Object]>
+  - `headers` <[Object]<[string], [string]>> If set changes the request HTTP headers. Header values will be converted to a string.
   - `method` <[string]> If set changes the request method (e.g. GET or POST)
   - `postData` <[string]|[Buffer]> If set changes the post data of request
-  - `headers` <[Object]<[string], [string]>> If set changes the request HTTP headers. Header values will be converted to a string.
+  - `url` <[string]> If set changes the request URL. New URL must have same protocol as original one.
 
 Continues route's request with optional overrides.
 
@@ -52,13 +52,13 @@ await page.route('**/*', (route, request) => {
 });
 ```
 
-## route.fulfill(response)
-- `response` <[Object]> Response that will fulfill this route's request.
-  - `status` <[number]> Response status code, defaults to `200`.
-  - `headers` <[Object]<[string], [string]>> Optional response headers. Header values will be converted to a string.
+## route.fulfill([options])
+- `options` <[Object]>
+  - `body` <[string]|[Buffer]> Response body.
   - `contentType` <[string]> If set, equals to setting `Content-Type` response header.
-  - `body` <[string]|[Buffer]> Optional response body.
-  - `path` <[string]> Optional file path to respond with. The content type will be inferred from file extension. If `path` is a relative path, then it is resolved relative to the current working directory.
+  - `headers` <[Object]<[string], [string]>> Response headers. Header values will be converted to a string.
+  - `path` <[string]> File path to respond with. The content type will be inferred from file extension. If `path` is a relative path, then it is resolved relative to the current working directory.
+  - `status` <[number]> Response status code, defaults to `200`.
 
 Fulfills route's request with given response.
 

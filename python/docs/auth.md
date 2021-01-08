@@ -51,26 +51,24 @@ These steps can be executed for every browser context. However, redoing login fo
 
 ## Reuse authentication state
 
-Web apps use cookie-based or token-based authentication, where authenticated state is stored as [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) or in [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage). The Playwright API can be used to retrieve this state from authenticated contexts and then load it into new contexts.
+Web apps use cookie-based or token-based authentication, where authenticated state is stored as [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) or in [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage). Playwright provides [browser_context.storage_state(**options)](./api/class-browsercontext.md#browsercontextstoragestateoptions) method that can be used to retrieve storage state from authenticated contexts and then create new contexts with prepopulated state.
 
 Cookies and local storage state can be used across different browsers. They depend on your application's authentication model: some apps might require both cookies and local storage.
 
-The following code snippets retrieve state from an authenticated page/context and load them into a new context.
-
-### Cookies
+The following code snippet retrieves state from an authenticated context and creates a new context with that state.
 
 ```python
 # async
 
 import json
 import os
-# Get cookies and store as an env variable
-cookies = await context.cookies()
-os.environ["COOKIES"] = json.dumps(cookies)
+# Save storage state and store as an env variable
+storage = await context.storage_state()
+os.environ["STORAGE"] = json.dumps(storage)
 
-# Set cookies in a new context
-deserialized_cookies = json.loads(os.environ["COOKIES"])
-await context.add_cookies(deserialized_cookies)
+# Create a new context with the saved storage state
+storage_state = json.loads(os.environ["STORAGE"])
+context = await browser.new_context(storage_state=storage_state)
 ```
 
 ```python
@@ -78,64 +76,18 @@ await context.add_cookies(deserialized_cookies)
 
 import json
 import os
-# Get cookies and store as an env variable
-cookies = context.cookies()
-os.environ["COOKIES"] = json.dumps(cookies)
+# Save storage state and store as an env variable
+storage = context.storage_state()
+os.environ["STORAGE"] = json.dumps(storage)
 
-# Set cookies in a new context
-deserialized_cookies = json.loads(os.environ["COOKIES"])
-context.add_cookies(deserialized_cookies)
-```
-
-### Local storage
-
-Local storage ([`window.localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)) is specific to a particular domain.
-
-```python
-# async
-
-import os
-import json
-# Get local storage and store as env variable
-local_storage = await page.evaluate("() => JSON.stringify(window.localStorage))
-os.environ["LOCAL_STORAGE"] = local_storage
-
-# Set local storage in a new context
-local_storage = os.environ["LOCAL_STORAGE"]
-await context.add_init_script("""storage => {
-  if (window.location.hostname == 'example.com') {
-    entries = JSON.parse(storage)
-    Object.keys(entries).forEach(key => {
-      window.localStorage.setItem(key, entries[key])
-    })
-  }
-}""", local_storage)
-```
-
-```python
-# sync
-
-import os
-import json
-# Get local storage and store as env variable
-local_storage = page.evaluate("() => JSON.stringify(window.localStorage)")
-os.environ["LOCAL_STORAGE"] = local_storage
-
-# Set local storage in a new context
-local_storage = os.environ["LOCAL_STORAGE"]
-context.add_init_script("""storage => {
-  if (window.location.hostname == 'example.com') {
-    entries = JSON.parse(storage)
-    Object.keys(entries).forEach(key => {
-      window.localStorage.setItem(key, entries[key])
-    })
-  }
-}""", local_storage)
+# Create a new context with the saved storage state
+storage_state = json.loads(os.environ["STORAGE"])
+context = browser.new_context(storage_state=storage_state)
 ```
 
 ### Session storage
 
-Session storage ([`window.sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)) is specific to a particular domain.
+Session storage ([`window.sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)) is specific to a particular domain. Playwright does not provide API to persist session storage, but the following snippet can be used to save/load session storage.
 
 ```python
 # async
@@ -189,13 +141,12 @@ This approach will also **work in CI environments**, since it does not rely on a
 
 ### Example
 
-[This example script](https://github.com/microsoft/playwright/blob/master/docs/examples/authentication.js) logs in on GitHub.com with Chromium, and then reuses the logged in cookie state in WebKit.
+[This example script](https://github.com/microsoft/playwright/blob/master/docs/examples/authentication.js) logs in on GitHub.com with Chromium, and then reuses the logged in storage state in WebKit.
 
 ### API reference
-- [BrowserContext]
-- [browser_context.cookies(**options)](./api/class-browsercontext.md#browsercontextcookiesoptions)
-- [browser_context.add_cookies(cookies)](./api/class-browsercontext.md#browsercontextaddcookiescookies)
-- [page.evaluate(page_function, **options)](./api/class-page.md#pageevaluatepagefunction-options)
+- [browser_context.storage_state(**options)](./api/class-browsercontext.md#browsercontextstoragestateoptions)
+- [browser.new_context(**options)](./api/class-browser.md#browsernewcontextoptions)
+- [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options)
 - [browser_context.add_init_script(**options)](./api/class-browsercontext.md#browsercontextaddinitscriptoptions)
 
 ## Multi-factor authentication

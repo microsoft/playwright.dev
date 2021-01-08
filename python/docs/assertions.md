@@ -159,14 +159,14 @@ assert length == 3
 ```
 
 #### API reference
-- [page.evaluate(page_function, **options)](./api/class-page.md#pageevaluatepagefunction-options)
-- [page.eval_on_selector(selector, page_function, **options)](./api/class-page.md#pageevalonselectorselector-pagefunction-options)
-- [page.eval_on_selector_all(selector, page_function, **options)](./api/class-page.md#pageevalonselectorallselector-pagefunction-options)
-- [frame.evaluate(page_function, **options)](./api/class-frame.md#frameevaluatepagefunction-options)
-- [frame.eval_on_selector(selector, page_function, **options)](./api/class-frame.md#frameevalonselectorselector-pagefunction-options)
-- [frame.eval_on_selector_all(selector, page_function, **options)](./api/class-frame.md#frameevalonselectorallselector-pagefunction-options)
-- [element_handle.$eval(selector, page_function, **options)](./api/class-elementhandle.md#elementhandleevalselector-pagefunction-options)
-- [element_handle.$$eval(selector, page_function, **options)](./api/class-elementhandle.md#elementhandleevalselector-pagefunction-options-1)
+- [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options)
+- [page.eval_on_selector(selector, expression, **options)](./api/class-page.md#pageevalonselectorselector-expression-options)
+- [page.eval_on_selector_all(selector, expression, **options)](./api/class-page.md#pageevalonselectorallselector-expression-options)
+- [frame.evaluate(expression, **options)](./api/class-frame.md#frameevaluateexpression-options)
+- [frame.eval_on_selector(selector, expression, **options)](./api/class-frame.md#frameevalonselectorselector-expression-options)
+- [frame.eval_on_selector_all(selector, expression, **options)](./api/class-frame.md#frameevalonselectorallselector-expression-options)
+- [element_handle.eval_on_selector(selector, expression, **options)](./api/class-elementhandle.md#elementhandleevalonselectorselector-expression-options)
+- [element_handle.eval_on_selector_all(selector, expression, **options)](./api/class-elementhandle.md#elementhandleevalonselectorallselector-expression-options)
 - [EvaluationArgument]
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"

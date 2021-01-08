@@ -34,7 +34,7 @@ Note that handling the event forks the control flow and makes script harder to f
 #### API reference
 - [Download]
 - [page.on("download")](./api/class-page.md#pageondownload)
-- [page.wait_for_event(event, predicate, **options)](./api/class-page.md#pagewaitforeventevent-predicate-options)
+- [page.wait_for_event(event, **options)](./api/class-page.md#pagewaitforeventevent-options)
 
 <br/>
 

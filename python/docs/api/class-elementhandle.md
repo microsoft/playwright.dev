@@ -9,13 +9,13 @@ ElementHandle represents an in-page DOM element. ElementHandles can be created w
 
 ElementHandle prevents DOM element from garbage collection unless the handle is disposed with [js_handle.dispose()](./api/class-jshandle.md#jshandledispose). ElementHandles are auto-disposed when their origin frame gets navigated.
 
-ElementHandle instances can be used as an argument in [page.eval_on_selector(selector, page_function, **options)](./api/class-page.md#pageevalonselectorselector-pagefunction-options) and [page.evaluate(page_function, **options)](./api/class-page.md#pageevaluatepagefunction-options) methods.
+ElementHandle instances can be used as an argument in [page.eval_on_selector(selector, expression, **options)](./api/class-page.md#pageevalonselectorselector-expression-options) and [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options) methods.
 
 
-- [element_handle.$(selector)](./api/class-elementhandle.md#elementhandleselector)
-- [element_handle.$$(selector)](./api/class-elementhandle.md#elementhandleselector-1)
-- [element_handle.$eval(selector, page_function, **options)](./api/class-elementhandle.md#elementhandleevalselector-pagefunction-options)
-- [element_handle.$$eval(selector, page_function, **options)](./api/class-elementhandle.md#elementhandleevalselector-pagefunction-options-1)
+- [element_handle.query_selector(selector)](./api/class-elementhandle.md#elementhandlequeryselectorselector)
+- [element_handle.query_selector_all(selector)](./api/class-elementhandle.md#elementhandlequeryselectorallselector)
+- [element_handle.eval_on_selector(selector, expression, **options)](./api/class-elementhandle.md#elementhandleevalonselectorselector-expression-options)
+- [element_handle.eval_on_selector_all(selector, expression, **options)](./api/class-elementhandle.md#elementhandleevalonselectorallselector-expression-options)
 - [element_handle.bounding_box()](./api/class-elementhandle.md#elementhandleboundingbox)
 - [element_handle.check(**options)](./api/class-elementhandle.md#elementhandlecheckoptions)
 - [element_handle.click(**options)](./api/class-elementhandle.md#elementhandleclickoptions)
@@ -28,6 +28,11 @@ ElementHandle instances can be used as an argument in [page.eval_on_selector(sel
 - [element_handle.hover(**options)](./api/class-elementhandle.md#elementhandlehoveroptions)
 - [element_handle.inner_html()](./api/class-elementhandle.md#elementhandleinnerhtml)
 - [element_handle.inner_text()](./api/class-elementhandle.md#elementhandleinnertext)
+- [element_handle.is_disabled()](./api/class-elementhandle.md#elementhandleisdisabled)
+- [element_handle.is_editable()](./api/class-elementhandle.md#elementhandleiseditable)
+- [element_handle.is_enabled()](./api/class-elementhandle.md#elementhandleisenabled)
+- [element_handle.is_hidden()](./api/class-elementhandle.md#elementhandleishidden)
+- [element_handle.is_visible()](./api/class-elementhandle.md#elementhandleisvisible)
 - [element_handle.owner_frame()](./api/class-elementhandle.md#elementhandleownerframe)
 - [element_handle.press(key, **options)](./api/class-elementhandle.md#elementhandlepresskey-options)
 - [element_handle.screenshot(**options)](./api/class-elementhandle.md#elementhandlescreenshotoptions)
@@ -43,28 +48,29 @@ ElementHandle instances can be used as an argument in [page.eval_on_selector(sel
 - [element_handle.wait_for_selector(selector, **options)](./api/class-elementhandle.md#elementhandlewaitforselectorselector-options)
 - [js_handle.as_element()](./api/class-jshandle.md#jshandleaselement)
 - [js_handle.dispose()](./api/class-jshandle.md#jshandledispose)
-- [js_handle.evaluate(page_function, **options)](./api/class-jshandle.md#jshandleevaluatepagefunction-options)
-- [js_handle.evaluate_handle(page_function, **options)](./api/class-jshandle.md#jshandleevaluatehandlepagefunction-options)
+- [js_handle.evaluate(expression, **options)](./api/class-jshandle.md#jshandleevaluateexpression-options)
+- [js_handle.evaluate_handle(expression, **options)](./api/class-jshandle.md#jshandleevaluatehandleexpression-options)
 - [js_handle.get_properties()](./api/class-jshandle.md#jshandlegetproperties)
 - [js_handle.get_property(property_name)](./api/class-jshandle.md#jshandlegetpropertypropertyname)
 - [js_handle.json_value()](./api/class-jshandle.md#jshandlejsonvalue)
 
-## element_handle.$(selector)
+## element_handle.query_selector(selector)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - returns: <[NoneType]|[ElementHandle]>
 
 The method finds an element matching the specified selector in the `ElementHandle`'s subtree. See [Working with selectors](./selectors.md#working-with-selectors) for more details. If no elements match the selector, returns `null`.
 
-## element_handle.$$(selector)
+## element_handle.query_selector_all(selector)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - returns: <[List]\[[ElementHandle]\]>
 
 The method finds all elements matching the specified selector in the `ElementHandle`s subtree. See [Working with selectors](./selectors.md#working-with-selectors) for more details. If no elements match the selector, returns empty array.
 
-## element_handle.$eval(selector, page_function, **options)
+## element_handle.eval_on_selector(selector, expression, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `page_function` <[Callable]\[[Element]\]> Function to be evaluated in browser context
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
+- `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[Serializable]>
 
 Returns the return value of `pageFunction`
@@ -75,10 +81,11 @@ If `pageFunction` returns a [Promise], then `frame.$eval` would wait for the pro
 
 Examples:
 
-## element_handle.$$eval(selector, page_function, **options)
+## element_handle.eval_on_selector_all(selector, expression, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `page_function` <[Callable]\[[List]\[[Element]\]\]> Function to be evaluated in browser context
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
+- `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[Serializable]>
 
 Returns the return value of `pageFunction`
@@ -242,6 +249,31 @@ Returns the `element.innerHTML`.
 
 Returns the `element.innerText`.
 
+## element_handle.is_disabled()
+- returns: <[bool]>
+
+Returns whether the element is disabled, the opposite of [enabled](./actionability.md#enabled).
+
+## element_handle.is_editable()
+- returns: <[bool]>
+
+Returns whether the element is [editable](./actionability.md#editable).
+
+## element_handle.is_enabled()
+- returns: <[bool]>
+
+Returns whether the element is [enabled](./actionability.md#enabled).
+
+## element_handle.is_hidden()
+- returns: <[bool]>
+
+Returns whether the element is hidden, the opposite of [visible](./actionability.md#visible).
+
+## element_handle.is_visible()
+- returns: <[bool]>
+
+Returns whether the element is [visible](./actionability.md#visible).
+
 ## element_handle.owner_frame()
 - returns: <[NoneType]|[Frame]>
 
@@ -372,7 +404,7 @@ If the element is detached from the DOM at any moment during the action, this me
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
 
 ## element_handle.wait_for_element_state(state, **options)
-- `state` <"visible"|"hidden"|"stable"|"enabled"|"disabled"> A state to wait for, see below for more details.
+- `state` <"visible"|"hidden"|"stable"|"enabled"|"disabled"|"editable"> A state to wait for, see below for more details.
 - `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
 
 Returns when the element satisfies the `state`.
@@ -383,6 +415,7 @@ Depending on the `state` parameter, this method waits for one of the [actionabil
 * `"stable"` Wait until the element is both [visible](./actionability.md#visible) and [stable](./actionability.md#stable).
 * `"enabled"` Wait until the element is [enabled](./actionability.md#enabled).
 * `"disabled"` Wait until the element is [not enabled](./actionability.md#enabled).
+* `"editable"` Wait until the element is [editable](./actionability.md#editable).
 
 If the element does not satisfy the condition for the `timeout` milliseconds, this method will throw.
 

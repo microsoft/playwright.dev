@@ -35,48 +35,25 @@ These steps can be executed for every browser context. However, redoing login fo
 
 ## Reuse authentication state
 
-Web apps use cookie-based or token-based authentication, where authenticated state is stored as [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) or in [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage). The Playwright API can be used to retrieve this state from authenticated contexts and then load it into new contexts.
+Web apps use cookie-based or token-based authentication, where authenticated state is stored as [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) or in [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage). Playwright provides [browserContext.storageState([options])](./api/class-browsercontext.md#browsercontextstoragestateoptions) method that can be used to retrieve storage state from authenticated contexts and then create new contexts with prepopulated state.
 
 Cookies and local storage state can be used across different browsers. They depend on your application's authentication model: some apps might require both cookies and local storage.
 
-The following code snippets retrieve state from an authenticated page/context and load them into a new context.
-
-### Cookies
+The following code snippet retrieves state from an authenticated context and creates a new context with that state.
 
 ```js
-// Get cookies and store as an env variable
-const cookies = await context.cookies();
-process.env.COOKIES = JSON.stringify(cookies);
+// Save storage state and store as an env variable
+const storage = await context.storageState();
+process.env.STORAGE = JSON.stringify(storage);
 
-// Set cookies in a new context
-const deserializedCookies = JSON.parse(process.env.COOKIES)
-await context.addCookies(deserializedCookies);
-```
-
-### Local storage
-
-Local storage ([`window.localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)) is specific to a particular domain.
-
-```js
-// Get local storage and store as env variable
-const localStorage = await page.evaluate(() => JSON.stringify(window.localStorage));
-process.env.LOCAL_STORAGE = localStorage;
-
-// Set local storage in a new context
-const localStorage = process.env.LOCAL_STORAGE;
-await context.addInitScript(storage => {
-  if (window.location.hostname === 'example.com') {
-    const entries = JSON.parse(storage);
-    Object.keys(entries).forEach(key => {
-      window.localStorage.setItem(key, entries[key]);
-    });
-  }
-}, localStorage);
+// Create a new context with the saved storage state
+const storageState = JSON.parse(process.env.STORAGE);
+const context = await browser.newContext({ storageState });
 ```
 
 ### Session storage
 
-Session storage ([`window.sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)) is specific to a particular domain.
+Session storage ([`window.sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)) is specific to a particular domain. Playwright does not provide API to persist session storage, but the following snippet can be used to save/load session storage.
 
 ```js
 // Get session storage and store as env variable
@@ -107,12 +84,11 @@ This approach will also **work in CI environments**, since it does not rely on a
 
 ### Example
 
-[This example script](https://github.com/microsoft/playwright/blob/master/docs/examples/authentication.js) logs in on GitHub.com with Chromium, and then reuses the logged in cookie state in WebKit.
+[This example script](https://github.com/microsoft/playwright/blob/master/docs/examples/authentication.js) logs in on GitHub.com with Chromium, and then reuses the logged in storage state in WebKit.
 
 ### API reference
-- [BrowserContext]
-- [browserContext.cookies([urls])](./api/class-browsercontext.md#browsercontextcookiesurls)
-- [browserContext.addCookies(cookies)](./api/class-browsercontext.md#browsercontextaddcookiescookies)
+- [browserContext.storageState([options])](./api/class-browsercontext.md#browsercontextstoragestateoptions)
+- [browser.newContext([options])](./api/class-browser.md#browsernewcontextoptions)
 - [page.evaluate(pageFunction[, arg])](./api/class-page.md#pageevaluatepagefunction-arg)
 - [browserContext.addInitScript(script[, arg])](./api/class-browsercontext.md#browsercontextaddinitscriptscript-arg)
 

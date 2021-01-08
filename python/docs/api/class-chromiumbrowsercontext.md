@@ -36,7 +36,7 @@ Chromium-specific features including background pages, service worker support, e
 - [browser_context.set_offline(offline)](./api/class-browsercontext.md#browsercontextsetofflineoffline)
 - [browser_context.storage_state(**options)](./api/class-browsercontext.md#browsercontextstoragestateoptions)
 - [browser_context.unroute(url, **options)](./api/class-browsercontext.md#browsercontextunrouteurl-options)
-- [browser_context.wait_for_event(event, predicate, **options)](./api/class-browsercontext.md#browsercontextwaitforeventevent-predicate-options)
+- [browser_context.wait_for_event(event, **options)](./api/class-browsercontext.md#browsercontextwaitforeventevent-options)
 - [browser_context.reset_geolocation()](./api/class-browsercontext.md#browsercontextresetgeolocation)
 
 ## chromium_browser_context.on("backgroundpage")

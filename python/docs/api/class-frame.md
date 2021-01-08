@@ -18,8 +18,8 @@ An example of getting text from an iframe element:
 
 - [frame.query_selector(selector)](./api/class-frame.md#framequeryselectorselector)
 - [frame.query_selector_all(selector)](./api/class-frame.md#framequeryselectorallselector)
-- [frame.eval_on_selector(selector, page_function, **options)](./api/class-frame.md#frameevalonselectorselector-pagefunction-options)
-- [frame.eval_on_selector_all(selector, page_function, **options)](./api/class-frame.md#frameevalonselectorallselector-pagefunction-options)
+- [frame.eval_on_selector(selector, expression, **options)](./api/class-frame.md#frameevalonselectorselector-expression-options)
+- [frame.eval_on_selector_all(selector, expression, **options)](./api/class-frame.md#frameevalonselectorallselector-expression-options)
 - [frame.add_script_tag(**options)](./api/class-frame.md#frameaddscripttagoptions)
 - [frame.add_style_tag(**options)](./api/class-frame.md#frameaddstyletagoptions)
 - [frame.check(selector, **options)](./api/class-frame.md#framecheckselector-options)
@@ -28,8 +28,8 @@ An example of getting text from an iframe element:
 - [frame.content()](./api/class-frame.md#framecontent)
 - [frame.dblclick(selector, **options)](./api/class-frame.md#framedblclickselector-options)
 - [frame.dispatch_event(selector, type, **options)](./api/class-frame.md#framedispatcheventselector-type-options)
-- [frame.evaluate(page_function, **options)](./api/class-frame.md#frameevaluatepagefunction-options)
-- [frame.evaluate_handle(page_function, **options)](./api/class-frame.md#frameevaluatehandlepagefunction-options)
+- [frame.evaluate(expression, **options)](./api/class-frame.md#frameevaluateexpression-options)
+- [frame.evaluate_handle(expression, **options)](./api/class-frame.md#frameevaluatehandleexpression-options)
 - [frame.fill(selector, value, **options)](./api/class-frame.md#framefillselector-value-options)
 - [frame.focus(selector, **options)](./api/class-frame.md#framefocusselector-options)
 - [frame.frame_element()](./api/class-frame.md#frameframeelement)
@@ -39,6 +39,11 @@ An example of getting text from an iframe element:
 - [frame.inner_html(selector, **options)](./api/class-frame.md#frameinnerhtmlselector-options)
 - [frame.inner_text(selector, **options)](./api/class-frame.md#frameinnertextselector-options)
 - [frame.is_detached()](./api/class-frame.md#frameisdetached)
+- [frame.is_disabled(selector, **options)](./api/class-frame.md#frameisdisabledselector-options)
+- [frame.is_editable(selector, **options)](./api/class-frame.md#frameiseditableselector-options)
+- [frame.is_enabled(selector, **options)](./api/class-frame.md#frameisenabledselector-options)
+- [frame.is_hidden(selector, **options)](./api/class-frame.md#frameishiddenselector-options)
+- [frame.is_visible(selector, **options)](./api/class-frame.md#frameisvisibleselector-options)
 - [frame.name()](./api/class-frame.md#framename)
 - [frame.page()](./api/class-frame.md#framepage)
 - [frame.parent_frame()](./api/class-frame.md#frameparentframe)
@@ -52,7 +57,7 @@ An example of getting text from an iframe element:
 - [frame.type(selector, text, **options)](./api/class-frame.md#frametypeselector-text-options)
 - [frame.uncheck(selector, **options)](./api/class-frame.md#frameuncheckselector-options)
 - [frame.url()](./api/class-frame.md#frameurl)
-- [frame.wait_for_function(page_function, **options)](./api/class-frame.md#framewaitforfunctionpagefunction-options)
+- [frame.wait_for_function(expression, **options)](./api/class-frame.md#framewaitforfunctionexpression-options)
 - [frame.wait_for_load_state(**options)](./api/class-frame.md#framewaitforloadstateoptions)
 - [frame.wait_for_navigation(**options)](./api/class-frame.md#framewaitfornavigationoptions)
 - [frame.wait_for_selector(selector, **options)](./api/class-frame.md#framewaitforselectorselector-options)
@@ -74,10 +79,11 @@ Returns the ElementHandles pointing to the frame elements.
 
 The method finds all elements matching the specified selector within the frame. See [Working with selectors](./selectors.md#working-with-selectors) for more details. If no elements match the selector, returns empty array.
 
-## frame.eval_on_selector(selector, page_function, **options)
+## frame.eval_on_selector(selector, expression, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `page_function` <[Callable]\[[Element]\]> Function to be evaluated in browser context
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
+- `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[Serializable]>
 
 Returns the return value of `pageFunction`
@@ -88,10 +94,11 @@ If `pageFunction` returns a [Promise], then `frame.$eval` would wait for the pro
 
 Examples:
 
-## frame.eval_on_selector_all(selector, page_function, **options)
+## frame.eval_on_selector_all(selector, expression, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `page_function` <[Callable]\[[List]\[[Element]\]\]> Function to be evaluated in browser context
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
+- `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[Serializable]>
 
 Returns the return value of `pageFunction`
@@ -103,10 +110,10 @@ If `pageFunction` returns a [Promise], then `frame.$$eval` would wait for the pr
 Examples:
 
 ## frame.add_script_tag(**options)
-- `url` <[str]> URL of a script to be added. Optional.
-- `path` <[Union]\[[str], [pathlib.Path]\]> Path to the JavaScript file to be injected into frame. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
-- `content` <[str]> Raw JavaScript content to be injected into frame. Optional.
-- `type` <[str]> Script type. Use 'module' in order to load a Javascript ES6 module. See [script](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script) for more details. Optional.
+- `content` <[str]> Raw JavaScript content to be injected into frame.
+- `path` <[Union]\[[str], [pathlib.Path]\]> Path to the JavaScript file to be injected into frame. If `path` is a relative path, then it is resolved relative to the current working directory.
+- `type` <[str]> Script type. Use 'module' in order to load a Javascript ES6 module. See [script](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script) for more details.
+- `url` <[str]> URL of a script to be added.
 - returns: <[ElementHandle]>
 
 Returns the added tag when the script's onload fires or when the script content was injected into frame.
@@ -114,9 +121,9 @@ Returns the added tag when the script's onload fires or when the script content 
 Adds a `<script>` tag into the page with the desired url or content.
 
 ## frame.add_style_tag(**options)
-- `url` <[str]> URL of the `<link>` tag. Optional.
-- `path` <[Union]\[[str], [pathlib.Path]\]> Path to the CSS file to be injected into frame. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
-- `content` <[str]> Raw CSS content to be injected into frame. Optional.
+- `content` <[str]> Raw CSS content to be injected into frame.
+- `path` <[Union]\[[str], [pathlib.Path]\]> Path to the CSS file to be injected into frame. If `path` is a relative path, then it is resolved relative to the current working directory.
+- `url` <[str]> URL of the `<link>` tag.
 - returns: <[ElementHandle]>
 
 Returns the added tag when the stylesheet's onload fires or when the CSS content was injected into frame.
@@ -214,9 +221,10 @@ Since `eventInit` is event-specific, please refer to the events documentation fo
 
 You can also specify `JSHandle` as the property value if you want live objects to be passed into the event:
 
-## frame.evaluate(page_function, **options)
-- `page_function` <[Callable]|[str]> Function to be evaluated in browser context
+## frame.evaluate(expression, **options)
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
+- `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[Serializable]>
 
 Returns the return value of `pageFunction`
@@ -229,9 +237,10 @@ A string can also be passed in instead of a function.
 
 [ElementHandle] instances can be passed as an argument to the `frame.evaluate`:
 
-## frame.evaluate_handle(page_function, **options)
-- `page_function` <[Callable]|[str]> Function to be evaluated in the page context
+## frame.evaluate_handle(expression, **options)
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
+- `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[JSHandle]>
 
 Returns the return value of `pageFunction` as in-page object (JSHandle).
@@ -337,6 +346,41 @@ Returns `element.innerText`.
 - returns: <[bool]>
 
 Returns `true` if the frame has been detached, or `false` otherwise.
+
+## frame.is_disabled(selector, **options)
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[bool]>
+
+Returns whether the element is disabled, the opposite of [enabled](./actionability.md#enabled).
+
+## frame.is_editable(selector, **options)
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[bool]>
+
+Returns whether the element is [editable](./actionability.md#editable).
+
+## frame.is_enabled(selector, **options)
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[bool]>
+
+Returns whether the element is [enabled](./actionability.md#enabled).
+
+## frame.is_hidden(selector, **options)
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[bool]>
+
+Returns whether the element is hidden, the opposite of [visible](./actionability.md#visible).
+
+## frame.is_visible(selector, **options)
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[bool]>
+
+Returns whether the element is [visible](./actionability.md#visible).
 
 ## frame.name()
 - returns: <[str]>
@@ -477,11 +521,12 @@ When all steps combined have not finished during the specified `timeout`, this m
 
 Returns frame's url.
 
-## frame.wait_for_function(page_function, **options)
-- `page_function` <[Callable]|[str]> Function to be evaluated in browser context
+## frame.wait_for_function(expression, **options)
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
 - `polling` <[float]|"raf"> If `polling` is `'raf'`, then `pageFunction` is constantly executed in `requestAnimationFrame` callback. If `polling` is a number, then it is treated as an interval in milliseconds at which the function would be executed. Defaults to `raf`.
 - `timeout` <[float]> maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+- `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
+- `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[JSHandle]>
 
 Returns when the `pageFunction` returns a truthy value, returns that value.

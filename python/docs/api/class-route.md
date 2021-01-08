@@ -8,7 +8,7 @@ Whenever a network route is set up with [page.route(url, handler)](./api/class-p
 
 
 - [route.abort(**options)](./api/class-route.md#routeabortoptions)
-- [route.continue(**options)](./api/class-route.md#routecontinueoptions)
+- [route.continue_(**options)](./api/class-route.md#routecontinueoptions)
 - [route.fulfill(**options)](./api/class-route.md#routefulfilloptions)
 - [route.request()](./api/class-route.md#routerequest)
 
@@ -31,20 +31,20 @@ Whenever a network route is set up with [page.route(url, handler)](./api/class-p
 
 Aborts the route's request.
 
-## route.continue(**options)
-- `url` <[str]> If set changes the request URL. New URL must have same protocol as original one.
+## route.continue_(**options)
+- `headers` <[Dict]\[[str], [str]\]> If set changes the request HTTP headers. Header values will be converted to a string.
 - `method` <[str]> If set changes the request method (e.g. GET or POST)
 - `post_data` <[str]|[Buffer]> If set changes the post data of request
-- `headers` <[Dict]\[[str], [str]\]> If set changes the request HTTP headers. Header values will be converted to a string.
+- `url` <[str]> If set changes the request URL. New URL must have same protocol as original one.
 
 Continues route's request with optional overrides.
 
 ## route.fulfill(**options)
-- `status` <[int]> Response status code, defaults to `200`.
-- `headers` <[Dict]\[[str], [str]\]> Optional response headers. Header values will be converted to a string.
+- `body` <[str]|[Buffer]> Response body.
 - `content_type` <[str]> If set, equals to setting `Content-Type` response header.
-- `body` <[str]|[Buffer]> Optional response body.
-- `path` <[Union]\[[str], [pathlib.Path]\]> Optional file path to respond with. The content type will be inferred from file extension. If `path` is a relative path, then it is resolved relative to the current working directory.
+- `headers` <[Dict]\[[str], [str]\]> Response headers. Header values will be converted to a string.
+- `path` <[Union]\[[str], [pathlib.Path]\]> File path to respond with. The content type will be inferred from file extension. If `path` is a relative path, then it is resolved relative to the current working directory.
+- `status` <[int]> Response status code, defaults to `200`.
 
 Fulfills route's request with given response.
 
