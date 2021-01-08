@@ -26,6 +26,7 @@ const Documentation = require('./documentation');
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
 
 const DIR_SRC = path.join(process.env.SRC_DIR, 'docs', 'src');
+const commonSnippets = new Set(['html', 'yml', 'yaml', 'json', 'groovy', 'html', 'sh']);
 
 class Generator {
   links = new Map();
@@ -137,10 +138,16 @@ title: "${clazz.name}"
    */
   formatComment(spec) {
     return (spec || []).filter(c => {
-      if (!c.codeLang)
+      if (!c.codeLang || commonSnippets.has(c.codeLang))
         return true;
-      return c.codeLang === 'html' || c.codeLang === 'sh' || c.codeLang === this.lang;
-    }).map(c => md.clone(c))
+      if (c.codeLang === this.lang)
+        return true;
+      if (!c.codeLang.startsWith(this.lang + '-'))
+        return false;
+      c.lines.unshift('# ' + c.codeLang.substring(this.lang.length + 1), '');
+      c.codeLang = this.lang;
+      return true;
+    });
   }
 
   /**
@@ -154,6 +161,10 @@ title: "${clazz.name}"
       if (node.text === '<!-- TOC -->')
         node.text = md.generateToc(nodes);
     }
+    md.visitAll(nodes, node => {
+      if (node.children)
+        node.children = this.formatComment(node.children);
+    });
     fs.mkdirSync(this.outDir, { recursive: true });
     fs.writeFileSync(path.join(this.outDir, name), [md.render(nodes), this.generatedLinksSuffix].join('\n'));
   }

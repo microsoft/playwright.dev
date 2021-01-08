@@ -40,10 +40,20 @@ We have a [pre-built Docker image](./docker.md) which can either be used directl
 Suggested configuration
 1. By default, Docker runs a container with a `/dev/shm` shared memory space 64MB. This is [typically too small](https://github.com/c0b/chrome-in-docker/issues/1) for Chromium and will cause Chromium to crash when rendering large pages. To fix, run the container with `docker run --shm-size=1gb` to increase the size of `/dev/shm`. Since Chromium 65, this is no longer necessary. Instead, launch the browser with the `--disable-dev-shm-usage` flag:
 
-   ```js
-   const browser = await playwright.chromium.launch({
-     args: ['--disable-dev-shm-usage']
-   });
+   ```python
+   # async
+   
+      browser = await playwright.chromium.launch(
+         args=['--disable-dev-shm-usage']
+      )
+   ```
+
+   ```python
+   # sync
+   
+      browser = playwright.chromium.launch({
+         args=['--disable-dev-shm-usage']
+      })
    ```
 
    This will write shared memory files into `/tmp` instead of `/dev/shm`. See [crbug.com/736452](https://bugs.chromium.org/p/chromium/issues/detail?id=736452) for more details.
@@ -170,9 +180,16 @@ image: mcr.microsoft.com/playwright:bionic
 
 While the Docker image supports sandboxing for Chromium, it does not work in the Bitbucket Pipelines environment. To launch Chromium on Bitbucket Pipelines, use the `chromiumSandbox: false` launch argument.
 
-```js
-const { chromium } = require('playwright');
-const browser = await chromium.launch({ chromiumSandbox: false });
+```python
+# async
+
+browser = await playwright.chromium.launch(chromiumSandbox=False)
+```
+
+```python
+# sync
+
+browser = playwright.chromium.launch(chromiumSandbox=False)
 ```
 
 ### GitLab CI
@@ -232,10 +249,28 @@ DEBUG=pw:browser* npm run test
 
 By default, Playwright launches browsers in headless mode. This can be changed by passing a flag when the browser is launched.
 
-```js
-// Works across chromium, firefox and webkit
-const { chromium } = require('playwright');
-const browser = await chromium.launch({ headless: false });
+```python
+# async
+
+import asyncio
+from playwright import async_playwright
+
+async def main():
+    async with async_playwright() as p:
+         # Works across chromium, firefox and webkit
+         browser = await p.chromium.launch(headless=False)
+
+asyncio.get_event_loop().run_until_complete(main())
+```
+
+```python
+# sync
+
+from playwright import sync_playwright
+
+with sync_playwright() as p:
+   # Works across chromium, firefox and webkit
+   browser = p.chromium.launch(headless=False)
 ```
 
 On Linux agents, headful execution requires [Xvfb](https://en.wikipedia.org/wiki/Xvfb) to be installed. Our [Docker image](./docker.md) and GitHub Action have Xvfb pre-installed. To run browsers in headful mode with Xvfb, add `xvfb-run` before the Node.js command.

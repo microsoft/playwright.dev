@@ -33,34 +33,13 @@ Navigations can be initiated by changing the URL bar, reloading the page or goin
 
 Navigating to a URL auto-waits for the page to fire the `load` event. If the page does a client-side redirect before `load`, `page.goto` will auto-wait for the redirected page to fire the `load` event.
 
-```js
-// Navigate the page
-await page.goto('https://example.com');
-```
-
 ### Custom wait
 
 Override the default behavior to wait until a specific event, like `networkidle`.
 
-```js
-// Navigate and wait until network is idle
-await page.goto('https://example.com', { waitUntil: 'networkidle' });
-```
-
 ### Wait for element
 
 In lazy-loaded pages, it can be useful to wait until an element is visible with [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewaitforselectorselector-options). Alternatively, page interactions like [page.click(selector, **options)](./api/class-page.md#pageclickselector-options) auto-wait for elements.
-
-```js
-// Navigate and wait for element
-await page.goto('https://example.com');
-await page.waitForSelector('text=Example Domain');
-
-// Navigate and click element
-// Click will auto-wait for the element
-await page.goto('https://example.com');
-await page.click('text=Example Domain');
-```
 
 #### API reference
 - [page.goto(url, **options)](./api/class-page.md#pagegotourl-options)
@@ -76,50 +55,19 @@ In the scenarios below, `page.click` initiates a navigation and then waits for t
 
 By default, `page.click` will wait for the navigation step to complete. This can be combined with a page interaction on the navigated page which would auto-wait for an element.
 
-```js
-// Click will auto-wait for navigation to complete
-await page.click('text=Login');
-// Fill will auto-wait for element on navigated page
-await page.fill('#username', 'John Doe');
-```
-
 ### Custom wait
 
 `page.click` can be combined with [page.wait_for_load_state(**options)](./api/class-page.md#pagewaitforloadstateoptions) to wait for a loading event.
 
-```js
-await page.click('button'); // Click triggers navigation
-await page.waitForLoadState('networkidle'); // This resolves after 'networkidle'
-```
-
 ### Wait for element
 
 In lazy-loaded pages, it can be useful to wait until an element is visible with [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewaitforselectorselector-options). Alternatively, page interactions like [page.click(selector, **options)](./api/class-page.md#pageclickselector-options) auto-wait for elements.
-
-```js
-// Click triggers navigation
-await page.click('text=Login');
- // Click will auto-wait for the element
-await page.waitForSelector('#username', 'John Doe');
-
-// Click triggers navigation
-await page.click('text=Login');
- // Fill will auto-wait for element
-await page.fill('#username', 'John Doe');
-```
 
 ### Asynchronous navigation
 
 Clicking an element could trigger asychronous processing before initiating the navigation. In these cases, it is recommended to explicitly call [page.wait_for_navigation(**options)](./api/class-page.md#pagewaitfornavigationoptions). For example:
 * Navigation is triggered from a `setTimeout`
 * Page waits for network requests before navigation
-
-```js
-await Promise.all([
-  page.click('a'), // Triggers a navigation after a timeout
-  page.waitForNavigation(), // Waits for the next navigation
-]);
-```
 
 The `Promise.all` pattern prevents a race condition between `page.click` and `page.waitForNavigation` when navigation happens quickly.
 
@@ -129,26 +77,11 @@ Clicking an element could trigger multiple navigations. In these cases, it is re
 * Client-side redirects issued after the `load` event
 * Multiple pushes to history state
 
-```js
-await Promise.all([
-  page.waitForNavigation({ url: '**/login' }),
-  page.click('a'), // Triggers a navigation with a script redirect
-]);
-```
-
 The `Promise.all` pattern prevents a race condition between `page.click` and `page.waitForNavigation` when navigation happens quickly.
 
 ### Loading a popup
 
 When popup is opened, explicitly calling [page.wait_for_load_state(**options)](./api/class-page.md#pagewaitforloadstateoptions) ensures that popup is loaded to the desired state.
-
-```js
-const [ popup ] = await Promise.all([
-  page.waitForEvent('popup'),
-  page.click('a[target="_blank"]'),  // Opens popup
-]);
-await popup.waitForLoadState('load');
-```
 
 #### API reference
 - [page.click(selector, **options)](./api/class-page.md#pageclickselector-options)
@@ -160,13 +93,6 @@ await popup.waitForLoadState('load');
 ## Advanced patterns
 
 For pages that have complicated loading patterns, [page.wait_for_function(page_function, **options)](./api/class-page.md#pagewaitforfunctionpagefunction-options) is a powerful and extensible approach to define a custom wait criteria.
-
-```js
-await page.goto('http://example.com');
-await page.waitForFunction(() => window.amILoadedYet());
-// Ready to take a screenshot, according to the page itself.
-await page.screenshot();
-```
 
 #### API reference
 - [page.wait_for_function(page_function, **options)](./api/class-page.md#pagewaitforfunctionpagefunction-options)

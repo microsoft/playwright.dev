@@ -18,34 +18,6 @@ By default the engine is run directly in the frame's JavaScript context and, for
 
 An example of registering selector engine that queries elements based on a tag name:
 
-```js
-// Must be a function that evaluates to a selector engine instance.
-const createTagNameEngine = () => ({
-  // Returns the first element matching given selector in the root's subtree.
-  query(root, selector) {
-    return root.querySelector(selector);
-  },
-
-  // Returns all elements matching given selector in the root's subtree.
-  queryAll(root, selector) {
-    return Array.from(root.querySelectorAll(selector));
-  }
-});
-
-// Register the engine. Selectors will be prefixed with "tag=".
-await selectors.register('tag', createTagNameEngine);
-
-// Now we can use 'tag=' selectors.
-const button = await page.$('tag=button');
-
-// We can combine it with other selector engines using `>>` combinator.
-await page.click('tag=div >> span >> "Click me"');
-
-// We can use it in any methods supporting selectors.
-const buttonCount = await page.$$eval('tag=button', buttons => buttons.length);
-```
-
-
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"

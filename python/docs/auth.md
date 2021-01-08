@@ -19,16 +19,32 @@ The Playwright API can automate interaction with a login form. See [Input guide]
 
 The following example automates login on GitHub. Once these steps are executed, the browser context will be authenticated.
 
-```js
-const page = await context.newPage();
-await page.goto('https://github.com/login');
+```python
+# async
 
-// Interact with login form
-await page.click('text=Login');
-await page.fill('input[name="login"]', USERNAME);
-await page.fill('input[name="password"]', PASSWORD);
-await page.click('text=Submit');
-// Verify app is logged in
+page = await context.new_page()
+await page.goto('https://github.com/login')
+
+# Interact with login form
+await page.click('text=Login')
+await page.fill('input[name="login"]', USERNAME)
+await page.fill('input[name="password"]', PASSWORD)
+await page.click('text=Submit')
+# Verify app is logged in
+```
+
+```python
+# sync
+
+page = context.new_page()
+page.goto('https://github.com/login')
+
+# Interact with login form
+page.click('text=Login')
+page.fill('input[name="login"]', USERNAME)
+page.fill('input[name="password"]', PASSWORD)
+page.click('text=Submit')
+# Verify app is logged in
 ```
 
 These steps can be executed for every browser context. However, redoing login for every test can slow down test execution. To prevent that, we will reuse existing authentication state in new browser contexts.
@@ -43,56 +59,122 @@ The following code snippets retrieve state from an authenticated page/context an
 
 ### Cookies
 
-```js
-// Get cookies and store as an env variable
-const cookies = await context.cookies();
-process.env.COOKIES = JSON.stringify(cookies);
+```python
+# async
 
-// Set cookies in a new context
-const deserializedCookies = JSON.parse(process.env.COOKIES)
-await context.addCookies(deserializedCookies);
+import json
+import os
+# Get cookies and store as an env variable
+cookies = await context.cookies()
+os.environ["COOKIES"] = json.dumps(cookies)
+
+# Set cookies in a new context
+deserialized_cookies = json.loads(os.environ["COOKIES"])
+await context.add_cookies(deserialized_cookies)
+```
+
+```python
+# sync
+
+import json
+import os
+# Get cookies and store as an env variable
+cookies = context.cookies()
+os.environ["COOKIES"] = json.dumps(cookies)
+
+# Set cookies in a new context
+deserialized_cookies = json.loads(os.environ["COOKIES"])
+context.add_cookies(deserialized_cookies)
 ```
 
 ### Local storage
 
 Local storage ([`window.localStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage)) is specific to a particular domain.
 
-```js
-// Get local storage and store as env variable
-const localStorage = await page.evaluate(() => JSON.stringify(window.localStorage));
-process.env.LOCAL_STORAGE = localStorage;
+```python
+# async
 
-// Set local storage in a new context
-const localStorage = process.env.LOCAL_STORAGE;
-await context.addInitScript(storage => {
-  if (window.location.hostname === 'example.com') {
-    const entries = JSON.parse(storage);
+import os
+import json
+# Get local storage and store as env variable
+local_storage = await page.evaluate("() => JSON.stringify(window.localStorage))
+os.environ["LOCAL_STORAGE"] = local_storage
+
+# Set local storage in a new context
+local_storage = os.environ["LOCAL_STORAGE"]
+await context.add_init_script("""storage => {
+  if (window.location.hostname == 'example.com') {
+    entries = JSON.parse(storage)
     Object.keys(entries).forEach(key => {
-      window.localStorage.setItem(key, entries[key]);
-    });
+      window.localStorage.setItem(key, entries[key])
+    })
   }
-}, localStorage);
+}""", local_storage)
+```
+
+```python
+# sync
+
+import os
+import json
+# Get local storage and store as env variable
+local_storage = page.evaluate("() => JSON.stringify(window.localStorage)")
+os.environ["LOCAL_STORAGE"] = local_storage
+
+# Set local storage in a new context
+local_storage = os.environ["LOCAL_STORAGE"]
+context.add_init_script("""storage => {
+  if (window.location.hostname == 'example.com') {
+    entries = JSON.parse(storage)
+    Object.keys(entries).forEach(key => {
+      window.localStorage.setItem(key, entries[key])
+    })
+  }
+}""", local_storage)
 ```
 
 ### Session storage
 
 Session storage ([`window.sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)) is specific to a particular domain.
 
-```js
-// Get session storage and store as env variable
-const sessionStorage = await page.evaluate(() => JSON.stringify(sessionStorage));
-process.env.SESSION_STORAGE = sessionStorage;
+```python
+# async
 
-// Set session storage in a new context
-const sessionStorage = process.env.SESSION_STORAGE;
-await context.addInitScript(storage => {
-  if (window.location.hostname === 'example.com') {
-    const entries = JSON.parse(storage);
+import os
+# Get session storage and store as env variable
+session_storage = await page.evaluate("() => JSON.stringify(sessionStorage)")
+os.environ["SESSION_STORAGE"] = session_storage
+
+# Set session storage in a new context
+session_storage = os.environ["SESSION_STORAGE"]
+await context.add_init_script(storage => {
+  if (window.location.hostname == 'example.com') {
+    entries = JSON.parse(storage)
     Object.keys(entries).forEach(key => {
-      window.sessionStorage.setItem(key, entries[key]);
-    });
+      window.sessionStorage.setItem(key, entries[key])
+    })
   }
-}, sessionStorage);
+}, session_storage)
+```
+
+```python
+# sync
+
+import os
+# Get session storage and store as env variable
+session_storage = page.evaluate("() => JSON.stringify(sessionStorage)")
+os.environ["SESSION_STORAGE"] = session_storage
+
+# Set session storage in a new context
+session_storage = os.environ["SESSION_STORAGE"]
+context.add_init_script(storage => {
+  if (window.location.hostname == 'example.com') {
+    entries = JSON.parse(storage)
+    Object.keys(entries).forEach(key => {
+      window.sessionStorage.setItem(key, entries[key])
+    })
+  }
+}, session_storage)
 ```
 
 ### Lifecycle
@@ -128,12 +210,30 @@ Note that persistent authentication is not suited for CI environments since it r
 
 User data directories can be used with the [browser_type.launch_persistent_context(user_data_dir, **options)](./api/class-browsertype.md#browsertypelaunchpersistentcontextuserdatadir-options) API.
 
-```js
-const { chromium } = require('playwright');
+```python
+# async
 
-const userDataDir = '/path/to/directory';
-const context = await chromium.launchPersistentContext(userDataDir, { headless: false });
-// Execute login steps manually in the browser window
+import asyncio
+from playwright import async_playwright
+
+async def main():
+    async with async_playwright() as p:
+        user_data_dir = '/path/to/directory'
+        browser = await p.chromium.launch_persistent_context(userDataDir, headless=False)
+        # Execute login steps manually in the browser window
+
+asyncio.get_event_loop().run_until_complete(main())
+```
+
+```python
+# sync
+
+from playwright import sync_playwright
+
+with sync_playwright() as p:
+    user_data_dir = '/path/to/directory'
+    browser = p.chromium.launch_persistent_context(user_data_dir, headless=False)
+    # Execute login steps manually in the browser window
 ```
 
 ### Lifecycle

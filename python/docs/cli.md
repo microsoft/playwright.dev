@@ -105,39 +105,17 @@ During `open` or `codegen`, you can use following API inside the developer tools
 
 Query Playwright selector, using the actual Playwright query engine, for example:
 
-```js
-> playwright.$('.auth-form >> text=Log in');
-
-<button>Log in</button>
-```
-
 #### playwright.$$(selector)
 
 Same as `playwright.$`, but returns all matching elements.
-
-```js
-> playwright.$$('li >> text=John')
-
-> [<li>, <li>, <li>, <li>]
-```
 
 #### playwright.inspect(selector)
 
 Reveal element in the Elements panel (if DevTools of the respective browser supports it).
 
-```js
-> playwright.inspect('text=Log in')
-```
-
 #### playwright.selector(element)
 
 Generates selector for the given element.
-
-```js
-> playwright.selector($0)
-
-"div[id="glow-ingress-block"] >> text=/.*Hello.*/"
-```
 
 ## Take screenshot
 

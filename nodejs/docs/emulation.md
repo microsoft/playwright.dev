@@ -145,6 +145,8 @@ const context = await browser.newContext({
 });
 ```
 
+Change the location later:
+
 ```js
 await context.setGeolocation({ longitude: 29.979097, latitude: 31.134256 });
 ```

@@ -20,35 +20,7 @@ Page objects **simplify maintenance**. They capture element selectors in one pla
 
 Page object models wrap over a Playwright [Page].
 
-```js
-// models/Search.js
-class SearchPage {
-  constructor(page) {
-    this.page = page;
-  }
-  async navigate() {
-    await this.page.goto('https://bing.com');
-  }
-  async search(text) {
-    await this.page.fill('[aria-label="Enter your search term"]', text);
-    await this.page.keyboard.press('Enter');
-  }
-}
-module.exports = { SearchPage };
-```
-
 Page objects can then be used inside a test.
-
-```js
-// search.spec.js
-const { SearchPage } = require('./models/Search');
-
-// In the test
-const page = await browser.newPage();
-const searchPage = new SearchPage(page);
-await searchPage.navigate();
-await searchPage.search('search query');
-```
 
 ### API reference
 - [Page]

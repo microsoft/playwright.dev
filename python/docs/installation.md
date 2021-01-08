@@ -121,17 +121,6 @@ $ npm i -D playwright-webkit
 
 Require package
 
-```js
-// Notice a proper package name in require
-const { webkit } = require('playwright-webkit');
-
-(async () => {
-  const browser = await webkit.launch();
-  // ...
-})();
-```
-
-
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"

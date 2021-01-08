@@ -19,21 +19,6 @@ You can try Playwright against Chrome for Android today. This support is experim
 
 ## How to run
 
-```js
-const { _clank } = require('playwright');
-
-(async () => {
-  const context = await _clank.launchPersistentContext('', {
-    viewport: null
-  });
-  const [page] = context.pages();
-  await page.goto('https://webkit.org/');
-  console.log(await page.evaluate(() => window.location.href));
-  await page.screenshot({ path: 'example.png' });
-  await context.close();
-})();
-```
-
 > [Clank](https://chromium.googlesource.com/chromium/src/+/master/docs/memory/android_dev_tips.md) is a code name for Chrome for Android.
 
 ## Known limitations

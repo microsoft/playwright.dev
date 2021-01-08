@@ -28,35 +28,6 @@ For convenience, selectors in the wrong format are heuristically converted to th
 - selector starting and ending with a quote (either `"` or `'`) is assumed to be `text=selector`;
 - otherwise selector is assumed to be `css=selector`.
 
-```js
-// queries 'div' css selector
-const handle = await page.$('css=div');
-
-// queries '//html/body/div' xpath selector
-const handle = await page.$('xpath=//html/body/div');
-
-// queries '"foo"' text selector
-const handle = await page.$('text="foo"');
-
-// queries 'span' css selector inside the result of '//html/body/div' xpath selector
-const handle = await page.$('xpath=//html/body/div >> css=span');
-
-// converted to 'css=div'
-const handle = await page.$('div');
-
-// converted to 'xpath=//html/body/div'
-const handle = await page.$('//html/body/div');
-
-// converted to 'text="foo"'
-const handle = await page.$('"foo"');
-
-// queries '../span' xpath selector starting with the result of 'div' css selector
-const handle = await page.$('div >> ../span');
-
-// queries 'span' css selector inside the div handle
-const handle = await divHandle.$('css=span');
-```
-
 ### Working with Chrome Extensions
 
 Playwright can be used for testing Chrome Extensions.
@@ -64,25 +35,6 @@ Playwright can be used for testing Chrome Extensions.
 > **NOTE** Extensions in Chrome / Chromium currently only work in non-headless mode.
 
 The following is code for getting a handle to the [background page](https://developer.chrome.com/extensions/background_pages) of an extension whose source is located in `./my-extension`:
-
-```js
-const { chromium } = require('playwright');
-
-(async () => {
-  const pathToExtension = require('path').join(__dirname, 'my-extension');
-  const userDataDir = '/tmp/test-user-data-dir';
-  const browserContext = await chromium.launchPersistentContext(userDataDir,{
-    headless: false,
-    args: [
-      `--disable-extensions-except=${pathToExtension}`,
-      `--load-extension=${pathToExtension}`
-    ]
-  });
-  const backgroundPage = browserContext.backgroundPages()[0];
-  // Test the background page as you would any other page.
-  await browserContext.close();
-})();
-```
 
 ## Syntax
 
@@ -116,13 +68,6 @@ For example,
 css=article >> css=.bar > .baz >> css=span[attr=value]
 ```
 
-```js
-document
-  .querySelector('article')
-  .querySelector('.bar > .baz')
-  .querySelector('span[attr=value]')
-```
-
 If a selector needs to include `>>` in the body, it should be escaped inside a string to not be confused with chaining separator, e.g. `text="some >> text"`.
 
 ### Intermediate matches
@@ -141,23 +86,6 @@ Attributes like text content, input placeholder, accessibility roles and labels 
 
 The following examples use the built-in [text] and [css] selector engines.
 
-```js
-// queries "Login" text selector
-await page.click('text="Login"');
-await page.click('"Login"'); // short-form
-
-// queries "Search GitHub" placeholder attribute
-await page.fill('css=[placeholder="Search GitHub"]');
-await page.fill('[placeholder="Search GitHub"]'); // short-form
-
-// queries "Close" accessibility label
-await page.click('css=[aria-label="Close"]');
-await page.click('[aria-label="Close"]'); // short-form
-
-// combine role and text queries
-await page.click('css=nav >> text=Login');
-```
-
 ### Define explicit contract
 
 When user-facing attributes change frequently, it is recommended to use explicit test ids, like `data-test-id`. These `data-*` attributes are supported by the [css] and [id selectors][id].
@@ -166,52 +94,11 @@ When user-facing attributes change frequently, it is recommended to use explicit
 <button data-test-id="directions">Itinéraire</button>
 ```
 
-```js
-// queries data-test-id attribute with css
-await page.click('css=[data-test-id=directions]');
-await page.click('[data-test-id=directions]'); // short-form
-
-// queries data-test-id with id
-await page.click('data-test-id=directions');
-```
-
 ### Avoid selectors tied to implementation
 
 [xpath] and [css] can be tied to the DOM structure or implementation. These selectors can break when the DOM structure changes.
 
-```js
-// avoid long css or xpath chains
-await page.click('#tsf > div:nth-child(2) > div.A8SBwf > div.RNNXgb > div > div.a4bIc > input');
-await page.click('//*[@id="tsf"]/div[2]/div[1]/div[1]/div/div[2]/input');
-```
-
 ## Examples
-
-```js
-// queries 'div' css selector
-const handle = await page.$('css=div');
-
-// queries '//html/body/div' xpath selector
-const handle = await page.$('xpath=//html/body/div');
-
-// queries '"foo"' text selector
-const handle = await page.$('text="foo"');
-
-// queries 'span' css selector inside the result of '//html/body/div' xpath selector
-const handle = await page.$('xpath=//html/body/div >> css=span');
-
-// converted to 'css=div'
-const handle = await page.$('div');
-
-// converted to 'xpath=//html/body/div'
-const handle = await page.$('//html/body/div');
-
-// converted to 'text="foo"'
-const handle = await page.$('"foo"');
-
-// queries 'span' css selector inside the div handle
-const handle = await divHandle.$('css=span');
-```
 
 ## Selector engines
 
@@ -261,13 +148,6 @@ Note that `<open mode shadow root>` is not an html element, but rather a shadow 
 
 The `:visible` pseudo-class matches elements that are visible as defined in the [actionability](./actionability.md#visible) guide. For example, `input` matches all the inputs on the page, while `input:visible` matches only visible inputs. This is useful to distinguish elements that are very similar but differ in visibility.
 
-```js
-// Clicks the first button.
-await page.click('button');
-// Clicks the first visible button. If there are some invisible buttons, this click will just ignore them.
-await page.click('button:visible');
-```
-
 Use `:visible` with caution, because it has two major drawbacks:
 * When elements change their visibility dynamically, `:visible` will give upredictable results based on the timing.
 * `:visible` forces a layout and may lead to querying being slow, especially when used with `page.waitForSelector(selector[, options])` method.
@@ -281,18 +161,9 @@ The `:text` pseudo-class matches elements that have a text node child with speci
 * `:text-matches("[+-]?\\d+")` - Matches text against a regular expression. Note that special characters like back-slash `\`, quotes `"`, square brackets `[]` and more should be escaped. Learn more about [regular expressions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp).
 * `:text-matches("value", "i")` - Matches text against a regular expression with specified flags.
 
-```js
-// Click a button with text "Sign in".
-await page.click('button:text("Sign in")');
-```
-
 #### CSS extension: light
 
 `css` engine [pierces shadow](#shadow-piercing) by default. It is possible to disable this behavior by wrapping a selector in `:light` pseudo-class: `:light(section > button.class)` matches in light DOM only.
-
-```js
-await page.click(':light(.article > .header)');
-```
 
 #### CSS extension: proximity
 
@@ -306,14 +177,6 @@ Proximity selectors use [bounding client rect](https://developer.mozilla.org/en-
 * `:above(inner > selector)` - Matches elements that are above any of the elements matching the inner selector.
 * `:below(inner > selector)` - Matches elements that are below any of the elements matching the inner selector.
 * `:near(inner > selector)` - Matches elements that are near (within 50 CSS pixels) any of the elements matching the inner selector.
-
-```js
-// Fill an input to the right of "Username".
-await page.fill('input:right-of(:text("Username"))');
-
-// Click a button near the promo card.
-await page.click('button:near(.promo-card)');
-```
 
 ### xpath
 
