@@ -21,6 +21,7 @@ const path = require('path');
 const md = require('./markdown');
 const { parseApi } = require('./api_parser');
 const Documentation = require('./documentation');
+const { METHODS } = require('http');
 
 /** @typedef {import('./documentation').Type} Type */
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
@@ -379,15 +380,15 @@ new Generator('python', path.join(__dirname, '..', 'python', 'docs'), {
     let text;
     const args = [];
     if (member.kind === 'property')
-      text = `${toSnakeCase(member.clazz.varName)}.${toSnakeCase(member.name)}`;
+      text = `${toSnakeCase(member.clazz.varName)}.${toSnakeCase(member.alias)}`;
   
     if (member.kind === 'event')
-      text = `${toSnakeCase(member.clazz.varName)}.on("${toSnakeCase(member.name)}")`;
+      text = `${toSnakeCase(member.clazz.varName)}.on("${toSnakeCase(member.alias)}")`;
   
     if (member.kind === 'method') {
       for (const arg of member.argsArray)
-        args.push(...expandPythonArgument(member.name, arg));
-      text = `${toSnakeCase(member.clazz.varName)}.${toSnakeCase(member.name)}(${renderPythonSignature(args)})`;
+        args.push(...expandPythonArgument(member.alias, arg));
+      text = `${toSnakeCase(member.clazz.varName)}.${toSnakeCase(member.alias)}(${renderPythonSignature(args)})`;
     }
     return { text, args };
   },

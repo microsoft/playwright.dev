@@ -606,7 +606,7 @@ There are two types of handles:
 Note that since any DOM element in the page is also a JavaScript object, Playwright's [ElementHandle] extends [JSHandle].
 
 ### Handles Lifecycle
-- Handles can be acquired using the page methods [page.evaluate_handle(page_function, **options)](./api/class-page.md#pageevaluatehandlepagefunction-options), [page.$(selector)](./api/class-page.md#pageselector) or [page.$$(selector)](./api/class-page.md#pageselector-1) or their frame counterparts [frame.evaluate_handle(page_function, **options)](./api/class-frame.md#frameevaluatehandlepagefunction-options), [frame.$(selector)](./api/class-frame.md#frameselector) or [frame.$$(selector)](./api/class-frame.md#frameselector-1).
+- Handles can be acquired using the page methods [page.evaluate_handle(page_function, **options)](./api/class-page.md#pageevaluatehandlepagefunction-options), [page.query_selector(selector)](./api/class-page.md#pagequeryselectorselector) or [page.query_selector_all(selector)](./api/class-page.md#pagequeryselectorallselector) or their frame counterparts [frame.evaluate_handle(page_function, **options)](./api/class-frame.md#frameevaluatehandlepagefunction-options), [frame.query_selector(selector)](./api/class-frame.md#framequeryselectorselector) or [frame.query_selector_all(selector)](./api/class-frame.md#framequeryselectorallselector).
 - Once created, handles will retain object from [garbage collection](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_Management).
 - Handles will be **automatically disposed** once the page or frame they belong to navigates or closes.
 - Handles can be **manually disposed** using [js_handle.dispose()](./api/class-jshandle.md#jshandledispose) method.
@@ -709,8 +709,8 @@ my_array_handle.dispose()
 - [JSHandle]
 - [ElementHandle]
 - [page.evaluate_handle(page_function, **options)](./api/class-page.md#pageevaluatehandlepagefunction-options)
-- [page.$(selector)](./api/class-page.md#pageselector)
-- [page.$$(selector)](./api/class-page.md#pageselector-1)
+- [page.query_selector(selector)](./api/class-page.md#pagequeryselectorselector)
+- [page.query_selector_all(selector)](./api/class-page.md#pagequeryselectorallselector)
 - [js_handle.evaluate(page_function, **options)](./api/class-jshandle.md#jshandleevaluatepagefunction-options)
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"

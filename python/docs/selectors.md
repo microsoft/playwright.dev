@@ -3,43 +3,42 @@ id: selectors
 title: "Element selectors"
 ---
 
-Selectors query elements on the web page for interactions, like [page.click(selector, **options)](./api/class-page.md#pageclickselector-options), and to obtain `ElementHandle` through [page.$(selector)](./api/class-page.md#pageselector). Built-in selectors auto-pierce [shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM).
+Selectors query elements on the web page for interactions, like [page.click(selector, **options)](./api/class-page.md#pageclickselector-options), and to obtain `ElementHandle` through [page.query_selector(selector)](./api/class-page.md#pagequeryselectorselector). Built-in selectors auto-pierce [shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM).
 
 - [Working with selectors](#working-with-selectors)
 - [Syntax](#syntax)
 - [Best practices](#best-practices)
-- [Examples](#examples)
-- [Selector engines](#selector-engines)
+- [CSS selector engine](#css-selector-engine)
+- [Xpath selector engine](#xpath-selector-engine)
+- [Text selector engine](#text-selector-engine)
 
 ## Working with selectors
 
-Selector describes an element in the page. It can be used to obtain `ElementHandle` (see [page.$(selector)](./api/class-page.md#pageselector) for example) or shortcut element operations to avoid intermediate handle (see [page.click(selector, **options)](./api/class-page.md#pageclickselector-options) for example).
+Selector describes an element in the page. It can be used to obtain `ElementHandle` (see [page.query_selector(selector)](./api/class-page.md#pagequeryselectorselector) for example) or shortcut element operations to avoid intermediate handle (see [page.click(selector, **options)](./api/class-page.md#pageclickselector-options) for example).
 
 Selector has the following format: `engine=body [>> engine=body]*`. Here `engine` is one of the supported [selector engines](./selectors.md) (e.g. `css` or `xpath`), and `body` is a selector body in the format of the particular engine. When multiple `engine=body` clauses are present (separated by `>>`), next one is queried relative to the previous one's result.
 
-Playwright also supports the following CSS extensions:
-* `:text("string")` - Matches elements that contain specific text node. Learn more about [text selector](./selectors.md#css-extension-text).
-* `:visible` - Matches only visible elements. Learn more about [visible selector](./selectors.md#css-extension-visible).
-* `:light(selector)` - Matches in the light DOM only as opposite to piercing open shadow roots. Learn more about [shadow piercing](./selectors.md#shadow-piercing).
-* `:right-of(selector)`, `:left-of(selector)`, `:above(selector)`, `:below(selector)`, `:near(selector)` - Match elements based on their relative position to another element. Learn more about [proximity selectors](./selectors.md#css-extension-proximity).
+Playwright supports various selector engines:
+* [Text] selectors, for example `text="Log in"`
+* [CSS] selectors, including the following extensions:
+  - [Shadow piercing](#shadow-piercing) by default and [`:light`](#css-extension-light) pseudo-class
+  - [`:visible`](#css-extension-visible) pseudo-class
+  - [`:text`](#css-extension-text) pseudo-class
+  - [`:has`](#css-extension-has) and [`:is`](#css-extension-is) pseudo-classes
+  - [Proximity selectors](#css-extension-proximity), for example `button:right-of(article)`
+* [XPath] selectors, for example `xpath=//html/body/div`
+* [id selectors][id], for example `id=sign-in`
+* [Custom selector engines](./extensibility.md)
 
 For convenience, selectors in the wrong format are heuristically converted to the right format:
 - selector starting with `//` or `..` is assumed to be `xpath=selector`;
 - selector starting and ending with a quote (either `"` or `'`) is assumed to be `text=selector`;
 - otherwise selector is assumed to be `css=selector`.
 
-### Working with Chrome Extensions
-
-Playwright can be used for testing Chrome Extensions.
-
-> **NOTE** Extensions in Chrome / Chromium currently only work in non-headless mode.
-
-The following is code for getting a handle to the [background page](https://developer.chrome.com/extensions/background_pages) of an extension whose source is located in `./my-extension`:
-
 ## Syntax
 
 Selectors are defined by selector engine name and selector body, `engine=body`.
-* `engine` refers to one of the [supported engines](#selector-engines)
+* `engine` refers to one of the supported engines
   * Built-in selector engines: [css], [text], [xpath] and [id selectors][id]
   * Learn more about [custom selector engines](./extensibility.md)
 * `body` refers to the query string for the respective engine
@@ -98,11 +97,7 @@ When user-facing attributes change frequently, it is recommended to use explicit
 
 [xpath] and [css] can be tied to the DOM structure or implementation. These selectors can break when the DOM structure changes.
 
-## Examples
-
-## Selector engines
-
-### css and css:light
+## CSS selector engine
 
 `css` is a default engine - any malformed selector not starting with `//` nor starting and ending with a quote is assumed to be a css selector. For example, Playwright converts `'span > button'` to `'css=span > button'`.
 
@@ -110,7 +105,7 @@ Playwright augments standard CSS selectors in two ways, see below for more detai
 * `css` engine pierces open shadow DOM by default.
 * Playwright adds a few custom pseudo-classes like `:visible`.
 
-#### Shadow piercing
+### Shadow piercing
 
 `css:light` engine is equivalent to [`Document.querySelector`](https://developer.mozilla.org/en/docs/Web/API/Document/querySelector) and behaves according to the CSS spec. However, it does not pierce shadow roots, which may be inconvenient when working with [Shadow DOM and Web Components](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM). For that reason, `css` engine pierces shadow roots. More specifically, any [Descendant combinator](https://developer.mozilla.org/en-US/docs/Web/CSS/Descendant_combinator) or [Child combinator](https://developer.mozilla.org/en-US/docs/Web/CSS/Child_combinator) pierces an arbitrary number of open shadow roots, including the implicit descendant combinator at the start of the selector.
 
@@ -144,28 +139,46 @@ Note that `<open mode shadow root>` is not an html element, but rather a shadow 
 - `"css:light=article > .in-the-shadow"` does not match anything.
 - `"css=article li#target"` matches the `<li id='target'>Deep in the shadow</li>`, piercing two shadow roots.
 
-#### CSS extension: visible
+### CSS extension: visible
 
-The `:visible` pseudo-class matches elements that are visible as defined in the [actionability](./actionability.md#visible) guide. For example, `input` matches all the inputs on the page, while `input:visible` matches only visible inputs. This is useful to distinguish elements that are very similar but differ in visibility.
+The `:visible` pseudo-class matches elements that are visible as defined in the [actionability](./actionability.md#visible) guide. For example, `input` matches all the inputs on the page, while `input:visible` matches only visible inputs. This is useful to distinguish elements that are very similar but differ in visibility, however it's usually better to follow [best practices](#best-practices) and find another way to select the element.
+
+Consider a page with two buttons, first invisible and second visible.
+
+```html
+<button style='display: none'>Invisible</button>
+<button>Visible</button>
+```
+
+* This will find the first button, because it is the first one in DOM order. Then it will wait for the button to become visible before clicking, or timeout while waiting:
+* This will find a second button, because it is visible, and then click it.
 
 Use `:visible` with caution, because it has two major drawbacks:
 * When elements change their visibility dynamically, `:visible` will give upredictable results based on the timing.
 * `:visible` forces a layout and may lead to querying being slow, especially when used with `page.waitForSelector(selector[, options])` method.
 
-#### CSS extension: text
+### CSS extension: text
 
-The `:text` pseudo-class matches elements that have a text node child with specific text. It is similar to the [text engine](#text-and-textlight). There are a few variations that support different arguments:
+The `:text` pseudo-class matches elements that have a text node child with specific text. It is similar to the [text] engine. There are a few variations that support different arguments:
 * `:text("substring")` - Matches when element's text contains "substring" somewhere. Matching is case-insensitive. Matching also normalizes whitespace, for example it turns multiple spaces into one, trusn line breaks into spaces and ignores leading and trailing whitespace.
 * `:text-is("string")` - Matches when element's text equals the "string". Matching is case-insensitive and normalizes whitespace.
 * `button:text("Sign in")` - Text selector may be combined with regular CSS.
 * `:text-matches("[+-]?\\d+")` - Matches text against a regular expression. Note that special characters like back-slash `\`, quotes `"`, square brackets `[]` and more should be escaped. Learn more about [regular expressions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp).
 * `:text-matches("value", "i")` - Matches text against a regular expression with specified flags.
 
-#### CSS extension: light
+### CSS extension: has
+
+The `:has()` pseudo-class is an [experimental CSS pseudo-class](https://developer.mozilla.org/en-US/docs/Web/CSS/:has) that is supported by Playwright.
+
+### CSS extension: is
+
+The `:is()` pseudo-class is an [experimental CSS pseudo-class](https://developer.mozilla.org/en-US/docs/Web/CSS/:is) that is supported by Playwright.
+
+### CSS extension: light
 
 `css` engine [pierces shadow](#shadow-piercing) by default. It is possible to disable this behavior by wrapping a selector in `:light` pseudo-class: `:light(section > button.class)` matches in light DOM only.
 
-#### CSS extension: proximity
+### CSS extension: proximity
 
 Playwright provides a few proximity selectors based on the page layout. These can be combined with regular CSS for better results, for example `input:right-of(:text("Password"))` matches an input field that is to the right of text "Password".
 
@@ -178,7 +191,7 @@ Proximity selectors use [bounding client rect](https://developer.mozilla.org/en-
 * `:below(inner > selector)` - Matches elements that are below any of the elements matching the inner selector.
 * `:near(inner > selector)` - Matches elements that are near (within 50 CSS pixels) any of the elements matching the inner selector.
 
-### xpath
+## Xpath selector engine
 
 XPath engine is equivalent to [`Document.evaluate`](https://developer.mozilla.org/en/docs/Web/API/Document/evaluate). Example: `xpath=//html/body`.
 
@@ -186,7 +199,7 @@ Malformed selector starting with `//` or `..` is assumed to be an xpath selector
 
 Note that `xpath` does not pierce shadow roots.
 
-### text and text:light
+## Text selector engine
 
 Text engine finds an element that contains a text node with the passed text. For example, `page.click('text=Login')` clicks on a login button, and `page.waitForSelector('"lazy loaded text")` waits for the `"lazy loaded text"` to appear in the page.
 - By default, the match is case-insensitive, ignores leading/trailing whitespace and searches for a substring. This means `text= Login` matches `<button>Button loGIN (click me)</button>`.
@@ -198,14 +211,14 @@ Malformed selector starting and ending with a quote (either `"` or `'`) is assum
 
 `text` engine open pierces shadow roots similarly to `css`, while `text:light` does not. Text engine first searches for elements in the light dom in the iteration order, and then recursively inside open shadow roots in the iteration order. It does not search inside closed shadow roots or iframes.
 
-### id, data-testid, data-test-id, data-test and their :light counterparts
+### id, data-testid, data-test-id, data-test selector engines
 
 Attribute engines are selecting based on the corresponding attribute value. For example: `data-test-id=foo` is equivalent to `css=[data-test-id="foo"]`, and `id:light=foo` is equivalent to `css:light=[id="foo"]`.
 
-[css]: #css-and-csslight
-[text]: #text-and-textlight
-[xpath]: #xpath
-[id]: #id-data-testid-data-test-id-data-test-and-their-light-counterparts
+[css]: #css-selector-engine
+[text]: #text-selector-engine
+[xpath]: #xpath-selector-engine
+[id]: #id-data-testid-data-test-id-data-test-selector-engines
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"

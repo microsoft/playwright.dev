@@ -8,7 +8,7 @@ JSHandle represents an in-page JavaScript object. JSHandles can be created with 
 
 JSHandle prevents the referenced JavaScript object being garbage collected unless the handle is exposed with [js_handle.dispose()](./api/class-jshandle.md#jshandledispose). JSHandles are auto-disposed when their origin frame gets navigated or the parent context gets destroyed.
 
-JSHandle instances can be used as an argument in [page.$eval(selector, page_function, **options)](./api/class-page.md#pageevalselector-pagefunction-options), [page.evaluate(page_function, **options)](./api/class-page.md#pageevaluatepagefunction-options) and [page.evaluate_handle(page_function, **options)](./api/class-page.md#pageevaluatehandlepagefunction-options) methods.
+JSHandle instances can be used as an argument in [page.eval_on_selector(selector, page_function, **options)](./api/class-page.md#pageevalonselectorselector-pagefunction-options), [page.evaluate(page_function, **options)](./api/class-page.md#pageevaluatepagefunction-options) and [page.evaluate_handle(page_function, **options)](./api/class-page.md#pageevaluatehandlepagefunction-options) methods.
 
 
 - [js_handle.as_element()](./api/class-jshandle.md#jshandleaselement)
