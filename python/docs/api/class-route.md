@@ -13,7 +13,7 @@ Whenever a network route is set up with [page.route(url, handler)](./api/class-p
 - [route.request()](./api/class-route.md#routerequest)
 
 ## route.abort(**options)
-- `error_code` <[string]> Optional error code. Defaults to `failed`, could be one of the following:
+- `error_code` <[str]> Optional error code. Defaults to `failed`, could be one of the following:
   * `'aborted'` - An operation was aborted (due to user action)
   * `'accessdenied'` - Permission to access a resource, other than the network, was denied
   * `'addressunreachable'` - The IP address is unreachable. This usually means that there is no route to the specified host or network.
@@ -28,58 +28,29 @@ Whenever a network route is set up with [page.route(url, handler)](./api/class-p
   * `'namenotresolved'` - The host name could not be resolved.
   * `'timedout'` - An operation timed out.
   * `'failed'` - A generic failure occurred.
-- returns: <[Promise]>
 
 Aborts the route's request.
 
 ## route.continue(**options)
-- `url` <[string]> If set changes the request URL. New URL must have same protocol as original one.
-- `method` <[string]> If set changes the request method (e.g. GET or POST)
-- `post_data` <[string]|[Buffer]> If set changes the post data of request
-- `headers` <[Object]<[string], [string]>> If set changes the request HTTP headers. Header values will be converted to a string.
-- returns: <[Promise]>
+- `url` <[str]> If set changes the request URL. New URL must have same protocol as original one.
+- `method` <[str]> If set changes the request method (e.g. GET or POST)
+- `post_data` <[str]|[Buffer]> If set changes the post data of request
+- `headers` <[Dict]\[[str], [str]\]> If set changes the request HTTP headers. Header values will be converted to a string.
 
 Continues route's request with optional overrides.
 
-```js
-await page.route('**/*', (route, request) => {
-  // Override headers
-  const headers = {
-    ...request.headers(),
-    foo: 'bar', // set "foo" header
-    origin: undefined, // remove "origin" header
-  };
-  route.continue({headers});
-});
-```
-
 ## route.fulfill(**options)
-- `status` <[number]> Response status code, defaults to `200`.
-- `headers` <[Object]<[string], [string]>> Optional response headers. Header values will be converted to a string.
-- `content_type` <[string]> If set, equals to setting `Content-Type` response header.
-- `body` <[string]|[Buffer]> Optional response body.
-- `path` <[string]> Optional file path to respond with. The content type will be inferred from file extension. If `path` is a relative path, then it is resolved relative to the current working directory.
-- returns: <[Promise]>
+- `status` <[int]> Response status code, defaults to `200`.
+- `headers` <[Dict]\[[str], [str]\]> Optional response headers. Header values will be converted to a string.
+- `content_type` <[str]> If set, equals to setting `Content-Type` response header.
+- `body` <[str]|[Buffer]> Optional response body.
+- `path` <[Union]\[[str], [pathlib.Path]\]> Optional file path to respond with. The content type will be inferred from file extension. If `path` is a relative path, then it is resolved relative to the current working directory.
 
 Fulfills route's request with given response.
 
 An example of fulfilling all requests with 404 responses:
 
-```js
-await page.route('**/*', route => {
-  route.fulfill({
-    status: 404,
-    contentType: 'text/plain',
-    body: 'Not Found!'
-  });
-});
-```
-
 An example of serving static file:
-
-```js
-await page.route('**/xhr_endpoint', route => route.fulfill({ path: 'mock_data.json' }));
-```
 
 ## route.request()
 - returns: <[Request]>
@@ -114,28 +85,24 @@ A request to be routed.
 [WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.md "WebSocket"
 [Worker]: ./api/class-worker.md "Worker"
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
 [Evaluation Argument]: ./core-concepts.md#evaluationargument "Evaluation Argument"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[URL]: https://nodejs.org/api/url.html "URL"
-[USKeyboardLayout]: ../src/usKeyboardLayout.ts "USKeyboardLayout"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
 [selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
+[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
+[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
+[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
+[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
+[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
+[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
+[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"

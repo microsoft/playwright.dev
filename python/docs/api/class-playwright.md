@@ -6,18 +6,6 @@ title: "Playwright"
 
 Playwright module provides a method to launch a browser instance. The following is a typical example of using Playwright to drive automation:
 
-```js
-const { chromium, firefox, webkit } = require('playwright');
-
-(async () => {
-  const browser = await chromium.launch();  // Or 'firefox' or 'webkit'.
-  const page = await browser.newPage();
-  await page.goto('http://example.com');
-  // other actions...
-  await browser.close();
-})();
-```
-
 By default, the `playwright` NPM package automatically downloads browser executables during installation. The `playwright-core` NPM package can be used to skip automatic downloads.
 
 
@@ -34,25 +22,9 @@ By default, the `playwright` NPM package automatically downloads browser executa
 This object can be used to launch or connect to Chromium, returning instances of [ChromiumBrowser].
 
 ## playwright.devices
-- type: <[Object]>
+- type: <[Dict]>
 
 Returns a list of devices to be used with [browser.new_context(**options)](./api/class-browser.md#browsernewcontextoptions) or [browser.new_page(**options)](./api/class-browser.md#browsernewpageoptions). Actual list of devices can be found in [src/server/deviceDescriptors.ts](https://github.com/Microsoft/playwright/blob/master/src/server/deviceDescriptors.ts).
-
-```js
-const { webkit, devices } = require('playwright');
-const iPhone = devices['iPhone 6'];
-
-(async () => {
-  const browser = await webkit.launch();
-  const context = await browser.newContext({
-    ...iPhone
-  });
-  const page = await context.newPage();
-  await page.goto('http://example.com');
-  // other actions...
-  await browser.close();
-})();
-```
 
 ## playwright.firefox
 - type: <[BrowserType]>
@@ -70,24 +42,8 @@ Selectors can be used to install custom selector engines. See [Working with sele
 This object can be used to launch or connect to WebKit, returning instances of [WebKitBrowser].
 
 ## playwright.stop()
-- returns: <[Promise]>
 
 Terminates this instance of Playwright in case it was created bypassing the Python context manager. This is useful in REPL applications.
-
-```py
->>> from playwright import sync_playwright
-
->>> playwright = sync_playwright().start()
-
->>> browser = playwright.chromium.launch()
->>> page = browser.newPage()
->>> page.goto("http://whatsmyuseragent.org/")
->>> page.screenshot(path="example.png")
->>> browser.close()
-
->>> playwright.stop()
-```
-
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
@@ -117,28 +73,24 @@ Terminates this instance of Playwright in case it was created bypassing the Pyth
 [WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.md "WebSocket"
 [Worker]: ./api/class-worker.md "Worker"
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
 [Evaluation Argument]: ./core-concepts.md#evaluationargument "Evaluation Argument"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[URL]: https://nodejs.org/api/url.html "URL"
-[USKeyboardLayout]: ../src/usKeyboardLayout.ts "USKeyboardLayout"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
 [selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
+[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
+[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
+[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
+[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
+[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
+[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
+[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"

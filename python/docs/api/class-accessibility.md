@@ -16,35 +16,35 @@ Most of the accessibility tree gets filtered out when converting from Blink AX T
 - [accessibility.snapshot(**options)](./api/class-accessibility.md#accessibilitysnapshotoptions)
 
 ## accessibility.snapshot(**options)
-- `interesting_only` <[boolean]> Prune uninteresting nodes from the tree. Defaults to `true`.
+- `interesting_only` <[bool]> Prune uninteresting nodes from the tree. Defaults to `true`.
 - `root` <[ElementHandle]> The root DOM element for the snapshot. Defaults to the whole page.
-- returns: <[Promise]<[null]|[Object]>>
-  - `role` <[string]> The [role](https://www.w3.org/TR/wai-aria/#usage_intro).
-  - `name` <[string]> A human readable name for the node.
-  - `value` <[string]|[number]> The current value of the node, if applicable.
-  - `description` <[string]> An additional human readable description of the node, if applicable.
-  - `keyshortcuts` <[string]> Keyboard shortcuts associated with this node, if applicable.
-  - `roledescription` <[string]> A human readable alternative to the role, if applicable.
-  - `valuetext` <[string]> A description of the current value, if applicable.
-  - `disabled` <[boolean]> Whether the node is disabled, if applicable.
-  - `expanded` <[boolean]> Whether the node is expanded or collapsed, if applicable.
-  - `focused` <[boolean]> Whether the node is focused, if applicable.
-  - `modal` <[boolean]> Whether the node is [modal](https://en.wikipedia.org/wiki/Modal_window), if applicable.
-  - `multiline` <[boolean]> Whether the node text input supports multiline, if applicable.
-  - `multiselectable` <[boolean]> Whether more than one child can be selected, if applicable.
-  - `readonly` <[boolean]> Whether the node is read only, if applicable.
-  - `required` <[boolean]> Whether the node is required, if applicable.
-  - `selected` <[boolean]> Whether the node is selected in its parent node, if applicable.
-  - `checked` <[boolean]|"mixed"> Whether the checkbox is checked, or "mixed", if applicable.
-  - `pressed` <[boolean]|"mixed"> Whether the toggle button is checked, or "mixed", if applicable.
-  - `level` <[number]> The level of a heading, if applicable.
-  - `valuemin` <[number]> The minimum value in a node, if applicable.
-  - `valuemax` <[number]> The maximum value in a node, if applicable.
-  - `autocomplete` <[string]> What kind of autocomplete is supported by a control, if applicable.
-  - `haspopup` <[string]> What kind of popup is currently being shown for a node, if applicable.
-  - `invalid` <[string]> Whether and in what way this node's value is invalid, if applicable.
-  - `orientation` <[string]> Whether the node is oriented horizontally or vertically, if applicable.
-  - `children` <[Array]<[Object]>> Child nodes, if any, if applicable.
+- returns: <[NoneType]|[Dict]>
+  - `role` <[str]> The [role](https://www.w3.org/TR/wai-aria/#usage_intro).
+  - `name` <[str]> A human readable name for the node.
+  - `value` <[str]|[float]> The current value of the node, if applicable.
+  - `description` <[str]> An additional human readable description of the node, if applicable.
+  - `keyshortcuts` <[str]> Keyboard shortcuts associated with this node, if applicable.
+  - `roledescription` <[str]> A human readable alternative to the role, if applicable.
+  - `valuetext` <[str]> A description of the current value, if applicable.
+  - `disabled` <[bool]> Whether the node is disabled, if applicable.
+  - `expanded` <[bool]> Whether the node is expanded or collapsed, if applicable.
+  - `focused` <[bool]> Whether the node is focused, if applicable.
+  - `modal` <[bool]> Whether the node is [modal](https://en.wikipedia.org/wiki/Modal_window), if applicable.
+  - `multiline` <[bool]> Whether the node text input supports multiline, if applicable.
+  - `multiselectable` <[bool]> Whether more than one child can be selected, if applicable.
+  - `readonly` <[bool]> Whether the node is read only, if applicable.
+  - `required` <[bool]> Whether the node is required, if applicable.
+  - `selected` <[bool]> Whether the node is selected in its parent node, if applicable.
+  - `checked` <[bool]|"mixed"> Whether the checkbox is checked, or "mixed", if applicable.
+  - `pressed` <[bool]|"mixed"> Whether the toggle button is checked, or "mixed", if applicable.
+  - `level` <[int]> The level of a heading, if applicable.
+  - `valuemin` <[float]> The minimum value in a node, if applicable.
+  - `valuemax` <[float]> The maximum value in a node, if applicable.
+  - `autocomplete` <[str]> What kind of autocomplete is supported by a control, if applicable.
+  - `haspopup` <[str]> What kind of popup is currently being shown for a node, if applicable.
+  - `invalid` <[str]> Whether and in what way this node's value is invalid, if applicable.
+  - `orientation` <[str]> Whether the node is oriented horizontally or vertically, if applicable.
+  - `children` <[List]\[[Dict]\]> Child nodes, if any, if applicable.
 
 Captures the current state of the accessibility tree. The returned object represents the root accessible node of the page.
 
@@ -52,29 +52,7 @@ Captures the current state of the accessibility tree. The returned object repres
 
 An example of dumping the entire accessibility tree:
 
-```js
-const snapshot = await page.accessibility.snapshot();
-console.log(snapshot);
-```
-
 An example of logging the focused node's name:
-
-```js
-const snapshot = await page.accessibility.snapshot();
-const node = findFocusedNode(snapshot);
-console.log(node && node.name);
-
-function findFocusedNode(node) {
-  if (node.focused)
-    return node;
-  for (const child of node.children || []) {
-    const foundNode = findFocusedNode(child);
-    return foundNode;
-  }
-  return null;
-}
-```
-
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
@@ -104,28 +82,24 @@ function findFocusedNode(node) {
 [WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.md "WebSocket"
 [Worker]: ./api/class-worker.md "Worker"
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
 [Evaluation Argument]: ./core-concepts.md#evaluationargument "Evaluation Argument"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[URL]: https://nodejs.org/api/url.html "URL"
-[USKeyboardLayout]: ../src/usKeyboardLayout.ts "USKeyboardLayout"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
 [selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
+[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
+[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
+[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
+[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
+[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
+[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
+[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"

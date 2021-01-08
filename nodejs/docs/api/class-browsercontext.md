@@ -82,7 +82,6 @@ console.log(await page.evaluate('location.href'));
   - `httpOnly` <[boolean]> Optional.
   - `secure` <[boolean]> Optional.
   - `sameSite` <"Strict"|"Lax"|"None"> Optional.
-- returns: <[Promise]>
 
 Adds cookies into this browser context. All pages within this context will have these cookies installed. Cookies can be obtained via [browserContext.cookies([urls])](./api/class-browsercontext.md#browsercontextcookiesurls).
 
@@ -95,7 +94,6 @@ await browserContext.addCookies([cookieObject1, cookieObject2]);
   - `path` <[string]> Path to the JavaScript file. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
   - `content` <[string]> Raw script content. Optional.
 - `arg` <[Serializable]> Optional argument to pass to `script` (only supported when passing a function).
-- returns: <[Promise]>
 
 Adds a script which would be evaluated in one of the following scenarios:
 * Whenever a page is created in the browser context or is navigated.
@@ -125,12 +123,10 @@ await browserContext.addInitScript({
 Returns the browser instance of the context. If it was launched as a persistent context null gets returned.
 
 ## browserContext.clearCookies()
-- returns: <[Promise]>
 
 Clears context cookies.
 
 ## browserContext.clearPermissions()
-- returns: <[Promise]>
 
 Clears all permission overrides for the browser context.
 
@@ -142,7 +138,6 @@ context.clearPermissions();
 ```
 
 ## browserContext.close()
-- returns: <[Promise]>
 
 Closes the browser context. All the pages that belong to the browser context will be closed.
 
@@ -167,7 +162,6 @@ If no URLs are specified, this method returns all cookies. If URLs are specified
 - `callback` <[function]> Callback function that will be called in the Playwright's context.
 - `options` <[Object]>
   - `handle` <[boolean]> Whether to pass the argument as a handle, instead of passing by value. When passing a handle, only one argument is supported. When passing by value, multiple arguments are supported.
-- returns: <[Promise]>
 
 The method adds a function called `name` on the `window` object of every frame in every page in the context. When called, the function executes `callback` and returns a [Promise] which resolves to the return value of `callback`. If the `callback` returns a [Promise], it will be awaited.
 
@@ -216,7 +210,6 @@ await page.setContent(`
 ## browserContext.exposeFunction(name, callback)
 - `name` <[string]> Name of the function on the window object.
 - `callback` <[function]> Callback function that will be called in the Playwright's context.
-- returns: <[Promise]>
 
 The method adds a function called `name` on the `window` object of every frame in every page in the context. When called, the function executes `callback` and returns a [Promise] which resolves to the return value of `callback`.
 
@@ -268,7 +261,6 @@ const crypto = require('crypto');
   * `'payment-handler'`
 - `options` <[Object]>
   - `origin` <[string]> The [origin] to grant permissions to, e.g. "https://example.com".
-- returns: <[Promise]>
 
 Grants specified permissions to the browser context. Only grants corresponding permissions to the given origin if specified.
 
@@ -285,7 +277,6 @@ Returns all open pages in the context. Non visible pages, such as `"background_p
 ## browserContext.route(url, handler)
 - `url` <[string]|[RegExp]|[function]\([URL]\):[boolean]> A glob pattern, regex pattern or predicate receiving [URL] to match while routing.
 - `handler` <[function]\([Route], [Request]\)> handler function to route the request.
-- returns: <[Promise]>
 
 Routing provides the capability to modify network requests that are made by any page in the browser context. Once route is enabled, every request matching the url pattern will stall unless it's continued, fulfilled or aborted.
 
@@ -335,7 +326,6 @@ This setting will change the default maximum time for all the methods accepting 
 
 ## browserContext.setExtraHTTPHeaders(headers)
 - `headers` <[Object]<[string], [string]>> An object containing additional HTTP headers to be sent with every request. All header values must be strings.
-- returns: <[Promise]>
 
 The extra HTTP headers will be sent with every request initiated by any page in the context. These headers are merged with page-specific extra HTTP headers set with [page.setExtraHTTPHeaders(headers)](./api/class-page.md#pagesetextrahttpheadersheaders). If page overrides a particular header, page-specific header value will be used instead of the browser context header value.
 
@@ -346,7 +336,6 @@ The extra HTTP headers will be sent with every request initiated by any page in 
   - `latitude` <[number]> Latitude between -90 and 90. **required**
   - `longitude` <[number]> Longitude between -180 and 180. **required**
   - `accuracy` <[number]> Non-negative accuracy value. Defaults to `0`.
-- returns: <[Promise]>
 
 Sets the context's geolocation. Passing `null` or `undefined` emulates position unavailable.
 
@@ -360,13 +349,11 @@ await browserContext.setGeolocation({latitude: 59.95, longitude: 30.31667});
 - `httpCredentials` <[null]|[Object]>
   - `username` <[string]> **required**
   - `password` <[string]> **required**
-- returns: <[Promise]>
 
 **DEPRECATED** Browsers may cache credentials after successful authentication. Create a new browser context instead.
 
 ## browserContext.setOffline(offline)
 - `offline` <[boolean]> Whether to emulate network being offline for the browser context.
-- returns: <[Promise]>
 
 ## browserContext.storageState([options])
 - `options` <[Object]>
@@ -392,7 +379,6 @@ Returns storage state for this browser context, contains current cookies and loc
 ## browserContext.unroute(url[, handler])
 - `url` <[string]|[RegExp]|[function]\([URL]\):[boolean]> A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with [browserContext.route(url, handler)](./api/class-browsercontext.md#browsercontextrouteurl-handler).
 - `handler` <[function]\([Route], [Request]\)> Optional handler function used to register a routing with [browserContext.route(url, handler)](./api/class-browsercontext.md#browsercontextrouteurl-handler).
-- returns: <[Promise]>
 
 Removes a route created with [browserContext.route(url, handler)](./api/class-browsercontext.md#browsercontextrouteurl-handler). When `handler` is not specified, removes all routes for the `url`.
 
@@ -443,28 +429,28 @@ await context.grantPermissions(['geolocation']);
 [WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.md "WebSocket"
 [Worker]: ./api/class-worker.md "Worker"
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
 [Evaluation Argument]: ./core-concepts.md#evaluationargument "Evaluation Argument"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[URL]: https://nodejs.org/api/url.html "URL"
-[USKeyboardLayout]: ../src/usKeyboardLayout.ts "USKeyboardLayout"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
 [selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[URL]: https://nodejs.org/api/url.html "URL"

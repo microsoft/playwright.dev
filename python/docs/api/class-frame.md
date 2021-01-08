@@ -13,32 +13,7 @@ At every point of time, page exposes its current frame tree via the [page.main_f
 
 An example of dumping frame tree:
 
-```js
-const { firefox } = require('playwright');  // Or 'chromium' or 'webkit'.
-
-(async () => {
-  const browser = await firefox.launch();
-  const page = await browser.newPage();
-  await page.goto('https://www.google.com/chrome/browser/canary.html');
-  dumpFrameTree(page.mainFrame(), '');
-  await browser.close();
-
-  function dumpFrameTree(frame, indent) {
-    console.log(indent + frame.url());
-    for (const child of frame.childFrames()) {
-      dumpFrameTree(child, indent + '  ');
-    }
-  }
-})();
-```
-
 An example of getting text from an iframe element:
-
-```js
-const frame = page.frames().find(frame => frame.name() === 'myframe');
-const text = await frame.$eval('.selector', element => element.textContent);
-console.log(text);
-```
 
 
 - [frame.$(selector)](./api/class-frame.md#frameselector)
@@ -84,26 +59,26 @@ console.log(text);
 - [frame.wait_for_timeout(timeout)](./api/class-frame.md#framewaitfortimeouttimeout)
 
 ## frame.$(selector)
-- `selector` <[string]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- returns: <[Promise]<[null]|[ElementHandle]>>
+- `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- returns: <[NoneType]|[ElementHandle]>
 
 Returns the ElementHandle pointing to the frame element.
 
 The method finds an element matching the specified selector within the frame. See [Working with selectors](./selectors.md#working-with-selectors) for more details. If no elements match the selector, returns `null`.
 
 ## frame.$$(selector)
-- `selector` <[string]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- returns: <[Promise]<[Array]<[ElementHandle]>>>
+- `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- returns: <[List]\[[ElementHandle]\]>
 
 Returns the ElementHandles pointing to the frame elements.
 
 The method finds all elements matching the specified selector within the frame. See [Working with selectors](./selectors.md#working-with-selectors) for more details. If no elements match the selector, returns empty array.
 
 ## frame.$eval(selector, page_function, **options)
-- `selector` <[string]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `page_function` <[function]\([Element]\)> Function to be evaluated in browser context
+- `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `page_function` <[Callable]\[[Element]\]> Function to be evaluated in browser context
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
-- returns: <[Promise]<[Serializable]>>
+- returns: <[Serializable]>
 
 Returns the return value of `pageFunction`
 
@@ -113,17 +88,11 @@ If `pageFunction` returns a [Promise], then `frame.$eval` would wait for the pro
 
 Examples:
 
-```js
-const searchValue = await frame.$eval('#search', el => el.value);
-const preloadHref = await frame.$eval('link[rel=preload]', el => el.href);
-const html = await frame.$eval('.main-container', (e, suffix) => e.outerHTML + suffix, 'hello');
-```
-
 ## frame.$$eval(selector, page_function, **options)
-- `selector` <[string]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `page_function` <[function]\([Array]<[Element]>\)> Function to be evaluated in browser context
+- `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `page_function` <[Callable]\[[List]\[[Element]\]\]> Function to be evaluated in browser context
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
-- returns: <[Promise]<[Serializable]>>
+- returns: <[Serializable]>
 
 Returns the return value of `pageFunction`
 
@@ -133,37 +102,32 @@ If `pageFunction` returns a [Promise], then `frame.$$eval` would wait for the pr
 
 Examples:
 
-```js
-const divsCounts = await frame.$$eval('div', (divs, min) => divs.length >= min, 10);
-```
-
 ## frame.add_script_tag(**options)
-- `url` <[string]> URL of a script to be added. Optional.
-- `path` <[string]> Path to the JavaScript file to be injected into frame. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
-- `content` <[string]> Raw JavaScript content to be injected into frame. Optional.
-- `type` <[string]> Script type. Use 'module' in order to load a Javascript ES6 module. See [script](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script) for more details. Optional.
-- returns: <[Promise]<[ElementHandle]>>
+- `url` <[str]> URL of a script to be added. Optional.
+- `path` <[Union]\[[str], [pathlib.Path]\]> Path to the JavaScript file to be injected into frame. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
+- `content` <[str]> Raw JavaScript content to be injected into frame. Optional.
+- `type` <[str]> Script type. Use 'module' in order to load a Javascript ES6 module. See [script](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script) for more details. Optional.
+- returns: <[ElementHandle]>
 
 Returns the added tag when the script's onload fires or when the script content was injected into frame.
 
 Adds a `<script>` tag into the page with the desired url or content.
 
 ## frame.add_style_tag(**options)
-- `url` <[string]> URL of the `<link>` tag. Optional.
-- `path` <[string]> Path to the CSS file to be injected into frame. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
-- `content` <[string]> Raw CSS content to be injected into frame. Optional.
-- returns: <[Promise]<[ElementHandle]>>
+- `url` <[str]> URL of the `<link>` tag. Optional.
+- `path` <[Union]\[[str], [pathlib.Path]\]> Path to the CSS file to be injected into frame. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
+- `content` <[str]> Raw CSS content to be injected into frame. Optional.
+- returns: <[ElementHandle]>
 
 Returns the added tag when the stylesheet's onload fires or when the CSS content was injected into frame.
 
 Adds a `<link rel="stylesheet">` tag into the page with the desired url or a `<style type="text/css">` tag with the content.
 
 ## frame.check(selector, **options)
-- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `force` <[boolean]> Whether to bypass the [actionability](./actionability.md) checks. Defaults to `false`.
-- `no_wait_after` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-- `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `force` <[bool]> Whether to bypass the [actionability](./actionability.md) checks. Defaults to `false`.
+- `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
 
 This method checks an element matching `selector` by performing the following steps:
 1. Find an element match matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -177,21 +141,20 @@ This method checks an element matching `selector` by performing the following st
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
 
 ## frame.child_frames()
-- returns: <[Array]<[Frame]>>
+- returns: <[List]\[[Frame]\]>
 
 ## frame.click(selector, **options)
-- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - `button` <"left"|"right"|"middle"> Defaults to `left`.
-- `click_count` <[number]> defaults to 1. See [UIEvent.detail].
-- `delay` <[number]> Time to wait between `mousedown` and `mouseup` in milliseconds. Defaults to 0.
-- `force` <[boolean]> Whether to bypass the [actionability](./actionability.md) checks. Defaults to `false`.
-- `modifiers` <[Array]<"Alt"|"Control"|"Meta"|"Shift">> Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used.
-- `no_wait_after` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-- `position` <[Object]> A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
-  - `x` <[number]>
-  - `y` <[number]>
-- `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
+- `click_count` <[int]> defaults to 1. See [UIEvent.detail].
+- `delay` <[float]> Time to wait between `mousedown` and `mouseup` in milliseconds. Defaults to 0.
+- `force` <[bool]> Whether to bypass the [actionability](./actionability.md) checks. Defaults to `false`.
+- `modifiers` <[List]\["Alt"|"Control"|"Meta"|"Shift"\]> Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used.
+- `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+- `position` <[Dict]> A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `x` <[float]>
+  - `y` <[float]>
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
 
 This method clicks an element matching `selector` by performing the following steps:
 1. Find an element match matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -203,22 +166,21 @@ This method clicks an element matching `selector` by performing the following st
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
 
 ## frame.content()
-- returns: <[Promise]<[string]>>
+- returns: <[str]>
 
 Gets the full HTML contents of the frame, including the doctype.
 
 ## frame.dblclick(selector, **options)
-- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - `button` <"left"|"right"|"middle"> Defaults to `left`.
-- `delay` <[number]> Time to wait between `mousedown` and `mouseup` in milliseconds. Defaults to 0.
-- `force` <[boolean]> Whether to bypass the [actionability](./actionability.md) checks. Defaults to `false`.
-- `modifiers` <[Array]<"Alt"|"Control"|"Meta"|"Shift">> Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used.
-- `no_wait_after` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-- `position` <[Object]> A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
-  - `x` <[number]>
-  - `y` <[number]>
-- `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
+- `delay` <[float]> Time to wait between `mousedown` and `mouseup` in milliseconds. Defaults to 0.
+- `force` <[bool]> Whether to bypass the [actionability](./actionability.md) checks. Defaults to `false`.
+- `modifiers` <[List]\["Alt"|"Control"|"Meta"|"Shift"\]> Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used.
+- `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+- `position` <[Dict]> A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `x` <[float]>
+  - `y` <[float]>
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
 
 This method double clicks an element matching `selector` by performing the following steps:
 1. Find an element match matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -232,17 +194,12 @@ When all steps combined have not finished during the specified `timeout`, this m
 > **NOTE** `frame.dblclick()` dispatches two `click` events and a single `dblclick` event.
 
 ## frame.dispatch_event(selector, type, **options)
-- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `type` <[string]> DOM event type: `"click"`, `"dragstart"`, etc.
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `type` <[str]> DOM event type: `"click"`, `"dragstart"`, etc.
 - `event_init` <[EvaluationArgument]> Optional event-specific initialization properties.
-- `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
 
 The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the elment, `click` is dispatched. This is equivalend to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
-
-```js
-await frame.dispatchEvent('button#submit', 'click');
-```
 
 Under the hood, it creates an instance of an event based on the given `type`, initializes it with `eventInit` properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
 
@@ -257,16 +214,10 @@ Since `eventInit` is event-specific, please refer to the events documentation fo
 
 You can also specify `JSHandle` as the property value if you want live objects to be passed into the event:
 
-```js
-// Note you can only create DataTransfer in Chromium and Firefox
-const dataTransfer = await frame.evaluateHandle(() => new DataTransfer());
-await frame.dispatchEvent('#source', 'dragstart', { dataTransfer });
-```
-
 ## frame.evaluate(page_function, **options)
-- `page_function` <[function]|[string]> Function to be evaluated in browser context
+- `page_function` <[Callable]|[str]> Function to be evaluated in browser context
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
-- returns: <[Promise]<[Serializable]>>
+- returns: <[Serializable]>
 
 Returns the return value of `pageFunction`
 
@@ -274,31 +225,14 @@ If the function passed to the `frame.evaluate` returns a [Promise], then `frame.
 
 If the function passed to the `frame.evaluate` returns a non-[Serializable] value, then `frame.evaluate` returns `undefined`. DevTools Protocol also supports transferring some additional values that are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`, and bigint literals.
 
-```js
-const result = await frame.evaluate(([x, y]) => {
-  return Promise.resolve(x * y);
-}, [7, 8]);
-console.log(result); // prints "56"
-```
-
 A string can also be passed in instead of a function.
-
-```js
-console.log(await frame.evaluate('1 + 2')); // prints "3"
-```
 
 [ElementHandle] instances can be passed as an argument to the `frame.evaluate`:
 
-```js
-const bodyHandle = await frame.$('body');
-const html = await frame.evaluate(([body, suffix]) => body.innerHTML + suffix, [bodyHandle, 'hello']);
-await bodyHandle.dispose();
-```
-
 ## frame.evaluate_handle(page_function, **options)
-- `page_function` <[function]|[string]> Function to be evaluated in the page context
+- `page_function` <[Callable]|[str]> Function to be evaluated in the page context
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
-- returns: <[Promise]<[JSHandle]>>
+- returns: <[JSHandle]>
 
 Returns the return value of `pageFunction` as in-page object (JSHandle).
 
@@ -306,46 +240,28 @@ The only difference between `frame.evaluate` and `frame.evaluateHandle` is that 
 
 If the function, passed to the `frame.evaluateHandle`, returns a [Promise], then `frame.evaluateHandle` would wait for the promise to resolve and return its value.
 
-```js
-const aWindowHandle = await frame.evaluateHandle(() => Promise.resolve(window));
-aWindowHandle; // Handle for the window object.
-```
-
 A string can also be passed in instead of a function.
-
-```js
-const aHandle = await frame.evaluateHandle('document'); // Handle for the 'document'.
-```
 
 [JSHandle] instances can be passed as an argument to the `frame.evaluateHandle`:
 
-```js
-const aHandle = await frame.evaluateHandle(() => document.body);
-const resultHandle = await frame.evaluateHandle(([body, suffix]) => body.innerHTML + suffix, [aHandle, 'hello']);
-console.log(await resultHandle.jsonValue());
-await resultHandle.dispose();
-```
-
 ## frame.fill(selector, value, **options)
-- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `value` <[string]> Value to fill for the `<input>`, `<textarea>` or `[contenteditable]` element.
-- `no_wait_after` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-- `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `value` <[str]> Value to fill for the `<input>`, `<textarea>` or `[contenteditable]` element.
+- `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
 
 This method waits for an element matching `selector`, waits for [actionability](./actionability.md) checks, focuses the element, fills it and triggers an `input` event after filling. If the element matching `selector` is not an `<input>`, `<textarea>` or `[contenteditable]` element, this method throws an error. Note that you can pass an empty string to clear the input field.
 
 To send fine-grained keyboard events, use [frame.type(selector, text, **options)](./api/class-frame.md#frametypeselector-text-options).
 
 ## frame.focus(selector, **options)
-- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
 
 This method fetches an element with `selector` and focuses it. If there's no element matching `selector`, the method waits until a matching element appears in the DOM.
 
 ## frame.frame_element()
-- returns: <[Promise]<[ElementHandle]>>
+- returns: <[ElementHandle]>
 
 Returns the `frame` or `iframe` element handle which corresponds to this frame.
 
@@ -353,29 +269,23 @@ This is an inverse of [element_handle.content_frame()](./api/class-elementhandle
 
 This method throws an error if the frame has been detached before `frameElement()` returns.
 
-```js
-const frameElement = await frame.frameElement();
-const contentFrame = await frameElement.contentFrame();
-console.log(frame === contentFrame);  // -> true
-```
-
 ## frame.get_attribute(selector, name, **options)
-- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `name` <[string]> Attribute name to get the value for.
-- `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]<[null]|[string]>>
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `name` <[str]> Attribute name to get the value for.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[NoneType]|[str]>
 
 Returns element attribute value.
 
 ## frame.goto(url, **options)
-- `url` <[string]> URL to navigate frame to. The url should include scheme, e.g. `https://`.
-- `referer` <[string]> Referer header value. If provided it will take preference over the referer header value set by [page.set_extra_http_headers(headers)](./api/class-page.md#pagesetextrahttpheadersheaders).
-- `timeout` <[number]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `url` <[str]> URL to navigate frame to. The url should include scheme, e.g. `https://`.
+- `referer` <[str]> Referer header value. If provided it will take preference over the referer header value set by [page.set_extra_http_headers(headers)](./api/class-page.md#pagesetextrahttpheadersheaders).
+- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
 - `wait_until` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
   * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
   * `'load'` - consider operation to be finished when the `load` event is fired.
   * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
-- returns: <[Promise]<[null]|[Response]>>
+- returns: <[NoneType]|[Response]>
 
 Returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect.
 
@@ -392,14 +302,13 @@ Returns the main resource response. In case of multiple redirects, the navigatio
 > **NOTE** Headless mode doesn't support navigation to a PDF document. See the [upstream issue](https://bugs.chromium.org/p/chromium/issues/detail?id=761295).
 
 ## frame.hover(selector, **options)
-- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `force` <[boolean]> Whether to bypass the [actionability](./actionability.md) checks. Defaults to `false`.
-- `modifiers` <[Array]<"Alt"|"Control"|"Meta"|"Shift">> Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used.
-- `position` <[Object]> A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
-  - `x` <[number]>
-  - `y` <[number]>
-- `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `force` <[bool]> Whether to bypass the [actionability](./actionability.md) checks. Defaults to `false`.
+- `modifiers` <[List]\["Alt"|"Control"|"Meta"|"Shift"\]> Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used.
+- `position` <[Dict]> A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `x` <[float]>
+  - `y` <[float]>
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
 
 This method hovers over an element matching `selector` by performing the following steps:
 1. Find an element match matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -411,26 +320,26 @@ This method hovers over an element matching `selector` by performing the followi
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
 
 ## frame.inner_html(selector, **options)
-- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]<[string]>>
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[str]>
 
 Returns `element.innerHTML`.
 
 ## frame.inner_text(selector, **options)
-- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]<[string]>>
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[str]>
 
 Returns `element.innerText`.
 
 ## frame.is_detached()
-- returns: <[boolean]>
+- returns: <[bool]>
 
 Returns `true` if the frame has been detached, or `false` otherwise.
 
 ## frame.name()
-- returns: <[string]>
+- returns: <[str]>
 
 Returns frame's name attribute as specified in the tag.
 
@@ -444,17 +353,16 @@ If the name is empty, returns the id attribute instead.
 Returns the page containing this frame.
 
 ## frame.parent_frame()
-- returns: <[null]|[Frame]>
+- returns: <[NoneType]|[Frame]>
 
 Parent frame, if any. Detached frames and main frames return `null`.
 
 ## frame.press(selector, key, **options)
-- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `key` <[string]> Name of the key to press or a character to generate, such as `ArrowLeft` or `a`.
-- `delay` <[number]> Time to wait between `keydown` and `keyup` in milliseconds. Defaults to 0.
-- `no_wait_after` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-- `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `key` <[str]> Name of the key to press or a character to generate, such as `ArrowLeft` or `a`.
+- `delay` <[float]> Time to wait between `keydown` and `keyup` in milliseconds. Defaults to 0.
+- `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
 
 `key` can specify the intended [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) value or a single character to generate the text for. A superset of the `key` values can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values). Examples of the keys are:
 
@@ -469,63 +377,49 @@ If `key` is a single character, it is case-sensitive, so the values `a` and `A` 
 Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported as well. When speficied with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
 
 ## frame.select_option(selector, **options)
-- `selector` <[string]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `no_wait_after` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-- `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- `element` <[ElementHandle]|[Array]<[ElementHandle]>> Option elements to select. Optional.
-- `index` <[number]|[Array]<[number]>> Options to select by index. Optional.
-- `value` <[string]|[Array]<[string]>> Options to select by value. If the `<select>` has the `multiple` attribute, all given options are selected, otherwise only the first option matching one of the passed options is selected. Optional.
-- `label` <[string]|[Array]<[string]>> Options to select by label. If the `<select>` has the `multiple` attribute, all given options are selected, otherwise only the first option matching one of the passed options is selected. Optional.
-- returns: <[Promise]<[Array]<[string]>>>
+- `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `element` <[ElementHandle]|[List]\[[ElementHandle]\]> Option elements to select. Optional.
+- `index` <[int]|[List]\[[int]\]> Options to select by index. Optional.
+- `value` <[str]|[List]\[[str]\]> Options to select by value. If the `<select>` has the `multiple` attribute, all given options are selected, otherwise only the first option matching one of the passed options is selected. Optional.
+- `label` <[str]|[List]\[[str]\]> Options to select by label. If the `<select>` has the `multiple` attribute, all given options are selected, otherwise only the first option matching one of the passed options is selected. Optional.
+- returns: <[List]\[[str]\]>
 
 Returns the array of option values that have been successfully selected.
 
 Triggers a `change` and `input` event once all the provided options have been selected. If there's no `<select>` element matching `selector`, the method throws an error.
 
-```js
-// single selection matching the value
-frame.selectOption('select#colors', 'blue');
-
-// single selection matching both the value and the label
-frame.selectOption('select#colors', { label: 'Blue' });
-
-// multiple selection
-frame.selectOption('select#colors', 'red', 'green', 'blue');
-```
-
 ## frame.set_content(html, **options)
-- `html` <[string]> HTML markup to assign to the page.
-- `timeout` <[number]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `html` <[str]> HTML markup to assign to the page.
+- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
 - `wait_until` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
   * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
   * `'load'` - consider operation to be finished when the `load` event is fired.
   * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
-- returns: <[Promise]>
 
 ## frame.set_input_files(selector, files, **options)
-- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `files` <[string]|[Array]<[string]>|[Object]|[Array]<[Object]>>
-  - `name` <[string]> [File] name **required**
-  - `mime_type` <[string]> [File] type **required**
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `files` <[Union]\[[str], [pathlib.Path]\]|[List]\[[Union]\[[str], [pathlib.Path]\]\]|[Dict]|[List]\[[Dict]\]>
+  - `name` <[str]> [File] name **required**
+  - `mime_type` <[str]> [File] type **required**
   - `buffer` <[Buffer]> File content **required**
-- `no_wait_after` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-- `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
+- `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
 
 This method expects `selector` to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input).
 
 Sets the value of the file input to these file paths or files. If some of the `filePaths` are relative paths, then they are resolved relative to the the current working directory. For empty array, clears the selected files.
 
 ## frame.tap(selector, **options)
-- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `force` <[boolean]> Whether to bypass the [actionability](./actionability.md) checks. Defaults to `false`.
-- `modifiers` <[Array]<"Alt"|"Control"|"Meta"|"Shift">> Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used.
-- `no_wait_after` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-- `position` <[Object]> A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
-  - `x` <[number]>
-  - `y` <[number]>
-- `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `force` <[bool]> Whether to bypass the [actionability](./actionability.md) checks. Defaults to `false`.
+- `modifiers` <[List]\["Alt"|"Control"|"Meta"|"Shift"\]> Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used.
+- `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+- `position` <[Dict]> A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `x` <[float]>
+  - `y` <[float]>
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
 
 This method taps an element matching `selector` by performing the following steps:
 1. Find an element match matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -539,40 +433,33 @@ When all steps combined have not finished during the specified `timeout`, this m
 > **NOTE** `frame.tap()` requires that the `hasTouch` option of the browser context be set to true.
 
 ## frame.text_content(selector, **options)
-- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]<[null]|[string]>>
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[NoneType]|[str]>
 
 Returns `element.textContent`.
 
 ## frame.title()
-- returns: <[Promise]<[string]>>
+- returns: <[str]>
 
 Returns the page title.
 
 ## frame.type(selector, text, **options)
-- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `text` <[string]> A text to type into a focused element.
-- `delay` <[number]> Time to wait between key presses in milliseconds. Defaults to 0.
-- `no_wait_after` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-- `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `text` <[str]> A text to type into a focused element.
+- `delay` <[float]> Time to wait between key presses in milliseconds. Defaults to 0.
+- `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
 
 Sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in the text. `frame.type` can be used to send fine-grained keyboard events. To fill values in form fields, use [frame.fill(selector, value, **options)](./api/class-frame.md#framefillselector-value-options).
 
 To press a special key, like `Control` or `ArrowDown`, use [keyboard.press(key, **options)](./api/class-keyboard.md#keyboardpresskey-options).
 
-```js
-await frame.type('#mytextarea', 'Hello'); // Types instantly
-await frame.type('#mytextarea', 'World', {delay: 100}); // Types slower, like a user
-```
-
 ## frame.uncheck(selector, **options)
-- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `force` <[boolean]> Whether to bypass the [actionability](./actionability.md) checks. Defaults to `false`.
-- `no_wait_after` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-- `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `force` <[bool]> Whether to bypass the [actionability](./actionability.md) checks. Defaults to `false`.
+- `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
 
 This method checks an element matching `selector` by performing the following steps:
 1. Find an element match matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -586,89 +473,58 @@ This method checks an element matching `selector` by performing the following st
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
 
 ## frame.url()
-- returns: <[string]>
+- returns: <[str]>
 
 Returns frame's url.
 
 ## frame.wait_for_function(page_function, **options)
-- `page_function` <[function]|[string]> Function to be evaluated in browser context
+- `page_function` <[Callable]|[str]> Function to be evaluated in browser context
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
-- `polling` <[number]|"raf"> If `polling` is `'raf'`, then `pageFunction` is constantly executed in `requestAnimationFrame` callback. If `polling` is a number, then it is treated as an interval in milliseconds at which the function would be executed. Defaults to `raf`.
-- `timeout` <[number]> maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
-- returns: <[Promise]<[JSHandle]>>
+- `polling` <[float]|"raf"> If `polling` is `'raf'`, then `pageFunction` is constantly executed in `requestAnimationFrame` callback. If `polling` is a number, then it is treated as an interval in milliseconds at which the function would be executed. Defaults to `raf`.
+- `timeout` <[float]> maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+- returns: <[JSHandle]>
 
 Returns when the `pageFunction` returns a truthy value, returns that value.
 
 The `waitForFunction` can be used to observe viewport size change:
 
-```js
-const { firefox } = require('playwright');  // Or 'chromium' or 'webkit'.
-
-(async () => {
-  const browser = await firefox.launch();
-  const page = await browser.newPage();
-  const watchDog = page.mainFrame().waitForFunction('window.innerWidth < 100');
-  page.setViewportSize({width: 50, height: 50});
-  await watchDog;
-  await browser.close();
-})();
-```
-
 To pass an argument to the predicate of `frame.waitForFunction` function:
-
-```js
-const selector = '.foo';
-await frame.waitForFunction(selector => !!document.querySelector(selector), selector);
-```
 
 ## frame.wait_for_load_state(**options)
 - `state` <"load"|"domcontentloaded"|"networkidle"> Optional load state to wait for, defaults to `load`. If the state has been already reached while loading current document, the method returns immediately. Can be one of:
   * `'load'` - wait for the `load` event to be fired.
   * `'domcontentloaded'` - wait for the `DOMContentLoaded` event to be fired.
   * `'networkidle'` - wait until there are no network connections for at least `500` ms.
-- `timeout` <[number]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]>
+- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
 
 Waits for the required load state to be reached.
 
 This returns when the frame reaches a required load state, `load` by default. The navigation must have been committed when this method is called. If current document has already reached the required state, resolves immediately.
 
-```js
-await frame.click('button'); // Click triggers navigation.
-await frame.waitForLoadState(); // Waits for 'load' state by default.
-```
-
 ## frame.wait_for_navigation(**options)
-- `timeout` <[number]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- `url` <[string]|[RegExp]|[function]\([URL]\):[boolean]> URL string, URL regex pattern or predicate receiving [URL] to match while waiting for the navigation.
+- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `url` <[str]|[Pattern]|[Callable]\[[URL]\]:[bool]> URL string, URL regex pattern or predicate receiving [URL] to match while waiting for the navigation.
 - `wait_until` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
   * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
   * `'load'` - consider operation to be finished when the `load` event is fired.
   * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
-- returns: <[Promise]<[null]|[Response]>>
+- returns: <[NoneType]|[Response]>
 
 Returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
 
 This method waits for the frame to navigate to a new URL. It is useful for when you run code which will indirectly cause the frame to navigate. Consider this example:
 
-```js
-const [response] = await Promise.all([
-  frame.waitForNavigation(), // Wait for the navigation to finish
-  frame.click('a.my-link'), // Clicking the link will indirectly cause a navigation
-]);
-```
-
 **NOTE** Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
 
 ## frame.wait_for_selector(selector, **options)
-- `selector` <[string]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - `state` <"attached"|"detached"|"visible"|"hidden"> Defaults to `'visible'`. Can be either:
   * `'attached'` - wait for element to be present in DOM.
   * `'detached'` - wait for element to not be present in DOM.
   * `'visible'` - wait for element to have non-empty bounding box and no `visibility:hidden`. Note that element without any content or with `display:none` has an empty bounding box and is not considered visible.
   * `'hidden'` - wait for element to be either detached from DOM, or have an empty bounding box or `visibility:hidden`. This is opposite to the `'visible'` option.
-- `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[Promise]<[null]|[ElementHandle]>>
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[NoneType]|[ElementHandle]>
 
 Returns when element specified by selector satisfies `state` option. Returns `null` if waiting for `hidden` or `detached`.
 
@@ -676,26 +532,8 @@ Wait for the `selector` to satisfy `state` option (either appear/disappear from 
 
 This method works across navigations:
 
-```js
-const { webkit } = require('playwright');  // Or 'chromium' or 'firefox'.
-
-(async () => {
-  const browser = await webkit.launch();
-  const page = await browser.newPage();
-  let currentURL;
-  page.mainFrame()
-    .waitForSelector('img')
-    .then(() => console.log('First URL with image: ' + currentURL));
-  for (currentURL of ['https://example.com', 'https://google.com', 'https://bbc.com']) {
-    await page.goto(currentURL);
-  }
-  await browser.close();
-})();
-```
-
 ## frame.wait_for_timeout(timeout)
-- `timeout` <[number]> A timeout to wait for
-- returns: <[Promise]>
+- `timeout` <[float]> A timeout to wait for
 
 Waits for the given `timeout` in milliseconds.
 
@@ -729,28 +567,24 @@ Note that `frame.waitForTimeout()` should only be used for debugging. Tests usin
 [WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.md "WebSocket"
 [Worker]: ./api/class-worker.md "Worker"
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
 [Evaluation Argument]: ./core-concepts.md#evaluationargument "Evaluation Argument"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[URL]: https://nodejs.org/api/url.html "URL"
-[USKeyboardLayout]: ../src/usKeyboardLayout.ts "USKeyboardLayout"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
 [selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
+[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
+[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
+[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
+[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
+[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
+[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
+[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"
