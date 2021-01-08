@@ -85,9 +85,9 @@ await page.selectOption('select#colors', option);
 ```
 
 #### API reference
-- [page.select_option(selector, values, **options)](./api/class-page.md#pageselectoptionselector-values-options)
-- [frame.select_option(selector, values, **options)](./api/class-frame.md#frameselectoptionselector-values-options)
-- [element_handle.select_option(values, **options)](./api/class-elementhandle.md#elementhandleselectoptionvalues-options)
+- [page.select_option(selector, **options)](./api/class-page.md#pageselectoptionselector-options)
+- [frame.select_option(selector, **options)](./api/class-frame.md#frameselectoptionselector-options)
+- [element_handle.select_option(**options)](./api/class-elementhandle.md#elementhandleselectoptionoptions)
 
 <br/>
 
@@ -273,12 +273,9 @@ await page.focus('input#name');
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"
-[BrowserServer]: ./api/class-browserserver.md "BrowserServer"
 [BrowserType]: ./api/class-browsertype.md "BrowserType"
 [CDPSession]: ./api/class-cdpsession.md "CDPSession"
-[ChromiumBrowser]: ./api/class-chromiumbrowser.md "ChromiumBrowser"
 [ChromiumBrowserContext]: ./api/class-chromiumbrowsercontext.md "ChromiumBrowserContext"
-[ChromiumCoverage]: ./api/class-chromiumcoverage.md "ChromiumCoverage"
 [ConsoleMessage]: ./api/class-consolemessage.md "ConsoleMessage"
 [Dialog]: ./api/class-dialog.md "Dialog"
 [Download]: ./api/class-download.md "Download"
@@ -288,7 +285,6 @@ await page.focus('input#name');
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
-[Logger]: ./api/class-logger.md "Logger"
 [Mouse]: ./api/class-mouse.md "Mouse"
 [Page]: ./api/class-page.md "Page"
 [Playwright]: ./api/class-playwright.md "Playwright"

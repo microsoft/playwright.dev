@@ -68,7 +68,7 @@ console.log(text);
 - [frame.page()](./api/class-frame.md#framepage)
 - [frame.parent_frame()](./api/class-frame.md#frameparentframe)
 - [frame.press(selector, key, **options)](./api/class-frame.md#framepressselector-key-options)
-- [frame.select_option(selector, values, **options)](./api/class-frame.md#frameselectoptionselector-values-options)
+- [frame.select_option(selector, **options)](./api/class-frame.md#frameselectoptionselector-options)
 - [frame.set_content(html, **options)](./api/class-frame.md#framesetcontenthtml-options)
 - [frame.set_input_files(selector, files, **options)](./api/class-frame.md#framesetinputfilesselector-files-options)
 - [frame.tap(selector, **options)](./api/class-frame.md#frametapselector-options)
@@ -468,14 +468,14 @@ If `key` is a single character, it is case-sensitive, so the values `a` and `A` 
 
 Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported as well. When speficied with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
 
-## frame.select_option(selector, values, **options)
+## frame.select_option(selector, **options)
 - `selector` <[string]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `values` <[null]|[string]|[ElementHandle]|[Array]<[string]>|[Object]|[Array]<[ElementHandle]>|[Array]<[Object]>> Options to select. If the `<select>` has the `multiple` attribute, all matching options are selected, otherwise only the first option matching one of the passed options is selected. String values are equivalent to `{value:'string'}`. Option is considered matching if all specified properties match.
-  - `value` <[string]> Matches by `option.value`. Optional.
-  - `label` <[string]> Matches by `option.label`. Optional.
-  - `index` <[number]> Matches by the index. Optional.
 - `no_wait_after` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
 - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `element` <[ElementHandle]|[Array]<[ElementHandle]>> Option elements to select. Optional.
+- `index` <[number]|[Array]<[number]>> Options to select by index. Optional.
+- `value` <[string]|[Array]<[string]>> Options to select by value. If the `<select>` has the `multiple` attribute, all given options are selected, otherwise only the first option matching one of the passed options is selected. Optional.
+- `label` <[string]|[Array]<[string]>> Options to select by label. If the `<select>` has the `multiple` attribute, all given options are selected, otherwise only the first option matching one of the passed options is selected. Optional.
 - returns: <[Promise]<[Array]<[string]>>>
 
 Returns the array of option values that have been successfully selected.
@@ -704,12 +704,9 @@ Note that `frame.waitForTimeout()` should only be used for debugging. Tests usin
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"
-[BrowserServer]: ./api/class-browserserver.md "BrowserServer"
 [BrowserType]: ./api/class-browsertype.md "BrowserType"
 [CDPSession]: ./api/class-cdpsession.md "CDPSession"
-[ChromiumBrowser]: ./api/class-chromiumbrowser.md "ChromiumBrowser"
 [ChromiumBrowserContext]: ./api/class-chromiumbrowsercontext.md "ChromiumBrowserContext"
-[ChromiumCoverage]: ./api/class-chromiumcoverage.md "ChromiumCoverage"
 [ConsoleMessage]: ./api/class-consolemessage.md "ConsoleMessage"
 [Dialog]: ./api/class-dialog.md "Dialog"
 [Download]: ./api/class-download.md "Download"
@@ -719,7 +716,6 @@ Note that `frame.waitForTimeout()` should only be used for debugging. Tests usin
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
-[Logger]: ./api/class-logger.md "Logger"
 [Mouse]: ./api/class-mouse.md "Mouse"
 [Page]: ./api/class-page.md "Page"
 [Playwright]: ./api/class-playwright.md "Playwright"

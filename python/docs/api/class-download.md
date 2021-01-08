@@ -23,18 +23,12 @@ const path = await download.path();
 > **NOTE** Browser context **must** be created with the `acceptDownloads` set to `true` when user needs access to the downloaded content. If `acceptDownloads` is not set or set to `false`, download events are emitted, but the actual download is not performed and user has no access to the downloaded files.
 
 
-- [download.create_read_stream()](./api/class-download.md#downloadcreatereadstream)
 - [download.delete()](./api/class-download.md#downloaddelete)
 - [download.failure()](./api/class-download.md#downloadfailure)
 - [download.path()](./api/class-download.md#downloadpath)
 - [download.save_as(path)](./api/class-download.md#downloadsaveaspath)
 - [download.suggested_filename()](./api/class-download.md#downloadsuggestedfilename)
 - [download.url()](./api/class-download.md#downloadurl)
-
-## download.create_read_stream()
-- returns: <[Promise]<[null]|[Readable]>>
-
-Returns readable stream for current download or `null` if download failed.
 
 ## download.delete()
 - returns: <[Promise]>
@@ -70,12 +64,9 @@ Returns downloaded url.
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"
-[BrowserServer]: ./api/class-browserserver.md "BrowserServer"
 [BrowserType]: ./api/class-browsertype.md "BrowserType"
 [CDPSession]: ./api/class-cdpsession.md "CDPSession"
-[ChromiumBrowser]: ./api/class-chromiumbrowser.md "ChromiumBrowser"
 [ChromiumBrowserContext]: ./api/class-chromiumbrowsercontext.md "ChromiumBrowserContext"
-[ChromiumCoverage]: ./api/class-chromiumcoverage.md "ChromiumCoverage"
 [ConsoleMessage]: ./api/class-consolemessage.md "ConsoleMessage"
 [Dialog]: ./api/class-dialog.md "Dialog"
 [Download]: ./api/class-download.md "Download"
@@ -85,7 +76,6 @@ Returns downloaded url.
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
-[Logger]: ./api/class-logger.md "Logger"
 [Mouse]: ./api/class-mouse.md "Mouse"
 [Page]: ./api/class-page.md "Page"
 [Playwright]: ./api/class-playwright.md "Playwright"

@@ -5,9 +5,7 @@ title: "Browser"
 
 * extends: [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter)
 
-A Browser is created when Playwright connects to a browser instance, either through [browser_type.launch(**options)](./api/class-browsertype.md#browsertypelaunchoptions) or [browser_type.connect(ws_endpoint, **options)](./api/class-browsertype.md#browsertypeconnectwsendpoint-options).
-
-An example of using a [Browser] to create a [Page]:
+A Browser is created via [browser_type.launch(**options)](./api/class-browsertype.md#browsertypelaunchoptions). An example of using a [Browser] to create a [Page]:
 
 ```js
 const { firefox } = require('playwright');  // Or 'chromium' or 'webkit'.
@@ -20,7 +18,7 @@ const { firefox } = require('playwright');  // Or 'chromium' or 'webkit'.
 })();
 ```
 
-See [ChromiumBrowser], [FirefoxBrowser] and [WebKitBrowser] for browser-specific features. Note that [browser_type.connect(ws_endpoint, **options)](./api/class-browsertype.md#browsertypeconnectwsendpoint-options) and [browser_type.launch(**options)](./api/class-browsertype.md#browsertypelaunchoptions) always return a specific browser instance, based on the browser being connected to or launched.
+See [ChromiumBrowser], [FirefoxBrowser] and [WebKitBrowser] for browser-specific features. Note that [browser_type.launch(**options)](./api/class-browsertype.md#browsertypelaunchoptions) always returns a specific browser instance, based on the browser being launched.
 
 
 - [browser.on("disconnected")](./api/class-browser.md#browserondisconnected)
@@ -42,7 +40,7 @@ Emitted when Browser gets disconnected from the browser application. This might 
 
 In case this browser is obtained using [browser_type.launch(**options)](./api/class-browsertype.md#browsertypelaunchoptions), closes the browser and all of its pages (if any were opened).
 
-In case this browser is obtained using [browser_type.connect(ws_endpoint, **options)](./api/class-browsertype.md#browsertypeconnectwsendpoint-options), clears all created contexts belonging to this browser and disconnects from the browser server.
+In case this browser is connected to, clears all created contexts belonging to this browser and disconnects from the browser server.
 
 The [Browser] object itself is considered to be disposed and cannot be used anymore.
 
@@ -211,12 +209,9 @@ Returns the browser version.
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"
-[BrowserServer]: ./api/class-browserserver.md "BrowserServer"
 [BrowserType]: ./api/class-browsertype.md "BrowserType"
 [CDPSession]: ./api/class-cdpsession.md "CDPSession"
-[ChromiumBrowser]: ./api/class-chromiumbrowser.md "ChromiumBrowser"
 [ChromiumBrowserContext]: ./api/class-chromiumbrowsercontext.md "ChromiumBrowserContext"
-[ChromiumCoverage]: ./api/class-chromiumcoverage.md "ChromiumCoverage"
 [ConsoleMessage]: ./api/class-consolemessage.md "ConsoleMessage"
 [Dialog]: ./api/class-dialog.md "Dialog"
 [Download]: ./api/class-download.md "Download"
@@ -226,7 +221,6 @@ Returns the browser version.
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
-[Logger]: ./api/class-logger.md "Logger"
 [Mouse]: ./api/class-mouse.md "Mouse"
 [Page]: ./api/class-page.md "Page"
 [Playwright]: ./api/class-playwright.md "Playwright"
