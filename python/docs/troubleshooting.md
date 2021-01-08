@@ -20,12 +20,6 @@ If you are using a JavaScript transpiler like babel or TypeScript, calling `eval
 
 Some workarounds to this problem would be to instruct the transpiler not to mess up with the code, for example, configure TypeScript to use latest ECMAScript version (`"target": "es2018"`). Another workaround could be using string templates instead of functions:
 
-```js
-await page.evaluate(`(async() => {
-   console.log('1');
-})()`);
-```
-
 ## Node.js requirements
 
 ### ReferenceError: URL is not defined

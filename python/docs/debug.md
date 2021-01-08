@@ -15,8 +15,18 @@ Playwright scripts work with existing debugging tools, like Node.js debuggers an
 
 Playwright runs browsers in headless mode by default. To change this behavior, use `headless: false` as a launch option. You can also use the `slowMo` option to slow down execution and follow along while debugging.
 
-```js
-await chromium.launch({ headless: false, slowMo: 100 }); // or firefox, webkit
+```python
+# async
+
+await chromium.launch(headless=False, slow_mo=100) # or firefox, webkit
+
+```
+
+```python
+# sync
+
+chromium.launch(headless=False, slow_mo=100) # or firefox, webkit
+
 ```
 
 ## Visual Studio Code debugger
@@ -52,8 +62,17 @@ You can use browser developer tools in Chromium, Firefox and WebKit while runnin
 
 In Chromium, you can also open developer tools through a launch option.
 
-```js
-await chromium.launch({ devtools: true });
+```python
+# async
+
+await chromium.launch(devtools=True)
+
+```
+
+```python
+# sync
+
+chromium.launch(devtools=True)
 ```
 
 ## Run in Debug Mode

@@ -16,21 +16,42 @@ title: "Input"
 
 This is the easiest way to fill out the form fields. It focuses the element and triggers an `input` event with the entered text. It works for `<input>`, `<textarea>`, `[contenteditable]` and `<label>` associated with an input or textarea.
 
-```js
-// Text input
-await page.fill('#name', 'Peter');
+```python
+# async
 
-// Date input
-await page.fill('#date', '2020-02-02');
+# Text input
+await page.fill('#name', 'Peter')
 
-// Time input
-await page.fill('#time', '13-15');
+# Date input
+await page.fill('#date', '2020-02-02')
 
-// Local datetime input
-await page.fill('#local', '2020-03-02T05:15');
+# Time input
+await page.fill('#time', '13-15')
 
-// Input through label
-await page.fill('text=First Name', 'Peter');
+# Local datetime input
+await page.fill('#local', '2020-03-02T05:15')
+
+# Input through label
+await page.fill('text=First Name', 'Peter')
+```
+
+```python
+# sync
+
+# Text input
+page.fill('#name', 'Peter')
+
+# Date input
+page.fill('#date', '2020-02-02')
+
+# Time input
+page.fill('#time', '13-15')
+
+# Local datetime input
+page.fill('#local', '2020-03-02T05:15')
+
+# Input through label
+page.fill('text=First Name', 'Peter')
 ```
 
 #### API reference
@@ -44,15 +65,30 @@ await page.fill('text=First Name', 'Peter');
 
 This is the easiest way to check and uncheck a checkbox or a radio button. This method can be used with `input[type=checkbox]`, `input[type=radio]`, `[role=checkbox]` or `label` associated with checkbox or radio button.
 
-```js
-// Check the checkbox
-await page.check('#agree');
+```python
+# async
 
-// Uncheck by input <label>.
-await page.uncheck('#subscribe-label');
+# Check the checkbox
+await page.check('#agree')
 
-// Select the radio button
-await page.check('text=XL');
+# Uncheck by input <label>.
+await page.uncheck('#subscribe-label')
+
+# Select the radio button
+await page.check('text=XL')
+```
+
+```python
+# sync
+
+# Check the checkbox
+page.check('#agree')
+
+# Uncheck by input <label>.
+page.uncheck('#subscribe-label')
+
+# Select the radio button
+page.check('text=XL')
 ```
 
 #### API reference
@@ -69,19 +105,38 @@ await page.check('text=XL');
 
 Selects one or multiple options in the `<select>` element. You can specify option `value`, `label` or `elementHandle` to select. Multiple options can be selected.
 
-```js
-// Single selection matching the value
-await page.selectOption('select#colors', 'blue');
+```python
+# async
 
-// Single selection matching the label
-await page.selectOption('select#colors', { label: 'Blue' });
+# Single selection matching the value
+await page.select_option('select#colors', 'blue')
 
-// Multiple selected items
-await page.selectOption('select#colors', ['red', 'green', 'blue']);
+# Single selection matching the label
+await page.select_option('select#colors', label='Blue')
 
-// Select the option via element handle
-const option = await page.$('#best-option');
-await page.selectOption('select#colors', option);
+# Multiple selected items
+await page.select_option('select#colors', ['red', 'green', 'blue'])
+
+# Select the option via element handle
+option = await page.query_selector('#best-option')
+await page.select_option('select#colors', option)
+```
+
+```python
+# sync
+
+# Single selection matching the value
+page.select_option('select#colors', 'blue')
+
+# Single selection matching the label
+page.select_option('select#colors', label='Blue')
+
+# Multiple selected items
+page.select_option('select#colors', ['red', 'green', 'blue'])
+
+# Select the option via element handle
+option = page.query_selector('#best-option')
+page.select_option('select#colors', option)
 ```
 
 #### API reference
@@ -95,24 +150,48 @@ await page.selectOption('select#colors', option);
 
 Performs a simple human click.
 
-```js
-// Generic click
-await page.click('button#submit');
+```python
+# async
 
-// Double click
-await page.dblclick('#item');
+# Generic click
+await page.click('button#submit')
 
-// Right click
-await page.click('#item', { button: 'right' });
+# Double click
+await page.dblclick('#item')
 
-// Shift + click
-await page.click('#item', { modifiers: ['Shift'] });
+# Right click
+await page.click('#item', button='right')
 
-// Hover over element
-await page.hover('#item');
+# Shift + click
+await page.click('#item', modifiers=['Shift'])
 
-// Click the top left corner
-await page.click('#item', { position: { x: 0, y: 0} });
+# Hover over element
+await page.hover('#item')
+
+# Click the top left corner
+await page.click('#item', position={ 'x': 0, 'y': 0})
+```
+
+```python
+# sync
+
+# Generic click
+page.click('button#submit')
+
+# Double click
+page.dblclick('#item')
+
+# Right click
+page.click('#item', button='right')
+
+# Shift + click
+page.click('#item', modifiers=['Shift'])
+
+# Hover over element
+page.hover('#item')
+
+# Click the top left corner
+page.click('#item', position={ 'x': 0, 'y': 0})
 ```
 
 Under the hood, this and other pointer-related methods:
@@ -127,16 +206,32 @@ Under the hood, this and other pointer-related methods:
 
 Sometimes, apps use non-trivial logic where hovering the element overlays it with another element that intercepts the click. This behavior is indistinguishable from a bug where element gets covered and the click is dispatched elsewhere. If you know this is taking place, you can bypass the [actionability](./actionability.md) checks and force the click:
 
-```js
-await page.click('button#submit', { force: true });
+```python
+# async
+
+await page.click('button#submit', force=True)
+```
+
+```python
+# sync
+
+page.click('button#submit', force=True)
 ```
 
 #### Programmatic click
 
 If you are not interested in testing your app under the real conditions and want to simulate the click by any means possible, you can trigger the [`HTMLElement.click()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click) behavior via simply dispatching a click event on the element:
 
-```js
-await page.dispatchEvent('button#submit', 'click');
+```python
+# async
+
+await page.dispatch_event('button#submit', 'click')
+```
+
+```python
+# sync
+
+page.dispatch_event('button#submit', 'click')
 ```
 
 #### API reference
@@ -159,9 +254,18 @@ await page.dispatchEvent('button#submit', 'click');
 
 Type into the field character by character, as if it was a user with a real keyboard.
 
-```js
-// Type character by character
-await page.type('#area', 'Hello World!');
+```python
+# async
+
+# Type character by character
+await page.type('#area', 'Hello World!')
+```
+
+```python
+# sync
+
+# Type character by character
+page.type('#area', 'Hello World!')
 ```
 
 This method will emit all the necessary keyboard events, with all the `keydown`, `keyup`, `keypress` events in place. You can even specify the optional `delay` between the key presses to simulate real user behavior.
@@ -178,15 +282,30 @@ This method will emit all the necessary keyboard events, with all the `keydown`,
 
 ## Keys and shortcuts
 
-```js
-// Hit Enter
-await page.press('#submit', 'Enter');
+```python
+# async
 
-// Dispatch Control+Right
-await page.press('#name', 'Control+ArrowRight');
+# Hit Enter
+await page.press('#submit', 'Enter')
 
-// Press $ sign on keyboard
-await page.press('#value', '$');
+# Dispatch Control+Right
+await page.press('#name', 'Control+ArrowRight')
+
+# Press $ sign on keyboard
+await page.press('#value', '$')
+```
+
+```python
+# sync
+
+# Hit Enter
+page.press('#submit', 'Enter')
+
+# Dispatch Control+Right
+page.press('#name', 'Control+ArrowRight')
+
+# Press $ sign on keyboard
+page.press('#value', '$')
 ```
 
 This method focuses the selected element and produces a single keystroke. It accepts the logical key names that are emitted in the [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) property of the keyboard events:
@@ -202,12 +321,24 @@ ArrowUp, F1 - F12, Digit0 - Digit9, KeyA - KeyZ, etc.
 
 Simple version produces a single character. This character is case-sensitive, so `"a"` and `"A"` will produce different results.
 
-```js
-// <input id=name>
-await page.press('#name', 'Shift+A');
+```python
+# async
 
-// <input id=name>
-await page.press('#name', 'Shift+ArrowLeft');
+# <input id=name>
+await page.press('#name', 'Shift+A')
+
+# <input id=name>
+await page.press('#name', 'Shift+ArrowLeft')
+```
+
+```python
+# sync
+
+# <input id=name>
+page.press('#name', 'Shift+A')
+
+# <input id=name>
+page.press('#name', 'Shift+ArrowLeft')
 ```
 
 Shortcuts such as `"Control+o"` or `"Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
@@ -224,22 +355,44 @@ Note that you still need to specify the capital `A` in `Shift-A` to produce the 
 
 ## Upload files
 
-```js
-// Select one file
-await page.setInputFiles('input#upload', 'myfile.pdf');
+```python
+# async
 
-// Select multiple files
-await page.setInputFiles('input#upload', ['file1.txt', 'file2.txt']);
+from playwright.async_api import FilePayload
+# Select one file
+await page.set_input_files('input#upload', 'myfile.pdf')
 
-// Remove all the selected files
-await page.setInputFiles('input#upload', []);
+# Select multiple files
+await page.set_input_files('input#upload', ['file1.txt', 'file2.txt'])
 
-// Upload buffer from memory
-await page.setInputFiles('input#upload', {
-  name: 'file.txt',
-  mimeType: 'text/plain',
-  buffer: Buffer.from('this is test')
-});
+# Remove all the selected files
+await page.set_input_files('input#upload', [])
+
+# Upload buffer from memory
+await page.set_input_files(
+    "input#upload",
+    files=[FilePayload("test.txt", "text/plain", b"this is a test")],
+)
+```
+
+```python
+# sync
+
+from playwright.sync_api import FilePayload
+# Select one file
+page.set_input_files('input#upload', 'myfile.pdf')
+
+# Select multiple files
+page.set_input_files('input#upload', ['file1.txt', 'file2.txt'])
+
+# Remove all the selected files
+page.set_input_files('input#upload', [])
+
+# Upload buffer from memory
+page.set_input_files(
+    "input#upload",
+    files=[FilePayload("test.txt", "text/plain", b"this is a test")],
+)
 ```
 
 You can select input files for upload using the [page.set_input_files(selector, files, **options)](./api/class-page.md#pagesetinputfilesselector-files-options) method. It expects first argument to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input) with the type `"file"`. Multiple files can be passed in the array. If some of the file paths are relative, they are resolved relative to the [current working directory](https://nodejs.org/api/process.html#process_process_cwd). Empty array clears the selected files.
@@ -259,8 +412,16 @@ You can select input files for upload using the [page.set_input_files(selector, 
 
 For the dynamic pages that handle focus events, you can focus the given element.
 
-```js
-await page.focus('input#name');
+```python
+# async
+
+await page.focus('input#name')
+```
+
+```python
+# sync
+
+page.focus('input#name')
 ```
 
 #### API reference

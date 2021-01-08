@@ -97,7 +97,7 @@ let page;
 
 TypeScript support will work out-of-the-box. Types can also be imported explicitly.
 
-```ts
+```js
 let page: import('playwright').Page;
 ```
 
