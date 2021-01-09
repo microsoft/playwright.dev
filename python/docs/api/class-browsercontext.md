@@ -35,7 +35,7 @@ Playwright allows creation of "incognito" browser contexts with `browser.newCont
 - [browser_context.set_offline(offline)](./api/class-browsercontext.md#browsercontextsetofflineoffline)
 - [browser_context.storage_state(**options)](./api/class-browsercontext.md#browsercontextstoragestateoptions)
 - [browser_context.unroute(url, **options)](./api/class-browsercontext.md#browsercontextunrouteurl-options)
-- [browser_context.wait_for_event(event, predicate, **options)](./api/class-browsercontext.md#browsercontextwaitforeventevent-predicate-options)
+- [browser_context.wait_for_event(event, **options)](./api/class-browsercontext.md#browsercontextwaitforeventevent-options)
 - [browser_context.reset_geolocation()](./api/class-browsercontext.md#browsercontextresetgeolocation)
 
 ## browser_context.on("close")
@@ -260,10 +260,10 @@ Returns storage state for this browser context, contains current cookies and loc
 
 Removes a route created with [browser_context.route(url, handler)](./api/class-browsercontext.md#browsercontextrouteurl-handler). When `handler` is not specified, removes all routes for the `url`.
 
-## browser_context.wait_for_event(event, predicate, **options)
+## browser_context.wait_for_event(event, **options)
 - `event` <[str]> Event name, same one would pass into `browserContext.on(event)`.
-- `predicate` <[Function]> receives the event data and resolves to truthy value when the waiting should resolve.
-- `timeout` <[float]> maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+- `predicate` <[Function]> Receives the event data and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
 - returns: <[Any]>
 
 Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the context closes before the event is fired. Returns the event data value.

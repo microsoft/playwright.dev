@@ -417,7 +417,7 @@ page.wait_for_selector('#promo', state='detached')
 
 Playwright scripts run in your Node.js environment. Your page scripts run in the browser page environment. Those environments don't intersect, they are running in different virtual machines in different processes and even potentially on different computers.
 
-The [page.evaluate(page_function, **options)](./api/class-page.md#pageevaluatepagefunction-options) API can run a JavaScript function in the context of the web page and bring results back to the Node.js environment. Browser globals like `window` and `document` can be used in `evaluate`.
+The [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options) API can run a JavaScript function in the context of the web page and bring results back to the Node.js environment. Browser globals like `window` and `document` can be used in `evaluate`.
 
 ```python
 # async
@@ -453,7 +453,7 @@ status = page.evaluate("""async () => {
 
 ## Evaluation Argument
 
-Playwright evaluation methods like [page.evaluate(page_function, **options)](./api/class-page.md#pageevaluatepagefunction-options) take a single optional argument. This argument can be a mix of [Serializable] values and [JSHandle] or [ElementHandle] instances. Handles are automatically converted to the value they represent.
+Playwright evaluation methods like [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options) take a single optional argument. This argument can be a mix of [Serializable] values and [JSHandle] or [ElementHandle] instances. Handles are automatically converted to the value they represent.
 
 ```python
 # async
@@ -589,8 +589,8 @@ result = page.evaluate("""() => {
 ```
 
 #### API reference
-- [page.evaluate(page_function, **options)](./api/class-page.md#pageevaluatepagefunction-options)
-- [frame.evaluate(page_function, **options)](./api/class-frame.md#frameevaluatepagefunction-options)
+- [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options)
+- [frame.evaluate(expression, **options)](./api/class-frame.md#frameevaluateexpression-options)
 - [EvaluationArgument]
 
 <br/>
@@ -606,7 +606,7 @@ There are two types of handles:
 Note that since any DOM element in the page is also a JavaScript object, Playwright's [ElementHandle] extends [JSHandle].
 
 ### Handles Lifecycle
-- Handles can be acquired using the page methods [page.evaluate_handle(page_function, **options)](./api/class-page.md#pageevaluatehandlepagefunction-options), [page.query_selector(selector)](./api/class-page.md#pagequeryselectorselector) or [page.query_selector_all(selector)](./api/class-page.md#pagequeryselectorallselector) or their frame counterparts [frame.evaluate_handle(page_function, **options)](./api/class-frame.md#frameevaluatehandlepagefunction-options), [frame.query_selector(selector)](./api/class-frame.md#framequeryselectorselector) or [frame.query_selector_all(selector)](./api/class-frame.md#framequeryselectorallselector).
+- Handles can be acquired using the page methods [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluatehandleexpression-options), [page.query_selector(selector)](./api/class-page.md#pagequeryselectorselector) or [page.query_selector_all(selector)](./api/class-page.md#pagequeryselectorallselector) or their frame counterparts [frame.evaluate_handle(expression, **options)](./api/class-frame.md#frameevaluatehandleexpression-options), [frame.query_selector(selector)](./api/class-frame.md#framequeryselectorselector) or [frame.query_selector_all(selector)](./api/class-frame.md#framequeryselectorallselector).
 - Once created, handles will retain object from [garbage collection](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_Management).
 - Handles will be **automatically disposed** once the page or frame they belong to navigates or closes.
 - Handles can be **manually disposed** using [js_handle.dispose()](./api/class-jshandle.md#jshandledispose) method.
@@ -629,7 +629,7 @@ ul_element_handle = page.query_selector('ul')
 ul_element_handle.evaluate("ulElement => getComputedStyle(ulElement).getPropertyValue('display')")
 ```
 
-Handles can also be passed as arguments to [page.evaluate(page_function, **options)](./api/class-page.md#pageevaluatepagefunction-options) function:
+Handles can also be passed as arguments to [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options) function:
 
 ```python
 # async
@@ -708,10 +708,10 @@ my_array_handle.dispose()
 #### API reference
 - [JSHandle]
 - [ElementHandle]
-- [page.evaluate_handle(page_function, **options)](./api/class-page.md#pageevaluatehandlepagefunction-options)
+- [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluatehandleexpression-options)
 - [page.query_selector(selector)](./api/class-page.md#pagequeryselectorselector)
 - [page.query_selector_all(selector)](./api/class-page.md#pagequeryselectorallselector)
-- [js_handle.evaluate(page_function, **options)](./api/class-jshandle.md#jshandleevaluatepagefunction-options)
+- [js_handle.evaluate(expression, **options)](./api/class-jshandle.md#jshandleevaluateexpression-options)
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"

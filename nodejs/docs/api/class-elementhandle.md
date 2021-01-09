@@ -41,6 +41,11 @@ ElementHandle instances can be used as an argument in [page.$eval(selector, page
 - [elementHandle.hover([options])](./api/class-elementhandle.md#elementhandlehoveroptions)
 - [elementHandle.innerHTML()](./api/class-elementhandle.md#elementhandleinnerhtml)
 - [elementHandle.innerText()](./api/class-elementhandle.md#elementhandleinnertext)
+- [elementHandle.isDisabled()](./api/class-elementhandle.md#elementhandleisdisabled)
+- [elementHandle.isEditable()](./api/class-elementhandle.md#elementhandleiseditable)
+- [elementHandle.isEnabled()](./api/class-elementhandle.md#elementhandleisenabled)
+- [elementHandle.isHidden()](./api/class-elementhandle.md#elementhandleishidden)
+- [elementHandle.isVisible()](./api/class-elementhandle.md#elementhandleisvisible)
 - [elementHandle.ownerFrame()](./api/class-elementhandle.md#elementhandleownerframe)
 - [elementHandle.press(key[, options])](./api/class-elementhandle.md#elementhandlepresskey-options)
 - [elementHandle.screenshot([options])](./api/class-elementhandle.md#elementhandlescreenshotoptions)
@@ -286,6 +291,31 @@ Returns the `element.innerHTML`.
 
 Returns the `element.innerText`.
 
+## elementHandle.isDisabled()
+- returns: <[Promise]<[boolean]>>
+
+Returns whether the element is disabled, the opposite of [enabled](./actionability.md#enabled).
+
+## elementHandle.isEditable()
+- returns: <[Promise]<[boolean]>>
+
+Returns whether the element is [editable](./actionability.md#editable).
+
+## elementHandle.isEnabled()
+- returns: <[Promise]<[boolean]>>
+
+Returns whether the element is [enabled](./actionability.md#enabled).
+
+## elementHandle.isHidden()
+- returns: <[Promise]<[boolean]>>
+
+Returns whether the element is hidden, the opposite of [visible](./actionability.md#visible).
+
+## elementHandle.isVisible()
+- returns: <[Promise]<[boolean]>>
+
+Returns whether the element is [visible](./actionability.md#visible).
+
 ## elementHandle.ownerFrame()
 - returns: <[Promise]<[null]|[Frame]>>
 
@@ -450,7 +480,7 @@ If the element is detached from the DOM at any moment during the action, this me
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
 
 ## elementHandle.waitForElementState(state[, options])
-- `state` <"visible"|"hidden"|"stable"|"enabled"|"disabled"> A state to wait for, see below for more details.
+- `state` <"visible"|"hidden"|"stable"|"enabled"|"disabled"|"editable"> A state to wait for, see below for more details.
 - `options` <[Object]>
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
 
@@ -462,6 +492,7 @@ Depending on the `state` parameter, this method waits for one of the [actionabil
 * `"stable"` Wait until the element is both [visible](./actionability.md#visible) and [stable](./actionability.md#stable).
 * `"enabled"` Wait until the element is [enabled](./actionability.md#enabled).
 * `"disabled"` Wait until the element is [not enabled](./actionability.md#enabled).
+* `"editable"` Wait until the element is [editable](./actionability.md#editable).
 
 If the element does not satisfy the condition for the `timeout` milliseconds, this method will throw.
 

@@ -88,14 +88,14 @@ When popup is opened, explicitly calling [page.wait_for_load_state(**options)](.
 - [page.wait_for_load_state(**options)](./api/class-page.md#pagewaitforloadstateoptions)
 - [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewaitforselectorselector-options)
 - [page.wait_for_navigation(**options)](./api/class-page.md#pagewaitfornavigationoptions)
-- [page.wait_for_function(page_function, **options)](./api/class-page.md#pagewaitforfunctionpagefunction-options)
+- [page.wait_for_function(expression, **options)](./api/class-page.md#pagewaitforfunctionexpression-options)
 
 ## Advanced patterns
 
-For pages that have complicated loading patterns, [page.wait_for_function(page_function, **options)](./api/class-page.md#pagewaitforfunctionpagefunction-options) is a powerful and extensible approach to define a custom wait criteria.
+For pages that have complicated loading patterns, [page.wait_for_function(expression, **options)](./api/class-page.md#pagewaitforfunctionexpression-options) is a powerful and extensible approach to define a custom wait criteria.
 
 #### API reference
-- [page.wait_for_function(page_function, **options)](./api/class-page.md#pagewaitforfunctionpagefunction-options)
+- [page.wait_for_function(expression, **options)](./api/class-page.md#pagewaitforfunctionexpression-options)
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"

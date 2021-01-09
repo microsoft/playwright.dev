@@ -327,12 +327,6 @@ function expandPythonArgument(methodName, arg) {
   const argName = arg.name;
   if (argName == 'options')
     expandType = arg.type;
-  if (argName == 'optionsOrPredicate')
-    expandType = arg.type.union[1];
-  if (argName == 'params' && arg.type.properties)
-    expandType = arg.type;
-  if (methodName == 'emulateMedia' && argName == 'params')
-    expandType = arg.type;
   if (methodName == 'fulfill' && argName == 'response')
     expandType = arg.type;
   if (methodName == 'continue' && argName == 'overrides')

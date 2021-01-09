@@ -60,7 +60,6 @@ Indicates that the browser is connected.
 - `is_mobile` <[bool]> Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.
 - `java_script_enabled` <[bool]> Whether or not to enable JavaScript in the context. Defaults to `true`.
 - `locale` <[str]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
-- `logger` <[Logger]> Logger sink for Playwright logging.
 - `offline` <[bool]> Whether to emulate network being offline. Defaults to `false`.
 - `permissions` <[List]\[[str]\]> A list of permissions to grant to all pages in this context. See [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browsercontextgrantpermissionspermissions-options) for more details.
 - `proxy` <[Dict]> Network proxy settings to use with this context. Note that browser needs to be launched with the global proxy for this option to work. If all contexts override the proxy, global proxy will be never used and can be any string, for example `launch({ proxy: { server: 'per-context' } })`.
@@ -123,7 +122,6 @@ Creates a new browser context. It won't share cookies/cache with other browser c
 - `is_mobile` <[bool]> Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.
 - `java_script_enabled` <[bool]> Whether or not to enable JavaScript in the context. Defaults to `true`.
 - `locale` <[str]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
-- `logger` <[Logger]> Logger sink for Playwright logging.
 - `offline` <[bool]> Whether to emulate network being offline. Defaults to `false`.
 - `permissions` <[List]\[[str]\]> A list of permissions to grant to all pages in this context. See [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browsercontextgrantpermissionspermissions-options) for more details.
 - `proxy` <[Dict]> Network proxy settings to use with this context. Note that browser needs to be launched with the global proxy for this option to work. If all contexts override the proxy, global proxy will be never used and can be any string, for example `launch({ proxy: { server: 'per-context' } })`.

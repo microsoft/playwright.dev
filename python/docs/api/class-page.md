@@ -37,8 +37,8 @@ To unsubscribe from events use the `removeListener` method:
 - [page.on("worker")](./api/class-page.md#pageonworker)
 - [page.query_selector(selector)](./api/class-page.md#pagequeryselectorselector)
 - [page.query_selector_all(selector)](./api/class-page.md#pagequeryselectorallselector)
-- [page.eval_on_selector(selector, page_function, **options)](./api/class-page.md#pageevalonselectorselector-pagefunction-options)
-- [page.eval_on_selector_all(selector, page_function, **options)](./api/class-page.md#pageevalonselectorallselector-pagefunction-options)
+- [page.eval_on_selector(selector, expression, **options)](./api/class-page.md#pageevalonselectorselector-expression-options)
+- [page.eval_on_selector_all(selector, expression, **options)](./api/class-page.md#pageevalonselectorallselector-expression-options)
 - [page.accessibility](./api/class-page.md#pageaccessibility)
 - [page.add_init_script(**options)](./api/class-page.md#pageaddinitscriptoptions)
 - [page.add_script_tag(**options)](./api/class-page.md#pageaddscripttagoptions)
@@ -52,8 +52,8 @@ To unsubscribe from events use the `removeListener` method:
 - [page.dblclick(selector, **options)](./api/class-page.md#pagedblclickselector-options)
 - [page.dispatch_event(selector, type, **options)](./api/class-page.md#pagedispatcheventselector-type-options)
 - [page.emulate_media(**options)](./api/class-page.md#pageemulatemediaoptions)
-- [page.evaluate(page_function, **options)](./api/class-page.md#pageevaluatepagefunction-options)
-- [page.evaluate_handle(page_function, **options)](./api/class-page.md#pageevaluatehandlepagefunction-options)
+- [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options)
+- [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluatehandleexpression-options)
 - [page.expose_binding(name, callback, **options)](./api/class-page.md#pageexposebindingname-callback-options)
 - [page.expose_function(name, callback)](./api/class-page.md#pageexposefunctionname-callback)
 - [page.fill(selector, value, **options)](./api/class-page.md#pagefillselector-value-options)
@@ -68,6 +68,11 @@ To unsubscribe from events use the `removeListener` method:
 - [page.inner_html(selector, **options)](./api/class-page.md#pageinnerhtmlselector-options)
 - [page.inner_text(selector, **options)](./api/class-page.md#pageinnertextselector-options)
 - [page.is_closed()](./api/class-page.md#pageisclosed)
+- [page.is_disabled(selector, **options)](./api/class-page.md#pageisdisabledselector-options)
+- [page.is_editable(selector, **options)](./api/class-page.md#pageiseditableselector-options)
+- [page.is_enabled(selector, **options)](./api/class-page.md#pageisenabledselector-options)
+- [page.is_hidden(selector, **options)](./api/class-page.md#pageishiddenselector-options)
+- [page.is_visible(selector, **options)](./api/class-page.md#pageisvisibleselector-options)
 - [page.keyboard](./api/class-page.md#pagekeyboard)
 - [page.main_frame()](./api/class-page.md#pagemainframe)
 - [page.mouse](./api/class-page.md#pagemouse)
@@ -94,8 +99,8 @@ To unsubscribe from events use the `removeListener` method:
 - [page.url()](./api/class-page.md#pageurl)
 - [page.video()](./api/class-page.md#pagevideo)
 - [page.viewport_size()](./api/class-page.md#pageviewportsize)
-- [page.wait_for_event(event, predicate, **options)](./api/class-page.md#pagewaitforeventevent-predicate-options)
-- [page.wait_for_function(page_function, **options)](./api/class-page.md#pagewaitforfunctionpagefunction-options)
+- [page.wait_for_event(event, **options)](./api/class-page.md#pagewaitforeventevent-options)
+- [page.wait_for_function(expression, **options)](./api/class-page.md#pagewaitforfunctionexpression-options)
 - [page.wait_for_load_state(**options)](./api/class-page.md#pagewaitforloadstateoptions)
 - [page.wait_for_navigation(**options)](./api/class-page.md#pagewaitfornavigationoptions)
 - [page.wait_for_request(url_or_predicate, **options)](./api/class-page.md#pagewaitforrequesturlorpredicate-options)
@@ -227,29 +232,31 @@ The method finds all elements matching the specified selector within the page. I
 
 Shortcut for main frame's [frame.query_selector_all(selector)](./api/class-frame.md#framequeryselectorallselector).
 
-## page.eval_on_selector(selector, page_function, **options)
+## page.eval_on_selector(selector, expression, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `page_function` <[Callable]\[[Element]\]> Function to be evaluated in browser context
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
+- `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[Serializable]>
 
 The method finds an element matching the specified selector within the page and passes it as a first argument to `pageFunction`. If no elements match the selector, the method throws an error. Returns the value of `pageFunction`.
 
-If `pageFunction` returns a [Promise], then [page.eval_on_selector(selector, page_function, **options)](./api/class-page.md#pageevalonselectorselector-pagefunction-options) would wait for the promise to resolve and return its value.
+If `pageFunction` returns a [Promise], then [page.eval_on_selector(selector, expression, **options)](./api/class-page.md#pageevalonselectorselector-expression-options) would wait for the promise to resolve and return its value.
 
 Examples:
 
-Shortcut for main frame's [frame.eval_on_selector(selector, page_function, **options)](./api/class-frame.md#frameevalonselectorselector-pagefunction-options).
+Shortcut for main frame's [frame.eval_on_selector(selector, expression, **options)](./api/class-frame.md#frameevalonselectorselector-expression-options).
 
-## page.eval_on_selector_all(selector, page_function, **options)
+## page.eval_on_selector_all(selector, expression, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `page_function` <[Callable]\[[List]\[[Element]\]\]> Function to be evaluated in browser context
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
+- `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[Serializable]>
 
 The method finds all elements matching the specified selector within the page and passes an array of matched elements as a first argument to `pageFunction`. Returns the result of `pageFunction` invocation.
 
-If `pageFunction` returns a [Promise], then [page.eval_on_selector_all(selector, page_function, **options)](./api/class-page.md#pageevalonselectorallselector-pagefunction-options) would wait for the promise to resolve and return its value.
+If `pageFunction` returns a [Promise], then [page.eval_on_selector_all(selector, expression, **options)](./api/class-page.md#pageevalonselectorallselector-expression-options) would wait for the promise to resolve and return its value.
 
 Examples:
 
@@ -271,10 +278,10 @@ An example of overriding `Math.random` before the page loads:
 > **NOTE** The order of evaluation of multiple scripts installed via [browser_context.add_init_script(**options)](./api/class-browsercontext.md#browsercontextaddinitscriptoptions) and [page.add_init_script(**options)](./api/class-page.md#pageaddinitscriptoptions) is not defined.
 
 ## page.add_script_tag(**options)
-- `url` <[str]> URL of a script to be added. Optional.
-- `path` <[Union]\[[str], [pathlib.Path]\]> Path to the JavaScript file to be injected into frame. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
-- `content` <[str]> Raw JavaScript content to be injected into frame. Optional.
-- `type` <[str]> Script type. Use 'module' in order to load a Javascript ES6 module. See [script](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script) for more details. Optional.
+- `content` <[str]> Raw JavaScript content to be injected into frame.
+- `path` <[Union]\[[str], [pathlib.Path]\]> Path to the JavaScript file to be injected into frame. If `path` is a relative path, then it is resolved relative to the current working directory.
+- `type` <[str]> Script type. Use 'module' in order to load a Javascript ES6 module. See [script](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script) for more details.
+- `url` <[str]> URL of a script to be added.
 - returns: <[ElementHandle]>
 
 Adds a `<script>` tag into the page with the desired url or content. Returns the added tag when the script's onload fires or when the script content was injected into frame.
@@ -282,9 +289,9 @@ Adds a `<script>` tag into the page with the desired url or content. Returns the
 Shortcut for main frame's [frame.add_script_tag(**options)](./api/class-frame.md#frameaddscripttagoptions).
 
 ## page.add_style_tag(**options)
-- `url` <[str]> URL of the `<link>` tag. Optional.
-- `path` <[Union]\[[str], [pathlib.Path]\]> Path to the CSS file to be injected into frame. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
-- `content` <[str]> Raw CSS content to be injected into frame. Optional.
+- `content` <[str]> Raw CSS content to be injected into frame.
+- `path` <[Union]\[[str], [pathlib.Path]\]> Path to the CSS file to be injected into frame. If `path` is a relative path, then it is resolved relative to the current working directory.
+- `url` <[str]> URL of the `<link>` tag.
 - returns: <[ElementHandle]>
 
 Adds a `<link rel="stylesheet">` tag into the page with the desired url or a `<style type="text/css">` tag with the content. Returns the added tag when the stylesheet's onload fires or when the CSS content was injected into frame.
@@ -408,9 +415,10 @@ You can also specify `JSHandle` as the property value if you want live objects t
 - `media` <[NoneType]|"screen"|"print"> Changes the CSS media type of the page. The only allowed values are `'screen'`, `'print'` and `null`. Passing `null` disables CSS media emulation. Omitting `media` or passing `undefined` does not change the emulated value. Optional.
 - `color_scheme` <[NoneType]|"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. Passing `null` disables color scheme emulation. Omitting `colorScheme` or passing `undefined` does not change the emulated value. Optional.
 
-## page.evaluate(page_function, **options)
-- `page_function` <[Callable]|[str]> Function to be evaluated in the page context
+## page.evaluate(expression, **options)
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
+- `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[Serializable]>
 
 Returns the value of the `pageFunction` invocation.
@@ -425,11 +433,12 @@ A string can also be passed in instead of a function:
 
 [ElementHandle] instances can be passed as an argument to the `page.evaluate`:
 
-Shortcut for main frame's [frame.evaluate(page_function, **options)](./api/class-frame.md#frameevaluatepagefunction-options).
+Shortcut for main frame's [frame.evaluate(expression, **options)](./api/class-frame.md#frameevaluateexpression-options).
 
-## page.evaluate_handle(page_function, **options)
-- `page_function` <[Callable]|[str]> Function to be evaluated in the page context
+## page.evaluate_handle(expression, **options)
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
+- `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[JSHandle]>
 
 Returns the value of the `pageFunction` invocation as in-page object (JSHandle).
@@ -603,6 +612,41 @@ Returns `element.innerText`.
 - returns: <[bool]>
 
 Indicates that the page has been closed.
+
+## page.is_disabled(selector, **options)
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[bool]>
+
+Returns whether the element is disabled, the opposite of [enabled](./actionability.md#enabled).
+
+## page.is_editable(selector, **options)
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[bool]>
+
+Returns whether the element is [editable](./actionability.md#editable).
+
+## page.is_enabled(selector, **options)
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[bool]>
+
+Returns whether the element is [enabled](./actionability.md#enabled).
+
+## page.is_hidden(selector, **options)
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[bool]>
+
+Returns whether the element is hidden, the opposite of [visible](./actionability.md#visible).
+
+## page.is_visible(selector, **options)
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[bool]>
+
+Returns whether the element is [visible](./actionability.md#visible).
 
 ## page.keyboard
 - type: <[Keyboard]>
@@ -913,21 +957,22 @@ Video object associated with this page.
   - `width` <[int]> page width in pixels.
   - `height` <[int]> page height in pixels.
 
-## page.wait_for_event(event, predicate, **options)
+## page.wait_for_event(event, **options)
 - `event` <[str]> Event name, same one would pass into `page.on(event)`.
-- `predicate` <[Function]> receives the event data and resolves to truthy value when the waiting should resolve.
-- `timeout` <[float]> maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+- `predicate` <[Function]> Receives the event data and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
 - returns: <[Any]>
 
 Returns the event data value.
 
 Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the page is closed before the event is fired.
 
-## page.wait_for_function(page_function, **options)
-- `page_function` <[Callable]|[str]> Function to be evaluated in browser context
+## page.wait_for_function(expression, **options)
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
 - `polling` <[float]|"raf"> If `polling` is `'raf'`, then `pageFunction` is constantly executed in `requestAnimationFrame` callback. If `polling` is a number, then it is treated as an interval in milliseconds at which the function would be executed. Defaults to `raf`.
 - `timeout` <[float]> maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+- `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
+- `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[JSHandle]>
 
 Returns when the `pageFunction` returns a truthy value. It resolves to a JSHandle of the truthy value.
@@ -936,7 +981,7 @@ The `waitForFunction` can be used to observe viewport size change:
 
 To pass an argument to the predicate of `page.waitForFunction` function:
 
-Shortcut for main frame's [frame.wait_for_function(page_function, **options)](./api/class-frame.md#framewaitforfunctionpagefunction-options).
+Shortcut for main frame's [frame.wait_for_function(expression, **options)](./api/class-frame.md#framewaitforfunctionexpression-options).
 
 ## page.wait_for_load_state(**options)
 - `state` <"load"|"domcontentloaded"|"networkidle"> Optional load state to wait for, defaults to `load`. If the state has been already reached while loading current document, the method resolves immediately. Can be one of:

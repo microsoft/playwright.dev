@@ -30,7 +30,6 @@ A path where Playwright expects to find a bundled browser executable.
 - `handle_sigterm` <[bool]> Close the browser process on SIGTERM. Defaults to `true`.
 - `headless` <[bool]> Whether to run browser in headless mode. More details for [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) and [Firefox](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode). Defaults to `true` unless the `devtools` option is `true`.
 - `ignore_default_args` <[bool]|[List]\[[str]\]> If `true`, Playwright does not pass its own configurations args and only uses the ones from `args`. If an array is given, then filters out the given default arguments. Dangerous option; use with care. Defaults to `false`.
-- `logger` <[Logger]> Logger sink for Playwright logging.
 - `proxy` <[Dict]> Network proxy settings.
   - `server` <[str]> Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
   - `bypass` <[str]> Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
@@ -82,7 +81,6 @@ You can use `ignoreDefaultArgs` to filter out `--mute-audio` from default argume
 - `is_mobile` <[bool]> Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.
 - `java_script_enabled` <[bool]> Whether or not to enable JavaScript in the context. Defaults to `true`.
 - `locale` <[str]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
-- `logger` <[Logger]> Logger sink for Playwright logging.
 - `offline` <[bool]> Whether to emulate network being offline. Defaults to `false`.
 - `permissions` <[List]\[[str]\]> A list of permissions to grant to all pages in this context. See [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browsercontextgrantpermissionspermissions-options) for more details.
 - `proxy` <[Dict]> Network proxy settings.

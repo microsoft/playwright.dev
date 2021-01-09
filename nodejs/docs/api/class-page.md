@@ -67,8 +67,8 @@ page.removeListener('request', logRequest);
 - [page.$$eval(selector, pageFunction[, arg])](./api/class-page.md#pageevalselector-pagefunction-arg-1)
 - [page.accessibility](./api/class-page.md#pageaccessibility)
 - [page.addInitScript(script[, arg])](./api/class-page.md#pageaddinitscriptscript-arg)
-- [page.addScriptTag(params)](./api/class-page.md#pageaddscripttagparams)
-- [page.addStyleTag(params)](./api/class-page.md#pageaddstyletagparams)
+- [page.addScriptTag([options])](./api/class-page.md#pageaddscripttagoptions)
+- [page.addStyleTag([options])](./api/class-page.md#pageaddstyletagoptions)
 - [page.bringToFront()](./api/class-page.md#pagebringtofront)
 - [page.check(selector[, options])](./api/class-page.md#pagecheckselector-options)
 - [page.click(selector[, options])](./api/class-page.md#pageclickselector-options)
@@ -95,6 +95,11 @@ page.removeListener('request', logRequest);
 - [page.innerHTML(selector[, options])](./api/class-page.md#pageinnerhtmlselector-options)
 - [page.innerText(selector[, options])](./api/class-page.md#pageinnertextselector-options)
 - [page.isClosed()](./api/class-page.md#pageisclosed)
+- [page.isDisabled(selector[, options])](./api/class-page.md#pageisdisabledselector-options)
+- [page.isEditable(selector[, options])](./api/class-page.md#pageiseditableselector-options)
+- [page.isEnabled(selector[, options])](./api/class-page.md#pageisenabledselector-options)
+- [page.isHidden(selector[, options])](./api/class-page.md#pageishiddenselector-options)
+- [page.isVisible(selector[, options])](./api/class-page.md#pageisvisibleselector-options)
 - [page.keyboard](./api/class-page.md#pagekeyboard)
 - [page.mainFrame()](./api/class-page.md#pagemainframe)
 - [page.mouse](./api/class-page.md#pagemouse)
@@ -361,28 +366,28 @@ await page.addInitScript(preloadFile);
 
 > **NOTE** The order of evaluation of multiple scripts installed via [browserContext.addInitScript(script[, arg])](./api/class-browsercontext.md#browsercontextaddinitscriptscript-arg) and [page.addInitScript(script[, arg])](./api/class-page.md#pageaddinitscriptscript-arg) is not defined.
 
-## page.addScriptTag(params)
-- `params` <[Object]>
-  - `url` <[string]> URL of a script to be added. Optional.
-  - `path` <[string]> Path to the JavaScript file to be injected into frame. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
-  - `content` <[string]> Raw JavaScript content to be injected into frame. Optional.
-  - `type` <[string]> Script type. Use 'module' in order to load a Javascript ES6 module. See [script](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script) for more details. Optional.
+## page.addScriptTag([options])
+- `options` <[Object]>
+  - `content` <[string]> Raw JavaScript content to be injected into frame.
+  - `path` <[string]> Path to the JavaScript file to be injected into frame. If `path` is a relative path, then it is resolved relative to the current working directory.
+  - `type` <[string]> Script type. Use 'module' in order to load a Javascript ES6 module. See [script](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script) for more details.
+  - `url` <[string]> URL of a script to be added.
 - returns: <[Promise]<[ElementHandle]>>
 
 Adds a `<script>` tag into the page with the desired url or content. Returns the added tag when the script's onload fires or when the script content was injected into frame.
 
-Shortcut for main frame's [frame.addScriptTag(params)](./api/class-frame.md#frameaddscripttagparams).
+Shortcut for main frame's [frame.addScriptTag([options])](./api/class-frame.md#frameaddscripttagoptions).
 
-## page.addStyleTag(params)
-- `params` <[Object]>
-  - `url` <[string]> URL of the `<link>` tag. Optional.
-  - `path` <[string]> Path to the CSS file to be injected into frame. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
-  - `content` <[string]> Raw CSS content to be injected into frame. Optional.
+## page.addStyleTag([options])
+- `options` <[Object]>
+  - `content` <[string]> Raw CSS content to be injected into frame.
+  - `path` <[string]> Path to the CSS file to be injected into frame. If `path` is a relative path, then it is resolved relative to the current working directory.
+  - `url` <[string]> URL of the `<link>` tag.
 - returns: <[Promise]<[ElementHandle]>>
 
 Adds a `<link rel="stylesheet">` tag into the page with the desired url or a `<style type="text/css">` tag with the content. Returns the added tag when the stylesheet's onload fires or when the CSS content was injected into frame.
 
-Shortcut for main frame's [frame.addStyleTag(params)](./api/class-frame.md#frameaddstyletagparams).
+Shortcut for main frame's [frame.addStyleTag([options])](./api/class-frame.md#frameaddstyletagoptions).
 
 ## page.bringToFront()
 
@@ -877,6 +882,46 @@ Returns `element.innerText`.
 - returns: <[boolean]>
 
 Indicates that the page has been closed.
+
+## page.isDisabled(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `options` <[Object]>
+  - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[Promise]<[boolean]>>
+
+Returns whether the element is disabled, the opposite of [enabled](./actionability.md#enabled).
+
+## page.isEditable(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `options` <[Object]>
+  - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[Promise]<[boolean]>>
+
+Returns whether the element is [editable](./actionability.md#editable).
+
+## page.isEnabled(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `options` <[Object]>
+  - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[Promise]<[boolean]>>
+
+Returns whether the element is [enabled](./actionability.md#enabled).
+
+## page.isHidden(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `options` <[Object]>
+  - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[Promise]<[boolean]>>
+
+Returns whether the element is hidden, the opposite of [visible](./actionability.md#visible).
+
+## page.isVisible(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `options` <[Object]>
+  - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[Promise]<[boolean]>>
+
+Returns whether the element is [visible](./actionability.md#visible).
 
 ## page.keyboard
 - type: <[Keyboard]>

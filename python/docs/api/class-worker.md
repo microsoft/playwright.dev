@@ -8,8 +8,8 @@ The Worker class represents a [WebWorker](https://developer.mozilla.org/en-US/do
 
 
 - [worker.on("close")](./api/class-worker.md#workeronclose)
-- [worker.evaluate(page_function, **options)](./api/class-worker.md#workerevaluatepagefunction-options)
-- [worker.evaluate_handle(page_function, **options)](./api/class-worker.md#workerevaluatehandlepagefunction-options)
+- [worker.evaluate(expression, **options)](./api/class-worker.md#workerevaluateexpression-options)
+- [worker.evaluate_handle(expression, **options)](./api/class-worker.md#workerevaluatehandleexpression-options)
 - [worker.url()](./api/class-worker.md#workerurl)
 
 ## worker.on("close")
@@ -17,9 +17,10 @@ The Worker class represents a [WebWorker](https://developer.mozilla.org/en-US/do
 
 Emitted when this dedicated [WebWorker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) is terminated.
 
-## worker.evaluate(page_function, **options)
-- `page_function` <[Callable]|[str]> Function to be evaluated in the worker context
+## worker.evaluate(expression, **options)
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
+- `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[Serializable]>
 
 Returns the return value of `pageFunction`
@@ -28,9 +29,10 @@ If the function passed to the `worker.evaluate` returns a [Promise], then `worke
 
 If the function passed to the `worker.evaluate` returns a non-[Serializable] value, then `worker.evaluate` returns `undefined`. DevTools Protocol also supports transferring some additional values that are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`, and bigint literals.
 
-## worker.evaluate_handle(page_function, **options)
-- `page_function` <[Callable]|[str]> Function to be evaluated in the page context
+## worker.evaluate_handle(expression, **options)
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
+- `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[JSHandle]>
 
 Returns the return value of `pageFunction` as in-page object (JSHandle).
