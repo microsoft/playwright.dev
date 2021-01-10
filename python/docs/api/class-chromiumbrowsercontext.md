@@ -31,13 +31,12 @@ Chromium-specific features including background pages, service worker support, e
 - [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout)
 - [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout)
 - [browser_context.set_extra_http_headers(headers)](./api/class-browsercontext.md#browsercontextsetextrahttpheadersheaders)
-- [browser_context.set_geolocation(latitude, longitude, **options)](./api/class-browsercontext.md#browsercontextsetgeolocationlatitude-longitude-options)
+- [browser_context.set_geolocation(geolocation)](./api/class-browsercontext.md#browsercontextsetgeolocationgeolocation)
 - [browser_context.set_http_credentials(http_credentials)](./api/class-browsercontext.md#browsercontextsethttpcredentialshttpcredentials)
 - [browser_context.set_offline(offline)](./api/class-browsercontext.md#browsercontextsetofflineoffline)
 - [browser_context.storage_state(**options)](./api/class-browsercontext.md#browsercontextstoragestateoptions)
 - [browser_context.unroute(url, **options)](./api/class-browsercontext.md#browsercontextunrouteurl-options)
 - [browser_context.wait_for_event(event, **options)](./api/class-browsercontext.md#browsercontextwaitforeventevent-options)
-- [browser_context.reset_geolocation()](./api/class-browsercontext.md#browsercontextresetgeolocation)
 
 ## chromium_browser_context.on("backgroundpage")
 - type: <[Page]>
@@ -78,7 +77,6 @@ All existing service workers in the context.
 [Download]: ./api/class-download.md "Download"
 [ElementHandle]: ./api/class-elementhandle.md "ElementHandle"
 [FileChooser]: ./api/class-filechooser.md "FileChooser"
-[FirefoxBrowser]: ./api/class-firefoxbrowser.md "FirefoxBrowser"
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
@@ -92,7 +90,6 @@ All existing service workers in the context.
 [TimeoutError]: ./api/class-timeouterror.md "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.md "Touchscreen"
 [Video]: ./api/class-video.md "Video"
-[WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.md "WebSocket"
 [Worker]: ./api/class-worker.md "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"

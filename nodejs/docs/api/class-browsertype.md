@@ -28,7 +28,7 @@ const { chromium } = require('playwright');  // Or 'firefox' or 'webkit'.
 
 ## browserType.connect(params)
 - `params` <[Object]>
-  - `wsEndpoint` <[string]> A browser websocket endpoint to connect to. **required**
+  - `wsEndpoint` <[string]> A browser websocket endpoint to connect to.
   - `slowMo` <[number]> Slows down Playwright operations by the specified amount of milliseconds. Useful so that you can see what is going on. Defaults to 0.
   - `logger` <[Logger]> Logger sink for Playwright logging. Optional.
   - `timeout` <[number]> Maximum time in milliseconds to wait for the connection to be established. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.

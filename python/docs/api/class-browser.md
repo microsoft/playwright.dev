@@ -60,6 +60,7 @@ Indicates that the browser is connected.
 - `is_mobile` <[bool]> Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.
 - `java_script_enabled` <[bool]> Whether or not to enable JavaScript in the context. Defaults to `true`.
 - `locale` <[str]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
+- `no_viewport` <[bool]> Disables the default viewport.
 - `offline` <[bool]> Whether to emulate network being offline. Defaults to `false`.
 - `permissions` <[List]\[[str]\]> A list of permissions to grant to all pages in this context. See [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browsercontextgrantpermissionspermissions-options) for more details.
 - `proxy` <[Dict]> Network proxy settings to use with this context. Note that browser needs to be launched with the global proxy for this option to work. If all contexts override the proxy, global proxy will be never used and can be any string, for example `launch({ proxy: { server: 'per-context' } })`.
@@ -67,28 +68,26 @@ Indicates that the browser is connected.
   - `bypass` <[str]> Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
   - `username` <[str]> Optional username to use if HTTP proxy requires authentication.
   - `password` <[str]> Optional password to use if HTTP proxy requires authentication.
-- `record_har` <[Dict]> Enables [HAR](http://www.softwareishard.com/blog/har-12-spec) recording for all pages into `recordHar.path` file. If not specified, the HAR is not recorded. Make sure to await [browser_context.close()](./api/class-browsercontext.md#browsercontextclose) for the HAR to be saved.
-  - `omit_content` <[bool]> Optional setting to control whether to omit request content from the HAR. Defaults to `false`.
-  - `path` <[Union]\[[str], [pathlib.Path]\]> Path on the filesystem to write the HAR file to.
-- `record_video` <[Dict]> Enables video recording for all pages into `recordVideo.dir` directory. If not specified videos are not recorded. Make sure to await [browser_context.close()](./api/class-browsercontext.md#browsercontextclose) for videos to be saved.
-  - `dir` <[Union]\[[str], [pathlib.Path]\]> Path to the directory to put videos into.
-  - `size` <[Dict]> Optional dimensions of the recorded videos. If not specified the size will be equal to `viewport`. If `viewport` is not configured explicitly the video size defaults to 1280x720. Actual picture of each page will be scaled down if necessary to fit the specified size.
-    - `width` <[int]> Video frame width.
-    - `height` <[int]> Video frame height.
+- `record_har_omit_content` <[bool]> Optional setting to control whether to omit request content from the HAR. Defaults to `false`.
+- `record_har_path` <[Union]\[[str], [pathlib.Path]\]> Path on the filesystem to write the HAR file to.
+- `record_video_dir` <[Union]\[[str], [pathlib.Path]\]> Path to the directory to put videos into.
+- `record_video_size` <[Dict]> Optional dimensions of the recorded videos. If not specified the size will be equal to `viewport`.
+  - `width` <[int]> Video frame width.
+  - `height` <[int]> Video frame height.
 - `storage_state` <[Union]\[[str], [pathlib.Path]\]|[Dict]> Populates context with given storage state. This method can be used to initialize context with logged-in information obtained via [browser_context.storage_state(**options)](./api/class-browsercontext.md#browsercontextstoragestateoptions). Either a path to the file with saved storage, or an object with the following fields:
   - `cookies` <[List]\[[Dict]\]> Optional cookies to set for context
-    - `name` <[str]> **required**
-    - `value` <[str]> **required**
+    - `name` <[str]>
+    - `value` <[str]>
     - `url` <[str]> Optional either url or domain / path are required
     - `domain` <[str]> Optional either url or domain / path are required
     - `path` <[str]> Optional either url or domain / path are required
     - `expires` <[float]> Optional Unix time in seconds.
-    - `http_only` <[bool]> Optional httpOnly flag
+    - `httpOnly` <[bool]> Optional httpOnly flag
     - `secure` <[bool]> Optional secure flag
-    - `same_site` <"Strict"|"Lax"|"None"> Optional sameSite flag
+    - `sameSite` <"Strict"|"Lax"|"None"> Optional sameSite flag
   - `origins` <[List]\[[Dict]\]> Optional localStorage to set for context
     - `origin` <[str]>
-    - `local_storage` <[List]\[[Dict]\]>
+    - `localStorage` <[List]\[[Dict]\]>
       - `name` <[str]>
       - `value` <[str]>
 - `timezone_id` <[str]> Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.
@@ -97,7 +96,7 @@ Indicates that the browser is connected.
   - `width` <[int]> Video frame width.
   - `height` <[int]> Video frame height.
 - `videos_path` <[Union]\[[str], [pathlib.Path]\]> **DEPRECATED** Use `recordVideo` instead.
-- `viewport` <[NoneType]|[Dict]> Sets a consistent viewport for each page. Defaults to an 1280x720 viewport. `null` disables the default viewport.
+- `viewport` <[NoneType]|[Dict]> Sets a consistent viewport for each page. Defaults to an 1280x720 viewport. `no_viewport` disables the fixed viewport.
   - `width` <[int]> page width in pixels.
   - `height` <[int]> page height in pixels.
 - returns: <[BrowserContext]>
@@ -122,6 +121,7 @@ Creates a new browser context. It won't share cookies/cache with other browser c
 - `is_mobile` <[bool]> Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.
 - `java_script_enabled` <[bool]> Whether or not to enable JavaScript in the context. Defaults to `true`.
 - `locale` <[str]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
+- `no_viewport` <[bool]> Disables the default viewport.
 - `offline` <[bool]> Whether to emulate network being offline. Defaults to `false`.
 - `permissions` <[List]\[[str]\]> A list of permissions to grant to all pages in this context. See [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browsercontextgrantpermissionspermissions-options) for more details.
 - `proxy` <[Dict]> Network proxy settings to use with this context. Note that browser needs to be launched with the global proxy for this option to work. If all contexts override the proxy, global proxy will be never used and can be any string, for example `launch({ proxy: { server: 'per-context' } })`.
@@ -129,28 +129,26 @@ Creates a new browser context. It won't share cookies/cache with other browser c
   - `bypass` <[str]> Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
   - `username` <[str]> Optional username to use if HTTP proxy requires authentication.
   - `password` <[str]> Optional password to use if HTTP proxy requires authentication.
-- `record_har` <[Dict]> Enables [HAR](http://www.softwareishard.com/blog/har-12-spec) recording for all pages into `recordHar.path` file. If not specified, the HAR is not recorded. Make sure to await [browser_context.close()](./api/class-browsercontext.md#browsercontextclose) for the HAR to be saved.
-  - `omit_content` <[bool]> Optional setting to control whether to omit request content from the HAR. Defaults to `false`.
-  - `path` <[Union]\[[str], [pathlib.Path]\]> Path on the filesystem to write the HAR file to.
-- `record_video` <[Dict]> Enables video recording for all pages into `recordVideo.dir` directory. If not specified videos are not recorded. Make sure to await [browser_context.close()](./api/class-browsercontext.md#browsercontextclose) for videos to be saved.
-  - `dir` <[Union]\[[str], [pathlib.Path]\]> Path to the directory to put videos into.
-  - `size` <[Dict]> Optional dimensions of the recorded videos. If not specified the size will be equal to `viewport`. If `viewport` is not configured explicitly the video size defaults to 1280x720. Actual picture of each page will be scaled down if necessary to fit the specified size.
-    - `width` <[int]> Video frame width.
-    - `height` <[int]> Video frame height.
+- `record_har_omit_content` <[bool]> Optional setting to control whether to omit request content from the HAR. Defaults to `false`.
+- `record_har_path` <[Union]\[[str], [pathlib.Path]\]> Path on the filesystem to write the HAR file to.
+- `record_video_dir` <[Union]\[[str], [pathlib.Path]\]> Path to the directory to put videos into.
+- `record_video_size` <[Dict]> Optional dimensions of the recorded videos. If not specified the size will be equal to `viewport`.
+  - `width` <[int]> Video frame width.
+  - `height` <[int]> Video frame height.
 - `storage_state` <[Union]\[[str], [pathlib.Path]\]|[Dict]> Populates context with given storage state. This method can be used to initialize context with logged-in information obtained via [browser_context.storage_state(**options)](./api/class-browsercontext.md#browsercontextstoragestateoptions). Either a path to the file with saved storage, or an object with the following fields:
   - `cookies` <[List]\[[Dict]\]> Optional cookies to set for context
-    - `name` <[str]> **required**
-    - `value` <[str]> **required**
+    - `name` <[str]>
+    - `value` <[str]>
     - `url` <[str]> Optional either url or domain / path are required
     - `domain` <[str]> Optional either url or domain / path are required
     - `path` <[str]> Optional either url or domain / path are required
     - `expires` <[float]> Optional Unix time in seconds.
-    - `http_only` <[bool]> Optional httpOnly flag
+    - `httpOnly` <[bool]> Optional httpOnly flag
     - `secure` <[bool]> Optional secure flag
-    - `same_site` <"Strict"|"Lax"|"None"> Optional sameSite flag
+    - `sameSite` <"Strict"|"Lax"|"None"> Optional sameSite flag
   - `origins` <[List]\[[Dict]\]> Optional localStorage to set for context
     - `origin` <[str]>
-    - `local_storage` <[List]\[[Dict]\]>
+    - `localStorage` <[List]\[[Dict]\]>
       - `name` <[str]>
       - `value` <[str]>
 - `timezone_id` <[str]> Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.
@@ -159,7 +157,7 @@ Creates a new browser context. It won't share cookies/cache with other browser c
   - `width` <[int]> Video frame width.
   - `height` <[int]> Video frame height.
 - `videos_path` <[Union]\[[str], [pathlib.Path]\]> **DEPRECATED** Use `recordVideo` instead.
-- `viewport` <[NoneType]|[Dict]> Sets a consistent viewport for each page. Defaults to an 1280x720 viewport. `null` disables the default viewport.
+- `viewport` <[NoneType]|[Dict]> Sets a consistent viewport for each page. Defaults to an 1280x720 viewport. `no_viewport` disables the fixed viewport.
   - `width` <[int]> page width in pixels.
   - `height` <[int]> page height in pixels.
 - returns: <[Page]>
@@ -184,7 +182,6 @@ Returns the browser version.
 [Download]: ./api/class-download.md "Download"
 [ElementHandle]: ./api/class-elementhandle.md "ElementHandle"
 [FileChooser]: ./api/class-filechooser.md "FileChooser"
-[FirefoxBrowser]: ./api/class-firefoxbrowser.md "FirefoxBrowser"
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
@@ -198,7 +195,6 @@ Returns the browser version.
 [TimeoutError]: ./api/class-timeouterror.md "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.md "Touchscreen"
 [Video]: ./api/class-video.md "Video"
-[WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.md "WebSocket"
 [Worker]: ./api/class-worker.md "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"

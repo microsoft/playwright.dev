@@ -7,14 +7,13 @@ title: "Selectors"
 Selectors can be used to install custom selector engines. See [Working with selectors](./selectors.md#working-with-selectors) for more information.
 
 
-- [selectors.register(name, script, **options)](./api/class-selectors.md#selectorsregistername-script-options)
+- [selectors.register(name, **options)](./api/class-selectors.md#selectorsregistername-options)
 
-## selectors.register(name, script, **options)
+## selectors.register(name, **options)
 - `name` <[str]> Name that is used in selectors as a prefix, e.g. `{name: 'foo'}` enables `foo=myselectorbody` selectors. May only contain `[a-zA-Z0-9_]` characters.
-- `script` <[Callable]|[str]|[Dict]> Script that evaluates to a selector engine instance.
-  - `path` <[Union]\[[str], [pathlib.Path]\]> Path to the JavaScript file. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
-  - `content` <[str]> Raw script content. Optional.
 - `content_script` <[bool]> Whether to run this selector engine in isolated JavaScript environment. This environment has access to the same DOM, but not any JavaScript objects from the frame's scripts. Defaults to `false`. Note that running as a content script is not guaranteed when this engine is used together with other registered engines.
+- `path` <[Union]\[[str], [pathlib.Path]\]> Path to the JavaScript file. If `path` is a relative path, then it is resolved relative to the current working directory.
+- `script` <[str]> Raw script content.
 
 An example of registering selector engine that queries elements based on a tag name:
 
@@ -29,7 +28,6 @@ An example of registering selector engine that queries elements based on a tag n
 [Download]: ./api/class-download.md "Download"
 [ElementHandle]: ./api/class-elementhandle.md "ElementHandle"
 [FileChooser]: ./api/class-filechooser.md "FileChooser"
-[FirefoxBrowser]: ./api/class-firefoxbrowser.md "FirefoxBrowser"
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
@@ -43,7 +41,6 @@ An example of registering selector engine that queries elements based on a tag n
 [TimeoutError]: ./api/class-timeouterror.md "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.md "Touchscreen"
 [Video]: ./api/class-video.md "Video"
-[WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.md "WebSocket"
 [Worker]: ./api/class-worker.md "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"

@@ -7,7 +7,7 @@ title: "Extensibility"
 
 ## Custom selector engines
 
-Playwright supports custom selector engines, registered with [selectors.register(name, script, **options)](./api/class-selectors.md#selectorsregistername-script-options).
+Playwright supports custom selector engines, registered with [selectors.register(name, **options)](./api/class-selectors.md#selectorsregistername-options).
 
 Selector engine should have the following properties:
 - `create` function to create a relative selector from `root` (root is either a `Document`, `ShadowRoot` or `Element`) to a `target` element.
@@ -29,7 +29,6 @@ An example of registering selector engine that queries elements based on a tag n
 [Download]: ./api/class-download.md "Download"
 [ElementHandle]: ./api/class-elementhandle.md "ElementHandle"
 [FileChooser]: ./api/class-filechooser.md "FileChooser"
-[FirefoxBrowser]: ./api/class-firefoxbrowser.md "FirefoxBrowser"
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
@@ -43,7 +42,6 @@ An example of registering selector engine that queries elements based on a tag n
 [TimeoutError]: ./api/class-timeouterror.md "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.md "Touchscreen"
 [Video]: ./api/class-video.md "Video"
-[WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.md "WebSocket"
 [Worker]: ./api/class-worker.md "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"

@@ -30,13 +30,12 @@ Playwright allows creation of "incognito" browser contexts with `browser.newCont
 - [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout)
 - [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout)
 - [browser_context.set_extra_http_headers(headers)](./api/class-browsercontext.md#browsercontextsetextrahttpheadersheaders)
-- [browser_context.set_geolocation(latitude, longitude, **options)](./api/class-browsercontext.md#browsercontextsetgeolocationlatitude-longitude-options)
+- [browser_context.set_geolocation(geolocation)](./api/class-browsercontext.md#browsercontextsetgeolocationgeolocation)
 - [browser_context.set_http_credentials(http_credentials)](./api/class-browsercontext.md#browsercontextsethttpcredentialshttpcredentials)
 - [browser_context.set_offline(offline)](./api/class-browsercontext.md#browsercontextsetofflineoffline)
 - [browser_context.storage_state(**options)](./api/class-browsercontext.md#browsercontextstoragestateoptions)
 - [browser_context.unroute(url, **options)](./api/class-browsercontext.md#browsercontextunrouteurl-options)
 - [browser_context.wait_for_event(event, **options)](./api/class-browsercontext.md#browsercontextwaitforeventevent-options)
-- [browser_context.reset_geolocation()](./api/class-browsercontext.md#browsercontextresetgeolocation)
 
 ## browser_context.on("close")
 
@@ -56,15 +55,15 @@ The earliest moment that page is available is when it has navigated to the initi
 
 ## browser_context.add_cookies(cookies)
 - `cookies` <[List]\[[Dict]\]>
-  - `name` <[str]> **required**
-  - `value` <[str]> **required**
+  - `name` <[str]>
+  - `value` <[str]>
   - `url` <[str]> either url or domain / path are required. Optional.
   - `domain` <[str]> either url or domain / path are required Optional.
   - `path` <[str]> either url or domain / path are required Optional.
   - `expires` <[float]> Unix time in seconds. Optional.
-  - `http_only` <[bool]> Optional.
+  - `httpOnly` <[bool]> Optional.
   - `secure` <[bool]> Optional.
-  - `same_site` <"Strict"|"Lax"|"None"> Optional.
+  - `sameSite` <"Strict"|"Lax"|"None"> Optional.
 
 Adds cookies into this browser context. All pages within this context will have these cookies installed. Cookies can be obtained via [browser_context.cookies(**options)](./api/class-browsercontext.md#browsercontextcookiesoptions).
 
@@ -109,9 +108,9 @@ Closes the browser context. All the pages that belong to the browser context wil
   - `domain` <[str]>
   - `path` <[str]>
   - `expires` <[float]> Unix time in seconds.
-  - `http_only` <[bool]>
+  - `httpOnly` <[bool]>
   - `secure` <[bool]>
-  - `same_site` <"Strict"|"Lax"|"None">
+  - `sameSite` <"Strict"|"Lax"|"None">
 
 If no URLs are specified, this method returns all cookies. If URLs are specified, only cookies that affect those URLs are returned.
 
@@ -215,10 +214,11 @@ The extra HTTP headers will be sent with every request initiated by any page in 
 
 > **NOTE** `browserContext.setExtraHTTPHeaders` does not guarantee the order of headers in the outgoing requests.
 
-## browser_context.set_geolocation(latitude, longitude, **options)
-- `latitude` <[float]> Latitude between -90 and 90. **required**
-- `longitude` <[float]> Longitude between -180 and 180. **required**
-- `accuracy` <[float]> Non-negative accuracy value. Defaults to `0`. Optional.
+## browser_context.set_geolocation(geolocation)
+- `geolocation` <[NoneType]|[Dict]>
+  - `latitude` <[float]> Latitude between -90 and 90.
+  - `longitude` <[float]> Longitude between -180 and 180.
+  - `accuracy` <[float]> Non-negative accuracy value. Defaults to `0`.
 
 Sets the context's geolocation. Passing `null` or `undefined` emulates position unavailable.
 
@@ -226,8 +226,8 @@ Sets the context's geolocation. Passing `null` or `undefined` emulates position 
 
 ## browser_context.set_http_credentials(http_credentials)
 - `http_credentials` <[NoneType]|[Dict]>
-  - `username` <[str]> **required**
-  - `password` <[str]> **required**
+  - `username` <[str]>
+  - `password` <[str]>
 
 **DEPRECATED** Browsers may cache credentials after successful authentication. Create a new browser context instead.
 
@@ -243,12 +243,12 @@ Sets the context's geolocation. Passing `null` or `undefined` emulates position 
     - `domain` <[str]>
     - `path` <[str]>
     - `expires` <[float]> Unix time in seconds.
-    - `http_only` <[bool]>
+    - `httpOnly` <[bool]>
     - `secure` <[bool]>
-    - `same_site` <"Strict"|"Lax"|"None">
+    - `sameSite` <"Strict"|"Lax"|"None">
   - `origins` <[List]\[[Dict]\]>
     - `origin` <[str]>
-    - `local_storage` <[List]\[[Dict]\]>
+    - `localStorage` <[List]\[[Dict]\]>
       - `name` <[str]>
       - `value` <[str]>
 
@@ -268,10 +268,6 @@ Removes a route created with [browser_context.route(url, handler)](./api/class-b
 
 Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the context closes before the event is fired. Returns the event data value.
 
-## browser_context.reset_geolocation()
-
-Emulates position unavailable state.
-
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"
@@ -283,7 +279,6 @@ Emulates position unavailable state.
 [Download]: ./api/class-download.md "Download"
 [ElementHandle]: ./api/class-elementhandle.md "ElementHandle"
 [FileChooser]: ./api/class-filechooser.md "FileChooser"
-[FirefoxBrowser]: ./api/class-firefoxbrowser.md "FirefoxBrowser"
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
@@ -297,7 +292,6 @@ Emulates position unavailable state.
 [TimeoutError]: ./api/class-timeouterror.md "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.md "Touchscreen"
 [Video]: ./api/class-video.md "Video"
-[WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.md "WebSocket"
 [Worker]: ./api/class-worker.md "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"

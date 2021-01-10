@@ -28,6 +28,7 @@ ElementHandle instances can be used as an argument in [page.eval_on_selector(sel
 - [element_handle.hover(**options)](./api/class-elementhandle.md#elementhandlehoveroptions)
 - [element_handle.inner_html()](./api/class-elementhandle.md#elementhandleinnerhtml)
 - [element_handle.inner_text()](./api/class-elementhandle.md#elementhandleinnertext)
+- [element_handle.is_checked()](./api/class-elementhandle.md#elementhandleischecked)
 - [element_handle.is_disabled()](./api/class-elementhandle.md#elementhandleisdisabled)
 - [element_handle.is_editable()](./api/class-elementhandle.md#elementhandleiseditable)
 - [element_handle.is_enabled()](./api/class-elementhandle.md#elementhandleisenabled)
@@ -249,6 +250,11 @@ Returns the `element.innerHTML`.
 
 Returns the `element.innerText`.
 
+## element_handle.is_checked()
+- returns: <[bool]>
+
+Returns whether the element is checked. Throws if the element is not a checkbox or radio input.
+
 ## element_handle.is_disabled()
 - returns: <[bool]>
 
@@ -338,9 +344,9 @@ This method waits for [actionability](./actionability.md) checks, then focuses t
 
 ## element_handle.set_input_files(files, **options)
 - `files` <[Union]\[[str], [pathlib.Path]\]|[List]\[[Union]\[[str], [pathlib.Path]\]\]|[Dict]|[List]\[[Dict]\]>
-  - `name` <[str]> [File] name **required**
-  - `mime_type` <[str]> [File] type **required**
-  - `buffer` <[Buffer]> File content **required**
+  - `name` <[str]> [File] name
+  - `mimeType` <[str]> [File] type
+  - `buffer` <[Buffer]> File content
 - `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
 - `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
 
@@ -446,7 +452,6 @@ Wait for the `selector` relative to the element handle to satisfy `state` option
 [Download]: ./api/class-download.md "Download"
 [ElementHandle]: ./api/class-elementhandle.md "ElementHandle"
 [FileChooser]: ./api/class-filechooser.md "FileChooser"
-[FirefoxBrowser]: ./api/class-firefoxbrowser.md "FirefoxBrowser"
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
@@ -460,7 +465,6 @@ Wait for the `selector` relative to the element handle to satisfy `state` option
 [TimeoutError]: ./api/class-timeouterror.md "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.md "Touchscreen"
 [Video]: ./api/class-video.md "Video"
-[WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.md "WebSocket"
 [Worker]: ./api/class-worker.md "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"

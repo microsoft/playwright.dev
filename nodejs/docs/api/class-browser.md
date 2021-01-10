@@ -98,8 +98,8 @@ Indicates that the browser is connected.
       - `height` <[number]> Video frame height.
   - `storageState` <[string]|[Object]> Populates context with given storage state. This method can be used to initialize context with logged-in information obtained via [browserContext.storageState([options])](./api/class-browsercontext.md#browsercontextstoragestateoptions). Either a path to the file with saved storage, or an object with the following fields:
     - `cookies` <[Array]<[Object]>> Optional cookies to set for context
-      - `name` <[string]> **required**
-      - `value` <[string]> **required**
+      - `name` <[string]>
+      - `value` <[string]>
       - `url` <[string]> Optional either url or domain / path are required
       - `domain` <[string]> Optional either url or domain / path are required
       - `path` <[string]> Optional either url or domain / path are required
@@ -173,8 +173,8 @@ Creates a new browser context. It won't share cookies/cache with other browser c
       - `height` <[number]> Video frame height.
   - `storageState` <[string]|[Object]> Populates context with given storage state. This method can be used to initialize context with logged-in information obtained via [browserContext.storageState([options])](./api/class-browsercontext.md#browsercontextstoragestateoptions). Either a path to the file with saved storage, or an object with the following fields:
     - `cookies` <[Array]<[Object]>> Optional cookies to set for context
-      - `name` <[string]> **required**
-      - `value` <[string]> **required**
+      - `name` <[string]>
+      - `value` <[string]>
       - `url` <[string]> Optional either url or domain / path are required
       - `domain` <[string]> Optional either url or domain / path are required
       - `path` <[string]> Optional either url or domain / path are required
