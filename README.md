@@ -10,13 +10,7 @@ This website is built using [Docusaurus v2](https://v2.docusaurus.io/). Content 
 npm install
 ```
 
-The project uses a fork of the [docusaurus-search-local](https://github.com/easyops-cn/docusaurus-search-local) plugin for search. Install dependencies and build the plugin.
-
-   ```sh
-   cd third_party/docusaurus-search-local
-   npm i
-   npm run build
-   ```
+The project uses a fork of the [docusaurus-search-local](https://github.com/easyops-cn/docusaurus-search-local) plugin for search. 
 
 ### Roll docs
 
