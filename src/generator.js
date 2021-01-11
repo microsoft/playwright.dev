@@ -100,12 +100,16 @@ title: "${clazz.name}"
       type: 'text',
       text: ''
     });
+    clazz.membersArray.sort((m1, m2) => {
+      const k1 = m1.kind + m1.alias.replace(/\$\$eval/, '$$eval2');
+      const k2 = m2.kind + m2.alias.replace(/\$\$eval/, '$$eval2');
+      return k1.localeCompare(k2);
+    });
     result.push(...this.generateClassToc(clazz));
     if (clazz.extends && clazz.extends !== 'EventEmitter' && clazz.extends !== 'Error') {
       const superClass = this.documentation.classes.get(clazz.extends);
       result.push(...this.generateClassToc(superClass));
     }
-
     for (const member of clazz.membersArray) {
       // Iterate members
       /** @type {MarkdownNode} */
@@ -178,7 +182,7 @@ title: "${clazz.name}"
     const key = file + '#' + text;
     if (this.links.has(key))
       return this.links.get(key);
-    const baseLink = file + '#' + text.toLowerCase().split(',').map(c => c.replace(/[^a-z]/g, '')).join('-');
+    const baseLink = file + '#' + text.toLowerCase().split(',').map(c => c.replace(/[^a-z_]/g, '')).join('-');
     let link = baseLink;
     let index = 0;
     while (this.rLinks.has(link))

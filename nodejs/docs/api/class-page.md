@@ -65,7 +65,6 @@ page.removeListener('request', logRequest);
 - [page.$$(selector)](./api/class-page.md#pageselector-1)
 - [page.$eval(selector, pageFunction[, arg])](./api/class-page.md#pageevalselector-pagefunction-arg)
 - [page.$$eval(selector, pageFunction[, arg])](./api/class-page.md#pageevalselector-pagefunction-arg-1)
-- [page.accessibility](./api/class-page.md#pageaccessibility)
 - [page.addInitScript(script[, arg])](./api/class-page.md#pageaddinitscriptscript-arg)
 - [page.addScriptTag([options])](./api/class-page.md#pageaddscripttagoptions)
 - [page.addStyleTag([options])](./api/class-page.md#pageaddstyletagoptions)
@@ -75,7 +74,6 @@ page.removeListener('request', logRequest);
 - [page.close([options])](./api/class-page.md#pagecloseoptions)
 - [page.content()](./api/class-page.md#pagecontent)
 - [page.context()](./api/class-page.md#pagecontext)
-- [page.coverage](./api/class-page.md#pagecoverage)
 - [page.dblclick(selector[, options])](./api/class-page.md#pagedblclickselector-options)
 - [page.dispatchEvent(selector, type[, eventInit, options])](./api/class-page.md#pagedispatcheventselector-type-eventinit-options)
 - [page.emulateMedia(params)](./api/class-page.md#pageemulatemediaparams)
@@ -101,9 +99,7 @@ page.removeListener('request', logRequest);
 - [page.isEnabled(selector[, options])](./api/class-page.md#pageisenabledselector-options)
 - [page.isHidden(selector[, options])](./api/class-page.md#pageishiddenselector-options)
 - [page.isVisible(selector[, options])](./api/class-page.md#pageisvisibleselector-options)
-- [page.keyboard](./api/class-page.md#pagekeyboard)
 - [page.mainFrame()](./api/class-page.md#pagemainframe)
-- [page.mouse](./api/class-page.md#pagemouse)
 - [page.opener()](./api/class-page.md#pageopener)
 - [page.pdf([options])](./api/class-page.md#pagepdfoptions)
 - [page.press(selector, key[, options])](./api/class-page.md#pagepressselector-key-options)
@@ -120,7 +116,6 @@ page.removeListener('request', logRequest);
 - [page.tap(selector[, options])](./api/class-page.md#pagetapselector-options)
 - [page.textContent(selector[, options])](./api/class-page.md#pagetextcontentselector-options)
 - [page.title()](./api/class-page.md#pagetitle)
-- [page.touchscreen](./api/class-page.md#pagetouchscreen)
 - [page.type(selector, text[, options])](./api/class-page.md#pagetypeselector-text-options)
 - [page.uncheck(selector[, options])](./api/class-page.md#pageuncheckselector-options)
 - [page.unroute(url[, handler])](./api/class-page.md#pageunrouteurl-handler)
@@ -136,6 +131,11 @@ page.removeListener('request', logRequest);
 - [page.waitForSelector(selector[, options])](./api/class-page.md#pagewaitforselectorselector-options)
 - [page.waitForTimeout(timeout)](./api/class-page.md#pagewaitfortimeouttimeout)
 - [page.workers()](./api/class-page.md#pageworkers)
+- [page.accessibility](./api/class-page.md#pageaccessibility)
+- [page.coverage](./api/class-page.md#pagecoverage)
+- [page.keyboard](./api/class-page.md#pagekeyboard)
+- [page.mouse](./api/class-page.md#pagemouse)
+- [page.touchscreen](./api/class-page.md#pagetouchscreen)
 
 ## page.on('close')
 
@@ -339,9 +339,6 @@ Examples:
 const divsCounts = await page.$$eval('div', (divs, min) => divs.length >= min, 10);
 ```
 
-## page.accessibility
-- type: <[Accessibility]>
-
 ## page.addInitScript(script[, arg])
 - `script` <[function]|[string]|[Object]> Script to be evaluated in the page.
   - `path` <[string]> Path to the JavaScript file. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
@@ -459,11 +456,6 @@ Gets the full HTML contents of the page, including the doctype.
 - returns: <[BrowserContext]>
 
 Get the browser context that the page belongs to.
-
-## page.coverage
-- type: <[null]|[ChromiumCoverage]>
-
-Browser-specific Coverage implementation, only available for Chromium atm. See [ChromiumCoverage](#class-chromiumcoverage) for more details.
 
 ## page.dblclick(selector[, options])
 - `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -932,16 +924,10 @@ Returns whether the element is hidden, the opposite of [visible](./actionability
 
 Returns whether the element is [visible](./actionability.md#visible).
 
-## page.keyboard
-- type: <[Keyboard]>
-
 ## page.mainFrame()
 - returns: <[Frame]>
 
 The page's main frame. Page is guaranteed to have a main frame which persists during navigations.
-
-## page.mouse
-- type: <[Mouse]>
 
 ## page.opener()
 - returns: <[Promise]<[null]|[Page]>>
@@ -1248,9 +1234,6 @@ Returns `element.textContent`.
 
 Returns the page's title. Shortcut for main frame's [frame.title()](./api/class-frame.md#frametitle).
 
-## page.touchscreen
-- type: <[Touchscreen]>
-
 ## page.type(selector, text[, options])
 - `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - `text` <[string]> A text to type into a focused element.
@@ -1495,6 +1478,23 @@ Shortcut for main frame's [frame.waitForTimeout(timeout)](./api/class-frame.md#f
 This method returns all of the dedicated [WebWorkers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) associated with the page.
 
 > **NOTE** This does not contain ServiceWorkers
+
+## page.accessibility
+- type: <[Accessibility]>
+
+## page.coverage
+- type: <[null]|[ChromiumCoverage]>
+
+Browser-specific Coverage implementation, only available for Chromium atm. See [ChromiumCoverage](#class-chromiumcoverage) for more details.
+
+## page.keyboard
+- type: <[Keyboard]>
+
+## page.mouse
+- type: <[Mouse]>
+
+## page.touchscreen
+- type: <[Touchscreen]>
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"

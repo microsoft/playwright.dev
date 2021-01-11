@@ -8,21 +8,26 @@ title: "Response"
 
 
 - [response.body()](./api/class-response.md#responsebody)
+- [response.finished()](./api/class-response.md#responsefinished)
 - [response.frame()](./api/class-response.md#responseframe)
 - [response.headers()](./api/class-response.md#responseheaders)
 - [response.json()](./api/class-response.md#responsejson)
 - [response.ok()](./api/class-response.md#responseok)
 - [response.request()](./api/class-response.md#responserequest)
 - [response.status()](./api/class-response.md#responsestatus)
-- [response.status_text()](./api/class-response.md#responsestatustext)
+- [response.status_text()](./api/class-response.md#responsestatus_text)
 - [response.text()](./api/class-response.md#responsetext)
 - [response.url()](./api/class-response.md#responseurl)
-- [response.finished()](./api/class-response.md#responsefinished)
 
 ## response.body()
 - returns: <[Buffer]>
 
 Returns the buffer with response body.
+
+## response.finished()
+- returns: <[NoneType]|[str]>
+
+Waits for this response to finish, returns failure error if request failed.
 
 ## response.frame()
 - returns: <[Frame]>
@@ -70,11 +75,6 @@ Returns the text representation of response body.
 - returns: <[str]>
 
 Contains the URL of the response.
-
-## response.finished()
-- returns: <[NoneType]|[str]>
-
-Waits for this response to finish, returns failure error if request failed.
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"

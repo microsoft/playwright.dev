@@ -7,14 +7,14 @@ title: "WebSocket"
 The [WebSocket] class represents websocket connections in the page.
 
 
-- [web_socket.on("close")](./api/class-websocket.md#websocketonclose)
-- [web_socket.on("framereceived")](./api/class-websocket.md#websocketonframereceived)
-- [web_socket.on("framesent")](./api/class-websocket.md#websocketonframesent)
-- [web_socket.on("socketerror")](./api/class-websocket.md#websocketonsocketerror)
-- [web_socket.is_closed()](./api/class-websocket.md#websocketisclosed)
-- [web_socket.url()](./api/class-websocket.md#websocketurl)
-- [web_socket.wait_for_event(event, **options)](./api/class-websocket.md#websocketwaitforeventevent-options)
-- [web_socket.expect_event(event, **options)](./api/class-websocket.md#websocketexpecteventevent-options)
+- [web_socket.on("close")](./api/class-websocket.md#web_socketonclose)
+- [web_socket.on("framereceived")](./api/class-websocket.md#web_socketonframereceived)
+- [web_socket.on("framesent")](./api/class-websocket.md#web_socketonframesent)
+- [web_socket.on("socketerror")](./api/class-websocket.md#web_socketonsocketerror)
+- [web_socket.expect_event(event, **options)](./api/class-websocket.md#web_socketexpect_eventevent-options)
+- [web_socket.is_closed()](./api/class-websocket.md#web_socketis_closed)
+- [web_socket.url()](./api/class-websocket.md#web_socketurl)
+- [web_socket.wait_for_event(event, **options)](./api/class-websocket.md#web_socketwait_for_eventevent-options)
 
 ## web_socket.on("close")
 
@@ -37,30 +37,10 @@ Fired when the websocket sends a frame.
 
 Fired when the websocket has an error.
 
-## web_socket.is_closed()
-- returns: <[bool]>
-
-Indicates that the web socket has been closed.
-
-## web_socket.url()
-- returns: <[str]>
-
-Contains the URL of the WebSocket.
-
-## web_socket.wait_for_event(event, **options)
-- `event` <[str]> Event name, same one would pass into `webSocket.on(event)`.
-- `predicate` <[Function]> Receives the event data and resolves to truthy value when the waiting should resolve.
-- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
-- returns: <[Any]>
-
-Returns the event data value.
-
-Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the webSocket is closed before the event is fired.
-
 ## web_socket.expect_event(event, **options)
 - `event` <[str]> Event name, same one typically passed into `page.on(event)`.
 - `predicate` <[Function]> Receives the event data and resolves to truthy value when the waiting should resolve.
-- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout).
 - returns: <[EventContextManager]>
 
 Performs action and waits for given `event` to fire. If predicate is provided, it passes event's value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the socket is closed before the `event` is fired.
@@ -81,6 +61,25 @@ with ws.expect_event(event_name) as event_info:
 value = event_info.value
 ```
 
+## web_socket.is_closed()
+- returns: <[bool]>
+
+Indicates that the web socket has been closed.
+
+## web_socket.url()
+- returns: <[str]>
+
+Contains the URL of the WebSocket.
+
+## web_socket.wait_for_event(event, **options)
+- `event` <[str]> Event name, same one would pass into `webSocket.on(event)`.
+- `predicate` <[Function]> Receives the event data and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout).
+- returns: <[Any]>
+
+Returns the event data value.
+
+Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the webSocket is closed before the event is fired.
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"

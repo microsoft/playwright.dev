@@ -4,11 +4,11 @@ title: "Route"
 ---
 
 
-Whenever a network route is set up with [page.route(url, handler)](./api/class-page.md#pagerouteurl-handler) or [browser_context.route(url, handler)](./api/class-browsercontext.md#browsercontextrouteurl-handler), the `Route` object allows to handle the route.
+Whenever a network route is set up with [page.route(url, handler)](./api/class-page.md#pagerouteurl-handler) or [browser_context.route(url, handler)](./api/class-browsercontext.md#browser_contextrouteurl-handler), the `Route` object allows to handle the route.
 
 
 - [route.abort(**options)](./api/class-route.md#routeabortoptions)
-- [route.continue_(**options)](./api/class-route.md#routecontinueoptions)
+- [route.continue_(**options)](./api/class-route.md#routecontinue_options)
 - [route.fulfill(**options)](./api/class-route.md#routefulfilloptions)
 - [route.request()](./api/class-route.md#routerequest)
 

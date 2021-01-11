@@ -10,7 +10,7 @@ An example of using `Dialog` class:
 
 
 - [dialog.accept(**options)](./api/class-dialog.md#dialogacceptoptions)
-- [dialog.default_value()](./api/class-dialog.md#dialogdefaultvalue)
+- [dialog.default_value()](./api/class-dialog.md#dialogdefault_value)
 - [dialog.dismiss()](./api/class-dialog.md#dialogdismiss)
 - [dialog.message()](./api/class-dialog.md#dialogmessage)
 - [dialog.type()](./api/class-dialog.md#dialogtype)

@@ -3,7 +3,7 @@ id: selectors
 title: "Element selectors"
 ---
 
-Selectors query elements on the web page for interactions, like [page.click(selector, **options)](./api/class-page.md#pageclickselector-options), and to obtain `ElementHandle` through [page.query_selector(selector)](./api/class-page.md#pagequeryselectorselector). Built-in selectors auto-pierce [shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM).
+Selectors query elements on the web page for interactions, like [page.click(selector, **options)](./api/class-page.md#pageclickselector-options), and to obtain `ElementHandle` through [page.query_selector(selector)](./api/class-page.md#pagequery_selectorselector). Built-in selectors auto-pierce [shadow DOM](https://developer.mozilla.org/en-US/docs/Web/Web_Components/Using_shadow_DOM).
 
 - [Working with selectors](#working-with-selectors)
 - [Syntax](#syntax)
@@ -14,7 +14,7 @@ Selectors query elements on the web page for interactions, like [page.click(sele
 
 ## Working with selectors
 
-Selector describes an element in the page. It can be used to obtain `ElementHandle` (see [page.query_selector(selector)](./api/class-page.md#pagequeryselectorselector) for example) or shortcut element operations to avoid intermediate handle (see [page.click(selector, **options)](./api/class-page.md#pageclickselector-options) for example).
+Selector describes an element in the page. It can be used to obtain `ElementHandle` (see [page.query_selector(selector)](./api/class-page.md#pagequery_selectorselector) for example) or shortcut element operations to avoid intermediate handle (see [page.click(selector, **options)](./api/class-page.md#pageclickselector-options) for example).
 
 Selector has the following format: `engine=body [>> engine=body]*`. Here `engine` is one of the supported [selector engines](./selectors.md) (e.g. `css` or `xpath`), and `body` is a selector body in the format of the particular engine. When multiple `engine=body` clauses are present (separated by `>>`), next one is queried relative to the previous one's result.
 

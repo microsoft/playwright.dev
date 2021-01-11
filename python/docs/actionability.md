@@ -58,7 +58,7 @@ Element is considered receiving pointer events when it is the hit target of the 
 
 Element is considered attached when it is [connected](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) to a Document or a ShadowRoot.
 
-Attached check differs between selector-based and handle-based actions, like [page.click(selector, **options)](./api/class-page.md#pageclickselector-options) as opposite to [element_handle.click(**options)](./api/class-elementhandle.md#elementhandleclickoptions):
+Attached check differs between selector-based and handle-based actions, like [page.click(selector, **options)](./api/class-page.md#pageclickselector-options) as opposite to [element_handle.click(**options)](./api/class-elementhandle.md#element_handleclickoptions):
 - For selector-based actions, Playwright first waits for an element matching `selector` to be attached to the DOM, and then checks that element is still attached before performing the action. If element was detached, the action is retried from the start.
 - For handle-based actions, Playwright throws if the element is not attached.
 

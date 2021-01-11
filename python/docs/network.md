@@ -17,7 +17,7 @@ Playwright provides APIs to **monitor** and **modify** network traffic, both HTT
 ## HTTP Authentication
 
 #### API reference
-- [browser.new_context(**options)](./api/class-browser.md#browsernewcontextoptions)
+- [browser.new_context(**options)](./api/class-browser.md#browsernew_contextoptions)
 
 <br/>
 
@@ -34,7 +34,7 @@ Note that handling the event forks the control flow and makes script harder to f
 #### API reference
 - [Download]
 - [page.on("download")](./api/class-page.md#pageondownload)
-- [page.wait_for_event(event, **options)](./api/class-page.md#pagewaitforeventevent-options)
+- [page.wait_for_event(event, **options)](./api/class-page.md#pagewait_for_eventevent-options)
 
 <br/>
 
@@ -51,8 +51,8 @@ Or wait for a network response after the button click:
 - [Response]
 - [page.on("request")](./api/class-page.md#pageonrequest)
 - [page.on("response")](./api/class-page.md#pageonresponse)
-- [page.wait_for_request(url_or_predicate, **options)](./api/class-page.md#pagewaitforrequesturlorpredicate-options)
-- [page.wait_for_response(url_or_predicate, **options)](./api/class-page.md#pagewaitforresponseurlorpredicate-options)
+- [page.wait_for_request(url_or_predicate, **options)](./api/class-page.md#pagewait_for_requesturl_or_predicate-options)
+- [page.wait_for_response(url_or_predicate, **options)](./api/class-page.md#pagewait_for_responseurl_or_predicate-options)
 
 <br/>
 
@@ -63,8 +63,8 @@ You can mock API endpoints via handling the network quests in your Playwright sc
 #### Variations
 
 #### API reference
-- [browser_context.route(url, handler)](./api/class-browsercontext.md#browsercontextrouteurl-handler)
-- [browser_context.unroute(url, **options)](./api/class-browsercontext.md#browsercontextunrouteurl-options)
+- [browser_context.route(url, handler)](./api/class-browsercontext.md#browser_contextrouteurl-handler)
+- [browser_context.unroute(url, **options)](./api/class-browsercontext.md#browser_contextunrouteurl-options)
 - [page.route(url, handler)](./api/class-page.md#pagerouteurl-handler)
 - [page.unroute(url, **options)](./api/class-page.md#pageunrouteurl-options)
 - [Route]
@@ -79,7 +79,7 @@ You can continue requests with modifications. Example above removes an HTTP head
 
 #### API reference
 - [page.route(url, handler)](./api/class-page.md#pagerouteurl-handler)
-- [browser_context.route(url, handler)](./api/class-browsercontext.md#browsercontextrouteurl-handler)
+- [browser_context.route(url, handler)](./api/class-browsercontext.md#browser_contextrouteurl-handler)
 - [route.abort(**options)](./api/class-route.md#routeabortoptions)
 
 <br/>

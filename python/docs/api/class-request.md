@@ -16,20 +16,31 @@ If request fails at some point, then instead of `'requestfinished'` event (and p
 If request gets a 'redirect' response, the request is successfully finished with the 'requestfinished' event, and a new request is  issued to a redirected url.
 
 
+- [request.failure()](./api/class-request.md#requestfailure)
 - [request.frame()](./api/class-request.md#requestframe)
 - [request.headers()](./api/class-request.md#requestheaders)
-- [request.is_navigation_request()](./api/class-request.md#requestisnavigationrequest)
+- [request.is_navigation_request()](./api/class-request.md#requestis_navigation_request)
 - [request.method()](./api/class-request.md#requestmethod)
-- [request.post_data()](./api/class-request.md#requestpostdata)
-- [request.post_data_buffer()](./api/class-request.md#requestpostdatabuffer)
-- [request.post_data_json()](./api/class-request.md#requestpostdatajson)
-- [request.redirected_from()](./api/class-request.md#requestredirectedfrom)
-- [request.redirected_to()](./api/class-request.md#requestredirectedto)
-- [request.resource_type()](./api/class-request.md#requestresourcetype)
+- [request.post_data()](./api/class-request.md#requestpost_data)
+- [request.post_data_buffer()](./api/class-request.md#requestpost_data_buffer)
+- [request.post_data_json()](./api/class-request.md#requestpost_data_json)
+- [request.redirected_from()](./api/class-request.md#requestredirected_from)
+- [request.redirected_to()](./api/class-request.md#requestredirected_to)
+- [request.resource_type()](./api/class-request.md#requestresource_type)
 - [request.response()](./api/class-request.md#requestresponse)
 - [request.timing()](./api/class-request.md#requesttiming)
 - [request.url()](./api/class-request.md#requesturl)
-- [request.failure()](./api/class-request.md#requestfailure)
+
+## request.failure()
+- returns: <[NoneType]|[str]>
+
+Returns human-readable error message, e.g. `'net::ERR_FAILED'`. The method returns `None` unless this request has failed, as reported by `requestfailed` event.
+
+Example of logging of all the failed requests:
+
+```python
+page.on('requestfailed', lambda request: print(request.url + ' ' + request.failure);
+```
 
 ## request.frame()
 - returns: <[Frame]>
@@ -84,7 +95,7 @@ If the website `https://google.com` has no redirects:
 
 New request issued by the browser if the server responded with redirect.
 
-This method is the opposite of [request.redirected_from()](./api/class-request.md#requestredirectedfrom):
+This method is the opposite of [request.redirected_from()](./api/class-request.md#requestredirected_from):
 
 ## request.resource_type()
 - returns: <[str]>
@@ -114,18 +125,6 @@ Returns resource timing information for given request. Most of the timing values
 - returns: <[str]>
 
 URL of the request.
-
-## request.failure()
-- returns: <[NoneType]|[str]>
-
-Returns human-readable error message, e.g. `'net::ERR_FAILED'`. The method returns `None` unless this request has failed, as reported by `requestfailed` event.
-
-Example of logging of all the failed requests:
-
-```python
-page.on('requestfailed', lambda request: print(request.url + ' ' + request.failure);
-```
-
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"

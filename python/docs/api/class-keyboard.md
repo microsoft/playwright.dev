@@ -6,7 +6,7 @@ title: "Keyboard"
 
 Keyboard provides an api for managing a virtual keyboard. The high level api is [keyboard.type(text, **options)](./api/class-keyboard.md#keyboardtypetext-options), which takes raw characters and generates proper keydown, keypress/input, and keyup events on your page.
 
-For finer control, you can use [keyboard.down(key)](./api/class-keyboard.md#keyboarddownkey), [keyboard.up(key)](./api/class-keyboard.md#keyboardupkey), and [keyboard.insert_text(text)](./api/class-keyboard.md#keyboardinserttexttext) to manually fire events as if they were generated from a real keyboard.
+For finer control, you can use [keyboard.down(key)](./api/class-keyboard.md#keyboarddownkey), [keyboard.up(key)](./api/class-keyboard.md#keyboardupkey), and [keyboard.insert_text(text)](./api/class-keyboard.md#keyboardinsert_texttext) to manually fire events as if they were generated from a real keyboard.
 
 An example of holding down `Shift` in order to select and delete some text:
 
@@ -16,7 +16,7 @@ An example to trigger select-all with the keyboard
 
 
 - [keyboard.down(key)](./api/class-keyboard.md#keyboarddownkey)
-- [keyboard.insert_text(text)](./api/class-keyboard.md#keyboardinserttexttext)
+- [keyboard.insert_text(text)](./api/class-keyboard.md#keyboardinsert_texttext)
 - [keyboard.press(key, **options)](./api/class-keyboard.md#keyboardpresskey-options)
 - [keyboard.type(text, **options)](./api/class-keyboard.md#keyboardtypetext-options)
 - [keyboard.up(key)](./api/class-keyboard.md#keyboardupkey)

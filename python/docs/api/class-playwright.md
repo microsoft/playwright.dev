@@ -9,12 +9,16 @@ Playwright module provides a method to launch a browser instance. The following 
 By default, the `playwright` NPM package automatically downloads browser executables during installation. The `playwright-core` NPM package can be used to skip automatic downloads.
 
 
+- [playwright.stop()](./api/class-playwright.md#playwrightstop)
 - [playwright.chromium](./api/class-playwright.md#playwrightchromium)
 - [playwright.devices](./api/class-playwright.md#playwrightdevices)
 - [playwright.firefox](./api/class-playwright.md#playwrightfirefox)
 - [playwright.selectors](./api/class-playwright.md#playwrightselectors)
 - [playwright.webkit](./api/class-playwright.md#playwrightwebkit)
-- [playwright.stop()](./api/class-playwright.md#playwrightstop)
+
+## playwright.stop()
+
+Terminates this instance of Playwright in case it was created bypassing the Python context manager. This is useful in REPL applications.
 
 ## playwright.chromium
 - type: <[BrowserType]>
@@ -24,7 +28,7 @@ This object can be used to launch or connect to Chromium, returning instances of
 ## playwright.devices
 - type: <[Dict]>
 
-Returns a list of devices to be used with [browser.new_context(**options)](./api/class-browser.md#browsernewcontextoptions) or [browser.new_page(**options)](./api/class-browser.md#browsernewpageoptions). Actual list of devices can be found in [src/server/deviceDescriptors.ts](https://github.com/Microsoft/playwright/blob/master/src/server/deviceDescriptors.ts).
+Returns a list of devices to be used with [browser.new_context(**options)](./api/class-browser.md#browsernew_contextoptions) or [browser.new_page(**options)](./api/class-browser.md#browsernew_pageoptions). Actual list of devices can be found in [src/server/deviceDescriptors.ts](https://github.com/Microsoft/playwright/blob/master/src/server/deviceDescriptors.ts).
 
 ## playwright.firefox
 - type: <[BrowserType]>
@@ -40,10 +44,6 @@ Selectors can be used to install custom selector engines. See [Working with sele
 - type: <[BrowserType]>
 
 This object can be used to launch or connect to WebKit, returning instances of [WebKitBrowser].
-
-## playwright.stop()
-
-Terminates this instance of Playwright in case it was created bypassing the Python context manager. This is useful in REPL applications.
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"

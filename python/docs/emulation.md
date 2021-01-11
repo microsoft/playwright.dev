@@ -59,7 +59,7 @@ All pages created in the context above will share the same device parameters.
 
 #### API reference
 - [playwright.devices](./api/class-playwright.md#playwrightdevices)
-- [browser.new_context(**options)](./api/class-browser.md#browsernewcontextoptions)
+- [browser.new_context(**options)](./api/class-browser.md#browsernew_contextoptions)
 
 <br/>
 
@@ -84,7 +84,7 @@ context = browser.new_context(
 ```
 
 #### API reference
-- [browser.new_context(**options)](./api/class-browser.md#browsernewcontextoptions)
+- [browser.new_context(**options)](./api/class-browser.md#browsernew_contextoptions)
 
 <br/>
 
@@ -129,8 +129,8 @@ context = browser.new_context(
 ```
 
 #### API reference
-- [browser.new_context(**options)](./api/class-browser.md#browsernewcontextoptions)
-- [page.set_viewport_size(viewport_size)](./api/class-page.md#pagesetviewportsizeviewportsize)
+- [browser.new_context(**options)](./api/class-browser.md#browsernew_contextoptions)
+- [page.set_viewport_size(viewport_size)](./api/class-page.md#pageset_viewport_sizeviewport_size)
 
 <br/>
 
@@ -157,7 +157,7 @@ context = browser.new_context(
 ```
 
 #### API reference
-- [browser.new_context(**options)](./api/class-browser.md#browsernewcontextoptions)
+- [browser.new_context(**options)](./api/class-browser.md#browsernew_contextoptions)
 
 <br/>
 
@@ -224,9 +224,9 @@ context.clear_permissions()
 ```
 
 #### API reference
-- [browser.new_context(**options)](./api/class-browser.md#browsernewcontextoptions)
-- [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browsercontextgrantpermissionspermissions-options)
-- [browser_context.clear_permissions()](./api/class-browsercontext.md#browsercontextclearpermissions)
+- [browser.new_context(**options)](./api/class-browser.md#browsernew_contextoptions)
+- [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browser_contextgrant_permissionspermissions-options)
+- [browser_context.clear_permissions()](./api/class-browsercontext.md#browser_contextclear_permissions)
 
 <br/>
 
@@ -269,8 +269,8 @@ context.set_geolocation({"longitude": 29.979097, "latitude": 31.134256})
 **Note** you can only change geolocation for all pages in the context.
 
 #### API reference
-- [browser.new_context(**options)](./api/class-browser.md#browsernewcontextoptions)
-- [browser_context.set_geolocation(geolocation)](./api/class-browsercontext.md#browsercontextsetgeolocationgeolocation)
+- [browser.new_context(**options)](./api/class-browser.md#browsernew_contextoptions)
+- [browser_context.set_geolocation(geolocation)](./api/class-browsercontext.md#browser_contextset_geolocationgeolocation)
 
 <br/>
 
@@ -319,8 +319,8 @@ page.emulate_media(media='print')
 ```
 
 #### API reference
-- [browser.new_context(**options)](./api/class-browser.md#browsernewcontextoptions)
-- [page.emulate_media(**options)](./api/class-page.md#pageemulatemediaoptions)
+- [browser.new_context(**options)](./api/class-browser.md#browsernew_contextoptions)
+- [page.emulate_media(**options)](./api/class-page.md#pageemulate_mediaoptions)
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"

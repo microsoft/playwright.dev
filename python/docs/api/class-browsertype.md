@@ -7,10 +7,10 @@ title: "BrowserType"
 BrowserType provides methods to launch a specific browser instance or connect to an existing one. The following is a typical example of using Playwright to drive automation:
 
 
-- [browser_type.executable_path()](./api/class-browsertype.md#browsertypeexecutablepath)
-- [browser_type.launch(**options)](./api/class-browsertype.md#browsertypelaunchoptions)
-- [browser_type.launch_persistent_context(user_data_dir, **options)](./api/class-browsertype.md#browsertypelaunchpersistentcontextuserdatadir-options)
-- [browser_type.name()](./api/class-browsertype.md#browsertypename)
+- [browser_type.executable_path()](./api/class-browsertype.md#browser_typeexecutable_path)
+- [browser_type.launch(**options)](./api/class-browsertype.md#browser_typelaunchoptions)
+- [browser_type.launch_persistent_context(user_data_dir, **options)](./api/class-browsertype.md#browser_typelaunch_persistent_contextuser_data_dir-options)
+- [browser_type.name()](./api/class-browsertype.md#browser_typename)
 
 ## browser_type.executable_path()
 - returns: <[str]>
@@ -47,7 +47,7 @@ You can use `ignoreDefaultArgs` to filter out `--mute-audio` from default argume
 >
 > If Google Chrome (rather than Chromium) is preferred, a [Chrome Canary](https://www.google.com/chrome/browser/canary.html) or [Dev Channel](https://www.chromium.org/getting-involved/dev-channel) build is suggested.
 >
-> In [browser_type.launch(**options)](./api/class-browsertype.md#browsertypelaunchoptions) above, any mention of Chromium also applies to Chrome.
+> In [browser_type.launch(**options)](./api/class-browsertype.md#browser_typelaunchoptions) above, any mention of Chromium also applies to Chrome.
 >
 > See [`this article`](https://www.howtogeek.com/202825/what%E2%80%99s-the-difference-between-chromium-and-chrome/) for a description of the differences between Chromium and Chrome. [`This article`](https://chromium.googlesource.com/chromium/src/+/lkgr/docs/chromium_browser_vs_google_chrome.md) describes some differences for Linux users.
 
@@ -57,7 +57,7 @@ You can use `ignoreDefaultArgs` to filter out `--mute-audio` from default argume
 - `args` <[List]\[[str]\]> Additional arguments to pass to the browser instance. The list of Chromium flags can be found [here](http://peter.sh/experiments/chromium-command-line-switches/).
 - `bypass_csp` <[bool]> Toggles bypassing page's Content-Security-Policy.
 - `chromium_sandbox` <[bool]> Enable Chromium sandboxing. Defaults to `true`.
-- `color_scheme` <"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [page.emulate_media(**options)](./api/class-page.md#pageemulatemediaoptions) for more details. Defaults to '`light`'.
+- `color_scheme` <"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [page.emulate_media(**options)](./api/class-page.md#pageemulate_mediaoptions) for more details. Defaults to '`light`'.
 - `device_scale_factor` <[float]> Specify device scale factor (can be thought of as dpr). Defaults to `1`.
 - `devtools` <[bool]> **Chromium-only** Whether to auto-open a Developer Tools panel for each tab. If this option is `true`, the `headless` option will be set `false`.
 - `downloads_path` <[Union]\[[str], [pathlib.Path]\]> If specified, accepted downloads are downloaded into this directory. Otherwise, temporary directory is created and is deleted when browser is closed.
@@ -83,7 +83,7 @@ You can use `ignoreDefaultArgs` to filter out `--mute-audio` from default argume
 - `locale` <[str]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
 - `no_viewport` <[bool]> Disables the default viewport.
 - `offline` <[bool]> Whether to emulate network being offline. Defaults to `false`.
-- `permissions` <[List]\[[str]\]> A list of permissions to grant to all pages in this context. See [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browsercontextgrantpermissionspermissions-options) for more details.
+- `permissions` <[List]\[[str]\]> A list of permissions to grant to all pages in this context. See [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browser_contextgrant_permissionspermissions-options) for more details.
 - `proxy` <[Dict]> Network proxy settings.
   - `server` <[str]> Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
   - `bypass` <[str]> Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.

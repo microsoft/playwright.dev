@@ -39,13 +39,13 @@ Override the default behavior to wait until a specific event, like `networkidle`
 
 ### Wait for element
 
-In lazy-loaded pages, it can be useful to wait until an element is visible with [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewaitforselectorselector-options). Alternatively, page interactions like [page.click(selector, **options)](./api/class-page.md#pageclickselector-options) auto-wait for elements.
+In lazy-loaded pages, it can be useful to wait until an element is visible with [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewait_for_selectorselector-options). Alternatively, page interactions like [page.click(selector, **options)](./api/class-page.md#pageclickselector-options) auto-wait for elements.
 
 #### API reference
 - [page.goto(url, **options)](./api/class-page.md#pagegotourl-options)
 - [page.reload(**options)](./api/class-page.md#pagereloadoptions)
-- [page.go_back(**options)](./api/class-page.md#pagegobackoptions)
-- [page.go_forward(**options)](./api/class-page.md#pagegoforwardoptions)
+- [page.go_back(**options)](./api/class-page.md#pagego_backoptions)
+- [page.go_forward(**options)](./api/class-page.md#pagego_forwardoptions)
 
 ## Scenarios initiated by page interaction
 
@@ -57,15 +57,15 @@ By default, `page.click` will wait for the navigation step to complete. This can
 
 ### Custom wait
 
-`page.click` can be combined with [page.wait_for_load_state(**options)](./api/class-page.md#pagewaitforloadstateoptions) to wait for a loading event.
+`page.click` can be combined with [page.wait_for_load_state(**options)](./api/class-page.md#pagewait_for_load_stateoptions) to wait for a loading event.
 
 ### Wait for element
 
-In lazy-loaded pages, it can be useful to wait until an element is visible with [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewaitforselectorselector-options). Alternatively, page interactions like [page.click(selector, **options)](./api/class-page.md#pageclickselector-options) auto-wait for elements.
+In lazy-loaded pages, it can be useful to wait until an element is visible with [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewait_for_selectorselector-options). Alternatively, page interactions like [page.click(selector, **options)](./api/class-page.md#pageclickselector-options) auto-wait for elements.
 
 ### Asynchronous navigation
 
-Clicking an element could trigger asychronous processing before initiating the navigation. In these cases, it is recommended to explicitly call [page.wait_for_navigation(**options)](./api/class-page.md#pagewaitfornavigationoptions). For example:
+Clicking an element could trigger asychronous processing before initiating the navigation. In these cases, it is recommended to explicitly call [page.wait_for_navigation(**options)](./api/class-page.md#pagewait_for_navigationoptions). For example:
 * Navigation is triggered from a `setTimeout`
 * Page waits for network requests before navigation
 
@@ -73,7 +73,7 @@ The `Promise.all` pattern prevents a race condition between `page.click` and `pa
 
 ### Multiple navigations
 
-Clicking an element could trigger multiple navigations. In these cases, it is recommended to explicitly [page.wait_for_navigation(**options)](./api/class-page.md#pagewaitfornavigationoptions) to a specific url. For example:
+Clicking an element could trigger multiple navigations. In these cases, it is recommended to explicitly [page.wait_for_navigation(**options)](./api/class-page.md#pagewait_for_navigationoptions) to a specific url. For example:
 * Client-side redirects issued after the `load` event
 * Multiple pushes to history state
 
@@ -81,21 +81,21 @@ The `Promise.all` pattern prevents a race condition between `page.click` and `pa
 
 ### Loading a popup
 
-When popup is opened, explicitly calling [page.wait_for_load_state(**options)](./api/class-page.md#pagewaitforloadstateoptions) ensures that popup is loaded to the desired state.
+When popup is opened, explicitly calling [page.wait_for_load_state(**options)](./api/class-page.md#pagewait_for_load_stateoptions) ensures that popup is loaded to the desired state.
 
 #### API reference
 - [page.click(selector, **options)](./api/class-page.md#pageclickselector-options)
-- [page.wait_for_load_state(**options)](./api/class-page.md#pagewaitforloadstateoptions)
-- [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewaitforselectorselector-options)
-- [page.wait_for_navigation(**options)](./api/class-page.md#pagewaitfornavigationoptions)
-- [page.wait_for_function(expression, **options)](./api/class-page.md#pagewaitforfunctionexpression-options)
+- [page.wait_for_load_state(**options)](./api/class-page.md#pagewait_for_load_stateoptions)
+- [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewait_for_selectorselector-options)
+- [page.wait_for_navigation(**options)](./api/class-page.md#pagewait_for_navigationoptions)
+- [page.wait_for_function(expression, **options)](./api/class-page.md#pagewait_for_functionexpression-options)
 
 ## Advanced patterns
 
-For pages that have complicated loading patterns, [page.wait_for_function(expression, **options)](./api/class-page.md#pagewaitforfunctionexpression-options) is a powerful and extensible approach to define a custom wait criteria.
+For pages that have complicated loading patterns, [page.wait_for_function(expression, **options)](./api/class-page.md#pagewait_for_functionexpression-options) is a powerful and extensible approach to define a custom wait criteria.
 
 #### API reference
-- [page.wait_for_function(expression, **options)](./api/class-page.md#pagewaitforfunctionexpression-options)
+- [page.wait_for_function(expression, **options)](./api/class-page.md#pagewait_for_functionexpression-options)
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
