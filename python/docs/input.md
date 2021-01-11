@@ -16,7 +16,7 @@ title: "Input"
 
 This is the easiest way to fill out the form fields. It focuses the element and triggers an `input` event with the entered text. It works for `<input>`, `<textarea>`, `[contenteditable]` and `<label>` associated with an input or textarea.
 
-```python
+```py
 # async
 
 # Text input
@@ -35,7 +35,7 @@ await page.fill('#local', '2020-03-02T05:15')
 await page.fill('text=First Name', 'Peter')
 ```
 
-```python
+```py
 # sync
 
 # Text input
@@ -65,7 +65,7 @@ page.fill('text=First Name', 'Peter')
 
 This is the easiest way to check and uncheck a checkbox or a radio button. This method can be used with `input[type=checkbox]`, `input[type=radio]`, `[role=checkbox]` or `label` associated with checkbox or radio button.
 
-```python
+```py
 # async
 
 # Check the checkbox
@@ -78,7 +78,7 @@ await page.uncheck('#subscribe-label')
 await page.check('text=XL')
 ```
 
-```python
+```py
 # sync
 
 # Check the checkbox
@@ -105,7 +105,7 @@ page.check('text=XL')
 
 Selects one or multiple options in the `<select>` element. You can specify option `value`, `label` or `elementHandle` to select. Multiple options can be selected.
 
-```python
+```py
 # async
 
 # Single selection matching the value
@@ -122,7 +122,7 @@ option = await page.query_selector('#best-option')
 await page.select_option('select#colors', option)
 ```
 
-```python
+```py
 # sync
 
 # Single selection matching the value
@@ -150,7 +150,7 @@ page.select_option('select#colors', option)
 
 Performs a simple human click.
 
-```python
+```py
 # async
 
 # Generic click
@@ -172,7 +172,7 @@ await page.hover('#item')
 await page.click('#item', position={ 'x': 0, 'y': 0})
 ```
 
-```python
+```py
 # sync
 
 # Generic click
@@ -206,13 +206,13 @@ Under the hood, this and other pointer-related methods:
 
 Sometimes, apps use non-trivial logic where hovering the element overlays it with another element that intercepts the click. This behavior is indistinguishable from a bug where element gets covered and the click is dispatched elsewhere. If you know this is taking place, you can bypass the [actionability](./actionability.md) checks and force the click:
 
-```python
+```py
 # async
 
 await page.click('button#submit', force=True)
 ```
 
-```python
+```py
 # sync
 
 page.click('button#submit', force=True)
@@ -222,13 +222,13 @@ page.click('button#submit', force=True)
 
 If you are not interested in testing your app under the real conditions and want to simulate the click by any means possible, you can trigger the [`HTMLElement.click()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click) behavior via simply dispatching a click event on the element:
 
-```python
+```py
 # async
 
 await page.dispatch_event('button#submit', 'click')
 ```
 
-```python
+```py
 # sync
 
 page.dispatch_event('button#submit', 'click')
@@ -254,14 +254,14 @@ page.dispatch_event('button#submit', 'click')
 
 Type into the field character by character, as if it was a user with a real keyboard.
 
-```python
+```py
 # async
 
 # Type character by character
 await page.type('#area', 'Hello World!')
 ```
 
-```python
+```py
 # sync
 
 # Type character by character
@@ -282,7 +282,7 @@ This method will emit all the necessary keyboard events, with all the `keydown`,
 
 ## Keys and shortcuts
 
-```python
+```py
 # async
 
 # Hit Enter
@@ -295,7 +295,7 @@ await page.press('#name', 'Control+ArrowRight')
 await page.press('#value', '$')
 ```
 
-```python
+```py
 # sync
 
 # Hit Enter
@@ -321,7 +321,7 @@ ArrowUp, F1 - F12, Digit0 - Digit9, KeyA - KeyZ, etc.
 
 Simple version produces a single character. This character is case-sensitive, so `"a"` and `"A"` will produce different results.
 
-```python
+```py
 # async
 
 # <input id=name>
@@ -331,7 +331,7 @@ await page.press('#name', 'Shift+A')
 await page.press('#name', 'Shift+ArrowLeft')
 ```
 
-```python
+```py
 # sync
 
 # <input id=name>
@@ -355,7 +355,7 @@ Note that you still need to specify the capital `A` in `Shift-A` to produce the 
 
 ## Upload files
 
-```python
+```py
 # async
 
 from playwright.async_api import FilePayload
@@ -375,7 +375,7 @@ await page.set_input_files(
 )
 ```
 
-```python
+```py
 # sync
 
 from playwright.sync_api import FilePayload
@@ -412,13 +412,13 @@ You can select input files for upload using the [page.set_input_files(selector, 
 
 For the dynamic pages that handle focus events, you can focus the given element.
 
-```python
+```py
 # async
 
 await page.focus('input#name')
 ```
 
-```python
+```py
 # sync
 
 page.focus('input#name')
@@ -477,6 +477,8 @@ page.focus('input#name')
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
 [List]: https://docs.python.org/3/library/typing.html#typing.List "List"
 [NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
+[URL]: https://en.wikipedia.org/wiki/URL "URL"
 [pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
 [str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
 [Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"

@@ -24,7 +24,7 @@ These commands download the Playwright package and install browser binaries for 
 
 Once installed, you can `import` Playwright in a Python script, and launch any of the 3 browsers (`chromium`, `firefox` and `webkit`).
 
-```python
+```py
 from playwright import sync_playwright
 
 with sync_playwright() as p:
@@ -36,7 +36,7 @@ with sync_playwright() as p:
 
 Playwright supports two variations of the API: synchronous are asynchronous. If your modern project uses [asyncio](https://docs.python.org/3/library/asyncio.html), you should use async API:
 
-```python
+```py
 from playwright import async_playwright
 
 with async_playwright() as p:
@@ -50,7 +50,7 @@ with async_playwright() as p:
 
 In our first script, we will navigate to `whatsmyuseragent.org` and take a screenshot in WebKit.
 
-```python
+```py
 from playwright import sync_playwright
 
 with sync_playwright() as p:
@@ -63,7 +63,7 @@ with sync_playwright() as p:
 
 By default, Playwright runs the browsers in headless mode. To see the browser UI, pass the `headless=False` flag while launching the browser. You can also use `slowMo` to slow down execution. Learn more in the debugging tools [section](./debug.md).
 
-```python
+```py
 firefox.launch(headless=False, slowMo=50)
 ```
 
@@ -130,6 +130,8 @@ Playwright requires Python version 3.7 or above. The browser binaries for Chromi
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
 [List]: https://docs.python.org/3/library/typing.html#typing.List "List"
 [NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
+[URL]: https://en.wikipedia.org/wiki/URL "URL"
 [pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
 [str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
 [Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"

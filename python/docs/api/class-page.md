@@ -465,7 +465,7 @@ Performs action and waits for `download` event to fire. If predicate is provided
 
 Performs action and waits for given `event` to fire. If predicate is provided, it passes event's value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the `event` is fired.
 
-```python
+```py
 # async
 
 async with page.expect_event(event_name) as event_info:
@@ -473,7 +473,7 @@ async with page.expect_event(event_name) as event_info:
 value = await event_info.value
 ```
 
-```python
+```py
 # sync
 
 with page.expect_event(event_name) as event_info:
@@ -498,7 +498,7 @@ Performs action and waits for `filechooser` event to fire. If predicate is provi
 
 Performs action and waits for the required load state. It resolves when the page reaches a required load state, `load` by default. The navigation must have been committed when this method is called. If current document has already reached the required state, resolves immediately.
 
-```python
+```py
 # async
 
 async with page.expect_load_state():
@@ -506,7 +506,7 @@ async with page.expect_load_state():
 # Context manager waits for 'load' event.
 ```
 
-```python
+```py
 # sync
 
 with page.expect_load_state():
@@ -529,7 +529,7 @@ Performs action and waits for the next navigation. In case of multiple redirects
 
 This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
 
-```python
+```py
 # async
 
 async with page.expect_navigation():
@@ -537,7 +537,7 @@ async with page.expect_navigation():
 # Context manager waited for the navigation to happen.
 ```
 
-```python
+```py
 # sync
 
 with page.expect_navigation():
@@ -1258,6 +1258,8 @@ This method returns all of the dedicated [WebWorkers](https://developer.mozilla.
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
 [List]: https://docs.python.org/3/library/typing.html#typing.List "List"
 [NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
+[URL]: https://en.wikipedia.org/wiki/URL "URL"
 [pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
 [str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
 [Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"

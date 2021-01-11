@@ -45,7 +45,7 @@ Fired when the websocket has an error.
 
 Performs action and waits for given `event` to fire. If predicate is provided, it passes event's value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the socket is closed before the `event` is fired.
 
-```python
+```py
 # async
 
 async with ws.expect_event(event_name) as event_info:
@@ -53,7 +53,7 @@ async with ws.expect_event(event_name) as event_info:
 value = await event_info.value
 ```
 
-```python
+```py
 # sync
 
 with ws.expect_event(event_name) as event_info:
@@ -127,6 +127,8 @@ Waits for event to fire and passes its value into the predicate function. Return
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
 [List]: https://docs.python.org/3/library/typing.html#typing.List "List"
 [NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
+[URL]: https://en.wikipedia.org/wiki/URL "URL"
 [pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
 [str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
 [Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"

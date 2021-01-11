@@ -22,7 +22,7 @@ Along with a test runner Playwright can be used to automate user interactions to
 
 A [Browser] refers to an instance of Chromium, Firefox or WebKit. Playwright scripts generally start with launching a browser instance and end with closing the browser. Browser instances can be launched in headless (without a GUI) or headful mode.
 
-```python
+```py
 # async
 
 import asyncio
@@ -36,7 +36,7 @@ async def main():
 asyncio.get_event_loop().run_until_complete(main())
 ```
 
-```python
+```py
 # sync
 
 from playwright import sync_playwright
@@ -57,14 +57,14 @@ Launching a browser instance can be expensive, and Playwright is designed to max
 
 A [BrowserContext] is an isolated incognito-alike session within a browser instance. Browser contexts are fast and cheap to create. Browser contexts can be used to parallelize isolated test executions.
 
-```python
+```py
 # async
 
 browser = await playwright.chromium.launch()
 context = await browser.new_context()
 ```
 
-```python
+```py
 # sync
 
 browser = playwright.chromium.launch()
@@ -73,7 +73,7 @@ context = browser.new_context()
 
 Browser contexts can also be used to emulate multi-page scenarios involving mobile devices, permissions, locale and color scheme.
 
-```python
+```py
 # async
 
 import asyncio
@@ -96,7 +96,7 @@ async def main():
 asyncio.get_event_loop().run_until_complete(main())
 ```
 
-```python
+```py
 # sync
 
 from playwright import sync_playwright
@@ -123,7 +123,7 @@ with sync_playwright() as p:
 
 A Browser context can have multiple pages. A [Page] refers to a single tab or a popup window within a browser context. It should be used to navigate to URLs and interact with the page content.
 
-```python
+```py
 # async
 
 page = await context.new_page()
@@ -142,7 +142,7 @@ print(page.url)
 # window.location.href = 'https://example.com'
 ```
 
-```python
+```py
 # sync
 
 page = context.new_page()
@@ -167,7 +167,7 @@ A page can have one or more [Frame] objects attached to it. Each page has a main
 
 A page can have additional frames attached with the `iframe` HTML tag. These frames can be accessed for interactions inside the frame.
 
-```python
+```py
 # async
 
 # Get frame using the frame's name attribute
@@ -184,7 +184,7 @@ frame = await frame_element_handle.content_frame()
 await frame.fill('#username-input', 'John')
 ```
 
-```python
+```py
 # sync
 
 # Get frame using the frame's name attribute
@@ -220,21 +220,21 @@ Learn more about selectors and selector engines [here](./selectors.md).
 
 Some examples below:
 
-```python
+```py
 # async
 
 # Using data-test-id= selector engine
 await page.click('data-test-id=foo')
 ```
 
-```python
+```py
 # sync
 
 # Using data-test-id= selector engine
 page.click('data-test-id=foo')
 ```
 
-```python
+```py
 # async
 
 # CSS and XPath selector engines are automatically detected
@@ -242,7 +242,7 @@ await page.click('div')
 await page.click('//html/body/div')
 ```
 
-```python
+```py
 # sync
 
 # CSS and XPath selector engines are automatically detected
@@ -250,21 +250,21 @@ page.click('div')
 page.click('//html/body/div')
 ```
 
-```python
+```py
 # async
 
 # Find node by text substring
 await page.click('text=Hello w')
 ```
 
-```python
+```py
 # sync
 
 # Find node by text substring
 page.click('text=Hello w')
 ```
 
-```python
+```py
 # async
 
 # Explicit CSS and XPath notation
@@ -272,7 +272,7 @@ await page.click('css=div')
 await page.click('xpath=//html/body/div')
 ```
 
-```python
+```py
 # sync
 
 # Explicit CSS and XPath notation
@@ -280,14 +280,14 @@ page.click('css=div')
 page.click('xpath=//html/body/div')
 ```
 
-```python
+```py
 # async
 
 # Only search light DOM, outside WebComponent shadow DOM:
 await page.click('css:light=div')
 ```
 
-```python
+```py
 # sync
 
 # Only search light DOM, outside WebComponent shadow DOM:
@@ -296,28 +296,28 @@ page.click('css:light=div')
 
 Selectors using the same or different engines can be combined using the `>>` separator. For example,
 
-```python
+```py
 # async
 
 # Click an element with text 'Sign Up' inside of a #free-month-promo.
 await page.click('#free-month-promo >> text=Sign Up')
 ```
 
-```python
+```py
 # sync
 
 # Click an element with text 'Sign Up' inside of a #free-month-promo.
 page.click('#free-month-promo >> text=Sign Up')
 ```
 
-```python
+```py
 # async
 
 # Capture textContent of a section that contains an element with text 'Selectors'.
 section_text = await page.eval_on_selector('*css=section >> text=Selectors', 'e => e.textContent')
 ```
 
-```python
+```py
 # sync
 
 # Capture textContent of a section that contains an element with text 'Selectors'.
@@ -336,21 +336,21 @@ Actions like [page.click(selector, **options)](./api/class-page.md#pageclicksele
 - wait for it to receive pointer events at the action point: for example, wait until element becomes non-obscured by other elements
 - retry if the element is detached during any of the above checks
 
-```python
+```py
 # async
 
 # Playwright waits for #search element to be in the DOM
 await page.fill('#search', 'query')
 ```
 
-```python
+```py
 # sync
 
 # Playwright waits for #search element to be in the DOM
 page.fill('#search', 'query')
 ```
 
-```python
+```py
 # async
 
 # Playwright waits for element to stop animating
@@ -358,7 +358,7 @@ page.fill('#search', 'query')
 await page.click('#search')
 ```
 
-```python
+```py
 # sync
 
 # Playwright waits for element to stop animating
@@ -368,7 +368,7 @@ page.click('#search')
 
 You can explicitly wait for an element to appear in the DOM or to become visible:
 
-```python
+```py
 # async
 
 # Wait for #search to appear in the DOM.
@@ -377,7 +377,7 @@ await page.wait_for_selector('#search', state='attached')
 await page.wait_for_selector('#promo')
 ```
 
-```python
+```py
 # sync
 
 # Wait for #search to appear in the DOM.
@@ -388,7 +388,7 @@ page.wait_for_selector('#promo')
 
 ... or to become hidden or detached
 
-```python
+```py
 # async
 
 # Wait for #details to become hidden, for example with `display:none`.
@@ -397,7 +397,7 @@ await page.wait_for_selector('#details', state='hidden')
 await page.wait_for_selector('#promo', state='detached')
 ```
 
-```python
+```py
 # sync
 
 # Wait for #details to become hidden, for example with `display:none`.
@@ -419,13 +419,13 @@ Playwright scripts run in your Node.js environment. Your page scripts run in the
 
 The [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options) API can run a JavaScript function in the context of the web page and bring results back to the Node.js environment. Browser globals like `window` and `document` can be used in `evaluate`.
 
-```python
+```py
 # async
 
 href = await page.evaluate('() => document.location.href')
 ```
 
-```python
+```py
 # sync
 
 href = page.evaluate('() => document.location.href')
@@ -433,7 +433,7 @@ href = page.evaluate('() => document.location.href')
 
 If the result is a Promise or if the function is asynchronous evaluate will automatically wait until it's resolved:
 
-```python
+```py
 # async
 
 status = await page.evaluate("""async () => {
@@ -442,7 +442,7 @@ status = await page.evaluate("""async () => {
 }""")
 ```
 
-```python
+```py
 # sync
 
 status = page.evaluate("""async () => {
@@ -455,7 +455,7 @@ status = page.evaluate("""async () => {
 
 Playwright evaluation methods like [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options) take a single optional argument. This argument can be a mix of [Serializable] values and [JSHandle] or [ElementHandle] instances. Handles are automatically converted to the value they represent.
 
-```python
+```py
 # async
 
 # A primitive value.
@@ -500,7 +500,7 @@ await page.evaluate("""
     { 'button1': button1, 'list': [button2], 'foo': None })
 ```
 
-```python
+```py
 # sync
 
 # A primitive value.
@@ -546,7 +546,7 @@ page.evaluate("""
 
 Right:
 
-```python
+```py
 # async
 
 data = { 'text': 'some data', 'value': 1 }
@@ -556,7 +556,7 @@ result = await page.evaluate("""data => {
 }""", data)
 ```
 
-```python
+```py
 # sync
 
 data = { 'text': 'some data', 'value': 1 }
@@ -568,7 +568,7 @@ result = page.evaluate("""data => {
 
 Wrong:
 
-```python
+```py
 # async
 
 data = { 'text': 'some data', 'value': 1 }
@@ -578,7 +578,7 @@ result = await page.evaluate("""() => {
 }""")
 ```
 
-```python
+```py
 # sync
 
 data = { 'text': 'some data', 'value': 1 }
@@ -613,7 +613,7 @@ Note that since any DOM element in the page is also a JavaScript object, Playwri
 
 ### Example: ElementHandle
 
-```python
+```py
 # async
 
 # The first parameter of the elementHandle.evaluate callback is the element handle points to.
@@ -621,7 +621,7 @@ ul_element_handle = await page.query_selector('ul')
 await ul_element_handle.evaluate("ulElement => getComputedStyle(ulElement).getPropertyValue('display')")
 ```
 
-```python
+```py
 # sync
 
 # The first parameter of the elementHandle.evaluate callback is the element handle points to.
@@ -631,14 +631,14 @@ ul_element_handle.evaluate("ulElement => getComputedStyle(ulElement).getProperty
 
 Handles can also be passed as arguments to [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options) function:
 
-```python
+```py
 # async
 
 ul_element_handle = await page.query_selector('ul')
 await page.evaluate("uiElement => getComputedStyle(uiElement).getPropertyValue('display')", uiElement)
 ```
 
-```python
+```py
 # sync
 
 ul_element_handle = page.query_selector('ul')
@@ -647,7 +647,7 @@ page.evaluate("uiElement => getComputedStyle(uiElement).getPropertyValue('displa
 
 ### Example: JSHandle
 
-```python
+```py
 # async
 
 # Create a new array in the page, write a reference to it in
@@ -676,7 +676,7 @@ new_length = await page.evaluate("() => window.myArray.length")
 await my_array_handle.dispose()
 ```
 
-```python
+```py
 # sync
 
 # Create a new array in the page, write a reference to it in
@@ -759,6 +759,8 @@ my_array_handle.dispose()
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
 [List]: https://docs.python.org/3/library/typing.html#typing.List "List"
 [NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
+[URL]: https://en.wikipedia.org/wiki/URL "URL"
 [pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
 [str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
 [Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"

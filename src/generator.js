@@ -21,7 +21,6 @@ const path = require('path');
 const md = require('./markdown');
 const { parseApi } = require('./api_parser');
 const Documentation = require('./documentation');
-const { METHODS } = require('http');
 
 /** @typedef {import('./documentation').Type} Type */
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
@@ -145,12 +144,14 @@ title: "${clazz.name}"
     return (spec || []).filter(c => {
       if (!c.codeLang || commonSnippets.has(c.codeLang))
         return true;
-      if (c.codeLang === this.lang)
+      if (c.codeLang === this.lang) {
+        c.codeLang = highlighterName(this.lang);
         return true;
+      }
       if (!c.codeLang.startsWith(this.lang + ' '))
         return false;
       c.lines.unshift('# ' + c.codeLang.substring(this.lang.length + 1), '');
-      c.codeLang = this.lang;
+      c.codeLang = highlighterName(this.lang);
       return true;
     });
   }
@@ -392,3 +393,12 @@ new Generator('python', path.join(__dirname, '..', 'python', 'docs'), {
     'string': 'str',
   },
 });
+
+/**
+ * @param {string} lang
+ */
+function highlighterName(lang) {
+  if (lang === 'python')
+    return 'py';
+  return lang;
+}
