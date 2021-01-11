@@ -115,7 +115,7 @@ with sync_playwright() as p:
 
 #### API reference
 - [BrowserContext]
-- [browser.new_context(**options)](./api/class-browser.md#browsernewcontextoptions)
+- [browser.new_context(**options)](./api/class-browser.md#browsernew_contextoptions)
 
 <br/>
 
@@ -409,7 +409,7 @@ page.wait_for_selector('#promo', state='detached')
 #### API reference
 - [page.click(selector, **options)](./api/class-page.md#pageclickselector-options)
 - [page.fill(selector, value, **options)](./api/class-page.md#pagefillselector-value-options)
-- [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewaitforselectorselector-options)
+- [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewait_for_selectorselector-options)
 
 <br/>
 
@@ -606,10 +606,10 @@ There are two types of handles:
 Note that since any DOM element in the page is also a JavaScript object, Playwright's [ElementHandle] extends [JSHandle].
 
 ### Handles Lifecycle
-- Handles can be acquired using the page methods [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluatehandleexpression-options), [page.query_selector(selector)](./api/class-page.md#pagequeryselectorselector) or [page.query_selector_all(selector)](./api/class-page.md#pagequeryselectorallselector) or their frame counterparts [frame.evaluate_handle(expression, **options)](./api/class-frame.md#frameevaluatehandleexpression-options), [frame.query_selector(selector)](./api/class-frame.md#framequeryselectorselector) or [frame.query_selector_all(selector)](./api/class-frame.md#framequeryselectorallselector).
+- Handles can be acquired using the page methods [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluate_handleexpression-options), [page.query_selector(selector)](./api/class-page.md#pagequery_selectorselector) or [page.query_selector_all(selector)](./api/class-page.md#pagequery_selector_allselector) or their frame counterparts [frame.evaluate_handle(expression, **options)](./api/class-frame.md#frameevaluate_handleexpression-options), [frame.query_selector(selector)](./api/class-frame.md#framequery_selectorselector) or [frame.query_selector_all(selector)](./api/class-frame.md#framequery_selector_allselector).
 - Once created, handles will retain object from [garbage collection](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_Management).
 - Handles will be **automatically disposed** once the page or frame they belong to navigates or closes.
-- Handles can be **manually disposed** using [js_handle.dispose()](./api/class-jshandle.md#jshandledispose) method.
+- Handles can be **manually disposed** using [js_handle.dispose()](./api/class-jshandle.md#js_handledispose) method.
 
 ### Example: ElementHandle
 
@@ -708,10 +708,10 @@ my_array_handle.dispose()
 #### API reference
 - [JSHandle]
 - [ElementHandle]
-- [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluatehandleexpression-options)
-- [page.query_selector(selector)](./api/class-page.md#pagequeryselectorselector)
-- [page.query_selector_all(selector)](./api/class-page.md#pagequeryselectorallselector)
-- [js_handle.evaluate(expression, **options)](./api/class-jshandle.md#jshandleevaluateexpression-options)
+- [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluate_handleexpression-options)
+- [page.query_selector(selector)](./api/class-page.md#pagequery_selectorselector)
+- [page.query_selector_all(selector)](./api/class-page.md#pagequery_selector_allselector)
+- [js_handle.evaluate(expression, **options)](./api/class-jshandle.md#js_handleevaluateexpression-options)
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"

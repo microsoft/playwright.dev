@@ -7,10 +7,10 @@ title: "FileChooser"
 [FileChooser] objects are dispatched by the page in the [page.on("filechooser")](./api/class-page.md#pageonfilechooser) event.
 
 
-- [file_chooser.element()](./api/class-filechooser.md#filechooserelement)
-- [file_chooser.is_multiple()](./api/class-filechooser.md#filechooserismultiple)
-- [file_chooser.page()](./api/class-filechooser.md#filechooserpage)
-- [file_chooser.set_files(files, **options)](./api/class-filechooser.md#filechoosersetfilesfiles-options)
+- [file_chooser.element()](./api/class-filechooser.md#file_chooserelement)
+- [file_chooser.is_multiple()](./api/class-filechooser.md#file_chooseris_multiple)
+- [file_chooser.page()](./api/class-filechooser.md#file_chooserpage)
+- [file_chooser.set_files(files, **options)](./api/class-filechooser.md#file_chooserset_filesfiles-options)
 
 ## file_chooser.element()
 - returns: <[ElementHandle]>
@@ -33,7 +33,7 @@ Returns page this file chooser belongs to.
   - `mimeType` <[str]> [File] type
   - `buffer` <[Buffer]> File content
 - `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 
 Sets the value of the file input this chooser is associated with. If some of the `filePaths` are relative paths, then they are resolved relative to the the current working directory. For empty array, clears the selected files.
 

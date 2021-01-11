@@ -16,8 +16,8 @@ Playwright can automate scenarios that span multiple browser contexts or multipl
 
 #### API reference
 - [BrowserContext]
-- [browser.new_context(**options)](./api/class-browser.md#browsernewcontextoptions)
-- [browser_context.add_cookies(cookies)](./api/class-browsercontext.md#browsercontextaddcookiescookies)
+- [browser.new_context(**options)](./api/class-browser.md#browsernew_contextoptions)
+- [browser_context.add_cookies(cookies)](./api/class-browsercontext.md#browser_contextadd_cookiescookies)
 
 ## Multiple pages
 
@@ -27,8 +27,8 @@ Each browser context can host multiple pages (tabs).
 
 #### API reference
 - [Page]
-- [browser_context.new_page()](./api/class-browsercontext.md#browsercontextnewpage)
-- [browser_context.pages()](./api/class-browsercontext.md#browsercontextpages)
+- [browser_context.new_page()](./api/class-browsercontext.md#browser_contextnew_page)
+- [browser_context.pages()](./api/class-browsercontext.md#browser_contextpages)
 
 ## Handling new pages
 
@@ -37,7 +37,7 @@ The `page` event on browser contexts can be used to get new pages that are creat
 If the action that triggers the new page is unknown, the following pattern can be used.
 
 #### API reference
-- [browser_context.on("page")](./api/class-browsercontext.md#browsercontextonpage)
+- [browser_context.on("page")](./api/class-browsercontext.md#browser_contextonpage)
 
 ## Handling popups
 

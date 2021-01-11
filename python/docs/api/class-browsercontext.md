@@ -12,32 +12,32 @@ If a page opens another page, e.g. with a `window.open` call, the popup will bel
 Playwright allows creation of "incognito" browser contexts with `browser.newContext()` method. "Incognito" browser contexts don't write any browsing data to disk.
 
 
-- [browser_context.on("close")](./api/class-browsercontext.md#browsercontextonclose)
-- [browser_context.on("page")](./api/class-browsercontext.md#browsercontextonpage)
-- [browser_context.add_cookies(cookies)](./api/class-browsercontext.md#browsercontextaddcookiescookies)
-- [browser_context.add_init_script(**options)](./api/class-browsercontext.md#browsercontextaddinitscriptoptions)
-- [browser_context.browser()](./api/class-browsercontext.md#browsercontextbrowser)
-- [browser_context.clear_cookies()](./api/class-browsercontext.md#browsercontextclearcookies)
-- [browser_context.clear_permissions()](./api/class-browsercontext.md#browsercontextclearpermissions)
-- [browser_context.close()](./api/class-browsercontext.md#browsercontextclose)
-- [browser_context.cookies(**options)](./api/class-browsercontext.md#browsercontextcookiesoptions)
-- [browser_context.expose_binding(name, callback, **options)](./api/class-browsercontext.md#browsercontextexposebindingname-callback-options)
-- [browser_context.expose_function(name, callback)](./api/class-browsercontext.md#browsercontextexposefunctionname-callback)
-- [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browsercontextgrantpermissionspermissions-options)
-- [browser_context.new_page()](./api/class-browsercontext.md#browsercontextnewpage)
-- [browser_context.pages()](./api/class-browsercontext.md#browsercontextpages)
-- [browser_context.route(url, handler)](./api/class-browsercontext.md#browsercontextrouteurl-handler)
-- [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout)
-- [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout)
-- [browser_context.set_extra_http_headers(headers)](./api/class-browsercontext.md#browsercontextsetextrahttpheadersheaders)
-- [browser_context.set_geolocation(geolocation)](./api/class-browsercontext.md#browsercontextsetgeolocationgeolocation)
-- [browser_context.set_http_credentials(http_credentials)](./api/class-browsercontext.md#browsercontextsethttpcredentialshttpcredentials)
-- [browser_context.set_offline(offline)](./api/class-browsercontext.md#browsercontextsetofflineoffline)
-- [browser_context.storage_state(**options)](./api/class-browsercontext.md#browsercontextstoragestateoptions)
-- [browser_context.unroute(url, **options)](./api/class-browsercontext.md#browsercontextunrouteurl-options)
-- [browser_context.wait_for_event(event, **options)](./api/class-browsercontext.md#browsercontextwaitforeventevent-options)
-- [browser_context.expect_event(event, **options)](./api/class-browsercontext.md#browsercontextexpecteventevent-options)
-- [browser_context.expect_page(**options)](./api/class-browsercontext.md#browsercontextexpectpageoptions)
+- [browser_context.on("close")](./api/class-browsercontext.md#browser_contextonclose)
+- [browser_context.on("page")](./api/class-browsercontext.md#browser_contextonpage)
+- [browser_context.add_cookies(cookies)](./api/class-browsercontext.md#browser_contextadd_cookiescookies)
+- [browser_context.add_init_script(**options)](./api/class-browsercontext.md#browser_contextadd_init_scriptoptions)
+- [browser_context.browser()](./api/class-browsercontext.md#browser_contextbrowser)
+- [browser_context.clear_cookies()](./api/class-browsercontext.md#browser_contextclear_cookies)
+- [browser_context.clear_permissions()](./api/class-browsercontext.md#browser_contextclear_permissions)
+- [browser_context.close()](./api/class-browsercontext.md#browser_contextclose)
+- [browser_context.cookies(**options)](./api/class-browsercontext.md#browser_contextcookiesoptions)
+- [browser_context.expect_event(event, **options)](./api/class-browsercontext.md#browser_contextexpect_eventevent-options)
+- [browser_context.expect_page(**options)](./api/class-browsercontext.md#browser_contextexpect_pageoptions)
+- [browser_context.expose_binding(name, callback, **options)](./api/class-browsercontext.md#browser_contextexpose_bindingname-callback-options)
+- [browser_context.expose_function(name, callback)](./api/class-browsercontext.md#browser_contextexpose_functionname-callback)
+- [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browser_contextgrant_permissionspermissions-options)
+- [browser_context.new_page()](./api/class-browsercontext.md#browser_contextnew_page)
+- [browser_context.pages()](./api/class-browsercontext.md#browser_contextpages)
+- [browser_context.route(url, handler)](./api/class-browsercontext.md#browser_contextrouteurl-handler)
+- [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout)
+- [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout)
+- [browser_context.set_extra_http_headers(headers)](./api/class-browsercontext.md#browser_contextset_extra_http_headersheaders)
+- [browser_context.set_geolocation(geolocation)](./api/class-browsercontext.md#browser_contextset_geolocationgeolocation)
+- [browser_context.set_http_credentials(http_credentials)](./api/class-browsercontext.md#browser_contextset_http_credentialshttp_credentials)
+- [browser_context.set_offline(offline)](./api/class-browsercontext.md#browser_contextset_offlineoffline)
+- [browser_context.storage_state(**options)](./api/class-browsercontext.md#browser_contextstorage_stateoptions)
+- [browser_context.unroute(url, **options)](./api/class-browsercontext.md#browser_contextunrouteurl-options)
+- [browser_context.wait_for_event(event, **options)](./api/class-browsercontext.md#browser_contextwait_for_eventevent-options)
 
 ## browser_context.on("close")
 
@@ -53,7 +53,7 @@ The event is emitted when a new Page is created in the BrowserContext. The page 
 
 The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
 
-> **NOTE** Use [page.wait_for_load_state(**options)](./api/class-page.md#pagewaitforloadstateoptions) to wait until the page gets to a particular state (you should not need it in most cases).
+> **NOTE** Use [page.wait_for_load_state(**options)](./api/class-page.md#pagewait_for_load_stateoptions) to wait until the page gets to a particular state (you should not need it in most cases).
 
 ## browser_context.add_cookies(cookies)
 - `cookies` <[List]\[[Dict]\]>
@@ -67,7 +67,7 @@ The earliest moment that page is available is when it has navigated to the initi
   - `secure` <[bool]> Optional.
   - `sameSite` <"Strict"|"Lax"|"None"> Optional.
 
-Adds cookies into this browser context. All pages within this context will have these cookies installed. Cookies can be obtained via [browser_context.cookies(**options)](./api/class-browsercontext.md#browsercontextcookiesoptions).
+Adds cookies into this browser context. All pages within this context will have these cookies installed. Cookies can be obtained via [browser_context.cookies(**options)](./api/class-browsercontext.md#browser_contextcookiesoptions).
 
 ## browser_context.add_init_script(**options)
 - `path` <[Union]\[[str], [pathlib.Path]\]> Path to the JavaScript file. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
@@ -81,7 +81,7 @@ The script is evaluated after the document was created but before any of its scr
 
 An example of overriding `Math.random` before the page loads:
 
-> **NOTE** The order of evaluation of multiple scripts installed via [browser_context.add_init_script(**options)](./api/class-browsercontext.md#browsercontextaddinitscriptoptions) and [page.add_init_script(**options)](./api/class-page.md#pageaddinitscriptoptions) is not defined.
+> **NOTE** The order of evaluation of multiple scripts installed via [browser_context.add_init_script(**options)](./api/class-browsercontext.md#browser_contextadd_init_scriptoptions) and [page.add_init_script(**options)](./api/class-page.md#pageadd_init_scriptoptions) is not defined.
 
 ## browser_context.browser()
 - returns: <[NoneType]|[Browser]>
@@ -116,6 +116,37 @@ Closes the browser context. All the pages that belong to the browser context wil
 
 If no URLs are specified, this method returns all cookies. If URLs are specified, only cookies that affect those URLs are returned.
 
+## browser_context.expect_event(event, **options)
+- `event` <[str]> Event name, same one typically passed into `page.on(event)`.
+- `predicate` <[Function]> Receives the event data and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout).
+- returns: <[EventContextManager]>
+
+Performs action and waits for given `event` to fire. If predicate is provided, it passes event's value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if browser context is closed before the `event` is fired.
+
+```python
+# async
+
+async with context.expect_event(event_name) as event_info:
+    await context.click("button")
+value = await event_info.value
+```
+
+```python
+# sync
+
+with context.expect_event(event_name) as event_info:
+    context.click("button")
+value = event_info.value
+```
+
+## browser_context.expect_page(**options)
+- `predicate` <[Callable]\[[Page]\]:[bool]> Receives the [Page] object and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout).
+- returns: <[EventContextManager]\[[Page]\]>
+
+Performs action and waits for `page` event to fire. If predicate is provided, it passes [Page] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the worker event is fired.
+
 ## browser_context.expose_binding(name, callback, **options)
 - `name` <[str]> Name of the function on the window object.
 - `callback` <[Callable]> Callback function that will be called in the Playwright's context.
@@ -125,7 +156,7 @@ The method adds a function called `name` on the `window` object of every frame i
 
 The first argument of the `callback` function contains information about the caller: `{ browserContext: BrowserContext, page: Page, frame: Frame }`.
 
-See [page.expose_binding(name, callback, **options)](./api/class-page.md#pageexposebindingname-callback-options) for page-only version.
+See [page.expose_binding(name, callback, **options)](./api/class-page.md#pageexpose_bindingname-callback-options) for page-only version.
 
 An example of exposing page URL to all frames in all pages in the context:
 
@@ -139,7 +170,7 @@ The method adds a function called `name` on the `window` object of every frame i
 
 If the `callback` returns a [Promise], it will be awaited.
 
-See [page.expose_function(name, callback)](./api/class-page.md#pageexposefunctionname-callback) for page-only version.
+See [page.expose_function(name, callback)](./api/class-page.md#pageexpose_functionname-callback) for page-only version.
 
 An example of adding an `md5` function to all pages in the context:
 
@@ -173,7 +204,7 @@ Creates a new page in the browser context.
 ## browser_context.pages()
 - returns: <[List]\[[Page]\]>
 
-Returns all open pages in the context. Non visible pages, such as `"background_page"`, will not be listed here. You can find them using [chromium_browser_context.background_pages()](./api/class-chromiumbrowsercontext.md#chromiumbrowsercontextbackgroundpages).
+Returns all open pages in the context. Non visible pages, such as `"background_page"`, will not be listed here. You can find them using [chromium_browser_context.background_pages()](./api/class-chromiumbrowsercontext.md#chromium_browser_contextbackground_pages).
 
 ## browser_context.route(url, handler)
 - `url` <[str]|[Pattern]|[Callable]\[[URL]\]:[bool]> A glob pattern, regex pattern or predicate receiving [URL] to match while routing.
@@ -193,26 +224,26 @@ Page routes (set up with [page.route(url, handler)](./api/class-page.md#pagerout
 - `timeout` <[float]> Maximum navigation time in milliseconds
 
 This setting will change the default maximum navigation time for the following methods and related shortcuts:
-* [page.go_back(**options)](./api/class-page.md#pagegobackoptions)
-* [page.go_forward(**options)](./api/class-page.md#pagegoforwardoptions)
+* [page.go_back(**options)](./api/class-page.md#pagego_backoptions)
+* [page.go_forward(**options)](./api/class-page.md#pagego_forwardoptions)
 * [page.goto(url, **options)](./api/class-page.md#pagegotourl-options)
 * [page.reload(**options)](./api/class-page.md#pagereloadoptions)
-* [page.set_content(html, **options)](./api/class-page.md#pagesetcontenthtml-options)
-* [page.wait_for_navigation(**options)](./api/class-page.md#pagewaitfornavigationoptions)
+* [page.set_content(html, **options)](./api/class-page.md#pageset_contenthtml-options)
+* [page.wait_for_navigation(**options)](./api/class-page.md#pagewait_for_navigationoptions)
 
-> **NOTE** [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) and [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) take priority over [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout).
+> **NOTE** [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) and [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) take priority over [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout).
 
 ## browser_context.set_default_timeout(timeout)
 - `timeout` <[float]> Maximum time in milliseconds
 
 This setting will change the default maximum time for all the methods accepting `timeout` option.
 
-> **NOTE** [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout), [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) and [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout) take priority over [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+> **NOTE** [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout), [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) and [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout) take priority over [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout).
 
 ## browser_context.set_extra_http_headers(headers)
 - `headers` <[Dict]\[[str], [str]\]> An object containing additional HTTP headers to be sent with every request. All header values must be strings.
 
-The extra HTTP headers will be sent with every request initiated by any page in the context. These headers are merged with page-specific extra HTTP headers set with [page.set_extra_http_headers(headers)](./api/class-page.md#pagesetextrahttpheadersheaders). If page overrides a particular header, page-specific header value will be used instead of the browser context header value.
+The extra HTTP headers will be sent with every request initiated by any page in the context. These headers are merged with page-specific extra HTTP headers set with [page.set_extra_http_headers(headers)](./api/class-page.md#pageset_extra_http_headersheaders). If page overrides a particular header, page-specific header value will be used instead of the browser context header value.
 
 > **NOTE** `browserContext.setExtraHTTPHeaders` does not guarantee the order of headers in the outgoing requests.
 
@@ -224,7 +255,7 @@ The extra HTTP headers will be sent with every request initiated by any page in 
 
 Sets the context's geolocation. Passing `null` or `undefined` emulates position unavailable.
 
-> **NOTE** Consider using [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browsercontextgrantpermissionspermissions-options) to grant permissions for the browser context pages to read its geolocation.
+> **NOTE** Consider using [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browser_contextgrant_permissionspermissions-options) to grant permissions for the browser context pages to read its geolocation.
 
 ## browser_context.set_http_credentials(http_credentials)
 - `http_credentials` <[NoneType]|[Dict]>
@@ -257,49 +288,18 @@ Sets the context's geolocation. Passing `null` or `undefined` emulates position 
 Returns storage state for this browser context, contains current cookies and local storage snapshot.
 
 ## browser_context.unroute(url, **options)
-- `url` <[str]|[Pattern]|[Callable]\[[URL]\]:[bool]> A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with [browser_context.route(url, handler)](./api/class-browsercontext.md#browsercontextrouteurl-handler).
-- `handler` <[Callable]\[[Route], [Request]\]> Optional handler function used to register a routing with [browser_context.route(url, handler)](./api/class-browsercontext.md#browsercontextrouteurl-handler).
+- `url` <[str]|[Pattern]|[Callable]\[[URL]\]:[bool]> A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with [browser_context.route(url, handler)](./api/class-browsercontext.md#browser_contextrouteurl-handler).
+- `handler` <[Callable]\[[Route], [Request]\]> Optional handler function used to register a routing with [browser_context.route(url, handler)](./api/class-browsercontext.md#browser_contextrouteurl-handler).
 
-Removes a route created with [browser_context.route(url, handler)](./api/class-browsercontext.md#browsercontextrouteurl-handler). When `handler` is not specified, removes all routes for the `url`.
+Removes a route created with [browser_context.route(url, handler)](./api/class-browsercontext.md#browser_contextrouteurl-handler). When `handler` is not specified, removes all routes for the `url`.
 
 ## browser_context.wait_for_event(event, **options)
 - `event` <[str]> Event name, same one would pass into `browserContext.on(event)`.
 - `predicate` <[Function]> Receives the event data and resolves to truthy value when the waiting should resolve.
-- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout).
 - returns: <[Any]>
 
 Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the context closes before the event is fired. Returns the event data value.
-
-## browser_context.expect_event(event, **options)
-- `event` <[str]> Event name, same one typically passed into `page.on(event)`.
-- `predicate` <[Function]> Receives the event data and resolves to truthy value when the waiting should resolve.
-- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
-- returns: <[EventContextManager]>
-
-Performs action and waits for given `event` to fire. If predicate is provided, it passes event's value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if browser context is closed before the `event` is fired.
-
-```python
-# async
-
-async with context.expect_event(event_name) as event_info:
-    await context.click("button")
-value = await event_info.value
-```
-
-```python
-# sync
-
-with context.expect_event(event_name) as event_info:
-    context.click("button")
-value = event_info.value
-```
-
-## browser_context.expect_page(**options)
-- `predicate` <[Callable]\[[Page]\]:[bool]> Receives the [Page] object and resolves to truthy value when the waiting should resolve.
-- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
-- returns: <[EventContextManager]\[[Page]\]>
-
-Performs action and waits for `page` event to fire. If predicate is provided, it passes [Page] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the worker event is fired.
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"

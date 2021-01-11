@@ -54,14 +54,14 @@ assert checked
 ```
 
 #### API reference
-- [page.text_content(selector, **options)](./api/class-page.md#pagetextcontentselector-options)
-- [page.inner_text(selector, **options)](./api/class-page.md#pageinnertextselector-options)
-- [page.inner_html(selector, **options)](./api/class-page.md#pageinnerhtmlselector-options)
-- [page.get_attribute(selector, name, **options)](./api/class-page.md#pagegetattributeselector-name-options)
-- [frame.text_content(selector, **options)](./api/class-frame.md#frametextcontentselector-options)
-- [frame.inner_text(selector, **options)](./api/class-frame.md#frameinnertextselector-options)
-- [frame.inner_html(selector, **options)](./api/class-frame.md#frameinnerhtmlselector-options)
-- [frame.get_attribute(selector, name, **options)](./api/class-frame.md#framegetattributeselector-name-options)
+- [page.text_content(selector, **options)](./api/class-page.md#pagetext_contentselector-options)
+- [page.inner_text(selector, **options)](./api/class-page.md#pageinner_textselector-options)
+- [page.inner_html(selector, **options)](./api/class-page.md#pageinner_htmlselector-options)
+- [page.get_attribute(selector, name, **options)](./api/class-page.md#pageget_attributeselector-name-options)
+- [frame.text_content(selector, **options)](./api/class-frame.md#frametext_contentselector-options)
+- [frame.inner_text(selector, **options)](./api/class-frame.md#frameinner_textselector-options)
+- [frame.inner_html(selector, **options)](./api/class-frame.md#frameinner_htmlselector-options)
+- [frame.get_attribute(selector, name, **options)](./api/class-frame.md#frameget_attributeselector-name-options)
 
 <br/>
 
@@ -69,7 +69,7 @@ assert checked
 
 [ElementHandle] objects represent in-page DOM elements. They can be used to assert for multiple properties of the element.
 
-It is recommended to fetch the [ElementHandle] object with [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewaitforselectorselector-options) or [frame.wait_for_selector(selector, **options)](./api/class-frame.md#framewaitforselectorselector-options). These APIs wait for the element to be visible and then return an `ElementHandle`.
+It is recommended to fetch the [ElementHandle] object with [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewait_for_selectorselector-options) or [frame.wait_for_selector(selector, **options)](./api/class-frame.md#framewait_for_selectorselector-options). These APIs wait for the element to be visible and then return an `ElementHandle`.
 
 ```python
 # async
@@ -102,11 +102,11 @@ assert 'highlighted' in class_names
 ```
 
 #### API reference
-- [element_handle.text_content()](./api/class-elementhandle.md#elementhandletextcontent)
-- [element_handle.inner_text()](./api/class-elementhandle.md#elementhandleinnertext)
-- [element_handle.inner_html()](./api/class-elementhandle.md#elementhandleinnerhtml)
-- [element_handle.get_attribute(name)](./api/class-elementhandle.md#elementhandlegetattributename)
-- [element_handle.bounding_box()](./api/class-elementhandle.md#elementhandleboundingbox)
+- [element_handle.text_content()](./api/class-elementhandle.md#element_handletext_content)
+- [element_handle.inner_text()](./api/class-elementhandle.md#element_handleinner_text)
+- [element_handle.inner_html()](./api/class-elementhandle.md#element_handleinner_html)
+- [element_handle.get_attribute(name)](./api/class-elementhandle.md#element_handleget_attributename)
+- [element_handle.bounding_box()](./api/class-elementhandle.md#element_handlebounding_box)
 
 <br/>
 
@@ -114,7 +114,7 @@ assert 'highlighted' in class_names
 
 With Playwright, you can also write custom JavaScript to run in the context of the browser. This is useful in situations where you want to assert for values that are not covered by the convenience APIs above.
 
-The following APIs do not auto-wait for the element. It is recommended to use [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewaitforselectorselector-options) or [frame.wait_for_selector(selector, **options)](./api/class-frame.md#framewaitforselectorselector-options).
+The following APIs do not auto-wait for the element. It is recommended to use [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewait_for_selectorselector-options) or [frame.wait_for_selector(selector, **options)](./api/class-frame.md#framewait_for_selectorselector-options).
 
 ```python
 # async
@@ -160,13 +160,13 @@ assert length == 3
 
 #### API reference
 - [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options)
-- [page.eval_on_selector(selector, expression, **options)](./api/class-page.md#pageevalonselectorselector-expression-options)
-- [page.eval_on_selector_all(selector, expression, **options)](./api/class-page.md#pageevalonselectorallselector-expression-options)
+- [page.eval_on_selector(selector, expression, **options)](./api/class-page.md#pageeval_on_selectorselector-expression-options)
+- [page.eval_on_selector_all(selector, expression, **options)](./api/class-page.md#pageeval_on_selector_allselector-expression-options)
 - [frame.evaluate(expression, **options)](./api/class-frame.md#frameevaluateexpression-options)
-- [frame.eval_on_selector(selector, expression, **options)](./api/class-frame.md#frameevalonselectorselector-expression-options)
-- [frame.eval_on_selector_all(selector, expression, **options)](./api/class-frame.md#frameevalonselectorallselector-expression-options)
-- [element_handle.eval_on_selector(selector, expression, **options)](./api/class-elementhandle.md#elementhandleevalonselectorselector-expression-options)
-- [element_handle.eval_on_selector_all(selector, expression, **options)](./api/class-elementhandle.md#elementhandleevalonselectorallselector-expression-options)
+- [frame.eval_on_selector(selector, expression, **options)](./api/class-frame.md#frameeval_on_selectorselector-expression-options)
+- [frame.eval_on_selector_all(selector, expression, **options)](./api/class-frame.md#frameeval_on_selector_allselector-expression-options)
+- [element_handle.eval_on_selector(selector, expression, **options)](./api/class-elementhandle.md#element_handleeval_on_selectorselector-expression-options)
+- [element_handle.eval_on_selector_all(selector, expression, **options)](./api/class-elementhandle.md#element_handleeval_on_selector_allselector-expression-options)
 - [EvaluationArgument]
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"

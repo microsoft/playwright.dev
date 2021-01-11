@@ -5,17 +5,17 @@ title: "Browser"
 
 * extends: [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter)
 
-A Browser is created via [browser_type.launch(**options)](./api/class-browsertype.md#browsertypelaunchoptions). An example of using a [Browser] to create a [Page]:
+A Browser is created via [browser_type.launch(**options)](./api/class-browsertype.md#browser_typelaunchoptions). An example of using a [Browser] to create a [Page]:
 
-See [ChromiumBrowser], [FirefoxBrowser] and [WebKitBrowser] for browser-specific features. Note that [browser_type.launch(**options)](./api/class-browsertype.md#browsertypelaunchoptions) always returns a specific browser instance, based on the browser being launched.
+See [ChromiumBrowser], [FirefoxBrowser] and [WebKitBrowser] for browser-specific features. Note that [browser_type.launch(**options)](./api/class-browsertype.md#browser_typelaunchoptions) always returns a specific browser instance, based on the browser being launched.
 
 
 - [browser.on("disconnected")](./api/class-browser.md#browserondisconnected)
 - [browser.close()](./api/class-browser.md#browserclose)
 - [browser.contexts()](./api/class-browser.md#browsercontexts)
-- [browser.is_connected()](./api/class-browser.md#browserisconnected)
-- [browser.new_context(**options)](./api/class-browser.md#browsernewcontextoptions)
-- [browser.new_page(**options)](./api/class-browser.md#browsernewpageoptions)
+- [browser.is_connected()](./api/class-browser.md#browseris_connected)
+- [browser.new_context(**options)](./api/class-browser.md#browsernew_contextoptions)
+- [browser.new_page(**options)](./api/class-browser.md#browsernew_pageoptions)
 - [browser.version()](./api/class-browser.md#browserversion)
 
 ## browser.on("disconnected")
@@ -26,7 +26,7 @@ Emitted when Browser gets disconnected from the browser application. This might 
 
 ## browser.close()
 
-In case this browser is obtained using [browser_type.launch(**options)](./api/class-browsertype.md#browsertypelaunchoptions), closes the browser and all of its pages (if any were opened).
+In case this browser is obtained using [browser_type.launch(**options)](./api/class-browsertype.md#browser_typelaunchoptions), closes the browser and all of its pages (if any were opened).
 
 In case this browser is connected to, clears all created contexts belonging to this browser and disconnects from the browser server.
 
@@ -45,7 +45,7 @@ Indicates that the browser is connected.
 ## browser.new_context(**options)
 - `accept_downloads` <[bool]> Whether to automatically download all the attachments. Defaults to `false` where all the downloads are canceled.
 - `bypass_csp` <[bool]> Toggles bypassing page's Content-Security-Policy.
-- `color_scheme` <"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [page.emulate_media(**options)](./api/class-page.md#pageemulatemediaoptions) for more details. Defaults to '`light`'.
+- `color_scheme` <"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [page.emulate_media(**options)](./api/class-page.md#pageemulate_mediaoptions) for more details. Defaults to '`light`'.
 - `device_scale_factor` <[float]> Specify device scale factor (can be thought of as dpr). Defaults to `1`.
 - `extra_http_headers` <[Dict]\[[str], [str]\]> An object containing additional HTTP headers to be sent with every request. All header values must be strings.
 - `geolocation` <[Dict]>
@@ -62,7 +62,7 @@ Indicates that the browser is connected.
 - `locale` <[str]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
 - `no_viewport` <[bool]> Disables the default viewport.
 - `offline` <[bool]> Whether to emulate network being offline. Defaults to `false`.
-- `permissions` <[List]\[[str]\]> A list of permissions to grant to all pages in this context. See [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browsercontextgrantpermissionspermissions-options) for more details.
+- `permissions` <[List]\[[str]\]> A list of permissions to grant to all pages in this context. See [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browser_contextgrant_permissionspermissions-options) for more details.
 - `proxy` <[Dict]> Network proxy settings to use with this context. Note that browser needs to be launched with the global proxy for this option to work. If all contexts override the proxy, global proxy will be never used and can be any string, for example `launch({ proxy: { server: 'per-context' } })`.
   - `server` <[str]> Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
   - `bypass` <[str]> Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
@@ -74,7 +74,7 @@ Indicates that the browser is connected.
 - `record_video_size` <[Dict]> Optional dimensions of the recorded videos. If not specified the size will be equal to `viewport`.
   - `width` <[int]> Video frame width.
   - `height` <[int]> Video frame height.
-- `storage_state` <[Union]\[[str], [pathlib.Path]\]|[Dict]> Populates context with given storage state. This method can be used to initialize context with logged-in information obtained via [browser_context.storage_state(**options)](./api/class-browsercontext.md#browsercontextstoragestateoptions). Either a path to the file with saved storage, or an object with the following fields:
+- `storage_state` <[Union]\[[str], [pathlib.Path]\]|[Dict]> Populates context with given storage state. This method can be used to initialize context with logged-in information obtained via [browser_context.storage_state(**options)](./api/class-browsercontext.md#browser_contextstorage_stateoptions). Either a path to the file with saved storage, or an object with the following fields:
   - `cookies` <[List]\[[Dict]\]> Optional cookies to set for context
     - `name` <[str]>
     - `value` <[str]>
@@ -106,7 +106,7 @@ Creates a new browser context. It won't share cookies/cache with other browser c
 ## browser.new_page(**options)
 - `accept_downloads` <[bool]> Whether to automatically download all the attachments. Defaults to `false` where all the downloads are canceled.
 - `bypass_csp` <[bool]> Toggles bypassing page's Content-Security-Policy.
-- `color_scheme` <"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [page.emulate_media(**options)](./api/class-page.md#pageemulatemediaoptions) for more details. Defaults to '`light`'.
+- `color_scheme` <"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [page.emulate_media(**options)](./api/class-page.md#pageemulate_mediaoptions) for more details. Defaults to '`light`'.
 - `device_scale_factor` <[float]> Specify device scale factor (can be thought of as dpr). Defaults to `1`.
 - `extra_http_headers` <[Dict]\[[str], [str]\]> An object containing additional HTTP headers to be sent with every request. All header values must be strings.
 - `geolocation` <[Dict]>
@@ -123,7 +123,7 @@ Creates a new browser context. It won't share cookies/cache with other browser c
 - `locale` <[str]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
 - `no_viewport` <[bool]> Disables the default viewport.
 - `offline` <[bool]> Whether to emulate network being offline. Defaults to `false`.
-- `permissions` <[List]\[[str]\]> A list of permissions to grant to all pages in this context. See [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browsercontextgrantpermissionspermissions-options) for more details.
+- `permissions` <[List]\[[str]\]> A list of permissions to grant to all pages in this context. See [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browser_contextgrant_permissionspermissions-options) for more details.
 - `proxy` <[Dict]> Network proxy settings to use with this context. Note that browser needs to be launched with the global proxy for this option to work. If all contexts override the proxy, global proxy will be never used and can be any string, for example `launch({ proxy: { server: 'per-context' } })`.
   - `server` <[str]> Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
   - `bypass` <[str]> Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
@@ -135,7 +135,7 @@ Creates a new browser context. It won't share cookies/cache with other browser c
 - `record_video_size` <[Dict]> Optional dimensions of the recorded videos. If not specified the size will be equal to `viewport`.
   - `width` <[int]> Video frame width.
   - `height` <[int]> Video frame height.
-- `storage_state` <[Union]\[[str], [pathlib.Path]\]|[Dict]> Populates context with given storage state. This method can be used to initialize context with logged-in information obtained via [browser_context.storage_state(**options)](./api/class-browsercontext.md#browsercontextstoragestateoptions). Either a path to the file with saved storage, or an object with the following fields:
+- `storage_state` <[Union]\[[str], [pathlib.Path]\]|[Dict]> Populates context with given storage state. This method can be used to initialize context with logged-in information obtained via [browser_context.storage_state(**options)](./api/class-browsercontext.md#browser_contextstorage_stateoptions). Either a path to the file with saved storage, or an object with the following fields:
   - `cookies` <[List]\[[Dict]\]> Optional cookies to set for context
     - `name` <[str]>
     - `value` <[str]>
@@ -164,7 +164,7 @@ Creates a new browser context. It won't share cookies/cache with other browser c
 
 Creates a new page in a new browser context. Closing this page will close the context as well.
 
-This is a convenience API that should only be used for the single-page scenarios and short snippets. Production code and testing frameworks should explicitly create [browser.new_context(**options)](./api/class-browser.md#browsernewcontextoptions) followed by the [browser_context.new_page()](./api/class-browsercontext.md#browsercontextnewpage) to control their exact life times.
+This is a convenience API that should only be used for the single-page scenarios and short snippets. Production code and testing frameworks should explicitly create [browser.new_context(**options)](./api/class-browser.md#browsernew_contextoptions) followed by the [browser_context.new_page()](./api/class-browsercontext.md#browser_contextnew_page) to control their exact life times.
 
 ## browser.version()
 - returns: <[str]>

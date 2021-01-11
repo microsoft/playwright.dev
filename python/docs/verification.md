@@ -11,19 +11,19 @@ title: "Verification"
 
 ## Videos
 
-Playwright can record videos for all pages in a [browser context](./core-concepts.md#browser-contexts). Videos are saved upon context closure, so make sure to await [browser_context.close()](./api/class-browsercontext.md#browsercontextclose).
+Playwright can record videos for all pages in a [browser context](./core-concepts.md#browser-contexts). Videos are saved upon context closure, so make sure to await [browser_context.close()](./api/class-browsercontext.md#browser_contextclose).
 
 #### API reference
 - [BrowserContext]
-- [browser.new_context(**options)](./api/class-browser.md#browsernewcontextoptions)
-- [browser.new_page(**options)](./api/class-browser.md#browsernewpageoptions)
-- [browser_context.close()](./api/class-browsercontext.md#browsercontextclose)
+- [browser.new_context(**options)](./api/class-browser.md#browsernew_contextoptions)
+- [browser.new_page(**options)](./api/class-browser.md#browsernew_pageoptions)
+- [browser_context.close()](./api/class-browsercontext.md#browser_contextclose)
 
 ## Screenshots
 
 #### API reference
 - [page.screenshot(**options)](./api/class-page.md#pagescreenshotoptions)
-- [element_handle.screenshot(**options)](./api/class-elementhandle.md#elementhandlescreenshotoptions)
+- [element_handle.screenshot(**options)](./api/class-elementhandle.md#element_handlescreenshotoptions)
 
 <br/>
 

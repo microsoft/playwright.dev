@@ -16,8 +16,8 @@ Download event is emitted once the download starts. Download path becomes availa
 - [download.delete()](./api/class-download.md#downloaddelete)
 - [download.failure()](./api/class-download.md#downloadfailure)
 - [download.path()](./api/class-download.md#downloadpath)
-- [download.save_as(path)](./api/class-download.md#downloadsaveaspath)
-- [download.suggested_filename()](./api/class-download.md#downloadsuggestedfilename)
+- [download.save_as(path)](./api/class-download.md#downloadsave_aspath)
+- [download.suggested_filename()](./api/class-download.md#downloadsuggested_filename)
 - [download.url()](./api/class-download.md#downloadurl)
 
 ## download.delete()

@@ -7,10 +7,10 @@ title: "ConsoleMessage"
 [ConsoleMessage] objects are dispatched by page via the [page.on("console")](./api/class-page.md#pageonconsole) event.
 
 
-- [console_message.args()](./api/class-consolemessage.md#consolemessageargs)
-- [console_message.location()](./api/class-consolemessage.md#consolemessagelocation)
-- [console_message.text()](./api/class-consolemessage.md#consolemessagetext)
-- [console_message.type()](./api/class-consolemessage.md#consolemessagetype)
+- [console_message.args()](./api/class-consolemessage.md#console_messageargs)
+- [console_message.location()](./api/class-consolemessage.md#console_messagelocation)
+- [console_message.text()](./api/class-consolemessage.md#console_messagetext)
+- [console_message.type()](./api/class-consolemessage.md#console_messagetype)
 
 ## console_message.args()
 - returns: <[List]\[[JSHandle]\]>

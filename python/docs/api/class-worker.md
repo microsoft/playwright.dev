@@ -9,7 +9,7 @@ The Worker class represents a [WebWorker](https://developer.mozilla.org/en-US/do
 
 - [worker.on("close")](./api/class-worker.md#workeronclose)
 - [worker.evaluate(expression, **options)](./api/class-worker.md#workerevaluateexpression-options)
-- [worker.evaluate_handle(expression, **options)](./api/class-worker.md#workerevaluatehandleexpression-options)
+- [worker.evaluate_handle(expression, **options)](./api/class-worker.md#workerevaluate_handleexpression-options)
 - [worker.url()](./api/class-worker.md#workerurl)
 
 ## worker.on("close")

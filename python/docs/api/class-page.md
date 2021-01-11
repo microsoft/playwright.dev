@@ -35,90 +35,90 @@ To unsubscribe from events use the `removeListener` method:
 - [page.on("response")](./api/class-page.md#pageonresponse)
 - [page.on("websocket")](./api/class-page.md#pageonwebsocket)
 - [page.on("worker")](./api/class-page.md#pageonworker)
-- [page.query_selector(selector)](./api/class-page.md#pagequeryselectorselector)
-- [page.query_selector_all(selector)](./api/class-page.md#pagequeryselectorallselector)
-- [page.eval_on_selector(selector, expression, **options)](./api/class-page.md#pageevalonselectorselector-expression-options)
-- [page.eval_on_selector_all(selector, expression, **options)](./api/class-page.md#pageevalonselectorallselector-expression-options)
-- [page.accessibility](./api/class-page.md#pageaccessibility)
-- [page.add_init_script(**options)](./api/class-page.md#pageaddinitscriptoptions)
-- [page.add_script_tag(**options)](./api/class-page.md#pageaddscripttagoptions)
-- [page.add_style_tag(**options)](./api/class-page.md#pageaddstyletagoptions)
-- [page.bring_to_front()](./api/class-page.md#pagebringtofront)
+- [page.add_init_script(**options)](./api/class-page.md#pageadd_init_scriptoptions)
+- [page.add_script_tag(**options)](./api/class-page.md#pageadd_script_tagoptions)
+- [page.add_style_tag(**options)](./api/class-page.md#pageadd_style_tagoptions)
+- [page.bring_to_front()](./api/class-page.md#pagebring_to_front)
 - [page.check(selector, **options)](./api/class-page.md#pagecheckselector-options)
 - [page.click(selector, **options)](./api/class-page.md#pageclickselector-options)
 - [page.close(**options)](./api/class-page.md#pagecloseoptions)
 - [page.content()](./api/class-page.md#pagecontent)
 - [page.context()](./api/class-page.md#pagecontext)
 - [page.dblclick(selector, **options)](./api/class-page.md#pagedblclickselector-options)
-- [page.dispatch_event(selector, type, **options)](./api/class-page.md#pagedispatcheventselector-type-options)
-- [page.emulate_media(**options)](./api/class-page.md#pageemulatemediaoptions)
+- [page.dispatch_event(selector, type, **options)](./api/class-page.md#pagedispatch_eventselector-type-options)
+- [page.emulate_media(**options)](./api/class-page.md#pageemulate_mediaoptions)
+- [page.eval_on_selector(selector, expression, **options)](./api/class-page.md#pageeval_on_selectorselector-expression-options)
+- [page.eval_on_selector_all(selector, expression, **options)](./api/class-page.md#pageeval_on_selector_allselector-expression-options)
 - [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options)
-- [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluatehandleexpression-options)
-- [page.expose_binding(name, callback, **options)](./api/class-page.md#pageexposebindingname-callback-options)
-- [page.expose_function(name, callback)](./api/class-page.md#pageexposefunctionname-callback)
+- [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluate_handleexpression-options)
+- [page.expect_console_message(**options)](./api/class-page.md#pageexpect_console_messageoptions)
+- [page.expect_download(**options)](./api/class-page.md#pageexpect_downloadoptions)
+- [page.expect_event(event, **options)](./api/class-page.md#pageexpect_eventevent-options)
+- [page.expect_file_chooser(**options)](./api/class-page.md#pageexpect_file_chooseroptions)
+- [page.expect_load_state(**options)](./api/class-page.md#pageexpect_load_stateoptions)
+- [page.expect_navigation(**options)](./api/class-page.md#pageexpect_navigationoptions)
+- [page.expect_popup(**options)](./api/class-page.md#pageexpect_popupoptions)
+- [page.expect_request(url_or_predicate, **options)](./api/class-page.md#pageexpect_requesturl_or_predicate-options)
+- [page.expect_response(url_or_predicate, **options)](./api/class-page.md#pageexpect_responseurl_or_predicate-options)
+- [page.expect_worker(**options)](./api/class-page.md#pageexpect_workeroptions)
+- [page.expose_binding(name, callback, **options)](./api/class-page.md#pageexpose_bindingname-callback-options)
+- [page.expose_function(name, callback)](./api/class-page.md#pageexpose_functionname-callback)
 - [page.fill(selector, value, **options)](./api/class-page.md#pagefillselector-value-options)
 - [page.focus(selector, **options)](./api/class-page.md#pagefocusselector-options)
 - [page.frame(**options)](./api/class-page.md#pageframeoptions)
 - [page.frames()](./api/class-page.md#pageframes)
-- [page.get_attribute(selector, name, **options)](./api/class-page.md#pagegetattributeselector-name-options)
-- [page.go_back(**options)](./api/class-page.md#pagegobackoptions)
-- [page.go_forward(**options)](./api/class-page.md#pagegoforwardoptions)
+- [page.get_attribute(selector, name, **options)](./api/class-page.md#pageget_attributeselector-name-options)
+- [page.go_back(**options)](./api/class-page.md#pagego_backoptions)
+- [page.go_forward(**options)](./api/class-page.md#pagego_forwardoptions)
 - [page.goto(url, **options)](./api/class-page.md#pagegotourl-options)
 - [page.hover(selector, **options)](./api/class-page.md#pagehoverselector-options)
-- [page.inner_html(selector, **options)](./api/class-page.md#pageinnerhtmlselector-options)
-- [page.inner_text(selector, **options)](./api/class-page.md#pageinnertextselector-options)
-- [page.is_checked(selector, **options)](./api/class-page.md#pageischeckedselector-options)
-- [page.is_closed()](./api/class-page.md#pageisclosed)
-- [page.is_disabled(selector, **options)](./api/class-page.md#pageisdisabledselector-options)
-- [page.is_editable(selector, **options)](./api/class-page.md#pageiseditableselector-options)
-- [page.is_enabled(selector, **options)](./api/class-page.md#pageisenabledselector-options)
-- [page.is_hidden(selector, **options)](./api/class-page.md#pageishiddenselector-options)
-- [page.is_visible(selector, **options)](./api/class-page.md#pageisvisibleselector-options)
-- [page.keyboard](./api/class-page.md#pagekeyboard)
-- [page.main_frame()](./api/class-page.md#pagemainframe)
-- [page.mouse](./api/class-page.md#pagemouse)
+- [page.inner_html(selector, **options)](./api/class-page.md#pageinner_htmlselector-options)
+- [page.inner_text(selector, **options)](./api/class-page.md#pageinner_textselector-options)
+- [page.is_checked(selector, **options)](./api/class-page.md#pageis_checkedselector-options)
+- [page.is_closed()](./api/class-page.md#pageis_closed)
+- [page.is_disabled(selector, **options)](./api/class-page.md#pageis_disabledselector-options)
+- [page.is_editable(selector, **options)](./api/class-page.md#pageis_editableselector-options)
+- [page.is_enabled(selector, **options)](./api/class-page.md#pageis_enabledselector-options)
+- [page.is_hidden(selector, **options)](./api/class-page.md#pageis_hiddenselector-options)
+- [page.is_visible(selector, **options)](./api/class-page.md#pageis_visibleselector-options)
+- [page.main_frame()](./api/class-page.md#pagemain_frame)
 - [page.opener()](./api/class-page.md#pageopener)
 - [page.pdf(**options)](./api/class-page.md#pagepdfoptions)
 - [page.press(selector, key, **options)](./api/class-page.md#pagepressselector-key-options)
+- [page.query_selector(selector)](./api/class-page.md#pagequery_selectorselector)
+- [page.query_selector_all(selector)](./api/class-page.md#pagequery_selector_allselector)
 - [page.reload(**options)](./api/class-page.md#pagereloadoptions)
 - [page.route(url, handler)](./api/class-page.md#pagerouteurl-handler)
 - [page.screenshot(**options)](./api/class-page.md#pagescreenshotoptions)
-- [page.select_option(selector, **options)](./api/class-page.md#pageselectoptionselector-options)
-- [page.set_content(html, **options)](./api/class-page.md#pagesetcontenthtml-options)
-- [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout)
-- [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout)
-- [page.set_extra_http_headers(headers)](./api/class-page.md#pagesetextrahttpheadersheaders)
-- [page.set_input_files(selector, files, **options)](./api/class-page.md#pagesetinputfilesselector-files-options)
-- [page.set_viewport_size(viewport_size)](./api/class-page.md#pagesetviewportsizeviewportsize)
+- [page.select_option(selector, **options)](./api/class-page.md#pageselect_optionselector-options)
+- [page.set_content(html, **options)](./api/class-page.md#pageset_contenthtml-options)
+- [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout)
+- [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout)
+- [page.set_extra_http_headers(headers)](./api/class-page.md#pageset_extra_http_headersheaders)
+- [page.set_input_files(selector, files, **options)](./api/class-page.md#pageset_input_filesselector-files-options)
+- [page.set_viewport_size(viewport_size)](./api/class-page.md#pageset_viewport_sizeviewport_size)
 - [page.tap(selector, **options)](./api/class-page.md#pagetapselector-options)
-- [page.text_content(selector, **options)](./api/class-page.md#pagetextcontentselector-options)
+- [page.text_content(selector, **options)](./api/class-page.md#pagetext_contentselector-options)
 - [page.title()](./api/class-page.md#pagetitle)
-- [page.touchscreen](./api/class-page.md#pagetouchscreen)
 - [page.type(selector, text, **options)](./api/class-page.md#pagetypeselector-text-options)
 - [page.uncheck(selector, **options)](./api/class-page.md#pageuncheckselector-options)
 - [page.unroute(url, **options)](./api/class-page.md#pageunrouteurl-options)
 - [page.url()](./api/class-page.md#pageurl)
 - [page.video()](./api/class-page.md#pagevideo)
-- [page.viewport_size()](./api/class-page.md#pageviewportsize)
-- [page.wait_for_event(event, **options)](./api/class-page.md#pagewaitforeventevent-options)
-- [page.wait_for_function(expression, **options)](./api/class-page.md#pagewaitforfunctionexpression-options)
-- [page.wait_for_load_state(**options)](./api/class-page.md#pagewaitforloadstateoptions)
-- [page.wait_for_navigation(**options)](./api/class-page.md#pagewaitfornavigationoptions)
-- [page.wait_for_request(url_or_predicate, **options)](./api/class-page.md#pagewaitforrequesturlorpredicate-options)
-- [page.wait_for_response(url_or_predicate, **options)](./api/class-page.md#pagewaitforresponseurlorpredicate-options)
-- [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewaitforselectorselector-options)
-- [page.wait_for_timeout(timeout)](./api/class-page.md#pagewaitfortimeouttimeout)
+- [page.viewport_size()](./api/class-page.md#pageviewport_size)
+- [page.wait_for_event(event, **options)](./api/class-page.md#pagewait_for_eventevent-options)
+- [page.wait_for_function(expression, **options)](./api/class-page.md#pagewait_for_functionexpression-options)
+- [page.wait_for_load_state(**options)](./api/class-page.md#pagewait_for_load_stateoptions)
+- [page.wait_for_navigation(**options)](./api/class-page.md#pagewait_for_navigationoptions)
+- [page.wait_for_request(url_or_predicate, **options)](./api/class-page.md#pagewait_for_requesturl_or_predicate-options)
+- [page.wait_for_response(url_or_predicate, **options)](./api/class-page.md#pagewait_for_responseurl_or_predicate-options)
+- [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewait_for_selectorselector-options)
+- [page.wait_for_timeout(timeout)](./api/class-page.md#pagewait_for_timeouttimeout)
 - [page.workers()](./api/class-page.md#pageworkers)
-- [page.expect_event(event, **options)](./api/class-page.md#pageexpecteventevent-options)
-- [page.expect_load_state(**options)](./api/class-page.md#pageexpectloadstateoptions)
-- [page.expect_navigation(**options)](./api/class-page.md#pageexpectnavigationoptions)
-- [page.expect_download(**options)](./api/class-page.md#pageexpectdownloadoptions)
-- [page.expect_popup(**options)](./api/class-page.md#pageexpectpopupoptions)
-- [page.expect_worker(**options)](./api/class-page.md#pageexpectworkeroptions)
-- [page.expect_console_message(**options)](./api/class-page.md#pageexpectconsolemessageoptions)
-- [page.expect_file_chooser(**options)](./api/class-page.md#pageexpectfilechooseroptions)
-- [page.expect_request(url_or_predicate, **options)](./api/class-page.md#pageexpectrequesturlorpredicate-options)
-- [page.expect_response(url_or_predicate, **options)](./api/class-page.md#pageexpectresponseurlorpredicate-options)
+- [page.accessibility](./api/class-page.md#pageaccessibility)
+- [page.keyboard](./api/class-page.md#pagekeyboard)
+- [page.mouse](./api/class-page.md#pagemouse)
+- [page.touchscreen](./api/class-page.md#pagetouchscreen)
 
 ## page.on("close")
 
@@ -160,7 +160,7 @@ Emitted when attachment download started. User can access basic file operations 
 ## page.on("filechooser")
 - type: <[FileChooser]>
 
-Emitted when a file chooser is supposed to appear, such as after clicking the  `<input type=file>`. Playwright can respond to it via setting the input files using [file_chooser.set_files(files, **options)](./api/class-filechooser.md#filechoosersetfilesfiles-options) that can be uploaded after that.
+Emitted when a file chooser is supposed to appear, such as after clicking the  `<input type=file>`. Playwright can respond to it via setting the input files using [file_chooser.set_files(files, **options)](./api/class-filechooser.md#file_chooserset_filesfiles-options) that can be uploaded after that.
 
 ## page.on("frameattached")
 - type: <[Frame]>
@@ -189,16 +189,16 @@ Emitted when an uncaught exception happens within the page.
 ## page.on("popup")
 - type: <[Page]>
 
-Emitted when the page opens a new tab or window. This event is emitted in addition to the [browser_context.on("page")](./api/class-browsercontext.md#browsercontextonpage), but only for popups relevant to this page.
+Emitted when the page opens a new tab or window. This event is emitted in addition to the [browser_context.on("page")](./api/class-browsercontext.md#browser_contextonpage), but only for popups relevant to this page.
 
 The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
 
-> **NOTE** Use [page.wait_for_load_state(**options)](./api/class-page.md#pagewaitforloadstateoptions) to wait until the page gets to a particular state (you should not need it in most cases).
+> **NOTE** Use [page.wait_for_load_state(**options)](./api/class-page.md#pagewait_for_load_stateoptions) to wait until the page gets to a particular state (you should not need it in most cases).
 
 ## page.on("request")
 - type: <[Request]>
 
-Emitted when a page issues a request. The [request] object is read-only. In order to intercept and mutate requests, see [page.route(url, handler)](./api/class-page.md#pagerouteurl-handler) or [browser_context.route(url, handler)](./api/class-browsercontext.md#browsercontextrouteurl-handler).
+Emitted when a page issues a request. The [request] object is read-only. In order to intercept and mutate requests, see [page.route(url, handler)](./api/class-page.md#pagerouteurl-handler) or [browser_context.route(url, handler)](./api/class-browsercontext.md#browser_contextrouteurl-handler).
 
 ## page.on("requestfailed")
 - type: <[Request]>
@@ -227,53 +227,6 @@ Emitted when <[WebSocket]> request is sent.
 
 Emitted when a dedicated [WebWorker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) is spawned by the page.
 
-## page.query_selector(selector)
-- `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- returns: <[NoneType]|[ElementHandle]>
-
-The method finds an element matching the specified selector within the page. If no elements match the selector, the return value resolves to `null`.
-
-Shortcut for main frame's [frame.query_selector(selector)](./api/class-frame.md#framequeryselectorselector).
-
-## page.query_selector_all(selector)
-- `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- returns: <[List]\[[ElementHandle]\]>
-
-The method finds all elements matching the specified selector within the page. If no elements match the selector, the return value resolves to `[]`.
-
-Shortcut for main frame's [frame.query_selector_all(selector)](./api/class-frame.md#framequeryselectorallselector).
-
-## page.eval_on_selector(selector, expression, **options)
-- `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
-- `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
-- `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
-- returns: <[Serializable]>
-
-The method finds an element matching the specified selector within the page and passes it as a first argument to `pageFunction`. If no elements match the selector, the method throws an error. Returns the value of `pageFunction`.
-
-If `pageFunction` returns a [Promise], then [page.eval_on_selector(selector, expression, **options)](./api/class-page.md#pageevalonselectorselector-expression-options) would wait for the promise to resolve and return its value.
-
-Examples:
-
-Shortcut for main frame's [frame.eval_on_selector(selector, expression, **options)](./api/class-frame.md#frameevalonselectorselector-expression-options).
-
-## page.eval_on_selector_all(selector, expression, **options)
-- `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
-- `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
-- `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
-- returns: <[Serializable]>
-
-The method finds all elements matching the specified selector within the page and passes an array of matched elements as a first argument to `pageFunction`. Returns the result of `pageFunction` invocation.
-
-If `pageFunction` returns a [Promise], then [page.eval_on_selector_all(selector, expression, **options)](./api/class-page.md#pageevalonselectorallselector-expression-options) would wait for the promise to resolve and return its value.
-
-Examples:
-
-## page.accessibility
-- type: <[Accessibility]>
-
 ## page.add_init_script(**options)
 - `path` <[Union]\[[str], [pathlib.Path]\]> Path to the JavaScript file. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
 - `script` <[str]> Script to be evaluated in all pages in the browser context. Optional.
@@ -286,7 +239,7 @@ The script is evaluated after the document was created but before any of its scr
 
 An example of overriding `Math.random` before the page loads:
 
-> **NOTE** The order of evaluation of multiple scripts installed via [browser_context.add_init_script(**options)](./api/class-browsercontext.md#browsercontextaddinitscriptoptions) and [page.add_init_script(**options)](./api/class-page.md#pageaddinitscriptoptions) is not defined.
+> **NOTE** The order of evaluation of multiple scripts installed via [browser_context.add_init_script(**options)](./api/class-browsercontext.md#browser_contextadd_init_scriptoptions) and [page.add_init_script(**options)](./api/class-page.md#pageadd_init_scriptoptions) is not defined.
 
 ## page.add_script_tag(**options)
 - `content` <[str]> Raw JavaScript content to be injected into frame.
@@ -297,7 +250,7 @@ An example of overriding `Math.random` before the page loads:
 
 Adds a `<script>` tag into the page with the desired url or content. Returns the added tag when the script's onload fires or when the script content was injected into frame.
 
-Shortcut for main frame's [frame.add_script_tag(**options)](./api/class-frame.md#frameaddscripttagoptions).
+Shortcut for main frame's [frame.add_script_tag(**options)](./api/class-frame.md#frameadd_script_tagoptions).
 
 ## page.add_style_tag(**options)
 - `content` <[str]> Raw CSS content to be injected into frame.
@@ -307,7 +260,7 @@ Shortcut for main frame's [frame.add_script_tag(**options)](./api/class-frame.md
 
 Adds a `<link rel="stylesheet">` tag into the page with the desired url or a `<style type="text/css">` tag with the content. Returns the added tag when the stylesheet's onload fires or when the CSS content was injected into frame.
 
-Shortcut for main frame's [frame.add_style_tag(**options)](./api/class-frame.md#frameaddstyletagoptions).
+Shortcut for main frame's [frame.add_style_tag(**options)](./api/class-frame.md#frameadd_style_tagoptions).
 
 ## page.bring_to_front()
 
@@ -317,7 +270,7 @@ Brings page to front (activates tab).
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - `force` <[bool]> Whether to bypass the [actionability](./actionability.md) checks. Defaults to `false`.
 - `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 
 This method checks an element matching `selector` by performing the following steps:
 1. Find an element match matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -343,7 +296,7 @@ Shortcut for main frame's [frame.check(selector, **options)](./api/class-frame.m
 - `position` <[Dict]> A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
   - `x` <[float]>
   - `y` <[float]>
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 
 This method clicks an element matching `selector` by performing the following steps:
 1. Find an element match matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -386,7 +339,7 @@ Get the browser context that the page belongs to.
 - `position` <[Dict]> A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
   - `x` <[float]>
   - `y` <[float]>
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 
 This method double clicks an element matching `selector` by performing the following steps:
 1. Find an element match matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -405,7 +358,7 @@ Shortcut for main frame's [frame.dblclick(selector, **options)](./api/class-fram
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - `type` <[str]> DOM event type: `"click"`, `"dragstart"`, etc.
 - `event_init` <[EvaluationArgument]> Optional event-specific initialization properties.
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 
 The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the elment, `click` is dispatched. This is equivalend to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
 
@@ -425,6 +378,34 @@ You can also specify `JSHandle` as the property value if you want live objects t
 ## page.emulate_media(**options)
 - `media` <[NoneType]|"screen"|"print"> Changes the CSS media type of the page. The only allowed values are `'screen'`, `'print'` and `null`. Passing `null` disables CSS media emulation. Omitting `media` or passing `undefined` does not change the emulated value. Optional.
 - `color_scheme` <[NoneType]|"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. Passing `null` disables color scheme emulation. Omitting `colorScheme` or passing `undefined` does not change the emulated value. Optional.
+
+## page.eval_on_selector(selector, expression, **options)
+- `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
+- `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
+- returns: <[Serializable]>
+
+The method finds an element matching the specified selector within the page and passes it as a first argument to `pageFunction`. If no elements match the selector, the method throws an error. Returns the value of `pageFunction`.
+
+If `pageFunction` returns a [Promise], then [page.eval_on_selector(selector, expression, **options)](./api/class-page.md#pageeval_on_selectorselector-expression-options) would wait for the promise to resolve and return its value.
+
+Examples:
+
+Shortcut for main frame's [frame.eval_on_selector(selector, expression, **options)](./api/class-frame.md#frameeval_on_selectorselector-expression-options).
+
+## page.eval_on_selector_all(selector, expression, **options)
+- `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
+- `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
+- returns: <[Serializable]>
+
+The method finds all elements matching the specified selector within the page and passes an array of matched elements as a first argument to `pageFunction`. Returns the result of `pageFunction` invocation.
+
+If `pageFunction` returns a [Promise], then [page.eval_on_selector_all(selector, expression, **options)](./api/class-page.md#pageeval_on_selector_allselector-expression-options) would wait for the promise to resolve and return its value.
+
+Examples:
 
 ## page.evaluate(expression, **options)
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
@@ -462,6 +443,140 @@ A string can also be passed in instead of a function:
 
 [JSHandle] instances can be passed as an argument to the `page.evaluateHandle`:
 
+## page.expect_console_message(**options)
+- `predicate` <[Callable]\[[ConsoleMessage]\]:[bool]> Receives the [ConsoleMessage] object and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout).
+- returns: <[EventContextManager]\[[ConsoleMessage]\]>
+
+Performs action and waits for `console` event to fire. If predicate is provided, it passes [ConsoleMessage] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the worker event is fired.
+
+## page.expect_download(**options)
+- `predicate` <[Callable]\[[Download]\]:[bool]> Receives the [Download] object and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout).
+- returns: <[EventContextManager]\[[Download]\]>
+
+Performs action and waits for `download` event to fire. If predicate is provided, it passes [Download] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the download event is fired.
+
+## page.expect_event(event, **options)
+- `event` <[str]> Event name, same one typically passed into `page.on(event)`.
+- `predicate` <[Function]> Receives the event data and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout).
+- returns: <[EventContextManager]>
+
+Performs action and waits for given `event` to fire. If predicate is provided, it passes event's value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the `event` is fired.
+
+```python
+# async
+
+async with page.expect_event(event_name) as event_info:
+    await page.click("button")
+value = await event_info.value
+```
+
+```python
+# sync
+
+with page.expect_event(event_name) as event_info:
+    page.click("button")
+value = event_info.value
+```
+
+## page.expect_file_chooser(**options)
+- `predicate` <[Callable]\[[FileChooser]\]:[bool]> Receives the [FileChooser] object and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout).
+- returns: <[EventContextManager]\[[FileChooser]\]>
+
+Performs action and waits for `filechooser` event to fire. If predicate is provided, it passes [FileChooser] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the worker event is fired.
+
+## page.expect_load_state(**options)
+- `state` <"load"|"domcontentloaded"|"networkidle"> Optional load state to wait for, defaults to `load`. If the state has been already reached while loading current document, the method resolves immediately. Can be one of:
+  * `'load'` - wait for the `load` event to be fired.
+  * `'domcontentloaded'` - wait for the `DOMContentLoaded` event to be fired.
+  * `'networkidle'` - wait until there are no network connections for at least `500` ms.
+- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
+- returns: <[EventContextManager]>
+
+Performs action and waits for the required load state. It resolves when the page reaches a required load state, `load` by default. The navigation must have been committed when this method is called. If current document has already reached the required state, resolves immediately.
+
+```python
+# async
+
+async with page.expect_load_state():
+    await page.click('button') # Click triggers navigation.
+# Context manager waits for 'load' event.
+```
+
+```python
+# sync
+
+with page.expect_load_state():
+    page.click('button') # Click triggers navigation.
+# Context manager waits for 'load' event.
+```
+
+Shortcut for main frame's [frame.expect_load_state(**options)](./api/class-frame.md#frameexpect_load_stateoptions).
+
+## page.expect_navigation(**options)
+- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
+- `url` <[str]|[Pattern]|[Callable]\[[URL]\]:[bool]> A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation.
+- `wait_until` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
+  * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+  * `'load'` - consider operation to be finished when the `load` event is fired.
+  * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+- returns: <[EventContextManager]>
+
+Performs action and wait for the next navigation. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
+
+This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
+
+```python
+# async
+
+async with page.expect_navigation():
+    await page.click("a.delayed-navigation") # Clicking the link will indirectly cause a navigation  
+# Context manager waited for the navigation to happen.
+```
+
+```python
+# sync
+
+with page.expect_navigation():
+    page.click("a.delayed-navigation") # Clicking the link will indirectly cause a navigation  
+# Context manager waited for the navigation to happen.
+```
+
+**NOTE** Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+
+Shortcut for main frame's [frame.expect_navigation(**options)](./api/class-frame.md#frameexpect_navigationoptions).
+
+## page.expect_popup(**options)
+- `predicate` <[Callable]\[[Page]\]:[bool]> Receives the [Popup] object and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout).
+- returns: <[EventContextManager]\[[Page]\]>
+
+Performs action and waits for `popup` event to fire. If predicate is provided, it passes [Popup] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the popup event is fired.
+
+## page.expect_request(url_or_predicate, **options)
+- `url_or_predicate` <[str]|[Pattern]|[Callable]\[[Request]\]:[bool]> Receives the [Request] object and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout).
+- returns: <[EventContextManager]\[[Request]\]>
+
+Performs action and waits for `response` event to fire. If predicate is provided, it passes [Request] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the download event is fired.
+
+## page.expect_response(url_or_predicate, **options)
+- `url_or_predicate` <[str]|[Pattern]|[Callable]\[[Response]\]:[bool]> Receives the [Response] object and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout).
+- returns: <[EventContextManager]\[[Response]\]>
+
+Performs action and waits for `response` event to fire. If predicate is provided, it passes [Response] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the download event is fired.
+
+## page.expect_worker(**options)
+- `predicate` <[Callable]\[[Worker]\]:[bool]> Receives the [Worker] object and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout).
+- returns: <[EventContextManager]\[[Worker]\]>
+
+Performs action and waits for `worker` event to fire. If predicate is provided, it passes [Worker] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the worker event is fired.
+
 ## page.expose_binding(name, callback, **options)
 - `name` <[str]> Name of the function on the window object.
 - `callback` <[Callable]> Callback function that will be called in the Playwright's context.
@@ -471,7 +586,7 @@ The method adds a function called `name` on the `window` object of every frame i
 
 The first argument of the `callback` function contains information about the caller: `{ browserContext: BrowserContext, page: Page, frame: Frame }`.
 
-See [browser_context.expose_binding(name, callback, **options)](./api/class-browsercontext.md#browsercontextexposebindingname-callback-options) for the context-wide version.
+See [browser_context.expose_binding(name, callback, **options)](./api/class-browsercontext.md#browser_contextexpose_bindingname-callback-options) for the context-wide version.
 
 > **NOTE** Functions installed via `page.exposeBinding` survive navigations.
 
@@ -487,7 +602,7 @@ The method adds a function called `name` on the `window` object of every frame i
 
 If the `callback` returns a [Promise], it will be awaited.
 
-See [browser_context.expose_function(name, callback)](./api/class-browsercontext.md#browsercontextexposefunctionname-callback) for context-wide exposed function.
+See [browser_context.expose_function(name, callback)](./api/class-browsercontext.md#browser_contextexpose_functionname-callback) for context-wide exposed function.
 
 > **NOTE** Functions installed via `page.exposeFunction` survive navigations.
 
@@ -499,7 +614,7 @@ An example of adding a `window.readfile` function to the page:
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - `value` <[str]> Value to fill for the `<input>`, `<textarea>` or `[contenteditable]` element.
 - `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 
 This method waits for an element matching `selector`, waits for [actionability](./actionability.md) checks, focuses the element, fills it and triggers an `input` event after filling. If the element matching `selector` is not an `<input>`, `<textarea>` or `[contenteditable]` element, this method throws an error. Note that you can pass an empty string to clear the input field.
 
@@ -509,7 +624,7 @@ Shortcut for main frame's [frame.fill(selector, value, **options)](./api/class-f
 
 ## page.focus(selector, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 
 This method fetches an element with `selector` and focuses it. If there's no element matching `selector`, the method waits until a matching element appears in the DOM.
 
@@ -530,13 +645,13 @@ An array of all frames attached to the page.
 ## page.get_attribute(selector, name, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - `name` <[str]> Attribute name to get the value for.
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 - returns: <[NoneType]|[str]>
 
 Returns element attribute value.
 
 ## page.go_back(**options)
-- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 - `wait_until` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
   * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
   * `'load'` - consider operation to be finished when the `load` event is fired.
@@ -548,7 +663,7 @@ Returns the main resource response. In case of multiple redirects, the navigatio
 Navigate to the previous page in history.
 
 ## page.go_forward(**options)
-- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 - `wait_until` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
   * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
   * `'load'` - consider operation to be finished when the `load` event is fired.
@@ -561,8 +676,8 @@ Navigate to the next page in history.
 
 ## page.goto(url, **options)
 - `url` <[str]> URL to navigate page to. The url should include scheme, e.g. `https://`.
-- `referer` <[str]> Referer header value. If provided it will take preference over the referer header value set by [page.set_extra_http_headers(headers)](./api/class-page.md#pagesetextrahttpheadersheaders).
-- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `referer` <[str]> Referer header value. If provided it will take preference over the referer header value set by [page.set_extra_http_headers(headers)](./api/class-page.md#pageset_extra_http_headersheaders).
+- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 - `wait_until` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
   * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
   * `'load'` - consider operation to be finished when the `load` event is fired.
@@ -592,7 +707,7 @@ Shortcut for main frame's [frame.goto(url, **options)](./api/class-frame.md#fram
 - `position` <[Dict]> A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
   - `x` <[float]>
   - `y` <[float]>
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 
 This method hovers over an element matching `selector` by performing the following steps:
 1. Find an element match matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -607,21 +722,21 @@ Shortcut for main frame's [frame.hover(selector, **options)](./api/class-frame.m
 
 ## page.inner_html(selector, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 - returns: <[str]>
 
 Returns `element.innerHTML`.
 
 ## page.inner_text(selector, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 - returns: <[str]>
 
 Returns `element.innerText`.
 
 ## page.is_checked(selector, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 - returns: <[bool]>
 
 Returns whether the element is checked. Throws if the element is not a checkbox or radio input.
@@ -633,49 +748,43 @@ Indicates that the page has been closed.
 
 ## page.is_disabled(selector, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 - returns: <[bool]>
 
 Returns whether the element is disabled, the opposite of [enabled](./actionability.md#enabled).
 
 ## page.is_editable(selector, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 - returns: <[bool]>
 
 Returns whether the element is [editable](./actionability.md#editable).
 
 ## page.is_enabled(selector, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 - returns: <[bool]>
 
 Returns whether the element is [enabled](./actionability.md#enabled).
 
 ## page.is_hidden(selector, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 - returns: <[bool]>
 
 Returns whether the element is hidden, the opposite of [visible](./actionability.md#visible).
 
 ## page.is_visible(selector, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 - returns: <[bool]>
 
 Returns whether the element is [visible](./actionability.md#visible).
-
-## page.keyboard
-- type: <[Keyboard]>
 
 ## page.main_frame()
 - returns: <[Frame]>
 
 The page's main frame. Page is guaranteed to have a main frame which persists during navigations.
-
-## page.mouse
-- type: <[Mouse]>
 
 ## page.opener()
 - returns: <[NoneType]|[Page]>
@@ -711,7 +820,7 @@ Returns the PDF buffer.
 
 > **NOTE** Generating a pdf is currently only supported in Chromium headless.
 
-`page.pdf()` generates a pdf of the page with `print` css media. To generate a pdf with `screen` media, call [page.emulate_media(**options)](./api/class-page.md#pageemulatemediaoptions) before calling `page.pdf()`:
+`page.pdf()` generates a pdf of the page with `print` css media. To generate a pdf with `screen` media, call [page.emulate_media(**options)](./api/class-page.md#pageemulate_mediaoptions) before calling `page.pdf()`:
 
 > **NOTE** By default, `page.pdf()` generates a pdf with modified colors for printing. Use the [`-webkit-print-color-adjust`](https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-print-color-adjust) property to force rendering of exact colors.
 
@@ -750,7 +859,7 @@ The `format` options are:
 - `key` <[str]> Name of the key to press or a character to generate, such as `ArrowLeft` or `a`.
 - `delay` <[float]> Time to wait between `keydown` and `keyup` in milliseconds. Defaults to 0.
 - `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 
 Focuses the element, and then uses [keyboard.down(key)](./api/class-keyboard.md#keyboarddownkey) and [keyboard.up(key)](./api/class-keyboard.md#keyboardupkey).
 
@@ -766,8 +875,24 @@ If `key` is a single character, it is case-sensitive, so the values `a` and `A` 
 
 Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported as well. When speficied with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
 
+## page.query_selector(selector)
+- `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- returns: <[NoneType]|[ElementHandle]>
+
+The method finds an element matching the specified selector within the page. If no elements match the selector, the return value resolves to `null`.
+
+Shortcut for main frame's [frame.query_selector(selector)](./api/class-frame.md#framequery_selectorselector).
+
+## page.query_selector_all(selector)
+- `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- returns: <[List]\[[ElementHandle]\]>
+
+The method finds all elements matching the specified selector within the page. If no elements match the selector, the return value resolves to `[]`.
+
+Shortcut for main frame's [frame.query_selector_all(selector)](./api/class-frame.md#framequery_selector_allselector).
+
 ## page.reload(**options)
-- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 - `wait_until` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
   * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
   * `'load'` - consider operation to be finished when the `load` event is fired.
@@ -790,7 +915,7 @@ An example of a naïve handler that aborts all image requests:
 
 or the same snippet using a regex pattern instead:
 
-Page routes take precedence over browser context routes (set up with [browser_context.route(url, handler)](./api/class-browsercontext.md#browsercontextrouteurl-handler)) when request matches both handlers.
+Page routes take precedence over browser context routes (set up with [browser_context.route(url, handler)](./api/class-browsercontext.md#browser_contextrouteurl-handler)) when request matches both handlers.
 
 > **NOTE** Enabling routing disables http cache.
 
@@ -804,7 +929,7 @@ Page routes take precedence over browser context routes (set up with [browser_co
 - `omit_background` <[bool]> Hides default white background and allows capturing screenshots with transparency. Not applicable to `jpeg` images. Defaults to `false`.
 - `path` <[Union]\[[str], [pathlib.Path]\]> The file path to save the image to. The screenshot type will be inferred from file extension. If `path` is a relative path, then it is resolved relative to the current working directory. If no path is provided, the image won't be saved to the disk.
 - `quality` <[int]> The quality of the image, between 0-100. Not applicable to `png` images.
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 - `type` <"png"|"jpeg"> Specify screenshot type, defaults to `png`.
 - returns: <[Buffer]>
 
@@ -815,7 +940,7 @@ Returns the buffer with the captured screenshot.
 ## page.select_option(selector, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 - `element` <[ElementHandle]|[List]\[[ElementHandle]\]> Option elements to select. Optional.
 - `index` <[int]|[List]\[[int]\]> Options to select by index. Optional.
 - `value` <[str]|[List]\[[str]\]> Options to select by value. If the `<select>` has the `multiple` attribute, all given options are selected, otherwise only the first option matching one of the passed options is selected. Optional.
@@ -826,11 +951,11 @@ Returns the array of option values that have been successfully selected.
 
 Triggers a `change` and `input` event once all the provided options have been selected. If there's no `<select>` element matching `selector`, the method throws an error.
 
-Shortcut for main frame's [frame.select_option(selector, **options)](./api/class-frame.md#frameselectoptionselector-options)
+Shortcut for main frame's [frame.select_option(selector, **options)](./api/class-frame.md#frameselect_optionselector-options)
 
 ## page.set_content(html, **options)
 - `html` <[str]> HTML markup to assign to the page.
-- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 - `wait_until` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
   * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
   * `'load'` - consider operation to be finished when the `load` event is fired.
@@ -840,21 +965,21 @@ Shortcut for main frame's [frame.select_option(selector, **options)](./api/class
 - `timeout` <[float]> Maximum navigation time in milliseconds
 
 This setting will change the default maximum navigation time for the following methods and related shortcuts:
-* [page.go_back(**options)](./api/class-page.md#pagegobackoptions)
-* [page.go_forward(**options)](./api/class-page.md#pagegoforwardoptions)
+* [page.go_back(**options)](./api/class-page.md#pagego_backoptions)
+* [page.go_forward(**options)](./api/class-page.md#pagego_forwardoptions)
 * [page.goto(url, **options)](./api/class-page.md#pagegotourl-options)
 * [page.reload(**options)](./api/class-page.md#pagereloadoptions)
-* [page.set_content(html, **options)](./api/class-page.md#pagesetcontenthtml-options)
-* [page.wait_for_navigation(**options)](./api/class-page.md#pagewaitfornavigationoptions)
+* [page.set_content(html, **options)](./api/class-page.md#pageset_contenthtml-options)
+* [page.wait_for_navigation(**options)](./api/class-page.md#pagewait_for_navigationoptions)
 
-> **NOTE** [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) takes priority over [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) and [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout).
+> **NOTE** [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) takes priority over [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) and [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout).
 
 ## page.set_default_timeout(timeout)
 - `timeout` <[float]> Maximum time in milliseconds
 
 This setting will change the default maximum time for all the methods accepting `timeout` option.
 
-> **NOTE** [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) takes priority over [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout).
+> **NOTE** [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) takes priority over [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout).
 
 ## page.set_extra_http_headers(headers)
 - `headers` <[Dict]\[[str], [str]\]> An object containing additional HTTP headers to be sent with every request. All header values must be strings.
@@ -870,7 +995,7 @@ The extra HTTP headers will be sent with every request the page initiates.
   - `mimeType` <[str]> [File] type
   - `buffer` <[Buffer]> File content
 - `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 
 This method expects `selector` to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input).
 
@@ -881,7 +1006,7 @@ Sets the value of the file input to these file paths or files. If some of the `f
   - `width` <[int]> page width in pixels.
   - `height` <[int]> page height in pixels.
 
-In the case of multiple pages in a single browser, each page can have its own viewport size. However, [browser.new_context(**options)](./api/class-browser.md#browsernewcontextoptions) allows to set viewport size (and more) for all pages in the context at once.
+In the case of multiple pages in a single browser, each page can have its own viewport size. However, [browser.new_context(**options)](./api/class-browser.md#browsernew_contextoptions) allows to set viewport size (and more) for all pages in the context at once.
 
 `page.setViewportSize` will resize the page. A lot of websites don't expect phones to change size, so you should set the viewport size before navigating to the page.
 
@@ -893,7 +1018,7 @@ In the case of multiple pages in a single browser, each page can have its own vi
 - `position` <[Dict]> A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
   - `x` <[float]>
   - `y` <[float]>
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 
 This method taps an element matching `selector` by performing the following steps:
 1. Find an element match matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -910,7 +1035,7 @@ Shortcut for main frame's [frame.tap(selector, **options)](./api/class-frame.md#
 
 ## page.text_content(selector, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 - returns: <[NoneType]|[str]>
 
 Returns `element.textContent`.
@@ -920,15 +1045,12 @@ Returns `element.textContent`.
 
 Returns the page's title. Shortcut for main frame's [frame.title()](./api/class-frame.md#frametitle).
 
-## page.touchscreen
-- type: <[Touchscreen]>
-
 ## page.type(selector, text, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - `text` <[str]> A text to type into a focused element.
 - `delay` <[float]> Time to wait between key presses in milliseconds. Defaults to 0.
 - `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 
 Sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in the text. `page.type` can be used to send fine-grained keyboard events. To fill values in form fields, use [page.fill(selector, value, **options)](./api/class-page.md#pagefillselector-value-options).
 
@@ -940,7 +1062,7 @@ Shortcut for main frame's [frame.type(selector, text, **options)](./api/class-fr
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - `force` <[bool]> Whether to bypass the [actionability](./actionability.md) checks. Defaults to `false`.
 - `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 
 This method unchecks an element matching `selector` by performing the following steps:
 1. Find an element match matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -979,7 +1101,7 @@ Video object associated with this page.
 ## page.wait_for_event(event, **options)
 - `event` <[str]> Event name, same one typically passed into `page.on(event)`.
 - `predicate` <[Function]> Receives the event data and resolves to truthy value when the waiting should resolve.
-- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout).
 - returns: <[Any]>
 
 Returns the event data value.
@@ -989,7 +1111,7 @@ Waits for event to fire and passes its value into the predicate function. Return
 ## page.wait_for_function(expression, **options)
 - `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
 - `polling` <[float]|"raf"> If `polling` is `'raf'`, then `pageFunction` is constantly executed in `requestAnimationFrame` callback. If `polling` is a number, then it is treated as an interval in milliseconds at which the function would be executed. Defaults to `raf`.
-- `timeout` <[float]> maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+- `timeout` <[float]> maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout).
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[JSHandle]>
@@ -1000,23 +1122,23 @@ The `waitForFunction` can be used to observe viewport size change:
 
 To pass an argument to the predicate of `page.waitForFunction` function:
 
-Shortcut for main frame's [frame.wait_for_function(expression, **options)](./api/class-frame.md#framewaitforfunctionexpression-options).
+Shortcut for main frame's [frame.wait_for_function(expression, **options)](./api/class-frame.md#framewait_for_functionexpression-options).
 
 ## page.wait_for_load_state(**options)
 - `state` <"load"|"domcontentloaded"|"networkidle"> Optional load state to wait for, defaults to `load`. If the state has been already reached while loading current document, the method resolves immediately. Can be one of:
   * `'load'` - wait for the `load` event to be fired.
   * `'domcontentloaded'` - wait for the `DOMContentLoaded` event to be fired.
   * `'networkidle'` - wait until there are no network connections for at least `500` ms.
-- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 
 Returns when the required load state has been reached.
 
 This resolves when the page reaches a required load state, `load` by default. The navigation must have been committed when this method is called. If current document has already reached the required state, resolves immediately.
 
-Shortcut for main frame's [frame.wait_for_load_state(**options)](./api/class-frame.md#framewaitforloadstateoptions).
+Shortcut for main frame's [frame.wait_for_load_state(**options)](./api/class-frame.md#framewait_for_load_stateoptions).
 
 ## page.wait_for_navigation(**options)
-- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 - `url` <[str]|[Pattern]|[Callable]\[[URL]\]:[bool]> A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation.
 - `wait_until` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
   * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
@@ -1030,18 +1152,18 @@ This resolves when the page navigates to a new URL or reloads. It is useful for 
 
 **NOTE** Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
 
-Shortcut for main frame's [frame.wait_for_navigation(**options)](./api/class-frame.md#framewaitfornavigationoptions).
+Shortcut for main frame's [frame.wait_for_navigation(**options)](./api/class-frame.md#framewait_for_navigationoptions).
 
 ## page.wait_for_request(url_or_predicate, **options)
 - `url_or_predicate` <[str]|[Pattern]|[Callable]\[[Request]\]:[bool]> Request URL string, regex or predicate receiving [Request] object.
-- `timeout` <[float]> Maximum wait time in milliseconds, defaults to 30 seconds, pass `0` to disable the timeout. The default value can be changed by using the [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) method.
+- `timeout` <[float]> Maximum wait time in milliseconds, defaults to 30 seconds, pass `0` to disable the timeout. The default value can be changed by using the [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) method.
 - returns: <[Request]>
 
 Waits for the matching request and returns it.
 
 ## page.wait_for_response(url_or_predicate, **options)
 - `url_or_predicate` <[str]|[Pattern]|[Callable]\[[Response]\]:[bool]> Request URL string, regex or predicate receiving [Response] object.
-- `timeout` <[float]> Maximum wait time in milliseconds, defaults to 30 seconds, pass `0` to disable the timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum wait time in milliseconds, defaults to 30 seconds, pass `0` to disable the timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 - returns: <[Response]>
 
 Returns the matched response.
@@ -1053,7 +1175,7 @@ Returns the matched response.
   * `'detached'` - wait for element to not be present in DOM.
   * `'visible'` - wait for element to have non-empty bounding box and no `visibility:hidden`. Note that element without any content or with `display:none` has an empty bounding box and is not considered visible.
   * `'hidden'` - wait for element to be either detached from DOM, or have an empty bounding box or `visibility:hidden`. This is opposite to the `'visible'` option.
-- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 - returns: <[NoneType]|[ElementHandle]>
 
 Returns when element specified by selector satisfies `state` option. Returns `null` if waiting for `hidden` or `detached`.
@@ -1069,7 +1191,7 @@ Waits for the given `timeout` in milliseconds.
 
 Note that `page.waitForTimeout()` should only be used for debugging. Tests using the timer in production are going to be flaky. Use signals such as network events, selectors becoming visible and others instead.
 
-Shortcut for main frame's [frame.wait_for_timeout(timeout)](./api/class-frame.md#framewaitfortimeouttimeout).
+Shortcut for main frame's [frame.wait_for_timeout(timeout)](./api/class-frame.md#framewait_for_timeouttimeout).
 
 ## page.workers()
 - returns: <[List]\[[Worker]\]>
@@ -1078,139 +1200,17 @@ This method returns all of the dedicated [WebWorkers](https://developer.mozilla.
 
 > **NOTE** This does not contain ServiceWorkers
 
-## page.expect_event(event, **options)
-- `event` <[str]> Event name, same one typically passed into `page.on(event)`.
-- `predicate` <[Function]> Receives the event data and resolves to truthy value when the waiting should resolve.
-- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
-- returns: <[EventContextManager]>
+## page.accessibility
+- type: <[Accessibility]>
 
-Performs action and waits for given `event` to fire. If predicate is provided, it passes event's value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the `event` is fired.
+## page.keyboard
+- type: <[Keyboard]>
 
-```python
-# async
+## page.mouse
+- type: <[Mouse]>
 
-async with page.expect_event(event_name) as event_info:
-    await page.click("button")
-value = await event_info.value
-```
-
-```python
-# sync
-
-with page.expect_event(event_name) as event_info:
-    page.click("button")
-value = event_info.value
-```
-
-## page.expect_load_state(**options)
-- `state` <"load"|"domcontentloaded"|"networkidle"> Optional load state to wait for, defaults to `load`. If the state has been already reached while loading current document, the method resolves immediately. Can be one of:
-  * `'load'` - wait for the `load` event to be fired.
-  * `'domcontentloaded'` - wait for the `DOMContentLoaded` event to be fired.
-  * `'networkidle'` - wait until there are no network connections for at least `500` ms.
-- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- returns: <[EventContextManager]>
-
-Performs action and waits for the required load state. It resolves when the page reaches a required load state, `load` by default. The navigation must have been committed when this method is called. If current document has already reached the required state, resolves immediately.
-
-```python
-# async
-
-async with page.expect_load_state():
-    await page.click('button') # Click triggers navigation.
-# Context manager waits for 'load' event.
-```
-
-```python
-# sync
-
-with page.expect_load_state():
-    page.click('button') # Click triggers navigation.
-# Context manager waits for 'load' event.
-```
-
-Shortcut for main frame's [frame.expect_load_state(**options)](./api/class-frame.md#frameexpectloadstateoptions).
-
-## page.expect_navigation(**options)
-- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
-- `url` <[str]|[Pattern]|[Callable]\[[URL]\]:[bool]> A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation.
-- `wait_until` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
-  * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
-  * `'load'` - consider operation to be finished when the `load` event is fired.
-  * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
-- returns: <[EventContextManager]>
-
-Performs action and wait for the next navigation. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
-
-This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
-
-```python
-# async
-
-async with page.expect_navigation():
-    await page.click("a.delayed-navigation") # Clicking the link will indirectly cause a navigation  
-# Context manager waited for the navigation to happen.
-```
-
-```python
-# sync
-
-with page.expect_navigation():
-    page.click("a.delayed-navigation") # Clicking the link will indirectly cause a navigation  
-# Context manager waited for the navigation to happen.
-```
-
-**NOTE** Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
-
-Shortcut for main frame's [frame.expect_navigation(**options)](./api/class-frame.md#frameexpectnavigationoptions).
-
-## page.expect_download(**options)
-- `predicate` <[Callable]\[[Download]\]:[bool]> Receives the [Download] object and resolves to truthy value when the waiting should resolve.
-- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
-- returns: <[EventContextManager]\[[Download]\]>
-
-Performs action and waits for `download` event to fire. If predicate is provided, it passes [Download] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the download event is fired.
-
-## page.expect_popup(**options)
-- `predicate` <[Callable]\[[Page]\]:[bool]> Receives the [Popup] object and resolves to truthy value when the waiting should resolve.
-- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
-- returns: <[EventContextManager]\[[Page]\]>
-
-Performs action and waits for `popup` event to fire. If predicate is provided, it passes [Popup] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the popup event is fired.
-
-## page.expect_worker(**options)
-- `predicate` <[Callable]\[[Worker]\]:[bool]> Receives the [Worker] object and resolves to truthy value when the waiting should resolve.
-- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
-- returns: <[EventContextManager]\[[Worker]\]>
-
-Performs action and waits for `worker` event to fire. If predicate is provided, it passes [Worker] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the worker event is fired.
-
-## page.expect_console_message(**options)
-- `predicate` <[Callable]\[[ConsoleMessage]\]:[bool]> Receives the [ConsoleMessage] object and resolves to truthy value when the waiting should resolve.
-- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
-- returns: <[EventContextManager]\[[ConsoleMessage]\]>
-
-Performs action and waits for `console` event to fire. If predicate is provided, it passes [ConsoleMessage] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the worker event is fired.
-
-## page.expect_file_chooser(**options)
-- `predicate` <[Callable]\[[FileChooser]\]:[bool]> Receives the [FileChooser] object and resolves to truthy value when the waiting should resolve.
-- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
-- returns: <[EventContextManager]\[[FileChooser]\]>
-
-Performs action and waits for `filechooser` event to fire. If predicate is provided, it passes [FileChooser] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the worker event is fired.
-
-## page.expect_request(url_or_predicate, **options)
-- `url_or_predicate` <[str]|[Pattern]|[Callable]\[[Request]\]:[bool]> Receives the [Request] object and resolves to truthy value when the waiting should resolve.
-- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
-- returns: <[EventContextManager]\[[Request]\]>
-
-Performs action and waits for `response` event to fire. If predicate is provided, it passes [Request] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the download event is fired.
-
-## page.expect_response(url_or_predicate, **options)
-- `url_or_predicate` <[str]|[Pattern]|[Callable]\[[Response]\]:[bool]> Receives the [Response] object and resolves to truthy value when the waiting should resolve.
-- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
-- returns: <[EventContextManager]\[[Response]\]>
-
-Performs action and waits for `response` event to fire. If predicate is provided, it passes [Response] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the download event is fired.
+## page.touchscreen
+- type: <[Touchscreen]>
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"

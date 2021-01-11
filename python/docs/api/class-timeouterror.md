@@ -5,7 +5,7 @@ title: "TimeoutError"
 
 * extends: [Error]
 
-TimeoutError is emitted whenever certain operations are terminated due to timeout, e.g. [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewaitforselectorselector-options) or [browser_type.launch(**options)](./api/class-browsertype.md#browsertypelaunchoptions).
+TimeoutError is emitted whenever certain operations are terminated due to timeout, e.g. [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewait_for_selectorselector-options) or [browser_type.launch(**options)](./api/class-browsertype.md#browser_typelaunchoptions).
 
 
 

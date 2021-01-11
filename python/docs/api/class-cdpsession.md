@@ -14,8 +14,8 @@ Useful links:
 * Getting Started with DevTools Protocol: https://github.com/aslushnikov/getting-started-with-cdp/blob/master/README.md
 
 
-- [cdp_session.detach()](./api/class-cdpsession.md#cdpsessiondetach)
-- [cdp_session.send(method, **options)](./api/class-cdpsession.md#cdpsessionsendmethod-options)
+- [cdp_session.detach()](./api/class-cdpsession.md#cdp_sessiondetach)
+- [cdp_session.send(method, **options)](./api/class-cdpsession.md#cdp_sessionsendmethod-options)
 
 ## cdp_session.detach()
 

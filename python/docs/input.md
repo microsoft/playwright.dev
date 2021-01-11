@@ -57,7 +57,7 @@ page.fill('text=First Name', 'Peter')
 #### API reference
 - [page.fill(selector, value, **options)](./api/class-page.md#pagefillselector-value-options)
 - [frame.fill(selector, value, **options)](./api/class-frame.md#framefillselector-value-options)
-- [element_handle.fill(value, **options)](./api/class-elementhandle.md#elementhandlefillvalue-options)
+- [element_handle.fill(value, **options)](./api/class-elementhandle.md#element_handlefillvalue-options)
 
 <br/>
 
@@ -96,8 +96,8 @@ page.check('text=XL')
 - [page.uncheck(selector, **options)](./api/class-page.md#pageuncheckselector-options)
 - [frame.check(selector, **options)](./api/class-frame.md#framecheckselector-options)
 - [frame.uncheck(selector, **options)](./api/class-frame.md#frameuncheckselector-options)
-- [element_handle.check(**options)](./api/class-elementhandle.md#elementhandlecheckoptions)
-- [element_handle.uncheck(**options)](./api/class-elementhandle.md#elementhandleuncheckoptions)
+- [element_handle.check(**options)](./api/class-elementhandle.md#element_handlecheckoptions)
+- [element_handle.uncheck(**options)](./api/class-elementhandle.md#element_handleuncheckoptions)
 
 <br/>
 
@@ -140,9 +140,9 @@ page.select_option('select#colors', option)
 ```
 
 #### API reference
-- [page.select_option(selector, **options)](./api/class-page.md#pageselectoptionselector-options)
-- [frame.select_option(selector, **options)](./api/class-frame.md#frameselectoptionselector-options)
-- [element_handle.select_option(**options)](./api/class-elementhandle.md#elementhandleselectoptionoptions)
+- [page.select_option(selector, **options)](./api/class-page.md#pageselect_optionselector-options)
+- [frame.select_option(selector, **options)](./api/class-frame.md#frameselect_optionselector-options)
+- [element_handle.select_option(**options)](./api/class-elementhandle.md#element_handleselect_optionoptions)
 
 <br/>
 
@@ -237,16 +237,16 @@ page.dispatch_event('button#submit', 'click')
 #### API reference
 - [page.click(selector, **options)](./api/class-page.md#pageclickselector-options)
 - [frame.click(selector, **options)](./api/class-frame.md#frameclickselector-options)
-- [element_handle.click(**options)](./api/class-elementhandle.md#elementhandleclickoptions)
+- [element_handle.click(**options)](./api/class-elementhandle.md#element_handleclickoptions)
 - [page.dblclick(selector, **options)](./api/class-page.md#pagedblclickselector-options)
 - [frame.dblclick(selector, **options)](./api/class-frame.md#framedblclickselector-options)
-- [element_handle.dblclick(**options)](./api/class-elementhandle.md#elementhandledblclickoptions)
+- [element_handle.dblclick(**options)](./api/class-elementhandle.md#element_handledblclickoptions)
 - [page.hover(selector, **options)](./api/class-page.md#pagehoverselector-options)
 - [frame.hover(selector, **options)](./api/class-frame.md#framehoverselector-options)
-- [element_handle.hover(**options)](./api/class-elementhandle.md#elementhandlehoveroptions)
-- [page.dispatch_event(selector, type, **options)](./api/class-page.md#pagedispatcheventselector-type-options)
-- [frame.dispatch_event(selector, type, **options)](./api/class-frame.md#framedispatcheventselector-type-options)
-- [element_handle.dispatch_event(type, **options)](./api/class-elementhandle.md#elementhandledispatcheventtype-options)
+- [element_handle.hover(**options)](./api/class-elementhandle.md#element_handlehoveroptions)
+- [page.dispatch_event(selector, type, **options)](./api/class-page.md#pagedispatch_eventselector-type-options)
+- [frame.dispatch_event(selector, type, **options)](./api/class-frame.md#framedispatch_eventselector-type-options)
+- [element_handle.dispatch_event(type, **options)](./api/class-elementhandle.md#element_handledispatch_eventtype-options)
 
 <br/>
 
@@ -275,7 +275,7 @@ This method will emit all the necessary keyboard events, with all the `keydown`,
 #### API reference
 - [page.type(selector, text, **options)](./api/class-page.md#pagetypeselector-text-options)
 - [frame.type(selector, text, **options)](./api/class-frame.md#frametypeselector-text-options)
-- [element_handle.type(text, **options)](./api/class-elementhandle.md#elementhandletypetext-options)
+- [element_handle.type(text, **options)](./api/class-elementhandle.md#element_handletypetext-options)
 - [keyboard.type(text, **options)](./api/class-keyboard.md#keyboardtypetext-options)
 
 <br/>
@@ -348,7 +348,7 @@ Note that you still need to specify the capital `A` in `Shift-A` to produce the 
 #### API reference
 - [page.press(selector, key, **options)](./api/class-page.md#pagepressselector-key-options)
 - [frame.press(selector, key, **options)](./api/class-frame.md#framepressselector-key-options)
-- [element_handle.press(key, **options)](./api/class-elementhandle.md#elementhandlepresskey-options)
+- [element_handle.press(key, **options)](./api/class-elementhandle.md#element_handlepresskey-options)
 - [keyboard.press(key, **options)](./api/class-keyboard.md#keyboardpresskey-options)
 
 <br/>
@@ -395,16 +395,16 @@ page.set_input_files(
 )
 ```
 
-You can select input files for upload using the [page.set_input_files(selector, files, **options)](./api/class-page.md#pagesetinputfilesselector-files-options) method. It expects first argument to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input) with the type `"file"`. Multiple files can be passed in the array. If some of the file paths are relative, they are resolved relative to the [current working directory](https://nodejs.org/api/process.html#process_process_cwd). Empty array clears the selected files.
+You can select input files for upload using the [page.set_input_files(selector, files, **options)](./api/class-page.md#pageset_input_filesselector-files-options) method. It expects first argument to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input) with the type `"file"`. Multiple files can be passed in the array. If some of the file paths are relative, they are resolved relative to the [current working directory](https://nodejs.org/api/process.html#process_process_cwd). Empty array clears the selected files.
 
 #### Example
 
 [This script](https://github.com/microsoft/playwright/blob/master/utils/docs/examples/upload.js) uploads a file to an `input` element that accepts file uploads.
 
 #### API reference
-- [page.set_input_files(selector, files, **options)](./api/class-page.md#pagesetinputfilesselector-files-options)
-- [frame.set_input_files(selector, files, **options)](./api/class-frame.md#framesetinputfilesselector-files-options)
-- [element_handle.set_input_files(files, **options)](./api/class-elementhandle.md#elementhandlesetinputfilesfiles-options)
+- [page.set_input_files(selector, files, **options)](./api/class-page.md#pageset_input_filesselector-files-options)
+- [frame.set_input_files(selector, files, **options)](./api/class-frame.md#frameset_input_filesselector-files-options)
+- [element_handle.set_input_files(files, **options)](./api/class-elementhandle.md#element_handleset_input_filesfiles-options)
 
 <br/>
 
@@ -427,7 +427,7 @@ page.focus('input#name')
 #### API reference
 - [page.focus(selector, **options)](./api/class-page.md#pagefocusselector-options)
 - [frame.focus(selector, **options)](./api/class-frame.md#framefocusselector-options)
-- [element_handle.focus()](./api/class-elementhandle.md#elementhandlefocus)
+- [element_handle.focus()](./api/class-elementhandle.md#element_handlefocus)
 
 <br/>
 

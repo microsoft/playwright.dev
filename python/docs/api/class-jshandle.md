@@ -4,20 +4,20 @@ title: "JSHandle"
 ---
 
 
-JSHandle represents an in-page JavaScript object. JSHandles can be created with the [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluatehandleexpression-options) method.
+JSHandle represents an in-page JavaScript object. JSHandles can be created with the [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluate_handleexpression-options) method.
 
-JSHandle prevents the referenced JavaScript object being garbage collected unless the handle is exposed with [js_handle.dispose()](./api/class-jshandle.md#jshandledispose). JSHandles are auto-disposed when their origin frame gets navigated or the parent context gets destroyed.
+JSHandle prevents the referenced JavaScript object being garbage collected unless the handle is exposed with [js_handle.dispose()](./api/class-jshandle.md#js_handledispose). JSHandles are auto-disposed when their origin frame gets navigated or the parent context gets destroyed.
 
-JSHandle instances can be used as an argument in [page.eval_on_selector(selector, expression, **options)](./api/class-page.md#pageevalonselectorselector-expression-options), [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options) and [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluatehandleexpression-options) methods.
+JSHandle instances can be used as an argument in [page.eval_on_selector(selector, expression, **options)](./api/class-page.md#pageeval_on_selectorselector-expression-options), [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options) and [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluate_handleexpression-options) methods.
 
 
-- [js_handle.as_element()](./api/class-jshandle.md#jshandleaselement)
-- [js_handle.dispose()](./api/class-jshandle.md#jshandledispose)
-- [js_handle.evaluate(expression, **options)](./api/class-jshandle.md#jshandleevaluateexpression-options)
-- [js_handle.evaluate_handle(expression, **options)](./api/class-jshandle.md#jshandleevaluatehandleexpression-options)
-- [js_handle.get_properties()](./api/class-jshandle.md#jshandlegetproperties)
-- [js_handle.get_property(property_name)](./api/class-jshandle.md#jshandlegetpropertypropertyname)
-- [js_handle.json_value()](./api/class-jshandle.md#jshandlejsonvalue)
+- [js_handle.as_element()](./api/class-jshandle.md#js_handleas_element)
+- [js_handle.dispose()](./api/class-jshandle.md#js_handledispose)
+- [js_handle.evaluate(expression, **options)](./api/class-jshandle.md#js_handleevaluateexpression-options)
+- [js_handle.evaluate_handle(expression, **options)](./api/class-jshandle.md#js_handleevaluate_handleexpression-options)
+- [js_handle.get_properties()](./api/class-jshandle.md#js_handleget_properties)
+- [js_handle.get_property(property_name)](./api/class-jshandle.md#js_handleget_propertyproperty_name)
+- [js_handle.json_value()](./api/class-jshandle.md#js_handlejson_value)
 
 ## js_handle.as_element()
 - returns: <[NoneType]|[ElementHandle]>
@@ -56,7 +56,7 @@ The only difference between `jsHandle.evaluate` and `jsHandle.evaluateHandle` is
 
 If the function passed to the `jsHandle.evaluateHandle` returns a [Promise], then `jsHandle.evaluateHandle` would wait for the promise to resolve and return its value.
 
-See [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluatehandleexpression-options) for more details.
+See [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluate_handleexpression-options) for more details.
 
 ## js_handle.get_properties()
 - returns: <[Map]\[[str], [JSHandle]\]>
