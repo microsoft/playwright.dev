@@ -36,6 +36,8 @@ Playwright allows creation of "incognito" browser contexts with `browser.newCont
 - [browser_context.storage_state(**options)](./api/class-browsercontext.md#browsercontextstoragestateoptions)
 - [browser_context.unroute(url, **options)](./api/class-browsercontext.md#browsercontextunrouteurl-options)
 - [browser_context.wait_for_event(event, **options)](./api/class-browsercontext.md#browsercontextwaitforeventevent-options)
+- [browser_context.expect_event(event, **options)](./api/class-browsercontext.md#browsercontextexpecteventevent-options)
+- [browser_context.expect_page(**options)](./api/class-browsercontext.md#browsercontextexpectpageoptions)
 
 ## browser_context.on("close")
 
@@ -268,6 +270,37 @@ Removes a route created with [browser_context.route(url, handler)](./api/class-b
 
 Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the context closes before the event is fired. Returns the event data value.
 
+## browser_context.expect_event(event, **options)
+- `event` <[str]> Event name, same one typically passed into `page.on(event)`.
+- `predicate` <[Function]> Receives the event data and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+- returns: <[EventContextManager]>
+
+Performs action and waits for given `event` to fire. If predicate is provided, it passes event's value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if browser context is closed before the `event` is fired.
+
+```python
+# async
+
+async with context.expect_event(event_name) as event_info:
+    await context.click("button")
+value = await event_info.value
+```
+
+```python
+# sync
+
+with context.expect_event(event_name) as event_info:
+    context.click("button")
+value = event_info.value
+```
+
+## browser_context.expect_page(**options)
+- `predicate` <[Callable]\[[Page]\]:[bool]> Receives the [Page] object and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+- returns: <[EventContextManager]\[[Page]\]>
+
+Performs action and waits for `page` event to fire. If predicate is provided, it passes [Page] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the worker event is fired.
+
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"
@@ -308,6 +341,7 @@ Waits for event to fire and passes its value into the predicate function. Return
 [Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
 [bool]: https://docs.python.org/3/library/stdtypes.html "bool"
 [Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
 [Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
 [float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"

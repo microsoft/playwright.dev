@@ -37,6 +37,8 @@ Chromium-specific features including background pages, service worker support, e
 - [browser_context.storage_state(**options)](./api/class-browsercontext.md#browsercontextstoragestateoptions)
 - [browser_context.unroute(url, **options)](./api/class-browsercontext.md#browsercontextunrouteurl-options)
 - [browser_context.wait_for_event(event, **options)](./api/class-browsercontext.md#browsercontextwaitforeventevent-options)
+- [browser_context.expect_event(event, **options)](./api/class-browsercontext.md#browsercontextexpecteventevent-options)
+- [browser_context.expect_page(**options)](./api/class-browsercontext.md#browsercontextexpectpageoptions)
 
 ## chromium_browser_context.on("backgroundpage")
 - type: <[Page]>
@@ -106,6 +108,7 @@ All existing service workers in the context.
 [Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
 [bool]: https://docs.python.org/3/library/stdtypes.html "bool"
 [Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
 [Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
 [float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"

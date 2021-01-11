@@ -1312,7 +1312,7 @@ Video object associated with this page.
   - `height` <[number]> page height in pixels.
 
 ## page.waitForEvent(event[, optionsOrPredicate])
-- `event` <[string]> Event name, same one would pass into `page.on(event)`.
+- `event` <[string]> Event name, same one typically passed into `page.on(event)`.
 - `optionsOrPredicate` <[Function]|[Object]> Either a predicate that receives an event or an options object. Optional.
   - `predicate` <[Function]> receives the event data and resolves to truthy value when the waiting should resolve.
   - `timeout` <[number]> maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).

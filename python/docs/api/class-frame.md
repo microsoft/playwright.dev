@@ -63,6 +63,8 @@ An example of getting text from an iframe element:
 - [frame.wait_for_navigation(**options)](./api/class-frame.md#framewaitfornavigationoptions)
 - [frame.wait_for_selector(selector, **options)](./api/class-frame.md#framewaitforselectorselector-options)
 - [frame.wait_for_timeout(timeout)](./api/class-frame.md#framewaitfortimeouttimeout)
+- [frame.expect_load_state(**options)](./api/class-frame.md#frameexpectloadstateoptions)
+- [frame.expect_navigation(**options)](./api/class-frame.md#frameexpectnavigationoptions)
 
 ## frame.query_selector(selector)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -544,7 +546,7 @@ The `waitForFunction` can be used to observe viewport size change:
 To pass an argument to the predicate of `frame.waitForFunction` function:
 
 ## frame.wait_for_load_state(**options)
-- `state` <"load"|"domcontentloaded"|"networkidle"> Optional load state to wait for, defaults to `load`. If the state has been already reached while loading current document, the method returns immediately. Can be one of:
+- `state` <"load"|"domcontentloaded"|"networkidle"> Optional load state to wait for, defaults to `load`. If the state has been already reached while loading current document, the method resolves immediately. Can be one of:
   * `'load'` - wait for the `load` event to be fired.
   * `'domcontentloaded'` - wait for the `DOMContentLoaded` event to be fired.
   * `'networkidle'` - wait until there are no network connections for at least `500` ms.
@@ -592,6 +594,63 @@ Waits for the given `timeout` in milliseconds.
 
 Note that `frame.waitForTimeout()` should only be used for debugging. Tests using the timer in production are going to be flaky. Use signals such as network events, selectors becoming visible and others instead.
 
+## frame.expect_load_state(**options)
+- `state` <"load"|"domcontentloaded"|"networkidle"> Optional load state to wait for, defaults to `load`. If the state has been already reached while loading current document, the method resolves immediately. Can be one of:
+  * `'load'` - wait for the `load` event to be fired.
+  * `'domcontentloaded'` - wait for the `DOMContentLoaded` event to be fired.
+  * `'networkidle'` - wait until there are no network connections for at least `500` ms.
+- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[EventContextManager]>
+
+Performs action and waits for the required load state. It resolves when the page reaches a required load state, `load` by default. The navigation must have been committed when this method is called. If current document has already reached the required state, resolves immediately.
+
+```python
+# async
+
+async with frame.expect_load_state():
+    await frame.click('button') # Click triggers navigation.
+# Context manager waits for 'load' event.
+```
+
+```python
+# sync
+
+with frame.expect_load_state():
+    frame.click('button') # Click triggers navigation.
+# Context manager waits for 'load' event.
+```
+
+## frame.expect_navigation(**options)
+- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `url` <[str]|[Pattern]|[Callable]\[[URL]\]:[bool]> A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation.
+- `wait_until` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
+  * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+  * `'load'` - consider operation to be finished when the `load` event is fired.
+  * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+- returns: <[EventContextManager]>
+
+Performs action and wait for the next navigation. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
+
+This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
+
+```python
+# async
+
+async with frame.expect_navigation():
+    await frame.click("a.delayed-navigation") # Clicking the link will indirectly cause a navigation  
+# Context manager waited for the navigation to happen.
+```
+
+```python
+# sync
+
+with frame.expect_navigation():
+    frame.click("a.delayed-navigation") # Clicking the link will indirectly cause a navigation  
+# Context manager waited for the navigation to happen.
+```
+
+**NOTE** Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"
@@ -632,6 +691,7 @@ Note that `frame.waitForTimeout()` should only be used for debugging. Tests usin
 [Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
 [bool]: https://docs.python.org/3/library/stdtypes.html "bool"
 [Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
 [Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
 [float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"

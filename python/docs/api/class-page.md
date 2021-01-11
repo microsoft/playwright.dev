@@ -109,6 +109,16 @@ To unsubscribe from events use the `removeListener` method:
 - [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewaitforselectorselector-options)
 - [page.wait_for_timeout(timeout)](./api/class-page.md#pagewaitfortimeouttimeout)
 - [page.workers()](./api/class-page.md#pageworkers)
+- [page.expect_event(event, **options)](./api/class-page.md#pageexpecteventevent-options)
+- [page.expect_load_state(**options)](./api/class-page.md#pageexpectloadstateoptions)
+- [page.expect_navigation(**options)](./api/class-page.md#pageexpectnavigationoptions)
+- [page.expect_download(**options)](./api/class-page.md#pageexpectdownloadoptions)
+- [page.expect_popup(**options)](./api/class-page.md#pageexpectpopupoptions)
+- [page.expect_worker(**options)](./api/class-page.md#pageexpectworkeroptions)
+- [page.expect_console_message(**options)](./api/class-page.md#pageexpectconsolemessageoptions)
+- [page.expect_file_chooser(**options)](./api/class-page.md#pageexpectfilechooseroptions)
+- [page.expect_request(url_or_predicate, **options)](./api/class-page.md#pageexpectrequesturlorpredicate-options)
+- [page.expect_response(url_or_predicate, **options)](./api/class-page.md#pageexpectresponseurlorpredicate-options)
 
 ## page.on("close")
 
@@ -967,7 +977,7 @@ Video object associated with this page.
   - `height` <[int]> page height in pixels.
 
 ## page.wait_for_event(event, **options)
-- `event` <[str]> Event name, same one would pass into `page.on(event)`.
+- `event` <[str]> Event name, same one typically passed into `page.on(event)`.
 - `predicate` <[Function]> Receives the event data and resolves to truthy value when the waiting should resolve.
 - `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
 - returns: <[Any]>
@@ -1068,6 +1078,140 @@ This method returns all of the dedicated [WebWorkers](https://developer.mozilla.
 
 > **NOTE** This does not contain ServiceWorkers
 
+## page.expect_event(event, **options)
+- `event` <[str]> Event name, same one typically passed into `page.on(event)`.
+- `predicate` <[Function]> Receives the event data and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+- returns: <[EventContextManager]>
+
+Performs action and waits for given `event` to fire. If predicate is provided, it passes event's value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the `event` is fired.
+
+```python
+# async
+
+async with page.expect_event(event_name) as event_info:
+    await page.click("button")
+value = await event_info.value
+```
+
+```python
+# sync
+
+with page.expect_event(event_name) as event_info:
+    page.click("button")
+value = event_info.value
+```
+
+## page.expect_load_state(**options)
+- `state` <"load"|"domcontentloaded"|"networkidle"> Optional load state to wait for, defaults to `load`. If the state has been already reached while loading current document, the method resolves immediately. Can be one of:
+  * `'load'` - wait for the `load` event to be fired.
+  * `'domcontentloaded'` - wait for the `DOMContentLoaded` event to be fired.
+  * `'networkidle'` - wait until there are no network connections for at least `500` ms.
+- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[EventContextManager]>
+
+Performs action and waits for the required load state. It resolves when the page reaches a required load state, `load` by default. The navigation must have been committed when this method is called. If current document has already reached the required state, resolves immediately.
+
+```python
+# async
+
+async with page.expect_load_state():
+    await page.click('button') # Click triggers navigation.
+# Context manager waits for 'load' event.
+```
+
+```python
+# sync
+
+with page.expect_load_state():
+    page.click('button') # Click triggers navigation.
+# Context manager waits for 'load' event.
+```
+
+Shortcut for main frame's [frame.expect_load_state(**options)](./api/class-frame.md#frameexpectloadstateoptions).
+
+## page.expect_navigation(**options)
+- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- `url` <[str]|[Pattern]|[Callable]\[[URL]\]:[bool]> A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation.
+- `wait_until` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
+  * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+  * `'load'` - consider operation to be finished when the `load` event is fired.
+  * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+- returns: <[EventContextManager]>
+
+Performs action and wait for the next navigation. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
+
+This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
+
+```python
+# async
+
+async with page.expect_navigation():
+    await page.click("a.delayed-navigation") # Clicking the link will indirectly cause a navigation  
+# Context manager waited for the navigation to happen.
+```
+
+```python
+# sync
+
+with page.expect_navigation():
+    page.click("a.delayed-navigation") # Clicking the link will indirectly cause a navigation  
+# Context manager waited for the navigation to happen.
+```
+
+**NOTE** Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+
+Shortcut for main frame's [frame.expect_navigation(**options)](./api/class-frame.md#frameexpectnavigationoptions).
+
+## page.expect_download(**options)
+- `predicate` <[Callable]\[[Download]\]:[bool]> Receives the [Download] object and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+- returns: <[EventContextManager]\[[Download]\]>
+
+Performs action and waits for `download` event to fire. If predicate is provided, it passes [Download] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the download event is fired.
+
+## page.expect_popup(**options)
+- `predicate` <[Callable]\[[Page]\]:[bool]> Receives the [Popup] object and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+- returns: <[EventContextManager]\[[Page]\]>
+
+Performs action and waits for `popup` event to fire. If predicate is provided, it passes [Popup] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the popup event is fired.
+
+## page.expect_worker(**options)
+- `predicate` <[Callable]\[[Worker]\]:[bool]> Receives the [Worker] object and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+- returns: <[EventContextManager]\[[Worker]\]>
+
+Performs action and waits for `worker` event to fire. If predicate is provided, it passes [Worker] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the worker event is fired.
+
+## page.expect_console_message(**options)
+- `predicate` <[Callable]\[[ConsoleMessage]\]:[bool]> Receives the [ConsoleMessage] object and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+- returns: <[EventContextManager]\[[ConsoleMessage]\]>
+
+Performs action and waits for `console` event to fire. If predicate is provided, it passes [ConsoleMessage] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the worker event is fired.
+
+## page.expect_file_chooser(**options)
+- `predicate` <[Callable]\[[FileChooser]\]:[bool]> Receives the [FileChooser] object and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+- returns: <[EventContextManager]\[[FileChooser]\]>
+
+Performs action and waits for `filechooser` event to fire. If predicate is provided, it passes [FileChooser] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the worker event is fired.
+
+## page.expect_request(url_or_predicate, **options)
+- `url_or_predicate` <[str]|[Pattern]|[Callable]\[[Request]\]:[bool]> Receives the [Request] object and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+- returns: <[EventContextManager]\[[Request]\]>
+
+Performs action and waits for `response` event to fire. If predicate is provided, it passes [Request] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the download event is fired.
+
+## page.expect_response(url_or_predicate, **options)
+- `url_or_predicate` <[str]|[Pattern]|[Callable]\[[Response]\]:[bool]> Receives the [Response] object and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+- returns: <[EventContextManager]\[[Response]\]>
+
+Performs action and waits for `response` event to fire. If predicate is provided, it passes [Response] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the download event is fired.
+
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"
@@ -1108,6 +1252,7 @@ This method returns all of the dedicated [WebWorkers](https://developer.mozilla.
 [Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
 [bool]: https://docs.python.org/3/library/stdtypes.html "bool"
 [Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
 [Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
 [float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
