@@ -14,6 +14,7 @@ The [WebSocket] class represents websocket connections in the page.
 - [web_socket.is_closed()](./api/class-websocket.md#websocketisclosed)
 - [web_socket.url()](./api/class-websocket.md#websocketurl)
 - [web_socket.wait_for_event(event, **options)](./api/class-websocket.md#websocketwaitforeventevent-options)
+- [web_socket.expect_event(event, **options)](./api/class-websocket.md#websocketexpecteventevent-options)
 
 ## web_socket.on("close")
 
@@ -56,6 +57,31 @@ Returns the event data value.
 
 Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the webSocket is closed before the event is fired.
 
+## web_socket.expect_event(event, **options)
+- `event` <[str]> Event name, same one typically passed into `page.on(event)`.
+- `predicate` <[Function]> Receives the event data and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+- returns: <[EventContextManager]>
+
+Performs action and waits for given `event` to fire. If predicate is provided, it passes event's value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the socket is closed before the `event` is fired.
+
+```python
+# async
+
+async with ws.expect_event(event_name) as event_info:
+    await ws.click("button")
+value = await event_info.value
+```
+
+```python
+# sync
+
+with ws.expect_event(event_name) as event_info:
+    ws.click("button")
+value = event_info.value
+```
+
+
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"
@@ -96,6 +122,7 @@ Waits for event to fire and passes its value into the predicate function. Return
 [Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
 [bool]: https://docs.python.org/3/library/stdtypes.html "bool"
 [Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
 [Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
 [float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
