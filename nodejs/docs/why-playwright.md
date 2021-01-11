@@ -33,7 +33,7 @@ Playwright enables fast, reliable and capable automation across all modern brows
 * **One-line installation**. Running `npm i playwright` auto-downloads browser dependencies for your team to be onboarded quickly.
 * **TypeScript support**. Playwright ships with built-in types for auto-completion and other benefits.
 * **Debugging tools**. Playwright works with the [editor debugger and browser developer tools](./debug.md) to pause execution and inspect the web page.
-* **Language bindings**. Playwright is also available in [Python](https://github.com/microsoft/playwright-python) and [C#](https://github.com/microsoft/playwright-sharp). Learn about [supported languages](./languages.md).
+* **Language bindings**. Playwright is available for [Node.js](https://github.com/microsoft/playwright) [Python](https://github.com/microsoft/playwright-python), [C#](https://github.com/microsoft/playwright-sharp) and [Java](https://github.com/microsoft/playwright-java). Learn more about [supported languages](./languages.md).
 * **Deploy tests to CI**. First-party [Docker image](./docker.md) and [GitHub Actions](https://github.com/microsoft/playwright-github-action) to deploy tests to [your preferred CI/CD provider](./ci.md).
 
 ## Limitations

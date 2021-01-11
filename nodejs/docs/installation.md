@@ -1,6 +1,6 @@
 ---
 id: installation
-title: "Advanced installation"
+title: "Installation"
 ---
 
 - [Managing browser binaries](#managing-browser-binaries)

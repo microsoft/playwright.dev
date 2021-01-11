@@ -4,30 +4,11 @@ module.exports = {
       "type": "category",
       "label": "Introduction",
       "items": [
-        {
-          "type": "doc",
-          "id": "why-playwright"
-        },
-        {
-          "type": "doc",
-          "id": "intro"
-        },
-        {
-          "type": "doc",
-          "id": "core-concepts"
-        },
-        {
-          "type": "doc",
-          "id": "debug"
-        },
-        {
-          "type": "doc",
-          "id": "languages"
-        },
-        {
-          "type": "doc",
-          "id": "cli"
-        }
+        { "type": "doc", "id": "why-playwright" },
+        { "type": "doc", "id": "intro-python" },
+        { "type": "doc", "id": "core-concepts" },
+        { "type": "doc", "id": "debug" },
+        { "type": "doc", "id": "languages" }
       ],
       "collapsed": false
     },
@@ -35,53 +16,19 @@ module.exports = {
       "type": "category",
       "label": "Guides",
       "items": [
-        {
-          "type": "doc",
-          "id": "selectors"
-        },
-        {
-          "type": "doc",
-          "id": "input"
-        },
-        {
-          "type": "doc",
-          "id": "emulation"
-        },
-        {
-          "type": "doc",
-          "id": "network"
-        },
-        {
-          "type": "doc",
-          "id": "assertions"
-        },
-        {
-          "type": "doc",
-          "id": "verification"
-        },
-        {
-          "type": "doc",
-          "id": "navigations"
-        },
-        {
-          "type": "doc",
-          "id": "multi-pages"
-        }
-      ],
-      "collapsed": false
-    },
-    {
-      "type": "category",
-      "label": "Tutorials",
-      "items": [
-        {
-          "type": "doc",
-          "id": "auth"
-        },
-        {
-          "type": "doc",
-          "id": "pom"
-        }
+        { "type": "doc", "id": "actionability" },
+        { "type": "doc", "id": "assertions" },
+        { "type": "doc", "id": "auth" },
+        { "type": "doc", "id": "selectors" },
+        { "type": "doc", "id": "emulation" },
+        { "type": "doc", "id": "extensibility" },
+        { "type": "doc", "id": "input" },
+        { "type": "doc", "id": "installation" },
+        { "type": "doc", "id": "multi-pages" },
+        { "type": "doc", "id": "navigations" },
+        { "type": "doc", "id": "network" },
+        { "type": "doc", "id": "pom" },
+        { "type": "doc", "id": "verification" },
       ],
       "collapsed": false
     },
@@ -89,37 +36,10 @@ module.exports = {
       "type": "category",
       "label": "Integrations",
       "items": [
-        {
-          "type": "doc",
-          "id": "test-runners"
-        },
-        {
-          "type": "doc",
-          "id": "docker"
-        },
-        {
-          "type": "doc",
-          "id": "ci"
-        }
-      ],
-      "collapsed": false
-    },
-    {
-      "type": "category",
-      "label": "Reference",
-      "items": [
-        {
-          "type": "doc",
-          "id": "actionability"
-        },
-        {
-          "type": "doc",
-          "id": "installation"
-        },
-        {
-          "type": "doc",
-          "id": "extensibility"
-        }
+        { "type": "doc", "id": "test-runners-python" },
+        { "type": "doc", "id": "docker" },
+        { "type": "doc", "id": "ci" },
+        { "type": "doc", "id": "cli" }
       ],
       "collapsed": false
     },

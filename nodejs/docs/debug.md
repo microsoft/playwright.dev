@@ -6,7 +6,7 @@ title: "Debugging tools"
 Playwright scripts work with existing debugging tools, like Node.js debuggers and browser developer tools. Playwright also introduces new debugging features for browser automation.
 
 - [Run in headful mode](#run-in-headful-mode)
-- [Visual Studio Code debugger](#visual-studio-code-debugger)
+- [Visual Studio Code debugger (Node.JS)](#visual-studio-code-debugger-nodejs)
 - [Browser Developer Tools](#browser-developer-tools)
 - [Run in Debug Mode](#run-in-debug-mode)
 - [Verbose API logs](#verbose-api-logs)
@@ -19,7 +19,7 @@ Playwright runs browsers in headless mode by default. To change this behavior, u
 await chromium.launch({ headless: false, slowMo: 100 }); // or firefox, webkit
 ```
 
-## Visual Studio Code debugger
+## Visual Studio Code debugger (Node.JS)
 
 The VS Code debugger can be used to pause and resume execution of Playwright scripts with breakpoints. The debugger can be configured in two ways.
 
@@ -27,12 +27,9 @@ The VS Code debugger can be used to pause and resume execution of Playwright scr
 
 Setup [`launch.json` configuration](https://code.visualstudio.com/docs/nodejs/nodejs-debugging) for your Node.js project. Once configured launch the scripts with F5 and use breakpoints.
 
-### Use the new JavaScript debugger
+### Use the new JavaScript debugging terminal
 
-VS Code 1.46+ introduces the new JavaScript debugger behind a feature flag. The new debugger does not require a `launch.json` configuration. To use this:
-1. Enable the preview debugger
-   * Open JSON settings and add `"debug.javascript.usePreview": true`
-   * Open settings UI and enable the `Debug › JavaScript: Use Preview` setting
+VS Code 1.46+ introduced the new JavaScript debugger that does not require a `launch.json` configuration. To use it:
 1. Set a breakpoint in VS Code
    * Use the `debugger` keyword or set a breakpoint in the VS Code UI
 1. Run your Node.js script from the terminal
