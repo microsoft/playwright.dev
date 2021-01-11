@@ -25,7 +25,7 @@ Most of these parameters are configured during the browser context construction,
 
 Playwright comes with a registry of device parameters for selected mobile devices. It can be used to simulate browser behavior on a mobile device:
 
-```python
+```py
 # async
 
 import asyncio
@@ -42,7 +42,7 @@ async def main():
 asyncio.get_event_loop().run_until_complete(main())
 ```
 
-```python
+```py
 # sync
 
 from playwright import sync_playwright
@@ -67,7 +67,7 @@ All pages created in the context above will share the same device parameters.
 
 All pages created in the context above will share the user agent specified:
 
-```python
+```py
 # async
 
 context = await browser.new_context(
@@ -75,7 +75,7 @@ context = await browser.new_context(
 )
 ```
 
-```python
+```py
 # sync
 
 context = browser.new_context(
@@ -92,7 +92,7 @@ context = browser.new_context(
 
 Create a context with custom viewport size:
 
-```python
+```py
 # async
 
 # Create context with given viewport
@@ -110,7 +110,7 @@ context = await browser.new_context(
 )
 ```
 
-```python
+```py
 # sync
 
 # Create context with given viewport
@@ -136,7 +136,7 @@ context = browser.new_context(
 
 ## Locale & timezone
 
-```python
+```py
 # async
 
 # Emulate locale and time
@@ -146,7 +146,7 @@ context = await browser.new_context(
 )
 ```
 
-```python
+```py
 # sync
 
 # Emulate locale and time
@@ -165,7 +165,7 @@ context = browser.new_context(
 
 Allow all pages in the context to show system notifications:
 
-```python
+```py
 # async
 
 context = await browser.new_context(
@@ -173,7 +173,7 @@ context = await browser.new_context(
 )
 ```
 
-```python
+```py
 # sync
 
 context = browser.new_context(
@@ -183,13 +183,13 @@ context = browser.new_context(
 
 Grant all pages in the existing context access to current location:
 
-```python
+```py
 # async
 
 await context.grant_permissions(['geolocation'])
 ```
 
-```python
+```py
 # sync
 
 context.grant_permissions(['geolocation'])
@@ -197,13 +197,13 @@ context.grant_permissions(['geolocation'])
 
 Grant notifications access from a specific domain:
 
-```python
+```py
 # async
 
 await context.grant_permissions(['notifications'], origin='https://skype.com')
 ```
 
-```python
+```py
 # sync
 
 context.grant_permissions(['notifications'], origin='https://skype.com')
@@ -211,13 +211,13 @@ context.grant_permissions(['notifications'], origin='https://skype.com')
 
 Revoke all permissions:
 
-```python
+```py
 # async
 
 await context.clear_permissions()
 ```
 
-```python
+```py
 # sync
 
 context.clear_permissions()
@@ -234,7 +234,7 @@ context.clear_permissions()
 
 Create a context with `"geolocation"` permissions granted:
 
-```python
+```py
 # async
 
 context = await browser.new_context(
@@ -243,7 +243,7 @@ context = await browser.new_context(
 )
 ```
 
-```python
+```py
 # sync
 
 context = browser.new_context(
@@ -254,13 +254,13 @@ context = browser.new_context(
 
 Change the location later:
 
-```python
+```py
 # async
 
 await context.set_geolocation({"longitude": 29.979097, "latitude": 31.134256})
 ```
 
-```python
+```py
 # sync
 
 context.set_geolocation({"longitude": 29.979097, "latitude": 31.134256})
@@ -278,7 +278,7 @@ context.set_geolocation({"longitude": 29.979097, "latitude": 31.134256})
 
 Create a context with dark or light mode. Pages created in this context will follow this color scheme preference.
 
-```python
+```py
 # async
 
 # Create context with dark mode
@@ -298,7 +298,7 @@ await page.emulate_media(color_scheme='dark')
 await page.emulate_media(media='print')
 ```
 
-```python
+```py
 # sync
 
 # Create context with dark mode
@@ -368,6 +368,8 @@ page.emulate_media(media='print')
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
 [List]: https://docs.python.org/3/library/typing.html#typing.List "List"
 [NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
+[URL]: https://en.wikipedia.org/wiki/URL "URL"
 [pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
 [str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
 [Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"

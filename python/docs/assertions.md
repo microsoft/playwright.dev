@@ -13,7 +13,7 @@ The Playwright API can be used to read element contents and properties for test 
 
 Playwright provides convenience APIs for common assertion tasks, like finding the text content of an element. These APIs require a [selector](./selectors.md) to locate the element.
 
-```python
+```py
 # async
 
 # Assert text content
@@ -33,7 +33,7 @@ checked = await page.get_attribute('input', 'checked')
 assert checked
 ```
 
-```python
+```py
 # sync
 
 # Assert text content
@@ -71,7 +71,7 @@ assert checked
 
 It is recommended to fetch the [ElementHandle] object with [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewait_for_selectorselector-options) or [frame.wait_for_selector(selector, **options)](./api/class-frame.md#framewait_for_selectorselector-options). These APIs wait for the element to be visible and then return an `ElementHandle`.
 
-```python
+```py
 # async
 
 # Get the element handle
@@ -86,7 +86,7 @@ class_names = await element_handle.get_attribute('class')
 assert 'highlighted' in class_names
 ```
 
-```python
+```py
 # sync
 
 # Get the element handle
@@ -116,7 +116,7 @@ With Playwright, you can also write custom JavaScript to run in the context of t
 
 The following APIs do not auto-wait for the element. It is recommended to use [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewait_for_selectorselector-options) or [frame.wait_for_selector(selector, **options)](./api/class-frame.md#framewait_for_selectorselector-options).
 
-```python
+```py
 # async
 
 # Assert local storage value
@@ -137,7 +137,7 @@ length = await page.eval_on_selector_all('li.selected', '(items) => items.length
 assert length == 3
 ```
 
-```python
+```py
 # sync
 
 # Assert local storage value
@@ -215,6 +215,8 @@ assert length == 3
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
 [List]: https://docs.python.org/3/library/typing.html#typing.List "List"
 [NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
+[URL]: https://en.wikipedia.org/wiki/URL "URL"
 [pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
 [str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
 [Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"

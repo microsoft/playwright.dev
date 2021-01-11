@@ -40,7 +40,7 @@ We have a [pre-built Docker image](./docker.md) which can either be used directl
 Suggested configuration
 1. By default, Docker runs a container with a `/dev/shm` shared memory space 64MB. This is [typically too small](https://github.com/c0b/chrome-in-docker/issues/1) for Chromium and will cause Chromium to crash when rendering large pages. To fix, run the container with `docker run --shm-size=1gb` to increase the size of `/dev/shm`. Since Chromium 65, this is no longer necessary. Instead, launch the browser with the `--disable-dev-shm-usage` flag:
 
-   ```python
+   ```py
    # async
    
       browser = await playwright.chromium.launch(
@@ -48,7 +48,7 @@ Suggested configuration
       )
    ```
 
-   ```python
+   ```py
    # sync
    
       browser = playwright.chromium.launch({
@@ -180,13 +180,13 @@ image: mcr.microsoft.com/playwright:bionic
 
 While the Docker image supports sandboxing for Chromium, it does not work in the Bitbucket Pipelines environment. To launch Chromium on Bitbucket Pipelines, use the `chromiumSandbox: false` launch argument.
 
-```python
+```py
 # async
 
 browser = await playwright.chromium.launch(chromiumSandbox=False)
 ```
 
-```python
+```py
 # sync
 
 browser = playwright.chromium.launch(chromiumSandbox=False)
@@ -249,7 +249,7 @@ DEBUG=pw:browser* npm run test
 
 By default, Playwright launches browsers in headless mode. This can be changed by passing a flag when the browser is launched.
 
-```python
+```py
 # async
 
 import asyncio
@@ -263,7 +263,7 @@ async def main():
 asyncio.get_event_loop().run_until_complete(main())
 ```
 
-```python
+```py
 # sync
 
 from playwright import sync_playwright
@@ -326,6 +326,8 @@ xvfb-run node index.js
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
 [List]: https://docs.python.org/3/library/typing.html#typing.List "List"
 [NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
+[URL]: https://en.wikipedia.org/wiki/URL "URL"
 [pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
 [str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
 [Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"

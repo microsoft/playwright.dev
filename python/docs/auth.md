@@ -19,7 +19,7 @@ The Playwright API can automate interaction with a login form. See [Input guide]
 
 The following example automates login on GitHub. Once these steps are executed, the browser context will be authenticated.
 
-```python
+```py
 # async
 
 page = await context.new_page()
@@ -33,7 +33,7 @@ await page.click('text=Submit')
 # Verify app is logged in
 ```
 
-```python
+```py
 # sync
 
 page = context.new_page()
@@ -57,7 +57,7 @@ Cookies and local storage state can be used across different browsers. They depe
 
 The following code snippet retrieves state from an authenticated context and creates a new context with that state.
 
-```python
+```py
 # async
 
 import json
@@ -71,7 +71,7 @@ storage_state = json.loads(os.environ["STORAGE"])
 context = await browser.new_context(storage_state=storage_state)
 ```
 
-```python
+```py
 # sync
 
 import json
@@ -89,7 +89,7 @@ context = browser.new_context(storage_state=storage_state)
 
 Session storage ([`window.sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)) is specific to a particular domain. Playwright does not provide API to persist session storage, but the following snippet can be used to save/load session storage.
 
-```python
+```py
 # async
 
 import os
@@ -109,7 +109,7 @@ await context.add_init_script(storage => {
 }, session_storage)
 ```
 
-```python
+```py
 # sync
 
 import os
@@ -161,7 +161,7 @@ Note that persistent authentication is not suited for CI environments since it r
 
 User data directories can be used with the [browser_type.launch_persistent_context(user_data_dir, **options)](./api/class-browsertype.md#browser_typelaunch_persistent_contextuser_data_dir-options) API.
 
-```python
+```py
 # async
 
 import asyncio
@@ -176,7 +176,7 @@ async def main():
 asyncio.get_event_loop().run_until_complete(main())
 ```
 
-```python
+```py
 # sync
 
 from playwright import sync_playwright
@@ -240,6 +240,8 @@ with sync_playwright() as p:
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
 [List]: https://docs.python.org/3/library/typing.html#typing.List "List"
 [NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
+[URL]: https://en.wikipedia.org/wiki/URL "URL"
 [pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
 [str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
 [Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"
