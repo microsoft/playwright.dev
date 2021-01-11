@@ -18,8 +18,8 @@ title: "ConsoleMessage"
 ## console_message.location()
 - returns: <[Dict]>
   - `url` <[str]> URL of the resource.
-  - `line_number` <[int]> 0-based line number in the resource.
-  - `column_number` <[int]> 0-based column number in the resource.
+  - `lineNumber` <[int]> 0-based line number in the resource.
+  - `columnNumber` <[int]> 0-based column number in the resource.
 
 ## console_message.text()
 - returns: <[str]>
@@ -40,7 +40,6 @@ One of the following values: `'log'`, `'debug'`, `'info'`, `'error'`, `'warning'
 [Download]: ./api/class-download.md "Download"
 [ElementHandle]: ./api/class-elementhandle.md "ElementHandle"
 [FileChooser]: ./api/class-filechooser.md "FileChooser"
-[FirefoxBrowser]: ./api/class-firefoxbrowser.md "FirefoxBrowser"
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
@@ -54,7 +53,6 @@ One of the following values: `'log'`, `'debug'`, `'info'`, `'error'`, `'warning'
 [TimeoutError]: ./api/class-timeouterror.md "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.md "Touchscreen"
 [Video]: ./api/class-video.md "Video"
-[WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.md "WebSocket"
 [Worker]: ./api/class-worker.md "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"

@@ -38,6 +38,7 @@ An example of getting text from an iframe element:
 - [frame.hover(selector, **options)](./api/class-frame.md#framehoverselector-options)
 - [frame.inner_html(selector, **options)](./api/class-frame.md#frameinnerhtmlselector-options)
 - [frame.inner_text(selector, **options)](./api/class-frame.md#frameinnertextselector-options)
+- [frame.is_checked(selector, **options)](./api/class-frame.md#frameischeckedselector-options)
 - [frame.is_detached()](./api/class-frame.md#frameisdetached)
 - [frame.is_disabled(selector, **options)](./api/class-frame.md#frameisdisabledselector-options)
 - [frame.is_editable(selector, **options)](./api/class-frame.md#frameiseditableselector-options)
@@ -342,6 +343,13 @@ Returns `element.innerHTML`.
 
 Returns `element.innerText`.
 
+## frame.is_checked(selector, **options)
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[bool]>
+
+Returns whether the element is checked. Throws if the element is not a checkbox or radio input.
+
 ## frame.is_detached()
 - returns: <[bool]>
 
@@ -445,9 +453,9 @@ Triggers a `change` and `input` event once all the provided options have been se
 ## frame.set_input_files(selector, files, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - `files` <[Union]\[[str], [pathlib.Path]\]|[List]\[[Union]\[[str], [pathlib.Path]\]\]|[Dict]|[List]\[[Dict]\]>
-  - `name` <[str]> [File] name **required**
-  - `mime_type` <[str]> [File] type **required**
-  - `buffer` <[Buffer]> File content **required**
+  - `name` <[str]> [File] name
+  - `mimeType` <[str]> [File] type
+  - `buffer` <[Buffer]> File content
 - `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
 - `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
 
@@ -595,7 +603,6 @@ Note that `frame.waitForTimeout()` should only be used for debugging. Tests usin
 [Download]: ./api/class-download.md "Download"
 [ElementHandle]: ./api/class-elementhandle.md "ElementHandle"
 [FileChooser]: ./api/class-filechooser.md "FileChooser"
-[FirefoxBrowser]: ./api/class-firefoxbrowser.md "FirefoxBrowser"
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
@@ -609,7 +616,6 @@ Note that `frame.waitForTimeout()` should only be used for debugging. Tests usin
 [TimeoutError]: ./api/class-timeouterror.md "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.md "Touchscreen"
 [Video]: ./api/class-video.md "Video"
-[WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.md "WebSocket"
 [Worker]: ./api/class-worker.md "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"

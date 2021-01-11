@@ -94,6 +94,7 @@ page.removeListener('request', logRequest);
 - [page.hover(selector[, options])](./api/class-page.md#pagehoverselector-options)
 - [page.innerHTML(selector[, options])](./api/class-page.md#pageinnerhtmlselector-options)
 - [page.innerText(selector[, options])](./api/class-page.md#pageinnertextselector-options)
+- [page.isChecked(selector[, options])](./api/class-page.md#pageischeckedselector-options)
 - [page.isClosed()](./api/class-page.md#pageisclosed)
 - [page.isDisabled(selector[, options])](./api/class-page.md#pageisdisabledselector-options)
 - [page.isEditable(selector[, options])](./api/class-page.md#pageiseditableselector-options)
@@ -878,6 +879,14 @@ Returns `element.innerHTML`.
 
 Returns `element.innerText`.
 
+## page.isChecked(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `options` <[Object]>
+  - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[Promise]<[boolean]>>
+
+Returns whether the element is checked. Throws if the element is not a checkbox or radio input.
+
 ## page.isClosed()
 - returns: <[boolean]>
 
@@ -1173,9 +1182,9 @@ The extra HTTP headers will be sent with every request the page initiates.
 ## page.setInputFiles(selector, files[, options])
 - `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - `files` <[string]|[Array]<[string]>|[Object]|[Array]<[Object]>>
-  - `name` <[string]> [File] name **required**
-  - `mimeType` <[string]> [File] type **required**
-  - `buffer` <[Buffer]> File content **required**
+  - `name` <[string]> [File] name
+  - `mimeType` <[string]> [File] type
+  - `buffer` <[Buffer]> File content
 - `options` <[Object]>
   - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
@@ -1186,8 +1195,8 @@ Sets the value of the file input to these file paths or files. If some of the `f
 
 ## page.setViewportSize(viewportSize)
 - `viewportSize` <[Object]>
-  - `width` <[number]> page width in pixels. **required**
-  - `height` <[number]> page height in pixels. **required**
+  - `width` <[number]> page width in pixels.
+  - `height` <[number]> page height in pixels.
 
 In the case of multiple pages in a single browser, each page can have its own viewport size. However, [browser.newContext([options])](./api/class-browser.md#browsernewcontextoptions) allows to set viewport size (and more) for all pages in the context at once.
 

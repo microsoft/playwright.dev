@@ -8,7 +8,6 @@ title: "Response"
 
 
 - [response.body()](./api/class-response.md#responsebody)
-- [response.finished()](./api/class-response.md#responsefinished)
 - [response.frame()](./api/class-response.md#responseframe)
 - [response.headers()](./api/class-response.md#responseheaders)
 - [response.json()](./api/class-response.md#responsejson)
@@ -18,16 +17,12 @@ title: "Response"
 - [response.status_text()](./api/class-response.md#responsestatustext)
 - [response.text()](./api/class-response.md#responsetext)
 - [response.url()](./api/class-response.md#responseurl)
+- [response.finished()](./api/class-response.md#responsefinished)
 
 ## response.body()
 - returns: <[Buffer]>
 
 Returns the buffer with response body.
-
-## response.finished()
-- returns: <[NoneType]|[Error]>
-
-Waits for this response to finish, returns failure error if request failed.
 
 ## response.frame()
 - returns: <[Frame]>
@@ -76,6 +71,11 @@ Returns the text representation of response body.
 
 Contains the URL of the response.
 
+## response.finished()
+- returns: <[NoneType]|[str]>
+
+Waits for this response to finish, returns failure error if request failed.
+
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"
@@ -87,7 +87,6 @@ Contains the URL of the response.
 [Download]: ./api/class-download.md "Download"
 [ElementHandle]: ./api/class-elementhandle.md "ElementHandle"
 [FileChooser]: ./api/class-filechooser.md "FileChooser"
-[FirefoxBrowser]: ./api/class-firefoxbrowser.md "FirefoxBrowser"
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
@@ -101,7 +100,6 @@ Contains the URL of the response.
 [TimeoutError]: ./api/class-timeouterror.md "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.md "Touchscreen"
 [Video]: ./api/class-video.md "Video"
-[WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.md "WebSocket"
 [Worker]: ./api/class-worker.md "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"

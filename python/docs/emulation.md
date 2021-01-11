@@ -130,7 +130,7 @@ context = browser.new_context(
 
 #### API reference
 - [browser.new_context(**options)](./api/class-browser.md#browsernewcontextoptions)
-- [page.set_viewport_size(width, height)](./api/class-page.md#pagesetviewportsizewidth-height)
+- [page.set_viewport_size(viewport_size)](./api/class-page.md#pagesetviewportsizeviewportsize)
 
 <br/>
 
@@ -238,8 +238,8 @@ Create a context with `"geolocation"` permissions granted:
 # async
 
 context = await browser.new_context(
-  geolocation={ 'longitude': 48.858455, 'latitude': 2.294474 },
-  permissions=['geolocation']
+  geolocation={"longitude": 48.858455, "latitude": 2.294474},
+  permissions=["geolocation"]
 )
 ```
 
@@ -247,8 +247,8 @@ context = await browser.new_context(
 # sync
 
 context = browser.new_context(
-  geolocation={ 'longitude': 48.858455, 'latitude': 2.294474 },
-  permissions=['geolocation']
+  geolocation={"longitude": 48.858455, "latitude": 2.294474},
+  permissions=["geolocation"]
 )
 ```
 
@@ -257,20 +257,20 @@ Change the location later:
 ```python
 # async
 
-await context.set_geolocation(longitude=29.979097, latitude=31.134256)
+await context.set_geolocation({"longitude": 29.979097, "latitude": 31.134256})
 ```
 
 ```python
 # sync
 
-context.set_geolocation(longitude=29.979097, latitude=31.134256)
+context.set_geolocation({"longitude": 29.979097, "latitude": 31.134256})
 ```
 
 **Note** you can only change geolocation for all pages in the context.
 
 #### API reference
 - [browser.new_context(**options)](./api/class-browser.md#browsernewcontextoptions)
-- [browser_context.set_geolocation(latitude, longitude, **options)](./api/class-browsercontext.md#browsercontextsetgeolocationlatitude-longitude-options)
+- [browser_context.set_geolocation(geolocation)](./api/class-browsercontext.md#browsercontextsetgeolocationgeolocation)
 
 <br/>
 
@@ -333,7 +333,6 @@ page.emulate_media(media='print')
 [Download]: ./api/class-download.md "Download"
 [ElementHandle]: ./api/class-elementhandle.md "ElementHandle"
 [FileChooser]: ./api/class-filechooser.md "FileChooser"
-[FirefoxBrowser]: ./api/class-firefoxbrowser.md "FirefoxBrowser"
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
@@ -347,7 +346,6 @@ page.emulate_media(media='print')
 [TimeoutError]: ./api/class-timeouterror.md "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.md "Touchscreen"
 [Video]: ./api/class-video.md "Video"
-[WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.md "WebSocket"
 [Worker]: ./api/class-worker.md "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"

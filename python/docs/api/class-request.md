@@ -16,7 +16,6 @@ If request fails at some point, then instead of `'requestfinished'` event (and p
 If request gets a 'redirect' response, the request is successfully finished with the 'requestfinished' event, and a new request is  issued to a redirected url.
 
 
-- [request.failure()](./api/class-request.md#requestfailure)
 - [request.frame()](./api/class-request.md#requestframe)
 - [request.headers()](./api/class-request.md#requestheaders)
 - [request.is_navigation_request()](./api/class-request.md#requestisnavigationrequest)
@@ -30,14 +29,7 @@ If request gets a 'redirect' response, the request is successfully finished with
 - [request.response()](./api/class-request.md#requestresponse)
 - [request.timing()](./api/class-request.md#requesttiming)
 - [request.url()](./api/class-request.md#requesturl)
-
-## request.failure()
-- returns: <[NoneType]|[Dict]>
-  - `error_text` <[str]> Human-readable error message, e.g. `'net::ERR_FAILED'`.
-
-The method returns `null` unless this request has failed, as reported by `requestfailed` event.
-
-Example of logging of all the failed requests:
+- [request.failure()](./api/class-request.md#requestfailure)
 
 ## request.frame()
 - returns: <[Frame]>
@@ -106,15 +98,15 @@ Returns the matching [Response] object, or `null` if the response was not receiv
 
 ## request.timing()
 - returns: <[Dict]>
-  - `start_time` <[float]> Request start time in milliseconds elapsed since January 1, 1970 00:00:00 UTC
-  - `domain_lookup_start` <[float]> Time immediately before the browser starts the domain name lookup for the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
-  - `domain_lookup_end` <[float]> Time immediately after the browser starts the domain name lookup for the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
-  - `connect_start` <[float]> Time immediately before the user agent starts establishing the connection to the server to retrieve the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
-  - `secure_connection_start` <[float]> Time immediately before the browser starts the handshake process to secure the current connection. The value is given in milliseconds relative to `startTime`, -1 if not available.
-  - `connect_end` <[float]> Time immediately before the user agent starts establishing the connection to the server to retrieve the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
-  - `request_start` <[float]> Time immediately before the browser starts requesting the resource from the server, cache, or local resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
-  - `response_start` <[float]> Time immediately after the browser starts requesting the resource from the server, cache, or local resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
-  - `response_end` <[float]> Time immediately after the browser receives the last byte of the resource or immediately before the transport connection is closed, whichever comes first. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `startTime` <[float]> Request start time in milliseconds elapsed since January 1, 1970 00:00:00 UTC
+  - `domainLookupStart` <[float]> Time immediately before the browser starts the domain name lookup for the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `domainLookupEnd` <[float]> Time immediately after the browser starts the domain name lookup for the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `connectStart` <[float]> Time immediately before the user agent starts establishing the connection to the server to retrieve the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `secureConnectionStart` <[float]> Time immediately before the browser starts the handshake process to secure the current connection. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `connectEnd` <[float]> Time immediately before the user agent starts establishing the connection to the server to retrieve the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `requestStart` <[float]> Time immediately before the browser starts requesting the resource from the server, cache, or local resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `responseStart` <[float]> Time immediately after the browser starts requesting the resource from the server, cache, or local resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `responseEnd` <[float]> Time immediately after the browser receives the last byte of the resource or immediately before the transport connection is closed, whichever comes first. The value is given in milliseconds relative to `startTime`, -1 if not available.
 
 Returns resource timing information for given request. Most of the timing values become available upon the response, `responseEnd` becomes available when request finishes. Find more information at [Resource Timing API](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceResourceTiming).
 
@@ -122,6 +114,18 @@ Returns resource timing information for given request. Most of the timing values
 - returns: <[str]>
 
 URL of the request.
+
+## request.failure()
+- returns: <[NoneType]|[str]>
+
+Returns human-readable error message, e.g. `'net::ERR_FAILED'`. The method returns `None` unless this request has failed, as reported by `requestfailed` event.
+
+Example of logging of all the failed requests:
+
+```python
+page.on('requestfailed', lambda request: print(request.url + ' ' + request.failure);
+```
+
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
@@ -134,7 +138,6 @@ URL of the request.
 [Download]: ./api/class-download.md "Download"
 [ElementHandle]: ./api/class-elementhandle.md "ElementHandle"
 [FileChooser]: ./api/class-filechooser.md "FileChooser"
-[FirefoxBrowser]: ./api/class-firefoxbrowser.md "FirefoxBrowser"
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
@@ -148,7 +151,6 @@ URL of the request.
 [TimeoutError]: ./api/class-timeouterror.md "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.md "Touchscreen"
 [Video]: ./api/class-video.md "Video"
-[WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.md "WebSocket"
 [Worker]: ./api/class-worker.md "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"

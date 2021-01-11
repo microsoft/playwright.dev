@@ -228,7 +228,7 @@ title: "${clazz.name}"
     let children;
     const properties = type.deepProperties();
     if (properties && properties.length)
-      children = properties.map(p => this.renderProperty(`\`${this.config.formatArgumentName(p)}\``, p.type, p.spec))
+      children = properties.map(p => this.renderProperty(`\`${p.name}\``, p.type, p.spec, false))
     else if (spec && spec.length > 1)
       children = spec.slice(1).map(s => md.clone(s));
 
@@ -318,26 +318,11 @@ function renderPythonSignature(args) {
 }
 
 /**
- * @param {string} methodName
  * @param {Documentation.Member} arg
  * @return {Documentation.Member[]}
  */
-function expandPythonArgument(methodName, arg) {
-  let expandType;
-  const argName = arg.name;
-  if (argName == 'options')
-    expandType = arg.type;
-  if (methodName == 'fulfill' && argName == 'response')
-    expandType = arg.type;
-  if (methodName == 'continue' && argName == 'overrides')
-    expandType = arg.type;
-  if (methodName == 'setViewportSize' && argName == 'viewportSize')
-    expandType = arg.type;
-  if (argName == 'geolocation')
-    expandType = arg.type.union[1];
-  if (argName == 'frameSelector')
-    expandType = arg.type.union[1]; 
-  return expandType ? expandType.properties : [arg];
+function expandPythonOptions(arg) {
+  return arg.name == 'options' ? arg.type.properties : [arg];
 }
 
 new Generator('js', path.join(__dirname, '..', 'nodejs', 'docs'), {
@@ -381,7 +366,7 @@ new Generator('python', path.join(__dirname, '..', 'python', 'docs'), {
   
     if (member.kind === 'method') {
       for (const arg of member.argsArray)
-        args.push(...expandPythonArgument(member.alias, arg));
+        args.push(...expandPythonOptions(arg));
       text = `${toSnakeCase(member.clazz.varName)}.${toSnakeCase(member.alias)}(${renderPythonSignature(args)})`;
     }
     return { text, args };

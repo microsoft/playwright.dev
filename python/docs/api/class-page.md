@@ -67,6 +67,7 @@ To unsubscribe from events use the `removeListener` method:
 - [page.hover(selector, **options)](./api/class-page.md#pagehoverselector-options)
 - [page.inner_html(selector, **options)](./api/class-page.md#pageinnerhtmlselector-options)
 - [page.inner_text(selector, **options)](./api/class-page.md#pageinnertextselector-options)
+- [page.is_checked(selector, **options)](./api/class-page.md#pageischeckedselector-options)
 - [page.is_closed()](./api/class-page.md#pageisclosed)
 - [page.is_disabled(selector, **options)](./api/class-page.md#pageisdisabledselector-options)
 - [page.is_editable(selector, **options)](./api/class-page.md#pageiseditableselector-options)
@@ -88,7 +89,7 @@ To unsubscribe from events use the `removeListener` method:
 - [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout)
 - [page.set_extra_http_headers(headers)](./api/class-page.md#pagesetextrahttpheadersheaders)
 - [page.set_input_files(selector, files, **options)](./api/class-page.md#pagesetinputfilesselector-files-options)
-- [page.set_viewport_size(width, height)](./api/class-page.md#pagesetviewportsizewidth-height)
+- [page.set_viewport_size(viewport_size)](./api/class-page.md#pagesetviewportsizeviewportsize)
 - [page.tap(selector, **options)](./api/class-page.md#pagetapselector-options)
 - [page.text_content(selector, **options)](./api/class-page.md#pagetextcontentselector-options)
 - [page.title()](./api/class-page.md#pagetitle)
@@ -608,6 +609,13 @@ Returns `element.innerHTML`.
 
 Returns `element.innerText`.
 
+## page.is_checked(selector, **options)
+- `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[bool]>
+
+Returns whether the element is checked. Throws if the element is not a checkbox or radio input.
+
 ## page.is_closed()
 - returns: <[bool]>
 
@@ -848,9 +856,9 @@ The extra HTTP headers will be sent with every request the page initiates.
 ## page.set_input_files(selector, files, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - `files` <[Union]\[[str], [pathlib.Path]\]|[List]\[[Union]\[[str], [pathlib.Path]\]\]|[Dict]|[List]\[[Dict]\]>
-  - `name` <[str]> [File] name **required**
-  - `mime_type` <[str]> [File] type **required**
-  - `buffer` <[Buffer]> File content **required**
+  - `name` <[str]> [File] name
+  - `mimeType` <[str]> [File] type
+  - `buffer` <[Buffer]> File content
 - `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
 - `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
 
@@ -858,9 +866,10 @@ This method expects `selector` to point to an [input element](https://developer.
 
 Sets the value of the file input to these file paths or files. If some of the `filePaths` are relative paths, then they are resolved relative to the the current working directory. For empty array, clears the selected files.
 
-## page.set_viewport_size(width, height)
-- `width` <[int]> page width in pixels. **required**
-- `height` <[int]> page height in pixels. **required**
+## page.set_viewport_size(viewport_size)
+- `viewport_size` <[Dict]>
+  - `width` <[int]> page width in pixels.
+  - `height` <[int]> page height in pixels.
 
 In the case of multiple pages in a single browser, each page can have its own viewport size. However, [browser.new_context(**options)](./api/class-browser.md#browsernewcontextoptions) allows to set viewport size (and more) for all pages in the context at once.
 
@@ -1070,7 +1079,6 @@ This method returns all of the dedicated [WebWorkers](https://developer.mozilla.
 [Download]: ./api/class-download.md "Download"
 [ElementHandle]: ./api/class-elementhandle.md "ElementHandle"
 [FileChooser]: ./api/class-filechooser.md "FileChooser"
-[FirefoxBrowser]: ./api/class-firefoxbrowser.md "FirefoxBrowser"
 [Frame]: ./api/class-frame.md "Frame"
 [JSHandle]: ./api/class-jshandle.md "JSHandle"
 [Keyboard]: ./api/class-keyboard.md "Keyboard"
@@ -1084,7 +1092,6 @@ This method returns all of the dedicated [WebWorkers](https://developer.mozilla.
 [TimeoutError]: ./api/class-timeouterror.md "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.md "Touchscreen"
 [Video]: ./api/class-video.md "Video"
-[WebKitBrowser]: ./api/class-webkitbrowser.md "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.md "WebSocket"
 [Worker]: ./api/class-worker.md "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"

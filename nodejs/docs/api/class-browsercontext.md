@@ -73,8 +73,8 @@ console.log(await page.evaluate('location.href'));
 
 ## browserContext.addCookies(cookies)
 - `cookies` <[Array]<[Object]>>
-  - `name` <[string]> **required**
-  - `value` <[string]> **required**
+  - `name` <[string]>
+  - `value` <[string]>
   - `url` <[string]> either url or domain / path are required. Optional.
   - `domain` <[string]> either url or domain / path are required Optional.
   - `path` <[string]> either url or domain / path are required Optional.
@@ -333,8 +333,8 @@ The extra HTTP headers will be sent with every request initiated by any page in 
 
 ## browserContext.setGeolocation(geolocation)
 - `geolocation` <[null]|[Object]>
-  - `latitude` <[number]> Latitude between -90 and 90. **required**
-  - `longitude` <[number]> Longitude between -180 and 180. **required**
+  - `latitude` <[number]> Latitude between -90 and 90.
+  - `longitude` <[number]> Longitude between -180 and 180.
   - `accuracy` <[number]> Non-negative accuracy value. Defaults to `0`.
 
 Sets the context's geolocation. Passing `null` or `undefined` emulates position unavailable.
@@ -347,8 +347,8 @@ await browserContext.setGeolocation({latitude: 59.95, longitude: 30.31667});
 
 ## browserContext.setHTTPCredentials(httpCredentials)
 - `httpCredentials` <[null]|[Object]>
-  - `username` <[string]> **required**
-  - `password` <[string]> **required**
+  - `username` <[string]>
+  - `password` <[string]>
 
 **DEPRECATED** Browsers may cache credentials after successful authentication. Create a new browser context instead.
 

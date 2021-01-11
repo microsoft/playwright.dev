@@ -63,6 +63,7 @@ console.log(text);
 - [frame.hover(selector[, options])](./api/class-frame.md#framehoverselector-options)
 - [frame.innerHTML(selector[, options])](./api/class-frame.md#frameinnerhtmlselector-options)
 - [frame.innerText(selector[, options])](./api/class-frame.md#frameinnertextselector-options)
+- [frame.isChecked(selector[, options])](./api/class-frame.md#frameischeckedselector-options)
 - [frame.isDetached()](./api/class-frame.md#frameisdetached)
 - [frame.isDisabled(selector[, options])](./api/class-frame.md#frameisdisabledselector-options)
 - [frame.isEditable(selector[, options])](./api/class-frame.md#frameiseditableselector-options)
@@ -435,6 +436,14 @@ Returns `element.innerHTML`.
 
 Returns `element.innerText`.
 
+## frame.isChecked(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
+- `options` <[Object]>
+  - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
+- returns: <[Promise]<[boolean]>>
+
+Returns whether the element is checked. Throws if the element is not a checkbox or radio input.
+
 ## frame.isDetached()
 - returns: <[boolean]>
 
@@ -557,9 +566,9 @@ frame.selectOption('select#colors', 'red', 'green', 'blue');
 ## frame.setInputFiles(selector, files[, options])
 - `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - `files` <[string]|[Array]<[string]>|[Object]|[Array]<[Object]>>
-  - `name` <[string]> [File] name **required**
-  - `mimeType` <[string]> [File] type **required**
-  - `buffer` <[Buffer]> File content **required**
+  - `name` <[string]> [File] name
+  - `mimeType` <[string]> [File] type
+  - `buffer` <[Buffer]> File content
 - `options` <[Object]>
   - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
