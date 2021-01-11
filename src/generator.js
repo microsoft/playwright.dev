@@ -147,7 +147,7 @@ title: "${clazz.name}"
         return true;
       if (c.codeLang === this.lang)
         return true;
-      if (!c.codeLang.startsWith(this.lang + '-'))
+      if (!c.codeLang.startsWith(this.lang + ' '))
         return false;
       c.lines.unshift('# ' + c.codeLang.substring(this.lang.length + 1), '');
       c.codeLang = this.lang;

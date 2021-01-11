@@ -525,7 +525,7 @@ Shortcut for main frame's [frame.expect_load_state(**options)](./api/class-frame
   * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
 - returns: <[EventContextManager]>
 
-Performs action and wait for the next navigation. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
+Performs action and waits for the next navigation. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
 
 This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
 

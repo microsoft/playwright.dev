@@ -1,114 +1,102 @@
 ---
-id: intro
-title: "Getting Started"
+id: test-runners-python
+title: "Test Runners"
 ---
 
-- [Installation](#installation)
+You can use our [Pytest integration](https://github.com/microsoft/playwright-pytest) to write end-to-end tests in Python.
+
 - [Usage](#usage)
-- [First script](#first-script)
-- [Record scripts](#record-scripts)
-- [TypeScript support](#typescript-support)
-- [System requirements](#system-requirements)
-
-## Installation
-
-Use npm or Yarn to install Playwright in your Node.js project. See [system requirements](#system-requirements).
-
-```sh
-npm i -D playwright
-```
-
-This single command downloads the Playwright NPM package and browser binaries for Chromium, Firefox and WebKit. To modify this behavior see [installation parameters](./installation.md).
+- [Fixtures](#fixtures)
+- [Examples](#examples)
+- [Debugging](#debugging)
+- [Deploy to CI](#deploy-to-ci)
 
 ## Usage
 
-Once installed, you can `require` Playwright in a Node.js script, and launch any of the 3 browsers (`chromium`, `firefox` and `webkit`).
-
-```js
-const { chromium } = require('playwright');
-
-(async () => {
-  const browser = await chromium.launch();
-  // Create pages, interact with UI elements, assert values
-  await browser.close();
-})();
+```sh
+pip install pytest-playwright
 ```
 
-Playwright APIs are asynchronous and return Promise objects. Our code examples use [the async/await pattern](https://developer.mozilla.org/en-US/docs/Learn/JavaScript/Asynchronous/Async_await) to ease readability. The code is wrapped in an unnamed async arrow function which is invoking itself.
+Use the `page` fixture to write a basic test. See [more examples](#examples).
 
-```js
-(async () => { // Start of async arrow function
-  // Function code
-  // ...
-})(); // End of the function and () to invoke itself
-```
-
-## First script
-
-In our first script, we will navigate to `whatsmyuseragent.org` and take a screenshot in WebKit.
-
-```js
-const { webkit } = require('playwright');
-
-(async () => {
-  const browser = await webkit.launch();
-  const page = await browser.newPage();
-  await page.goto('http://whatsmyuseragent.org/');
-  await page.screenshot({ path: `example.png` });
-  await browser.close();
-})();
-```
-
-By default, Playwright runs the browsers in headless mode. To see the browser UI, pass the `headless: false` flag while launching the browser. You can also use `slowMo` to slow down execution. Learn more in the debugging tools [section](./debug.md).
-
-```js
-firefox.launch({ headless: false, slowMo: 50 });
-```
-
-## Record scripts
-
-Command Line Interface [CLI](./cli.md) can be used to record user interactions and generate JavaScript code.
+To run your tests, use pytest CLI.
 
 ```sh
-npx playwright codegen wikipedia.org
+# Run tests (Chromium and headless by default)
+pytest
+
+# Run tests in headful mode
+pytest --headful
+
+# Run tests in a different browser (chromium, firefox, webkit)
+pytest --browser firefox
+
+# Run tests in multiple browsers
+pytest --browser chromium --browser webkit
 ```
 
-## TypeScript support
+If you want to add the CLI arguments automatically without specifying them, you can use the [pytest.ini](https://docs.pytest.org/en/stable/reference.html#ini-options-ref) file:
 
-Playwright includes built-in support for TypeScript. Type definitions will be imported automatically. It is recommended to use type-checking to improve the IDE experience.
+## Fixtures
 
-### In JavaScript
+This plugin configures Playwright-specific [fixtures for pytest](https://docs.pytest.org/en/latest/fixture.html). To use these fixtures, use the fixture name as an argument to the test function.
 
-Add the following to the top of your JavaScript file to get type-checking in VS Code or WebStorm.
+**Function scope**: These fixtures are created when requested in a test function and destroyed when the test ends.
+- `context`: New [browser context](https://playwright.dev/#path=docs%2Fcore-concepts.md&q=browser-contexts) for a test.
+- `page`: New [browser page](https://playwright.dev/#path=docs%2Fcore-concepts.md&q=pages-and-frames) for a test.
 
-```js
-//@ts-check
-// ...
+**Session scope**: These fixtures are created when requested in a test function and destroyed when all tests end.
+- `browser`: Browser instance launched by Playwright.
+- `browser_name`: Browser name as string.
+- `is_chromium`, `is_webkit`, `is_firefox`: Booleans for the respective browser types.
+
+**Customizing fixture options**: For `browser` and `context` fixtures, use the the following fixtures to define custom launch options.
+- `browser_type_launch_args`: Override launch arguments for [`browserType.launch()`](https://playwright.dev/#path=docs%2Fapi.md&q=browsertypelaunchoptions). It should return a Dict.
+- `browser_context_args`: Override the options for [`browser.newContext()`](https://playwright.dev/#path=docs%2Fapi.md&q=browsernewcontextoptions). It should return a Dict.
+
+## Examples
+
+### Configure Mypy typings for auto-completion
+
+### Skip test by browser
+
+### Run on a specific browser
+
+### Configure base-url
+
+Start Pytest with the `base-url` argument.
+
+```sh
+pytest --base-url http://localhost:8080
 ```
 
-Alternatively, you can use JSDoc to set types for variables.
+### Ignore HTTPS errors
 
-```js
-/** @type {import('playwright').Page} */
-let page;
-```
+conftest.py
 
-### In TypeScript
+### Use custom viewport size
 
-TypeScript support will work out-of-the-box. Types can also be imported explicitly.
+conftest.py
 
-```js
-let page: import('playwright').Page;
-```
+### Device emulation
 
-## System requirements
+conftest.py
 
-Playwright requires Node.js version 10.17 or above. The browser binaries for Chromium, Firefox and WebKit work across the 3 platforms (Windows, macOS, Linux):
-* **Windows**: Works with Windows and Windows Subsystem for Linux (WSL).
-* **macOS**: Requires 10.14 or above.
-* **Linux**: Depending on your Linux distribution, you might need to install additional dependencies to run the browsers.
-  * Firefox requires Ubuntu 18.04+
-  * For Ubuntu 18.04, the additional dependencies are defined in [our Docker image](https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.bionic), which is based on Ubuntu.
+## Debugging
+
+### Use with pdb
+
+Use the `breakpoint()` statement in your test code to pause execution and get a [pdb](https://docs.python.org/3/library/pdb.html) REPL.
+
+### Screenshot on test failure
+
+You can capture screenshots for failed tests with a [pytest runtest hook](https://docs.pytest.org/en/6.1.0/reference.html?highlight=pytest_runtest_makereport#test-running-runtest-hooks). Add this to your `conftest.py` file.
+
+Note that this snippet uses `slugify` to convert test names to file paths, which can be installed with `pip install python-slugify`.
+
+## Deploy to CI
+
+Use the [Playwright GitHub Action](https://github.com/microsoft/playwright-github-action) or [guides for other CI providers](https://playwright.dev/#path=docs%2Fci.md&q=) to deploy your tests to CI/CD
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
