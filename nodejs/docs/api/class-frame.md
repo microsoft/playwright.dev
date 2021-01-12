@@ -237,7 +237,9 @@ This method double clicks an element matching `selector` by performing the follo
 
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
 
-> **NOTE** `frame.dblclick()` dispatches two `click` events and a single `dblclick` event.
+:::note
+`frame.dblclick()` dispatches two `click` events and a single `dblclick` event.
+:::
 
 ## frame.dispatchEvent(selector, type[, eventInit, options])
 - `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -398,8 +400,13 @@ Returns the main resource response. In case of multiple redirects, the navigatio
 
 `frame.goto` will not throw an error when any valid HTTP status code is returned by the remote server, including 404 "Not Found" and 500 "Internal Server Error".  The status code for such responses can be retrieved by calling [response.status()](./api/class-response.md#responsestatus).
 
-> **NOTE** `frame.goto` either throws an error or returns a main resource response. The only exceptions are navigation to `about:blank` or navigation to the same URL with a different hash, which would succeed and return `null`.
-> **NOTE** Headless mode doesn't support navigation to a PDF document. See the [upstream issue](https://bugs.chromium.org/p/chromium/issues/detail?id=761295).
+:::note
+`frame.goto` either throws an error or returns a main resource response. The only exceptions are navigation to `about:blank` or navigation to the same URL with a different hash, which would succeed and return `null`.
+:::
+
+:::note
+Headless mode doesn't support navigation to a PDF document. See the [upstream issue](https://bugs.chromium.org/p/chromium/issues/detail?id=761295).
+:::
 
 ## frame.hover(selector[, options])
 - `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -496,7 +503,9 @@ Returns frame's name attribute as specified in the tag.
 
 If the name is empty, returns the id attribute instead.
 
-> **NOTE** This value is calculated once when the frame is created, and will not update if the attribute is changed later.
+:::note
+This value is calculated once when the frame is created, and will not update if the attribute is changed later.
+:::
 
 ## frame.page()
 - returns: <[Page]>
@@ -597,7 +606,9 @@ This method taps an element matching `selector` by performing the following step
 
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
 
-> **NOTE** `frame.tap()` requires that the `hasTouch` option of the browser context be set to true.
+:::note
+`frame.tap()` requires that the `hasTouch` option of the browser context be set to true.
+:::
 
 ## frame.textContent(selector[, options])
 - `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -722,7 +733,9 @@ const [response] = await Promise.all([
 ]);
 ```
 
-**NOTE** Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::note
+Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::
 
 ## frame.waitForSelector(selector[, options])
 - `selector` <[string]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.

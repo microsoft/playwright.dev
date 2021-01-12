@@ -47,7 +47,9 @@ const backgroundPage = await context.waitForEvent('backgroundpage');
 
 Emitted when new background page is created in the context.
 
-> **NOTE** Only works with persistent context.
+:::note
+Only works with persistent context.
+:::
 
 ## chromiumBrowserContext.on('serviceworker')
 - type: <[Worker]>

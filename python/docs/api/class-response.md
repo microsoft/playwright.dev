@@ -9,15 +9,15 @@ title: "Response"
 
 - [response.body()](./api/class-response.md#responsebody)
 - [response.finished()](./api/class-response.md#responsefinished)
-- [response.frame()](./api/class-response.md#responseframe)
-- [response.headers()](./api/class-response.md#responseheaders)
+- [response.frame](./api/class-response.md#responseframe)
+- [response.headers](./api/class-response.md#responseheaders)
 - [response.json()](./api/class-response.md#responsejson)
-- [response.ok()](./api/class-response.md#responseok)
-- [response.request()](./api/class-response.md#responserequest)
-- [response.status()](./api/class-response.md#responsestatus)
-- [response.status_text()](./api/class-response.md#responsestatus_text)
+- [response.ok](./api/class-response.md#responseok)
+- [response.request](./api/class-response.md#responserequest)
+- [response.status](./api/class-response.md#responsestatus)
+- [response.status_text](./api/class-response.md#responsestatus_text)
 - [response.text()](./api/class-response.md#responsetext)
-- [response.url()](./api/class-response.md#responseurl)
+- [response.url](./api/class-response.md#responseurl)
 
 ## response.body()
 - returns: <[Buffer]>
@@ -29,12 +29,12 @@ Returns the buffer with response body.
 
 Waits for this response to finish, returns failure error if request failed.
 
-## response.frame()
+## response.frame
 - returns: <[Frame]>
 
 Returns the [Frame] that initiated this response.
 
-## response.headers()
+## response.headers
 - returns: <[Dict]\[[str], [str]\]>
 
 Returns the object with HTTP headers associated with the response. All header names are lower-case.
@@ -46,22 +46,22 @@ Returns the JSON representation of response body.
 
 This method will throw if the response body is not parsable via `JSON.parse`.
 
-## response.ok()
+## response.ok
 - returns: <[bool]>
 
 Contains a boolean stating whether the response was successful (status in the range 200-299) or not.
 
-## response.request()
+## response.request
 - returns: <[Request]>
 
 Returns the matching [Request] object.
 
-## response.status()
+## response.status
 - returns: <[int]>
 
 Contains the status code of the response (e.g., 200 for a success).
 
-## response.status_text()
+## response.status_text
 - returns: <[str]>
 
 Contains the status text of the response (e.g. usually an "OK" for a success).
@@ -71,7 +71,7 @@ Contains the status text of the response (e.g. usually an "OK" for a success).
 
 Returns the text representation of response body.
 
-## response.url()
+## response.url
 - returns: <[str]>
 
 Contains the URL of the response.

@@ -37,11 +37,11 @@ class Generator {
    * @param {string} outDir
    * @param {{
    *   formatMember: function(Documentation.Member): { text: string, args: Documentation.Member[] },
-   *   formatArgumentName: function(Documentation.Member): string,
+   *   formatArgumentName: function(string): string,
    *   formatTemplate: function(string): string,
    *   formatFunction: function(string): string,
    *   formatPromise: function(string): string,
-   *   typesMap: Object<string, string>,
+   *   renderType: function(string, string): string,
    * }} config
    */
   constructor(lang, outDir, config) {
@@ -53,9 +53,9 @@ class Generator {
     this.documentation.setLinkRenderer(item => {
       const { clazz, member, param, option } = item;
       if (param)
-        return `\`${param}\``;
+        return `\`${config.formatArgumentName(param)}\``;
       if (option)
-        return `\`${option}\``;
+        return `\`${config.formatArgumentName(option)}\``;
       if (clazz)
         return `[${clazz.name}]`;
       return this.createMemberLink(member);
@@ -115,7 +115,7 @@ title: "${clazz.name}"
       const memberNode = { type: 'h2', children: [] };
       const { text, args } = this.config.formatMember(member);
       memberNode.text = text;
-      memberNode.children.push(...args.map(a => this.renderProperty(`\`${this.config.formatArgumentName(a)}\``, a.type, a.spec)));
+      memberNode.children.push(...args.map(a => this.renderProperty(`\`${this.config.formatArgumentName(a.name)}\``, a.type, a.spec, 'in')));
 
       // Append type
       if (member.type && member.type.name !== 'void') {
@@ -125,7 +125,7 @@ title: "${clazz.name}"
           case 'property': name = 'type:'; break;
           case 'method': name = 'returns:'; break;
         }
-        memberNode.children.push(this.renderProperty(name, member.type, undefined, member.async));
+        memberNode.children.push(this.renderProperty(name, member.type, undefined, 'out', member.async));
       }
 
       // Append member doc
@@ -223,21 +223,22 @@ title: "${clazz.name}"
   /**
    * @param {string} name
    * @param {Type} type
-   * @param {MarkdownNode[]} [spec]
+   * @param {MarkdownNode[]} spec
+   * @param {'in'|'out'} direction
    * @param {boolean=} async
    */
-  renderProperty(name, type, spec, async) {
+  renderProperty(name, type, spec, direction, async) {
     let comment = '';
     if (spec && spec.length)
       comment = spec[0].text;
     let children;
     const properties = type.deepProperties();
     if (properties && properties.length)
-      children = properties.map(p => this.renderProperty(`\`${p.name}\``, p.type, p.spec, false))
+      children = properties.map(p => this.renderProperty(`\`${p.name}\``, p.type, p.spec, direction, false))
     else if (spec && spec.length > 1)
       children = spec.slice(1).map(s => md.clone(s));
 
-    let typeText = this.renderType(type);
+    let typeText = this.renderType(type, direction);
     if (async)
       typeText = this.config.formatPromise(typeText);
 
@@ -254,24 +255,26 @@ title: "${clazz.name}"
 
   /**
    * @param {Documentation.Type} type
+   * @param {'in'|'out'} direction
    */
-  renderType(type) {
+  renderType(type, direction) {
     if (type.union)
-      return type.union.map(l => this.renderType(l)).join('|');
+      return type.union.map(l => this.renderType(l, direction)).join('|');
     if (type.templates)
-      return `${this.renderTypeName(type.name)}${this.config.formatTemplate(type.templates.map(l => this.renderType(l)).join(', '))}`;
+      return `${this.renderTypeName(type.name, direction)}${this.config.formatTemplate(type.templates.map(l => this.renderType(l, direction)).join(', '))}`;
     if (type.args)
-      return `${this.config.formatFunction(type.args.map(l => this.renderType(l)).join(', '))}${type.returnType ? ':' + this.renderType(type.returnType) : ''}`;
+      return `${this.config.formatFunction(type.args.map(l => this.renderType(l, direction)).join(', '))}${type.returnType ? ':' + this.renderType(type.returnType, direction) : ''}`;
     if (type.name.startsWith('"'))
       return type.name;
-    return `${this.renderTypeName(type.name)}`;
+    return `${this.renderTypeName(type.name, direction)}`;
   }
 
   /**
    * @param {string} typeName
+   * @param {'in'|'out'} direction
    */
-  renderTypeName(typeName) {
-    return `[${this.config.typesMap[typeName] || typeName}]`;
+  renderTypeName(typeName, direction) {
+    return `[${this.config.renderType(typeName, direction)}]`;
   }
 }
 
@@ -347,15 +350,18 @@ new Generator('js', path.join(__dirname, '..', 'nodejs', 'docs'), {
     }
     return { text, args };
   },
-  formatArgumentName: p => p.name,
+  formatArgumentName: name => name,
   formatTemplate: text => `<${text}>`,
   formatFunction: text => `[function]\\(${text}\\)`,
   formatPromise: text => `[Promise]<${text}>`,
-  typesMap: {
-    'int': 'number',
-    'float': 'number',
-    'path': 'string',
-    'any': 'Object'
+  renderType: text => {
+    switch (text) {
+      case 'int': return 'number';
+      case 'float': return 'number';
+      case 'path': return 'string';
+      case 'any': return 'Object';
+    }
+    return text;
   },
 });
 
@@ -372,25 +378,35 @@ new Generator('python', path.join(__dirname, '..', 'python', 'docs'), {
     if (member.kind === 'method') {
       for (const arg of member.argsArray)
         args.push(...expandPythonOptions(arg));
-      text = `${toSnakeCase(member.clazz.varName)}.${toSnakeCase(member.alias)}(${renderPythonSignature(args)})`;
+      const signature = renderPythonSignature(args);
+      let isGetter = !signature && !member.async && !!member.type;
+      if (member.name.startsWith('is') || member.name.startsWith('as'))
+        isGetter = false;
+      if (isGetter)
+        text = `${toSnakeCase(member.clazz.varName)}.${toSnakeCase(member.alias)}`;
+      else
+        text = `${toSnakeCase(member.clazz.varName)}.${toSnakeCase(member.alias)}(${signature})`;
     }
     return { text, args };
   },
-  formatArgumentName: p => toSnakeCase(p.name),
+  formatArgumentName: name => toSnakeCase(name),
   formatTemplate: text => `\\[${text}\\]`,
   formatFunction: text => `[Callable]\\[${text}\\]`,
   formatPromise: text => text,
-  typesMap: {
-    'RegExp': 'Pattern',
-    'any': 'Any',
-    'function': 'Callable',
-    'path': 'Union]\\[[str], [pathlib.Path]\\',
-    'Array': 'List',
-    'Object': 'Dict',
-    'null': 'NoneType',
-    'void': 'NoneType',
-    'boolean': 'bool',
-    'string': 'str',
+  renderType: (text, direction) => {
+    switch (text) {
+      case 'RegExp': return 'Pattern';
+      case 'any': return 'Any';
+      case 'function': return 'Callable';
+      case 'path': return direction === 'out' ? 'pathlib.Path' : 'Union]\\[[str], [pathlib.Path]\\';
+      case 'Array': return 'List';
+      case 'Object': return 'Dict';
+      case 'null': return 'NoneType';
+      case 'void': return 'NoneType';
+      case 'boolean': return 'bool';
+      case 'string': return 'str';
+    }
+    return text;
   },
 });
 

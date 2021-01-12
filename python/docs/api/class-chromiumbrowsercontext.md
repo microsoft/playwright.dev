@@ -10,14 +10,14 @@ Chromium-specific features including background pages, service worker support, e
 
 - [chromium_browser_context.on("backgroundpage")](./api/class-chromiumbrowsercontext.md#chromium_browser_contextonbackgroundpage)
 - [chromium_browser_context.on("serviceworker")](./api/class-chromiumbrowsercontext.md#chromium_browser_contextonserviceworker)
-- [chromium_browser_context.background_pages()](./api/class-chromiumbrowsercontext.md#chromium_browser_contextbackground_pages)
+- [chromium_browser_context.background_pages](./api/class-chromiumbrowsercontext.md#chromium_browser_contextbackground_pages)
 - [chromium_browser_context.new_cdp_session(page)](./api/class-chromiumbrowsercontext.md#chromium_browser_contextnew_cdp_sessionpage)
-- [chromium_browser_context.service_workers()](./api/class-chromiumbrowsercontext.md#chromium_browser_contextservice_workers)
+- [chromium_browser_context.service_workers](./api/class-chromiumbrowsercontext.md#chromium_browser_contextservice_workers)
 - [browser_context.on("close")](./api/class-browsercontext.md#browser_contextonclose)
 - [browser_context.on("page")](./api/class-browsercontext.md#browser_contextonpage)
 - [browser_context.add_cookies(cookies)](./api/class-browsercontext.md#browser_contextadd_cookiescookies)
 - [browser_context.add_init_script(**options)](./api/class-browsercontext.md#browser_contextadd_init_scriptoptions)
-- [browser_context.browser()](./api/class-browsercontext.md#browser_contextbrowser)
+- [browser_context.browser](./api/class-browsercontext.md#browser_contextbrowser)
 - [browser_context.clear_cookies()](./api/class-browsercontext.md#browser_contextclear_cookies)
 - [browser_context.clear_permissions()](./api/class-browsercontext.md#browser_contextclear_permissions)
 - [browser_context.close()](./api/class-browsercontext.md#browser_contextclose)
@@ -28,13 +28,12 @@ Chromium-specific features including background pages, service worker support, e
 - [browser_context.expose_function(name, callback)](./api/class-browsercontext.md#browser_contextexpose_functionname-callback)
 - [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browser_contextgrant_permissionspermissions-options)
 - [browser_context.new_page()](./api/class-browsercontext.md#browser_contextnew_page)
-- [browser_context.pages()](./api/class-browsercontext.md#browser_contextpages)
+- [browser_context.pages](./api/class-browsercontext.md#browser_contextpages)
 - [browser_context.route(url, handler)](./api/class-browsercontext.md#browser_contextrouteurl-handler)
 - [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout)
 - [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout)
 - [browser_context.set_extra_http_headers(headers)](./api/class-browsercontext.md#browser_contextset_extra_http_headersheaders)
 - [browser_context.set_geolocation(geolocation)](./api/class-browsercontext.md#browser_contextset_geolocationgeolocation)
-- [browser_context.set_http_credentials(http_credentials)](./api/class-browsercontext.md#browser_contextset_http_credentialshttp_credentials)
 - [browser_context.set_offline(offline)](./api/class-browsercontext.md#browser_contextset_offlineoffline)
 - [browser_context.storage_state(**options)](./api/class-browsercontext.md#browser_contextstorage_stateoptions)
 - [browser_context.unroute(url, **options)](./api/class-browsercontext.md#browser_contextunrouteurl-options)
@@ -45,14 +44,16 @@ Chromium-specific features including background pages, service worker support, e
 
 Emitted when new background page is created in the context.
 
-> **NOTE** Only works with persistent context.
+:::note
+Only works with persistent context.
+:::
 
 ## chromium_browser_context.on("serviceworker")
 - type: <[Worker]>
 
 Emitted when new service worker is created in the context.
 
-## chromium_browser_context.background_pages()
+## chromium_browser_context.background_pages
 - returns: <[List]\[[Page]\]>
 
 All existing background pages in the context.
@@ -63,7 +64,7 @@ All existing background pages in the context.
 
 Returns the newly created session.
 
-## chromium_browser_context.service_workers()
+## chromium_browser_context.service_workers
 - returns: <[List]\[[Worker]\]>
 
 All existing service workers in the context.

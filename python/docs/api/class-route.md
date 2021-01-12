@@ -10,7 +10,7 @@ Whenever a network route is set up with [page.route(url, handler)](./api/class-p
 - [route.abort(**options)](./api/class-route.md#routeabortoptions)
 - [route.continue_(**options)](./api/class-route.md#routecontinue_options)
 - [route.fulfill(**options)](./api/class-route.md#routefulfilloptions)
-- [route.request()](./api/class-route.md#routerequest)
+- [route.request](./api/class-route.md#routerequest)
 
 ## route.abort(**options)
 - `error_code` <[str]> Optional error code. Defaults to `failed`, could be one of the following:
@@ -52,7 +52,7 @@ An example of fulfilling all requests with 404 responses:
 
 An example of serving static file:
 
-## route.request()
+## route.request
 - returns: <[Request]>
 
 A request to be routed.

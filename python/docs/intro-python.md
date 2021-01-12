@@ -24,26 +24,21 @@ These commands download the Playwright package and install browser binaries for 
 
 Once installed, you can `import` Playwright in a Python script, and launch any of the 3 browsers (`chromium`, `firefox` and `webkit`).
 
-```py
-from playwright import sync_playwright
-
-with sync_playwright() as p:
-    browser = p.chromium.launch()
-    page = browser.new_page()
-    # interact with UI elements, assert values
-    browser.close()
-```
-
-Playwright supports two variations of the API: synchronous are asynchronous. If your modern project uses [asyncio](https://docs.python.org/3/library/asyncio.html), you should use async API:
+Playwright supports two variations of the API: synchronous and asynchronous. If your modern project uses [asyncio](https://docs.python.org/3/library/asyncio.html), you should use async API:
 
 ```py
-from playwright import async_playwright
+import asyncio
+from playwright.async_api import async_playwright
 
-with async_playwright() as p:
-    browser = await p.chromium.launch()
-    page = await browser.new_page()
-    # interact with UI elements, assert values
-    await browser.close()
+async def main():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch()
+        page = await browser.new_page()
+        await page.goto("http://playwright.dev")
+        print(await page.title())
+        await browser.close()
+
+asyncio.run(main())
 ```
 
 ## First script
@@ -51,7 +46,7 @@ with async_playwright() as p:
 In our first script, we will navigate to `whatsmyuseragent.org` and take a screenshot in WebKit.
 
 ```py
-from playwright import sync_playwright
+from playwright.sync_api import sync_playwright
 
 with sync_playwright() as p:
     browser = p.webkit.launch()

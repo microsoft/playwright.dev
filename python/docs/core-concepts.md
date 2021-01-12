@@ -26,7 +26,7 @@ A [Browser] refers to an instance of Chromium, Firefox or WebKit. Playwright scr
 # async
 
 import asyncio
-from playwright import async_playwright
+from playwright.async_api import async_playwright
 
 async def main():
     async with async_playwright() as p:
@@ -39,7 +39,7 @@ asyncio.get_event_loop().run_until_complete(main())
 ```py
 # sync
 
-from playwright import sync_playwright
+from playwright.sync_api import sync_playwright
 
 with sync_playwright() as p:
     browser = p.chromium.launch(headless=False)
@@ -77,7 +77,7 @@ Browser contexts can also be used to emulate multi-page scenarios involving mobi
 # async
 
 import asyncio
-from playwright import async_playwright
+from playwright.async_api import async_playwright
 
 async def main():
     async with async_playwright() as p:
@@ -99,7 +99,7 @@ asyncio.get_event_loop().run_until_complete(main())
 ```py
 # sync
 
-from playwright import sync_playwright
+from playwright.sync_api import sync_playwright
 
 with sync_playwright() as p:
     iphone_11 = p.devices['iPhone 11 Pro']

@@ -48,8 +48,8 @@ Contains the URL of the WebSocket.
 
 ## webSocket.waitForEvent(event[, optionsOrPredicate])
 - `event` <[string]> Event name, same one would pass into `webSocket.on(event)`.
-- `optionsOrPredicate` <[Function]|[Object]> Either a predicate that receives an event or an options object. Optional.
-  - `predicate` <[Function]> receives the event data and resolves to truthy value when the waiting should resolve.
+- `optionsOrPredicate` <[function]|[Object]> Either a predicate that receives an event or an options object. Optional.
+  - `predicate` <[function]> receives the event data and resolves to truthy value when the waiting should resolve.
   - `timeout` <[number]> maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
 - returns: <[Promise]<[Object]>>
 

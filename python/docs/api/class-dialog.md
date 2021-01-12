@@ -10,17 +10,17 @@ An example of using `Dialog` class:
 
 
 - [dialog.accept(**options)](./api/class-dialog.md#dialogacceptoptions)
-- [dialog.default_value()](./api/class-dialog.md#dialogdefault_value)
+- [dialog.default_value](./api/class-dialog.md#dialogdefault_value)
 - [dialog.dismiss()](./api/class-dialog.md#dialogdismiss)
-- [dialog.message()](./api/class-dialog.md#dialogmessage)
-- [dialog.type()](./api/class-dialog.md#dialogtype)
+- [dialog.message](./api/class-dialog.md#dialogmessage)
+- [dialog.type](./api/class-dialog.md#dialogtype)
 
 ## dialog.accept(**options)
 - `prompt_text` <[str]> A text to enter in prompt. Does not cause any effects if the dialog's `type` is not prompt. Optional.
 
 Returns when the dialog has been accepted.
 
-## dialog.default_value()
+## dialog.default_value
 - returns: <[str]>
 
 If dialog is prompt, returns default prompt value. Otherwise, returns empty string.
@@ -29,12 +29,12 @@ If dialog is prompt, returns default prompt value. Otherwise, returns empty stri
 
 Returns when the dialog has been dismissed.
 
-## dialog.message()
+## dialog.message
 - returns: <[str]>
 
 A message displayed in the dialog.
 
-## dialog.type()
+## dialog.type
 - returns: <[str]>
 
 Returns dialog's type, can be one of `alert`, `beforeunload`, `confirm` or `prompt`.

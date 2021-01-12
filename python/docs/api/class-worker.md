@@ -10,7 +10,7 @@ The Worker class represents a [WebWorker](https://developer.mozilla.org/en-US/do
 - [worker.on("close")](./api/class-worker.md#workeronclose)
 - [worker.evaluate(expression, **options)](./api/class-worker.md#workerevaluateexpression-options)
 - [worker.evaluate_handle(expression, **options)](./api/class-worker.md#workerevaluate_handleexpression-options)
-- [worker.url()](./api/class-worker.md#workerurl)
+- [worker.url](./api/class-worker.md#workerurl)
 
 ## worker.on("close")
 - type: <[Worker]>
@@ -18,30 +18,30 @@ The Worker class represents a [WebWorker](https://developer.mozilla.org/en-US/do
 Emitted when this dedicated [WebWorker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) is terminated.
 
 ## worker.evaluate(expression, **options)
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `arg` <[EvaluationArgument]> Optional argument to pass to `page_function`
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[Serializable]>
 
-Returns the return value of `pageFunction`
+Returns the return value of `page_function`
 
 If the function passed to the `worker.evaluate` returns a [Promise], then `worker.evaluate` would wait for the promise to resolve and return its value.
 
 If the function passed to the `worker.evaluate` returns a non-[Serializable] value, then `worker.evaluate` returns `undefined`. DevTools Protocol also supports transferring some additional values that are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`, and bigint literals.
 
 ## worker.evaluate_handle(expression, **options)
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `arg` <[EvaluationArgument]> Optional argument to pass to `page_function`
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[JSHandle]>
 
-Returns the return value of `pageFunction` as in-page object (JSHandle).
+Returns the return value of `page_function` as in-page object (JSHandle).
 
 The only difference between `worker.evaluate` and `worker.evaluateHandle` is that `worker.evaluateHandle` returns in-page object (JSHandle).
 
 If the function passed to the `worker.evaluateHandle` returns a [Promise], then `worker.evaluateHandle` would wait for the promise to resolve and return its value.
 
-## worker.url()
+## worker.url
 - returns: <[str]>
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"

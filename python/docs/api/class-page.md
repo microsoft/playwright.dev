@@ -43,7 +43,7 @@ To unsubscribe from events use the `removeListener` method:
 - [page.click(selector, **options)](./api/class-page.md#pageclickselector-options)
 - [page.close(**options)](./api/class-page.md#pagecloseoptions)
 - [page.content()](./api/class-page.md#pagecontent)
-- [page.context()](./api/class-page.md#pagecontext)
+- [page.context](./api/class-page.md#pagecontext)
 - [page.dblclick(selector, **options)](./api/class-page.md#pagedblclickselector-options)
 - [page.dispatch_event(selector, type, **options)](./api/class-page.md#pagedispatch_eventselector-type-options)
 - [page.emulate_media(**options)](./api/class-page.md#pageemulate_mediaoptions)
@@ -55,7 +55,6 @@ To unsubscribe from events use the `removeListener` method:
 - [page.expect_download(**options)](./api/class-page.md#pageexpect_downloadoptions)
 - [page.expect_event(event, **options)](./api/class-page.md#pageexpect_eventevent-options)
 - [page.expect_file_chooser(**options)](./api/class-page.md#pageexpect_file_chooseroptions)
-- [page.expect_load_state(**options)](./api/class-page.md#pageexpect_load_stateoptions)
 - [page.expect_navigation(**options)](./api/class-page.md#pageexpect_navigationoptions)
 - [page.expect_popup(**options)](./api/class-page.md#pageexpect_popupoptions)
 - [page.expect_request(url_or_predicate, **options)](./api/class-page.md#pageexpect_requesturl_or_predicate-options)
@@ -66,7 +65,7 @@ To unsubscribe from events use the `removeListener` method:
 - [page.fill(selector, value, **options)](./api/class-page.md#pagefillselector-value-options)
 - [page.focus(selector, **options)](./api/class-page.md#pagefocusselector-options)
 - [page.frame(**options)](./api/class-page.md#pageframeoptions)
-- [page.frames()](./api/class-page.md#pageframes)
+- [page.frames](./api/class-page.md#pageframes)
 - [page.get_attribute(selector, name, **options)](./api/class-page.md#pageget_attributeselector-name-options)
 - [page.go_back(**options)](./api/class-page.md#pagego_backoptions)
 - [page.go_forward(**options)](./api/class-page.md#pagego_forwardoptions)
@@ -81,7 +80,7 @@ To unsubscribe from events use the `removeListener` method:
 - [page.is_enabled(selector, **options)](./api/class-page.md#pageis_enabledselector-options)
 - [page.is_hidden(selector, **options)](./api/class-page.md#pageis_hiddenselector-options)
 - [page.is_visible(selector, **options)](./api/class-page.md#pageis_visibleselector-options)
-- [page.main_frame()](./api/class-page.md#pagemain_frame)
+- [page.main_frame](./api/class-page.md#pagemain_frame)
 - [page.opener()](./api/class-page.md#pageopener)
 - [page.pdf(**options)](./api/class-page.md#pagepdfoptions)
 - [page.press(selector, key, **options)](./api/class-page.md#pagepressselector-key-options)
@@ -103,9 +102,9 @@ To unsubscribe from events use the `removeListener` method:
 - [page.type(selector, text, **options)](./api/class-page.md#pagetypeselector-text-options)
 - [page.uncheck(selector, **options)](./api/class-page.md#pageuncheckselector-options)
 - [page.unroute(url, **options)](./api/class-page.md#pageunrouteurl-options)
-- [page.url()](./api/class-page.md#pageurl)
-- [page.video()](./api/class-page.md#pagevideo)
-- [page.viewport_size()](./api/class-page.md#pageviewport_size)
+- [page.url](./api/class-page.md#pageurl)
+- [page.video](./api/class-page.md#pagevideo)
+- [page.viewport_size](./api/class-page.md#pageviewport_size)
 - [page.wait_for_event(event, **options)](./api/class-page.md#pagewait_for_eventevent-options)
 - [page.wait_for_function(expression, **options)](./api/class-page.md#pagewait_for_functionexpression-options)
 - [page.wait_for_load_state(**options)](./api/class-page.md#pagewait_for_load_stateoptions)
@@ -114,7 +113,7 @@ To unsubscribe from events use the `removeListener` method:
 - [page.wait_for_response(url_or_predicate, **options)](./api/class-page.md#pagewait_for_responseurl_or_predicate-options)
 - [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewait_for_selectorselector-options)
 - [page.wait_for_timeout(timeout)](./api/class-page.md#pagewait_for_timeouttimeout)
-- [page.workers()](./api/class-page.md#pageworkers)
+- [page.workers](./api/class-page.md#pageworkers)
 - [page.accessibility](./api/class-page.md#pageaccessibility)
 - [page.keyboard](./api/class-page.md#pagekeyboard)
 - [page.mouse](./api/class-page.md#pagemouse)
@@ -155,7 +154,9 @@ Emitted when the JavaScript [`DOMContentLoaded`](https://developer.mozilla.org/e
 
 Emitted when attachment download started. User can access basic file operations on downloaded content via the passed [Download] instance.
 
-> **NOTE** Browser context **must** be created with the `acceptDownloads` set to `true` when user needs access to the downloaded content. If `acceptDownloads` is not set or set to `false`, download events are emitted, but the actual download is not performed and user has no access to the downloaded files.
+:::note
+Browser context **must** be created with the `accept_downloads` set to `true` when user needs access to the downloaded content. If `accept_downloads` is not set, download events are emitted, but the actual download is not performed and user has no access to the downloaded files.
+:::
 
 ## page.on("filechooser")
 - type: <[FileChooser]>
@@ -193,7 +194,9 @@ Emitted when the page opens a new tab or window. This event is emitted in additi
 
 The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
 
-> **NOTE** Use [page.wait_for_load_state(**options)](./api/class-page.md#pagewait_for_load_stateoptions) to wait until the page gets to a particular state (you should not need it in most cases).
+:::note
+Use [page.wait_for_load_state(**options)](./api/class-page.md#pagewait_for_load_stateoptions) to wait until the page gets to a particular state (you should not need it in most cases).
+:::
 
 ## page.on("request")
 - type: <[Request]>
@@ -205,7 +208,9 @@ Emitted when a page issues a request. The [request] object is read-only. In orde
 
 Emitted when a request fails, for example by timing out.
 
-> **NOTE** HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [page.on("requestfinished")](./api/class-page.md#pageonrequestfinished) event and not with [page.on("requestfailed")](./api/class-page.md#pageonrequestfailed).
+:::note
+HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [page.on("requestfinished")](./api/class-page.md#pageonrequestfinished) event and not with [page.on("requestfailed")](./api/class-page.md#pageonrequestfailed).
+:::
 
 ## page.on("requestfinished")
 - type: <[Request]>
@@ -239,7 +244,9 @@ The script is evaluated after the document was created but before any of its scr
 
 An example of overriding `Math.random` before the page loads:
 
-> **NOTE** The order of evaluation of multiple scripts installed via [browser_context.add_init_script(**options)](./api/class-browsercontext.md#browser_contextadd_init_scriptoptions) and [page.add_init_script(**options)](./api/class-page.md#pageadd_init_scriptoptions) is not defined.
+:::note
+The order of evaluation of multiple scripts installed via [browser_context.add_init_script(**options)](./api/class-browsercontext.md#browser_contextadd_init_scriptoptions) and [page.add_init_script(**options)](./api/class-page.md#pageadd_init_scriptoptions) is not defined.
+:::
 
 ## page.add_script_tag(**options)
 - `content` <[str]> Raw JavaScript content to be injected into frame.
@@ -278,7 +285,7 @@ This method checks an element matching `selector` by performing the following st
 1. Wait for [actionability](./actionability.md) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
 1. Scroll the element into view if needed.
 1. Use [page.mouse](./api/class-page.md#pagemouse) to click in the center of the element.
-1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+1. Wait for initiated navigations to either succeed or fail, unless `no_wait_after` option is set.
 1. Ensure that the element is now checked. If not, this method rejects.
 
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
@@ -303,7 +310,7 @@ This method clicks an element matching `selector` by performing the following st
 1. Wait for [actionability](./actionability.md) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
 1. Scroll the element into view if needed.
 1. Use [page.mouse](./api/class-page.md#pagemouse) to click in the center of the element, or the specified `position`.
-1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+1. Wait for initiated navigations to either succeed or fail, unless `no_wait_after` option is set.
 
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
 
@@ -312,19 +319,20 @@ Shortcut for main frame's [frame.click(selector, **options)](./api/class-frame.m
 ## page.close(**options)
 - `run_before_unload` <[bool]> Defaults to `false`. Whether to run the [before unload](https://developer.mozilla.org/en-US/docs/Web/Events/beforeunload) page handlers.
 
-If `runBeforeUnload` is `false`, does not run any unload handlers and waits for the page to be closed. If `runBeforeUnload` is `true` the method will run unload handlers, but will **not** wait for the page to close.
+If `run_before_unload` is `false`, does not run any unload handlers and waits for the page to be closed. If `run_before_unload` is `true` the method will run unload handlers, but will **not** wait for the page to close.
 
 By default, `page.close()` **does not** run `beforeunload` handlers.
 
-> **NOTE** if `runBeforeUnload` is passed as true, a `beforeunload` dialog might be summoned
-> and should be handled manually via [page.on("dialog")](./api/class-page.md#pageondialog) event.
+:::note
+if `run_before_unload` is passed as true, a `beforeunload` dialog might be summoned and should be handled manually via [page.on("dialog")](./api/class-page.md#pageondialog) event.
+:::
 
 ## page.content()
 - returns: <[str]>
 
 Gets the full HTML contents of the page, including the doctype.
 
-## page.context()
+## page.context
 - returns: <[BrowserContext]>
 
 Get the browser context that the page belongs to.
@@ -346,11 +354,13 @@ This method double clicks an element matching `selector` by performing the follo
 1. Wait for [actionability](./actionability.md) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
 1. Scroll the element into view if needed.
 1. Use [page.mouse](./api/class-page.md#pagemouse) to double click in the center of the element, or the specified `position`.
-1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set. Note that if the first click of the `dblclick()` triggers a navigation event, this method will reject.
+1. Wait for initiated navigations to either succeed or fail, unless `no_wait_after` option is set. Note that if the first click of the `dblclick()` triggers a navigation event, this method will reject.
 
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
 
-> **NOTE** `page.dblclick()` dispatches two `click` events and a single `dblclick` event.
+:::note
+`page.dblclick()` dispatches two `click` events and a single `dblclick` event.
+:::
 
 Shortcut for main frame's [frame.dblclick(selector, **options)](./api/class-frame.md#framedblclickselector-options).
 
@@ -362,9 +372,9 @@ Shortcut for main frame's [frame.dblclick(selector, **options)](./api/class-fram
 
 The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the elment, `click` is dispatched. This is equivalend to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
 
-Under the hood, it creates an instance of an event based on the given `type`, initializes it with `eventInit` properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
+Under the hood, it creates an instance of an event based on the given `type`, initializes it with `event_init` properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
 
-Since `eventInit` is event-specific, please refer to the events documentation for the lists of initial properties:
+Since `event_init` is event-specific, please refer to the events documentation for the lists of initial properties:
 * [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/DragEvent/DragEvent)
 * [FocusEvent](https://developer.mozilla.org/en-US/docs/Web/API/FocusEvent/FocusEvent)
 * [KeyboardEvent](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/KeyboardEvent)
@@ -381,14 +391,14 @@ You can also specify `JSHandle` as the property value if you want live objects t
 
 ## page.eval_on_selector(selector, expression, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `arg` <[EvaluationArgument]> Optional argument to pass to `page_function`
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[Serializable]>
 
-The method finds an element matching the specified selector within the page and passes it as a first argument to `pageFunction`. If no elements match the selector, the method throws an error. Returns the value of `pageFunction`.
+The method finds an element matching the specified selector within the page and passes it as a first argument to `page_function`. If no elements match the selector, the method throws an error. Returns the value of `page_function`.
 
-If `pageFunction` returns a [Promise], then [page.eval_on_selector(selector, expression, **options)](./api/class-page.md#pageeval_on_selectorselector-expression-options) would wait for the promise to resolve and return its value.
+If `page_function` returns a [Promise], then [page.eval_on_selector(selector, expression, **options)](./api/class-page.md#pageeval_on_selectorselector-expression-options) would wait for the promise to resolve and return its value.
 
 Examples:
 
@@ -396,30 +406,30 @@ Shortcut for main frame's [frame.eval_on_selector(selector, expression, **option
 
 ## page.eval_on_selector_all(selector, expression, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `arg` <[EvaluationArgument]> Optional argument to pass to `page_function`
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[Serializable]>
 
-The method finds all elements matching the specified selector within the page and passes an array of matched elements as a first argument to `pageFunction`. Returns the result of `pageFunction` invocation.
+The method finds all elements matching the specified selector within the page and passes an array of matched elements as a first argument to `page_function`. Returns the result of `page_function` invocation.
 
-If `pageFunction` returns a [Promise], then [page.eval_on_selector_all(selector, expression, **options)](./api/class-page.md#pageeval_on_selector_allselector-expression-options) would wait for the promise to resolve and return its value.
+If `page_function` returns a [Promise], then [page.eval_on_selector_all(selector, expression, **options)](./api/class-page.md#pageeval_on_selector_allselector-expression-options) would wait for the promise to resolve and return its value.
 
 Examples:
 
 ## page.evaluate(expression, **options)
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `arg` <[EvaluationArgument]> Optional argument to pass to `page_function`
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[Serializable]>
 
-Returns the value of the `pageFunction` invocation.
+Returns the value of the `page_function` invocation.
 
 If the function passed to the `page.evaluate` returns a [Promise], then `page.evaluate` would wait for the promise to resolve and return its value.
 
 If the function passed to the `page.evaluate` returns a non-[Serializable] value, then `page.evaluate` resolves to `undefined`. DevTools Protocol also supports transferring some additional values that are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`, and bigint literals.
 
-Passing argument to `pageFunction`:
+Passing argument to `page_function`:
 
 A string can also be passed in instead of a function:
 
@@ -428,12 +438,12 @@ A string can also be passed in instead of a function:
 Shortcut for main frame's [frame.evaluate(expression, **options)](./api/class-frame.md#frameevaluateexpression-options).
 
 ## page.evaluate_handle(expression, **options)
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `arg` <[EvaluationArgument]> Optional argument to pass to `page_function`
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[JSHandle]>
 
-Returns the value of the `pageFunction` invocation as in-page object (JSHandle).
+Returns the value of the `page_function` invocation as in-page object (JSHandle).
 
 The only difference between `page.evaluate` and `page.evaluateHandle` is that `page.evaluateHandle` returns in-page object (JSHandle).
 
@@ -458,8 +468,8 @@ Performs action and waits for `console` event to fire. If predicate is provided,
 Performs action and waits for `download` event to fire. If predicate is provided, it passes [Download] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the download event is fired.
 
 ## page.expect_event(event, **options)
-- `event` <[str]> Event name, same one typically passed into `page.on(event)`.
-- `predicate` <[Function]> Receives the event data and resolves to truthy value when the waiting should resolve.
+- `event` <[str]> Event name, same one typically passed into `*.on(event)`.
+- `predicate` <[Callable]> Receives the event data and resolves to truthy value when the waiting should resolve.
 - `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout).
 - returns: <[EventContextManager]>
 
@@ -487,34 +497,6 @@ value = event_info.value
 - returns: <[EventContextManager]\[[FileChooser]\]>
 
 Performs action and waits for `filechooser` event to fire. If predicate is provided, it passes [FileChooser] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the page is closed before the worker event is fired.
-
-## page.expect_load_state(**options)
-- `state` <"load"|"domcontentloaded"|"networkidle"> Optional load state to wait for, defaults to `load`. If the state has been already reached while loading current document, the method resolves immediately. Can be one of:
-  * `'load'` - wait for the `load` event to be fired.
-  * `'domcontentloaded'` - wait for the `DOMContentLoaded` event to be fired.
-  * `'networkidle'` - wait until there are no network connections for at least `500` ms.
-- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
-- returns: <[EventContextManager]>
-
-Performs action and waits for the required load state. It resolves when the page reaches a required load state, `load` by default. The navigation must have been committed when this method is called. If current document has already reached the required state, resolves immediately.
-
-```py
-# async
-
-async with page.expect_load_state():
-    await page.click('button') # Click triggers navigation.
-# Context manager waits for 'load' event.
-```
-
-```py
-# sync
-
-with page.expect_load_state():
-    page.click('button') # Click triggers navigation.
-# Context manager waits for 'load' event.
-```
-
-Shortcut for main frame's [frame.expect_load_state(**options)](./api/class-frame.md#frameexpect_load_stateoptions).
 
 ## page.expect_navigation(**options)
 - `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
@@ -545,7 +527,9 @@ with page.expect_navigation():
 # Context manager waited for the navigation to happen.
 ```
 
-**NOTE** Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::note
+Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::
 
 Shortcut for main frame's [frame.expect_navigation(**options)](./api/class-frame.md#frameexpect_navigationoptions).
 
@@ -588,7 +572,9 @@ The first argument of the `callback` function contains information about the cal
 
 See [browser_context.expose_binding(name, callback, **options)](./api/class-browsercontext.md#browser_contextexpose_bindingname-callback-options) for the context-wide version.
 
-> **NOTE** Functions installed via `page.exposeBinding` survive navigations.
+:::note
+Functions installed via [page.expose_binding(name, callback, **options)](./api/class-page.md#pageexpose_bindingname-callback-options) survive navigations.
+:::
 
 An example of exposing page URL to all frames in a page:
 
@@ -604,7 +590,9 @@ If the `callback` returns a [Promise], it will be awaited.
 
 See [browser_context.expose_function(name, callback)](./api/class-browsercontext.md#browser_contextexpose_functionname-callback) for context-wide exposed function.
 
-> **NOTE** Functions installed via `page.exposeFunction` survive navigations.
+:::note
+Functions installed via [page.expose_function(name, callback)](./api/class-page.md#pageexpose_functionname-callback) survive navigations.
+:::
 
 An example of adding an `md5` function to the page:
 
@@ -637,7 +625,7 @@ Shortcut for main frame's [frame.focus(selector, **options)](./api/class-frame.m
 
 Returns frame matching the specified criteria. Either `name` or `url` must be specified.
 
-## page.frames()
+## page.frames
 - returns: <[List]\[[Frame]\]>
 
 An array of all frames attached to the page.
@@ -693,10 +681,15 @@ Returns the main resource response. In case of multiple redirects, the navigatio
 * the remote server does not respond or is unreachable.
 * the main resource failed to load.
 
-`page.goto` will not throw an error when any valid HTTP status code is returned by the remote server, including 404 "Not Found" and 500 "Internal Server Error".  The status code for such responses can be retrieved by calling [response.status()](./api/class-response.md#responsestatus).
+`page.goto` will not throw an error when any valid HTTP status code is returned by the remote server, including 404 "Not Found" and 500 "Internal Server Error".  The status code for such responses can be retrieved by calling [response.status](./api/class-response.md#responsestatus).
 
-> **NOTE** `page.goto` either throws an error or returns a main resource response. The only exceptions are navigation to `about:blank` or navigation to the same URL with a different hash, which would succeed and return `null`.
-> **NOTE** Headless mode doesn't support navigation to a PDF document. See the [upstream issue](https://bugs.chromium.org/p/chromium/issues/detail?id=761295).
+:::note
+`page.goto` either throws an error or returns a main resource response. The only exceptions are navigation to `about:blank` or navigation to the same URL with a different hash, which would succeed and return `null`.
+:::
+
+:::note
+Headless mode doesn't support navigation to a PDF document. See the [upstream issue](https://bugs.chromium.org/p/chromium/issues/detail?id=761295).
+:::
 
 Shortcut for main frame's [frame.goto(url, **options)](./api/class-frame.md#framegotourl-options)
 
@@ -781,7 +774,7 @@ Returns whether the element is hidden, the opposite of [visible](./actionability
 
 Returns whether the element is [visible](./actionability.md#visible).
 
-## page.main_frame()
+## page.main_frame
 - returns: <[Frame]>
 
 The page's main frame. Page is guaranteed to have a main frame which persists during navigations.
@@ -793,7 +786,7 @@ Returns the opener for popup pages and `null` for others. If the opener has been
 
 ## page.pdf(**options)
 - `display_header_footer` <[bool]> Display header and footer. Defaults to `false`.
-- `footer_template` <[str]> HTML template for the print footer. Should use the same format as the `headerTemplate`.
+- `footer_template` <[str]> HTML template for the print footer. Should use the same format as the `header_template`.
 - `format` <[str]> Paper format. If set, takes priority over `width` or `height` options. Defaults to 'Letter'.
 - `header_template` <[str]> HTML template for the print header. Should be valid HTML markup with following classes used to inject printing values into them:
   * `'date'` formatted print date
@@ -818,11 +811,15 @@ Returns the opener for popup pages and `null` for others. If the opener has been
 
 Returns the PDF buffer.
 
-> **NOTE** Generating a pdf is currently only supported in Chromium headless.
+:::note
+Generating a pdf is currently only supported in Chromium headless.
+:::
 
 `page.pdf()` generates a pdf of the page with `print` css media. To generate a pdf with `screen` media, call [page.emulate_media(**options)](./api/class-page.md#pageemulate_mediaoptions) before calling `page.pdf()`:
 
-> **NOTE** By default, `page.pdf()` generates a pdf with modified colors for printing. Use the [`-webkit-print-color-adjust`](https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-print-color-adjust) property to force rendering of exact colors.
+:::note
+By default, `page.pdf()` generates a pdf with modified colors for printing. Use the [`-webkit-print-color-adjust`](https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-print-color-adjust) property to force rendering of exact colors.
+:::
 
 The `width`, `height`, and `margin` options accept values labeled with units. Unlabeled values are treated as pixels.
 
@@ -850,9 +847,9 @@ The `format` options are:
 * `A5`: 5.83in x 8.27in
 * `A6`: 4.13in x 5.83in
 
-> **NOTE** `headerTemplate` and `footerTemplate` markup have the following limitations:
-> 1. Script tags inside templates are not evaluated.
-> 2. Page styles are not visible inside templates.
+:::note
+`header_template` and `footer_template` markup have the following limitations: > 1. Script tags inside templates are not evaluated. > 2. Page styles are not visible inside templates.
+:::
 
 ## page.press(selector, key, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -909,7 +906,9 @@ Routing provides the capability to modify network requests that are made by a pa
 
 Once routing is enabled, every request matching the url pattern will stall unless it's continued, fulfilled or aborted.
 
-> **NOTE** The handler will only be called for the first url if the response is a redirect.
+:::note
+The handler will only be called for the first url if the response is a redirect.
+:::
 
 An example of a naïve handler that aborts all image requests:
 
@@ -917,7 +916,9 @@ or the same snippet using a regex pattern instead:
 
 Page routes take precedence over browser context routes (set up with [browser_context.route(url, handler)](./api/class-browsercontext.md#browser_contextrouteurl-handler)) when request matches both handlers.
 
-> **NOTE** Enabling routing disables http cache.
+:::note
+Enabling routing disables http cache.
+:::
 
 ## page.screenshot(**options)
 - `clip` <[Dict]> An object which specifies clipping of the resulting image. Should have the following fields:
@@ -935,7 +936,9 @@ Page routes take precedence over browser context routes (set up with [browser_co
 
 Returns the buffer with the captured screenshot.
 
-> **NOTE** Screenshots take at least 1/6 second on Chromium OS X and Chromium Windows. See https://crbug.com/741689 for discussion.
+:::note
+Screenshots take at least 1/6 second on Chromium OS X and Chromium Windows. See https://crbug.com/741689 for discussion.
+:::
 
 ## page.select_option(selector, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -972,21 +975,27 @@ This setting will change the default maximum navigation time for the following m
 * [page.set_content(html, **options)](./api/class-page.md#pageset_contenthtml-options)
 * [page.wait_for_navigation(**options)](./api/class-page.md#pagewait_for_navigationoptions)
 
-> **NOTE** [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) takes priority over [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) and [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout).
+:::note
+[page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) takes priority over [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) and [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout).
+:::
 
 ## page.set_default_timeout(timeout)
 - `timeout` <[float]> Maximum time in milliseconds
 
 This setting will change the default maximum time for all the methods accepting `timeout` option.
 
-> **NOTE** [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) takes priority over [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout).
+:::note
+[page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) takes priority over [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout).
+:::
 
 ## page.set_extra_http_headers(headers)
 - `headers` <[Dict]\[[str], [str]\]> An object containing additional HTTP headers to be sent with every request. All header values must be strings.
 
 The extra HTTP headers will be sent with every request the page initiates.
 
-> **NOTE** page.setExtraHTTPHeaders does not guarantee the order of headers in the outgoing requests.
+:::note
+[page.set_extra_http_headers(headers)](./api/class-page.md#pageset_extra_http_headersheaders) does not guarantee the order of headers in the outgoing requests.
+:::
 
 ## page.set_input_files(selector, files, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -1025,11 +1034,13 @@ This method taps an element matching `selector` by performing the following step
 1. Wait for [actionability](./actionability.md) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
 1. Scroll the element into view if needed.
 1. Use [page.touchscreen](./api/class-page.md#pagetouchscreen) to tap the center of the element, or the specified `position`.
-1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+1. Wait for initiated navigations to either succeed or fail, unless `no_wait_after` option is set.
 
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
 
-> **NOTE** `page.tap()` requires that the `hasTouch` option of the browser context be set to true.
+:::note
+[page.tap(selector, **options)](./api/class-page.md#pagetapselector-options) requires that the `has_touch` option of the browser context be set to true.
+:::
 
 Shortcut for main frame's [frame.tap(selector, **options)](./api/class-frame.md#frametapselector-options).
 
@@ -1070,7 +1081,7 @@ This method unchecks an element matching `selector` by performing the following 
 1. Wait for [actionability](./actionability.md) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
 1. Scroll the element into view if needed.
 1. Use [page.mouse](./api/class-page.md#pagemouse) to click in the center of the element.
-1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+1. Wait for initiated navigations to either succeed or fail, unless `no_wait_after` option is set.
 1. Ensure that the element is now unchecked. If not, this method rejects.
 
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
@@ -1083,24 +1094,24 @@ Shortcut for main frame's [frame.uncheck(selector, **options)](./api/class-frame
 
 Removes a route created with [page.route(url, handler)](./api/class-page.md#pagerouteurl-handler). When `handler` is not specified, removes all routes for the `url`.
 
-## page.url()
+## page.url
 - returns: <[str]>
 
-Shortcut for main frame's [frame.url()](./api/class-frame.md#frameurl).
+Shortcut for main frame's [frame.url](./api/class-frame.md#frameurl).
 
-## page.video()
+## page.video
 - returns: <[NoneType]|[Video]>
 
 Video object associated with this page.
 
-## page.viewport_size()
+## page.viewport_size
 - returns: <[NoneType]|[Dict]>
   - `width` <[int]> page width in pixels.
   - `height` <[int]> page height in pixels.
 
 ## page.wait_for_event(event, **options)
-- `event` <[str]> Event name, same one typically passed into `page.on(event)`.
-- `predicate` <[Function]> Receives the event data and resolves to truthy value when the waiting should resolve.
+- `event` <[str]> Event name, same one typically passed into `*.on(event)`.
+- `predicate` <[Callable]> Receives the event data and resolves to truthy value when the waiting should resolve.
 - `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout).
 - returns: <[Any]>
 
@@ -1109,14 +1120,14 @@ Returns the event data value.
 Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the page is closed before the event is fired.
 
 ## page.wait_for_function(expression, **options)
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
-- `polling` <[float]|"raf"> If `polling` is `'raf'`, then `pageFunction` is constantly executed in `requestAnimationFrame` callback. If `polling` is a number, then it is treated as an interval in milliseconds at which the function would be executed. Defaults to `raf`.
+- `arg` <[EvaluationArgument]> Optional argument to pass to `page_function`
+- `polling` <[float]|"raf"> If `polling` is `'raf'`, then `page_function` is constantly executed in `requestAnimationFrame` callback. If `polling` is a number, then it is treated as an interval in milliseconds at which the function would be executed. Defaults to `raf`.
 - `timeout` <[float]> maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout).
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[JSHandle]>
 
-Returns when the `pageFunction` returns a truthy value. It resolves to a JSHandle of the truthy value.
+Returns when the `page_function` returns a truthy value. It resolves to a JSHandle of the truthy value.
 
 The `waitForFunction` can be used to observe viewport size change:
 
@@ -1150,7 +1161,9 @@ Returns the main resource response. In case of multiple redirects, the navigatio
 
 This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
 
-**NOTE** Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::note
+Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::
 
 Shortcut for main frame's [frame.wait_for_navigation(**options)](./api/class-frame.md#framewait_for_navigationoptions).
 
@@ -1193,12 +1206,14 @@ Note that `page.waitForTimeout()` should only be used for debugging. Tests using
 
 Shortcut for main frame's [frame.wait_for_timeout(timeout)](./api/class-frame.md#framewait_for_timeouttimeout).
 
-## page.workers()
+## page.workers
 - returns: <[List]\[[Worker]\]>
 
 This method returns all of the dedicated [WebWorkers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) associated with the page.
 
-> **NOTE** This does not contain ServiceWorkers
+:::note
+This does not contain ServiceWorkers
+:::
 
 ## page.accessibility
 - type: <[Accessibility]>

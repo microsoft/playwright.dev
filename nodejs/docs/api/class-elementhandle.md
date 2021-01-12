@@ -214,7 +214,9 @@ If the element is detached from the DOM at any moment during the action, this me
 
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
 
-> **NOTE** `elementHandle.dblclick()` dispatches two `click` events and a single `dblclick` event.
+:::note
+`elementHandle.dblclick()` dispatches two `click` events and a single `dblclick` event.
+:::
 
 ## elementHandle.dispatchEvent(type[, eventInit])
 - `type` <[string]> DOM event type: `"click"`, `"dragstart"`, etc.
@@ -436,7 +438,9 @@ If the element is detached from the DOM at any moment during the action, this me
 
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
 
-> **NOTE** `elementHandle.tap()` requires that the `hasTouch` option of the browser context be set to true.
+:::note
+`elementHandle.tap()` requires that the `hasTouch` option of the browser context be set to true.
+:::
 
 ## elementHandle.textContent()
 - returns: <[Promise]<[null]|[string]>>
@@ -524,7 +528,10 @@ const div = await page.$('div');
 const span = await div.waitForSelector('span', { state: 'attached' });
 ```
 
-> **NOTE** This method does not work across navigations, use [page.waitForSelector(selector[, options])](./api/class-page.md#pagewaitforselectorselector-options) instead.
+:::note
+This method does not work across navigations, use [page.waitForSelector(selector[, options])](./api/class-page.md#pagewaitforselectorselector-options) instead.
+:::
+
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"

@@ -10,7 +10,7 @@ When browser context is created with the `videosPath` option, each page has a vi
 - [video.path()](./api/class-video.md#videopath)
 
 ## video.path()
-- returns: <[str]>
+- returns: <[pathlib.Path]>
 
 Returns the file system path this video will be recorded to. The video is guaranteed to be written to the filesystem upon closing the browser context.
 

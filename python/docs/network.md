@@ -23,7 +23,7 @@ Playwright provides APIs to **monitor** and **modify** network traffic, both HTT
 
 ## Handle file downloads
 
-For every attachment downloaded by the page, [page.on("download")](./api/class-page.md#pageondownload) event is emitted. If you create a browser context with the `acceptDownloads: true`, all these attachments are going to be downloaded into a temporary folder. You can obtain the download url, file system path and payload stream using the [Download] object from the event.
+For every attachment downloaded by the page, [page.on("download")](./api/class-page.md#pageondownload) event is emitted. If you create a browser context with the `accept_downloads` set, all these attachments are going to be downloaded into a temporary folder. You can obtain the download url, file system path and payload stream using the [Download] object from the event.
 
 #### Variations
 

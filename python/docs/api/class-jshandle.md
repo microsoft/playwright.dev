@@ -29,28 +29,28 @@ Returns either `null` or the object handle itself, if the object handle is an in
 The `jsHandle.dispose` method stops referencing the element handle.
 
 ## js_handle.evaluate(expression, **options)
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `arg` <[EvaluationArgument]> Optional argument to pass to `page_function`
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[Serializable]>
 
-Returns the return value of `pageFunction`
+Returns the return value of `page_function`
 
-This method passes this handle as the first argument to `pageFunction`.
+This method passes this handle as the first argument to `page_function`.
 
-If `pageFunction` returns a [Promise], then `handle.evaluate` would wait for the promise to resolve and return its value.
+If `page_function` returns a [Promise], then `handle.evaluate` would wait for the promise to resolve and return its value.
 
 Examples:
 
 ## js_handle.evaluate_handle(expression, **options)
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `arg` <[EvaluationArgument]> Optional argument to pass to `page_function`
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[JSHandle]>
 
-Returns the return value of `pageFunction` as in-page object (JSHandle).
+Returns the return value of `page_function` as in-page object (JSHandle).
 
-This method passes this handle as the first argument to `pageFunction`.
+This method passes this handle as the first argument to `page_function`.
 
 The only difference between `jsHandle.evaluate` and `jsHandle.evaluateHandle` is that `jsHandle.evaluateHandle` returns in-page object (JSHandle).
 
@@ -74,7 +74,10 @@ Fetches a single property from the referenced object.
 
 Returns a JSON representation of the object. If the object has a `toJSON` function, it **will not be called**.
 
-> **NOTE** The method will return an empty JSON object if the referenced object is not stringifiable. It will throw an error if the object has circular references.
+:::note
+The method will return an empty JSON object if the referenced object is not stringifiable. It will throw an error if the object has circular references.
+:::
+
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
