@@ -7,12 +7,12 @@ title: "FileChooser"
 [FileChooser] objects are dispatched by the page in the [page.on("filechooser")](./api/class-page.md#pageonfilechooser) event.
 
 
-- [file_chooser.element()](./api/class-filechooser.md#file_chooserelement)
+- [file_chooser.element](./api/class-filechooser.md#file_chooserelement)
 - [file_chooser.is_multiple()](./api/class-filechooser.md#file_chooseris_multiple)
-- [file_chooser.page()](./api/class-filechooser.md#file_chooserpage)
+- [file_chooser.page](./api/class-filechooser.md#file_chooserpage)
 - [file_chooser.set_files(files, **options)](./api/class-filechooser.md#file_chooserset_filesfiles-options)
 
-## file_chooser.element()
+## file_chooser.element
 - returns: <[ElementHandle]>
 
 Returns input element associated with this file chooser.
@@ -22,7 +22,7 @@ Returns input element associated with this file chooser.
 
 Returns whether this file chooser accepts multiple files.
 
-## file_chooser.page()
+## file_chooser.page
 - returns: <[Page]>
 
 Returns page this file chooser belongs to.

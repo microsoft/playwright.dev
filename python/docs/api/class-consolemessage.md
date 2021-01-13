@@ -7,24 +7,24 @@ title: "ConsoleMessage"
 [ConsoleMessage] objects are dispatched by page via the [page.on("console")](./api/class-page.md#pageonconsole) event.
 
 
-- [console_message.args()](./api/class-consolemessage.md#console_messageargs)
-- [console_message.location()](./api/class-consolemessage.md#console_messagelocation)
-- [console_message.text()](./api/class-consolemessage.md#console_messagetext)
-- [console_message.type()](./api/class-consolemessage.md#console_messagetype)
+- [console_message.args](./api/class-consolemessage.md#console_messageargs)
+- [console_message.location](./api/class-consolemessage.md#console_messagelocation)
+- [console_message.text](./api/class-consolemessage.md#console_messagetext)
+- [console_message.type](./api/class-consolemessage.md#console_messagetype)
 
-## console_message.args()
+## console_message.args
 - returns: <[List]\[[JSHandle]\]>
 
-## console_message.location()
+## console_message.location
 - returns: <[Dict]>
   - `url` <[str]> URL of the resource.
   - `lineNumber` <[int]> 0-based line number in the resource.
   - `columnNumber` <[int]> 0-based column number in the resource.
 
-## console_message.text()
+## console_message.text
 - returns: <[str]>
 
-## console_message.type()
+## console_message.type
 - returns: <[str]>
 
 One of the following values: `'log'`, `'debug'`, `'info'`, `'error'`, `'warning'`, `'dir'`, `'dirxml'`, `'table'`, `'trace'`, `'clear'`, `'startGroup'`, `'startGroupCollapsed'`, `'endGroup'`, `'assert'`, `'profile'`, `'profileEnd'`, `'count'`, `'timeEnd'`.

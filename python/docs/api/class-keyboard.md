@@ -40,14 +40,18 @@ If `key` is a modifier key, `Shift`, `Meta`, `Control`, or `Alt`, subsequent key
 
 After the key is pressed once, subsequent calls to [keyboard.down(key)](./api/class-keyboard.md#keyboarddownkey) will have [repeat](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/repeat) set to true. To release the key, use [keyboard.up(key)](./api/class-keyboard.md#keyboardupkey).
 
-> **NOTE** Modifier keys DO influence `keyboard.down`. Holding down `Shift` will type the text in upper case.
+:::note
+Modifier keys DO influence `keyboard.down`. Holding down `Shift` will type the text in upper case.
+:::
 
 ## keyboard.insert_text(text)
 - `text` <[str]> Sets input to the specified text value.
 
 Dispatches only `input` event, does not emit the `keydown`, `keyup` or `keypress` events.
 
-> **NOTE** Modifier keys DO NOT effect `keyboard.insertText`. Holding down `Shift` will not type the text in upper case.
+:::note
+Modifier keys DO NOT effect `keyboard.insertText`. Holding down `Shift` will not type the text in upper case.
+:::
 
 ## keyboard.press(key, **options)
 - `key` <[str]> Name of the key to press or a character to generate, such as `ArrowLeft` or `a`.
@@ -75,7 +79,9 @@ Sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in t
 
 To press a special key, like `Control` or `ArrowDown`, use [keyboard.press(key, **options)](./api/class-keyboard.md#keyboardpresskey-options).
 
-> **NOTE** Modifier keys DO NOT effect `keyboard.type`. Holding down `Shift` will not type the text in upper case.
+:::note
+Modifier keys DO NOT effect `keyboard.type`. Holding down `Shift` will not type the text in upper case.
+:::
 
 ## keyboard.up(key)
 - `key` <[str]> Name of the key to press or a character to generate, such as `ArrowLeft` or `a`.

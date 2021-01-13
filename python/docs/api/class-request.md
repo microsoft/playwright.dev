@@ -11,27 +11,29 @@ Whenever the page sends a request for a network resource the following sequence 
 
 If request fails at some point, then instead of `'requestfinished'` event (and possibly instead of 'response' event), the  [page.on("requestfailed")](./api/class-page.md#pageonrequestfailed) event is emitted.
 
-> **NOTE** HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with `'requestfinished'` event.
+:::note
+HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with `'requestfinished'` event.
+:::
 
 If request gets a 'redirect' response, the request is successfully finished with the 'requestfinished' event, and a new request is  issued to a redirected url.
 
 
-- [request.failure()](./api/class-request.md#requestfailure)
-- [request.frame()](./api/class-request.md#requestframe)
-- [request.headers()](./api/class-request.md#requestheaders)
+- [request.failure](./api/class-request.md#requestfailure)
+- [request.frame](./api/class-request.md#requestframe)
+- [request.headers](./api/class-request.md#requestheaders)
 - [request.is_navigation_request()](./api/class-request.md#requestis_navigation_request)
-- [request.method()](./api/class-request.md#requestmethod)
-- [request.post_data()](./api/class-request.md#requestpost_data)
-- [request.post_data_buffer()](./api/class-request.md#requestpost_data_buffer)
-- [request.post_data_json()](./api/class-request.md#requestpost_data_json)
-- [request.redirected_from()](./api/class-request.md#requestredirected_from)
-- [request.redirected_to()](./api/class-request.md#requestredirected_to)
-- [request.resource_type()](./api/class-request.md#requestresource_type)
+- [request.method](./api/class-request.md#requestmethod)
+- [request.post_data](./api/class-request.md#requestpost_data)
+- [request.post_data_buffer](./api/class-request.md#requestpost_data_buffer)
+- [request.post_data_json](./api/class-request.md#requestpost_data_json)
+- [request.redirected_from](./api/class-request.md#requestredirected_from)
+- [request.redirected_to](./api/class-request.md#requestredirected_to)
+- [request.resource_type](./api/class-request.md#requestresource_type)
 - [request.response()](./api/class-request.md#requestresponse)
-- [request.timing()](./api/class-request.md#requesttiming)
-- [request.url()](./api/class-request.md#requesturl)
+- [request.timing](./api/class-request.md#requesttiming)
+- [request.url](./api/class-request.md#requesturl)
 
-## request.failure()
+## request.failure
 - returns: <[NoneType]|[str]>
 
 Returns human-readable error message, e.g. `'net::ERR_FAILED'`. The method returns `None` unless this request has failed, as reported by `requestfailed` event.
@@ -42,12 +44,12 @@ Example of logging of all the failed requests:
 page.on('requestfailed', lambda request: print(request.url + ' ' + request.failure);
 ```
 
-## request.frame()
+## request.frame
 - returns: <[Frame]>
 
 Returns the [Frame] that initiated this request.
 
-## request.headers()
+## request.headers
 - returns: <[Dict]\[[str], [str]\]>
 
 An object with HTTP headers associated with the request. All header names are lower-case.
@@ -57,29 +59,29 @@ An object with HTTP headers associated with the request. All header names are lo
 
 Whether this request is driving frame's navigation.
 
-## request.method()
+## request.method
 - returns: <[str]>
 
 Request's method (GET, POST, etc.)
 
-## request.post_data()
+## request.post_data
 - returns: <[NoneType]|[str]>
 
 Request's post body, if any.
 
-## request.post_data_buffer()
+## request.post_data_buffer
 - returns: <[NoneType]|[Buffer]>
 
 Request's post body in a binary form, if any.
 
-## request.post_data_json()
+## request.post_data_json
 - returns: <[NoneType]|[Any]>
 
 Returns parsed request's body for `form-urlencoded` and JSON as a fallback if any.
 
 When the response is `application/x-www-form-urlencoded` then a key/value object of the values will be returned. Otherwise it will be parsed as JSON.
 
-## request.redirected_from()
+## request.redirected_from
 - returns: <[NoneType]|[Request]>
 
 Request that was redirected by the server to this one, if any.
@@ -90,14 +92,14 @@ For example, if the website `http://example.com` redirects to `https://example.c
 
 If the website `https://google.com` has no redirects:
 
-## request.redirected_to()
+## request.redirected_to
 - returns: <[NoneType]|[Request]>
 
 New request issued by the browser if the server responded with redirect.
 
-This method is the opposite of [request.redirected_from()](./api/class-request.md#requestredirected_from):
+This method is the opposite of [request.redirected_from](./api/class-request.md#requestredirected_from):
 
-## request.resource_type()
+## request.resource_type
 - returns: <[str]>
 
 Contains the request's resource type as it was perceived by the rendering engine. ResourceType will be one of the following: `document`, `stylesheet`, `image`, `media`, `font`, `script`, `texttrack`, `xhr`, `fetch`, `eventsource`, `websocket`, `manifest`, `other`.
@@ -107,7 +109,7 @@ Contains the request's resource type as it was perceived by the rendering engine
 
 Returns the matching [Response] object, or `null` if the response was not received due to error.
 
-## request.timing()
+## request.timing
 - returns: <[Dict]>
   - `startTime` <[float]> Request start time in milliseconds elapsed since January 1, 1970 00:00:00 UTC
   - `domainLookupStart` <[float]> Time immediately before the browser starts the domain name lookup for the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
@@ -121,7 +123,7 @@ Returns the matching [Response] object, or `null` if the response was not receiv
 
 Returns resource timing information for given request. Most of the timing values become available upon the response, `responseEnd` becomes available when request finishes. Find more information at [Resource Timing API](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceResourceTiming).
 
-## request.url()
+## request.url
 - returns: <[str]>
 
 URL of the request.

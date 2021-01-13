@@ -17,7 +17,7 @@ Playwright splits the process of showing a new document in a page into **navigat
 **Navigations** can be initiated by changing the page URL or by interacting with the page (e.g., clicking a link). Navigation ends when response headers have been parsed and session history is updated. The navigation intent may be canceled, for example, on hitting an unresolved DNS address or transformed into a file download. Only after the navigation succeeds, page starts **loading** the document.
 
 **Loading** covers getting the remaining response body over the network, parsing, executing the scripts and firing load events:
-- [page.url()](./api/class-page.md#pageurl) is set to the new url
+- [page.url](./api/class-page.md#pageurl) is set to the new url
 - document content is loaded over network and parsed
 - [page.on("domcontentloaded")](./api/class-page.md#pageondomcontentloaded) event is fired
 - page executes some scripts and loads resources like stylesheets and images

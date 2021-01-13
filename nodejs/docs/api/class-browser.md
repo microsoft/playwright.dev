@@ -18,8 +18,6 @@ const { firefox } = require('playwright');  // Or 'chromium' or 'webkit'.
 })();
 ```
 
-See [ChromiumBrowser], [FirefoxBrowser] and [WebKitBrowser] for browser-specific features. Note that [browserType.launch([options])](./api/class-browsertype.md#browsertypelaunchoptions) always returns a specific browser instance, based on the browser being launched.
-
 
 - [browser.on('disconnected')](./api/class-browser.md#browserondisconnected)
 - [browser.close()](./api/class-browser.md#browserclose)

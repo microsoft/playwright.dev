@@ -10,15 +10,17 @@ All the downloaded files belonging to the browser context are deleted when the b
 
 Download event is emitted once the download starts. Download path becomes available once download completes:
 
-> **NOTE** Browser context **must** be created with the `acceptDownloads` set to `true` when user needs access to the downloaded content. If `acceptDownloads` is not set or set to `false`, download events are emitted, but the actual download is not performed and user has no access to the downloaded files.
+:::note
+Browser context **must** be created with the `accept_downloads` set to `true` when user needs access to the downloaded content. If `accept_downloads` is not set, download events are emitted, but the actual download is not performed and user has no access to the downloaded files.
+:::
 
 
 - [download.delete()](./api/class-download.md#downloaddelete)
 - [download.failure()](./api/class-download.md#downloadfailure)
 - [download.path()](./api/class-download.md#downloadpath)
 - [download.save_as(path)](./api/class-download.md#downloadsave_aspath)
-- [download.suggested_filename()](./api/class-download.md#downloadsuggested_filename)
-- [download.url()](./api/class-download.md#downloadurl)
+- [download.suggested_filename](./api/class-download.md#downloadsuggested_filename)
+- [download.url](./api/class-download.md#downloadurl)
 
 ## download.delete()
 
@@ -30,7 +32,7 @@ Deletes the downloaded file.
 Returns download error if any.
 
 ## download.path()
-- returns: <[NoneType]|[str]>
+- returns: <[NoneType]|[pathlib.Path]>
 
 Returns path to the downloaded file in case of successful download.
 
@@ -39,12 +41,12 @@ Returns path to the downloaded file in case of successful download.
 
 Saves the download to a user-specified path.
 
-## download.suggested_filename()
+## download.suggested_filename
 - returns: <[str]>
 
 Returns suggested filename for this download. It is typically computed by the browser from the [`Content-Disposition`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition) response header or the `download` attribute. See the spec on [whatwg](https://html.spec.whatwg.org/#downloading-resources). Different browsers can use different logic for computing it.
 
-## download.url()
+## download.url
 - returns: <[str]>
 
 Returns downloaded url.

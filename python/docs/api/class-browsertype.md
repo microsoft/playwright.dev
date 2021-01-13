@@ -7,12 +7,12 @@ title: "BrowserType"
 BrowserType provides methods to launch a specific browser instance or connect to an existing one. The following is a typical example of using Playwright to drive automation:
 
 
-- [browser_type.executable_path()](./api/class-browsertype.md#browser_typeexecutable_path)
+- [browser_type.executable_path](./api/class-browsertype.md#browser_typeexecutable_path)
 - [browser_type.launch(**options)](./api/class-browsertype.md#browser_typelaunchoptions)
 - [browser_type.launch_persistent_context(user_data_dir, **options)](./api/class-browsertype.md#browser_typelaunch_persistent_contextuser_data_dir-options)
-- [browser_type.name()](./api/class-browsertype.md#browser_typename)
+- [browser_type.name](./api/class-browsertype.md#browser_typename)
 
-## browser_type.executable_path()
+## browser_type.executable_path
 - returns: <[str]>
 
 A path where Playwright expects to find a bundled browser executable.
@@ -23,7 +23,7 @@ A path where Playwright expects to find a bundled browser executable.
 - `devtools` <[bool]> **Chromium-only** Whether to auto-open a Developer Tools panel for each tab. If this option is `true`, the `headless` option will be set `false`.
 - `downloads_path` <[Union]\[[str], [pathlib.Path]\]> If specified, accepted downloads are downloaded into this directory. Otherwise, temporary directory is created and is deleted when browser is closed.
 - `env` <[Dict]\[[str], [str]|[float]|[bool]\]> Specify environment variables that will be visible to the browser. Defaults to `process.env`.
-- `executable_path` <[Union]\[[str], [pathlib.Path]\]> Path to a browser executable to run instead of the bundled one. If `executablePath` is a relative path, then it is resolved relative to the current working directory. Note that Playwright only works with the bundled Chromium, Firefox or WebKit, use at your own risk.
+- `executable_path` <[Union]\[[str], [pathlib.Path]\]> Path to a browser executable to run instead of the bundled one. If `executable_path` is a relative path, then it is resolved relative to the current working directory. Note that Playwright only works with the bundled Chromium, Firefox or WebKit, use at your own risk.
 - `firefox_user_prefs` <[Dict]\[[str], [str]|[float]|[bool]\]> Firefox user preferences. Learn more about the Firefox user preferences at [`about:config`](https://support.mozilla.org/en-US/kb/about-config-editor-firefox).
 - `handle_sighup` <[bool]> Close the browser process on SIGHUP. Defaults to `true`.
 - `handle_sigint` <[bool]> Close the browser process on Ctrl-C. Defaults to `true`.
@@ -41,9 +41,9 @@ A path where Playwright expects to find a bundled browser executable.
 
 Returns the browser instance.
 
-You can use `ignoreDefaultArgs` to filter out `--mute-audio` from default arguments:
+You can use `ignore_default_args` to filter out `--mute-audio` from default arguments:
 
-> **Chromium-only** Playwright can also be used to control the Chrome browser, but it works best with the version of Chromium it is bundled with. There is no guarantee it will work with any other version. Use `executablePath` option with extreme caution.
+> **Chromium-only** Playwright can also be used to control the Chrome browser, but it works best with the version of Chromium it is bundled with. There is no guarantee it will work with any other version. Use `executable_path` option with extreme caution.
 >
 > If Google Chrome (rather than Chromium) is preferred, a [Chrome Canary](https://www.google.com/chrome/browser/canary.html) or [Dev Channel](https://www.chromium.org/getting-involved/dev-channel) build is suggested.
 >
@@ -62,7 +62,7 @@ You can use `ignoreDefaultArgs` to filter out `--mute-audio` from default argume
 - `devtools` <[bool]> **Chromium-only** Whether to auto-open a Developer Tools panel for each tab. If this option is `true`, the `headless` option will be set `false`.
 - `downloads_path` <[Union]\[[str], [pathlib.Path]\]> If specified, accepted downloads are downloaded into this directory. Otherwise, temporary directory is created and is deleted when browser is closed.
 - `env` <[Dict]\[[str], [str]|[float]|[bool]\]> Specify environment variables that will be visible to the browser. Defaults to `process.env`.
-- `executable_path` <[Union]\[[str], [pathlib.Path]\]> Path to a browser executable to run instead of the bundled one. If `executablePath` is a relative path, then it is resolved relative to the current working directory. **BEWARE**: Playwright is only guaranteed to work with the bundled Chromium, Firefox or WebKit, use at your own risk.
+- `executable_path` <[Union]\[[str], [pathlib.Path]\]> Path to a browser executable to run instead of the bundled one. If `executable_path` is a relative path, then it is resolved relative to the current working directory. **BEWARE**: Playwright is only guaranteed to work with the bundled Chromium, Firefox or WebKit, use at your own risk.
 - `extra_http_headers` <[Dict]\[[str], [str]\]> An object containing additional HTTP headers to be sent with every request. All header values must be strings.
 - `geolocation` <[Dict]>
   - `latitude` <[float]> Latitude between -90 and 90.
@@ -81,7 +81,7 @@ You can use `ignoreDefaultArgs` to filter out `--mute-audio` from default argume
 - `is_mobile` <[bool]> Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.
 - `java_script_enabled` <[bool]> Whether or not to enable JavaScript in the context. Defaults to `true`.
 - `locale` <[str]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
-- `no_viewport` <[bool]> Disables the default viewport.
+- `no_viewport` <[bool]> Does not enforce fixed viewport, allows resizing window in the headed mode.
 - `offline` <[bool]> Whether to emulate network being offline. Defaults to `false`.
 - `permissions` <[List]\[[str]\]> A list of permissions to grant to all pages in this context. See [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browser_contextgrant_permissionspermissions-options) for more details.
 - `proxy` <[Dict]> Network proxy settings.
@@ -99,10 +99,6 @@ You can use `ignoreDefaultArgs` to filter out `--mute-audio` from default argume
 - `timeout` <[float]> Maximum time in milliseconds to wait for the browser instance to start. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
 - `timezone_id` <[str]> Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.
 - `user_agent` <[str]> Specific user agent to use in this context.
-- `video_size` <[Dict]> **DEPRECATED** Use `recordVideo` instead.
-  - `width` <[int]> Video frame width.
-  - `height` <[int]> Video frame height.
-- `videos_path` <[Union]\[[str], [pathlib.Path]\]> **DEPRECATED** Use `recordVideo` instead.
 - `viewport` <[NoneType]|[Dict]> Sets a consistent viewport for each page. Defaults to an 1280x720 viewport. `no_viewport` disables the fixed viewport.
   - `width` <[int]> page width in pixels.
   - `height` <[int]> page height in pixels.
@@ -110,9 +106,9 @@ You can use `ignoreDefaultArgs` to filter out `--mute-audio` from default argume
 
 Returns the persistent browser context instance.
 
-Launches browser that uses persistent storage located at `userDataDir` and returns the only context. Closing this context will automatically close the browser.
+Launches browser that uses persistent storage located at `user_data_dir` and returns the only context. Closing this context will automatically close the browser.
 
-## browser_type.name()
+## browser_type.name
 - returns: <[str]>
 
 Returns browser name. For example: `'chromium'`, `'webkit'` or `'firefox'`.

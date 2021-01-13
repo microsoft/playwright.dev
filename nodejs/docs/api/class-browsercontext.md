@@ -69,7 +69,9 @@ const [page] = await Promise.all([
 console.log(await page.evaluate('location.href'));
 ```
 
-> **NOTE** Use [page.waitForLoadState([state, options])](./api/class-page.md#pagewaitforloadstatestate-options) to wait until the page gets to a particular state (you should not need it in most cases).
+:::note
+Use [page.waitForLoadState([state, options])](./api/class-page.md#pagewaitforloadstatestate-options) to wait until the page gets to a particular state (you should not need it in most cases).
+:::
 
 ## browserContext.addCookies(cookies)
 - `cookies` <[Array]<[Object]>>
@@ -115,7 +117,9 @@ await browserContext.addInitScript({
 });
 ```
 
-> **NOTE** The order of evaluation of multiple scripts installed via [browserContext.addInitScript(script[, arg])](./api/class-browsercontext.md#browsercontextaddinitscriptscript-arg) and [page.addInitScript(script[, arg])](./api/class-page.md#pageaddinitscriptscript-arg) is not defined.
+:::note
+The order of evaluation of multiple scripts installed via [browserContext.addInitScript(script[, arg])](./api/class-browsercontext.md#browsercontextaddinitscriptscript-arg) and [page.addInitScript(script[, arg])](./api/class-page.md#pageaddinitscriptscript-arg) is not defined.
+:::
 
 ## browserContext.browser()
 - returns: <[null]|[Browser]>
@@ -141,7 +145,9 @@ context.clearPermissions();
 
 Closes the browser context. All the pages that belong to the browser context will be closed.
 
-> **NOTE** the default browser context cannot be closed.
+:::note
+The default browser context cannot be closed.
+:::
 
 ## browserContext.cookies([urls])
 - `urls` <[string]|[Array]<[string]>> Optional list of URLs.
@@ -302,7 +308,9 @@ await browser.close();
 
 Page routes (set up with [page.route(url, handler)](./api/class-page.md#pagerouteurl-handler)) take precedence over browser context routes when request matches both handlers.
 
-> **NOTE** Enabling routing disables http cache.
+:::note
+Enabling routing disables http cache.
+:::
 
 ## browserContext.setDefaultNavigationTimeout(timeout)
 - `timeout` <[number]> Maximum navigation time in milliseconds
@@ -315,21 +323,27 @@ This setting will change the default maximum navigation time for the following m
 * [page.setContent(html[, options])](./api/class-page.md#pagesetcontenthtml-options)
 * [page.waitForNavigation([options])](./api/class-page.md#pagewaitfornavigationoptions)
 
-> **NOTE** [page.setDefaultNavigationTimeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) and [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) take priority over [browserContext.setDefaultNavigationTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout).
+:::note
+[page.setDefaultNavigationTimeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) and [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) take priority over [browserContext.setDefaultNavigationTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout).
+:::
 
 ## browserContext.setDefaultTimeout(timeout)
 - `timeout` <[number]> Maximum time in milliseconds
 
 This setting will change the default maximum time for all the methods accepting `timeout` option.
 
-> **NOTE** [page.setDefaultNavigationTimeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout), [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) and [browserContext.setDefaultNavigationTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout) take priority over [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+:::note
+[page.setDefaultNavigationTimeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout), [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) and [browserContext.setDefaultNavigationTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout) take priority over [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
+:::
 
 ## browserContext.setExtraHTTPHeaders(headers)
 - `headers` <[Object]<[string], [string]>> An object containing additional HTTP headers to be sent with every request. All header values must be strings.
 
 The extra HTTP headers will be sent with every request initiated by any page in the context. These headers are merged with page-specific extra HTTP headers set with [page.setExtraHTTPHeaders(headers)](./api/class-page.md#pagesetextrahttpheadersheaders). If page overrides a particular header, page-specific header value will be used instead of the browser context header value.
 
-> **NOTE** `browserContext.setExtraHTTPHeaders` does not guarantee the order of headers in the outgoing requests.
+:::note
+[browserContext.setExtraHTTPHeaders(headers)](./api/class-browsercontext.md#browsercontextsetextrahttpheadersheaders) does not guarantee the order of headers in the outgoing requests.
+:::
 
 ## browserContext.setGeolocation(geolocation)
 - `geolocation` <[null]|[Object]>
@@ -343,7 +357,9 @@ Sets the context's geolocation. Passing `null` or `undefined` emulates position 
 await browserContext.setGeolocation({latitude: 59.95, longitude: 30.31667});
 ```
 
-> **NOTE** Consider using [browserContext.grantPermissions(permissions[, options])](./api/class-browsercontext.md#browsercontextgrantpermissionspermissions-options) to grant permissions for the browser context pages to read its geolocation.
+:::note
+Consider using [browserContext.grantPermissions(permissions[, options])](./api/class-browsercontext.md#browsercontextgrantpermissionspermissions-options) to grant permissions for the browser context pages to read its geolocation.
+:::
 
 ## browserContext.setHTTPCredentials(httpCredentials)
 - `httpCredentials` <[null]|[Object]>
@@ -384,8 +400,8 @@ Removes a route created with [browserContext.route(url, handler)](./api/class-br
 
 ## browserContext.waitForEvent(event[, optionsOrPredicate])
 - `event` <[string]> Event name, same one would pass into `browserContext.on(event)`.
-- `optionsOrPredicate` <[Function]|[Object]> Either a predicate that receives an event or an options object. Optional.
-  - `predicate` <[Function]> receives the event data and resolves to truthy value when the waiting should resolve.
+- `optionsOrPredicate` <[function]|[Object]> Either a predicate that receives an event or an options object. Optional.
+  - `predicate` <[function]> receives the event data and resolves to truthy value when the waiting should resolve.
   - `timeout` <[number]> maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
 - returns: <[Promise]<[Object]>>
 

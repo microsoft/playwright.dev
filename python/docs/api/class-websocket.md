@@ -13,7 +13,7 @@ The [WebSocket] class represents websocket connections in the page.
 - [web_socket.on("socketerror")](./api/class-websocket.md#web_socketonsocketerror)
 - [web_socket.expect_event(event, **options)](./api/class-websocket.md#web_socketexpect_eventevent-options)
 - [web_socket.is_closed()](./api/class-websocket.md#web_socketis_closed)
-- [web_socket.url()](./api/class-websocket.md#web_socketurl)
+- [web_socket.url](./api/class-websocket.md#web_socketurl)
 - [web_socket.wait_for_event(event, **options)](./api/class-websocket.md#web_socketwait_for_eventevent-options)
 
 ## web_socket.on("close")
@@ -38,8 +38,8 @@ Fired when the websocket sends a frame.
 Fired when the websocket has an error.
 
 ## web_socket.expect_event(event, **options)
-- `event` <[str]> Event name, same one typically passed into `page.on(event)`.
-- `predicate` <[Function]> Receives the event data and resolves to truthy value when the waiting should resolve.
+- `event` <[str]> Event name, same one typically passed into `*.on(event)`.
+- `predicate` <[Callable]> Receives the event data and resolves to truthy value when the waiting should resolve.
 - `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout).
 - returns: <[EventContextManager]>
 
@@ -66,14 +66,14 @@ value = event_info.value
 
 Indicates that the web socket has been closed.
 
-## web_socket.url()
+## web_socket.url
 - returns: <[str]>
 
 Contains the URL of the WebSocket.
 
 ## web_socket.wait_for_event(event, **options)
 - `event` <[str]> Event name, same one would pass into `webSocket.on(event)`.
-- `predicate` <[Function]> Receives the event data and resolves to truthy value when the waiting should resolve.
+- `predicate` <[Callable]> Receives the event data and resolves to truthy value when the waiting should resolve.
 - `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout).
 - returns: <[Any]>
 

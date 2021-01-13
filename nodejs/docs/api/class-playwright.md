@@ -36,7 +36,7 @@ This object can be used to launch or connect to Chromium, returning instances of
 ## playwright.devices
 - type: <[Object]>
 
-Returns a list of devices to be used with [browser.newContext([options])](./api/class-browser.md#browsernewcontextoptions) or [browser.newPage([options])](./api/class-browser.md#browsernewpageoptions). Actual list of devices can be found in [src/server/deviceDescriptors.ts](https://github.com/Microsoft/playwright/blob/master/src/server/deviceDescriptors.ts).
+Returns a dictionary of devices to be used with [browser.newContext([options])](./api/class-browser.md#browsernewcontextoptions) or [browser.newPage([options])](./api/class-browser.md#browsernewpageoptions).
 
 ```js
 const { webkit, devices } = require('playwright');

@@ -270,7 +270,9 @@ page.type('#area', 'Hello World!')
 
 This method will emit all the necessary keyboard events, with all the `keydown`, `keyup`, `keypress` events in place. You can even specify the optional `delay` between the key presses to simulate real user behavior.
 
-> **NOTE** that most of the time, [page.fill(selector, value, **options)](./api/class-page.md#pagefillselector-value-options) will just work. You only need to type characters if there is special keyboard handling on the page.
+:::note
+Most of the time, [page.fill(selector, value, **options)](./api/class-page.md#pagefillselector-value-options) will just work. You only need to type characters if there is special keyboard handling on the page.
+:::
 
 #### API reference
 - [page.type(selector, text, **options)](./api/class-page.md#pagetypeselector-text-options)

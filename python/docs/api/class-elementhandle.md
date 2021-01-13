@@ -80,7 +80,7 @@ This method checks the element by performing the following steps:
 1. Wait for [actionability](./actionability.md) checks on the element, unless `force` option is set.
 1. Scroll the element into view if needed.
 1. Use [page.mouse](./api/class-page.md#pagemouse) to click in the center of the element.
-1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+1. Wait for initiated navigations to either succeed or fail, unless `no_wait_after` option is set.
 1. Ensure that the element is now checked. If not, this method rejects.
 
 If the element is detached from the DOM at any moment during the action, this method rejects.
@@ -103,7 +103,7 @@ This method clicks the element by performing the following steps:
 1. Wait for [actionability](./actionability.md) checks on the element, unless `force` option is set.
 1. Scroll the element into view if needed.
 1. Use [page.mouse](./api/class-page.md#pagemouse) to click in the center of the element, or the specified `position`.
-1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+1. Wait for initiated navigations to either succeed or fail, unless `no_wait_after` option is set.
 
 If the element is detached from the DOM at any moment during the action, this method rejects.
 
@@ -129,13 +129,15 @@ This method double clicks the element by performing the following steps:
 1. Wait for [actionability](./actionability.md) checks on the element, unless `force` option is set.
 1. Scroll the element into view if needed.
 1. Use [page.mouse](./api/class-page.md#pagemouse) to double click in the center of the element, or the specified `position`.
-1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set. Note that if the first click of the `dblclick()` triggers a navigation event, this method will reject.
+1. Wait for initiated navigations to either succeed or fail, unless `no_wait_after` option is set. Note that if the first click of the `dblclick()` triggers a navigation event, this method will reject.
 
 If the element is detached from the DOM at any moment during the action, this method rejects.
 
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
 
-> **NOTE** `elementHandle.dblclick()` dispatches two `click` events and a single `dblclick` event.
+:::note
+`elementHandle.dblclick()` dispatches two `click` events and a single `dblclick` event.
+:::
 
 ## element_handle.dispatch_event(type, **options)
 - `type` <[str]> DOM event type: `"click"`, `"dragstart"`, etc.
@@ -143,9 +145,9 @@ When all steps combined have not finished during the specified `timeout`, this m
 
 The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the elment, `click` is dispatched. This is equivalend to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
 
-Under the hood, it creates an instance of an event based on the given `type`, initializes it with `eventInit` properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
+Under the hood, it creates an instance of an event based on the given `type`, initializes it with `event_init` properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
 
-Since `eventInit` is event-specific, please refer to the events documentation for the lists of initial properties:
+Since `event_init` is event-specific, please refer to the events documentation for the lists of initial properties:
 * [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/DragEvent/DragEvent)
 * [FocusEvent](https://developer.mozilla.org/en-US/docs/Web/API/FocusEvent/FocusEvent)
 * [KeyboardEvent](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/KeyboardEvent)
@@ -158,31 +160,31 @@ You can also specify `JSHandle` as the property value if you want live objects t
 
 ## element_handle.eval_on_selector(selector, expression, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `arg` <[EvaluationArgument]> Optional argument to pass to `page_function`
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[Serializable]>
 
-Returns the return value of `pageFunction`
+Returns the return value of `page_function`
 
-The method finds an element matching the specified selector in the `ElementHandle`s subtree and passes it as a first argument to `pageFunction`. See [Working with selectors](./selectors.md#working-with-selectors) for more details. If no elements match the selector, the method throws an error.
+The method finds an element matching the specified selector in the `ElementHandle`s subtree and passes it as a first argument to `page_function`. See [Working with selectors](./selectors.md#working-with-selectors) for more details. If no elements match the selector, the method throws an error.
 
-If `pageFunction` returns a [Promise], then `frame.$eval` would wait for the promise to resolve and return its value.
+If `page_function` returns a [Promise], then `frame.$eval` would wait for the promise to resolve and return its value.
 
 Examples:
 
 ## element_handle.eval_on_selector_all(selector, expression, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `arg` <[EvaluationArgument]> Optional argument to pass to `page_function`
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[Serializable]>
 
-Returns the return value of `pageFunction`
+Returns the return value of `page_function`
 
-The method finds all elements matching the specified selector in the `ElementHandle`'s subtree and passes an array of matched elements as a first argument to `pageFunction`. See [Working with selectors](./selectors.md#working-with-selectors) for more details.
+The method finds all elements matching the specified selector in the `ElementHandle`'s subtree and passes an array of matched elements as a first argument to `page_function`. See [Working with selectors](./selectors.md#working-with-selectors) for more details.
 
-If `pageFunction` returns a [Promise], then `frame.$$eval` would wait for the promise to resolve and return its value.
+If `page_function` returns a [Promise], then `frame.$$eval` would wait for the promise to resolve and return its value.
 
 Examples:
 
@@ -367,13 +369,15 @@ This method taps the element by performing the following steps:
 1. Wait for [actionability](./actionability.md) checks on the element, unless `force` option is set.
 1. Scroll the element into view if needed.
 1. Use [page.touchscreen](./api/class-page.md#pagetouchscreen) to tap the center of the element, or the specified `position`.
-1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+1. Wait for initiated navigations to either succeed or fail, unless `no_wait_after` option is set.
 
 If the element is detached from the DOM at any moment during the action, this method rejects.
 
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
 
-> **NOTE** `elementHandle.tap()` requires that the `hasTouch` option of the browser context be set to true.
+:::note
+`elementHandle.tap()` requires that the `hasTouch` option of the browser context be set to true.
+:::
 
 ## element_handle.text_content()
 - returns: <[NoneType]|[str]>
@@ -402,7 +406,7 @@ This method checks the element by performing the following steps:
 1. Wait for [actionability](./actionability.md) checks on the element, unless `force` option is set.
 1. Scroll the element into view if needed.
 1. Use [page.mouse](./api/class-page.md#pagemouse) to click in the center of the element.
-1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+1. Wait for initiated navigations to either succeed or fail, unless `no_wait_after` option is set.
 1. Ensure that the element is now unchecked. If not, this method rejects.
 
 If the element is detached from the DOM at any moment during the action, this method rejects.
@@ -439,7 +443,10 @@ Returns element specified by selector when it satisfies `state` option. Returns 
 
 Wait for the `selector` relative to the element handle to satisfy `state` option (either appear/disappear from dom, or become visible/hidden). If at the moment of calling the method `selector` already satisfies the condition, the method will return immediately. If the selector doesn't satisfy the condition for the `timeout` milliseconds, the function will throw.
 
-> **NOTE** This method does not work across navigations, use [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewait_for_selectorselector-options) instead.
+:::note
+This method does not work across navigations, use [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewait_for_selectorselector-options) instead.
+:::
+
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"

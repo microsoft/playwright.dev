@@ -48,7 +48,9 @@ Most of the accessibility tree gets filtered out when converting from Blink AX T
 
 Captures the current state of the accessibility tree. The returned object represents the root accessible node of the page.
 
-> **NOTE** The Chromium accessibility tree contains nodes that go unused on most platforms and by most screen readers. Playwright will discard them as well for an easier to process tree, unless `interestingOnly` is set to `false`.
+:::note
+The Chromium accessibility tree contains nodes that go unused on most platforms and by most screen readers. Playwright will discard them as well for an easier to process tree, unless `interesting_only` is set to `false`.
+:::
 
 An example of dumping the entire accessibility tree:
 

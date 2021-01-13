@@ -28,7 +28,7 @@ Each browser context can host multiple pages (tabs).
 #### API reference
 - [Page]
 - [browser_context.new_page()](./api/class-browsercontext.md#browser_contextnew_page)
-- [browser_context.pages()](./api/class-browsercontext.md#browser_contextpages)
+- [browser_context.pages](./api/class-browsercontext.md#browser_contextpages)
 
 ## Handling new pages
 

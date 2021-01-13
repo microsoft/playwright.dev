@@ -24,7 +24,7 @@ These commands download the Playwright package and install browser binaries for 
 
 Once installed, you can `import` Playwright in a Python script, and launch any of the 3 browsers (`chromium`, `firefox` and `webkit`).
 
-Playwright supports two variations of the API: synchronous are asynchronous. If your modern project uses [asyncio](https://docs.python.org/3/library/asyncio.html), you should use async API:
+Playwright supports two variations of the API: synchronous and asynchronous. If your modern project uses [asyncio](https://docs.python.org/3/library/asyncio.html), you should use async API:
 
 ## First script
 

@@ -201,7 +201,9 @@ Emitted when the JavaScript [`DOMContentLoaded`](https://developer.mozilla.org/e
 
 Emitted when attachment download started. User can access basic file operations on downloaded content via the passed [Download] instance.
 
-> **NOTE** Browser context **must** be created with the `acceptDownloads` set to `true` when user needs access to the downloaded content. If `acceptDownloads` is not set or set to `false`, download events are emitted, but the actual download is not performed and user has no access to the downloaded files.
+:::note
+Browser context **must** be created with the `acceptDownloads` set to `true` when user needs access to the downloaded content. If `acceptDownloads` is not set, download events are emitted, but the actual download is not performed and user has no access to the downloaded files.
+:::
 
 ## page.on('filechooser')
 - type: <[FileChooser]>
@@ -253,7 +255,9 @@ const [popup] = await Promise.all([
 console.log(await popup.evaluate('location.href'));
 ```
 
-> **NOTE** Use [page.waitForLoadState([state, options])](./api/class-page.md#pagewaitforloadstatestate-options) to wait until the page gets to a particular state (you should not need it in most cases).
+:::note
+Use [page.waitForLoadState([state, options])](./api/class-page.md#pagewaitforloadstatestate-options) to wait until the page gets to a particular state (you should not need it in most cases).
+:::
 
 ## page.on('request')
 - type: <[Request]>
@@ -265,7 +269,9 @@ Emitted when a page issues a request. The [request] object is read-only. In orde
 
 Emitted when a request fails, for example by timing out.
 
-> **NOTE** HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [page.on('requestfinished')](./api/class-page.md#pageonrequestfinished) event and not with [page.on('requestfailed')](./api/class-page.md#pageonrequestfailed).
+:::note
+HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [page.on('requestfinished')](./api/class-page.md#pageonrequestfinished) event and not with [page.on('requestfailed')](./api/class-page.md#pageonrequestfailed).
+:::
 
 ## page.on('requestfinished')
 - type: <[Request]>
@@ -362,7 +368,9 @@ const preloadFile = fs.readFileSync('./preload.js', 'utf8');
 await page.addInitScript(preloadFile);
 ```
 
-> **NOTE** The order of evaluation of multiple scripts installed via [browserContext.addInitScript(script[, arg])](./api/class-browsercontext.md#browsercontextaddinitscriptscript-arg) and [page.addInitScript(script[, arg])](./api/class-page.md#pageaddinitscriptscript-arg) is not defined.
+:::note
+The order of evaluation of multiple scripts installed via [browserContext.addInitScript(script[, arg])](./api/class-browsercontext.md#browsercontextaddinitscriptscript-arg) and [page.addInitScript(script[, arg])](./api/class-page.md#pageaddinitscriptscript-arg) is not defined.
+:::
 
 ## page.addScriptTag([options])
 - `options` <[Object]>
@@ -444,8 +452,9 @@ If `runBeforeUnload` is `false`, does not run any unload handlers and waits for 
 
 By default, `page.close()` **does not** run `beforeunload` handlers.
 
-> **NOTE** if `runBeforeUnload` is passed as true, a `beforeunload` dialog might be summoned
-> and should be handled manually via [page.on('dialog')](./api/class-page.md#pageondialog) event.
+:::note
+if `runBeforeUnload` is passed as true, a `beforeunload` dialog might be summoned and should be handled manually via [page.on('dialog')](./api/class-page.md#pageondialog) event.
+:::
 
 ## page.content()
 - returns: <[Promise]<[string]>>
@@ -479,7 +488,9 @@ This method double clicks an element matching `selector` by performing the follo
 
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
 
-> **NOTE** `page.dblclick()` dispatches two `click` events and a single `dblclick` event.
+:::note
+`page.dblclick()` dispatches two `click` events and a single `dblclick` event.
+:::
 
 Shortcut for main frame's [frame.dblclick(selector[, options])](./api/class-frame.md#framedblclickselector-options).
 
@@ -625,7 +636,9 @@ The first argument of the `callback` function contains information about the cal
 
 See [browserContext.exposeBinding(name, callback[, options])](./api/class-browsercontext.md#browsercontextexposebindingname-callback-options) for the context-wide version.
 
-> **NOTE** Functions installed via `page.exposeBinding` survive navigations.
+:::note
+Functions installed via [page.exposeBinding(name, callback[, options])](./api/class-page.md#pageexposebindingname-callback-options) survive navigations.
+:::
 
 An example of exposing page URL to all frames in a page:
 
@@ -675,7 +688,9 @@ If the `callback` returns a [Promise], it will be awaited.
 
 See [browserContext.exposeFunction(name, callback)](./api/class-browsercontext.md#browsercontextexposefunctionname-callback) for context-wide exposed function.
 
-> **NOTE** Functions installed via `page.exposeFunction` survive navigations.
+:::note
+Functions installed via [page.exposeFunction(name, callback)](./api/class-page.md#pageexposefunctionname-callback) survive navigations.
+:::
 
 An example of adding an `md5` function to the page:
 
@@ -829,8 +844,13 @@ Returns the main resource response. In case of multiple redirects, the navigatio
 
 `page.goto` will not throw an error when any valid HTTP status code is returned by the remote server, including 404 "Not Found" and 500 "Internal Server Error".  The status code for such responses can be retrieved by calling [response.status()](./api/class-response.md#responsestatus).
 
-> **NOTE** `page.goto` either throws an error or returns a main resource response. The only exceptions are navigation to `about:blank` or navigation to the same URL with a different hash, which would succeed and return `null`.
-> **NOTE** Headless mode doesn't support navigation to a PDF document. See the [upstream issue](https://bugs.chromium.org/p/chromium/issues/detail?id=761295).
+:::note
+`page.goto` either throws an error or returns a main resource response. The only exceptions are navigation to `about:blank` or navigation to the same URL with a different hash, which would succeed and return `null`.
+:::
+
+:::note
+Headless mode doesn't support navigation to a PDF document. See the [upstream issue](https://bugs.chromium.org/p/chromium/issues/detail?id=761295).
+:::
 
 Shortcut for main frame's [frame.goto(url[, options])](./api/class-frame.md#framegotourl-options)
 
@@ -962,11 +982,15 @@ Returns the opener for popup pages and `null` for others. If the opener has been
 
 Returns the PDF buffer.
 
-> **NOTE** Generating a pdf is currently only supported in Chromium headless.
+:::note
+Generating a pdf is currently only supported in Chromium headless.
+:::
 
 `page.pdf()` generates a pdf of the page with `print` css media. To generate a pdf with `screen` media, call [page.emulateMedia(params)](./api/class-page.md#pageemulatemediaparams) before calling `page.pdf()`:
 
-> **NOTE** By default, `page.pdf()` generates a pdf with modified colors for printing. Use the [`-webkit-print-color-adjust`](https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-print-color-adjust) property to force rendering of exact colors.
+:::note
+By default, `page.pdf()` generates a pdf with modified colors for printing. Use the [`-webkit-print-color-adjust`](https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-print-color-adjust) property to force rendering of exact colors.
+:::
 
 ```js
 // Generates a PDF with 'screen' media type.
@@ -1000,9 +1024,9 @@ The `format` options are:
 * `A5`: 5.83in x 8.27in
 * `A6`: 4.13in x 5.83in
 
-> **NOTE** `headerTemplate` and `footerTemplate` markup have the following limitations:
-> 1. Script tags inside templates are not evaluated.
-> 2. Page styles are not visible inside templates.
+:::note
+`headerTemplate` and `footerTemplate` markup have the following limitations: > 1. Script tags inside templates are not evaluated. > 2. Page styles are not visible inside templates.
+:::
 
 ## page.press(selector, key[, options])
 - `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -1057,7 +1081,9 @@ Routing provides the capability to modify network requests that are made by a pa
 
 Once routing is enabled, every request matching the url pattern will stall unless it's continued, fulfilled or aborted.
 
-> **NOTE** The handler will only be called for the first url if the response is a redirect.
+:::note
+The handler will only be called for the first url if the response is a redirect.
+:::
 
 An example of a naïve handler that aborts all image requests:
 
@@ -1079,7 +1105,9 @@ await browser.close();
 
 Page routes take precedence over browser context routes (set up with [browserContext.route(url, handler)](./api/class-browsercontext.md#browsercontextrouteurl-handler)) when request matches both handlers.
 
-> **NOTE** Enabling routing disables http cache.
+:::note
+Enabling routing disables http cache.
+:::
 
 ## page.screenshot([options])
 - `options` <[Object]>
@@ -1098,7 +1126,9 @@ Page routes take precedence over browser context routes (set up with [browserCon
 
 Returns the buffer with the captured screenshot.
 
-> **NOTE** Screenshots take at least 1/6 second on Chromium OS X and Chromium Windows. See https://crbug.com/741689 for discussion.
+:::note
+Screenshots take at least 1/6 second on Chromium OS X and Chromium Windows. See https://crbug.com/741689 for discussion.
+:::
 
 ## page.selectOption(selector, values[, options])
 - `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -1149,21 +1179,27 @@ This setting will change the default maximum navigation time for the following m
 * [page.setContent(html[, options])](./api/class-page.md#pagesetcontenthtml-options)
 * [page.waitForNavigation([options])](./api/class-page.md#pagewaitfornavigationoptions)
 
-> **NOTE** [page.setDefaultNavigationTimeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) takes priority over [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout), [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) and [browserContext.setDefaultNavigationTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout).
+:::note
+[page.setDefaultNavigationTimeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) takes priority over [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout), [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) and [browserContext.setDefaultNavigationTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaultnavigationtimeouttimeout).
+:::
 
 ## page.setDefaultTimeout(timeout)
 - `timeout` <[number]> Maximum time in milliseconds
 
 This setting will change the default maximum time for all the methods accepting `timeout` option.
 
-> **NOTE** [page.setDefaultNavigationTimeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) takes priority over [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout).
+:::note
+[page.setDefaultNavigationTimeout(timeout)](./api/class-page.md#pagesetdefaultnavigationtimeouttimeout) takes priority over [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout).
+:::
 
 ## page.setExtraHTTPHeaders(headers)
 - `headers` <[Object]<[string], [string]>> An object containing additional HTTP headers to be sent with every request. All header values must be strings.
 
 The extra HTTP headers will be sent with every request the page initiates.
 
-> **NOTE** page.setExtraHTTPHeaders does not guarantee the order of headers in the outgoing requests.
+:::note
+[page.setExtraHTTPHeaders(headers)](./api/class-page.md#pagesetextrahttpheadersheaders) does not guarantee the order of headers in the outgoing requests.
+:::
 
 ## page.setInputFiles(selector, files[, options])
 - `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -1217,7 +1253,9 @@ This method taps an element matching `selector` by performing the following step
 
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
 
-> **NOTE** `page.tap()` requires that the `hasTouch` option of the browser context be set to true.
+:::note
+[page.tap(selector[, options])](./api/class-page.md#pagetapselector-options) requires that the `hasTouch` option of the browser context be set to true.
+:::
 
 Shortcut for main frame's [frame.tap(selector[, options])](./api/class-frame.md#frametapselector-options).
 
@@ -1295,9 +1333,9 @@ Video object associated with this page.
   - `height` <[number]> page height in pixels.
 
 ## page.waitForEvent(event[, optionsOrPredicate])
-- `event` <[string]> Event name, same one typically passed into `page.on(event)`.
-- `optionsOrPredicate` <[Function]|[Object]> Either a predicate that receives an event or an options object. Optional.
-  - `predicate` <[Function]> receives the event data and resolves to truthy value when the waiting should resolve.
+- `event` <[string]> Event name, same one typically passed into `*.on(event)`.
+- `optionsOrPredicate` <[function]|[Object]> Either a predicate that receives an event or an options object. Optional.
+  - `predicate` <[function]> receives the event data and resolves to truthy value when the waiting should resolve.
   - `timeout` <[number]> maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout).
 - returns: <[Promise]<[Object]>>
 
@@ -1388,7 +1426,9 @@ const [response] = await Promise.all([
 ]);
 ```
 
-**NOTE** Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::note
+Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::
 
 Shortcut for main frame's [frame.waitForNavigation([options])](./api/class-frame.md#framewaitfornavigationoptions).
 
@@ -1477,7 +1517,9 @@ Shortcut for main frame's [frame.waitForTimeout(timeout)](./api/class-frame.md#f
 
 This method returns all of the dedicated [WebWorkers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) associated with the page.
 
-> **NOTE** This does not contain ServiceWorkers
+:::note
+This does not contain ServiceWorkers
+:::
 
 ## page.accessibility
 - type: <[Accessibility]>

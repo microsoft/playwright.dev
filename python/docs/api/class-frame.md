@@ -4,7 +4,7 @@ title: "Frame"
 ---
 
 
-At every point of time, page exposes its current frame tree via the [page.main_frame()](./api/class-page.md#pagemain_frame) and [frame.child_frames()](./api/class-frame.md#framechild_frames) methods.
+At every point of time, page exposes its current frame tree via the [page.main_frame](./api/class-page.md#pagemain_frame) and [frame.child_frames](./api/class-frame.md#framechild_frames) methods.
 
 [Frame] object's lifecycle is controlled by three events, dispatched on the page object:
 * [page.on("frameattached")](./api/class-page.md#pageonframeattached) - fired when the frame gets attached to the page. A Frame can be attached to the page only once.
@@ -19,7 +19,7 @@ An example of getting text from an iframe element:
 - [frame.add_script_tag(**options)](./api/class-frame.md#frameadd_script_tagoptions)
 - [frame.add_style_tag(**options)](./api/class-frame.md#frameadd_style_tagoptions)
 - [frame.check(selector, **options)](./api/class-frame.md#framecheckselector-options)
-- [frame.child_frames()](./api/class-frame.md#framechild_frames)
+- [frame.child_frames](./api/class-frame.md#framechild_frames)
 - [frame.click(selector, **options)](./api/class-frame.md#frameclickselector-options)
 - [frame.content()](./api/class-frame.md#framecontent)
 - [frame.dblclick(selector, **options)](./api/class-frame.md#framedblclickselector-options)
@@ -28,7 +28,6 @@ An example of getting text from an iframe element:
 - [frame.eval_on_selector_all(selector, expression, **options)](./api/class-frame.md#frameeval_on_selector_allselector-expression-options)
 - [frame.evaluate(expression, **options)](./api/class-frame.md#frameevaluateexpression-options)
 - [frame.evaluate_handle(expression, **options)](./api/class-frame.md#frameevaluate_handleexpression-options)
-- [frame.expect_load_state(**options)](./api/class-frame.md#frameexpect_load_stateoptions)
 - [frame.expect_navigation(**options)](./api/class-frame.md#frameexpect_navigationoptions)
 - [frame.fill(selector, value, **options)](./api/class-frame.md#framefillselector-value-options)
 - [frame.focus(selector, **options)](./api/class-frame.md#framefocusselector-options)
@@ -45,9 +44,9 @@ An example of getting text from an iframe element:
 - [frame.is_enabled(selector, **options)](./api/class-frame.md#frameis_enabledselector-options)
 - [frame.is_hidden(selector, **options)](./api/class-frame.md#frameis_hiddenselector-options)
 - [frame.is_visible(selector, **options)](./api/class-frame.md#frameis_visibleselector-options)
-- [frame.name()](./api/class-frame.md#framename)
-- [frame.page()](./api/class-frame.md#framepage)
-- [frame.parent_frame()](./api/class-frame.md#frameparent_frame)
+- [frame.name](./api/class-frame.md#framename)
+- [frame.page](./api/class-frame.md#framepage)
+- [frame.parent_frame](./api/class-frame.md#frameparent_frame)
 - [frame.press(selector, key, **options)](./api/class-frame.md#framepressselector-key-options)
 - [frame.query_selector(selector)](./api/class-frame.md#framequery_selectorselector)
 - [frame.query_selector_all(selector)](./api/class-frame.md#framequery_selector_allselector)
@@ -59,7 +58,7 @@ An example of getting text from an iframe element:
 - [frame.title()](./api/class-frame.md#frametitle)
 - [frame.type(selector, text, **options)](./api/class-frame.md#frametypeselector-text-options)
 - [frame.uncheck(selector, **options)](./api/class-frame.md#frameuncheckselector-options)
-- [frame.url()](./api/class-frame.md#frameurl)
+- [frame.url](./api/class-frame.md#frameurl)
 - [frame.wait_for_function(expression, **options)](./api/class-frame.md#framewait_for_functionexpression-options)
 - [frame.wait_for_load_state(**options)](./api/class-frame.md#framewait_for_load_stateoptions)
 - [frame.wait_for_navigation(**options)](./api/class-frame.md#framewait_for_navigationoptions)
@@ -99,12 +98,12 @@ This method checks an element matching `selector` by performing the following st
 1. Wait for [actionability](./actionability.md) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
 1. Scroll the element into view if needed.
 1. Use [page.mouse](./api/class-page.md#pagemouse) to click in the center of the element.
-1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+1. Wait for initiated navigations to either succeed or fail, unless `no_wait_after` option is set.
 1. Ensure that the element is now checked. If not, this method rejects.
 
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
 
-## frame.child_frames()
+## frame.child_frames
 - returns: <[List]\[[Frame]\]>
 
 ## frame.click(selector, **options)
@@ -125,7 +124,7 @@ This method clicks an element matching `selector` by performing the following st
 1. Wait for [actionability](./actionability.md) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
 1. Scroll the element into view if needed.
 1. Use [page.mouse](./api/class-page.md#pagemouse) to click in the center of the element, or the specified `position`.
-1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+1. Wait for initiated navigations to either succeed or fail, unless `no_wait_after` option is set.
 
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
 
@@ -151,11 +150,13 @@ This method double clicks an element matching `selector` by performing the follo
 1. Wait for [actionability](./actionability.md) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
 1. Scroll the element into view if needed.
 1. Use [page.mouse](./api/class-page.md#pagemouse) to double click in the center of the element, or the specified `position`.
-1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set. Note that if the first click of the `dblclick()` triggers a navigation event, this method will reject.
+1. Wait for initiated navigations to either succeed or fail, unless `no_wait_after` option is set. Note that if the first click of the `dblclick()` triggers a navigation event, this method will reject.
 
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
 
-> **NOTE** `frame.dblclick()` dispatches two `click` events and a single `dblclick` event.
+:::note
+`frame.dblclick()` dispatches two `click` events and a single `dblclick` event.
+:::
 
 ## frame.dispatch_event(selector, type, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -165,9 +166,9 @@ When all steps combined have not finished during the specified `timeout`, this m
 
 The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the elment, `click` is dispatched. This is equivalend to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
 
-Under the hood, it creates an instance of an event based on the given `type`, initializes it with `eventInit` properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
+Under the hood, it creates an instance of an event based on the given `type`, initializes it with `event_init` properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
 
-Since `eventInit` is event-specific, please refer to the events documentation for the lists of initial properties:
+Since `event_init` is event-specific, please refer to the events documentation for the lists of initial properties:
 * [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/DragEvent/DragEvent)
 * [FocusEvent](https://developer.mozilla.org/en-US/docs/Web/API/FocusEvent/FocusEvent)
 * [KeyboardEvent](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/KeyboardEvent)
@@ -180,41 +181,41 @@ You can also specify `JSHandle` as the property value if you want live objects t
 
 ## frame.eval_on_selector(selector, expression, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `arg` <[EvaluationArgument]> Optional argument to pass to `page_function`
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[Serializable]>
 
-Returns the return value of `pageFunction`
+Returns the return value of `page_function`
 
-The method finds an element matching the specified selector within the frame and passes it as a first argument to `pageFunction`. See [Working with selectors](./selectors.md#working-with-selectors) for more details. If no elements match the selector, the method throws an error.
+The method finds an element matching the specified selector within the frame and passes it as a first argument to `page_function`. See [Working with selectors](./selectors.md#working-with-selectors) for more details. If no elements match the selector, the method throws an error.
 
-If `pageFunction` returns a [Promise], then `frame.$eval` would wait for the promise to resolve and return its value.
+If `page_function` returns a [Promise], then `frame.$eval` would wait for the promise to resolve and return its value.
 
 Examples:
 
 ## frame.eval_on_selector_all(selector, expression, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `arg` <[EvaluationArgument]> Optional argument to pass to `page_function`
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[Serializable]>
 
-Returns the return value of `pageFunction`
+Returns the return value of `page_function`
 
-The method finds all elements matching the specified selector within the frame and passes an array of matched elements as a first argument to `pageFunction`. See [Working with selectors](./selectors.md#working-with-selectors) for more details.
+The method finds all elements matching the specified selector within the frame and passes an array of matched elements as a first argument to `page_function`. See [Working with selectors](./selectors.md#working-with-selectors) for more details.
 
-If `pageFunction` returns a [Promise], then `frame.$$eval` would wait for the promise to resolve and return its value.
+If `page_function` returns a [Promise], then `frame.$$eval` would wait for the promise to resolve and return its value.
 
 Examples:
 
 ## frame.evaluate(expression, **options)
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `arg` <[EvaluationArgument]> Optional argument to pass to `page_function`
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[Serializable]>
 
-Returns the return value of `pageFunction`
+Returns the return value of `page_function`
 
 If the function passed to the `frame.evaluate` returns a [Promise], then `frame.evaluate` would wait for the promise to resolve and return its value.
 
@@ -225,12 +226,12 @@ A string can also be passed in instead of a function.
 [ElementHandle] instances can be passed as an argument to the `frame.evaluate`:
 
 ## frame.evaluate_handle(expression, **options)
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `arg` <[EvaluationArgument]> Optional argument to pass to `page_function`
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[JSHandle]>
 
-Returns the return value of `pageFunction` as in-page object (JSHandle).
+Returns the return value of `page_function` as in-page object (JSHandle).
 
 The only difference between `frame.evaluate` and `frame.evaluateHandle` is that `frame.evaluateHandle` returns in-page object (JSHandle).
 
@@ -239,32 +240,6 @@ If the function, passed to the `frame.evaluateHandle`, returns a [Promise], then
 A string can also be passed in instead of a function.
 
 [JSHandle] instances can be passed as an argument to the `frame.evaluateHandle`:
-
-## frame.expect_load_state(**options)
-- `state` <"load"|"domcontentloaded"|"networkidle"> Optional load state to wait for, defaults to `load`. If the state has been already reached while loading current document, the method resolves immediately. Can be one of:
-  * `'load'` - wait for the `load` event to be fired.
-  * `'domcontentloaded'` - wait for the `DOMContentLoaded` event to be fired.
-  * `'networkidle'` - wait until there are no network connections for at least `500` ms.
-- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
-- returns: <[EventContextManager]>
-
-Performs action and waits for the required load state. It resolves when the page reaches a required load state, `load` by default. The navigation must have been committed when this method is called. If current document has already reached the required state, resolves immediately.
-
-```py
-# async
-
-async with frame.expect_load_state():
-    await frame.click('button') # Click triggers navigation.
-# Context manager waits for 'load' event.
-```
-
-```py
-# sync
-
-with frame.expect_load_state():
-    frame.click('button') # Click triggers navigation.
-# Context manager waits for 'load' event.
-```
 
 ## frame.expect_navigation(**options)
 - `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
@@ -295,7 +270,9 @@ with frame.expect_navigation():
 # Context manager waited for the navigation to happen.
 ```
 
-**NOTE** Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::note
+Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::
 
 ## frame.fill(selector, value, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -349,10 +326,15 @@ Returns the main resource response. In case of multiple redirects, the navigatio
 * the remote server does not respond or is unreachable.
 * the main resource failed to load.
 
-`frame.goto` will not throw an error when any valid HTTP status code is returned by the remote server, including 404 "Not Found" and 500 "Internal Server Error".  The status code for such responses can be retrieved by calling [response.status()](./api/class-response.md#responsestatus).
+`frame.goto` will not throw an error when any valid HTTP status code is returned by the remote server, including 404 "Not Found" and 500 "Internal Server Error".  The status code for such responses can be retrieved by calling [response.status](./api/class-response.md#responsestatus).
 
-> **NOTE** `frame.goto` either throws an error or returns a main resource response. The only exceptions are navigation to `about:blank` or navigation to the same URL with a different hash, which would succeed and return `null`.
-> **NOTE** Headless mode doesn't support navigation to a PDF document. See the [upstream issue](https://bugs.chromium.org/p/chromium/issues/detail?id=761295).
+:::note
+`frame.goto` either throws an error or returns a main resource response. The only exceptions are navigation to `about:blank` or navigation to the same URL with a different hash, which would succeed and return `null`.
+:::
+
+:::note
+Headless mode doesn't support navigation to a PDF document. See the [upstream issue](https://bugs.chromium.org/p/chromium/issues/detail?id=761295).
+:::
 
 ## frame.hover(selector, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -433,21 +415,23 @@ Returns whether the element is hidden, the opposite of [visible](./actionability
 
 Returns whether the element is [visible](./actionability.md#visible).
 
-## frame.name()
+## frame.name
 - returns: <[str]>
 
 Returns frame's name attribute as specified in the tag.
 
 If the name is empty, returns the id attribute instead.
 
-> **NOTE** This value is calculated once when the frame is created, and will not update if the attribute is changed later.
+:::note
+This value is calculated once when the frame is created, and will not update if the attribute is changed later.
+:::
 
-## frame.page()
+## frame.page
 - returns: <[Page]>
 
 Returns the page containing this frame.
 
-## frame.parent_frame()
+## frame.parent_frame
 - returns: <[NoneType]|[Frame]>
 
 Parent frame, if any. Detached frames and main frames return `null`.
@@ -537,11 +521,13 @@ This method taps an element matching `selector` by performing the following step
 1. Wait for [actionability](./actionability.md) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
 1. Scroll the element into view if needed.
 1. Use [page.touchscreen](./api/class-page.md#pagetouchscreen) to tap the center of the element, or the specified `position`.
-1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+1. Wait for initiated navigations to either succeed or fail, unless `no_wait_after` option is set.
 
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
 
-> **NOTE** `frame.tap()` requires that the `hasTouch` option of the browser context be set to true.
+:::note
+`frame.tap()` requires that the `hasTouch` option of the browser context be set to true.
+:::
 
 ## frame.text_content(selector, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -578,25 +564,25 @@ This method checks an element matching `selector` by performing the following st
 1. Wait for [actionability](./actionability.md) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
 1. Scroll the element into view if needed.
 1. Use [page.mouse](./api/class-page.md#pagemouse) to click in the center of the element.
-1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+1. Wait for initiated navigations to either succeed or fail, unless `no_wait_after` option is set.
 1. Ensure that the element is now unchecked. If not, this method rejects.
 
 When all steps combined have not finished during the specified `timeout`, this method rejects with a [TimeoutError]. Passing zero timeout disables this.
 
-## frame.url()
+## frame.url
 - returns: <[str]>
 
 Returns frame's url.
 
 ## frame.wait_for_function(expression, **options)
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
-- `polling` <[float]|"raf"> If `polling` is `'raf'`, then `pageFunction` is constantly executed in `requestAnimationFrame` callback. If `polling` is a number, then it is treated as an interval in milliseconds at which the function would be executed. Defaults to `raf`.
+- `arg` <[EvaluationArgument]> Optional argument to pass to `page_function`
+- `polling` <[float]|"raf"> If `polling` is `'raf'`, then `page_function` is constantly executed in `requestAnimationFrame` callback. If `polling` is a number, then it is treated as an interval in milliseconds at which the function would be executed. Defaults to `raf`.
 - `timeout` <[float]> maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout).
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `force_expr` <[bool]> Whether to treat given `expression` as JavaScript evaluate expression, even though it looks like an arrow function. Optional.
 - returns: <[JSHandle]>
 
-Returns when the `pageFunction` returns a truthy value, returns that value.
+Returns when the `page_function` returns a truthy value, returns that value.
 
 The `waitForFunction` can be used to observe viewport size change:
 
@@ -626,7 +612,9 @@ Returns the main resource response. In case of multiple redirects, the navigatio
 
 This method waits for the frame to navigate to a new URL. It is useful for when you run code which will indirectly cause the frame to navigate. Consider this example:
 
-**NOTE** Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::note
+Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::
 
 ## frame.wait_for_selector(selector, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.

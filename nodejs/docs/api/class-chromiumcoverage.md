@@ -47,7 +47,9 @@ Returns coverage is started
 
 Returns coverage is started
 
-> **NOTE** Anonymous scripts are ones that don't have an associated url. These are scripts that are dynamically created on the page using `eval` or `new Function`. If `reportAnonymousScripts` is set to `true`, anonymous scripts will have `__playwright_evaluation_script__` as their URL.
+:::note
+Anonymous scripts are ones that don't have an associated url. These are scripts that are dynamically created on the page using `eval` or `new Function`. If `reportAnonymousScripts` is set to `true`, anonymous scripts will have `__playwright_evaluation_script__` as their URL.
+:::
 
 ## chromiumCoverage.stopCSSCoverage()
 - returns: <[Promise]<[Array]<[Object]>>>
@@ -59,7 +61,9 @@ Returns coverage is started
 
 Returns the array of coverage reports for all stylesheets
 
-> **NOTE** CSS Coverage doesn't include dynamically injected style tags without sourceURLs.
+:::note
+CSS Coverage doesn't include dynamically injected style tags without sourceURLs.
+:::
 
 ## chromiumCoverage.stopJSCoverage()
 - returns: <[Promise]<[Array]<[Object]>>>
@@ -76,7 +80,10 @@ Returns the array of coverage reports for all stylesheets
 
 Returns the array of coverage reports for all scripts
 
-> **NOTE** JavaScript Coverage doesn't include anonymous scripts by default. However, scripts with sourceURLs are reported.
+:::note
+JavaScript Coverage doesn't include anonymous scripts by default. However, scripts with sourceURLs are reported.
+:::
+
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"

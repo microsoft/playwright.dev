@@ -7,16 +7,14 @@ title: "Browser"
 
 A Browser is created via [browser_type.launch(**options)](./api/class-browsertype.md#browser_typelaunchoptions). An example of using a [Browser] to create a [Page]:
 
-See [ChromiumBrowser], [FirefoxBrowser] and [WebKitBrowser] for browser-specific features. Note that [browser_type.launch(**options)](./api/class-browsertype.md#browser_typelaunchoptions) always returns a specific browser instance, based on the browser being launched.
-
 
 - [browser.on("disconnected")](./api/class-browser.md#browserondisconnected)
 - [browser.close()](./api/class-browser.md#browserclose)
-- [browser.contexts()](./api/class-browser.md#browsercontexts)
+- [browser.contexts](./api/class-browser.md#browsercontexts)
 - [browser.is_connected()](./api/class-browser.md#browseris_connected)
 - [browser.new_context(**options)](./api/class-browser.md#browsernew_contextoptions)
 - [browser.new_page(**options)](./api/class-browser.md#browsernew_pageoptions)
-- [browser.version()](./api/class-browser.md#browserversion)
+- [browser.version](./api/class-browser.md#browserversion)
 
 ## browser.on("disconnected")
 
@@ -32,7 +30,7 @@ In case this browser is connected to, clears all created contexts belonging to t
 
 The [Browser] object itself is considered to be disposed and cannot be used anymore.
 
-## browser.contexts()
+## browser.contexts
 - returns: <[List]\[[BrowserContext]\]>
 
 Returns an array of all open browser contexts. In a newly created browser, this will return zero browser contexts.
@@ -60,7 +58,7 @@ Indicates that the browser is connected.
 - `is_mobile` <[bool]> Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.
 - `java_script_enabled` <[bool]> Whether or not to enable JavaScript in the context. Defaults to `true`.
 - `locale` <[str]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
-- `no_viewport` <[bool]> Disables the default viewport.
+- `no_viewport` <[bool]> Does not enforce fixed viewport, allows resizing window in the headed mode.
 - `offline` <[bool]> Whether to emulate network being offline. Defaults to `false`.
 - `permissions` <[List]\[[str]\]> A list of permissions to grant to all pages in this context. See [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browser_contextgrant_permissionspermissions-options) for more details.
 - `proxy` <[Dict]> Network proxy settings to use with this context. Note that browser needs to be launched with the global proxy for this option to work. If all contexts override the proxy, global proxy will be never used and can be any string, for example `launch({ proxy: { server: 'per-context' } })`.
@@ -92,10 +90,6 @@ Indicates that the browser is connected.
       - `value` <[str]>
 - `timezone_id` <[str]> Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.
 - `user_agent` <[str]> Specific user agent to use in this context.
-- `video_size` <[Dict]> **DEPRECATED** Use `recordVideo` instead.
-  - `width` <[int]> Video frame width.
-  - `height` <[int]> Video frame height.
-- `videos_path` <[Union]\[[str], [pathlib.Path]\]> **DEPRECATED** Use `recordVideo` instead.
 - `viewport` <[NoneType]|[Dict]> Sets a consistent viewport for each page. Defaults to an 1280x720 viewport. `no_viewport` disables the fixed viewport.
   - `width` <[int]> page width in pixels.
   - `height` <[int]> page height in pixels.
@@ -121,7 +115,7 @@ Creates a new browser context. It won't share cookies/cache with other browser c
 - `is_mobile` <[bool]> Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.
 - `java_script_enabled` <[bool]> Whether or not to enable JavaScript in the context. Defaults to `true`.
 - `locale` <[str]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
-- `no_viewport` <[bool]> Disables the default viewport.
+- `no_viewport` <[bool]> Does not enforce fixed viewport, allows resizing window in the headed mode.
 - `offline` <[bool]> Whether to emulate network being offline. Defaults to `false`.
 - `permissions` <[List]\[[str]\]> A list of permissions to grant to all pages in this context. See [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browser_contextgrant_permissionspermissions-options) for more details.
 - `proxy` <[Dict]> Network proxy settings to use with this context. Note that browser needs to be launched with the global proxy for this option to work. If all contexts override the proxy, global proxy will be never used and can be any string, for example `launch({ proxy: { server: 'per-context' } })`.
@@ -153,10 +147,6 @@ Creates a new browser context. It won't share cookies/cache with other browser c
       - `value` <[str]>
 - `timezone_id` <[str]> Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.
 - `user_agent` <[str]> Specific user agent to use in this context.
-- `video_size` <[Dict]> **DEPRECATED** Use `recordVideo` instead.
-  - `width` <[int]> Video frame width.
-  - `height` <[int]> Video frame height.
-- `videos_path` <[Union]\[[str], [pathlib.Path]\]> **DEPRECATED** Use `recordVideo` instead.
 - `viewport` <[NoneType]|[Dict]> Sets a consistent viewport for each page. Defaults to an 1280x720 viewport. `no_viewport` disables the fixed viewport.
   - `width` <[int]> page width in pixels.
   - `height` <[int]> page height in pixels.
@@ -166,7 +156,7 @@ Creates a new page in a new browser context. Closing this page will close the co
 
 This is a convenience API that should only be used for the single-page scenarios and short snippets. Production code and testing frameworks should explicitly create [browser.new_context(**options)](./api/class-browser.md#browsernew_contextoptions) followed by the [browser_context.new_page()](./api/class-browsercontext.md#browser_contextnew_page) to control their exact life times.
 
-## browser.version()
+## browser.version
 - returns: <[str]>
 
 Returns the browser version.
