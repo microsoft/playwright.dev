@@ -17,7 +17,6 @@ const [ download ] = await Promise.all([
 ]);
 // wait for download to complete
 const path = await download.path();
-...
 ```
 
 :::note

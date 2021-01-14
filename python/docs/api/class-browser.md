@@ -7,6 +7,41 @@ title: "Browser"
 
 A Browser is created via [browser_type.launch(**options)](./api/class-browsertype.md#browser_typelaunchoptions). An example of using a [Browser] to create a [Page]:
 
+```py
+# async
+
+import asyncio
+from playwright.async_api import async_playwright
+
+async def run(playwright):
+    firefox = playwright.firefox
+    browser = await firefox.launch()
+    page = await browser.new_page()
+    await page.goto("https://example.com")
+    await browser.close()
+
+async def main():
+    async with async_playwright() as playwright:
+        await run(playwright)
+asyncio.run(main())
+```
+
+```py
+# sync
+
+from playwright.sync_api import sync_playwright
+
+def run(playwright):
+    firefox = playwright.firefox
+    browser = firefox.launch()
+    page = browser.new_page()
+    page.goto("https://example.com")
+    browser.close()
+
+with sync_playwright() as playwright:
+    run(playwright)
+```
+
 
 - [browser.on("disconnected")](./api/class-browser.md#browserondisconnected)
 - [browser.close()](./api/class-browser.md#browserclose)
@@ -34,6 +69,24 @@ The [Browser] object itself is considered to be disposed and cannot be used anym
 - returns: <[List]\[[BrowserContext]\]>
 
 Returns an array of all open browser contexts. In a newly created browser, this will return zero browser contexts.
+
+```py
+# async
+
+browser = await pw.webkit.launch()
+print(len(browser.contexts())) # prints `0`
+context = await browser.new_context()
+print(len(browser.contexts())) # prints `1`
+```
+
+```py
+# sync
+
+browser = pw.webkit.launch()
+print(len(browser.contexts())) # prints `0`
+context = browser.new_context()
+print(len(browser.contexts())) # prints `1`
+```
 
 ## browser.is_connected()
 - returns: <[bool]>
@@ -96,6 +149,28 @@ Indicates that the browser is connected.
 - returns: <[BrowserContext]>
 
 Creates a new browser context. It won't share cookies/cache with other browser contexts.
+
+```py
+# async
+
+    browser = await playwright.firefox.launch() # or "chromium" or "webkit".
+    # create a new incognito browser context.
+    context = await browser.new_context()
+    # create a new page in a pristine context.
+    page = await context.new_page()
+    await page.goto("https://example.com")
+```
+
+```py
+# sync
+
+    browser = playwright.firefox.launch() # or "chromium" or "webkit".
+    # create a new incognito browser context.
+    context = browser.new_context()
+    # create a new page in a pristine context.
+    page = context.new_page()
+    page.goto("https://example.com")
+```
 
 ## browser.new_page(**options)
 - `accept_downloads` <[bool]> Whether to automatically download all the attachments. Defaults to `false` where all the downloads are canceled.

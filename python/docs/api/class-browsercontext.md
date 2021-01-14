@@ -11,6 +11,30 @@ If a page opens another page, e.g. with a `window.open` call, the popup will bel
 
 Playwright allows creation of "incognito" browser contexts with `browser.newContext()` method. "Incognito" browser contexts don't write any browsing data to disk.
 
+```py
+# async
+
+# create a new incognito browser context
+context = await browser.new_context()
+# create a new page inside context.
+page = await context.new_page()
+await page.goto("https://example.com")
+# dispose context once it"s no longer needed.
+await context.close()
+```
+
+```py
+# sync
+
+# create a new incognito browser context
+context = browser.new_context()
+# create a new page inside context.
+page = context.new_page()
+page.goto("https://example.com")
+# dispose context once it"s no longer needed.
+context.close()
+```
+
 
 - [browser_context.on("close")](./api/class-browsercontext.md#browser_contextonclose)
 - [browser_context.on("page")](./api/class-browsercontext.md#browser_contextonpage)
@@ -52,6 +76,24 @@ The event is emitted when a new Page is created in the BrowserContext. The page 
 
 The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
 
+```py
+# async
+
+async with context.expect_page() as page_info:
+    await page.click("a[target=_blank]"),
+page = await page_info.value
+print(await page.evaluate("location.href"))
+```
+
+```py
+# sync
+
+with context.expect_page() as page_info:
+    page.click("a[target=_blank]"),
+page = page_info.value
+print(page.evaluate("location.href"))
+```
+
 :::note
 Use [page.wait_for_load_state(**options)](./api/class-page.md#pagewait_for_load_stateoptions) to wait until the page gets to a particular state (you should not need it in most cases).
 :::
@@ -70,6 +112,18 @@ Use [page.wait_for_load_state(**options)](./api/class-page.md#pagewait_for_load_
 
 Adds cookies into this browser context. All pages within this context will have these cookies installed. Cookies can be obtained via [browser_context.cookies(**options)](./api/class-browsercontext.md#browser_contextcookiesoptions).
 
+```py
+# async
+
+await browser_context.add_cookies([cookie_object1, cookie_object2])
+```
+
+```py
+# sync
+
+browser_context.add_cookies([cookie_object1, cookie_object2])
+```
+
 ## browser_context.add_init_script(**options)
 - `path` <[Union]\[[str], [pathlib.Path]\]> Path to the JavaScript file. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
 - `script` <[str]> Script to be evaluated in all pages in the browser context. Optional.
@@ -81,6 +135,20 @@ Adds a script which would be evaluated in one of the following scenarios:
 The script is evaluated after the document was created but before any of its scripts were run. This is useful to amend the JavaScript environment, e.g. to seed `Math.random`.
 
 An example of overriding `Math.random` before the page loads:
+
+```py
+# async
+
+# in your playwright script, assuming the preload.js file is in same directory.
+await browser_context.add_init_script(path="preload.js")
+```
+
+```py
+# sync
+
+# in your playwright script, assuming the preload.js file is in same directory.
+browser_context.add_init_script(path="preload.js")
+```
 
 :::note
 The order of evaluation of multiple scripts installed via [browser_context.add_init_script(**options)](./api/class-browsercontext.md#browser_contextadd_init_scriptoptions) and [page.add_init_script(**options)](./api/class-page.md#pageadd_init_scriptoptions) is not defined.
@@ -98,6 +166,24 @@ Clears context cookies.
 ## browser_context.clear_permissions()
 
 Clears all permission overrides for the browser context.
+
+```py
+# async
+
+context = await browser.new_context()
+await context.grant_permissions(["clipboard-read"])
+# do stuff ..
+context.clear_permissions()
+```
+
+```py
+# sync
+
+context = browser.new_context()
+context.grant_permissions(["clipboard-read"])
+# do stuff ..
+context.clear_permissions()
+```
 
 ## browser_context.close()
 
@@ -165,7 +251,94 @@ See [page.expose_binding(name, callback, **options)](./api/class-page.md#pageexp
 
 An example of exposing page URL to all frames in all pages in the context:
 
+```py
+# async
+
+import asyncio
+from playwright.async_api import async_playwright
+
+async def run(playwright):
+    webkit = playwright.webkit
+    browser = await webkit.launch(headless=false)
+    context = await browser.new_context()
+    await context.expose_binding("pageURL", lambda source: source["page"].url)
+    page = await context.new_page()
+    await page.set_content("""
+    <script>
+      async function onClick() {
+        document.querySelector('div').textContent = await window.pageURL();
+      }
+    </script>
+    <button onclick="onClick()">Click me</button>
+    <div></div>
+    """)
+    await page.click("button")
+
+async def main():
+    async with async_playwright() as playwright:
+        await run(playwright)
+asyncio.run(main())
+```
+
+```py
+# sync
+
+from playwright.sync_api import sync_playwright
+
+def run(playwright):
+    webkit = playwright.webkit
+    browser = webkit.launch(headless=false)
+    context = browser.new_context()
+    context.expose_binding("pageURL", lambda source: source["page"].url)
+    page = context.new_page()
+    page.set_content("""
+    <script>
+      async function onClick() {
+        document.querySelector('div').textContent = await window.pageURL();
+      }
+    </script>
+    <button onclick="onClick()">Click me</button>
+    <div></div>
+    """)
+    page.click("button")
+
+with sync_playwright() as playwright:
+    run(playwright)
+```
+
 An example of passing an element handle:
+
+```py
+# async
+
+async def print(source, element):
+    print(await element.text_content())
+
+await context.expose_binding("clicked", print, handle=true)
+await page.set_content("""
+  <script>
+    document.addEventListener('click', event => window.clicked(event.target));
+  </script>
+  <div>Click me</div>
+  <div>Or click me</div>
+""")
+```
+
+```py
+# sync
+
+def print(source, element):
+    print(element.text_content())
+
+context.expose_binding("clicked", print, handle=true)
+page.set_content("""
+  <script>
+    document.addEventListener('click', event => window.clicked(event.target));
+  </script>
+  <div>Click me</div>
+  <div>Or click me</div>
+""")
+```
 
 ## browser_context.expose_function(name, callback)
 - `name` <[str]> Name of the function on the window object.
@@ -178,6 +351,76 @@ If the `callback` returns a [Promise], it will be awaited.
 See [page.expose_function(name, callback)](./api/class-page.md#pageexpose_functionname-callback) for page-only version.
 
 An example of adding an `md5` function to all pages in the context:
+
+```py
+# async
+
+import asyncio
+import hashlib
+from playwright.async_api import async_playwright
+
+async def sha1(text):
+    m = hashlib.sha1()
+    m.update(bytes(text, "utf8"))
+    return m.hexdigest()
+
+
+async def run(playwright):
+    webkit = playwright.webkit
+    browser = await webkit.launch(headless=False)
+    context = await browser.new_context()
+    await context.expose_function("sha1", sha1)
+    page = await context.new_page()
+    await page.set_content("""
+        <script>
+          async function onClick() {
+            document.querySelector('div').textContent = await window.sha1('PLAYWRIGHT');
+          }
+        </script>
+        <button onclick="onClick()">Click me</button>
+        <div></div>
+    """)
+    await page.click("button")
+
+async def main():
+    async with async_playwright() as playwright:
+        await run(playwright)
+asyncio.run(main())
+```
+
+```py
+# sync
+
+import hashlib
+from playwright.sync_api import sync_playwright
+
+def sha1(text):
+    m = hashlib.sha1()
+    m.update(bytes(text, "utf8"))
+    return m.hexdigest()
+
+
+def run(playwright):
+    webkit = playwright.webkit
+    browser = webkit.launch(headless=False)
+    context = browser.new_context()
+    context.expose_function("sha1", sha1)
+    page = context.new_page()
+    page.expose_function("sha1", sha1)
+    page.set_content("""
+        <script>
+          async function onClick() {
+            document.querySelector('div').textContent = await window.sha1('PLAYWRIGHT');
+          }
+        </script>
+        <button onclick="onClick()">Click me</button>
+        <div></div>
+    """)
+    page.click("button")
+
+with sync_playwright() as playwright:
+    run(playwright)
+```
 
 ## browser_context.grant_permissions(permissions, **options)
 - `permissions` <[List]\[[str]\]> A permission or an array of permissions to grant. Permissions can be one of the following values:
@@ -219,7 +462,48 @@ Routing provides the capability to modify network requests that are made by any 
 
 An example of a naïve handler that aborts all image requests:
 
+```py
+# async
+
+context = await browser.new_context()
+page = await context.new_page()
+await context.route("**/*.{png,jpg,jpeg}", lambda route: route.abort())
+await page.goto("https://example.com")
+await browser.close()
+```
+
+```py
+# sync
+
+context = browser.new_context()
+page = context.new_page()
+context.route("**/*.{png,jpg,jpeg}", lambda route: route.abort())
+page.goto("https://example.com")
+browser.close()
+```
+
 or the same snippet using a regex pattern instead:
+
+```py
+# async
+
+context = await browser.new_context()
+page = await context.new_page()
+await context.route(r"(\.png$)|(\.jpg$)", lambda page = await context.new_page()
+await page.goto("https://example.com")
+await browser.close()
+```
+
+```py
+# sync
+
+context = browser.new_context()
+page = context.new_page()
+context.route(r"(\.png$)|(\.jpg$)", lambda page = await context.new_page()
+page = context.new_page()
+page.goto("https://example.com")
+browser.close()
+```
 
 Page routes (set up with [page.route(url, handler)](./api/class-page.md#pagerouteurl-handler)) take precedence over browser context routes when request matches both handlers.
 
@@ -268,6 +552,18 @@ The extra HTTP headers will be sent with every request initiated by any page in 
 
 Sets the context's geolocation. Passing `null` or `undefined` emulates position unavailable.
 
+```py
+# async
+
+await browser_context.set_geolocation({"latitude": 59.95, "longitude": 30.31667})
+```
+
+```py
+# sync
+
+browser_context.set_geolocation({"latitude": 59.95, "longitude": 30.31667})
+```
+
 :::note
 Consider using [browser_context.grant_permissions(permissions, **options)](./api/class-browsercontext.md#browser_contextgrant_permissionspermissions-options) to grant permissions for the browser context pages to read its geolocation.
 :::
@@ -308,6 +604,21 @@ Removes a route created with [browser_context.route(url, handler)](./api/class-b
 - returns: <[Any]>
 
 Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the context closes before the event is fired. Returns the event data value.
+
+```py
+# async
+
+context = await browser.new_context()
+await context.grant_permissions(["geolocation"])
+```
+
+```py
+# sync
+
+context = browser.new_context()
+context.grant_permissions(["geolocation"])
+```
+
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"

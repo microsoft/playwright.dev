@@ -367,7 +367,7 @@ This method waits for the [actionability](./actionability.md) checks, then scrol
 - `options` <[Object]>
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.md#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.md#pagesetdefaulttimeouttimeout) methods.
 
-This method waits for [actionability](./actionability.md) checks, then tries to scroll element into view, unless it is completely visible as defined by [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)'s ```ratio```.
+This method waits for [actionability](./actionability.md) checks, then tries to scroll element into view, unless it is completely visible as defined by [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)'s `ratio`.
 
 Throws when `elementHandle` does not point to an element [connected](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) to a Document or a ShadowRoot.
 
@@ -387,16 +387,13 @@ Triggers a `change` and `input` event once all the provided options have been se
 
 ```js
 // single selection matching the value
-handle.selectOption('blue');
+handle.selectOption('select#colors', 'blue');
 
-// single selection matching both the value and the label
-handle.selectOption({ label: 'Blue' });
+// single selection matching the label
+handle.selectOption('select#colors', { label: 'Blue' });
 
 // multiple selection
-handle.selectOption('red', 'green', 'blue');
-
-// multiple selection for blue, red and second option
-handle.selectOption({ value: 'blue' }, { index: 2 }, 'red');
+handle.selectOption('select#colors', ['red', 'green', 'blue']);
 ```
 
 ## elementHandle.selectText([options])

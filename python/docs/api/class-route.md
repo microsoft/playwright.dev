@@ -39,6 +39,36 @@ Aborts the route's request.
 
 Continues route's request with optional overrides.
 
+```py
+# async
+
+async def handle(route, request):
+    # override headers
+    headers = {
+        **request.headers,
+        "foo": "bar" # set "foo" header
+        "origin": None # remove "origin" header
+    }
+    await route.continue(headers=headers)
+}
+await page.route("**/*", handle)
+```
+
+```py
+# sync
+
+def handle(route, request):
+    # override headers
+    headers = {
+        **request.headers,
+        "foo": "bar" # set "foo" header
+        "origin": None # remove "origin" header
+    }
+    route.continue(headers=headers)
+}
+page.route("**/*", handle)
+```
+
 ## route.fulfill(**options)
 - `body` <[str]|[Buffer]> Response body.
 - `content_type` <[str]> If set, equals to setting `Content-Type` response header.
@@ -50,7 +80,37 @@ Fulfills route's request with given response.
 
 An example of fulfilling all requests with 404 responses:
 
+```py
+# async
+
+await page.route("**/*", lambda route: route.fulfill(
+    status=404,
+    content_type="text/plain",
+    body="not found!"))
+```
+
+```py
+# sync
+
+page.route("**/*", lambda route: route.fulfill(
+    status=404,
+    content_type="text/plain",
+    body="not found!"))
+```
+
 An example of serving static file:
+
+```py
+# async
+
+await page.route("**/xhr_endpoint", lambda route: route.fulfill(path="mock_data.json"))
+```
+
+```py
+# sync
+
+page.route("**/xhr_endpoint", lambda route: route.fulfill(path="mock_data.json"))
+```
 
 ## route.request
 - returns: <[Request]>

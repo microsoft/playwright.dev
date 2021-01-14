@@ -17,6 +17,18 @@ for (const worker of page.workers())
   console.log('  ' + worker.url());
 ```
 
+```py
+def handle_worker(worker):
+    print("worker created: " + worker.url)
+    worker.on("close", lambda: print("worker destroyed: " + worker.url))
+
+page.on('worker', handle_worker)
+
+print("current workers:")
+for worker in page.workers:
+    print("    " + worker.url)
+```
+
 
 - [worker.on('close')](./api/class-worker.md#workeronclose)
 - [worker.evaluate(pageFunction[, arg])](./api/class-worker.md#workerevaluatepagefunction-arg)

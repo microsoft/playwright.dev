@@ -26,7 +26,7 @@ const Documentation = require('./documentation');
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
 
 const DIR_SRC = path.join(process.env.SRC_DIR, 'docs', 'src');
-const commonSnippets = new Set(['html', 'yml', 'yaml', 'json', 'groovy', 'html', 'sh']);
+const commonSnippets = new Set(['html', 'yml', 'yaml', 'json', 'groovy', 'html', 'sh', 'py']);
 
 class Generator {
   links = new Map();

@@ -6,6 +6,43 @@ title: "BrowserType"
 
 BrowserType provides methods to launch a specific browser instance or connect to an existing one. The following is a typical example of using Playwright to drive automation:
 
+```py
+# async
+
+import asyncio
+from playwright.async_api import async_playwright
+
+async def run(playwright):
+    chromium = playwright.chromium
+    browser = await chromium.launch()
+    page = await browser.new_page()
+    await page.goto("https://example.com")
+    # other actions...
+    await browser.close()
+
+async def main():
+    async with async_playwright() as playwright:
+        await run(playwright)
+asyncio.run(main())
+```
+
+```py
+# sync
+
+from playwright.sync_api import sync_playwright
+
+def run(playwright):
+    chromium = playwright.chromium
+    browser = chromium.launch()
+    page = browser.new_page()
+    page.goto("https://example.com")
+    # other actions...
+    browser.close()
+
+with sync_playwright() as playwright:
+    run(playwright)
+```
+
 
 - [browser_type.executable_path](./api/class-browsertype.md#browser_typeexecutable_path)
 - [browser_type.launch(**options)](./api/class-browsertype.md#browser_typelaunchoptions)
@@ -42,6 +79,22 @@ A path where Playwright expects to find a bundled browser executable.
 Returns the browser instance.
 
 You can use `ignore_default_args` to filter out `--mute-audio` from default arguments:
+
+```py
+# async
+
+browser = await playwright.chromium.launch( # or "firefox" or "webkit".
+    ignore_default_args=["--mute-audio"]
+)
+```
+
+```py
+# sync
+
+browser = playwright.chromium.launch( # or "firefox" or "webkit".
+    ignore_default_args=["--mute-audio"]
+)
+```
 
 > **Chromium-only** Playwright can also be used to control the Chrome browser, but it works best with the version of Chromium it is bundled with. There is no guarantee it will work with any other version. Use `executable_path` option with extreme caution.
 >

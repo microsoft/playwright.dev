@@ -10,9 +10,69 @@ For finer control, you can use [keyboard.down(key)](./api/class-keyboard.md#keyb
 
 An example of holding down `Shift` in order to select and delete some text:
 
+```py
+# async
+
+await page.keyboard.type("Hello World!")
+await page.keyboard.press("ArrowLeft")
+await page.keyboard.down("Shift")
+for i in range(6):
+    await page.keyboard.press("ArrowLeft")
+await page.keyboard.up("Shift")
+await page.keyboard.press("Backspace")
+# result text will end up saying "Hello!"
+```
+
+```py
+# sync
+
+page.keyboard.type("Hello World!")
+page.keyboard.press("ArrowLeft")
+page.keyboard.down("Shift")
+for i in range(6):
+    page.keyboard.press("ArrowLeft")
+page.keyboard.up("Shift")
+page.keyboard.press("Backspace")
+# result text will end up saying "Hello!"
+```
+
 An example of pressing uppercase `A`
 
+```py
+# async
+
+await page.keyboard.press("Shift+KeyA")
+# or
+await page.keyboard.press("Shift+A")
+```
+
+```py
+# sync
+
+page.keyboard.press("Shift+KeyA")
+# or
+page.keyboard.press("Shift+A")
+```
+
 An example to trigger select-all with the keyboard
+
+```py
+# async
+
+# on windows and linux
+await page.keyboard.press("Control+A")
+# on mac_os
+await page.keyboard.press("Meta+A")
+```
+
+```py
+# sync
+
+# on windows and linux
+page.keyboard.press("Control+A")
+# on mac_os
+page.keyboard.press("Meta+A")
+```
 
 
 - [keyboard.down(key)](./api/class-keyboard.md#keyboarddownkey)
@@ -49,6 +109,18 @@ Modifier keys DO influence `keyboard.down`. Holding down `Shift` will type the t
 
 Dispatches only `input` event, does not emit the `keydown`, `keyup` or `keypress` events.
 
+```py
+# async
+
+await page.keyboard.insert_text("嗨")
+```
+
+```py
+# sync
+
+page.keyboard.insert_text("嗨")
+```
+
 :::note
 Modifier keys DO NOT effect `keyboard.insertText`. Holding down `Shift` will not type the text in upper case.
 :::
@@ -69,6 +141,34 @@ If `key` is a single character, it is case-sensitive, so the values `a` and `A` 
 
 Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported as well. When speficied with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
 
+```py
+# async
+
+page = await browser.new_page()
+await page.goto("https://keycode.info")
+await page.keyboard.press("a")
+await page.screenshot(path="a.png")
+await page.keyboard.press("ArrowLeft")
+await page.screenshot(path="arrow_left.png")
+await page.keyboard.press("Shift+O")
+await page.screenshot(path="o.png")
+await browser.close()
+```
+
+```py
+# sync
+
+page = browser.new_page()
+page.goto("https://keycode.info")
+page.keyboard.press("a")
+page.screenshot(path="a.png")
+page.keyboard.press("ArrowLeft")
+page.screenshot(path="arrow_left.png")
+page.keyboard.press("Shift+O")
+page.screenshot(path="o.png")
+browser.close()
+```
+
 Shortcut for [keyboard.down(key)](./api/class-keyboard.md#keyboarddownkey) and [keyboard.up(key)](./api/class-keyboard.md#keyboardupkey).
 
 ## keyboard.type(text, **options)
@@ -78,6 +178,20 @@ Shortcut for [keyboard.down(key)](./api/class-keyboard.md#keyboarddownkey) and [
 Sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in the text.
 
 To press a special key, like `Control` or `ArrowDown`, use [keyboard.press(key, **options)](./api/class-keyboard.md#keyboardpresskey-options).
+
+```py
+# async
+
+await page.keyboard.type("Hello") # types instantly
+await page.keyboard.type("World", delay=100) # types slower, like a user
+```
+
+```py
+# sync
+
+page.keyboard.type("Hello") # types instantly
+page.keyboard.type("World", delay=100) # types slower, like a user
+```
 
 :::note
 Modifier keys DO NOT effect `keyboard.type`. Holding down `Shift` will not type the text in upper case.

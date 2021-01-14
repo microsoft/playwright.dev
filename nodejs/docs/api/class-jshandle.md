@@ -48,7 +48,7 @@ Examples:
 
 ```js
 const tweetHandle = await page.$('.tweet .retweets');
-expect(await tweetHandle.evaluate((node, suffix) => node.innerText, ' retweets')).toBe('10 retweets');
+expect(await tweetHandle.evaluate(node => node.innerText)).toBe('10 retweets');
 ```
 
 ## jsHandle.evaluateHandle(pageFunction[, arg])

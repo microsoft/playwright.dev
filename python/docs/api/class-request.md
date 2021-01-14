@@ -90,7 +90,35 @@ When the server responds with a redirect, Playwright creates a new [Request] obj
 
 For example, if the website `http://example.com` redirects to `https://example.com`:
 
+```py
+# async
+
+response = await page.goto("http://example.com")
+print(response.request.redirected_from.url) # "http://example.com"
+```
+
+```py
+# sync
+
+response = page.goto("http://example.com")
+print(response.request.redirected_from.url) # "http://example.com"
+```
+
 If the website `https://google.com` has no redirects:
+
+```py
+# async
+
+response = await page.goto("https://google.com")
+print(response.request.redirected_from) # None
+```
+
+```py
+# sync
+
+response = page.goto("https://google.com")
+print(response.request.redirected_from) # None
+```
 
 ## request.redirected_to
 - returns: <[NoneType]|[Request]>
@@ -98,6 +126,10 @@ If the website `https://google.com` has no redirects:
 New request issued by the browser if the server responded with redirect.
 
 This method is the opposite of [request.redirected_from](./api/class-request.md#requestredirected_from):
+
+```py
+assert request.redirected_from.redirected_to == request
+```
 
 ## request.resource_type
 - returns: <[str]>
@@ -122,6 +154,24 @@ Returns the matching [Response] object, or `null` if the response was not receiv
   - `responseEnd` <[float]> Time immediately after the browser receives the last byte of the resource or immediately before the transport connection is closed, whichever comes first. The value is given in milliseconds relative to `startTime`, -1 if not available.
 
 Returns resource timing information for given request. Most of the timing values become available upon the response, `responseEnd` becomes available when request finishes. Find more information at [Resource Timing API](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceResourceTiming).
+
+```py
+# async
+
+async with page.expect_event("requestfinished") as request_info:
+    await page.goto("http://example.com")
+request = await request_info.value
+print(request.timing)
+```
+
+```py
+# sync
+
+with page.expect_event("requestfinished") as request_info:
+    page.goto("http://example.com")
+request = request_info.value
+print(request.timing)
+```
 
 ## request.url
 - returns: <[str]>

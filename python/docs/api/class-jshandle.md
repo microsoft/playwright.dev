@@ -6,6 +6,20 @@ title: "JSHandle"
 
 JSHandle represents an in-page JavaScript object. JSHandles can be created with the [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluate_handleexpression-options) method.
 
+```py
+# async
+
+window_handle = await page.evaluate_handle("window")
+# ...
+```
+
+```py
+# sync
+
+window_handle = page.evaluate_handle("window")
+# ...
+```
+
 JSHandle prevents the referenced JavaScript object being garbage collected unless the handle is exposed with [js_handle.dispose()](./api/class-jshandle.md#js_handledispose). JSHandles are auto-disposed when their origin frame gets navigated or the parent context gets destroyed.
 
 JSHandle instances can be used as an argument in [page.eval_on_selector(selector, expression, **options)](./api/class-page.md#pageeval_on_selectorselector-expression-options), [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options) and [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluate_handleexpression-options) methods.
@@ -42,6 +56,20 @@ If `page_function` returns a [Promise], then `handle.evaluate` would wait for th
 
 Examples:
 
+```py
+# async
+
+tweet_handle = await page.query_selector(".tweet .retweets")
+assert await tweet_handle.evaluate("node => node.innerText") == "10 retweets"
+```
+
+```py
+# sync
+
+tweet_handle = page.query_selector(".tweet .retweets")
+assert tweet_handle.evaluate("node => node.innerText") == "10 retweets"
+```
+
 ## js_handle.evaluate_handle(expression, **options)
 - `arg` <[EvaluationArgument]> Optional argument to pass to `page_function`
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
@@ -62,6 +90,26 @@ See [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevalua
 - returns: <[Map]\[[str], [JSHandle]\]>
 
 The method returns a map with **own property names** as keys and JSHandle instances for the property values.
+
+```py
+# async
+
+handle = await page.evaluate_handle("{window, document}")
+properties = await handle.get_properties()
+window_handle = properties.get("window")
+document_handle = properties.get("document")
+await handle.dispose()
+```
+
+```py
+# sync
+
+handle = page.evaluate_handle("{window, document}")
+properties = handle.get_properties()
+window_handle = properties.get("window")
+document_handle = properties.get("document")
+handle.dispose()
+```
 
 ## js_handle.get_property(property_name)
 - `property_name` <[str]> property to get

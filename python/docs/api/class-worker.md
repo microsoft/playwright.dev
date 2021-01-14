@@ -6,6 +6,18 @@ title: "Worker"
 
 The Worker class represents a [WebWorker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API). `worker` event is emitted on the page object to signal a worker creation. `close` event is emitted on the worker object when the worker is gone.
 
+```py
+def handle_worker(worker):
+    print("worker created: " + worker.url)
+    worker.on("close", lambda: print("worker destroyed: " + worker.url))
+
+page.on('worker', handle_worker)
+
+print("current workers:")
+for worker in page.workers:
+    print("    " + worker.url)
+```
+
 
 - [worker.on("close")](./api/class-worker.md#workeronclose)
 - [worker.evaluate(expression, **options)](./api/class-worker.md#workerevaluateexpression-options)

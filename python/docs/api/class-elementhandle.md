@@ -7,6 +7,45 @@ title: "ElementHandle"
 
 ElementHandle represents an in-page DOM element. ElementHandles can be created with the [page.query_selector(selector)](./api/class-page.md#pagequery_selectorselector) method.
 
+```py
+# async
+
+import asyncio
+from playwright.async_api import async_playwright
+
+async def run(playwright):
+    chromium = playwright.chromium
+    browser = await chromium.launch()
+    page = await browser.new_page()
+    await page.goto("https://example.com")
+    href_element = await page.query_selector("a")
+    await href_element.click()
+    # ...
+
+async def main():
+    async with async_playwright() as playwright:
+        await run(playwright)
+asyncio.run(main())
+```
+
+```py
+# sync
+
+from playwright.sync_api import sync_playwright
+
+def run(playwright):
+    chromium = playwright.chromium
+    browser = chromium.launch()
+    page = browser.new_page()
+    page.goto("https://example.com")
+    href_element = page.query_selector("a")
+    href_element.click()
+    # ...
+
+with sync_playwright() as playwright:
+    run(playwright)
+```
+
 ElementHandle prevents DOM element from garbage collection unless the handle is disposed with [js_handle.dispose()](./api/class-jshandle.md#js_handledispose). ElementHandles are auto-disposed when their origin frame gets navigated.
 
 ElementHandle instances can be used as an argument in [page.eval_on_selector(selector, expression, **options)](./api/class-page.md#pageeval_on_selectorselector-expression-options) and [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options) methods.
@@ -69,6 +108,20 @@ Scrolling affects the returned bonding box, similarly to [Element.getBoundingCli
 Elements from child frames return the bounding box relative to the main frame, unlike the [Element.getBoundingClientRect](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect).
 
 Assuming the page is static, it is safe to use bounding box coordinates to perform input. For example, the following snippet should click the center of the element.
+
+```py
+# async
+
+box = await element_handle.bounding_box()
+await page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+```
+
+```py
+# sync
+
+box = element_handle.bounding_box()
+page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+```
 
 ## element_handle.check(**options)
 - `force` <[bool]> Whether to bypass the [actionability](./actionability.md) checks. Defaults to `false`.
@@ -145,6 +198,18 @@ When all steps combined have not finished during the specified `timeout`, this m
 
 The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the elment, `click` is dispatched. This is equivalend to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
 
+```py
+# async
+
+await element_handle.dispatch_event("click")
+```
+
+```py
+# sync
+
+element_handle.dispatch_event("click")
+```
+
 Under the hood, it creates an instance of an event based on the given `type`, initializes it with `event_init` properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
 
 Since `event_init` is event-specific, please refer to the events documentation for the lists of initial properties:
@@ -157,6 +222,22 @@ Since `event_init` is event-specific, please refer to the events documentation f
 * [Event](https://developer.mozilla.org/en-US/docs/Web/API/Event/Event)
 
 You can also specify `JSHandle` as the property value if you want live objects to be passed into the event:
+
+```py
+# async
+
+# note you can only create data_transfer in chromium and firefox
+data_transfer = await page.evaluate_handle("new DataTransfer()")
+await element_handle.dispatch_event("#source", "dragstart", {"dataTransfer": data_transfer})
+```
+
+```py
+# sync
+
+# note you can only create data_transfer in chromium and firefox
+data_transfer = page.evaluate_handle("new DataTransfer()")
+element_handle.dispatch_event("#source", "dragstart", {"dataTransfer": data_transfer})
+```
 
 ## element_handle.eval_on_selector(selector, expression, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -172,6 +253,22 @@ The method finds an element matching the specified selector in the `ElementHandl
 If `page_function` returns a [Promise], then `frame.$eval` would wait for the promise to resolve and return its value.
 
 Examples:
+
+```py
+# async
+
+tweet_handle = await page.query_selector(".tweet")
+assert await tweet_handle.eval_on_selector(".like", "node => node.innerText") == "100"
+assert await tweet_handle.eval_on_selector(".retweets", "node => node.innerText") = "10"
+```
+
+```py
+# sync
+
+tweet_handle = page.query_selector(".tweet")
+assert tweet_handle.eval_on_selector(".like", "node => node.innerText") == "100"
+assert tweet_handle.eval_on_selector(".retweets", "node => node.innerText") = "10"
+```
 
 ## element_handle.eval_on_selector_all(selector, expression, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -193,6 +290,21 @@ Examples:
   <div class="tweet">Hello!</div>
   <div class="tweet">Hi!</div>
 </div>
+```
+
+```py
+# async
+
+# FIXME
+feed_handle = await page.query_selector(".feed")
+assert await feed_handle.eval_on_selector_all(".tweet", "nodes => nodes.map(n => n.innerText)") == ["hello!", "hi!"]
+```
+
+```py
+# sync
+
+feed_handle = page.query_selector(".feed")
+assert feed_handle.eval_on_selector_all(".tweet", "nodes => nodes.map(n => n.innerText)") == ["hello!", "hi!"]
 ```
 
 ## element_handle.fill(value, **options)
@@ -322,7 +434,7 @@ This method waits for the [actionability](./actionability.md) checks, then scrol
 ## element_handle.scroll_into_view_if_needed(**options)
 - `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 
-This method waits for [actionability](./actionability.md) checks, then tries to scroll element into view, unless it is completely visible as defined by [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)'s ```ratio```.
+This method waits for [actionability](./actionability.md) checks, then tries to scroll element into view, unless it is completely visible as defined by [IntersectionObserver](https://developer.mozilla.org/en-US/docs/Web/API/Intersection_Observer_API)'s `ratio`.
 
 Throws when `elementHandle` does not point to an element [connected](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) to a Document or a ShadowRoot.
 
@@ -338,6 +450,42 @@ Throws when `elementHandle` does not point to an element [connected](https://dev
 Returns the array of option values that have been successfully selected.
 
 Triggers a `change` and `input` event once all the provided options have been selected. If element is not a `<select>` element, the method throws an error.
+
+```py
+# async
+
+# single selection matching the value
+await handle.select_option("select#colors", "blue")
+# single selection matching the label
+await handle.select_option("select#colors", label="blue")
+# multiple selection
+await handle.select_option("select#colors", value=["red", "green", "blue"])
+```
+
+```py
+# sync
+
+# single selection matching the value
+handle.select_option("select#colors", "blue")
+# single selection matching both the label
+handle.select_option("select#colors", label="blue")
+# multiple selection
+handle.select_option("select#colors", value=["red", "green", "blue"])
+```
+
+```py
+# sync
+
+# FIXME
+# single selection matching the value
+handle.select_option("blue")
+# single selection matching both the value and the label
+handle.select_option(label="blue")
+# multiple selection
+handle.select_option("red", "green", "blue")
+# multiple selection for blue, red and second option
+handle.select_option(value="blue", { index: 2 }, "red")
+```
 
 ## element_handle.select_text(**options)
 - `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
@@ -394,7 +542,37 @@ Focuses the element, and then sends a `keydown`, `keypress`/`input`, and `keyup`
 
 To press a special key, like `Control` or `ArrowDown`, use [element_handle.press(key, **options)](./api/class-elementhandle.md#element_handlepresskey-options).
 
+```py
+# async
+
+await element_handle.type("hello") # types instantly
+await element_handle.type("world", delay=100) # types slower, like a user
+```
+
+```py
+# sync
+
+element_handle.type("hello") # types instantly
+element_handle.type("world", delay=100) # types slower, like a user
+```
+
 An example of typing into a text field and then submitting the form:
+
+```py
+# async
+
+element_handle = await page.query_selector("input")
+await element_handle.type("some text")
+await element_handle.press("Enter")
+```
+
+```py
+# sync
+
+element_handle = page.query_selector("input")
+element_handle.type("some text")
+element_handle.press("Enter")
+```
 
 ## element_handle.uncheck(**options)
 - `force` <[bool]> Whether to bypass the [actionability](./actionability.md) checks. Defaults to `false`.
@@ -442,6 +620,24 @@ If the element does not satisfy the condition for the `timeout` milliseconds, th
 Returns element specified by selector when it satisfies `state` option. Returns `null` if waiting for `hidden` or `detached`.
 
 Wait for the `selector` relative to the element handle to satisfy `state` option (either appear/disappear from dom, or become visible/hidden). If at the moment of calling the method `selector` already satisfies the condition, the method will return immediately. If the selector doesn't satisfy the condition for the `timeout` milliseconds, the function will throw.
+
+```py
+# async
+
+await page.set_content("<div><span></span></div>")
+div = await page.query_selector("div")
+# waiting for the "span" selector relative to the div.
+span = await div.wait_for_selector("span", state="attached")
+```
+
+```py
+# sync
+
+page.set_content("<div><span></span></div>")
+div = page.query_selector("div")
+# waiting for the "span" selector relative to the div.
+span = div.wait_for_selector("span", state="attached")
+```
 
 :::note
 This method does not work across navigations, use [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewait_for_selectorselector-options) instead.

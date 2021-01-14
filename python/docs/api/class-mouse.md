@@ -8,6 +8,32 @@ The Mouse class operates in main-frame CSS pixels relative to the top-left corne
 
 Every `page` object has its own Mouse, accessible with [page.mouse](./api/class-page.md#pagemouse).
 
+```py
+# async
+
+# using ‘page.mouse’ to trace a 100x100 square.
+await page.mouse.move(0, 0)
+await page.mouse.down()
+await page.mouse.move(0, 100)
+await page.mouse.move(100, 100)
+await page.mouse.move(100, 0)
+await page.mouse.move(0, 0)
+await page.mouse.up()
+```
+
+```py
+# sync
+
+# using ‘page.mouse’ to trace a 100x100 square.
+page.mouse.move(0, 0)
+page.mouse.down()
+page.mouse.move(0, 100)
+page.mouse.move(100, 100)
+page.mouse.move(100, 0)
+page.mouse.move(0, 0)
+page.mouse.up()
+```
+
 
 - [mouse.click(x, y, **options)](./api/class-mouse.md#mouseclickx-y-options)
 - [mouse.dblclick(x, y, **options)](./api/class-mouse.md#mousedblclickx-y-options)

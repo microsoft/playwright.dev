@@ -47,6 +47,10 @@ page.on('requestfailed', request => {
 });
 ```
 
+```py
+page.on("requestfailed", lambda: request => print(request.url + " " + request.failure)
+```
+
 ## request.frame()
 - returns: <[Frame]>
 
@@ -116,6 +120,10 @@ This method is the opposite of [request.redirectedFrom()](./api/class-request.md
 console.log(request.redirectedFrom().redirectedTo() === request); // true
 ```
 
+```py
+assert request.redirected_from.redirected_to == request
+```
+
 ## request.resourceType()
 - returns: <[string]>
 
@@ -143,7 +151,7 @@ Returns resource timing information for given request. Most of the timing values
 ```js
 const [request] = await Promise.all([
   page.waitForEvent('requestfinished'),
-  page.goto(httpsServer.EMPTY_PAGE)
+  page.goto('http://example.com')
 ]);
 console.log(request.timing());
 ```

@@ -6,6 +6,43 @@ title: "Playwright"
 
 Playwright module provides a method to launch a browser instance. The following is a typical example of using Playwright to drive automation:
 
+```py
+# async
+
+import asyncio
+from playwright.async_api import async_playwright
+
+async def run(playwright):
+    chromium = playwright.chromium # or "firefox" or "webkit".
+    browser = await chromium.launch()
+    page = await browser.new_page()
+    await page.goto("http://example.com")
+    # other actions...
+    await browser.close()
+
+async def main():
+    async with async_playwright() as playwright:
+        await run(playwright)
+asyncio.run(main())
+```
+
+```py
+# sync
+
+from playwright.sync_api import sync_playwright
+
+def run(playwright):
+    chromium = playwright.chromium # or "firefox" or "webkit".
+    browser = chromium.launch()
+    page = browser.new_page()
+    page.goto("http://example.com")
+    # other actions...
+    browser.close()
+
+with sync_playwright() as playwright:
+    run(playwright)
+```
+
 By default, the `playwright` NPM package automatically downloads browser executables during installation. The `playwright-core` NPM package can be used to skip automatic downloads.
 
 
@@ -20,6 +57,20 @@ By default, the `playwright` NPM package automatically downloads browser executa
 
 Terminates this instance of Playwright in case it was created bypassing the Python context manager. This is useful in REPL applications.
 
+```py
+>>> from playwright.sync_api import sync_playwright
+
+>>> playwright = sync_playwright().start()
+
+>>> browser = playwright.chromium.launch()
+>>> page = browser.newPage()
+>>> page.goto("http://whatsmyuseragent.org/")
+>>> page.screenshot(path="example.png")
+>>> browser.close()
+
+>>> playwright.stop()
+```
+
 ## playwright.chromium
 - type: <[BrowserType]>
 
@@ -29,6 +80,47 @@ This object can be used to launch or connect to Chromium, returning instances of
 - type: <[Dict]>
 
 Returns a dictionary of devices to be used with [browser.new_context(**options)](./api/class-browser.md#browsernew_contextoptions) or [browser.new_page(**options)](./api/class-browser.md#browsernew_pageoptions).
+
+```py
+# async
+
+import asyncio
+from playwright.async_api import async_playwright
+
+async def run(playwright):
+    webkit = playwright.webkit
+    iphone = playwright.devices["iPhone 6"]
+    browser = await webkit.launch()
+    context = await browser.new_context(**iphone)
+    page = await context.new_page()
+    await page.goto("http://example.com")
+    # other actions...
+    await browser.close()
+
+async def main():
+    async with async_playwright() as playwright:
+        await run(playwright)
+asyncio.run(main())
+```
+
+```py
+# sync
+
+from playwright.sync_api import sync_playwright
+
+def run(playwright):
+    webkit = playwright.webkit
+    iphone = playwright.devices["iPhone 6"]
+    browser = webkit.launch()
+    context = browser.new_context(**iphone)
+    page = context.new_page()
+    page.goto("http://example.com")
+    # other actions...
+    browser.close()
+
+with sync_playwright() as playwright:
+    run(playwright)
+```
 
 ## playwright.firefox
 - type: <[BrowserType]>
