@@ -6,6 +6,18 @@ title: "FileChooser"
 
 [FileChooser] objects are dispatched by the page in the [page.on("filechooser")](./api/class-page.md#pageonfilechooser) event.
 
+```py
+# async
+
+page.on("filechooser", lambda file_chooser: file_chooser.set_files("/tmp/myfile.pdf"))
+```
+
+```py
+# sync
+
+page.on("filechooser", lambda file_chooser: file_chooser.set_files("/tmp/myfile.pdf"))
+```
+
 
 - [file_chooser.element](./api/class-filechooser.md#file_chooserelement)
 - [file_chooser.is_multiple()](./api/class-filechooser.md#file_chooseris_multiple)

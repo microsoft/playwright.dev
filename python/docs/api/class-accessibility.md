@@ -54,7 +54,56 @@ The Chromium accessibility tree contains nodes that go unused on most platforms 
 
 An example of dumping the entire accessibility tree:
 
+```py
+# async
+
+snapshot = await page.accessibility.snapshot()
+print(snapshot)
+```
+
+```py
+# sync
+
+snapshot = page.accessibility.snapshot()
+print(snapshot)
+```
+
 An example of logging the focused node's name:
+
+```py
+# async
+
+def find_focused_node(node):
+    if (node.get("focused"))
+        return node
+    for child in (node.get("children") or []):
+        found_node = find_focused_node(child)
+        return found_node
+    return null
+
+snapshot = await page.accessibility.snapshot()
+node = find_focused_node(snapshot)
+if node:
+    print(node["name"]) 
+```
+
+```py
+# sync
+
+def find_focused_node(node):
+    if (node.get("focused"))
+        return node
+    for child in (node.get("children") or []):
+        found_node = find_focused_node(child)
+        return found_node
+    return null
+
+snapshot = page.accessibility.snapshot()
+node = find_focused_node(snapshot)
+if node:
+    print(node["name"]) 
+```
+
 
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"

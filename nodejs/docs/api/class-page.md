@@ -30,6 +30,10 @@ This example logs a message for a single page `load` event:
 page.once('load', () => console.log('Page loaded!'));
 ```
 
+```py
+page.once("load", lambda: print("page loaded!"))
+```
+
 To unsubscribe from events use the `removeListener` method:
 
 ```js
@@ -39,6 +43,14 @@ function logRequest(interceptedRequest) {
 page.on('request', logRequest);
 // Sometime later...
 page.removeListener('request', logRequest);
+```
+
+```py
+def log_request(intercepted_request):
+    print("a request was made:", intercepted_request.url)
+page.on("request", log_request)
+# sometime later...
+page.remove_listener("request", log_request)
 ```
 
 
@@ -153,7 +165,7 @@ An example of handling `console` event:
 ```js
 page.on('console', msg => {
   for (let i = 0; i < msg.args().length; ++i)
-    console.log(`${i}: ${msg.args()[i]}`);
+    console.log(`${i}: ${await msg.args()[i].jsonValue()}`);
 });
 page.evaluate(() => console.log('hello', 5, {foo: 'bar'}));
 ```
@@ -173,18 +185,6 @@ try {
 } catch (e) {
   // When the page crashes, exception message contains 'crash'.
 }
-```
-
-However, when manually listening to events, it might be useful to avoid stalling when the page crashes. In this case, handling `crash` event helps:
-
-```js
-await new Promise((resolve, reject) => {
-  page.on('requestfinished', async request => {
-    if (await someProcessing(request))
-      resolve(request);
-  });
-  page.on('crash', error => reject(error));
-});
 ```
 
 ## page.on('dialog')
@@ -214,6 +214,10 @@ Emitted when a file chooser is supposed to appear, such as after clicking the  `
 page.on('filechooser', async (fileChooser) => {
   await fileChooser.setFiles('/tmp/myfile.pdf');
 });
+```
+
+```py
+page.on("filechooser", lambda file_chooser: file_chooser.set_files("/tmp/myfile.pdf"))
 ```
 
 ## page.on('frameattached')
@@ -342,7 +346,7 @@ If `pageFunction` returns a [Promise], then [page.$$eval(selector, pageFunction[
 Examples:
 
 ```js
-const divsCounts = await page.$$eval('div', (divs, min) => divs.length >= min, 10);
+const divCounts = await page.$$eval('div', (divs, min) => divs.length >= min, 10);
 ```
 
 ## page.addInitScript(script[, arg])
@@ -362,10 +366,11 @@ An example of overriding `Math.random` before the page loads:
 ```js
 // preload.js
 Math.random = () => 42;
+```
 
+```js
 // In your playwright script, assuming the preload.js file is in same directory
-const preloadFile = fs.readFileSync('./preload.js', 'utf8');
-await page.addInitScript(preloadFile);
+await page.addInitScript({ path: './preload.js' });
 ```
 
 :::note
@@ -567,9 +572,9 @@ await page.evaluate(() => matchMedia('(prefers-color-scheme: no-preference)').ma
 
 Returns the value of the `pageFunction` invocation.
 
-If the function passed to the `page.evaluate` returns a [Promise], then `page.evaluate` would wait for the promise to resolve and return its value.
+If the function passed to the [page.evaluate(pageFunction[, arg])](./api/class-page.md#pageevaluatepagefunction-arg) returns a [Promise], then [page.evaluate(pageFunction[, arg])](./api/class-page.md#pageevaluatepagefunction-arg) would wait for the promise to resolve and return its value.
 
-If the function passed to the `page.evaluate` returns a non-[Serializable] value, then `page.evaluate` resolves to `undefined`. DevTools Protocol also supports transferring some additional values that are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`, and bigint literals.
+If the function passed to the [page.evaluate(pageFunction[, arg])](./api/class-page.md#pageevaluatepagefunction-arg) returns a non-[Serializable] value, then[ method: `Page.evaluate`] resolves to `undefined`. DevTools Protocol also supports transferring some additional values that are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`, and bigint literals.
 
 Passing argument to `pageFunction`:
 
@@ -588,7 +593,7 @@ const x = 10;
 console.log(await page.evaluate(`1 + ${x}`)); // prints "11"
 ```
 
-[ElementHandle] instances can be passed as an argument to the `page.evaluate`:
+[ElementHandle] instances can be passed as an argument to the [page.evaluate(pageFunction[, arg])](./api/class-page.md#pageevaluatepagefunction-arg):
 
 ```js
 const bodyHandle = await page.$('body');
@@ -605,9 +610,14 @@ Shortcut for main frame's [frame.evaluate(pageFunction[, arg])](./api/class-fram
 
 Returns the value of the `pageFunction` invocation as in-page object (JSHandle).
 
-The only difference between `page.evaluate` and `page.evaluateHandle` is that `page.evaluateHandle` returns in-page object (JSHandle).
+The only difference between [page.evaluate(pageFunction[, arg])](./api/class-page.md#pageevaluatepagefunction-arg) and [page.evaluateHandle(pageFunction[, arg])](./api/class-page.md#pageevaluatehandlepagefunction-arg) is that [page.evaluateHandle(pageFunction[, arg])](./api/class-page.md#pageevaluatehandlepagefunction-arg) returns in-page object (JSHandle).
 
-If the function passed to the `page.evaluateHandle` returns a [Promise], then `page.evaluateHandle` would wait for the promise to resolve and return its value.
+If the function passed to the [page.evaluateHandle(pageFunction[, arg])](./api/class-page.md#pageevaluatehandlepagefunction-arg) returns a [Promise], then [`method:Ppage.EvaluateHandle`] would wait for the promise to resolve and return its value.
+
+```js
+const aWindowHandle = await page.evaluateHandle(() => Promise.resolve(window));
+aWindowHandle; // Handle for the window object.
+```
 
 A string can also be passed in instead of a function:
 
@@ -615,7 +625,7 @@ A string can also be passed in instead of a function:
 const aHandle = await page.evaluateHandle('document'); // Handle for the 'document'
 ```
 
-[JSHandle] instances can be passed as an argument to the `page.evaluateHandle`:
+[JSHandle] instances can be passed as an argument to the [page.evaluateHandle(pageFunction[, arg])](./api/class-page.md#pageevaluatehandlepagefunction-arg):
 
 ```js
 const aHandle = await page.evaluateHandle(() => document.body);
@@ -692,7 +702,7 @@ See [browserContext.exposeFunction(name, callback)](./api/class-browsercontext.m
 Functions installed via [page.exposeFunction(name, callback)](./api/class-page.md#pageexposefunctionname-callback) survive navigations.
 :::
 
-An example of adding an `md5` function to the page:
+An example of adding an `sha1` function to the page:
 
 ```js
 const { webkit } = require('playwright');  // Or 'chromium' or 'firefox'.
@@ -701,46 +711,17 @@ const crypto = require('crypto');
 (async () => {
   const browser = await webkit.launch({ headless: false });
   const page = await browser.newPage();
-  await page.exposeFunction('md5', text => crypto.createHash('md5').update(text).digest('hex'));
+  await page.exposeFunction('sha1', text => crypto.createHash('sha1').update(text).digest('hex'));
   await page.setContent(`
     <script>
       async function onClick() {
-        document.querySelector('div').textContent = await window.md5('PLAYWRIGHT');
+        document.querySelector('div').textContent = await window.sha1('PLAYWRIGHT');
       }
     </script>
     <button onclick="onClick()">Click me</button>
     <div></div>
   `);
   await page.click('button');
-})();
-```
-
-An example of adding a `window.readfile` function to the page:
-
-```js
-const { chromium } = require('playwright');  // Or 'firefox' or 'webkit'.
-const fs = require('fs');
-
-(async () => {
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
-  page.on('console', msg => console.log(msg.text()));
-  await page.exposeFunction('readfile', async filePath => {
-    return new Promise((resolve, reject) => {
-      fs.readFile(filePath, 'utf8', (err, text) => {
-        if (err)
-          reject(err);
-        else
-          resolve(text);
-      });
-    });
-  });
-  await page.evaluate(async () => {
-    // use window.readfile to read contents of a file
-    const content = await window.readfile('/etc/hosts');
-    console.log(content);
-  });
-  await browser.close();
 })();
 ```
 
@@ -778,8 +759,16 @@ Returns frame matching the specified criteria. Either `name` or `url` must be sp
 const frame = page.frame('frame-name');
 ```
 
+```py
+frame = page.frame(name="frame-name")
+```
+
 ```js
 const frame = page.frame({ url: /.*domain.*/ });
+```
+
+```py
+frame = page.frame(url=r".*domain.*")
 ```
 
 ## page.frames()
@@ -1149,7 +1138,7 @@ Triggers a `change` and `input` event once all the provided options have been se
 // single selection matching the value
 page.selectOption('select#colors', 'blue');
 
-// single selection matching both the value and the label
+// single selection matching the label
 page.selectOption('select#colors', { label: 'Blue' });
 
 // multiple selection
@@ -1361,14 +1350,14 @@ const { webkit } = require('playwright');  // Or 'chromium' or 'firefox'.
 (async () => {
   const browser = await webkit.launch();
   const page = await browser.newPage();
-  const watchDog = page.waitForFunction('window.innerWidth < 100');
+  const watchDog = page.waitForFunction(() => window.innerWidth < 100);
   await page.setViewportSize({width: 50, height: 50});
   await watchDog;
   await browser.close();
 })();
 ```
 
-To pass an argument to the predicate of `page.waitForFunction` function:
+To pass an argument to the predicate of [page.waitForFunction(pageFunction[, arg, options])](./api/class-page.md#pagewaitforfunctionpagefunction-arg-options) function:
 
 ```js
 const selector = '.foo';
@@ -1487,12 +1476,10 @@ const { chromium } = require('playwright');  // Or 'firefox' or 'webkit'.
 (async () => {
   const browser = await chromium.launch();
   const page = await browser.newPage();
-  let currentURL;
-  page
-    .waitForSelector('img')
-    .then(() => console.log('First URL with image: ' + currentURL));
-  for (currentURL of ['https://example.com', 'https://google.com', 'https://bbc.com']) {
+  for (let currentURL of ['https://google.com', 'https://bbc.com']) {
     await page.goto(currentURL);
+    const element = await page.waitForSelector('img');
+    console.log('Loaded image: ' + await element.getAttribute('src'));
   }
   await browser.close();
 })();

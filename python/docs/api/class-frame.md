@@ -13,7 +13,52 @@ At every point of time, page exposes its current frame tree via the [page.main_f
 
 An example of dumping frame tree:
 
-An example of getting text from an iframe element:
+```py
+# async
+
+import asyncio
+from playwright.async_api import async_playwright
+
+async def run(playwright):
+    firefox = playwright.firefox
+    browser = await firefox.launch()
+    page = await browser.new_page()
+    await page.goto("https://www.theverge.com")
+    dump_frame_tree(page.main_frame, "")
+    await browser.close()
+
+def dump_frame_tree(frame, indent):
+    print(indent + frame.name + '@' + frame.url)
+    for child in frame.child_frames:
+        dump_frame_tree(child, indent + "    ")
+
+async def main():
+    async with async_playwright() as playwright:
+        await run(playwright)
+asyncio.run(main())
+```
+
+```py
+# sync
+
+from playwright.sync_api import sync_playwright
+
+def run(playwright):
+    firefox = playwright.firefox
+    browser = firefox.launch()
+    page = browser.new_page()
+    page.goto("https://www.theverge.com")
+    dump_frame_tree(page.main_frame, "")
+    browser.close()
+
+def dump_frame_tree(frame, indent):
+    print(indent + frame.name + '@' + frame.url)
+    for child in frame.child_frames:
+        dump_frame_tree(child, indent + "    ")
+
+with sync_playwright() as playwright:
+    run(playwright)
+```
 
 
 - [frame.add_script_tag(**options)](./api/class-frame.md#frameadd_script_tagoptions)
@@ -166,6 +211,18 @@ When all steps combined have not finished during the specified `timeout`, this m
 
 The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the elment, `click` is dispatched. This is equivalend to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
 
+```py
+# async
+
+await frame.dispatch_event("button#submit", "click")
+```
+
+```py
+# sync
+
+frame.dispatch_event("button#submit", "click")
+```
+
 Under the hood, it creates an instance of an event based on the given `type`, initializes it with `event_init` properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
 
 Since `event_init` is event-specific, please refer to the events documentation for the lists of initial properties:
@@ -178,6 +235,22 @@ Since `event_init` is event-specific, please refer to the events documentation f
 * [Event](https://developer.mozilla.org/en-US/docs/Web/API/Event/Event)
 
 You can also specify `JSHandle` as the property value if you want live objects to be passed into the event:
+
+```py
+# async
+
+# note you can only create data_transfer in chromium and firefox
+data_transfer = await frame.evaluate_handle("new DataTransfer()")
+await frame.dispatch_event("#source", "dragstart", { "dataTransfer": data_transfer })
+```
+
+```py
+# sync
+
+# note you can only create data_transfer in chromium and firefox
+data_transfer = frame.evaluate_handle("new DataTransfer()")
+frame.dispatch_event("#source", "dragstart", { "dataTransfer": data_transfer })
+```
 
 ## frame.eval_on_selector(selector, expression, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -194,6 +267,22 @@ If `page_function` returns a [Promise], then `frame.$eval` would wait for the pr
 
 Examples:
 
+```py
+# async
+
+search_value = await frame.eval_on_selector("#search", "el => el.value")
+preload_href = await frame.eval_on_selector("link[rel=preload]", "el => el.href")
+html = await frame.eval_on_selector(".main-container", "(e, suffix) => e.outerHTML + suffix", "hello")
+```
+
+```py
+# sync
+
+search_value = frame.eval_on_selector("#search", "el => el.value")
+preload_href = frame.eval_on_selector("link[rel=preload]", "el => el.href")
+html = frame.eval_on_selector(".main-container", "(e, suffix) => e.outerHTML + suffix", "hello")
+```
+
 ## frame.eval_on_selector_all(selector, expression, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - `arg` <[EvaluationArgument]> Optional argument to pass to `page_function`
@@ -209,6 +298,18 @@ If `page_function` returns a [Promise], then `frame.$$eval` would wait for the p
 
 Examples:
 
+```py
+# async
+
+divs_counts = await frame.eval_on_selector_all("div", "(divs, min) => divs.length >= min", 10)
+```
+
+```py
+# sync
+
+divs_counts = frame.eval_on_selector_all("div", "(divs, min) => divs.length >= min", 10)
+```
+
 ## frame.evaluate(expression, **options)
 - `arg` <[EvaluationArgument]> Optional argument to pass to `page_function`
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
@@ -217,13 +318,59 @@ Examples:
 
 Returns the return value of `page_function`
 
-If the function passed to the `frame.evaluate` returns a [Promise], then `frame.evaluate` would wait for the promise to resolve and return its value.
+If the function passed to the [frame.evaluate(expression, **options)](./api/class-frame.md#frameevaluateexpression-options) returns a [Promise], then [frame.evaluate(expression, **options)](./api/class-frame.md#frameevaluateexpression-options) would wait for the promise to resolve and return its value.
 
-If the function passed to the `frame.evaluate` returns a non-[Serializable] value, then `frame.evaluate` returns `undefined`. DevTools Protocol also supports transferring some additional values that are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`, and bigint literals.
+If the function passed to the [frame.evaluate(expression, **options)](./api/class-frame.md#frameevaluateexpression-options) returns a non-[Serializable] value, then[ method: `Frame.evaluate`] returns `undefined`. DevTools Protocol also supports transferring some additional values that are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`, and bigint literals.
+
+```py
+# async
+
+result = await frame.evaluate("([x, y]) => Promise.resolve(x * y)", [7, 8])
+print(result) # prints "56"
+```
+
+```py
+# sync
+
+result = frame.evaluate("([x, y]) => Promise.resolve(x * y)", [7, 8])
+print(result) # prints "56"
+```
 
 A string can also be passed in instead of a function.
 
-[ElementHandle] instances can be passed as an argument to the `frame.evaluate`:
+```py
+# async
+
+print(await frame.evaluate("1 + 2")) # prints "3"
+x = 10
+print(await frame.evaluate(f"1 + {x}")) # prints "11"
+```
+
+```py
+# sync
+
+print(frame.evaluate("1 + 2")) # prints "3"
+x = 10
+print(frame.evaluate(f"1 + {x}")) # prints "11"
+```
+
+[ElementHandle] instances can be passed as an argument to the [frame.evaluate(expression, **options)](./api/class-frame.md#frameevaluateexpression-options):
+
+```py
+# async
+
+body_handle = await frame.query_selector("body")
+html = await frame.evaluate("([body, suffix]) => body.innerHTML + suffix", [body_handle, "hello"])
+await body_handle.dispose()
+```
+
+```py
+# sync
+
+body_handle = frame.query_selector("body")
+html = frame.evaluate("([body, suffix]) => body.innerHTML + suffix", [body_handle, "hello"])
+body_handle.dispose()
+```
 
 ## frame.evaluate_handle(expression, **options)
 - `arg` <[EvaluationArgument]> Optional argument to pass to `page_function`
@@ -233,13 +380,58 @@ A string can also be passed in instead of a function.
 
 Returns the return value of `page_function` as in-page object (JSHandle).
 
-The only difference between `frame.evaluate` and `frame.evaluateHandle` is that `frame.evaluateHandle` returns in-page object (JSHandle).
+The only difference between [frame.evaluate(expression, **options)](./api/class-frame.md#frameevaluateexpression-options) and [frame.evaluate_handle(expression, **options)](./api/class-frame.md#frameevaluate_handleexpression-options) is that[ method: Fframe.evaluateHandle`] returns in-page object (JSHandle).
 
-If the function, passed to the `frame.evaluateHandle`, returns a [Promise], then `frame.evaluateHandle` would wait for the promise to resolve and return its value.
+If the function, passed to the [frame.evaluate_handle(expression, **options)](./api/class-frame.md#frameevaluate_handleexpression-options), returns a [Promise], then[ method: Fframe.evaluateHandle`] would wait for the promise to resolve and return its value.
+
+```py
+# async
+
+# FIXME
+a_window_handle = await frame.evaluate_handle("Promise.resolve(window)")
+a_window_handle # handle for the window object.
+```
+
+```py
+# sync
+
+a_window_handle = frame.evaluate_handle("Promise.resolve(window)")
+a_window_handle # handle for the window object.
+```
 
 A string can also be passed in instead of a function.
 
-[JSHandle] instances can be passed as an argument to the `frame.evaluateHandle`:
+```py
+# async
+
+a_handle = await page.evaluate_handle("document") # handle for the "document"
+```
+
+```py
+# sync
+
+a_handle = page.evaluate_handle("document") # handle for the "document"
+```
+
+[JSHandle] instances can be passed as an argument to the [frame.evaluate_handle(expression, **options)](./api/class-frame.md#frameevaluate_handleexpression-options):
+
+```py
+# async
+
+a_handle = await page.evaluate_handle("document.body")
+result_handle = await page.evaluate_handle("body => body.innerHTML", a_handle)
+print(await result_handle.json_value())
+await result_handle.dispose()
+```
+
+```py
+# sync
+
+a_handle = page.evaluate_handle("document.body")
+result_handle = page.evaluate_handle("body => body.innerHTML", a_handle)
+print(result_handle.json_value())
+result_handle.dispose()
+```
 
 ## frame.expect_navigation(**options)
 - `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
@@ -298,6 +490,22 @@ Returns the `frame` or `iframe` element handle which corresponds to this frame.
 This is an inverse of [element_handle.content_frame()](./api/class-elementhandle.md#element_handlecontent_frame). Note that returned handle actually belongs to the parent frame.
 
 This method throws an error if the frame has been detached before `frameElement()` returns.
+
+```py
+# async
+
+frame_element = await frame.frame_element()
+content_frame = await frame_element.content_frame()
+assert frame == content_frame
+```
+
+```py
+# sync
+
+frame_element = frame.frame_element()
+content_frame = frame_element.content_frame()
+assert frame == content_frame
+```
 
 ## frame.get_attribute(selector, name, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -485,6 +693,28 @@ Returns the array of option values that have been successfully selected.
 
 Triggers a `change` and `input` event once all the provided options have been selected. If there's no `<select>` element matching `selector`, the method throws an error.
 
+```py
+# async
+
+# single selection matching the value
+await frame.select_option("select#colors", "blue")
+# single selection matching the label
+await frame.select_option("select#colors", label="blue")
+# multiple selection
+await frame.select_option("select#colors", value=["red", "green", "blue"])
+```
+
+```py
+# sync
+
+# single selection matching the value
+frame.select_option("select#colors", "blue")
+# single selection matching both the label
+frame.select_option("select#colors", label="blue")
+# multiple selection
+frame.select_option("select#colors", value=["red", "green", "blue"])
+```
+
 ## frame.set_content(html, **options)
 - `html` <[str]> HTML markup to assign to the page.
 - `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
@@ -552,6 +782,20 @@ Sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in t
 
 To press a special key, like `Control` or `ArrowDown`, use [keyboard.press(key, **options)](./api/class-keyboard.md#keyboardpresskey-options).
 
+```py
+# async
+
+await frame.type("#mytextarea", "hello") # types instantly
+await frame.type("#mytextarea", "world", delay=100) # types slower, like a user
+```
+
+```py
+# sync
+
+frame.type("#mytextarea", "hello") # types instantly
+frame.type("#mytextarea", "world", delay=100) # types slower, like a user
+```
+
 ## frame.uncheck(selector, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - `force` <[bool]> Whether to bypass the [actionability](./actionability.md) checks. Defaults to `false`.
@@ -586,7 +830,60 @@ Returns when the `page_function` returns a truthy value, returns that value.
 
 The `waitForFunction` can be used to observe viewport size change:
 
+```py
+# async
+
+import asyncio
+from playwright.async_api import async_playwright
+
+async def run(playwright):
+    webkit = playwright.webkit
+    browser = await webkit.launch()
+    page = await browser.new_page()
+    watch_dog = page.main_frame.wait_for_function("() => window.innerWidth < 100")
+    await page.set_viewport_size({"width": 50, "height": 50})
+    await watch_dog
+    await browser.close()
+
+async def main():
+    async with async_playwright() as playwright:
+        await run(playwright)
+asyncio.run(main())
+```
+
+```py
+# sync
+
+from playwright.sync_api import sync_playwright
+
+def run(playwright):
+    webkit = playwright.webkit
+    browser = await webkit.launch()
+    page = await browser.new_page()
+    watch_dog = page.main_frame.wait_for_function("() => window.innerWidth < 100")
+    await page.set_viewport_size({"width": 50, "height": 50})
+    await watch_dog
+    await browser.close()
+
+with sync_playwright() as playwright:
+    run(playwright)
+```
+
 To pass an argument to the predicate of `frame.waitForFunction` function:
+
+```py
+# async
+
+selector = ".foo"
+await frame.wait_for_function("selector => !!document.querySelector(selector)", selector)
+```
+
+```py
+# sync
+
+selector = ".foo"
+frame.wait_for_function("selector => !!document.querySelector(selector)", selector)
+```
 
 ## frame.wait_for_load_state(**options)
 - `state` <"load"|"domcontentloaded"|"networkidle"> Optional load state to wait for, defaults to `load`. If the state has been already reached while loading current document, the method resolves immediately. Can be one of:
@@ -598,6 +895,20 @@ To pass an argument to the predicate of `frame.waitForFunction` function:
 Waits for the required load state to be reached.
 
 This returns when the frame reaches a required load state, `load` by default. The navigation must have been committed when this method is called. If current document has already reached the required state, resolves immediately.
+
+```py
+# async
+
+await frame.click("button") # click triggers navigation.
+await frame.wait_for_load_state() # the promise resolves after "load" event.
+```
+
+```py
+# sync
+
+frame.click("button") # click triggers navigation.
+frame.wait_for_load_state() # the promise resolves after "load" event.
+```
 
 ## frame.wait_for_navigation(**options)
 - `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_navigation_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.md#pageset_default_navigation_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
@@ -611,6 +922,22 @@ This returns when the frame reaches a required load state, `load` by default. Th
 Returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
 
 This method waits for the frame to navigate to a new URL. It is useful for when you run code which will indirectly cause the frame to navigate. Consider this example:
+
+```py
+# async
+
+async with frame.expect_navigation():
+    await frame.click("a.delayed-navigation") # clicking the link will indirectly cause a navigation
+# Resolves after navigation has finished
+```
+
+```py
+# sync
+
+with frame.expect_navigation():
+    frame.click("a.delayed-navigation") # clicking the link will indirectly cause a navigation
+# Resolves after navigation has finished
+```
 
 :::note
 Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
@@ -631,6 +958,47 @@ Returns when element specified by selector satisfies `state` option. Returns `nu
 Wait for the `selector` to satisfy `state` option (either appear/disappear from dom, or become visible/hidden). If at the moment of calling the method `selector` already satisfies the condition, the method will return immediately. If the selector doesn't satisfy the condition for the `timeout` milliseconds, the function will throw.
 
 This method works across navigations:
+
+```py
+# async
+
+import asyncio
+from playwright.async_api import async_playwright
+
+async def run(playwright):
+    chromium = playwright.chromium
+    browser = await chromium.launch()
+    page = await browser.new_page()
+    for current_url in ["https://google.com", "https://bbc.com"]:
+        await page.goto(current_url, wait_until="domcontentloaded")
+        element = await page.main_frame.wait_for_selector("img")
+        print("Loaded image: " + str(await element.get_attribute("src")))
+    await browser.close()
+
+async def main():
+    async with async_playwright() as playwright:
+        await run(playwright)
+asyncio.run(main())
+```
+
+```py
+# sync
+
+from playwright.sync_api import sync_playwright
+
+def run(playwright):
+    chromium = playwright.chromium
+    browser = chromium.launch()
+    page = browser.new_page()
+    for current_url in ["https://google.com", "https://bbc.com"]:
+        page.goto(current_url, wait_until="domcontentloaded")
+        element = page.main_frame.wait_for_selector("img")
+        print("Loaded image: " + str(element.get_attribute("src")))
+    browser.close()
+
+with sync_playwright() as playwright:
+    run(playwright)
+```
 
 ## frame.wait_for_timeout(timeout)
 - `timeout` <[float]> A timeout to wait for

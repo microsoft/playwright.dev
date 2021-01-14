@@ -32,14 +32,6 @@ const { firefox } = require('playwright');  // Or 'chromium' or 'webkit'.
 })();
 ```
 
-An example of getting text from an iframe element:
-
-```js
-const frame = page.frames().find(frame => frame.name() === 'myframe');
-const text = await frame.$eval('.selector', element => element.textContent);
-console.log(text);
-```
-
 
 - [frame.$(selector)](./api/class-frame.md#frameselector)
 - [frame.$$(selector)](./api/class-frame.md#frameselector-1)
@@ -280,9 +272,9 @@ await frame.dispatchEvent('#source', 'dragstart', { dataTransfer });
 
 Returns the return value of `pageFunction`
 
-If the function passed to the `frame.evaluate` returns a [Promise], then `frame.evaluate` would wait for the promise to resolve and return its value.
+If the function passed to the [frame.evaluate(pageFunction[, arg])](./api/class-frame.md#frameevaluatepagefunction-arg) returns a [Promise], then [frame.evaluate(pageFunction[, arg])](./api/class-frame.md#frameevaluatepagefunction-arg) would wait for the promise to resolve and return its value.
 
-If the function passed to the `frame.evaluate` returns a non-[Serializable] value, then `frame.evaluate` returns `undefined`. DevTools Protocol also supports transferring some additional values that are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`, and bigint literals.
+If the function passed to the [frame.evaluate(pageFunction[, arg])](./api/class-frame.md#frameevaluatepagefunction-arg) returns a non-[Serializable] value, then[ method: `Frame.evaluate`] returns `undefined`. DevTools Protocol also supports transferring some additional values that are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`, and bigint literals.
 
 ```js
 const result = await frame.evaluate(([x, y]) => {
@@ -297,7 +289,7 @@ A string can also be passed in instead of a function.
 console.log(await frame.evaluate('1 + 2')); // prints "3"
 ```
 
-[ElementHandle] instances can be passed as an argument to the `frame.evaluate`:
+[ElementHandle] instances can be passed as an argument to the [frame.evaluate(pageFunction[, arg])](./api/class-frame.md#frameevaluatepagefunction-arg):
 
 ```js
 const bodyHandle = await frame.$('body');
@@ -312,9 +304,9 @@ await bodyHandle.dispose();
 
 Returns the return value of `pageFunction` as in-page object (JSHandle).
 
-The only difference between `frame.evaluate` and `frame.evaluateHandle` is that `frame.evaluateHandle` returns in-page object (JSHandle).
+The only difference between [frame.evaluate(pageFunction[, arg])](./api/class-frame.md#frameevaluatepagefunction-arg) and [frame.evaluateHandle(pageFunction[, arg])](./api/class-frame.md#frameevaluatehandlepagefunction-arg) is that[ method: Fframe.evaluateHandle`] returns in-page object (JSHandle).
 
-If the function, passed to the `frame.evaluateHandle`, returns a [Promise], then `frame.evaluateHandle` would wait for the promise to resolve and return its value.
+If the function, passed to the [frame.evaluateHandle(pageFunction[, arg])](./api/class-frame.md#frameevaluatehandlepagefunction-arg), returns a [Promise], then[ method: Fframe.evaluateHandle`] would wait for the promise to resolve and return its value.
 
 ```js
 const aWindowHandle = await frame.evaluateHandle(() => Promise.resolve(window));
@@ -327,7 +319,7 @@ A string can also be passed in instead of a function.
 const aHandle = await frame.evaluateHandle('document'); // Handle for the 'document'.
 ```
 
-[JSHandle] instances can be passed as an argument to the `frame.evaluateHandle`:
+[JSHandle] instances can be passed as an argument to the [frame.evaluateHandle(pageFunction[, arg])](./api/class-frame.md#frameevaluatehandlepagefunction-arg):
 
 ```js
 const aHandle = await frame.evaluateHandle(() => document.body);
@@ -728,8 +720,8 @@ This method waits for the frame to navigate to a new URL. It is useful for when 
 
 ```js
 const [response] = await Promise.all([
-  frame.waitForNavigation(), // Wait for the navigation to finish
-  frame.click('a.my-link'), // Clicking the link will indirectly cause a navigation
+  frame.waitForNavigation(), // The promise resolves after navigation has finished
+  frame.click('a.delayed-navigation'), // Clicking the link will indirectly cause a navigation
 ]);
 ```
 
@@ -755,17 +747,15 @@ Wait for the `selector` to satisfy `state` option (either appear/disappear from 
 This method works across navigations:
 
 ```js
-const { webkit } = require('playwright');  // Or 'chromium' or 'firefox'.
+const { chromium } = require('playwright');  // Or 'firefox' or 'webkit'.
 
 (async () => {
-  const browser = await webkit.launch();
+  const browser = await chromium.launch();
   const page = await browser.newPage();
-  let currentURL;
-  page.mainFrame()
-    .waitForSelector('img')
-    .then(() => console.log('First URL with image: ' + currentURL));
-  for (currentURL of ['https://example.com', 'https://google.com', 'https://bbc.com']) {
+  for (let currentURL of ['https://google.com', 'https://bbc.com']) {
     await page.goto(currentURL);
+    const element = await page.mainFrame().waitForSelector('img');
+    console.log('Loaded image: ' + await element.getAttribute('src'));
   }
   await browser.close();
 })();

@@ -6,6 +6,18 @@ title: "Video"
 
 When browser context is created with the `videosPath` option, each page has a video object associated with it.
 
+```py
+# async
+
+print(await page.video.path())
+```
+
+```py
+# sync
+
+print(page.video.path())
+```
+
 
 - [video.path()](./api/class-video.md#videopath)
 

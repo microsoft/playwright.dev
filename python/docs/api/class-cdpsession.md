@@ -13,6 +13,32 @@ Useful links:
 * Documentation on DevTools Protocol can be found here: [DevTools Protocol Viewer](https://chromedevtools.github.io/devtools-protocol/).
 * Getting Started with DevTools Protocol: https://github.com/aslushnikov/getting-started-with-cdp/blob/master/README.md
 
+```py
+# async
+
+client = await page.context().new_cdp_session(page)
+await client.send("animation.enable")
+client.on("animation.animation_created", lambda: print("animation created!"))
+response = await client.send("animation.get_playback_rate")
+print("playback rate is " + response["playback_rate"])
+await client.send("animation.set_playback_rate", {
+    playback_rate: response["playback_rate"] / 2
+})
+```
+
+```py
+# sync
+
+client = page.context().new_cdp_session(page)
+client.send("animation.enable")
+client.on("animation.animation_created", lambda: print("animation created!"))
+response = client.send("animation.get_playback_rate")
+print("playback rate is " + response["playback_rate"])
+client.send("animation.set_playback_rate", {
+    playback_rate: response["playback_rate"] / 2
+})
+```
+
 
 - [cdp_session.detach()](./api/class-cdpsession.md#cdp_sessiondetach)
 - [cdp_session.send(method, **options)](./api/class-cdpsession.md#cdp_sessionsendmethod-options)

@@ -24,13 +24,54 @@ These commands download the Playwright package and install browser binaries for 
 
 Once installed, you can `import` Playwright in a Python script, and launch any of the 3 browsers (`chromium`, `firefox` and `webkit`).
 
+```py
+from playwright.sync_api import sync_playwright
+
+with sync_playwright() as p:
+    browser = p.chromium.launch()
+    page = browser.new_page()
+    page.goto("http://playwright.dev")
+    print(page.title())
+    browser.close()
+```
+
 Playwright supports two variations of the API: synchronous and asynchronous. If your modern project uses [asyncio](https://docs.python.org/3/library/asyncio.html), you should use async API:
+
+```py
+import asyncio
+from playwright.async_api import async_playwright
+
+async def main():
+    async with async_playwright() as p:
+        browser = await p.chromium.launch()
+        page = await browser.new_page()
+        await page.goto("http://playwright.dev")
+        print(await page.title())
+        await browser.close()
+
+asyncio.run(main())
+```
 
 ## First script
 
 In our first script, we will navigate to `whatsmyuseragent.org` and take a screenshot in WebKit.
 
+```py
+from playwright.sync_api import sync_playwright
+
+with sync_playwright() as p:
+    browser = p.webkit.launch()
+    page = await browser.new_page()
+    page.goto("http://whatsmyuseragent.org/")
+    page.screenshot(path="example.png")
+    browser.close()
+```
+
 By default, Playwright runs the browsers in headless mode. To see the browser UI, pass the `headless=False` flag while launching the browser. You can also use `slowMo` to slow down execution. Learn more in the debugging tools [section](./debug.md).
+
+```py
+firefox.launch(headless=False, slowMo=50)
+```
 
 ## Record scripts
 

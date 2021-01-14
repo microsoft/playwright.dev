@@ -9,11 +9,62 @@ Page provides methods to interact with a single tab in a [Browser], or an [exten
 
 This example creates a page, navigates it to a URL, and then saves a screenshot:
 
+```py
+# async
+
+import asyncio
+from playwright.async_api import async_playwright
+
+async def run(playwright):
+    webkit = playwright.webkit
+    browser = await webkit.launch()
+    context = await browser.new_context()
+    page = await context.new_page()
+    await page.goto("https://example.com")
+    await page.screenshot(path="screenshot.png")
+    await browser.close()
+
+async def main():
+    async with async_playwright() as playwright:
+        await run(playwright)
+asyncio.run(main())
+```
+
+```py
+# sync
+
+from playwright.sync_api import sync_playwright
+
+def run(playwright):
+    webkit = playwright.webkit
+    browser = webkit.launch()
+    context = browser.new_context()
+    page = context.new_page()
+    page.goto("https://example.com")
+    page.screenshot(path="screenshot.png")
+    browser.close()
+
+with sync_playwright() as playwright:
+    run(playwright)
+```
+
 The Page class emits various events (described below) which can be handled using any of Node's native [`EventEmitter`](https://nodejs.org/api/events.html#events_class_eventemitter) methods, such as `on`, `once` or `removeListener`.
 
 This example logs a message for a single page `load` event:
 
+```py
+page.once("load", lambda: print("page loaded!"))
+```
+
 To unsubscribe from events use the `removeListener` method:
+
+```py
+def log_request(intercepted_request):
+    print("a request was made:", intercepted_request.url)
+page.on("request", log_request)
+# sometime later...
+page.remove_listener("request", log_request)
+```
 
 
 - [page.on("close")](./api/class-page.md#pageonclose)
@@ -132,13 +183,57 @@ The arguments passed into `console.log` appear as arguments on the event handler
 
 An example of handling `console` event:
 
+```py
+# async
+
+async def print_args(msg):
+    for arg in msg.args:
+        print(await arg.json_value())
+
+page.on("console", print_args)
+await page.evaluate("console.log('hello', 5, {foo: 'bar'})")
+```
+
+```py
+# sync
+
+def print_args(msg):
+    for arg in msg.args:
+        print(arg.json_value())
+
+page.on("console", print_args)
+page.evaluate("console.log('hello', 5, {foo: 'bar'})")
+```
+
 ## page.on("crash")
 
 Emitted when the page crashes. Browser pages might crash if they try to allocate too much memory. When the page crashes, ongoing and subsequent operations will throw.
 
 The most common way to deal with crashes is to catch an exception:
 
-However, when manually listening to events, it might be useful to avoid stalling when the page crashes. In this case, handling `crash` event helps:
+```py
+# async
+
+try:
+    # crash might happen during a click.
+    await page.click("button")
+    # or while waiting for an event.
+    await page.wait_for_event("popup")
+except Error as e:
+    # when the page crashes, exception message contains "crash".
+```
+
+```py
+# sync
+
+try:
+    # crash might happen during a click.
+    page.click("button")
+    # or while waiting for an event.
+    page.wait_for_event("popup")
+except Error as e:
+    # when the page crashes, exception message contains "crash".
+```
 
 ## page.on("dialog")
 - type: <[Dialog]>
@@ -162,6 +257,10 @@ Browser context **must** be created with the `accept_downloads` set to `true` wh
 - type: <[FileChooser]>
 
 Emitted when a file chooser is supposed to appear, such as after clicking the  `<input type=file>`. Playwright can respond to it via setting the input files using [file_chooser.set_files(files, **options)](./api/class-filechooser.md#file_chooserset_filesfiles-options) that can be uploaded after that.
+
+```py
+page.on("filechooser", lambda file_chooser: file_chooser.set_files("/tmp/myfile.pdf"))
+```
 
 ## page.on("frameattached")
 - type: <[Frame]>
@@ -193,6 +292,24 @@ Emitted when an uncaught exception happens within the page.
 Emitted when the page opens a new tab or window. This event is emitted in addition to the [browser_context.on("page")](./api/class-browsercontext.md#browser_contextonpage), but only for popups relevant to this page.
 
 The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
+
+```py
+# async
+
+async with page.expect_event("popup") as page_info:
+    page.evaluate("window.open('https://example.com')")
+popup = await page_info.value
+print(await popup.evaluate("location.href"))
+```
+
+```py
+# sync
+
+with page.expect_event("popup") as page_info:
+    page.evaluate("window.open('https://example.com')")
+popup = page_info.value
+print(popup.evaluate("location.href"))
+```
 
 :::note
 Use [page.wait_for_load_state(**options)](./api/class-page.md#pagewait_for_load_stateoptions) to wait until the page gets to a particular state (you should not need it in most cases).
@@ -243,6 +360,20 @@ Adds a script which would be evaluated in one of the following scenarios:
 The script is evaluated after the document was created but before any of its scripts were run. This is useful to amend the JavaScript environment, e.g. to seed `Math.random`.
 
 An example of overriding `Math.random` before the page loads:
+
+```py
+# async
+
+# in your playwright script, assuming the preload.js file is in same directory
+await page.add_init_script(path="./preload.js")
+```
+
+```py
+# sync
+
+# in your playwright script, assuming the preload.js file is in same directory
+page.add_init_script(path="./preload.js")
+```
 
 :::note
 The order of evaluation of multiple scripts installed via [browser_context.add_init_script(**options)](./api/class-browsercontext.md#browser_contextadd_init_scriptoptions) and [page.add_init_script(**options)](./api/class-page.md#pageadd_init_scriptoptions) is not defined.
@@ -372,6 +503,18 @@ Shortcut for main frame's [frame.dblclick(selector, **options)](./api/class-fram
 
 The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the elment, `click` is dispatched. This is equivalend to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
 
+```py
+# async
+
+await page.dispatch_event("button#submit", "click")
+```
+
+```py
+# sync
+
+page.dispatch_event("button#submit", "click")
+```
+
 Under the hood, it creates an instance of an event based on the given `type`, initializes it with `event_init` properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
 
 Since `event_init` is event-specific, please refer to the events documentation for the lists of initial properties:
@@ -385,9 +528,90 @@ Since `event_init` is event-specific, please refer to the events documentation f
 
 You can also specify `JSHandle` as the property value if you want live objects to be passed into the event:
 
+```py
+# async
+
+# note you can only create data_transfer in chromium and firefox
+data_transfer = await page.evaluate_handle("new DataTransfer()")
+await page.dispatch_event("#source", "dragstart", { "dataTransfer": data_transfer })
+```
+
+```py
+# sync
+
+# note you can only create data_transfer in chromium and firefox
+data_transfer = page.evaluate_handle("new DataTransfer()")
+page.dispatch_event("#source", "dragstart", { "dataTransfer": data_transfer })
+```
+
 ## page.emulate_media(**options)
 - `media` <[NoneType]|"screen"|"print"> Changes the CSS media type of the page. The only allowed values are `'screen'`, `'print'` and `null`. Passing `null` disables CSS media emulation. Omitting `media` or passing `undefined` does not change the emulated value. Optional.
 - `color_scheme` <[NoneType]|"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. Passing `null` disables color scheme emulation. Omitting `colorScheme` or passing `undefined` does not change the emulated value. Optional.
+
+```py
+# async
+
+await page.evaluate("matchMedia('screen').matches")
+# → True
+await page.evaluate("matchMedia('print').matches")
+# → False
+
+await page.emulate_media(media="print")
+await page.evaluate("matchMedia('screen').matches")
+# → False
+await page.evaluate("matchMedia('print').matches")
+# → True
+
+await page.emulate_media()
+await page.evaluate("matchMedia('screen').matches")
+# → True
+await page.evaluate("matchMedia('print').matches")
+# → False
+```
+
+```py
+# sync
+
+page.evaluate("matchMedia('screen').matches")
+# → True
+page.evaluate("matchMedia('print').matches")
+# → False
+
+page.emulate_media(media="print")
+page.evaluate("matchMedia('screen').matches")
+# → False
+page.evaluate("matchMedia('print').matches")
+# → True
+
+page.emulate_media()
+page.evaluate("matchMedia('screen').matches")
+# → True
+page.evaluate("matchMedia('print').matches")
+# → False
+```
+
+```py
+# async
+
+await page.emulate_media(color_scheme="dark")
+await page.evaluate("matchMedia('(prefers-color-scheme: dark)').matches")
+# → True
+await page.evaluate("matchMedia('(prefers-color-scheme: light)').matches")
+# → False
+await page.evaluate("matchMedia('(prefers-color-scheme: no-preference)').matches")
+# → False
+```
+
+```py
+# sync
+
+page.emulate_media(color_scheme="dark")
+page.evaluate("matchMedia('(prefers-color-scheme: dark)').matches")
+# → True
+page.evaluate("matchMedia('(prefers-color-scheme: light)').matches")
+# → False
+page.evaluate("matchMedia('(prefers-color-scheme: no-preference)').matches")
+```
 
 ## page.eval_on_selector(selector, expression, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -401,6 +625,22 @@ The method finds an element matching the specified selector within the page and 
 If `page_function` returns a [Promise], then [page.eval_on_selector(selector, expression, **options)](./api/class-page.md#pageeval_on_selectorselector-expression-options) would wait for the promise to resolve and return its value.
 
 Examples:
+
+```py
+# async
+
+search_value = await page.eval_on_selector("#search", "el => el.value")
+preload_href = await page.eval_on_selector("link[rel=preload]", "el => el.href")
+html = await page.eval_on_selector(".main-container", "(e, suffix) => e.outer_html + suffix", "hello")
+```
+
+```py
+# sync
+
+search_value = page.eval_on_selector("#search", "el => el.value")
+preload_href = page.eval_on_selector("link[rel=preload]", "el => el.href")
+html = page.eval_on_selector(".main-container", "(e, suffix) => e.outer_html + suffix", "hello")
+```
 
 Shortcut for main frame's [frame.eval_on_selector(selector, expression, **options)](./api/class-frame.md#frameeval_on_selectorselector-expression-options).
 
@@ -417,6 +657,18 @@ If `page_function` returns a [Promise], then [page.eval_on_selector_all(selector
 
 Examples:
 
+```py
+# async
+
+div_counts = await page.eval_on_selector_all("div", "(divs, min) => divs.length >= min", 10)
+```
+
+```py
+# sync
+
+div_counts = page.eval_on_selector_all("div", "(divs, min) => divs.length >= min", 10)
+```
+
 ## page.evaluate(expression, **options)
 - `arg` <[EvaluationArgument]> Optional argument to pass to `page_function`
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
@@ -425,15 +677,61 @@ Examples:
 
 Returns the value of the `page_function` invocation.
 
-If the function passed to the `page.evaluate` returns a [Promise], then `page.evaluate` would wait for the promise to resolve and return its value.
+If the function passed to the [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options) returns a [Promise], then [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options) would wait for the promise to resolve and return its value.
 
-If the function passed to the `page.evaluate` returns a non-[Serializable] value, then `page.evaluate` resolves to `undefined`. DevTools Protocol also supports transferring some additional values that are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`, and bigint literals.
+If the function passed to the [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options) returns a non-[Serializable] value, then[ method: `Page.evaluate`] resolves to `undefined`. DevTools Protocol also supports transferring some additional values that are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`, and bigint literals.
 
 Passing argument to `page_function`:
 
+```py
+# async
+
+result = await page.evaluate("([x, y]) => Promise.resolve(x * y)", [7, 8])
+print(result) # prints "56"
+```
+
+```py
+# sync
+
+result = page.evaluate("([x, y]) => Promise.resolve(x * y)", [7, 8])
+print(result) # prints "56"
+```
+
 A string can also be passed in instead of a function:
 
-[ElementHandle] instances can be passed as an argument to the `page.evaluate`:
+```py
+# async
+
+print(await page.evaluate("1 + 2")) # prints "3"
+x = 10
+print(await page.evaluate(f"1 + {x}")) # prints "11"
+```
+
+```py
+# sync
+
+print(page.evaluate("1 + 2")) # prints "3"
+x = 10
+print(page.evaluate(f"1 + {x}")) # prints "11"
+```
+
+[ElementHandle] instances can be passed as an argument to the [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options):
+
+```py
+# async
+
+body_handle = await page.query_selector("body")
+html = await page.evaluate("([body, suffix]) => body.innerHTML + suffix", [body_handle, "hello"])
+await body_handle.dispose()
+```
+
+```py
+# sync
+
+body_handle = page.query_selector("body")
+html = page.evaluate("([body, suffix]) => body.innerHTML + suffix", [body_handle, "hello"])
+body_handle.dispose()
+```
 
 Shortcut for main frame's [frame.evaluate(expression, **options)](./api/class-frame.md#frameevaluateexpression-options).
 
@@ -445,13 +743,58 @@ Shortcut for main frame's [frame.evaluate(expression, **options)](./api/class-fr
 
 Returns the value of the `page_function` invocation as in-page object (JSHandle).
 
-The only difference between `page.evaluate` and `page.evaluateHandle` is that `page.evaluateHandle` returns in-page object (JSHandle).
+The only difference between [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options) and [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluate_handleexpression-options) is that [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluate_handleexpression-options) returns in-page object (JSHandle).
 
-If the function passed to the `page.evaluateHandle` returns a [Promise], then `page.evaluateHandle` would wait for the promise to resolve and return its value.
+If the function passed to the [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluate_handleexpression-options) returns a [Promise], then [`method:Ppage.EvaluateHandle`] would wait for the promise to resolve and return its value.
+
+```py
+# async
+
+# FIXME
+a_window_handle = await page.evaluate_handle("Promise.resolve(window)")
+a_window_handle # handle for the window object.
+```
+
+```py
+# sync
+
+a_window_handle = page.evaluate_handle("Promise.resolve(window)")
+a_window_handle # handle for the window object.
+```
 
 A string can also be passed in instead of a function:
 
-[JSHandle] instances can be passed as an argument to the `page.evaluateHandle`:
+```py
+# async
+
+a_handle = await page.evaluate_handle("document") # handle for the "document"
+```
+
+```py
+# sync
+
+a_handle = page.evaluate_handle("document") # handle for the "document"
+```
+
+[JSHandle] instances can be passed as an argument to the [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluate_handleexpression-options):
+
+```py
+# async
+
+a_handle = await page.evaluate_handle("document.body")
+result_handle = await page.evaluate_handle("body => body.innerHTML", a_handle)
+print(await result_handle.json_value())
+await result_handle.dispose()
+```
+
+```py
+# sync
+
+a_handle = page.evaluate_handle("document.body")
+result_handle = page.evaluate_handle("body => body.innerHTML", a_handle)
+print(result_handle.json_value())
+result_handle.dispose()
+```
 
 ## page.expect_console_message(**options)
 - `predicate` <[Callable]\[[ConsoleMessage]\]:[bool]> Receives the [ConsoleMessage] object and resolves to truthy value when the waiting should resolve.
@@ -578,7 +921,94 @@ Functions installed via [page.expose_binding(name, callback, **options)](./api/c
 
 An example of exposing page URL to all frames in a page:
 
+```py
+# async
+
+import asyncio
+from playwright.async_api import async_playwright
+
+async def run(playwright):
+    webkit = playwright.webkit
+    browser = await webkit.launch(headless=false)
+    context = await browser.new_context()
+    page = await context.new_page()
+    await page.expose_binding("pageURL", lambda source: source["page"].url)
+    await page.set_content("""
+    <script>
+      async function onClick() {
+        document.querySelector('div').textContent = await window.pageURL();
+      }
+    </script>
+    <button onclick="onClick()">Click me</button>
+    <div></div>
+    """)
+    await page.click("button")
+
+async def main():
+    async with async_playwright() as playwright:
+        await run(playwright)
+asyncio.run(main())
+```
+
+```py
+# sync
+
+from playwright.sync_api import sync_playwright
+
+def run(playwright):
+    webkit = playwright.webkit
+    browser = webkit.launch(headless=false)
+    context = browser.new_context()
+    page = context.new_page()
+    page.expose_binding("pageURL", lambda source: source["page"].url)
+    page.set_content("""
+    <script>
+      async function onClick() {
+        document.querySelector('div').textContent = await window.pageURL();
+      }
+    </script>
+    <button onclick="onClick()">Click me</button>
+    <div></div>
+    """)
+    page.click("button")
+
+with sync_playwright() as playwright:
+    run(playwright)
+```
+
 An example of passing an element handle:
+
+```py
+# async
+
+async def print(source, element):
+    print(await element.text_content())
+
+await page.expose_binding("clicked", print, handle=true)
+await page.set_content("""
+  <script>
+    document.addEventListener('click', event => window.clicked(event.target));
+  </script>
+  <div>Click me</div>
+  <div>Or click me</div>
+""")
+```
+
+```py
+# sync
+
+def print(source, element):
+    print(element.text_content())
+
+page.expose_binding("clicked", print, handle=true)
+page.set_content("""
+  <script>
+    document.addEventListener('click', event => window.clicked(event.target));
+  </script>
+  <div>Click me</div>
+  <div>Or click me</div>
+""")
+```
 
 ## page.expose_function(name, callback)
 - `name` <[str]> Name of the function on the window object
@@ -594,9 +1024,74 @@ See [browser_context.expose_function(name, callback)](./api/class-browsercontext
 Functions installed via [page.expose_function(name, callback)](./api/class-page.md#pageexpose_functionname-callback) survive navigations.
 :::
 
-An example of adding an `md5` function to the page:
+An example of adding an `sha1` function to the page:
 
-An example of adding a `window.readfile` function to the page:
+```py
+# async
+
+import asyncio
+import hashlib
+from playwright.async_api import async_playwright
+
+async def sha1(text):
+    m = hashlib.sha1()
+    m.update(bytes(text, "utf8"))
+    return m.hexdigest()
+
+
+async def run(playwright):
+    webkit = playwright.webkit
+    browser = await webkit.launch(headless=False)
+    page = await browser.new_page()
+    await page.expose_function("sha1", sha1)
+    await page.set_content("""
+        <script>
+          async function onClick() {
+            document.querySelector('div').textContent = await window.sha1('PLAYWRIGHT');
+          }
+        </script>
+        <button onclick="onClick()">Click me</button>
+        <div></div>
+    """)
+    await page.click("button")
+
+async def main():
+    async with async_playwright() as playwright:
+        await run(playwright)
+asyncio.run(main())
+```
+
+```py
+# sync
+
+import hashlib
+from playwright.sync_api import sync_playwright
+
+def sha1(text):
+    m = hashlib.sha1()
+    m.update(bytes(text, "utf8"))
+    return m.hexdigest()
+
+
+def run(playwright):
+    webkit = playwright.webkit
+    browser = webkit.launch(headless=False)
+    page = browser.new_page()
+    page.expose_function("sha1", sha1)
+    page.set_content("""
+        <script>
+          async function onClick() {
+            document.querySelector('div').textContent = await window.sha1('PLAYWRIGHT');
+          }
+        </script>
+        <button onclick="onClick()">Click me</button>
+        <div></div>
+    """)
+    page.click("button")
+
+with sync_playwright() as playwright:
+    run(playwright)
+```
 
 ## page.fill(selector, value, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -624,6 +1119,14 @@ Shortcut for main frame's [frame.focus(selector, **options)](./api/class-frame.m
 - returns: <[NoneType]|[Frame]>
 
 Returns frame matching the specified criteria. Either `name` or `url` must be specified.
+
+```py
+frame = page.frame(name="frame-name")
+```
+
+```py
+frame = page.frame(url=r".*domain.*")
+```
 
 ## page.frames
 - returns: <[List]\[[Frame]\]>
@@ -821,6 +1324,22 @@ Generating a pdf is currently only supported in Chromium headless.
 By default, `page.pdf()` generates a pdf with modified colors for printing. Use the [`-webkit-print-color-adjust`](https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-print-color-adjust) property to force rendering of exact colors.
 :::
 
+```py
+# async
+
+# generates a pdf with "screen" media type.
+await page.emulate_media(media="screen")
+await page.pdf(path="page.pdf")
+```
+
+```py
+# sync
+
+# generates a pdf with "screen" media type.
+page.emulate_media(media="screen")
+page.pdf(path="page.pdf")
+```
+
 The `width`, `height`, and `margin` options accept values labeled with units. Unlabeled values are treated as pixels.
 
 A few examples:
@@ -872,6 +1391,34 @@ If `key` is a single character, it is case-sensitive, so the values `a` and `A` 
 
 Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported as well. When speficied with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
 
+```py
+# async
+
+page = await browser.new_page()
+await page.goto("https://keycode.info")
+await page.press("body", "A")
+await page.screenshot(path="a.png")
+await page.press("body", "ArrowLeft")
+await page.screenshot(path="arrow_left.png")
+await page.press("body", "Shift+O")
+await page.screenshot(path="o.png")
+await browser.close()
+```
+
+```py
+# sync
+
+page = browser.new_page()
+page.goto("https://keycode.info")
+page.press("body", "A")
+page.screenshot(path="a.png")
+page.press("body", "ArrowLeft")
+page.screenshot(path="arrow_left.png")
+page.press("body", "Shift+O")
+page.screenshot(path="o.png")
+browser.close()
+```
+
 ## page.query_selector(selector)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - returns: <[NoneType]|[ElementHandle]>
@@ -912,7 +1459,43 @@ The handler will only be called for the first url if the response is a redirect.
 
 An example of a naïve handler that aborts all image requests:
 
+```py
+# async
+
+page = await browser.new_page()
+await page.route("**/*.{png,jpg,jpeg}", lambda route: route.abort())
+await page.goto("https://example.com")
+await browser.close()
+```
+
+```py
+# sync
+
+page = browser.new_page()
+page.route("**/*.{png,jpg,jpeg}", lambda route: route.abort())
+page.goto("https://example.com")
+browser.close()
+```
+
 or the same snippet using a regex pattern instead:
+
+```py
+# async
+
+page = await browser.new_page()
+await page.route(r"(\.png$)|(\.jpg$)", lambda route: route.abort())
+await page.goto("https://example.com")
+await browser.close()
+```
+
+```py
+# sync
+
+page = browser.new_page()
+page.route(r"(\.png$)|(\.jpg$)", lambda route: route.abort())
+page.goto("https://example.com")
+browser.close()
+```
 
 Page routes take precedence over browser context routes (set up with [browser_context.route(url, handler)](./api/class-browsercontext.md#browser_contextrouteurl-handler)) when request matches both handlers.
 
@@ -953,6 +1536,28 @@ Screenshots take at least 1/6 second on Chromium OS X and Chromium Windows. See 
 Returns the array of option values that have been successfully selected.
 
 Triggers a `change` and `input` event once all the provided options have been selected. If there's no `<select>` element matching `selector`, the method throws an error.
+
+```py
+# async
+
+# single selection matching the value
+await page.select_option("select#colors", "blue")
+# single selection matching the label
+await page.select_option("select#colors", label="blue")
+# multiple selection
+await page.select_option("select#colors", value=["red", "green", "blue"])
+```
+
+```py
+# sync
+
+# single selection matching the value
+page.select_option("select#colors", "blue")
+# single selection matching both the label
+page.select_option("select#colors", label="blue")
+# multiple selection
+page.select_option("select#colors", value=["red", "green", "blue"])
+```
 
 Shortcut for main frame's [frame.select_option(selector, **options)](./api/class-frame.md#frameselect_optionselector-options)
 
@@ -1019,6 +1624,22 @@ In the case of multiple pages in a single browser, each page can have its own vi
 
 `page.setViewportSize` will resize the page. A lot of websites don't expect phones to change size, so you should set the viewport size before navigating to the page.
 
+```py
+# async
+
+page = await browser.new_page()
+await page.set_viewport_size({"width": 640, "height": 480})
+await page.goto("https://example.com")
+```
+
+```py
+# sync
+
+page = browser.new_page()
+page.set_viewport_size({"width": 640, "height": 480})
+page.goto("https://example.com")
+```
+
 ## page.tap(selector, **options)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.md#working-with-selectors) for more details.
 - `force` <[bool]> Whether to bypass the [actionability](./actionability.md) checks. Defaults to `false`.
@@ -1066,6 +1687,20 @@ Returns the page's title. Shortcut for main frame's [frame.title()](./api/class-
 Sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in the text. `page.type` can be used to send fine-grained keyboard events. To fill values in form fields, use [page.fill(selector, value, **options)](./api/class-page.md#pagefillselector-value-options).
 
 To press a special key, like `Control` or `ArrowDown`, use [keyboard.press(key, **options)](./api/class-keyboard.md#keyboardpresskey-options).
+
+```py
+# async
+
+await page.type("#mytextarea", "hello") # types instantly
+await page.type("#mytextarea", "world", delay=100) # types slower, like a user
+```
+
+```py
+# sync
+
+page.type("#mytextarea", "hello") # types instantly
+page.type("#mytextarea", "world", delay=100) # types slower, like a user
+```
 
 Shortcut for main frame's [frame.type(selector, text, **options)](./api/class-frame.md#frametypeselector-text-options).
 
@@ -1131,7 +1766,60 @@ Returns when the `page_function` returns a truthy value. It resolves to a JSHand
 
 The `waitForFunction` can be used to observe viewport size change:
 
-To pass an argument to the predicate of `page.waitForFunction` function:
+```py
+# async
+
+import asyncio
+from playwright.async_api import async_playwright
+
+async def run(playwright):
+    webkit = playwright.webkit
+    browser = await webkit.launch()
+    page = await browser.new_page()
+    watch_dog = page.wait_for_function("() => window.innerWidth < 100")
+    await page.set_viewport_size({"width": 50, "height": 50})
+    await watch_dog
+    await browser.close()
+
+async def main():
+    async with async_playwright() as playwright:
+        await run(playwright)
+asyncio.run(main())
+```
+
+```py
+# sync
+
+from playwright.sync_api import sync_playwright
+
+def run(playwright):
+    webkit = playwright.webkit
+    browser = await webkit.launch()
+    page = await browser.new_page()
+    watch_dog = page.wait_for_function("() => window.innerWidth < 100")
+    await page.set_viewport_size({"width": 50, "height": 50})
+    await watch_dog
+    await browser.close()
+
+with sync_playwright() as playwright:
+    run(playwright)
+```
+
+To pass an argument to the predicate of [page.wait_for_function(expression, **options)](./api/class-page.md#pagewait_for_functionexpression-options) function:
+
+```py
+# async
+
+selector = ".foo"
+await page.wait_for_function("selector => !!document.querySelector(selector)", selector)
+```
+
+```py
+# sync
+
+selector = ".foo"
+page.wait_for_function("selector => !!document.querySelector(selector)", selector)
+```
 
 Shortcut for main frame's [frame.wait_for_function(expression, **options)](./api/class-frame.md#framewait_for_functionexpression-options).
 
@@ -1145,6 +1833,42 @@ Shortcut for main frame's [frame.wait_for_function(expression, **options)](./api
 Returns when the required load state has been reached.
 
 This resolves when the page reaches a required load state, `load` by default. The navigation must have been committed when this method is called. If current document has already reached the required state, resolves immediately.
+
+```py
+# async
+
+await page.click("button") # click triggers navigation.
+await page.wait_for_load_state() # the promise resolves after "load" event.
+```
+
+```py
+# sync
+
+page.click("button") # click triggers navigation.
+page.wait_for_load_state() # the promise resolves after "load" event.
+```
+
+```py
+# async
+
+async with page.expect_popup() as page_info:
+    await page.click("button") # click triggers a popup.
+popup = await page_info.value
+ # Following resolves after "domcontentloaded" event.
+await popup.wait_for_load_state("domcontentloaded")
+print(await popup.title()) # popup is ready to use.
+```
+
+```py
+# sync
+
+with page.expect_popup() as page_info:
+    page.click("button") # click triggers a popup.
+popup = page_info.value
+ # Following resolves after "domcontentloaded" event.
+popup.wait_for_load_state("domcontentloaded")
+print(popup.title()) # popup is ready to use.
+```
 
 Shortcut for main frame's [frame.wait_for_load_state(**options)](./api/class-frame.md#framewait_for_load_stateoptions).
 
@@ -1161,6 +1885,22 @@ Returns the main resource response. In case of multiple redirects, the navigatio
 
 This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
 
+```py
+# async
+
+async with page.expect_navigation():
+    await page.click("a.delayed-navigation") # clicking the link will indirectly cause a navigation
+# Resolves after navigation has finished
+```
+
+```py
+# sync
+
+with page.expect_navigation():
+    page.click("a.delayed-navigation") # clicking the link will indirectly cause a navigation
+# Resolves after navigation has finished
+```
+
 :::note
 Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
 :::
@@ -1174,12 +1914,44 @@ Shortcut for main frame's [frame.wait_for_navigation(**options)](./api/class-fra
 
 Waits for the matching request and returns it.
 
+```py
+# async
+
+first_request = await page.wait_for_request("http://example.com/resource")
+final_request = await page.wait_for_request(lambda request: request.url == "http://example.com" and request.method == "get")
+return first_request.url
+```
+
+```py
+# sync
+
+first_request = page.wait_for_request("http://example.com/resource")
+final_request = page.wait_for_request(lambda request: request.url == "http://example.com" and request.method == "get")
+return first_request.url
+```
+
 ## page.wait_for_response(url_or_predicate, **options)
 - `url_or_predicate` <[str]|[Pattern]|[Callable]\[[Response]\]:[bool]> Request URL string, regex or predicate receiving [Response] object.
 - `timeout` <[float]> Maximum wait time in milliseconds, defaults to 30 seconds, pass `0` to disable the timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.md#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.md#pageset_default_timeouttimeout) methods.
 - returns: <[Response]>
 
 Returns the matched response.
+
+```py
+# async
+
+first_response = await page.wait_for_response("https://example.com/resource")
+final_response = await page.wait_for_response(lambda response: response.url == "https://example.com" and response.status === 200)
+return final_response.ok
+```
+
+```py
+# sync
+
+first_response = page.wait_for_response("https://example.com/resource")
+final_response = page.wait_for_response(lambda response: response.url == "https://example.com" and response.status === 200)
+return final_response.ok
+```
 
 ## page.wait_for_selector(selector, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.md#working-with-selectors) for more details.
@@ -1197,12 +1969,67 @@ Wait for the `selector` to satisfy `state` option (either appear/disappear from 
 
 This method works across navigations:
 
+```py
+# async
+
+import asyncio
+from playwright.async_api import async_playwright
+
+async def run(playwright):
+    chromium = playwright.chromium
+    browser = await chromium.launch()
+    page = await browser.new_page()
+    for current_url in ["https://google.com", "https://bbc.com"]:
+        await page.goto(current_url, wait_until="domcontentloaded")
+        element = await page.wait_for_selector("img")
+        print("Loaded image: " + str(await element.get_attribute("src")))
+    await browser.close()
+
+async def main():
+    async with async_playwright() as playwright:
+        await run(playwright)
+asyncio.run(main())
+```
+
+```py
+# sync
+
+from playwright.sync_api import sync_playwright
+
+def run(playwright):
+    chromium = playwright.chromium
+    browser = chromium.launch()
+    page = browser.new_page()
+    for current_url in ["https://google.com", "https://bbc.com"]:
+        page.goto(current_url, wait_until="domcontentloaded")
+        element = page.wait_for_selector("img")
+        print("Loaded image: " + str(element.get_attribute("src")))
+    browser.close()
+
+with sync_playwright() as playwright:
+    run(playwright)
+```
+
 ## page.wait_for_timeout(timeout)
 - `timeout` <[float]> A timeout to wait for
 
 Waits for the given `timeout` in milliseconds.
 
 Note that `page.waitForTimeout()` should only be used for debugging. Tests using the timer in production are going to be flaky. Use signals such as network events, selectors becoming visible and others instead.
+
+```py
+# async
+
+# wait for 1 second
+await page.wait_for_timeout(1000)
+```
+
+```py
+# sync
+
+# wait for 1 second
+page.wait_for_timeout(1000)
+```
 
 Shortcut for main frame's [frame.wait_for_timeout(timeout)](./api/class-frame.md#framewait_for_timeouttimeout).
 

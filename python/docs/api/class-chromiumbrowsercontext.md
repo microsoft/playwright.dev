@@ -7,6 +7,20 @@ title: "ChromiumBrowserContext"
 
 Chromium-specific features including background pages, service worker support, etc.
 
+```py
+# async
+
+# FIXME
+background_page = await context.wait_for_event("backgroundpage")
+```
+
+```py
+# sync
+
+# FIXME
+background_page = context.wait_for_event("backgroundpage")
+```
+
 
 - [chromium_browser_context.on("backgroundpage")](./api/class-chromiumbrowsercontext.md#chromium_browser_contextonbackgroundpage)
 - [chromium_browser_context.on("serviceworker")](./api/class-chromiumbrowsercontext.md#chromium_browser_contextonserviceworker)

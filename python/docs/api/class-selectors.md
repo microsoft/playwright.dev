@@ -17,6 +17,19 @@ Selectors can be used to install custom selector engines. See [Working with sele
 
 An example of registering selector engine that queries elements based on a tag name:
 
+```py
+# async
+
+# FIXME: add snippet
+```
+
+```py
+# sync
+
+# FIXME: add snippet
+```
+
+
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"
