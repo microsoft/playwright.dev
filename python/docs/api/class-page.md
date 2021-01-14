@@ -3,7 +3,7 @@ id: class-page
 title: "Page"
 ---
 
-* extends: [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter)
+* extends: [EventEmitter]
 
 Page provides methods to interact with a single tab in a [Browser], or an [extension background page](https://developer.chrome.com/extensions/background_pages) in Chromium. One [Browser] instance might have multiple [Page] instances.
 
@@ -745,7 +745,7 @@ Returns the value of the `page_function` invocation as in-page object (JSHandle)
 
 The only difference between [page.evaluate(expression, **options)](./api/class-page.md#pageevaluateexpression-options) and [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluate_handleexpression-options) is that [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluate_handleexpression-options) returns in-page object (JSHandle).
 
-If the function passed to the [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluate_handleexpression-options) returns a [Promise], then [`method:Ppage.EvaluateHandle`] would wait for the promise to resolve and return its value.
+If the function passed to the [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluate_handleexpression-options) returns a [Promise], then [page.evaluate_handle(expression, **options)](./api/class-page.md#pageevaluate_handleexpression-options) would wait for the promise to resolve and return its value.
 
 ```py
 # async
@@ -858,7 +858,7 @@ This resolves when the page navigates to a new URL or reloads. It is useful for 
 # async
 
 async with page.expect_navigation():
-    await page.click("a.delayed-navigation") # Clicking the link will indirectly cause a navigation  
+    await page.click("a.delayed-navigation") # Clicking the link will indirectly cause a navigation
 # Context manager waited for the navigation to happen.
 ```
 
@@ -866,7 +866,7 @@ async with page.expect_navigation():
 # sync
 
 with page.expect_navigation():
-    page.click("a.delayed-navigation") # Clicking the link will indirectly cause a navigation  
+    page.click("a.delayed-navigation") # Clicking the link will indirectly cause a navigation
 # Context manager waited for the navigation to happen.
 ```
 
@@ -2095,6 +2095,7 @@ This does not contain ServiceWorkers
 [bool]: https://docs.python.org/3/library/stdtypes.html "bool"
 [Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
 [EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
 [Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
 [float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"

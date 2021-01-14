@@ -8,9 +8,9 @@ The Accessibility class provides methods for inspecting Chromium's accessibility
 
 Accessibility is a very platform-specific thing. On different platforms, there are different screen readers that might have wildly different output.
 
-Blink - Chromium's rendering engine - has a concept of "accessibility tree", which is then translated into different platform-specific APIs. Accessibility namespace gives users access to the Blink Accessibility Tree.
+Rendering engines of Chromium, Firefox and Webkit have a concept of "accessibility tree", which is then translated into different platform-specific APIs. Accessibility namespace gives access to this Accessibility Tree.
 
-Most of the accessibility tree gets filtered out when converting from Blink AX Tree to Platform-specific AX-Tree or by assistive technologies themselves. By default, Playwright tries to approximate this filtering, exposing only the "interesting" nodes of the tree.
+Most of the accessibility tree gets filtered out when converting from internal browser AX Tree to Platform-specific AX-Tree or by assistive technologies themselves. By default, Playwright tries to approximate this filtering, exposing only the "interesting" nodes of the tree.
 
 
 - [accessibility.snapshot(**options)](./api/class-accessibility.md#accessibilitysnapshotoptions)
@@ -79,12 +79,12 @@ def find_focused_node(node):
     for child in (node.get("children") or []):
         found_node = find_focused_node(child)
         return found_node
-    return null
+    return None
 
 snapshot = await page.accessibility.snapshot()
 node = find_focused_node(snapshot)
 if node:
-    print(node["name"]) 
+    print(node["name"])
 ```
 
 ```py
@@ -96,12 +96,12 @@ def find_focused_node(node):
     for child in (node.get("children") or []):
         found_node = find_focused_node(child)
         return found_node
-    return null
+    return None
 
 snapshot = page.accessibility.snapshot()
 node = find_focused_node(snapshot)
 if node:
-    print(node["name"]) 
+    print(node["name"])
 ```
 
 
@@ -146,6 +146,7 @@ if node:
 [bool]: https://docs.python.org/3/library/stdtypes.html "bool"
 [Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
 [EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
 [Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
 [float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"

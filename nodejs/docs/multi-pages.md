@@ -74,7 +74,7 @@ If the action that triggers the new page is unknown, the following pattern can b
 // Get all new pages (including popups) in the context
 context.on('page', async page => {
   await page.waitForLoadState();
-  await page.title();
+  console.log(await page.title());
 })
 ```
 
@@ -94,7 +94,7 @@ const [popup] = await Promise.all([
   page.click('#open')
 ]);
 await popup.waitForLoadState();
-await popup.title();
+console.log(await popup.title());
 ```
 
 If the action that triggers the popup is unknown, the following pattern can be used.
@@ -158,6 +158,7 @@ page.on('popup', async popup => {
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
 [ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
 [Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
 [function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
 [Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
 [null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"

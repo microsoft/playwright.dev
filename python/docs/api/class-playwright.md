@@ -43,15 +43,32 @@ with sync_playwright() as playwright:
     run(playwright)
 ```
 
-By default, the `playwright` NPM package automatically downloads browser executables during installation. The `playwright-core` NPM package can be used to skip automatic downloads.
 
-
+- [playwright.start()](./api/class-playwright.md#playwrightstart)
 - [playwright.stop()](./api/class-playwright.md#playwrightstop)
 - [playwright.chromium](./api/class-playwright.md#playwrightchromium)
 - [playwright.devices](./api/class-playwright.md#playwrightdevices)
 - [playwright.firefox](./api/class-playwright.md#playwrightfirefox)
 - [playwright.selectors](./api/class-playwright.md#playwrightselectors)
 - [playwright.webkit](./api/class-playwright.md#playwrightwebkit)
+
+## playwright.start()
+
+Starts a new instance of Playwright without using the Python context manager. This is useful in REPL applications. Requires [playwright.stop()](./api/class-playwright.md#playwrightstop) to be called to cleanup resources.
+
+```py
+>>> from playwright.sync_api import sync_playwright
+
+>>> playwright = sync_playwright().start()
+
+>>> browser = playwright.chromium.launch()
+>>> page = browser.newPage()
+>>> page.goto("http://whatsmyuseragent.org/")
+>>> page.screenshot(path="example.png")
+>>> browser.close()
+
+>>> playwright.stop()
+```
 
 ## playwright.stop()
 
@@ -178,6 +195,7 @@ This object can be used to launch or connect to WebKit, returning instances of [
 [bool]: https://docs.python.org/3/library/stdtypes.html "bool"
 [Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
 [EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
 [Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
 [float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"

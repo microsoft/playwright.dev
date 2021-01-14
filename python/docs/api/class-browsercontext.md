@@ -3,7 +3,7 @@ id: class-browsercontext
 title: "BrowserContext"
 ---
 
-* extends: [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter)
+* extends: [EventEmitter]
 
 BrowserContexts provide a way to operate multiple independent browser sessions.
 
@@ -489,7 +489,8 @@ or the same snippet using a regex pattern instead:
 
 context = await browser.new_context()
 page = await context.new_page()
-await context.route(r"(\.png$)|(\.jpg$)", lambda page = await context.new_page()
+await context.route(r"(\.png$)|(\.jpg$)", lambda route: route.abort())
+page = await context.new_page()
 await page.goto("https://example.com")
 await browser.close()
 ```
@@ -499,7 +500,8 @@ await browser.close()
 
 context = browser.new_context()
 page = context.new_page()
-context.route(r"(\.png$)|(\.jpg$)", lambda page = await context.new_page()
+context.route(r"(\.png$)|(\.jpg$)", lambda route: route.abort())
+page = await context.new_page()
 page = context.new_page()
 page.goto("https://example.com")
 browser.close()
@@ -661,6 +663,7 @@ context.grant_permissions(["geolocation"])
 [bool]: https://docs.python.org/3/library/stdtypes.html "bool"
 [Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
 [EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
 [Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
 [float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"

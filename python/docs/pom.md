@@ -20,7 +20,65 @@ Page objects **simplify maintenance**. They capture element selectors in one pla
 
 Page object models wrap over a Playwright [Page].
 
+```py
+# async
+
+# models/search.py
+class SearchPage:
+    def __init__(self, page):
+        self.page = page
+
+    async def navigate(self):
+        await self.page.goto("https://bing.com")
+
+    async def search(self, text):
+        await self.page.fill('[aria-label="Enter your search term"]', text)
+        await self.page.press('[aria-label="Enter your search term"]', "Enter")
+```
+
+```py
+# sync
+
+# models/search.py
+class SearchPage:
+    def __init__(self, page):
+        self.page = page
+
+    def navigate(self):
+        self.page.goto("https://bing.com")
+
+    def search(self, text):
+        self.page.fill('[aria-label="Enter your search term"]', text)
+        self.page.press('[aria-label="Enter your search term"]', "Enter")
+```
+
 Page objects can then be used inside a test.
+
+```py
+# async
+
+# test_search.py
+from models.search import SearchPage
+
+# in the test
+page = await browser.new_page()
+search_page = SearchPage(page)
+await search_page.navigate()
+await search_page.search("search query")
+```
+
+```py
+# sync
+
+# test_search.py
+from models.search import SearchPage
+
+# in the test
+page = browser.new_page()
+search_page = SearchPage(page)
+search_page.navigate()
+search_page.search("search query")
+```
 
 ### API reference
 - [Page]
@@ -66,6 +124,7 @@ Page objects can then be used inside a test.
 [bool]: https://docs.python.org/3/library/stdtypes.html "bool"
 [Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
 [EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
 [Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
 [float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"

@@ -70,11 +70,11 @@ await page.click('text=Example Domain');
 
 ## Scenarios initiated by page interaction
 
-In the scenarios below, `page.click` initiates a navigation and then waits for the navigation to complete.
+In the scenarios below, [page.click(selector[, options])](./api/class-page.md#pageclickselector-options) initiates a navigation and then waits for the navigation to complete.
 
 ### Auto-wait
 
-By default, `page.click` will wait for the navigation step to complete. This can be combined with a page interaction on the navigated page which would auto-wait for an element.
+By default, [page.click(selector[, options])](./api/class-page.md#pageclickselector-options) will wait for the navigation step to complete. This can be combined with a page interaction on the navigated page which would auto-wait for an element.
 
 ```js
 // Click will auto-wait for navigation to complete
@@ -99,12 +99,12 @@ In lazy-loaded pages, it can be useful to wait until an element is visible with 
 ```js
 // Click triggers navigation
 await page.click('text=Login');
- // Click will auto-wait for the element
+// Click will auto-wait for the element
 await page.waitForSelector('#username', 'John Doe');
 
 // Click triggers navigation
 await page.click('text=Login');
- // Fill will auto-wait for element
+// Fill will auto-wait for element
 await page.fill('#username', 'John Doe');
 ```
 
@@ -115,13 +115,13 @@ Clicking an element could trigger asychronous processing before initiating the n
 * Page waits for network requests before navigation
 
 ```js
+// Note that Promise.all prevents a race condition
+// between clicking and waiting for a navigation.
 await Promise.all([
-  page.click('a'), // Triggers a navigation after a timeout
   page.waitForNavigation(), // Waits for the next navigation
+  page.click('a'), // Triggers a navigation after a timeout
 ]);
 ```
-
-The `Promise.all` pattern prevents a race condition between `page.click` and `page.waitForNavigation` when navigation happens quickly.
 
 ### Multiple navigations
 
@@ -130,13 +130,13 @@ Clicking an element could trigger multiple navigations. In these cases, it is re
 * Multiple pushes to history state
 
 ```js
+// Note that Promise.all prevents a race condition
+// between clicking and waiting for a navigation.
 await Promise.all([
   page.waitForNavigation({ url: '**/login' }),
   page.click('a'), // Triggers a navigation with a script redirect
 ]);
 ```
-
-The `Promise.all` pattern prevents a race condition between `page.click` and `page.waitForNavigation` when navigation happens quickly.
 
 ### Loading a popup
 
@@ -219,6 +219,7 @@ await page.screenshot();
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
 [ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
 [Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
 [function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
 [Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
 [null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
