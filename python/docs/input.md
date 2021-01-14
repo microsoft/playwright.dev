@@ -360,7 +360,6 @@ Note that you still need to specify the capital `A` in `Shift-A` to produce the 
 ```py
 # async
 
-from playwright.async_api import FilePayload
 # Select one file
 await page.set_input_files('input#upload', 'myfile.pdf')
 
@@ -373,14 +372,15 @@ await page.set_input_files('input#upload', [])
 # Upload buffer from memory
 await page.set_input_files(
     "input#upload",
-    files=[FilePayload("test.txt", "text/plain", b"this is a test")],
+    files=[
+        {"name": "test.txt", "mimeType": "text/plain", "buffer": b"this is a test"}
+    ],
 )
 ```
 
 ```py
 # sync
 
-from playwright.sync_api import FilePayload
 # Select one file
 page.set_input_files('input#upload', 'myfile.pdf')
 
@@ -393,7 +393,9 @@ page.set_input_files('input#upload', [])
 # Upload buffer from memory
 page.set_input_files(
     "input#upload",
-    files=[FilePayload("test.txt", "text/plain", b"this is a test")],
+    files=[
+        {"name": "test.txt", "mimeType": "text/plain", "buffer": b"this is a test"}
+    ],
 )
 ```
 
@@ -474,6 +476,7 @@ page.focus('input#name')
 [bool]: https://docs.python.org/3/library/stdtypes.html "bool"
 [Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
 [EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
 [Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
 [float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"

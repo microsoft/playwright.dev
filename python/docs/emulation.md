@@ -31,15 +31,17 @@ Playwright comes with a registry of device parameters for selected mobile device
 import asyncio
 from playwright.async_api import async_playwright
 
-async def main():
-    async with async_playwright() as p:
-        pixel_2 = p.devices['Pixel 2']
-        browser = await p.webkit.launch(headless=False)
-        context = await browser.new_context(
-            **pixel_2,
-        )
+async def run(playwright):
+    pixel_2 = playwright.devices['Pixel 2']
+    browser = await playwright.webkit.launch(headless=False)
+    context = await browser.new_context(
+        **pixel_2,
+    )
 
-asyncio.get_event_loop().run_until_complete(main())
+async def main():
+    async with async_playwright() as playwright:
+        await run(playwright)
+asyncio.run(main())
 ```
 
 ```py
@@ -47,12 +49,15 @@ asyncio.get_event_loop().run_until_complete(main())
 
 from playwright.sync_api import sync_playwright
 
-with sync_playwright() as p:
-    pixel_2 = p.devices['Pixel 2']
-    browser = p.webkit.launch(headless=False)
+def run(playwright):
+    pixel_2 = playwright.devices['Pixel 2']
+    browser = playwright.webkit.launch(headless=False)
     context = browser.new_context(
         **pixel_2,
     )
+
+with sync_playwright() as playwright:
+    run(playwright)
 ```
 
 All pages created in the context above will share the same device parameters.
@@ -125,7 +130,6 @@ page.set_viewport_size(width=1600, height=1200)
 context = browser.new_context(
   viewport={ 'width': 2560, 'height': 1440 },
   device_scale_factor=2,
-
 ```
 
 #### API reference
@@ -363,6 +367,7 @@ page.emulate_media(media='print')
 [bool]: https://docs.python.org/3/library/stdtypes.html "bool"
 [Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
 [EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
 [Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
 [float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"

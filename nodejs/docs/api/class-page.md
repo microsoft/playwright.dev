@@ -3,7 +3,7 @@ id: class-page
 title: "Page"
 ---
 
-* extends: [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter)
+* extends: [EventEmitter]
 
 Page provides methods to interact with a single tab in a [Browser], or an [extension background page](https://developer.chrome.com/extensions/background_pages) in Chromium. One [Browser] instance might have multiple [Page] instances.
 
@@ -612,7 +612,7 @@ Returns the value of the `pageFunction` invocation as in-page object (JSHandle).
 
 The only difference between [page.evaluate(pageFunction[, arg])](./api/class-page.md#pageevaluatepagefunction-arg) and [page.evaluateHandle(pageFunction[, arg])](./api/class-page.md#pageevaluatehandlepagefunction-arg) is that [page.evaluateHandle(pageFunction[, arg])](./api/class-page.md#pageevaluatehandlepagefunction-arg) returns in-page object (JSHandle).
 
-If the function passed to the [page.evaluateHandle(pageFunction[, arg])](./api/class-page.md#pageevaluatehandlepagefunction-arg) returns a [Promise], then [`method:Ppage.EvaluateHandle`] would wait for the promise to resolve and return its value.
+If the function passed to the [page.evaluateHandle(pageFunction[, arg])](./api/class-page.md#pageevaluatehandlepagefunction-arg) returns a [Promise], then [page.evaluateHandle(pageFunction[, arg])](./api/class-page.md#pageevaluatehandlepagefunction-arg) would wait for the promise to resolve and return its value.
 
 ```js
 const aWindowHandle = await page.evaluateHandle(() => Promise.resolve(window));
@@ -1573,6 +1573,7 @@ Browser-specific Coverage implementation, only available for Chromium atm. See [
 [Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
 [ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
 [Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
 [function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
 [Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
 [null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"

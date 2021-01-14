@@ -33,13 +33,67 @@ Navigations can be initiated by changing the URL bar, reloading the page or goin
 
 Navigating to a URL auto-waits for the page to fire the `load` event. If the page does a client-side redirect before `load`, `page.goto` will auto-wait for the redirected page to fire the `load` event.
 
+```py
+# async
+
+# Navigate the page
+await page.goto("https://example.com")
+```
+
+```py
+# sync
+
+# Navigate the page
+page.goto("https://example.com")
+```
+
 ### Custom wait
 
 Override the default behavior to wait until a specific event, like `networkidle`.
 
+```py
+# async
+
+# Navigate and wait until network is idle
+await page.goto("https://example.com", wait_until="networkidle")
+```
+
+```py
+# sync
+
+# Navigate and wait until network is idle
+page.goto("https://example.com", wait_until="networkidle")
+```
+
 ### Wait for element
 
 In lazy-loaded pages, it can be useful to wait until an element is visible with [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewait_for_selectorselector-options). Alternatively, page interactions like [page.click(selector, **options)](./api/class-page.md#pageclickselector-options) auto-wait for elements.
+
+```py
+# async
+
+# Navigate and wait for element
+await page.goto("https://example.com")
+await page.wait_for_selector("text=example domain")
+
+# Navigate and click element
+# Click will auto-wait for the element
+await page.goto("https://example.com")
+await page.click("text=example domain")
+```
+
+```py
+# sync
+
+# Navigate and wait for element
+page.goto("https://example.com")
+page.wait_for_selector("text=example domain")
+
+# Navigate and click element
+# Click will auto-wait for the element
+page.goto("https://example.com")
+page.click("text=example domain")
+```
 
 #### API reference
 - [page.goto(url, **options)](./api/class-page.md#pagegotourl-options)
@@ -49,19 +103,81 @@ In lazy-loaded pages, it can be useful to wait until an element is visible with 
 
 ## Scenarios initiated by page interaction
 
-In the scenarios below, `page.click` initiates a navigation and then waits for the navigation to complete.
+In the scenarios below, [page.click(selector, **options)](./api/class-page.md#pageclickselector-options) initiates a navigation and then waits for the navigation to complete.
 
 ### Auto-wait
 
-By default, `page.click` will wait for the navigation step to complete. This can be combined with a page interaction on the navigated page which would auto-wait for an element.
+By default, [page.click(selector, **options)](./api/class-page.md#pageclickselector-options) will wait for the navigation step to complete. This can be combined with a page interaction on the navigated page which would auto-wait for an element.
+
+```py
+# async
+
+# Click will auto-wait for navigation to complete
+await page.click("text=Login")
+
+# Fill will auto-wait for element on navigated page
+await page.fill("#username", "John Doe")
+```
+
+```py
+# sync
+
+# Click will auto-wait for navigation to complete
+page.click("text=Login")
+
+# Fill will auto-wait for element on navigated page
+page.fill("#username", "John Doe")
+```
 
 ### Custom wait
 
 `page.click` can be combined with [page.wait_for_load_state(**options)](./api/class-page.md#pagewait_for_load_stateoptions) to wait for a loading event.
 
+```py
+# async
+
+await page.click("button"); # Click triggers navigation
+await page.wait_for_load_state("networkidle"); # This waits for the "networkidle"
+```
+
+```py
+# sync
+
+page.click("button"); # Click triggers navigation
+page.wait_for_load_state("networkidle"); # This waits for the "networkidle"
+```
+
 ### Wait for element
 
 In lazy-loaded pages, it can be useful to wait until an element is visible with [page.wait_for_selector(selector, **options)](./api/class-page.md#pagewait_for_selectorselector-options). Alternatively, page interactions like [page.click(selector, **options)](./api/class-page.md#pageclickselector-options) auto-wait for elements.
+
+```py
+# async
+
+# Click triggers navigation
+await page.click("text=Login")
+# Click will auto-wait for the element
+await page.wait_for_selector("#username", "John Doe")
+
+# Click triggers navigation
+await page.click("text=Login")
+# Fill will auto-wait for element
+await page.fill("#username", "John Doe")
+```
+
+```py
+# sync
+
+# Click triggers navigation
+page.click("text=Login")
+# Click will auto-wait for the element
+page.wait_for_selector("#username", "John Doe")
+
+# Click triggers navigation
+page.click("text=Login")
+# Fill will auto-wait for element
+page.fill("#username", "John Doe")
+```
 
 ### Asynchronous navigation
 
@@ -69,7 +185,25 @@ Clicking an element could trigger asychronous processing before initiating the n
 * Navigation is triggered from a `setTimeout`
 * Page waits for network requests before navigation
 
-The `Promise.all` pattern prevents a race condition between `page.click` and `page.waitForNavigation` when navigation happens quickly.
+```py
+# async
+
+# Waits for the next navigation. Using Python context manager
+# prevents a race condition between clicking and waiting for a navigation.
+async with page.expect_navigation():
+    # Triggers a navigation after a timeout
+    await page.click("a")
+```
+
+```py
+# sync
+
+# Waits for the next navigation. Using Python context manager
+# prevents a race condition between clicking and waiting for a navigation.
+with page.expect_navigation():
+    # Triggers a navigation after a timeout
+    page.click("a")
+```
 
 ### Multiple navigations
 
@@ -77,11 +211,47 @@ Clicking an element could trigger multiple navigations. In these cases, it is re
 * Client-side redirects issued after the `load` event
 * Multiple pushes to history state
 
-The `Promise.all` pattern prevents a race condition between `page.click` and `page.waitForNavigation` when navigation happens quickly.
+```py
+# async
+
+# Using Python context manager prevents a race condition
+# between clicking and waiting for a navigation.
+async with page.expect_navigation(url="**/login"):
+    # Triggers a navigation with a script redirect
+    await page.click("a")
+```
+
+```py
+# sync
+
+# Using Python context manager prevents a race condition
+# between clicking and waiting for a navigation.
+with page.expect_navigation(url="**/login"):
+    # Triggers a navigation with a script redirect
+    page.click("a")
+```
 
 ### Loading a popup
 
 When popup is opened, explicitly calling [page.wait_for_load_state(**options)](./api/class-page.md#pagewait_for_load_stateoptions) ensures that popup is loaded to the desired state.
+
+```py
+# async
+
+async with page.expect_popup() as popup_info:
+    await page.click('a[target="_blank"]') # Opens popup
+popup = await popup_info.value
+await popup.wait_for_load_state("load")
+```
+
+```py
+# sync
+
+with page.expect_popup() as popup_info:
+    page.click('a[target="_blank"]') # Opens popup
+popup = popup_info.value
+popup.wait_for_load_state("load")
+```
 
 #### API reference
 - [page.click(selector, **options)](./api/class-page.md#pageclickselector-options)
@@ -93,6 +263,25 @@ When popup is opened, explicitly calling [page.wait_for_load_state(**options)](.
 ## Advanced patterns
 
 For pages that have complicated loading patterns, [page.wait_for_function(expression, **options)](./api/class-page.md#pagewait_for_functionexpression-options) is a powerful and extensible approach to define a custom wait criteria.
+
+```py
+# async
+
+await page.goto("http://example.com")
+await page.wait_for_function("() => window.amILoadedYet()")
+# Ready to take a screenshot, according to the page itself.
+await page.screenshot()
+```
+
+```py
+# sync
+
+# FIXME
+page.goto("http://example.com")
+page.wait_for_function("() => window.amILoadedYet()")
+# Ready to take a screenshot, according to the page itself.
+page.screenshot()
+```
 
 #### API reference
 - [page.wait_for_function(expression, **options)](./api/class-page.md#pagewait_for_functionexpression-options)
@@ -138,6 +327,7 @@ For pages that have complicated loading patterns, [page.wait_for_function(expres
 [bool]: https://docs.python.org/3/library/stdtypes.html "bool"
 [Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
 [EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
 [Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
 [float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"

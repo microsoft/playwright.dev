@@ -40,7 +40,7 @@ from playwright.sync_api import sync_playwright
 
 def handle_dialog(dialog):
     print(dialog.message)
-    await dialog.dismiss()
+    dialog.dismiss()
 
 def run(playwright):
     chromium = playwright.chromium
@@ -126,6 +126,7 @@ Returns dialog's type, can be one of `alert`, `beforeunload`, `confirm` or `prom
 [bool]: https://docs.python.org/3/library/stdtypes.html "bool"
 [Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
 [EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
 [Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
 [float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"

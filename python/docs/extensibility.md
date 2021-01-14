@@ -18,6 +18,67 @@ By default the engine is run directly in the frame's JavaScript context and, for
 
 An example of registering selector engine that queries elements based on a tag name:
 
+```py
+# async
+
+tag_selector = """
+    // Must evaluate to a selector engine instance.
+    {
+      // Returns the first element matching given selector in the root's subtree.
+      query(root, selector) {
+        return root.querySelector(selector);
+      },
+
+      // Returns all elements matching given selector in the root's subtree.
+      queryAll(root, selector) {
+        return Array.from(root.querySelectorAll(selector));
+      }
+    }"""
+
+# register the engine. selectors will be prefixed with "tag=".
+await playwright.selectors.register("tag", tag_selector)
+
+# now we can use "tag=" selectors.
+button = await page.query_selector("tag=button")
+
+# we can combine it with other selector engines using `>>` combinator.
+await page.click("tag=div >> span >> "click me"")
+
+# we can use it in any methods supporting selectors.
+button_count = await page.eval_on_selector_all("tag=button", buttons => buttons.length)
+```
+
+```py
+# sync
+
+tag_selector = """
+    // Must evaluate to a selector engine instance.
+    {
+      // Returns the first element matching given selector in the root's subtree.
+      query(root, selector) {
+        return root.querySelector(selector);
+      },
+
+      // Returns all elements matching given selector in the root's subtree.
+      queryAll(root, selector) {
+        return Array.from(root.querySelectorAll(selector));
+      }
+    }"""
+
+# register the engine. selectors will be prefixed with "tag=".
+playwright.selectors.register("tag", tag_selector)
+
+# now we can use "tag=" selectors.
+button = page.query_selector("tag=button")
+
+# we can combine it with other selector engines using `>>` combinator.
+page.click("tag=div >> span >> "click me"")
+
+# we can use it in any methods supporting selectors.
+button_count = page.eval_on_selector_all("tag=button", buttons => buttons.length)
+```
+
+
 [Accessibility]: ./api/class-accessibility.md "Accessibility"
 [Browser]: ./api/class-browser.md "Browser"
 [BrowserContext]: ./api/class-browsercontext.md "BrowserContext"
@@ -59,6 +120,7 @@ An example of registering selector engine that queries elements based on a tag n
 [bool]: https://docs.python.org/3/library/stdtypes.html "bool"
 [Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
 [EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
 [Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
 [float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"

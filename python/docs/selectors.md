@@ -35,6 +35,68 @@ For convenience, selectors in the wrong format are heuristically converted to th
 - selector starting and ending with a quote (either `"` or `'`) is assumed to be `text=selector`;
 - otherwise selector is assumed to be `css=selector`.
 
+```py
+# async
+
+# queries 'div' css selector
+handle = await page.query_selector('css=div')
+
+# queries '//html/body/div' xpath selector
+handle = await page.query_selector('xpath=//html/body/div')
+
+# queries '"foo"' text selector
+handle = await page.query_selector('text="foo"')
+
+# queries 'span' css selector inside the result of '//html/body/div' xpath selector
+handle = await page.query_selector('xpath=//html/body/div >> css=span')
+
+# converted to 'css=div'
+handle = await page.query_selector('div')
+
+# converted to 'xpath=//html/body/div'
+handle = await page.query_selector('//html/body/div')
+
+# converted to 'text="foo"'
+handle = await page.query_selector('"foo"')
+
+# queries '../span' xpath selector starting with the result of 'div' css selector
+handle = await page.query_selector('div >> ../span')
+
+# queries 'span' css selector inside the div handle
+handle = await div_handle.query_selector('css=span')
+```
+
+```py
+# sync
+
+# queries 'div' css selector
+handle = page.query_selector('css=div')
+
+# queries '//html/body/div' xpath selector
+handle = page.query_selector('xpath=//html/body/div')
+
+# queries '"foo"' text selector
+handle = page.query_selector('text="foo"')
+
+# queries 'span' css selector inside the result of '//html/body/div' xpath selector
+handle = page.query_selector('xpath=//html/body/div >> css=span')
+
+# converted to 'css=div'
+handle = page.query_selector('div')
+
+# converted to 'xpath=//html/body/div'
+handle = page.query_selector('//html/body/div')
+
+# converted to 'text="foo"'
+handle = page.query_selector('"foo"')
+
+# queries '../span' xpath selector starting with the result of 'div' css selector
+handle = page.query_selector('div >> ../span')
+
+# queries 'span' css selector inside the div handle
+handle = div_handle.query_selector('css=span')
+```
+
 ## Syntax
 
 Selectors are defined by selector engine name and selector body, `engine=body`.
@@ -85,6 +147,44 @@ Attributes like text content, input placeholder, accessibility roles and labels 
 
 The following examples use the built-in [text] and [css] selector engines.
 
+```py
+# async
+
+# queries "Login" text selector
+await page.click('text="Login"')
+await page.click('"Login"') # short-form
+
+# queries "Search GitHub" placeholder attribute
+await page.fill('css=[placeholder="Search GitHub"]')
+await page.fill('[placeholder="Search GitHub"]') # short-form
+
+# queries "Close" accessibility label
+await page.click('css=[aria-label="Close"]')
+await page.click('[aria-label="Close"]') # short-form
+
+# combine role and text queries
+await page.click('css=nav >> text=Login')
+```
+
+```py
+# sync
+
+# queries "Login" text selector
+page.click('text="Login"')
+page.click('"Login"') # short-form
+
+# queries "Search GitHub" placeholder attribute
+page.fill('css=[placeholder="Search GitHub"]')
+page.fill('[placeholder="Search GitHub"]') # short-form
+
+# queries "Close" accessibility label
+page.click('css=[aria-label="Close"]')
+page.click('[aria-label="Close"]') # short-form
+
+# combine role and text queries
+page.click('css=nav >> text=Login')
+```
+
 ### Define explicit contract
 
 When user-facing attributes change frequently, it is recommended to use explicit test ids, like `data-test-id`. These `data-*` attributes are supported by the [css] and [id selectors][id].
@@ -93,9 +193,47 @@ When user-facing attributes change frequently, it is recommended to use explicit
 <button data-test-id="directions">Itinéraire</button>
 ```
 
+```py
+# async
+
+# queries data-test-id attribute with css
+await page.click('css=[data-test-id=directions]')
+await page.click('[data-test-id=directions]') # short-form
+
+# queries data-test-id with id
+await page.click('data-test-id=directions')
+```
+
+```py
+# sync
+
+# queries data-test-id attribute with css
+page.click('css=[data-test-id=directions]')
+page.click('[data-test-id=directions]') # short-form
+
+# queries data-test-id with id
+page.click('data-test-id=directions')
+```
+
 ### Avoid selectors tied to implementation
 
 [xpath] and [css] can be tied to the DOM structure or implementation. These selectors can break when the DOM structure changes.
+
+```py
+# async
+
+# avoid long css or xpath chains
+await page.click('#tsf > div:nth-child(2) > div.A8SBwf > div.RNNXgb > div > div.a4bIc > input')
+await page.click('//*[@id="tsf"]/div[2]/div[1]/div[1]/div/div[2]/input')
+```
+
+```py
+# sync
+
+# avoid long css or xpath chains
+page.click('#tsf > div:nth-child(2) > div.A8SBwf > div.RNNXgb > div > div.a4bIc > input')
+page.click('//*[@id="tsf"]/div[2]/div[1]/div[1]/div/div[2]/input')
+```
 
 ## CSS selector engine
 
@@ -151,7 +289,32 @@ Consider a page with two buttons, first invisible and second visible.
 ```
 
 * This will find the first button, because it is the first one in DOM order. Then it will wait for the button to become visible before clicking, or timeout while waiting:
+
+  ```py
+  # async
+  
+  await page.click("button")
+  ```
+
+  ```py
+  # sync
+  
+  page.click("button")
+  ```
+
 * This will find a second button, because it is visible, and then click it.
+
+  ```py
+  # async
+  
+  await page.click("button:visible")
+  ```
+
+  ```py
+  # sync
+  
+  page.click("button:visible")
+  ```
 
 Use `:visible` with caution, because it has two major drawbacks:
 * When elements change their visibility dynamically, `:visible` will give upredictable results based on the timing.
@@ -166,17 +329,71 @@ The `:text` pseudo-class matches elements that have a text node child with speci
 * `:text-matches("[+-]?\\d+")` - Matches text against a regular expression. Note that special characters like back-slash `\`, quotes `"`, square brackets `[]` and more should be escaped. Learn more about [regular expressions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp).
 * `:text-matches("value", "i")` - Matches text against a regular expression with specified flags.
 
+```py
+# async
+
+# Click a button with text "Sign in".
+await page.click('button:text("Sign in")')
+```
+
+```py
+# sync
+
+# Click a button with text "Sign in".
+page.click('button:text("Sign in")')
+```
+
 ### CSS extension: has
 
 The `:has()` pseudo-class is an [experimental CSS pseudo-class](https://developer.mozilla.org/en-US/docs/Web/CSS/:has) that is supported by Playwright.
+
+```py
+# async
+
+# Returns text content of an <article> element that has a <div class=promo> inside.
+await page.textContent("article:has(div.promo)")
+```
+
+```py
+# sync
+
+# Returns text content of an <article> element that has a <div class=promo> inside.
+page.textContent("article:has(div.promo)")
+```
 
 ### CSS extension: is
 
 The `:is()` pseudo-class is an [experimental CSS pseudo-class](https://developer.mozilla.org/en-US/docs/Web/CSS/:is) that is supported by Playwright.
 
+```py
+# async
+
+# Clicks a <button> that has either a "Log in" or "Sign in" text.
+await page.click('button:is(:text("Log in"), :text("Sign in"))')
+```
+
+```py
+# sync
+
+# Clicks a <button> that has either a "Log in" or "Sign in" text.
+page.click('button:is(:text("Log in"), :text("Sign in"))')
+```
+
 ### CSS extension: light
 
 `css` engine [pierces shadow](#shadow-piercing) by default. It is possible to disable this behavior by wrapping a selector in `:light` pseudo-class: `:light(section > button.class)` matches in light DOM only.
+
+```py
+# async
+
+await page.click(":light(.article > .header)")
+```
+
+```py
+# sync
+
+page.click(":light(.article > .header)")
+```
 
 ### CSS extension: position
 
@@ -190,6 +407,26 @@ Position selectors use [bounding client rect](https://developer.mozilla.org/en-U
 * `:above(inner > selector)` - Matches elements that are above any of the elements matching the inner selector.
 * `:below(inner > selector)` - Matches elements that are below any of the elements matching the inner selector.
 * `:near(inner > selector)` - Matches elements that are near (within 50 CSS pixels) any of the elements matching the inner selector.
+
+```py
+# async
+
+# Fill an input to the right of "Username".
+await page.fill('input:right-of(:text("Username"))')
+
+# Click a button near the promo card.
+await page.click('button:near(.promo-card)')
+```
+
+```py
+# sync
+
+# Fill an input to the right of "Username".
+page.fill('input:right-of(:text("Username"))')
+
+# Click a button near the promo card.
+page.click('button:near(.promo-card)')
+```
 
 ## Xpath selector engine
 
@@ -261,6 +498,7 @@ Attribute engines are selecting based on the corresponding attribute value. For 
 [bool]: https://docs.python.org/3/library/stdtypes.html "bool"
 [Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
 [EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
 [Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
 [float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"

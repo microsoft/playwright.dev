@@ -455,22 +455,22 @@ Triggers a `change` and `input` event once all the provided options have been se
 # async
 
 # single selection matching the value
-await handle.select_option("select#colors", "blue")
+await handle.select_option("blue")
 # single selection matching the label
-await handle.select_option("select#colors", label="blue")
+await handle.select_option(label="blue")
 # multiple selection
-await handle.select_option("select#colors", value=["red", "green", "blue"])
+await handle.select_option(value=["red", "green", "blue"])
 ```
 
 ```py
 # sync
 
 # single selection matching the value
-handle.select_option("select#colors", "blue")
+handle.select_option("blue")
 # single selection matching both the label
-handle.select_option("select#colors", label="blue")
+handle.select_option(label="blue")
 # multiple selection
-handle.select_option("select#colors", value=["red", "green", "blue"])
+handle.select_option(value=["red", "green", "blue"])
 ```
 
 ```py
@@ -685,6 +685,7 @@ This method does not work across navigations, use [page.wait_for_selector(select
 [bool]: https://docs.python.org/3/library/stdtypes.html "bool"
 [Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
 [EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
 [Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
 [float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"

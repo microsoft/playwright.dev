@@ -450,7 +450,7 @@ This resolves when the page navigates to a new URL or reloads. It is useful for 
 # async
 
 async with frame.expect_navigation():
-    await frame.click("a.delayed-navigation") # Clicking the link will indirectly cause a navigation  
+    await frame.click("a.delayed-navigation") # Clicking the link will indirectly cause a navigation
 # Context manager waited for the navigation to happen.
 ```
 
@@ -458,7 +458,7 @@ async with frame.expect_navigation():
 # sync
 
 with frame.expect_navigation():
-    frame.click("a.delayed-navigation") # Clicking the link will indirectly cause a navigation  
+    frame.click("a.delayed-navigation") # Clicking the link will indirectly cause a navigation
 # Context manager waited for the navigation to happen.
 ```
 
@@ -840,7 +840,7 @@ async def run(playwright):
     webkit = playwright.webkit
     browser = await webkit.launch()
     page = await browser.new_page()
-    watch_dog = page.main_frame.wait_for_function("() => window.innerWidth < 100")
+    watch_dog = asyncio.create_task(page.main_frame.wait_for_function("() => window.innerWidth < 100")
     await page.set_viewport_size({"width": 50, "height": 50})
     await watch_dog
     await browser.close()
@@ -849,24 +849,6 @@ async def main():
     async with async_playwright() as playwright:
         await run(playwright)
 asyncio.run(main())
-```
-
-```py
-# sync
-
-from playwright.sync_api import sync_playwright
-
-def run(playwright):
-    webkit = playwright.webkit
-    browser = await webkit.launch()
-    page = await browser.new_page()
-    watch_dog = page.main_frame.wait_for_function("() => window.innerWidth < 100")
-    await page.set_viewport_size({"width": 50, "height": 50})
-    await watch_dog
-    await browser.close()
-
-with sync_playwright() as playwright:
-    run(playwright)
 ```
 
 To pass an argument to the predicate of `frame.waitForFunction` function:
@@ -1048,6 +1030,7 @@ Note that `frame.waitForTimeout()` should only be used for debugging. Tests usin
 [bool]: https://docs.python.org/3/library/stdtypes.html "bool"
 [Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
 [EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
 [Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
 [float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"

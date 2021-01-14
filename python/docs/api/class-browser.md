@@ -3,7 +3,7 @@ id: class-browser
 title: "Browser"
 ---
 
-* extends: [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter)
+* extends: [EventEmitter]
 
 A Browser is created via [browser_type.launch(**options)](./api/class-browsertype.md#browser_typelaunchoptions). An example of using a [Browser] to create a [Page]:
 
@@ -153,23 +153,23 @@ Creates a new browser context. It won't share cookies/cache with other browser c
 ```py
 # async
 
-    browser = await playwright.firefox.launch() # or "chromium" or "webkit".
-    # create a new incognito browser context.
-    context = await browser.new_context()
-    # create a new page in a pristine context.
-    page = await context.new_page()
-    await page.goto("https://example.com")
+browser = await playwright.firefox.launch() # or "chromium" or "webkit".
+# create a new incognito browser context.
+context = await browser.new_context()
+# create a new page in a pristine context.
+page = await context.new_page()
+await page.goto("https://example.com")
 ```
 
 ```py
 # sync
 
-    browser = playwright.firefox.launch() # or "chromium" or "webkit".
-    # create a new incognito browser context.
-    context = browser.new_context()
-    # create a new page in a pristine context.
-    page = context.new_page()
-    page.goto("https://example.com")
+browser = playwright.firefox.launch() # or "chromium" or "webkit".
+# create a new incognito browser context.
+context = browser.new_context()
+# create a new page in a pristine context.
+page = context.new_page()
+page.goto("https://example.com")
 ```
 
 ## browser.new_page(**options)
@@ -277,6 +277,7 @@ Returns the browser version.
 [bool]: https://docs.python.org/3/library/stdtypes.html "bool"
 [Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
 [EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
 [Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
 [float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
