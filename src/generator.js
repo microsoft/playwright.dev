@@ -47,6 +47,8 @@ class Generator {
   constructor(lang, outDir, config) {
     this.lang = lang;
     this.outDir = outDir;
+    this.sourceFiles = [];
+    listFiles(DIR_SRC, DIR_SRC, this.sourceFiles);
     this.config = config;
     this.documentation = parseApi(path.join(DIR_SRC, 'api'));
     this.documentation.filterForLanguage(lang);
@@ -75,10 +77,13 @@ class Generator {
       this.generateClassDoc(clazz);
 
     for (const name of fs.readdirSync(path.join(DIR_SRC))) {
-      if (name.startsWith('links.md') || name === 'api')
+      if (name.startsWith('links') || name === 'api')
         continue;
       this.generateDoc(name);
     }
+  }
+
+  collectLinks() {
   }
 
   /**
@@ -133,7 +138,17 @@ title: "${clazz.name}"
       result.push(memberNode);
     }
     fs.mkdirSync(path.join(this.outDir, 'api'), { recursive: true });
-    fs.writeFileSync(path.join(this.outDir, 'api', `class-${clazz.name.toLowerCase()}.md`), [md.render(result), this.generatedLinksSuffix].join('\n'));
+    const output = [md.render(result), this.generatedLinksSuffix].join('\n');
+    fs.writeFileSync(path.join(this.outDir, 'api', `class-${clazz.name.toLowerCase()}.mdx`), this.mdxLinks(output));
+  }
+
+  /**
+   * @param {string} text
+   */
+  mdxLinks(text) {
+    for (const name of this.sourceFiles)
+      text = text.replace(new RegExp('\\' + name, 'g'), name + 'x');
+    return text;
   }
 
   /**
@@ -185,7 +200,8 @@ title: "${clazz.name}"
         node.children = this.formatComment(node.children);
     });
     fs.mkdirSync(this.outDir, { recursive: true });
-    fs.writeFileSync(path.join(this.outDir, name), [md.render(nodes), this.generatedLinksSuffix].join('\n'));
+    const output = [md.render(nodes), this.generatedLinksSuffix].join('\n');
+    fs.writeFileSync(path.join(this.outDir, name + 'x'), this.mdxLinks(output));
   }
 
   /**
@@ -430,4 +446,21 @@ function highlighterName(lang) {
   if (lang === 'python')
     return 'py';
   return lang;
+}
+
+/**
+ * @param {string} dir
+ * @param {string} base
+ * @param {string[]} result
+ */
+function listFiles(dir, base, result) {
+  for (const name of fs.readdirSync(dir)) {
+    const f = path.join(dir, name);
+    if (fs.lstatSync(f).isDirectory()) {
+      listFiles(f, base, result);
+    } else {
+      if (name.endsWith('.md'))
+        result.push('./' + path.relative(base, f));
+    }
+  }
 }
