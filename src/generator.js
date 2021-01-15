@@ -142,17 +142,30 @@ title: "${clazz.name}"
    */
   formatComment(spec) {
     return (spec || []).filter(c => {
+      // No lang or common lang - Ok.
       if (!c.codeLang || commonSnippets.has(c.codeLang))
         return true;
+
+      // Our lang - Ok.
       if (c.codeLang === this.lang) {
         c.codeLang = highlighterName(this.lang);
         return true;
       }
-      if (!c.codeLang.startsWith(this.lang + ' '))
-        return false;
-      c.lines.unshift('# ' + c.codeLang.substring(this.lang.length + 1), '');
-      c.codeLang = highlighterName(this.lang);
-      return true;
+
+      // '* browser' - always Ok
+      // 'sh python' - Ok for Python.
+      const tokens = c.codeLang.split(' ');
+      if (tokens[1] === 'browser' || tokens[1] === this.lang) {
+        c.codeLang = highlighterName(tokens[0]);
+        return true;
+      }
+      // python * - Ok for Python
+      if (tokens[0] === this.lang) {
+        c.lines.unshift('# ' + tokens[1], '');
+        c.codeLang = highlighterName(this.lang);
+        return true;
+      }
+      return false;
     });
   }
 

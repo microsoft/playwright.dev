@@ -14,7 +14,7 @@ You can use our [Pytest integration](https://github.com/microsoft/playwright-pyt
 ## Usage
 
 ```sh
-pip install pytest-playwright
+$ pip install pytest-playwright
 ```
 
 Use the `page` fixture to write a basic test. See [more examples](#examples).
@@ -30,16 +30,16 @@ To run your tests, use pytest CLI.
 
 ```sh
 # Run tests (Chromium and headless by default)
-pytest
+$ pytest
 
 # Run tests in headful mode
-pytest --headful
+$ pytest --headful
 
 # Run tests in a different browser (chromium, firefox, webkit)
-pytest --browser firefox
+$ pytest --browser firefox
 
 # Run tests in multiple browsers
-pytest --browser chromium --browser webkit
+$ pytest --browser chromium --browser webkit
 ```
 
 If you want to add the CLI arguments automatically without specifying them, you can use the [pytest.ini](https://docs.pytest.org/en/stable/reference.html#ini-options-ref) file:
@@ -106,7 +106,7 @@ def test_visit_example(page):
 Start Pytest with the `base-url` argument.
 
 ```sh
-pytest --base-url http://localhost:8080
+$ pytest --base-url http://localhost:8080
 ```
 
 ```py

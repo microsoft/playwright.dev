@@ -136,6 +136,11 @@ The script is evaluated after the document was created but before any of its scr
 
 An example of overriding `Math.random` before the page loads:
 
+```js
+// preload.js
+Math.random = () => 42;
+```
+
 ```py
 # async
 

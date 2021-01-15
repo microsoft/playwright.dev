@@ -78,11 +78,11 @@ Set the `PWDEBUG` environment variable to run your scripts in debug mode. This c
 
 ```sh
 # Linux/macOS
-$ PWDEBUG=1 npm run test
+$ PWDEBUG=1 pytest -s
 
 # Windows
 $ set PWDEBUG=1
-$ npm run test
+$ pytest -s
 ```
 
 ### Defaults
@@ -117,11 +117,11 @@ Playwright supports verbose logging with the `DEBUG` environment variable.
 
 ```sh
 # Linux/macOS
-$ DEBUG=pw:api npm run test
+$ DEBUG=pw:api pytest -s
 
 # Windows
 $ set DEBUG=pw:api
-$ npm run test
+$ pytest -s
 ```
 
 

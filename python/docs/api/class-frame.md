@@ -440,7 +440,7 @@ result_handle.dispose()
   * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
   * `'load'` - consider operation to be finished when the `load` event is fired.
   * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
-- returns: <[EventContextManager]>
+- returns: <[EventContextManager[Response]]>
 
 Performs action and waits for the next navigation. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
 

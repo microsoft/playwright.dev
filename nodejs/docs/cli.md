@@ -63,12 +63,12 @@ With `open`, you can use Playwright bundled browsers to browse web pages. Playwr
 
 ```sh
 # Open page in Chromium
-npx playwright open example.com
+$ npx playwright open example.com
 ```
 
 ```sh
 # Open page in WebKit
-npx playwright wk example.com
+$ npx playwright wk example.com
 ```
 
 ### Emulate devices
@@ -77,14 +77,14 @@ npx playwright wk example.com
 
 ```sh
 # Emulate iPhone 11.
-npx playwright --device="iPhone 11" open wikipedia.org
+$ npx playwright --device="iPhone 11" open wikipedia.org
 ```
 
 ### Emulate color scheme and viewport size
 
 ```sh
 # Emulate screen size and color scheme.
-npx playwright --viewport-size=800,600 --color-scheme=dark open twitter.com
+$ npx playwright --viewport-size=800,600 --color-scheme=dark open twitter.com
 ```
 
 ### Emulate geolocation, language and timezone
@@ -92,7 +92,7 @@ npx playwright --viewport-size=800,600 --color-scheme=dark open twitter.com
 ```sh
 # Emulate timezone, language & location
 # Once page opens, click the "my location" button to see geolocation in action
-npx playwright --timezone="Europe/Rome" --geolocation="41.890221,12.492348" --lang="it-IT" open maps.google.com
+$ npx playwright --timezone="Europe/Rome" --geolocation="41.890221,12.492348" --lang="it-IT" open maps.google.com
 ```
 
 ## Inspect selectors
@@ -148,7 +148,7 @@ $ npx playwright screenshot --help
 
 ```sh
 # Wait 3 seconds before capturing a screenshot after page loads ('load' event fires)
-npx playwright \
+$ npx playwright \
   --device="iPhone 11" \
   --color-scheme=dark \
   screenshot \
@@ -158,7 +158,7 @@ npx playwright \
 
 ```sh
 # Capture a full page screenshot
-npx playwright screenshot --full-page en.wikipedia.org wiki-full.png
+$ npx playwright screenshot --full-page en.wikipedia.org wiki-full.png
 ```
 
 ## Generate PDF
