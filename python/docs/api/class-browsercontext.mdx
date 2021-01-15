@@ -275,12 +275,12 @@ The default browser context cannot be closed.
 If no URLs are specified, this method returns all cookies. If URLs are specified, only cookies that affect those URLs are returned.
 
 ## browser_context.expect_event(event, **options)
-- `event` <[str]> Event name, same one typically passed into `*.on(event)`.
+- `event` <[str]> Event name, same one would pass into `browserContext.on(event)`.
 - `predicate` <[Callable]> Receives the event data and resolves to truthy value when the waiting should resolve.
 - `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout).
 - returns: <[EventContextManager]>
 
-Performs action and waits for given `event` to fire. If predicate is provided, it passes event's value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if browser context is closed before the `event` is fired.
+Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the context closes before the event is fired. Returns the event data value.
 
 <Tabs
   groupId="python-flavor"
@@ -294,7 +294,7 @@ Performs action and waits for given `event` to fire. If predicate is provided, i
 
 ```py
 with context.expect_event("page") as event_info:
-    context.click("button")
+    page.click("button")
 page = event_info.value
 ```
 
@@ -303,7 +303,7 @@ page = event_info.value
 
 ```py
 async with context.expect_event("page") as event_info:
-    await context.click("button")
+    await page.click("button")
 page = await event_info.value
 ```
 
@@ -624,7 +624,7 @@ or the same snippet using a regex pattern instead:
 ```py
 context = browser.new_context()
 page = context.new_page()
-context.route(r"(\.png$)|(\.jpg$)", lambda route: route.abort())
+context.route(re.compile(r"(\.png$)|(\.jpg$)"), lambda route: route.abort())
 page = await context.new_page()
 page = context.new_page()
 page.goto("https://example.com")
@@ -637,7 +637,7 @@ browser.close()
 ```py
 context = await browser.new_context()
 page = await context.new_page()
-await context.route(r"(\.png$)|(\.jpg$)", lambda route: route.abort())
+await context.route(re.compile(r"(\.png$)|(\.jpg$)"), lambda route: route.abort())
 page = await context.new_page()
 await page.goto("https://example.com")
 await browser.close()
@@ -661,7 +661,7 @@ This setting will change the default maximum navigation time for the following m
 * [page.goto(url, **options)](./api/class-page.mdx#pagegotourl-options)
 * [page.reload(**options)](./api/class-page.mdx#pagereloadoptions)
 * [page.set_content(html, **options)](./api/class-page.mdx#pageset_contenthtml-options)
-* [page.wait_for_navigation(**options)](./api/class-page.mdx#pagewait_for_navigationoptions)
+* [page.expect_navigation(**options)](./api/class-page.mdx#pageexpect_navigationoptions)
 
 :::note
 [page.set_default_navigation_timeout(timeout)](./api/class-page.mdx#pageset_default_navigation_timeouttimeout) and [page.set_default_timeout(timeout)](./api/class-page.mdx#pageset_default_timeouttimeout) take priority over [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_navigation_timeouttimeout).
@@ -751,38 +751,16 @@ Returns storage state for this browser context, contains current cookies and loc
 Removes a route created with [browser_context.route(url, handler)](./api/class-browsercontext.mdx#browser_contextrouteurl-handler). When `handler` is not specified, removes all routes for the `url`.
 
 ## browser_context.wait_for_event(event, **options)
-- `event` <[str]> Event name, same one would pass into `browserContext.on(event)`.
+- `event` <[str]> Event name, same one typically passed into `*.on(event)`.
 - `predicate` <[Callable]> Receives the event data and resolves to truthy value when the waiting should resolve.
 - `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout).
 - returns: <[Any]>
 
-Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the context closes before the event is fired. Returns the event data value.
+:::note
+In most cases, you should use [browser_context.expect_event(event, **options)](./api/class-browsercontext.mdx#browser_contextexpect_eventevent-options).
+:::
 
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-context = browser.new_context()
-context.grant_permissions(["geolocation"])
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-context = await browser.new_context()
-await context.grant_permissions(["geolocation"])
-```
-
-</TabItem>
-</Tabs>
+Waits for given `event` to fire. If predicate is provided, it passes event's value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the socket is closed before the `event` is fired.
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Browser]: ./api/class-browser.mdx "Browser"
