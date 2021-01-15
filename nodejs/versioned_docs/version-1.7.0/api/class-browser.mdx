@@ -1,0 +1,281 @@
+---
+id: class-browser
+title: "Browser"
+---
+
+* extends: [EventEmitter](https://nodejs.org/api/events.html#events_class_eventemitter)
+
+A Browser is created when Playwright connects to a browser instance, either through [browserType.launch([options])](api/class-browsertype.mdx#browsertypelaunchoptions) or
+[browserType.connect(params)](api/class-browsertype.mdx#browsertypeconnectparams).
+
+An example of using a [Browser] to create a [Page]:
+
+```js
+const { firefox } = require('playwright');  // Or 'chromium' or 'webkit'.
+
+(async () => {
+  const browser = await firefox.launch();
+  const page = await browser.newPage();
+  await page.goto('https://example.com');
+  await browser.close();
+})();
+```
+
+See [ChromiumBrowser], [FirefoxBrowser] and [WebKitBrowser] for browser-specific features. Note that
+[browserType.connect(params)](#browsertypeconnectparams) and [browserType.launch([options])](#browsertypelaunchoptions) always return a specific browser instance, based on the browser
+being connected to or launched.
+
+<!-- GEN:toc -->
+- [browser.on('disconnected')](api/class-browser.mdx#browserondisconnected)
+- [browser.close()](api/class-browser.mdx#browserclose)
+- [browser.contexts()](api/class-browser.mdx#browsercontexts)
+- [browser.isConnected()](api/class-browser.mdx#browserisconnected)
+- [browser.newContext([options])](api/class-browser.mdx#browsernewcontextoptions)
+- [browser.newPage([options])](api/class-browser.mdx#browsernewpageoptions)
+- [browser.version()](api/class-browser.mdx#browserversion)
+<!-- GEN:stop -->
+
+## browser.on('disconnected')
+
+Emitted when Browser gets disconnected from the browser application. This might happen because of one of the following:
+* Browser application is closed or crashed.
+* The [browser.close()](#browserclose) method was called.
+
+## browser.close()
+- returns: <[Promise]>
+
+In case this browser is obtained using [browserType.launch([options])](#browsertypelaunchoptions), closes the browser and all of its pages (if any were
+opened).
+
+In case this browser is obtained using [browserType.connect(params)](#browsertypeconnectparams), clears all created contexts belonging to this browser
+and disconnects from the browser server.
+
+The [Browser] object itself is considered to be disposed and cannot be used anymore.
+
+## browser.contexts()
+- returns: <[Array]<[BrowserContext]>>
+
+Returns an array of all open browser contexts. In a newly created browser, this will return zero browser contexts.
+
+```js
+const browser = await pw.webkit.launch();
+console.log(browser.contexts().length); // prints `0`
+
+const context = await browser.newContext();
+console.log(browser.contexts().length); // prints `1`
+```
+
+## browser.isConnected()
+- returns: <[boolean]>
+
+Indicates that the browser is connected.
+
+## browser.newContext([options])
+- `options` <[Object]>
+  - `acceptDownloads` <[boolean]> Whether to automatically download all the attachments. Defaults to `false` where all the downloads are canceled.
+  - `ignoreHTTPSErrors` <[boolean]> Whether to ignore HTTPS errors during navigation. Defaults to `false`.
+  - `bypassCSP` <[boolean]> Toggles bypassing page's Content-Security-Policy.
+  - `viewport` <[null]|[Object]> Sets a consistent viewport for each page. Defaults to an 1280x720 viewport. `null` disables the default viewport.
+    - `width` <[number]> page width in pixels.
+    - `height` <[number]> page height in pixels.
+  - `userAgent` <[string]> Specific user agent to use in this context.
+  - `deviceScaleFactor` <[number]> Specify device scale factor (can be thought of as dpr). Defaults to `1`.
+  - `isMobile` <[boolean]> Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.
+  - `hasTouch` <[boolean]> Specifies if viewport supports touch events. Defaults to false.
+  - `javaScriptEnabled` <[boolean]> Whether or not to enable JavaScript in the context. Defaults to `true`.
+  - `timezoneId` <[string]> Changes the timezone of the context. See [ICU’s `metaZones.txt`](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.
+  - `geolocation` <[Object]>
+    - `latitude` <[number]> Latitude between -90 and 90.
+    - `longitude` <[number]> Longitude between -180 and 180.
+    - `accuracy` <[number]> Non-negative accuracy value. Defaults to `0`.
+  - `locale` <[string]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
+  - `permissions` <[Array]<[string]>> A list of permissions to grant to all pages in this context. See [browserContext.grantPermissions(permissions[, options])](api/class-browsercontext.mdx#browsercontextgrantpermissionspermissions-options) for more details.
+  - `extraHTTPHeaders` <[Object]<[string], [string]>> An object containing additional HTTP headers to be sent with every request. All header values must be strings.
+  - `offline` <[boolean]> Whether to emulate network being offline. Defaults to `false`.
+  - `httpCredentials` <[Object]> Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).
+    - `username` <[string]>
+    - `password` <[string]>
+  - `colorScheme` <"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [page.emulateMedia(params)](api/class-page.mdx#pageemulatemediaparams) for more details. Defaults to '`light`'.
+  - `logger` <[Logger]> Logger sink for Playwright logging.
+  - `videosPath` <[string]> **NOTE** Use `recordVideo` instead, it takes precedence over `videosPath`. Enables video recording for all pages to `videosPath` directory. If not specified, videos are not recorded. Make sure to await [browserContext.close()](api/class-browsercontext.mdx#browsercontextclose) for videos to be saved.
+  - `videoSize` <[Object]> **NOTE** Use `recordVideo` instead, it takes precedence over `videoSize`. Specifies dimensions of the automatically recorded video. Can only be used if `videosPath` is set. If not specified the size will be equal to `viewport`. If `viewport` is not configured explicitly the video size defaults to 1280x720. Actual picture of the page will be scaled down if necessary to fit specified size.
+    - `width` <[number]> Video frame width.
+    - `height` <[number]> Video frame height.
+  - `recordHar` <[Object]> Enables [HAR](http://www.softwareishard.com/blog/har-12-spec) recording for all pages into `recordHar.path` file. If not specified, the HAR is not recorded. Make sure to await [browserContext.close()](#browsercontextclose) for the HAR to be saved.
+    - `omitContent` <[boolean]> Optional setting to control whether to omit request content from the HAR. Defaults to `false`.
+    - `path` <[string]> Path on the filesystem to write the HAR file to.
+  - `recordVideo` <[Object]> Enables video recording for all pages into `recordVideo.dir` directory. If not specified videos are not recorded. Make sure to await [browserContext.close()](#browsercontextclose) for videos to be saved.
+    - `dir` <[string]> Path to the directory to put videos into.
+    - `size` <[Object]> Optional dimensions of the recorded videos. If not specified the size will be equal to `viewport`. If `viewport` is not configured explicitly the video size defaults to 1280x720. Actual picture of each page will be scaled down if necessary to fit the specified size.
+      - `width` <[number]> Video frame width.
+      - `height` <[number]> Video frame height.
+  - `proxy` <[Object]> Network proxy settings to use with this context. Note that browser needs to be launched with the global proxy for this option to work. If all contexts override the proxy, global proxy will be never used and can be any string, for example `launch({ proxy: { server: 'per-context' } })`.
+    - `server` <[string]> Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
+    - `bypass` <[string]> Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
+    - `username` <[string]> Optional username to use if HTTP proxy requires authentication.
+    - `password` <[string]> Optional password to use if HTTP proxy requires authentication.
+  - `storageState` <[string]|[Object]> Populates context with given storage state. This method can be used to initialize context with logged-in information obtained via [browserContext.storageState([options])](api/class-browsercontext.mdx#browsercontextstoragestateoptions). Either a path to the file with saved storage, or an object with the following fields:
+    - `cookies` <[Array]<[Object]>> Optional cookies to set for context
+      - `name` <[string]> **required**
+      - `value` <[string]> **required**
+      - `url` <[string]> Optional either url or domain / path are required
+      - `domain` <[string]> Optional either url or domain / path are required
+      - `path` <[string]> Optional either url or domain / path are required
+      - `expires` <[number]> Optional Unix time in seconds.
+      - `httpOnly` <[boolean]> Optional httpOnly flag
+      - `secure` <[boolean]> Optional secure flag
+      - `sameSite` <"Strict"|"Lax"|"None"> Optional sameSite flag
+    - `origins` <[Array]<[Object]>> Optional localStorage to set for context
+      - `origin` <[string]>
+      - `localStorage` <[Array]<[Object]>>
+        - `name` <[string]>
+        - `value` <[string]>
+- returns: <[Promise]<[BrowserContext]>>
+
+Creates a new browser context. It won't share cookies/cache with other browser contexts.
+
+```js
+(async () => {
+  const browser = await playwright.firefox.launch();  // Or 'chromium' or 'webkit'.
+  // Create a new incognito browser context.
+  const context = await browser.newContext();
+  // Create a new page in a pristine context.
+  const page = await context.newPage();
+  await page.goto('https://example.com');
+})();
+```
+
+## browser.newPage([options])
+- `options` <[Object]>
+  - `acceptDownloads` <[boolean]> Whether to automatically download all the attachments. Defaults to `false` where all the downloads are canceled.
+  - `ignoreHTTPSErrors` <[boolean]> Whether to ignore HTTPS errors during navigation. Defaults to `false`.
+  - `bypassCSP` <[boolean]> Toggles bypassing page's Content-Security-Policy.
+  - `viewport` <[null]|[Object]> Sets a consistent viewport for each page. Defaults to an 1280x720 viewport. `null` disables the default viewport.
+    - `width` <[number]> page width in pixels.
+    - `height` <[number]> page height in pixels.
+  - `userAgent` <[string]> Specific user agent to use in this context.
+  - `deviceScaleFactor` <[number]> Specify device scale factor (can be thought of as dpr). Defaults to `1`.
+  - `isMobile` <[boolean]> Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.
+  - `hasTouch` <[boolean]> Specifies if viewport supports touch events. Defaults to false.
+  - `javaScriptEnabled` <[boolean]> Whether or not to enable JavaScript in the context. Defaults to `true`.
+  - `timezoneId` <[string]> Changes the timezone of the context. See [ICU’s `metaZones.txt`](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.
+  - `geolocation` <[Object]>
+    - `latitude` <[number]> Latitude between -90 and 90.
+    - `longitude` <[number]> Longitude between -180 and 180.
+    - `accuracy` <[number]> Non-negative accuracy value. Defaults to `0`.
+  - `locale` <[string]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
+  - `permissions` <[Array]<[string]>> A list of permissions to grant to all pages in this context. See [browserContext.grantPermissions(permissions[, options])](#browsercontextgrantpermissionspermissions-options) for more details.
+  - `extraHTTPHeaders` <[Object]<[string], [string]>> An object containing additional HTTP headers to be sent with every request. All header values must be strings.
+  - `offline` <[boolean]> Whether to emulate network being offline. Defaults to `false`.
+  - `httpCredentials` <[Object]> Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).
+    - `username` <[string]>
+    - `password` <[string]>
+  - `colorScheme` <"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [page.emulateMedia(params)](#pageemulatemediaparams) for more details. Defaults to '`light`'.
+  - `logger` <[Logger]> Logger sink for Playwright logging.
+  - `videosPath` <[string]> **NOTE** Use `recordVideo` instead, it takes precedence over `videosPath`. Enables video recording for all pages to `videosPath` directory. If not specified, videos are not recorded. Make sure to await [browserContext.close()](#browsercontextclose) for videos to be saved.
+  - `videoSize` <[Object]> **NOTE** Use `recordVideo` instead, it takes precedence over `videoSize`. Specifies dimensions of the automatically recorded video. Can only be used if `videosPath` is set. If not specified the size will be equal to `viewport`. If `viewport` is not configured explicitly the video size defaults to 1280x720. Actual picture of the page will be scaled down if necessary to fit specified size.
+    - `width` <[number]> Video frame width.
+    - `height` <[number]> Video frame height.
+  - `recordHar` <[Object]> Enables [HAR](http://www.softwareishard.com/blog/har-12-spec) recording for all pages into `recordHar.path` file. If not specified, the HAR is not recorded. Make sure to await [browserContext.close()](#browsercontextclose) for the HAR to be saved.
+    - `omitContent` <[boolean]> Optional setting to control whether to omit request content from the HAR. Defaults to `false`.
+    - `path` <[string]> Path on the filesystem to write the HAR file to.
+  - `recordVideo` <[Object]> Enables video recording for all pages into `recordVideo.dir` directory. If not specified videos are not recorded. Make sure to await [browserContext.close()](#browsercontextclose) for videos to be saved.
+    - `dir` <[string]> Path to the directory to put videos into.
+    - `size` <[Object]> Optional dimensions of the recorded videos. If not specified the size will be equal to `viewport`. If `viewport` is not configured explicitly the video size defaults to 1280x720. Actual picture of each page will be scaled down if necessary to fit the specified size.
+      - `width` <[number]> Video frame width.
+      - `height` <[number]> Video frame height.
+  - `proxy` <[Object]> Network proxy settings to use with this context. Note that browser needs to be launched with the global proxy for this option to work. If all contexts override the proxy, global proxy will be never used and can be any string, for example `launch({ proxy: { server: 'per-context' } })`.
+    - `server` <[string]> Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
+    - `bypass` <[string]> Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
+    - `username` <[string]> Optional username to use if HTTP proxy requires authentication.
+    - `password` <[string]> Optional password to use if HTTP proxy requires authentication.
+  - `storageState` <[string]|[Object]> Populates context with given storage state. This method can be used to initialize context with logged-in information obtained via [browserContext.storageState([options])](#browsercontextstoragestateoptions). Either a path to the file with saved storage, or an object with the following fields:
+    - `cookies` <[Array]<[Object]>> Optional cookies to set for context
+      - `name` <[string]> **required**
+      - `value` <[string]> **required**
+      - `url` <[string]> Optional either url or domain / path are required
+      - `domain` <[string]> Optional either url or domain / path are required
+      - `path` <[string]> Optional either url or domain / path are required
+      - `expires` <[number]> Optional Unix time in seconds.
+      - `httpOnly` <[boolean]> Optional httpOnly flag
+      - `secure` <[boolean]> Optional secure flag
+      - `sameSite` <"Strict"|"Lax"|"None"> Optional sameSite flag
+    - `origins` <[Array]<[Object]>> Optional localStorage to set for context
+      - `origin` <[string]>
+      - `localStorage` <[Array]<[Object]>>
+        - `name` <[string]>
+        - `value` <[string]>
+- returns: <[Promise]<[Page]>>
+
+Creates a new page in a new browser context. Closing this page will close the context as well.
+
+This is a convenience API that should only be used for the single-page scenarios and short snippets. Production code and
+testing frameworks should explicitly create [browser.newContext([options])](#browsernewcontextoptions) followed by the [browserContext.newPage()](api/class-browsercontext.mdx#browsercontextnewpage) to
+control their exact life times.
+
+## browser.version()
+- returns: <[string]>
+
+Returns the browser version.
+
+
+
+[AXNode]: api/class-accessibility.mdx#accessibilitysnapshotoptions "AXNode"
+[Accessibility]: api/class-accessibility.mdx#class-accessibility "Accessibility"
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[BrowserServer]: api/class-browser.mdx#class-browserserver  "BrowserServer"
+[BrowserContext]: api/class-browsercontext.mdx#class-browsercontext  "BrowserContext"
+[BrowserType]: api/class-browsertype.mdx#class-browsertype "BrowserType"
+[Browser]: api/class-browser.mdx  "Browser"
+[Buffer]: https://nodejs.org/api/buffer.htmlapi.mdx#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[ChromiumBrowser]: api/class-chromiumbrowser.mdx#class-chromiumbrowser "ChromiumBrowser"
+[ChromiumBrowserContext]: api/class-chromiumbrowsercontext.mdx#class-chromiumbrowsercontext "ChromiumBrowserContext"
+[ChromiumCoverage]: api/class-chromiumcoverage.mdx#class-chromiumcoverage "ChromiumCoverage"
+[CDPSession]: api/class-cdpsession.mdx#class-cdpsession  "CDPSession"
+[ConsoleMessage]: api/class-consolemessage.mdx#class-consolemessage "ConsoleMessage"
+[Dialog]: api/class-dialog.mdx#class-dialog "Dialog"
+[Download]: api/class-download.mdx#class-download "Download"
+[ElementHandle]: api/class-elementhandle.mdx#class-elementhandle "ElementHandle"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[Error]: https://nodejs.org/api/errors.htmlapi.mdx#errors_class_error "Error"
+[EvaluationArgument]: api/evaluationargument.mdx#evaluationargument "Evaluation Argument"
+[File]: https://developer.mozilla.org/en-US/docs/Web/API/File "File"
+[FileChooser]: api/class-filechooser.mdx#class-filechooser "FileChooser"
+[FirefoxBrowser]: api/class-firefoxbrowser.mdx#class-firefoxbrowser "FirefoxBrowser"
+[Frame]: api/class-frame.mdx#class-frame "Frame"
+[JSHandle]: api/class-jshandle.mdx#class-jshandle "JSHandle"
+[Keyboard]: api/class-keyboard.mdx#class-keyboard "Keyboard"
+[Logger]: api/class-logger.mdx#class-logger "Logger"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[Mouse]: api/class-mouse.mdx#class-mouse "Mouse"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Page]: api/class-page.mdx#class-page "Page"
+[Playwright]: api/class-playwright.mdx "Playwright"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp
+[Request]: api/class-request.mdx#class-request  "Request"
+[Response]: api/class-response.mdx#class-response  "Response"
+[Route]: api/class-route.mdx#class-route  "Route"
+[Selectors]: api/class-selectors.mdx#class-selectors  "Selectors"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringifyapi.mdx#Description "Serializable"
+[TimeoutError]: api/class-timeouterror.mdx#class-timeouterror "TimeoutError"
+[Touchscreen]: api/class-touchscreen.mdx#class-touchscreen "Touchscreen"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[URL]: https://nodejs.org/api/url.html
+[USKeyboardLayout]: ../src/usKeyboardLayout.ts "USKeyboardLayout"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[Video]: api/class-video.mdx#class-video "Video"
+[WebKitBrowser]: api/class-webkitbrowser.mdx#class-webkitbrowser "WebKitBrowser"
+[WebSocket]: api/class-websocket.mdx#class-websocket "WebSocket"
+[Worker]: api/class-worker.mdx#class-worker "Worker"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structuresapi.mdx#Boolean_type "Boolean"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structuresapi.mdx#Number_type "Number"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Readable]: https://nodejs.org/api/stream.htmlapi.mdx#stream_class_stream_readable "Readable"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structuresapi.mdx#String_type "String"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
