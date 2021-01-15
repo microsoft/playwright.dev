@@ -2,7 +2,8 @@
 id: class-keyboard
 title: "Keyboard"
 ---
-
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 Keyboard provides an api for managing a virtual keyboard. The high level api is [keyboard.type(text, **options)](./api/class-keyboard.mdx#keyboardtypetext-options), which takes raw characters and generates proper keydown, keypress/input, and keyup events on your page.
 
@@ -10,22 +11,17 @@ For finer control, you can use [keyboard.down(key)](./api/class-keyboard.mdx#key
 
 An example of holding down `Shift` in order to select and delete some text:
 
-```py
-# async
-
-await page.keyboard.type("Hello World!")
-await page.keyboard.press("ArrowLeft")
-await page.keyboard.down("Shift")
-for i in range(6):
-    await page.keyboard.press("ArrowLeft")
-await page.keyboard.up("Shift")
-await page.keyboard.press("Backspace")
-# result text will end up saying "Hello!"
-```
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
 ```py
-# sync
-
 page.keyboard.type("Hello World!")
 page.keyboard.press("ArrowLeft")
 page.keyboard.down("Shift")
@@ -36,43 +32,84 @@ page.keyboard.press("Backspace")
 # result text will end up saying "Hello!"
 ```
 
-An example of pressing uppercase `A`
+</TabItem>
+<TabItem value="async">
 
 ```py
-# async
-
-await page.keyboard.press("Shift+KeyA")
-# or
-await page.keyboard.press("Shift+A")
+await page.keyboard.type("Hello World!")
+await page.keyboard.press("ArrowLeft")
+await page.keyboard.down("Shift")
+for i in range(6):
+    await page.keyboard.press("ArrowLeft")
+await page.keyboard.up("Shift")
+await page.keyboard.press("Backspace")
+# result text will end up saying "Hello!"
 ```
 
-```py
-# sync
+</TabItem>
+</Tabs>
 
+An example of pressing uppercase `A`
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
 page.keyboard.press("Shift+KeyA")
 # or
 page.keyboard.press("Shift+A")
 ```
 
-An example to trigger select-all with the keyboard
+</TabItem>
+<TabItem value="async">
 
 ```py
-# async
+await page.keyboard.press("Shift+KeyA")
+# or
+await page.keyboard.press("Shift+A")
+```
 
+</TabItem>
+</Tabs>
+
+An example to trigger select-all with the keyboard
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# on windows and linux
+page.keyboard.press("Control+A")
+# on mac_os
+page.keyboard.press("Meta+A")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 # on windows and linux
 await page.keyboard.press("Control+A")
 # on mac_os
 await page.keyboard.press("Meta+A")
 ```
 
-```py
-# sync
-
-# on windows and linux
-page.keyboard.press("Control+A")
-# on mac_os
-page.keyboard.press("Meta+A")
-```
+</TabItem>
+</Tabs>
 
 
 - [keyboard.down(key)](./api/class-keyboard.mdx#keyboarddownkey)
@@ -109,17 +146,29 @@ Modifier keys DO influence `keyboard.down`. Holding down `Shift` will type the t
 
 Dispatches only `input` event, does not emit the `keydown`, `keyup` or `keypress` events.
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+page.keyboard.insert_text("嗨")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 await page.keyboard.insert_text("嗨")
 ```
 
-```py
-# sync
-
-page.keyboard.insert_text("嗨")
-```
+</TabItem>
+</Tabs>
 
 :::note
 Modifier keys DO NOT effect `keyboard.insertText`. Holding down `Shift` will not type the text in upper case.
@@ -141,23 +190,17 @@ If `key` is a single character, it is case-sensitive, so the values `a` and `A` 
 
 Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported as well. When speficied with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
 
-```py
-# async
-
-page = await browser.new_page()
-await page.goto("https://keycode.info")
-await page.keyboard.press("a")
-await page.screenshot(path="a.png")
-await page.keyboard.press("ArrowLeft")
-await page.screenshot(path="arrow_left.png")
-await page.keyboard.press("Shift+O")
-await page.screenshot(path="o.png")
-await browser.close()
-```
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
 ```py
-# sync
-
 page = browser.new_page()
 page.goto("https://keycode.info")
 page.keyboard.press("a")
@@ -169,6 +212,24 @@ page.screenshot(path="o.png")
 browser.close()
 ```
 
+</TabItem>
+<TabItem value="async">
+
+```py
+page = await browser.new_page()
+await page.goto("https://keycode.info")
+await page.keyboard.press("a")
+await page.screenshot(path="a.png")
+await page.keyboard.press("ArrowLeft")
+await page.screenshot(path="arrow_left.png")
+await page.keyboard.press("Shift+O")
+await page.screenshot(path="o.png")
+await browser.close()
+```
+
+</TabItem>
+</Tabs>
+
 Shortcut for [keyboard.down(key)](./api/class-keyboard.mdx#keyboarddownkey) and [keyboard.up(key)](./api/class-keyboard.mdx#keyboardupkey).
 
 ## keyboard.type(text, **options)
@@ -179,19 +240,31 @@ Sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in t
 
 To press a special key, like `Control` or `ArrowDown`, use [keyboard.press(key, **options)](./api/class-keyboard.mdx#keyboardpresskey-options).
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+page.keyboard.type("Hello") # types instantly
+page.keyboard.type("World", delay=100) # types slower, like a user
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 await page.keyboard.type("Hello") # types instantly
 await page.keyboard.type("World", delay=100) # types slower, like a user
 ```
 
-```py
-# sync
-
-page.keyboard.type("Hello") # types instantly
-page.keyboard.type("World", delay=100) # types slower, like a user
-```
+</TabItem>
+</Tabs>
 
 :::note
 Modifier keys DO NOT effect `keyboard.type`. Holding down `Shift` will not type the text in upper case.

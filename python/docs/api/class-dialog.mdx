@@ -2,15 +2,47 @@
 id: class-dialog
 title: "Dialog"
 ---
-
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 [Dialog] objects are dispatched by page via the [page.on("dialog")](./api/class-page.mdx#pageondialog) event.
 
 An example of using `Dialog` class:
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+# FIXME
+from playwright.sync_api import sync_playwright
+
+def handle_dialog(dialog):
+    print(dialog.message)
+    dialog.dismiss()
+
+def run(playwright):
+    chromium = playwright.chromium
+    browser = chromium.launch()
+    page = browser.new_page()
+    page.on("dialog", handle_dialog)
+    page.evaluate("alert('1')")
+    browser.close()
+
+with sync_playwright() as playwright:
+    run(playwright)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 import asyncio
 from playwright.async_api import async_playwright
 
@@ -32,27 +64,8 @@ async def main():
 asyncio.run(main())
 ```
 
-```py
-# sync
-
-# FIXME
-from playwright.sync_api import sync_playwright
-
-def handle_dialog(dialog):
-    print(dialog.message)
-    dialog.dismiss()
-
-def run(playwright):
-    chromium = playwright.chromium
-    browser = chromium.launch()
-    page = browser.new_page()
-    page.on("dialog", handle_dialog)
-    page.evaluate("alert('1')")
-    browser.close()
-
-with sync_playwright() as playwright:
-    run(playwright)
-```
+</TabItem>
+</Tabs>
 
 
 - [dialog.accept(**options)](./api/class-dialog.mdx#dialogacceptoptions)

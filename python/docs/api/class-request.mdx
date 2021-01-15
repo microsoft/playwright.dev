@@ -2,7 +2,8 @@
 id: class-request
 title: "Request"
 ---
-
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 Whenever the page sends a request for a network resource the following sequence of events are emitted by [Page]:
 * [page.on("request")](./api/class-page.mdx#pageonrequest) emitted when the request is issued by the page.
@@ -90,35 +91,59 @@ When the server responds with a redirect, Playwright creates a new [Request] obj
 
 For example, if the website `http://example.com` redirects to `https://example.com`:
 
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
 ```py
-# async
-
-response = await page.goto("http://example.com")
-print(response.request.redirected_from.url) # "http://example.com"
-```
-
-```py
-# sync
-
 response = page.goto("http://example.com")
 print(response.request.redirected_from.url) # "http://example.com"
 ```
 
-If the website `https://google.com` has no redirects:
+</TabItem>
+<TabItem value="async">
 
 ```py
-# async
+response = await page.goto("http://example.com")
+print(response.request.redirected_from.url) # "http://example.com"
+```
 
+</TabItem>
+</Tabs>
+
+If the website `https://google.com` has no redirects:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+response = page.goto("https://google.com")
+print(response.request.redirected_from) # None
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 response = await page.goto("https://google.com")
 print(response.request.redirected_from) # None
 ```
 
-```py
-# sync
-
-response = page.goto("https://google.com")
-print(response.request.redirected_from) # None
-```
+</TabItem>
+</Tabs>
 
 ## request.redirected_to
 - returns: <[NoneType]|[Request]>
@@ -155,23 +180,35 @@ Returns the matching [Response] object, or `null` if the response was not receiv
 
 Returns resource timing information for given request. Most of the timing values become available upon the response, `responseEnd` becomes available when request finishes. Find more information at [Resource Timing API](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceResourceTiming).
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+with page.expect_event("requestfinished") as request_info:
+    page.goto("http://example.com")
+request = request_info.value
+print(request.timing)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 async with page.expect_event("requestfinished") as request_info:
     await page.goto("http://example.com")
 request = await request_info.value
 print(request.timing)
 ```
 
-```py
-# sync
-
-with page.expect_event("requestfinished") as request_info:
-    page.goto("http://example.com")
-request = request_info.value
-print(request.timing)
-```
+</TabItem>
+</Tabs>
 
 ## request.url
 - returns: <[str]>

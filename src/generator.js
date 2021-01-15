@@ -98,8 +98,10 @@ class Generator {
 id: class-${clazz.name.toLowerCase()}
 title: "${clazz.name}"
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 `});
-    result.push(...this.formatComment(clazz.spec));
+    result.push(...this.formatComment(clazz.spec, 0));
     result.push({
       type: 'text',
       text: ''
@@ -134,7 +136,7 @@ title: "${clazz.name}"
       }
 
       // Append member doc
-      memberNode.children.push(...this.formatComment(member.spec));
+      memberNode.children.push(...this.formatComment(member.spec, 0));
       result.push(memberNode);
     }
     fs.mkdirSync(path.join(this.outDir, 'api'), { recursive: true });
@@ -156,7 +158,44 @@ title: "${clazz.name}"
    * @return {MarkdownNode[]}
    */
   formatComment(spec) {
-    return (spec || []).filter(c => {
+    if (this.lang === 'python') {
+      /** @type {MarkdownNode[]} */
+      const newSpec = [];
+      for (let i = 0; i < spec.length; ++i) {
+        if (spec[i].codeLang === 'python async') {
+          if (spec[i + 1].codeLang !== 'python sync') {
+            console.error(spec[i]);
+            throw new Error('Bad Python snippet pair');
+          }
+          spec[i].codeLang = 'py';
+          spec[i + 1].codeLang = 'py';
+          const text = `<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+${md.render([spec[i+1]])}
+</TabItem>
+<TabItem value="async">
+${md.render([spec[i]])}
+</TabItem>
+</Tabs>`;
+          newSpec.push({
+            type: 'text',
+            text
+          });
+          ++i;
+        } else {
+          newSpec.push(spec[i]);
+        }
+      }
+      spec = newSpec;
+    }
+    spec = spec.filter(c => {
       // No lang or common lang - Ok.
       if (!c.codeLang || commonSnippets.has(c.codeLang))
         return true;
@@ -182,6 +221,7 @@ title: "${clazz.name}"
       }
       return false;
     });
+    return spec;
   }
 
   /**
@@ -195,12 +235,17 @@ title: "${clazz.name}"
       if (node.text === '<!-- TOC -->')
         node.text = md.generateToc(nodes);
     }
-    md.visitAll(nodes, node => {
+    md.visitAll(nodes, (node, depth) => {
       if (node.children)
-        node.children = this.formatComment(node.children);
+        node.children = this.formatComment(node.children, depth);
     });
     fs.mkdirSync(this.outDir, { recursive: true });
-    const output = [md.render(nodes), this.generatedLinksSuffix].join('\n');
+    let output = [md.render(nodes), this.generatedLinksSuffix].join('\n');
+    output = output.replace(`"
+---`, `"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';`);
     fs.writeFileSync(path.join(this.outDir, name + 'x'), this.mdxLinks(output));
   }
 

@@ -2,6 +2,8 @@
 id: class-cdpsession
 title: "CDPSession"
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 * extends: [EventEmitter]
 
@@ -13,9 +15,31 @@ Useful links:
 * Documentation on DevTools Protocol can be found here: [DevTools Protocol Viewer](https://chromedevtools.github.io/devtools-protocol/).
 * Getting Started with DevTools Protocol: https://github.com/aslushnikov/getting-started-with-cdp/blob/master/README.md
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+client = page.context().new_cdp_session(page)
+client.send("animation.enable")
+client.on("animation.animation_created", lambda: print("animation created!"))
+response = client.send("animation.get_playback_rate")
+print("playback rate is " + response["playback_rate"])
+client.send("animation.set_playback_rate", {
+    playback_rate: response["playback_rate"] / 2
+})
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 client = await page.context().new_cdp_session(page)
 await client.send("animation.enable")
 client.on("animation.animation_created", lambda: print("animation created!"))
@@ -26,18 +50,8 @@ await client.send("animation.set_playback_rate", {
 })
 ```
 
-```py
-# sync
-
-client = page.context().new_cdp_session(page)
-client.send("animation.enable")
-client.on("animation.animation_created", lambda: print("animation created!"))
-response = client.send("animation.get_playback_rate")
-print("playback rate is " + response["playback_rate"])
-client.send("animation.set_playback_rate", {
-    playback_rate: response["playback_rate"] / 2
-})
-```
+</TabItem>
+</Tabs>
 
 
 - [cdp_session.detach()](./api/class-cdpsession.mdx#cdp_sessiondetach)
