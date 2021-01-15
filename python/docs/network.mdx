@@ -2,6 +2,8 @@
 id: network
 title: "Network"
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 Playwright provides APIs to **monitor** and **modify** network traffic, both HTTP and HTTPS. Any requests that page does, including [XHRs](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) requests, can be tracked, modified and handled.
 
@@ -16,9 +18,28 @@ Playwright provides APIs to **monitor** and **modify** network traffic, both HTT
 
 ## HTTP Authentication
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+context = browser.new_context(
+    http_credentials={"username": "bill", "password": "pa55w0rd"}
+)
+page = context.new_page()
+page.goto("https://example.com")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 context = await browser.new_context(
     http_credentials={"username": "bill", "password": "pa55w0rd"}
 )
@@ -26,15 +47,8 @@ page = await context.new_page()
 await page.goto("https://example.com")
 ```
 
-```py
-# sync
-
-context = browser.new_context(
-    http_credentials={"username": "bill", "password": "pa55w0rd"}
-)
-page = context.new_page()
-page.goto("https://example.com")
-```
+</TabItem>
+</Tabs>
 
 #### API reference
 - [browser.new_context(**options)](./api/class-browser.mdx#browsernew_contextoptions)
@@ -43,20 +57,17 @@ page.goto("https://example.com")
 
 ## Handle file downloads
 
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
 ```py
-# async
-
-# Start waiting for the download
-async with page.expect_download() as download_info:
-    # Perform the action that directly or indirectly initiates it
-    await page.click("button#delayed-download")
-download = await download_info.value
-path = await download.path()
-```
-
-```py
-# sync
-
 # Start waiting for the download
 with page.expect_download() as download_info:
     # Perform the action that directly or indirectly initiates it
@@ -65,25 +76,52 @@ download = download_info.value
 path = download.path()
 ```
 
+</TabItem>
+<TabItem value="async">
+
+```py
+# Start waiting for the download
+async with page.expect_download() as download_info:
+    # Perform the action that directly or indirectly initiates it
+    await page.click("button#delayed-download")
+download = await download_info.value
+path = await download.path()
+```
+
+</TabItem>
+</Tabs>
+
 For every attachment downloaded by the page, [page.on("download")](./api/class-page.mdx#pageondownload) event is emitted. If you create a browser context with the `accept_downloads` set, all these attachments are going to be downloaded into a temporary folder. You can obtain the download url, file system path and payload stream using the [Download] object from the event.
 
 #### Variations
 
 If you have no idea what initiates the download, you can still handle the event:
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+page.on("download", lambda download: print(download.path()))
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 async def handle_download(download):
     print(await download.path())
 page.on("download", handle_download)
 ```
 
-```py
-# sync
-
-page.on("download", lambda download: print(download.path()))
-```
+</TabItem>
+</Tabs>
 
 Note that handling the event forks the control flow and makes script harder to follow. Your scenario might end while you are downloading a file since your main control flow is not awaiting for this operation to resolve.
 
@@ -98,9 +136,37 @@ Note that handling the event forks the control flow and makes script harder to f
 
 You can monitor all the requests and responses:
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+from playwright.sync_api import sync_playwright
+
+def run(playwright):
+    chromium = playwright.chromium
+    browser = chromium.launch()
+    page = browser.new_page()
+    # Subscribe to "request" and "response" events.
+    page.on("request", lambda request: print(">>", request.method, request.url))
+    page.on("response", lambda response: print("<<", response.status, response.url))
+    page.goto("https://example.com")
+    browser.close()
+
+with sync_playwright() as playwright:
+    run(playwright)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 import asyncio
 from playwright.async_api import async_playwright
 
@@ -120,50 +186,69 @@ async def main():
 asyncio.run(main())
 ```
 
-```py
-# sync
-
-from playwright.sync_api import sync_playwright
-
-def run(playwright):
-    chromium = playwright.chromium
-    browser = chromium.launch()
-    page = browser.new_page()
-    # Subscribe to "request" and "response" events.
-    page.on("request", lambda request: print(">>", request.method, request.url))
-    page.on("response", lambda response: print("<<", response.status, response.url))
-    page.goto("https://example.com")
-    browser.close()
-
-with sync_playwright() as playwright:
-    run(playwright)
-```
+</TabItem>
+</Tabs>
 
 Or wait for a network response after the button click:
 
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
 ```py
-# async
-
-# Use a glob url pattern
-async with page.expect_response("**/api/fetch_data") as response_info:
-    await page.click("button#update")
-response = await response_info.value
-```
-
-```py
-# sync
-
 # Use a glob url pattern
 with page.expect_response("**/api/fetch_data") as response_info:
     page.click("button#update")
 response = response_info.value
 ```
 
-#### Variations
+</TabItem>
+<TabItem value="async">
 
 ```py
-# async
+# Use a glob url pattern
+async with page.expect_response("**/api/fetch_data") as response_info:
+    await page.click("button#update")
+response = await response_info.value
+```
 
+</TabItem>
+</Tabs>
+
+#### Variations
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Use a regular expresison
+with page.expect_response(re.compile(r"\.jpeg$")) as response_info:
+    page.click("button#update")
+response = response_info.value
+
+# Use a predicate taking a response object
+with page.expect_response(lambda response: token in response.url) as response_info:
+    page.click("button#update")
+response = response_info.value
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 # Use a regular expresison
 async with page.expect_response(re.compile(r"\.jpeg$")) as response_info:
     await page.click("button#update")
@@ -175,19 +260,8 @@ async with page.expect_response(lambda response: token in response.url) as respo
 response = await response_info.value
 ```
 
-```py
-# sync
-
-# Use a regular expresison
-with page.expect_response(re.compile(r"\.jpeg$")) as response_info:
-    page.click("button#update")
-response = response_info.value
-
-# Use a predicate taking a response object
-with page.expect_response(lambda response: token in response.url) as response_info:
-    page.click("button#update")
-response = response_info.value
-```
+</TabItem>
+</Tabs>
 
 #### API reference
 - [Request]
@@ -201,31 +275,63 @@ response = response_info.value
 
 ## Handle requests
 
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
 ```py
-# async
-
-await page.route(
-    "**/api/fetch_data",
-    lambda route: route.fulfill(status=200, body=test_data))
-await page.goto("https://example.com")
-```
-
-```py
-# sync
-
 page.route(
     "**/api/fetch_data",
     lambda route: route.fulfill(status=200, body=test_data))
 page.goto("https://example.com")
 ```
 
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.route(
+    "**/api/fetch_data",
+    lambda route: route.fulfill(status=200, body=test_data))
+await page.goto("https://example.com")
+```
+
+</TabItem>
+</Tabs>
+
 You can mock API endpoints via handling the network quests in your Playwright script.
 
 #### Variations
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+# Set up route on the entire browser context.
+# It will apply to popup windows and opened links.
+context.route(
+    "**/api/login",
+    lambda route: route.fulfill(status=200, body="accept"))
+page.goto("https://example.com")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 # Set up route on the entire browser context.
 # It will apply to popup windows and opened links.
 await context.route(
@@ -234,16 +340,8 @@ await context.route(
 await page.goto("https://example.com")
 ```
 
-```py
-# sync
-
-# Set up route on the entire browser context.
-# It will apply to popup windows and opened links.
-context.route(
-    "**/api/login",
-    lambda route: route.fulfill(status=200, body="accept"))
-page.goto("https://example.com")
-```
+</TabItem>
+</Tabs>
 
 #### API reference
 - [browser_context.route(url, handler)](./api/class-browsercontext.mdx#browser_contextrouteurl-handler)
@@ -256,23 +354,17 @@ page.goto("https://example.com")
 
 ## Modify requests
 
-```py
-# async
-
-# Delete header
-async def handle_route(route):
-    headers = route.request.headers
-    del headers["x-secret"]
-    route.continue_(headers=headers)
-await page.route("**/*", handle_route)
-
-# Continue requests as POST.
-await page.route("**/*", lambda route: route.continue_(method="POST"))
-```
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
 ```py
-# sync
-
 # Delete header
 def handle_route(route):
     headers = route.request.headers
@@ -284,27 +376,57 @@ page.route("**/*", handle_route)
 page.route("**/*", lambda route: route.continue_(method="POST"))
 ```
 
+</TabItem>
+<TabItem value="async">
+
+```py
+# Delete header
+async def handle_route(route):
+    headers = route.request.headers
+    del headers["x-secret"]
+    route.continue_(headers=headers)
+await page.route("**/*", handle_route)
+
+# Continue requests as POST.
+await page.route("**/*", lambda route: route.continue_(method="POST"))
+```
+
+</TabItem>
+</Tabs>
+
 You can continue requests with modifications. Example above removes an HTTP header from the outgoing requests.
 
 ## Abort requests
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+page.route("**/*.{png,jpg,jpeg}", lambda route: route.abort())
+
+# Abort based on the request type
+page.route("**/*", lambda route: route.abort() if route.request.resource_type == "image"  else route.continue_())
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 await page.route("**/*.{png,jpg,jpeg}", lambda route: route.abort())
 
 # Abort based on the request type
 await page.route("**/*", lambda route: route.abort() if route.request.resource_type == "image"  else route.continue_())
 ```
 
-```py
-# sync
-
-page.route("**/*.{png,jpg,jpeg}", lambda route: route.abort())
-
-# Abort based on the request type
-page.route("**/*", lambda route: route.abort() if route.request.resource_type == "image"  else route.continue_())
-```
+</TabItem>
+</Tabs>
 
 #### API reference
 - [page.route(url, handler)](./api/class-page.mdx#pagerouteurl-handler)

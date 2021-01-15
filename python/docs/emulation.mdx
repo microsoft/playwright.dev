@@ -2,6 +2,8 @@
 id: emulation
 title: "Device and environment emulation"
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 Playwright allows overriding various parameters of the device where the browser is running:
 - viewport size, device scale factor, touch support
@@ -25,9 +27,34 @@ Most of these parameters are configured during the browser context construction,
 
 Playwright comes with a registry of device parameters for selected mobile devices. It can be used to simulate browser behavior on a mobile device:
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+from playwright.sync_api import sync_playwright
+
+def run(playwright):
+    pixel_2 = playwright.devices['Pixel 2']
+    browser = playwright.webkit.launch(headless=False)
+    context = browser.new_context(
+        **pixel_2,
+    )
+
+with sync_playwright() as playwright:
+    run(playwright)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 import asyncio
 from playwright.async_api import async_playwright
 
@@ -44,21 +71,8 @@ async def main():
 asyncio.run(main())
 ```
 
-```py
-# sync
-
-from playwright.sync_api import sync_playwright
-
-def run(playwright):
-    pixel_2 = playwright.devices['Pixel 2']
-    browser = playwright.webkit.launch(headless=False)
-    context = browser.new_context(
-        **pixel_2,
-    )
-
-with sync_playwright() as playwright:
-    run(playwright)
-```
+</TabItem>
+</Tabs>
 
 All pages created in the context above will share the same device parameters.
 
@@ -72,21 +86,33 @@ All pages created in the context above will share the same device parameters.
 
 All pages created in the context above will share the user agent specified:
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+context = browser.new_context(
+  user_agent='My user agent'
+)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 context = await browser.new_context(
   user_agent='My user agent'
 )
 ```
 
-```py
-# sync
-
-context = browser.new_context(
-  user_agent='My user agent'
-)
-```
+</TabItem>
+</Tabs>
 
 #### API reference
 - [browser.new_context(**options)](./api/class-browser.mdx#browsernew_contextoptions)
@@ -97,9 +123,35 @@ context = browser.new_context(
 
 Create a context with custom viewport size:
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+# Create context with given viewport
+context = browser.new_context(
+  viewport={ 'width': 1280, 'height': 1024 }
+)
+
+# Resize viewport for individual page
+page.set_viewport_size(width=1600, height=1200)
+
+# Emulate high-DPI
+context = browser.new_context(
+  viewport={ 'width': 2560, 'height': 1440 },
+  device_scale_factor=2,
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 # Create context with given viewport
 context = await browser.new_context(
   viewport={ 'width': 1280, 'height': 1024 }
@@ -115,22 +167,8 @@ context = await browser.new_context(
 )
 ```
 
-```py
-# sync
-
-# Create context with given viewport
-context = browser.new_context(
-  viewport={ 'width': 1280, 'height': 1024 }
-)
-
-# Resize viewport for individual page
-page.set_viewport_size(width=1600, height=1200)
-
-# Emulate high-DPI
-context = browser.new_context(
-  viewport={ 'width': 2560, 'height': 1440 },
-  device_scale_factor=2,
-```
+</TabItem>
+</Tabs>
 
 #### API reference
 - [browser.new_context(**options)](./api/class-browser.mdx#browsernew_contextoptions)
@@ -140,9 +178,28 @@ context = browser.new_context(
 
 ## Locale & timezone
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+# Emulate locale and time
+context = browser.new_context(
+  locale='de-DE',
+  timezone_id='Europe/Berlin',
+)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 # Emulate locale and time
 context = await browser.new_context(
   locale='de-DE',
@@ -150,15 +207,8 @@ context = await browser.new_context(
 )
 ```
 
-```py
-# sync
-
-# Emulate locale and time
-context = browser.new_context(
-  locale='de-DE',
-  timezone_id='Europe/Berlin',
-)
-```
+</TabItem>
+</Tabs>
 
 #### API reference
 - [browser.new_context(**options)](./api/class-browser.mdx#browsernew_contextoptions)
@@ -169,63 +219,111 @@ context = browser.new_context(
 
 Allow all pages in the context to show system notifications:
 
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
 ```py
-# async
-
-context = await browser.new_context(
-  permissions=['notifications'],
-)
-```
-
-```py
-# sync
-
 context = browser.new_context(
   permissions=['notifications'],
 )
 ```
 
-Grant all pages in the existing context access to current location:
+</TabItem>
+<TabItem value="async">
 
 ```py
-# async
-
-await context.grant_permissions(['geolocation'])
+context = await browser.new_context(
+  permissions=['notifications'],
+)
 ```
 
-```py
-# sync
+</TabItem>
+</Tabs>
 
+Grant all pages in the existing context access to current location:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
 context.grant_permissions(['geolocation'])
 ```
 
-Grant notifications access from a specific domain:
+</TabItem>
+<TabItem value="async">
 
 ```py
-# async
-
-await context.grant_permissions(['notifications'], origin='https://skype.com')
+await context.grant_permissions(['geolocation'])
 ```
 
-```py
-# sync
+</TabItem>
+</Tabs>
 
+Grant notifications access from a specific domain:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
 context.grant_permissions(['notifications'], origin='https://skype.com')
 ```
 
-Revoke all permissions:
+</TabItem>
+<TabItem value="async">
 
 ```py
-# async
+await context.grant_permissions(['notifications'], origin='https://skype.com')
+```
 
+</TabItem>
+</Tabs>
+
+Revoke all permissions:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+context.clear_permissions()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 await context.clear_permissions()
 ```
 
-```py
-# sync
-
-context.clear_permissions()
-```
+</TabItem>
+</Tabs>
 
 #### API reference
 - [browser.new_context(**options)](./api/class-browser.mdx#browsernew_contextoptions)
@@ -238,37 +336,61 @@ context.clear_permissions()
 
 Create a context with `"geolocation"` permissions granted:
 
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
 ```py
-# async
-
-context = await browser.new_context(
-  geolocation={"longitude": 48.858455, "latitude": 2.294474},
-  permissions=["geolocation"]
-)
-```
-
-```py
-# sync
-
 context = browser.new_context(
   geolocation={"longitude": 48.858455, "latitude": 2.294474},
   permissions=["geolocation"]
 )
 ```
 
-Change the location later:
+</TabItem>
+<TabItem value="async">
 
 ```py
-# async
+context = await browser.new_context(
+  geolocation={"longitude": 48.858455, "latitude": 2.294474},
+  permissions=["geolocation"]
+)
+```
 
+</TabItem>
+</Tabs>
+
+Change the location later:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+context.set_geolocation({"longitude": 29.979097, "latitude": 31.134256})
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 await context.set_geolocation({"longitude": 29.979097, "latitude": 31.134256})
 ```
 
-```py
-# sync
-
-context.set_geolocation({"longitude": 29.979097, "latitude": 31.134256})
-```
+</TabItem>
+</Tabs>
 
 **Note** you can only change geolocation for all pages in the context.
 
@@ -282,9 +404,38 @@ context.set_geolocation({"longitude": 29.979097, "latitude": 31.134256})
 
 Create a context with dark or light mode. Pages created in this context will follow this color scheme preference.
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+# Create context with dark mode
+context = browser.new_context(
+  color_scheme='dark' # or 'light'
+)
+
+# Create page with dark mode
+page = browser.new_page(
+  color_scheme='dark' # or 'light'
+)
+
+# Change color scheme for the page
+page.emulate_media(color_scheme='dark')
+
+# Change media for page
+page.emulate_media(media='print')
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 # Create context with dark mode
 context = await browser.new_context(
   color_scheme='dark' # or 'light'
@@ -302,25 +453,8 @@ await page.emulate_media(color_scheme='dark')
 await page.emulate_media(media='print')
 ```
 
-```py
-# sync
-
-# Create context with dark mode
-context = browser.new_context(
-  color_scheme='dark' # or 'light'
-)
-
-# Create page with dark mode
-page = browser.new_page(
-  color_scheme='dark' # or 'light'
-)
-
-# Change color scheme for the page
-page.emulate_media(color_scheme='dark')
-
-# Change media for page
-page.emulate_media(media='print')
-```
+</TabItem>
+</Tabs>
 
 #### API reference
 - [browser.new_context(**options)](./api/class-browser.mdx#browsernew_contextoptions)

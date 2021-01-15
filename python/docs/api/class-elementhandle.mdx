@@ -2,14 +2,43 @@
 id: class-elementhandle
 title: "ElementHandle"
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 * extends: [JSHandle]
 
 ElementHandle represents an in-page DOM element. ElementHandles can be created with the [page.query_selector(selector)](./api/class-page.mdx#pagequery_selectorselector) method.
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+from playwright.sync_api import sync_playwright
+
+def run(playwright):
+    chromium = playwright.chromium
+    browser = chromium.launch()
+    page = browser.new_page()
+    page.goto("https://example.com")
+    href_element = page.query_selector("a")
+    href_element.click()
+    # ...
+
+with sync_playwright() as playwright:
+    run(playwright)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 import asyncio
 from playwright.async_api import async_playwright
 
@@ -28,23 +57,8 @@ async def main():
 asyncio.run(main())
 ```
 
-```py
-# sync
-
-from playwright.sync_api import sync_playwright
-
-def run(playwright):
-    chromium = playwright.chromium
-    browser = chromium.launch()
-    page = browser.new_page()
-    page.goto("https://example.com")
-    href_element = page.query_selector("a")
-    href_element.click()
-    # ...
-
-with sync_playwright() as playwright:
-    run(playwright)
-```
+</TabItem>
+</Tabs>
 
 ElementHandle prevents DOM element from garbage collection unless the handle is disposed with [js_handle.dispose()](./api/class-jshandle.mdx#js_handledispose). ElementHandles are auto-disposed when their origin frame gets navigated.
 
@@ -109,19 +123,31 @@ Elements from child frames return the bounding box relative to the main frame, u
 
 Assuming the page is static, it is safe to use bounding box coordinates to perform input. For example, the following snippet should click the center of the element.
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+box = element_handle.bounding_box()
+page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 box = await element_handle.bounding_box()
 await page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
 ```
 
-```py
-# sync
-
-box = element_handle.bounding_box()
-page.mouse.click(box["x"] + box["width"] / 2, box["y"] + box["height"] / 2)
-```
+</TabItem>
+</Tabs>
 
 ## element_handle.check(**options)
 - `force` <[bool]> Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.
@@ -198,17 +224,29 @@ When all steps combined have not finished during the specified `timeout`, this m
 
 The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the elment, `click` is dispatched. This is equivalend to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+element_handle.dispatch_event("click")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 await element_handle.dispatch_event("click")
 ```
 
-```py
-# sync
-
-element_handle.dispatch_event("click")
-```
+</TabItem>
+</Tabs>
 
 Under the hood, it creates an instance of an event based on the given `type`, initializes it with `event_init` properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
 
@@ -223,21 +261,33 @@ Since `event_init` is event-specific, please refer to the events documentation f
 
 You can also specify `JSHandle` as the property value if you want live objects to be passed into the event:
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+# note you can only create data_transfer in chromium and firefox
+data_transfer = page.evaluate_handle("new DataTransfer()")
+element_handle.dispatch_event("#source", "dragstart", {"dataTransfer": data_transfer})
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 # note you can only create data_transfer in chromium and firefox
 data_transfer = await page.evaluate_handle("new DataTransfer()")
 await element_handle.dispatch_event("#source", "dragstart", {"dataTransfer": data_transfer})
 ```
 
-```py
-# sync
-
-# note you can only create data_transfer in chromium and firefox
-data_transfer = page.evaluate_handle("new DataTransfer()")
-element_handle.dispatch_event("#source", "dragstart", {"dataTransfer": data_transfer})
-```
+</TabItem>
+</Tabs>
 
 ## element_handle.eval_on_selector(selector, expression, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.mdx#working-with-selectors) for more details.
@@ -254,21 +304,33 @@ If `page_function` returns a [Promise], then `frame.$eval` would wait for the pr
 
 Examples:
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+tweet_handle = page.query_selector(".tweet")
+assert tweet_handle.eval_on_selector(".like", "node => node.innerText") == "100"
+assert tweet_handle.eval_on_selector(".retweets", "node => node.innerText") = "10"
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 tweet_handle = await page.query_selector(".tweet")
 assert await tweet_handle.eval_on_selector(".like", "node => node.innerText") == "100"
 assert await tweet_handle.eval_on_selector(".retweets", "node => node.innerText") = "10"
 ```
 
-```py
-# sync
-
-tweet_handle = page.query_selector(".tweet")
-assert tweet_handle.eval_on_selector(".like", "node => node.innerText") == "100"
-assert tweet_handle.eval_on_selector(".retweets", "node => node.innerText") = "10"
-```
+</TabItem>
+</Tabs>
 
 ## element_handle.eval_on_selector_all(selector, expression, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.mdx#working-with-selectors) for more details.
@@ -292,20 +354,32 @@ Examples:
 </div>
 ```
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+feed_handle = page.query_selector(".feed")
+assert feed_handle.eval_on_selector_all(".tweet", "nodes => nodes.map(n => n.innerText)") == ["hello!", "hi!"]
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 # FIXME
 feed_handle = await page.query_selector(".feed")
 assert await feed_handle.eval_on_selector_all(".tweet", "nodes => nodes.map(n => n.innerText)") == ["hello!", "hi!"]
 ```
 
-```py
-# sync
-
-feed_handle = page.query_selector(".feed")
-assert feed_handle.eval_on_selector_all(".tweet", "nodes => nodes.map(n => n.innerText)") == ["hello!", "hi!"]
-```
+</TabItem>
+</Tabs>
 
 ## element_handle.fill(value, **options)
 - `value` <[str]> Value to set for the `<input>`, `<textarea>` or `[contenteditable]` element.
@@ -451,9 +525,29 @@ Returns the array of option values that have been successfully selected.
 
 Triggers a `change` and `input` event once all the provided options have been selected. If element is not a `<select>` element, the method throws an error.
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+# single selection matching the value
+handle.select_option("blue")
+# single selection matching both the label
+handle.select_option(label="blue")
+# multiple selection
+handle.select_option(value=["red", "green", "blue"])
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 # single selection matching the value
 await handle.select_option("blue")
 # single selection matching the label
@@ -462,16 +556,8 @@ await handle.select_option(label="blue")
 await handle.select_option(value=["red", "green", "blue"])
 ```
 
-```py
-# sync
-
-# single selection matching the value
-handle.select_option("blue")
-# single selection matching both the label
-handle.select_option(label="blue")
-# multiple selection
-handle.select_option(value=["red", "green", "blue"])
-```
+</TabItem>
+</Tabs>
 
 ```py
 # sync
@@ -542,37 +628,61 @@ Focuses the element, and then sends a `keydown`, `keypress`/`input`, and `keyup`
 
 To press a special key, like `Control` or `ArrowDown`, use [element_handle.press(key, **options)](./api/class-elementhandle.mdx#element_handlepresskey-options).
 
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
 ```py
-# async
-
-await element_handle.type("hello") # types instantly
-await element_handle.type("world", delay=100) # types slower, like a user
-```
-
-```py
-# sync
-
 element_handle.type("hello") # types instantly
 element_handle.type("world", delay=100) # types slower, like a user
 ```
 
-An example of typing into a text field and then submitting the form:
+</TabItem>
+<TabItem value="async">
 
 ```py
-# async
+await element_handle.type("hello") # types instantly
+await element_handle.type("world", delay=100) # types slower, like a user
+```
 
+</TabItem>
+</Tabs>
+
+An example of typing into a text field and then submitting the form:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+element_handle = page.query_selector("input")
+element_handle.type("some text")
+element_handle.press("Enter")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 element_handle = await page.query_selector("input")
 await element_handle.type("some text")
 await element_handle.press("Enter")
 ```
 
-```py
-# sync
-
-element_handle = page.query_selector("input")
-element_handle.type("some text")
-element_handle.press("Enter")
-```
+</TabItem>
+</Tabs>
 
 ## element_handle.uncheck(**options)
 - `force` <[bool]> Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.
@@ -621,23 +731,35 @@ Returns element specified by selector when it satisfies `state` option. Returns 
 
 Wait for the `selector` relative to the element handle to satisfy `state` option (either appear/disappear from dom, or become visible/hidden). If at the moment of calling the method `selector` already satisfies the condition, the method will return immediately. If the selector doesn't satisfy the condition for the `timeout` milliseconds, the function will throw.
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+page.set_content("<div><span></span></div>")
+div = page.query_selector("div")
+# waiting for the "span" selector relative to the div.
+span = div.wait_for_selector("span", state="attached")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 await page.set_content("<div><span></span></div>")
 div = await page.query_selector("div")
 # waiting for the "span" selector relative to the div.
 span = await div.wait_for_selector("span", state="attached")
 ```
 
-```py
-# sync
-
-page.set_content("<div><span></span></div>")
-div = page.query_selector("div")
-# waiting for the "span" selector relative to the div.
-span = div.wait_for_selector("span", state="attached")
-```
+</TabItem>
+</Tabs>
 
 :::note
 This method does not work across navigations, use [page.wait_for_selector(selector, **options)](./api/class-page.mdx#pagewait_for_selectorselector-options) instead.

@@ -2,23 +2,36 @@
 id: class-jshandle
 title: "JSHandle"
 ---
-
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 JSHandle represents an in-page JavaScript object. JSHandles can be created with the [page.evaluate_handle(expression, **options)](./api/class-page.mdx#pageevaluate_handleexpression-options) method.
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+window_handle = page.evaluate_handle("window")
+# ...
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 window_handle = await page.evaluate_handle("window")
 # ...
 ```
 
-```py
-# sync
-
-window_handle = page.evaluate_handle("window")
-# ...
-```
+</TabItem>
+</Tabs>
 
 JSHandle prevents the referenced JavaScript object being garbage collected unless the handle is exposed with [js_handle.dispose()](./api/class-jshandle.mdx#js_handledispose). JSHandles are auto-disposed when their origin frame gets navigated or the parent context gets destroyed.
 
@@ -56,19 +69,31 @@ If `page_function` returns a [Promise], then `handle.evaluate` would wait for th
 
 Examples:
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+tweet_handle = page.query_selector(".tweet .retweets")
+assert tweet_handle.evaluate("node => node.innerText") == "10 retweets"
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 tweet_handle = await page.query_selector(".tweet .retweets")
 assert await tweet_handle.evaluate("node => node.innerText") == "10 retweets"
 ```
 
-```py
-# sync
-
-tweet_handle = page.query_selector(".tweet .retweets")
-assert tweet_handle.evaluate("node => node.innerText") == "10 retweets"
-```
+</TabItem>
+</Tabs>
 
 ## js_handle.evaluate_handle(expression, **options)
 - `arg` <[EvaluationArgument]> Optional argument to pass to `page_function`
@@ -91,9 +116,28 @@ See [page.evaluate_handle(expression, **options)](./api/class-page.mdx#pageevalu
 
 The method returns a map with **own property names** as keys and JSHandle instances for the property values.
 
-```py
-# async
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
+```py
+handle = page.evaluate_handle("{window, document}")
+properties = handle.get_properties()
+window_handle = properties.get("window")
+document_handle = properties.get("document")
+handle.dispose()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 handle = await page.evaluate_handle("{window, document}")
 properties = await handle.get_properties()
 window_handle = properties.get("window")
@@ -101,15 +145,8 @@ document_handle = properties.get("document")
 await handle.dispose()
 ```
 
-```py
-# sync
-
-handle = page.evaluate_handle("{window, document}")
-properties = handle.get_properties()
-window_handle = properties.get("window")
-document_handle = properties.get("document")
-handle.dispose()
-```
+</TabItem>
+</Tabs>
 
 ## js_handle.get_property(property_name)
 - `property_name` <[str]> property to get

@@ -2,7 +2,8 @@
 id: class-route
 title: "Route"
 ---
-
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
 Whenever a network route is set up with [page.route(url, handler)](./api/class-page.mdx#pagerouteurl-handler) or [browser_context.route(url, handler)](./api/class-browsercontext.mdx#browser_contextrouteurl-handler), the `Route` object allows to handle the route.
 
@@ -39,24 +40,17 @@ Aborts the route's request.
 
 Continues route's request with optional overrides.
 
-```py
-# async
-
-async def handle(route, request):
-    # override headers
-    headers = {
-        **request.headers,
-        "foo": "bar" # set "foo" header
-        "origin": None # remove "origin" header
-    }
-    await route.continue(headers=headers)
-}
-await page.route("**/*", handle)
-```
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
 ```py
-# sync
-
 def handle(route, request):
     # override headers
     headers = {
@@ -69,6 +63,25 @@ def handle(route, request):
 page.route("**/*", handle)
 ```
 
+</TabItem>
+<TabItem value="async">
+
+```py
+async def handle(route, request):
+    # override headers
+    headers = {
+        **request.headers,
+        "foo": "bar" # set "foo" header
+        "origin": None # remove "origin" header
+    }
+    await route.continue(headers=headers)
+}
+await page.route("**/*", handle)
+```
+
+</TabItem>
+</Tabs>
+
 ## route.fulfill(**options)
 - `body` <[str]|[Buffer]> Response body.
 - `content_type` <[str]> If set, equals to setting `Content-Type` response header.
@@ -80,37 +93,61 @@ Fulfills route's request with given response.
 
 An example of fulfilling all requests with 404 responses:
 
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
 ```py
-# async
-
-await page.route("**/*", lambda route: route.fulfill(
-    status=404,
-    content_type="text/plain",
-    body="not found!"))
-```
-
-```py
-# sync
-
 page.route("**/*", lambda route: route.fulfill(
     status=404,
     content_type="text/plain",
     body="not found!"))
 ```
 
-An example of serving static file:
+</TabItem>
+<TabItem value="async">
 
 ```py
-# async
+await page.route("**/*", lambda route: route.fulfill(
+    status=404,
+    content_type="text/plain",
+    body="not found!"))
+```
 
+</TabItem>
+</Tabs>
+
+An example of serving static file:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.route("**/xhr_endpoint", lambda route: route.fulfill(path="mock_data.json"))
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
 await page.route("**/xhr_endpoint", lambda route: route.fulfill(path="mock_data.json"))
 ```
 
-```py
-# sync
-
-page.route("**/xhr_endpoint", lambda route: route.fulfill(path="mock_data.json"))
-```
+</TabItem>
+</Tabs>
 
 ## route.request
 - returns: <[Request]>
