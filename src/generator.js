@@ -47,7 +47,8 @@ class Generator {
   constructor(lang, outDir, config) {
     this.lang = lang;
     this.outDir = outDir;
-    this.sourceFiles = [];
+    /** @type {Set<string>} */
+    this.sourceFiles = new Set();
     listFiles(DIR_SRC, DIR_SRC, this.sourceFiles);
     this.config = config;
     this.documentation = parseApi(path.join(DIR_SRC, 'api'));
@@ -500,16 +501,17 @@ function highlighterName(lang) {
 /**
  * @param {string} dir
  * @param {string} base
- * @param {string[]} result
+ * @param {Set<string>} result
  */
 function listFiles(dir, base, result) {
-  for (const name of fs.readdirSync(dir)) {
+  for (let name of fs.readdirSync(dir)) {
     const f = path.join(dir, name);
     if (fs.lstatSync(f).isDirectory()) {
       listFiles(f, base, result);
     } else {
+      name = name.replace(/(-js\.|-python\.|-java\.|-sharp\.)/, '.');
       if (name.endsWith('.md'))
-        result.push('./' + path.relative(base, f));
+        result.add('./' + path.relative(base, path.join(dir, name)));
     }
   }
 }
