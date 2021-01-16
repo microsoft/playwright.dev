@@ -5,7 +5,7 @@ module.exports = {
       "label": "Introduction",
       "items": [
         { "type": "doc", "id": "why-playwright" },
-        { "type": "doc", "id": "intro-python" },
+        { "type": "doc", "id": "intro" },
         { "type": "doc", "id": "core-concepts" },
         { "type": "doc", "id": "debug" },
         { "type": "doc", "id": "languages" }
@@ -36,7 +36,7 @@ module.exports = {
       "type": "category",
       "label": "Integrations",
       "items": [
-        { "type": "doc", "id": "test-runners-python" },
+        { "type": "doc", "id": "test-runners" },
         { "type": "doc", "id": "docker" },
         { "type": "doc", "id": "ci" },
         { "type": "doc", "id": "cli" }

@@ -48,7 +48,7 @@ module.exports = {
       items: [
         {
           type: "doc",
-          docId: "intro-python",
+          docId: "intro",
           label: "Docs",
           position: "left",
         },
