@@ -101,14 +101,14 @@ title: "${clazz.name}"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 `});
-    result.push(...this.formatComment(clazz.spec, 0));
+    result.push(...this.formatComment(clazz.spec));
     result.push({
       type: 'text',
       text: ''
     });
     clazz.membersArray.sort((m1, m2) => {
-      const k1 = m1.kind + m1.alias.replace(/\$\$eval/, '$$eval2');
-      const k2 = m2.kind + m2.alias.replace(/\$\$eval/, '$$eval2');
+      const k1 = m1.kind + toSnakeCase(m1.alias.replace(/\$\$eval/, '$$eval2'));
+      const k2 = m2.kind + toSnakeCase(m2.alias.replace(/\$\$eval/, '$$eval2'));
       return k1.localeCompare(k2);
     });
     result.push(...this.generateClassToc(clazz));
@@ -136,7 +136,7 @@ import TabItem from '@theme/TabItem';
       }
 
       // Append member doc
-      memberNode.children.push(...this.formatComment(member.spec, 0));
+      memberNode.children.push(...this.formatComment(member.spec));
       result.push(memberNode);
     }
     fs.mkdirSync(path.join(this.outDir, 'api'), { recursive: true });
@@ -235,9 +235,9 @@ ${md.render([spec[i]])}
       if (node.text === '<!-- TOC -->')
         node.text = md.generateToc(nodes);
     }
-    md.visitAll(nodes, (node, depth) => {
+    md.visitAll(nodes, node => {
       if (node.children)
-        node.children = this.formatComment(node.children, depth);
+        node.children = this.formatComment(node.children);
     });
     fs.mkdirSync(this.outDir, { recursive: true });
     let output = [md.render(nodes), this.generatedLinksSuffix].join('\n');

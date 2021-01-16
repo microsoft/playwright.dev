@@ -119,7 +119,6 @@ asyncio.run(main())
 - [frame.url](./api/class-frame.mdx#frameurl)
 - [frame.wait_for_function(expression, **options)](./api/class-frame.mdx#framewait_for_functionexpression-options)
 - [frame.wait_for_load_state(**options)](./api/class-frame.mdx#framewait_for_load_stateoptions)
-- [frame.wait_for_navigation(**options)](./api/class-frame.mdx#framewait_for_navigationoptions)
 - [frame.wait_for_selector(selector, **options)](./api/class-frame.mdx#framewait_for_selectorselector-options)
 - [frame.wait_for_timeout(timeout)](./api/class-frame.mdx#framewait_for_timeouttimeout)
 
@@ -568,16 +567,16 @@ await result_handle.dispose()
 
 ## frame.expect_navigation(**options)
 - `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_navigation_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.mdx#pageset_default_navigation_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.mdx#pageset_default_timeouttimeout) methods.
-- `url` <[str]|[Pattern]|[Callable]\[[URL]\]:[bool]> A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation.
+- `url` <[str]|[Pattern]|[Callable]\[[URL]\]:[bool]> URL string, URL regex pattern or predicate receiving [URL] to match while waiting for the navigation.
 - `wait_until` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
   * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
   * `'load'` - consider operation to be finished when the `load` event is fired.
   * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
-- returns: <[EventContextManager[Response]]>
+- returns: <[EventContextManager]\[[Response]\]>
 
-Performs action and waits for the next navigation. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
+Waits for the frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
 
-This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
+This method waits for the frame to navigate to a new URL. It is useful for when you run code which will indirectly cause the frame to navigate. Consider this example:
 
 <Tabs
   groupId="python-flavor"
@@ -591,8 +590,8 @@ This resolves when the page navigates to a new URL or reloads. It is useful for 
 
 ```py
 with frame.expect_navigation():
-    frame.click("a.delayed-navigation") # Clicking the link will indirectly cause a navigation
-# Context manager waited for the navigation to happen.
+    frame.click("a.delayed-navigation") # clicking the link will indirectly cause a navigation
+# Resolves after navigation has finished
 ```
 
 </TabItem>
@@ -600,8 +599,8 @@ with frame.expect_navigation():
 
 ```py
 async with frame.expect_navigation():
-    await frame.click("a.delayed-navigation") # Clicking the link will indirectly cause a navigation
-# Context manager waited for the navigation to happen.
+    await frame.click("a.delayed-navigation") # clicking the link will indirectly cause a navigation
+# Resolves after navigation has finished
 ```
 
 </TabItem>
@@ -1124,51 +1123,6 @@ await frame.wait_for_load_state() # the promise resolves after "load" event.
 
 </TabItem>
 </Tabs>
-
-## frame.wait_for_navigation(**options)
-- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_navigation_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.mdx#pageset_default_navigation_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.mdx#pageset_default_timeouttimeout) methods.
-- `url` <[str]|[Pattern]|[Callable]\[[URL]\]:[bool]> URL string, URL regex pattern or predicate receiving [URL] to match while waiting for the navigation.
-- `wait_until` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
-  * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
-  * `'load'` - consider operation to be finished when the `load` event is fired.
-  * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
-- returns: <[NoneType]|[Response]>
-
-Returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
-
-This method waits for the frame to navigate to a new URL. It is useful for when you run code which will indirectly cause the frame to navigate. Consider this example:
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-with frame.expect_navigation():
-    frame.click("a.delayed-navigation") # clicking the link will indirectly cause a navigation
-# Resolves after navigation has finished
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-async with frame.expect_navigation():
-    await frame.click("a.delayed-navigation") # clicking the link will indirectly cause a navigation
-# Resolves after navigation has finished
-```
-
-</TabItem>
-</Tabs>
-
-:::note
-Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
-:::
 
 ## frame.wait_for_selector(selector, **options)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.mdx#working-with-selectors) for more details.
