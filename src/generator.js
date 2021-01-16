@@ -228,6 +228,9 @@ ${md.render([spec[i]])}
    * @param {string} name 
    */
   generateDoc(name) {
+    if (name.includes('-js') || name.includes('-python') || name.includes('-java') || name.includes('sharp'))
+      if (!name.includes('-' + this.lang))
+        return;
     const content = fs.readFileSync(path.join(DIR_SRC, name)).toString();
     const nodes = md.parse(content);
     this.documentation.renderLinksInText(nodes);
@@ -246,7 +249,8 @@ ${md.render([spec[i]])}
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';`);
-    fs.writeFileSync(path.join(this.outDir, name + 'x'), this.mdxLinks(output));
+    const outName = name.replace(new RegExp('-' + this.lang), '') + 'x';
+    fs.writeFileSync(path.join(this.outDir, outName), this.mdxLinks(output));
   }
 
   /**
