@@ -5,103 +5,126 @@ title: "Assertions"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-The Playwright API can be used to read element contents and properties for test assertions. These values are fetched from the browser page and asserted in your script.
+Playwright provides convenience APIs for common tasks, like reading the text content of an element. These APIs can be used in your test assertions.
 
-- [Common patterns](#common-patterns)
-- [Element Handles](#element-handles)
+- [Text content](#text-content)
+- [Inner text](#inner-text)
+- [Attribute value](#attribute-value)
+- [Checkbox state](#checkbox-state)
+- [JS expression](#js-expression)
+- [Inner HTML](#inner-html)
+- [Visibility](#visibility)
+- [Enabled state](#enabled-state)
 - [Custom assertions](#custom-assertions)
 
-## Common patterns
-
-Playwright provides convenience APIs for common assertion tasks, like finding the text content of an element. These APIs require a [selector](./selectors.mdx) to locate the element.
+## Text content
 
 ```js
-// This example uses the Node.js's built-in `assert` module,
-// but any assertion library (Expect, Chai, etc.) will work.
-
-// Assert text content
 const content = await page.textContent('nav:first-child');
-assert(content === 'home');
-
-// Assert inner text
-const text = await page.innerText('.selected');
-assert(text === 'value');
-
-// Assert inner HTML
-const html = await page.innerHTML('div.result');
-assert(html === '<p>Result</p>')
-
-// Assert `checked` attribute
-const checked = await page.getAttribute('input', 'checked');
-assert(checked);
+expect(content).toBe('home');
 ```
 
-#### API reference
-- [page.textContent(selector[, options])](./api/class-page.mdx#pagetextcontentselector-options)
+### API reference
 - [page.innerText(selector[, options])](./api/class-page.mdx#pageinnertextselector-options)
-- [page.innerHTML(selector[, options])](./api/class-page.mdx#pageinnerhtmlselector-options)
-- [page.getAttribute(selector, name[, options])](./api/class-page.mdx#pagegetattributeselector-name-options)
-- [frame.textContent(selector[, options])](./api/class-frame.mdx#frametextcontentselector-options)
-- [frame.innerText(selector[, options])](./api/class-frame.mdx#frameinnertextselector-options)
-- [frame.innerHTML(selector[, options])](./api/class-frame.mdx#frameinnerhtmlselector-options)
-- [frame.getAttribute(selector, name[, options])](./api/class-frame.mdx#framegetattributeselector-name-options)
+- [elementHandle.innerText()](./api/class-elementhandle.mdx#elementhandleinnertext)
 
-<br/>
-
-## Element Handles
-
-[ElementHandle] objects represent in-page DOM elements. They can be used to assert for multiple properties of the element.
-
-It is recommended to fetch the [ElementHandle] object with [page.waitForSelector(selector[, options])](./api/class-page.mdx#pagewaitforselectorselector-options) or [frame.waitForSelector(selector[, options])](./api/class-frame.mdx#framewaitforselectorselector-options). These APIs wait for the element to be visible and then return an `ElementHandle`.
+## Inner text
 
 ```js
-// Get the element handle
-const elementHandle = page.waitForSelector('#box');
-
-// Assert bounding box for the element
-const boundingBox = await elementHandle.boundingBox();
-assert(boundingBox.width === 100);
-
-// Assert attribute for the element
-const classNames = await elementHandle.getAttribute('class');
-assert(classNames.includes('highlighted'));
+const text = await page.innerText('.selected');
+expect(text).toBe('value');
 ```
 
-#### API reference
-- [elementHandle.textContent()](./api/class-elementhandle.mdx#elementhandletextcontent)
+### API reference
+- [page.innerText(selector[, options])](./api/class-page.mdx#pageinnertextselector-options)
 - [elementHandle.innerText()](./api/class-elementhandle.mdx#elementhandleinnertext)
-- [elementHandle.innerHTML()](./api/class-elementhandle.mdx#elementhandleinnerhtml)
-- [elementHandle.getAttribute(name)](./api/class-elementhandle.mdx#elementhandlegetattributename)
-- [elementHandle.boundingBox()](./api/class-elementhandle.mdx#elementhandleboundingbox)
 
-<br/>
+## Attribute value
+
+```js
+const alt = await page.getAttribute('input', 'alt');
+expect(alt).toBe('Text');
+```
+
+## Checkbox state
+
+```js
+const checked = await page.isChecked('input');
+expect(checked).toBeTruthy();
+```
+
+### API reference
+- [page.isChecked(selector[, options])](./api/class-page.mdx#pageischeckedselector-options)
+- [elementHandle.isChecked()](./api/class-elementhandle.mdx#elementhandleischecked)
+
+## JS expression
+
+```js
+const content = await page.$eval('nav:first-child', e => e.textContent);
+expect(content).toBe('home');
+```
+
+### API reference
+- [page.$eval(selector, pageFunction[, arg])](./api/class-page.mdx#pageevalselector-pagefunction-arg)
+- [jsHandle.evaluate(pageFunction[, arg])](./api/class-jshandle.mdx#jshandleevaluatepagefunction-arg)
+
+## Inner HTML
+
+```js
+const html = await page.innerHTML('div.result');
+expect(html).toBe('<p>Result</p>');
+```
+
+### API reference
+- [page.innerHTML(selector[, options])](./api/class-page.mdx#pageinnerhtmlselector-options)
+- [elementHandle.innerHTML()](./api/class-elementhandle.mdx#elementhandleinnerhtml)
+
+## Visibility
+
+```js
+const visible = await page.isVisible('input');
+expect(visible).toBeTruthy();
+```
+
+### API reference
+- [page.isVisible(selector[, options])](./api/class-page.mdx#pageisvisibleselector-options)
+- [elementHandle.isVisible()](./api/class-elementhandle.mdx#elementhandleisvisible)
+
+## Enabled state
+
+```js
+const enabled = await page.isEnabled('input');
+expect(visible).toBeTruthy();
+```
+
+### API reference
+- [page.isEnabled(selector[, options])](./api/class-page.mdx#pageisenabledselector-options)
+- [elementHandle.isEnabled()](./api/class-elementhandle.mdx#elementhandleisenabled)
 
 ## Custom assertions
 
 With Playwright, you can also write custom JavaScript to run in the context of the browser. This is useful in situations where you want to assert for values that are not covered by the convenience APIs above.
 
-The following APIs do not auto-wait for the element. It is recommended to use [page.waitForSelector(selector[, options])](./api/class-page.mdx#pagewaitforselectorselector-options) or [frame.waitForSelector(selector[, options])](./api/class-frame.mdx#framewaitforselectorselector-options).
-
 ```js
 // Assert local storage value
 const userId = page.evaluate(() => window.localStorage.getItem('userId'));
-assert(userId);
+expect(userId).toBeTruthy();
 
 // Assert value for input element
 await page.waitForSelector('#search');
 const value = await page.$eval('#search', el => el.value);
-assert(value === 'query');
+expect(value === 'query').toBeTruthy();
 
 // Assert computed style
 const fontSize = await page.$eval('div', el => window.getComputedStyle(el).fontSize);
-assert(fontSize === '16px');
+expect(fontSize === '16px').toBeTruthy();
 
 // Assert list length
 const length = await page.$$eval('li.selected', (items) => items.length);
-assert(length === 3);
+expect(length === 3).toBeTruthy();
 ```
 
-#### API reference
+### API reference
 - [page.evaluate(pageFunction[, arg])](./api/class-page.mdx#pageevaluatepagefunction-arg)
 - [page.$eval(selector, pageFunction[, arg])](./api/class-page.mdx#pageevalselector-pagefunction-arg)
 - [page.$$eval(selector, pageFunction[, arg])](./api/class-page.mdx#pageevalselector-pagefunction-arg-1)

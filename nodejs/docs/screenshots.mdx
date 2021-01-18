@@ -1,69 +1,58 @@
 ---
-id: downloads
-title: "Downloads"
+id: screenshots
+title: "Screenshots"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-:::note
-For uploading files, see the [uploading files](./input.mdx#upload-files) section.
-:::
+- [Screenshots](#screenshots)
+- [Full page screenshots](#full-page-screenshots)
+- [Capture into buffer](#capture-into-buffer)
+- [Element screenshot](#element-screenshot)
 
-For every attachment downloaded by the page, [page.on('download')](./api/class-page.mdx#pageondownload) event is emitted. If you create a browser context with the `acceptDownloads` set, all these attachments are going to be downloaded into a temporary folder. You can obtain the download url, file system path and payload stream using the [Download] object from the event.
+## Screenshots
 
-You can specify where to persist downloaded files using the `downloadsPath` option in [browserType.launch([options])](./api/class-browsertype.mdx#browsertypelaunchoptions).
-
-:::note
-Unless `downloadsPath` is set, downloaded files are deleted when the browser context that produced them is closed.
-:::
-
-Here is the simplest way to handle the file download:
+Here is a quick way to capture a screenshot and save it into a file:
 
 ```js
-const [ download ] = await Promise.all([
-  // Start waiting for the download
-  page.waitForEvent('download'),
-  // Perform the action that initiates download
-  page.click('button#delayed-download')
-]);
-// Wait for the download process to complete
-const path = await download.path();
+await page.screenshot({ path: 'screenshot.png' });
 ```
 
-```python async
-# Start waiting for the download
-async with page.expect_download() as download_info:
-    # Perform the action that initiates download
-    await page.click("button#delayed-download")
-download = await download_info.value
-# Wait for the download process to complete
-path = await download.path()
-```
-
-```python sync
-# Start waiting for the download
-with page.expect_download() as download_info:
-    # Perform the action that initiates download
-    page.click("button#delayed-download")
-download = download_info.value
-# Wait for the download process to complete
-path = download.path()
-```
-
-#### Variations
-
-If you have no idea what initiates the download, you can still handle the event:
-
-```js
-page.on('download', download => download.path().then(console.log));
-```
-
-Note that handling the event forks the control flow and makes script harder to follow. Your scenario might end while you are downloading a file since your main control flow is not awaiting for this operation to resolve.
+Screenshots API accepts many parameters for image format, clip area, quality, etc. Make sure to check them out.
 
 ### API reference
-- [Download]
-- [page.on('download')](./api/class-page.mdx#pageondownload)
-- [page.waitForEvent(event[, optionsOrPredicate])](./api/class-page.mdx#pagewaitforeventevent-optionsorpredicate)
+- [page.screenshot([options])](./api/class-page.mdx#pagescreenshotoptions)
+- [elementHandle.screenshot([options])](./api/class-elementhandle.mdx#elementhandlescreenshotoptions)
+
+## Full page screenshots
+
+Full page screenshot is a screenshot of a full scrollable page, as if you had a very tall screen and the page could fit it entirely.
+
+```js
+await page.screenshot({ path: 'screenshot.png', fullPage: true });
+```
+
+## Capture into buffer
+
+Rather than writing into a file, you can get a buffer with the image and post-process it or pass it to a third party pixel diff facility.
+
+```js
+const buffer = await page.screenshot();
+console.log(buffer.toString('base64'));
+```
+
+## Element screenshot
+
+Sometimes it is useful to take a screenshot of a single element.
+
+```js
+const elementHandle = await page.$('.header');
+await elementHandle.screenshot({ path: 'screenshot.png' });
+```
+
+### API reference
+- [page.screenshot([options])](./api/class-page.mdx#pagescreenshotoptions)
+- [elementHandle.screenshot([options])](./api/class-elementhandle.mdx#elementhandlescreenshotoptions)
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Browser]: ./api/class-browser.mdx "Browser"
