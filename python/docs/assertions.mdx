@@ -5,15 +5,19 @@ title: "Assertions"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-The Playwright API can be used to read element contents and properties for test assertions. These values are fetched from the browser page and asserted in your script.
+Playwright provides convenience APIs for common tasks, like reading the text content of an element. These APIs can be used in your test assertions.
 
-- [Common patterns](#common-patterns)
-- [Element Handles](#element-handles)
+- [Text content](#text-content)
+- [Inner text](#inner-text)
+- [Attribute value](#attribute-value)
+- [Checkbox state](#checkbox-state)
+- [JS expression](#js-expression)
+- [Inner HTML](#inner-html)
+- [Visibility](#visibility)
+- [Enabled state](#enabled-state)
 - [Custom assertions](#custom-assertions)
 
-## Common patterns
-
-Playwright provides convenience APIs for common assertion tasks, like finding the text content of an element. These APIs require a [selector](./selectors.mdx) to locate the element.
+## Text content
 
 <Tabs
   groupId="python-flavor"
@@ -26,64 +30,26 @@ Playwright provides convenience APIs for common assertion tasks, like finding th
 <TabItem value="sync">
 
 ```py
-# Assert text content
-content = page.text_content('nav:first-child')
-assert content == 'home'
-
-# Assert inner text
-text = page.inner_text('.selected')
-assert text == 'value'
-
-# Assert inner HTML
-html = page.inner_html('div.result')
-assert html == '<p>Result</p>'
-
-# Assert `checked` attribute
-checked = page.get_attribute('input', 'checked')
-assert checked
+content = page.text_content("nav:first-child")
+assert content == "home"
 ```
 
 </TabItem>
 <TabItem value="async">
 
 ```py
-# Assert text content
-content = await page.text_content('nav:first-child')
-assert content == 'home'
-
-# Assert inner text
-text = await page.inner_text('.selected')
-assert text == 'value'
-
-# Assert inner HTML
-html = await page.inner_html('div.result')
-assert html == '<p>Result</p>'
-
-# Assert `checked` attribute
-checked = await page.get_attribute('input', 'checked')
-assert checked
+content = await page.text_content("nav:first-child")
+assert content == "home"
 ```
 
 </TabItem>
 </Tabs>
 
-#### API reference
-- [page.text_content(selector, **options)](./api/class-page.mdx#pagetext_contentselector-options)
+### API reference
 - [page.inner_text(selector, **options)](./api/class-page.mdx#pageinner_textselector-options)
-- [page.inner_html(selector, **options)](./api/class-page.mdx#pageinner_htmlselector-options)
-- [page.get_attribute(selector, name, **options)](./api/class-page.mdx#pageget_attributeselector-name-options)
-- [frame.text_content(selector, **options)](./api/class-frame.mdx#frametext_contentselector-options)
-- [frame.inner_text(selector, **options)](./api/class-frame.mdx#frameinner_textselector-options)
-- [frame.inner_html(selector, **options)](./api/class-frame.mdx#frameinner_htmlselector-options)
-- [frame.get_attribute(selector, name, **options)](./api/class-frame.mdx#frameget_attributeselector-name-options)
+- [element_handle.inner_text()](./api/class-elementhandle.mdx#element_handleinner_text)
 
-<br/>
-
-## Element Handles
-
-[ElementHandle] objects represent in-page DOM elements. They can be used to assert for multiple properties of the element.
-
-It is recommended to fetch the [ElementHandle] object with [page.wait_for_selector(selector, **options)](./api/class-page.mdx#pagewait_for_selectorselector-options) or [frame.wait_for_selector(selector, **options)](./api/class-frame.mdx#framewait_for_selectorselector-options). These APIs wait for the element to be visible and then return an `ElementHandle`.
+## Inner text
 
 <Tabs
   groupId="python-flavor"
@@ -96,51 +62,216 @@ It is recommended to fetch the [ElementHandle] object with [page.wait_for_select
 <TabItem value="sync">
 
 ```py
-# Get the element handle
-element_handle = page.wait_for_selector('#box')
-
-# Assert bounding box for the element
-bounding_box = element_handle.bounding_box()
-assert bounding_box.width == 100
-
-# Assert attribute for the element
-class_names = element_handle.get_attribute('class')
-assert 'highlighted' in class_names
+text = page.inner_text(".selected")
+assert text == "value"
 ```
 
 </TabItem>
 <TabItem value="async">
 
 ```py
-# Get the element handle
-element_handle = page.wait_for_selector('#box')
-
-# Assert bounding box for the element
-bounding_box = await element_handle.bounding_box()
-assert bounding_box.width == 100
-
-# Assert attribute for the element
-class_names = await element_handle.get_attribute('class')
-assert 'highlighted' in class_names
+text = await page.inner_text(".selected")
+assert text == "value"
 ```
 
 </TabItem>
 </Tabs>
 
-#### API reference
-- [element_handle.text_content()](./api/class-elementhandle.mdx#element_handletext_content)
+### API reference
+- [page.inner_text(selector, **options)](./api/class-page.mdx#pageinner_textselector-options)
 - [element_handle.inner_text()](./api/class-elementhandle.mdx#element_handleinner_text)
-- [element_handle.inner_html()](./api/class-elementhandle.mdx#element_handleinner_html)
-- [element_handle.get_attribute(name)](./api/class-elementhandle.mdx#element_handleget_attributename)
-- [element_handle.bounding_box()](./api/class-elementhandle.mdx#element_handlebounding_box)
 
-<br/>
+## Attribute value
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+checked = page.get_attribute("input", "alt")
+assert alt == "Text"
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+checked = await page.get_attribute("input", "alt")
+assert alt == "Text"
+```
+
+</TabItem>
+</Tabs>
+
+## Checkbox state
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+checked = page.is_checked("input")
+assert checked
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+checked = await page.is_checked("input")
+assert checked
+```
+
+</TabItem>
+</Tabs>
+
+### API reference
+- [page.is_checked(selector, **options)](./api/class-page.mdx#pageis_checkedselector-options)
+- [element_handle.is_checked()](./api/class-elementhandle.mdx#element_handleis_checked)
+
+## JS expression
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+content = page.eval_on_selector("nav:first-child", "e => e.textContent")
+assert content == "home"
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+content = await page.eval_on_selector("nav:first-child", "e => e.textContent")
+assert content == "home"
+```
+
+</TabItem>
+</Tabs>
+
+### API reference
+- [page.eval_on_selector(selector, expression, **options)](./api/class-page.mdx#pageeval_on_selectorselector-expression-options)
+- [js_handle.evaluate(expression, **options)](./api/class-jshandle.mdx#js_handleevaluateexpression-options)
+
+## Inner HTML
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+html = page.inner_html("div.result")
+assert html == "<p>Result</p>"
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+html = await page.inner_html("div.result")
+assert html == "<p>Result</p>"
+```
+
+</TabItem>
+</Tabs>
+
+### API reference
+- [page.inner_html(selector, **options)](./api/class-page.mdx#pageinner_htmlselector-options)
+- [element_handle.inner_html()](./api/class-elementhandle.mdx#element_handleinner_html)
+
+## Visibility
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+visible = page.is_visible("input")
+assert visible
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+visible = await page.is_visible("input")
+assert visible
+```
+
+</TabItem>
+</Tabs>
+
+### API reference
+- [page.is_visible(selector, **options)](./api/class-page.mdx#pageis_visibleselector-options)
+- [element_handle.is_visible()](./api/class-elementhandle.mdx#element_handleis_visible)
+
+## Enabled state
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+enabled = page.is_enabled("input")
+assert enabled
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+enabled = await page.is_enabled("input")
+assert enabled
+```
+
+</TabItem>
+</Tabs>
+
+### API reference
+- [page.is_enabled(selector, **options)](./api/class-page.mdx#pageis_enabledselector-options)
+- [element_handle.is_enabled()](./api/class-elementhandle.mdx#element_handleis_enabled)
 
 ## Custom assertions
 
 With Playwright, you can also write custom JavaScript to run in the context of the browser. This is useful in situations where you want to assert for values that are not covered by the convenience APIs above.
-
-The following APIs do not auto-wait for the element. It is recommended to use [page.wait_for_selector(selector, **options)](./api/class-page.mdx#pagewait_for_selectorselector-options) or [frame.wait_for_selector(selector, **options)](./api/class-frame.mdx#framewait_for_selectorselector-options).
 
 <Tabs
   groupId="python-flavor"
@@ -196,7 +327,7 @@ assert length == 3
 </TabItem>
 </Tabs>
 
-#### API reference
+### API reference
 - [page.evaluate(expression, **options)](./api/class-page.mdx#pageevaluateexpression-options)
 - [page.eval_on_selector(selector, expression, **options)](./api/class-page.mdx#pageeval_on_selectorselector-expression-options)
 - [page.eval_on_selector_all(selector, expression, **options)](./api/class-page.mdx#pageeval_on_selector_allselector-expression-options)

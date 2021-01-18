@@ -1,69 +1,74 @@
 ---
-id: downloads
-title: "Downloads"
+id: videos
+title: "Videos"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-:::note
-For uploading files, see the [uploading files](./input.mdx#upload-files) section.
-:::
 
-For every attachment downloaded by the page, [page.on('download')](./api/class-page.mdx#pageondownload) event is emitted. If you create a browser context with the `acceptDownloads` set, all these attachments are going to be downloaded into a temporary folder. You can obtain the download url, file system path and payload stream using the [Download] object from the event.
-
-You can specify where to persist downloaded files using the `downloadsPath` option in [browserType.launch([options])](./api/class-browsertype.mdx#browsertypelaunchoptions).
-
-:::note
-Unless `downloadsPath` is set, downloaded files are deleted when the browser context that produced them is closed.
-:::
-
-Here is the simplest way to handle the file download:
+Playwright can record videos for all pages in a [browser context](./core-concepts.mdx#browser-contexts). Videos are saved upon context closure, so make sure to await [browserContext.close()](./api/class-browsercontext.mdx#browsercontextclose).
 
 ```js
-const [ download ] = await Promise.all([
-  // Start waiting for the download
-  page.waitForEvent('download'),
-  // Perform the action that initiates download
-  page.click('button#delayed-download')
-]);
-// Wait for the download process to complete
-const path = await download.path();
+// With browser.newContext()
+const context = await browser.newContext({ recordVideo: { dir: 'videos/' } });
+// Make sure to await close, so that videos are saved.
+await context.close();
+
+// With browser.newPage()
+const page = await browser.newPage({ recordVideo: { dir: 'videos/' } });
+// Make sure to await close, so that videos are saved.
+await page.close();
+
+// [Optional] Specify video size; defaults to viewport size
+const context = await browser.newContext({
+  recordVideo: {
+    dir: 'videos/',
+    size: { width: 800, height: 600 },
+  }
+});
 ```
 
 ```python async
-# Start waiting for the download
-async with page.expect_download() as download_info:
-    # Perform the action that initiates download
-    await page.click("button#delayed-download")
-download = await download_info.value
-# Wait for the download process to complete
-path = await download.path()
+# With browser.new_context()
+context = await browser.new_context(record_video_dir="videos/")
+# Make sure to await close, so that videos are saved.
+await context.close()
+
+# With browser.new_page()
+page = await browser.new_page(record_video_dir="videos/")
+# Make sure to await close, so that videos are saved.
+await page.close()
+
+# [Optional] specify video size; defaults to viewport size
+context = await browser.new_context(
+    record_video_dir="videos/",
+    record_video_size={"width": 800, "height": 600}
+)
 ```
 
 ```python sync
-# Start waiting for the download
-with page.expect_download() as download_info:
-    # Perform the action that initiates download
-    page.click("button#delayed-download")
-download = download_info.value
-# Wait for the download process to complete
-path = download.path()
+# With browser.new_context()
+context = browser.new_context(record_video_dir="videos/")
+# Make sure to close, so that videos are saved.
+context.close()
+
+# With browser.new_page()
+page = browser.new_page(record_video_dir="videos/")
+# Make sure to close, so that videos are saved.
+page.close()
+
+# [Optional] specify video size; defaults to viewport size
+context = browser.new_context(
+    record_video_dir="videos/",
+    record_video_size={"width": 800, "height": 600}
+)
 ```
-
-#### Variations
-
-If you have no idea what initiates the download, you can still handle the event:
-
-```js
-page.on('download', download => download.path().then(console.log));
-```
-
-Note that handling the event forks the control flow and makes script harder to follow. Your scenario might end while you are downloading a file since your main control flow is not awaiting for this operation to resolve.
 
 ### API reference
-- [Download]
-- [page.on('download')](./api/class-page.mdx#pageondownload)
-- [page.waitForEvent(event[, optionsOrPredicate])](./api/class-page.mdx#pagewaitforeventevent-optionsorpredicate)
+- [BrowserContext]
+- [browser.newContext([options])](./api/class-browser.mdx#browsernewcontextoptions)
+- [browser.newPage([options])](./api/class-browser.mdx#browsernewpageoptions)
+- [browserContext.close()](./api/class-browsercontext.mdx#browsercontextclose)
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Browser]: ./api/class-browser.mdx "Browser"
