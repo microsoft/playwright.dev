@@ -19,18 +19,30 @@ Unless `downloads_path` is set, downloaded files are deleted when the browser co
 
 Here is the simplest way to handle the file download:
 
-```js
-const [ download ] = await Promise.all([
-  // Start waiting for the download
-  page.waitForEvent('download'),
-  // Perform the action that initiates download
-  page.click('button#delayed-download')
-]);
-// Wait for the download process to complete
-const path = await download.path();
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Start waiting for the download
+with page.expect_download() as download_info:
+    # Perform the action that initiates download
+    page.click("button#delayed-download")
+download = download_info.value
+# Wait for the download process to complete
+path = download.path()
 ```
 
-```python async
+</TabItem>
+<TabItem value="async">
+
+```py
 # Start waiting for the download
 async with page.expect_download() as download_info:
     # Perform the action that initiates download
@@ -40,15 +52,8 @@ download = await download_info.value
 path = await download.path()
 ```
 
-```python sync
-# Start waiting for the download
-with page.expect_download() as download_info:
-    # Perform the action that initiates download
-    page.click("button#delayed-download")
-download = download_info.value
-# Wait for the download process to complete
-path = download.path()
-```
+</TabItem>
+</Tabs>
 
 #### Variations
 

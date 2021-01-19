@@ -233,12 +233,13 @@ ${md.render([spec[i]])}
       if (!name.includes('-' + this.lang))
         return;
     const content = fs.readFileSync(path.join(DIR_SRC, name)).toString();
-    const nodes = md.parse(content);
+    let nodes = md.parse(content);
     this.documentation.renderLinksInText(nodes);
     for (const node of nodes) {
       if (node.text === '<!-- TOC -->')
         node.text = md.generateToc(nodes);
     }
+    nodes = this.formatComment(nodes);
     md.visitAll(nodes, node => {
       if (node.children)
         node.children = this.formatComment(node.children);
