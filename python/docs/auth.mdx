@@ -13,6 +13,7 @@ Tests written with Playwright execute in isolated clean-slate environments calle
 
 - [Automate logging in](#automate-logging-in)
 - [Reuse authentication state](#reuse-authentication-state)
+- [Session storage](#session-storage)
 - [Multi-factor authentication](#multi-factor-authentication)
 
 ## Automate logging in
@@ -111,9 +112,21 @@ context = await browser.new_context(storage_state=storage_state)
 </TabItem>
 </Tabs>
 
-### Session storage
+Logging in via the UI and then reusing authentication state can be combined to implement **login once and run multiple scenarios**. The lifecycle looks like:
+1. Run tests (for example, with `npm run test`).
+1. Login via UI and retrieve authentication state.
+   * In Jest, this can be executed in [`globalSetup`](https://jestjs.io/docs/en/configuration#globalsetup-string).
+1. In each test, load authentication state in `beforeEach` or `beforeAll` step.
 
-Session storage ([`window.sessionStorage`](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage)) is specific to a particular domain. Playwright does not provide API to persist session storage, but the following snippet can be used to save/load session storage.
+This approach will also **work in CI environments**, since it does not rely on any external state.
+
+### API reference
+- [browser_context.storage_state(**options)](./api/class-browsercontext.mdx#browser_contextstorage_stateoptions)
+- [browser.new_context(**options)](./api/class-browser.mdx#browsernew_contextoptions)
+
+## Session storage
+
+Rarely, [session storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage) is used for storing information associated with the logged-in state. Session storage is specific to a particular domain and is not persisted across page loads. Playwright does not provide API to persist session storage, but the following snippet can be used to save/load session storage.
 
 <Tabs
   groupId="python-flavor"
@@ -166,20 +179,6 @@ await context.add_init_script(storage => {
 
 </TabItem>
 </Tabs>
-
-### Lifecycle
-
-Logging in via the UI and then reusing authentication state can be combined to implement **login once and run multiple scenarios**. The lifecycle looks like:
-1. Run tests (for example, with `npm run test`).
-1. Login via UI and retrieve authentication state.
-   * In Jest, this can be executed in [`globalSetup`](https://jestjs.io/docs/en/configuration#globalsetup-string).
-1. In each test, load authentication state in `beforeEach` or `beforeAll` step.
-
-This approach will also **work in CI environments**, since it does not rely on any external state.
-
-### Example
-
-[This example script](https://github.com/microsoft/playwright/blob/master/docs/examples/authentication.js) logs in on GitHub.com with Chromium, and then reuses the logged in storage state in WebKit.
 
 ### API reference
 - [browser_context.storage_state(**options)](./api/class-browsercontext.mdx#browser_contextstorage_stateoptions)

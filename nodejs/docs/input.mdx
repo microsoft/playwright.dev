@@ -231,6 +231,8 @@ Note that you still need to specify the capital `A` in `Shift-A` to produce the 
 
 ## Upload files
 
+You can select input files for upload using the [page.setInputFiles(selector, files[, options])](./api/class-page.mdx#pagesetinputfilesselector-files-options) method. It expects first argument to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input) with the type `"file"`. Multiple files can be passed in the array. If some of the file paths are relative, they are resolved relative to the current working directory. Empty array clears the selected files.
+
 ```js
 // Select one file
 await page.setInputFiles('input#upload', 'myfile.pdf');
@@ -249,13 +251,18 @@ await page.setInputFiles('input#upload', {
 });
 ```
 
-You can select input files for upload using the [page.setInputFiles(selector, files[, options])](./api/class-page.mdx#pagesetinputfilesselector-files-options) method. It expects first argument to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input) with the type `"file"`. Multiple files can be passed in the array. If some of the file paths are relative, they are resolved relative to the [current working directory](https://nodejs.org/api/process.html#process_process_cwd). Empty array clears the selected files.
+If you don't have input element in hand (it is created dynamically), you can handle the [page.on('filechooser')](./api/class-page.mdx#pageonfilechooser) event or use a corresponding waiting method upon your action:
 
-#### Example
-
-[This script](https://github.com/microsoft/playwright/blob/master/utils/docs/examples/upload.js) uploads a file to an `input` element that accepts file uploads.
+```js
+const [fileChooser] = await Promise.all([
+  page.waitForEvent('filechooser'),
+  page.click('upload')
+]);
+await fileChooser.setFiles('myfile.pdf');
+```
 
 ### API reference
+- [FileChooser]
 - [page.setInputFiles(selector, files[, options])](./api/class-page.mdx#pagesetinputfilesselector-files-options)
 - [frame.setInputFiles(selector, files[, options])](./api/class-frame.mdx#framesetinputfilesselector-files-options)
 - [elementHandle.setInputFiles(files[, options])](./api/class-elementhandle.mdx#elementhandlesetinputfilesfiles-options)

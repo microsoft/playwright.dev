@@ -473,6 +473,8 @@ Note that you still need to specify the capital `A` in `Shift-A` to produce the 
 
 ## Upload files
 
+You can select input files for upload using the [page.set_input_files(selector, files, **options)](./api/class-page.mdx#pageset_input_filesselector-files-options) method. It expects first argument to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input) with the type `"file"`. Multiple files can be passed in the array. If some of the file paths are relative, they are resolved relative to the current working directory. Empty array clears the selected files.
+
 <Tabs
   groupId="python-flavor"
   defaultValue="sync"
@@ -527,13 +529,40 @@ await page.set_input_files(
 </TabItem>
 </Tabs>
 
-You can select input files for upload using the [page.set_input_files(selector, files, **options)](./api/class-page.mdx#pageset_input_filesselector-files-options) method. It expects first argument to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input) with the type `"file"`. Multiple files can be passed in the array. If some of the file paths are relative, they are resolved relative to the [current working directory](https://nodejs.org/api/process.html#process_process_cwd). Empty array clears the selected files.
+If you don't have input element in hand (it is created dynamically), you can handle the [page.on("filechooser")](./api/class-page.mdx#pageonfilechooser) event or use a corresponding waiting method upon your action:
 
-#### Example
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
-[This script](https://github.com/microsoft/playwright/blob/master/utils/docs/examples/upload.js) uploads a file to an `input` element that accepts file uploads.
+```py
+with page.expect_file_chooser() as fc_info:
+    page.click("upload")
+file_chooser = fc_info.value
+file_chooser.set_files("myfile.pdf")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+async with page.expect_file_chooser() as fc_info:
+    await page.click("upload")
+file_chooser = await fc_info.value
+await file_chooser.set_files("myfile.pdf")
+```
+
+</TabItem>
+</Tabs>
 
 ### API reference
+- [FileChooser]
 - [page.set_input_files(selector, files, **options)](./api/class-page.mdx#pageset_input_filesselector-files-options)
 - [frame.set_input_files(selector, files, **options)](./api/class-frame.mdx#frameset_input_filesselector-files-options)
 - [element_handle.set_input_files(files, **options)](./api/class-elementhandle.mdx#element_handleset_input_filesfiles-options)

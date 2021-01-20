@@ -15,7 +15,7 @@ Selectors are strings that point to the elements in the page. They are used to p
 - [Selecting elements by text](#selecting-elements-by-text)
 - [Selecting elements in Shadow DOM](#selecting-elements-in-shadow-dom)
 - [Selecting elements based on layout](#selecting-elements-based-on-layout)
-- [XPpath selectors](#xppath-selectors)
+- [XPath selectors](#xpath-selectors)
 - [id, data-testid, data-test-id, data-test selectors](#id-data-testid-data-test-id-data-test-selectors)
 - [Chaining selectors](#chaining-selectors)
 - [Best practices](#best-practices)
@@ -28,9 +28,9 @@ Text selectors locate elements that contain text nodes with the passed text.
 await page.click('text=Log in');
 ```
 
-By default, the match is case-insensitive, it ignores leading/trailing whitespace and searches for a substring. This means `text= Login` matches `<button>Button loGIN (click me)</button>`.
+Matching is case-insensitive and searches for a substring. This means `text=Login` matches `<button>Button loGIN (click me)</button>`. Matching also normalizes whitespace, for example it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
 
-Text body can be escaped with single or double quotes for precise matching, insisting on exact match, including specified whitespace and case. This means `text="Login "` will only match `<button>Login </button>` with exactly one space after "Login". Quoted text follows the usual escaping rules, e.g. use `\"` to escape double quote in a double-quoted string: `text="foo\"bar"`.
+Text body can be escaped with single or double quotes for full-string case-sensitive match instead. This means `text="Login"` will match `<button>Login</button>`, but not `<button>Login (click me)</button>` or `<button>login</button>`. Quoted text follows the usual escaping rules, e.g. use `\"` to escape double quote in a double-quoted string: `text="foo\"bar"`.  Note that quoted match still normalizes whitespace.
 
 Text body can also be a JavaScript-like regex wrapped in `/` symbols. This means `text=/^\\s*Login$/i` will match `<button> loGIN</button>` with any number of spaces before "Login" and no spaces after.
 
@@ -101,7 +101,7 @@ await page.click('button:is(:text("Log in"), :text("Sign in"))');
 ## Selecting elements by text
 
 The `:text` pseudo-class matches elements that have a text node child with specific text. It is similar to the [text] engine, but can be used in combination with other `css` selector extensions. There are a few variations that support different arguments:
-* `:text("substring")` - Matches when element's text contains "substring" somewhere. Matching is case-insensitive. Matching also normalizes whitespace, for example it turns multiple spaces into one, trusn line breaks into spaces and ignores leading and trailing whitespace.
+* `:text("substring")` - Matches when element's text contains "substring" somewhere. Matching is case-insensitive. Matching also normalizes whitespace, for example it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
 * `:text-is("string")` - Matches when element's text equals the "string". Matching is case-insensitive and normalizes whitespace.
 * `button:text("Sign in")` - Text selector may be combined with regular CSS.
 * `:text-matches("[+-]?\\d+")` - Matches text against a regular expression. Note that special characters like back-slash `\`, quotes `"`, square brackets `[]` and more should be escaped. Learn more about [regular expressions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp).
@@ -145,14 +145,14 @@ More advanced Shadow DOM use cases:
 </article>
 ```
 
-- Both `"css=article div"` and `"css:light=article div"` match the first `<div>In the light dom</div>`.
-- Both `"css=article > div"` and `"css:light=article > div"` match two `div` elements that are direct children of the `article`.
-- `"css=article .in-the-shadow"` matches the `<div class='in-the-shadow'>`, piercing the shadow root, while `"css:light=article .in-the-shadow"` does not match anything.
-- `"css:light=article div > span"` does not match anything, because both light-dom `div` elements do not contain a `span`.
-- `"css=article div > span"` matches the `<span class='content'>`, piercing the shadow root.
-- `"css=article > .in-the-shadow"` does not match anything, because `<div class='in-the-shadow'>` is not a direct child of `article`
-- `"css:light=article > .in-the-shadow"` does not match anything.
-- `"css=article li#target"` matches the `<li id='target'>Deep in the shadow</li>`, piercing two shadow roots.
+- Both `"article div"` and `":light(article div)"` match the first `<div>In the light dom</div>`.
+- Both `"article > div"` and `":light(article > div)"` match two `div` elements that are direct children of the `article`.
+- `"article .in-the-shadow"` matches the `<div class='in-the-shadow'>`, piercing the shadow root, while `":light(article .in-the-shadow)"` does not match anything.
+- `":light(article div > span)"` does not match anything, because both light-dom `div` elements do not contain a `span`.
+- `"article div > span"` matches the `<span class='content'>`, piercing the shadow root.
+- `"article > .in-the-shadow"` does not match anything, because `<div class='in-the-shadow'>` is not a direct child of `article`
+- `":light(article > .in-the-shadow)"` does not match anything.
+- `"article li#target"` matches the `<li id='target'>Deep in the shadow</li>`, piercing two shadow roots.
 
 ## Selecting elements based on layout
 
@@ -177,11 +177,11 @@ await page.fill('input:right-of(:text("Username"))');
 await page.click('button:near(.promo-card)');
 ```
 
-## XPpath selectors
+## XPath selectors
 
-XPath engine is equivalent to [`Document.evaluate`](https://developer.mozilla.org/en/docs/Web/API/Document/evaluate). Example: `xpath=//html/body`.
+XPath selectors are equivalent to calling [`Document.evaluate`](https://developer.mozilla.org/en/docs/Web/API/Document/evaluate). Example: `xpath=//html/body`.
 
-Malformed selector starting with `//` or `..` is assumed to be an xpath selector. For example, Playwright converts `'//html/body'` to `'xpath=//html/body'`.
+Selector starting with `//` or `..` is assumed to be an xpath selector. For example, Playwright converts `'//html/body'` to `'xpath=//html/body'`.
 
 :::note
 `xpath` does not pierce shadow roots
