@@ -1,0 +1,179 @@
+---
+id: dialogs
+title: "Dialogs"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Playwright can interact with the web page dialogs such as [`alert`](https://developer.mozilla.org/en-US/docs/Web/API/Window/alert), [`confirm`](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm), [`prompt`](https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt) as well as [`beforeunload`](https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event) confirmation.
+
+- [alert(), confirm(), prompt() dialogs](#alert-confirm-prompt-dialogs)
+- [beforeunload dialog](#beforeunload-dialog)
+
+## alert(), confirm(), prompt() dialogs
+
+You can register a dialog handler before the action that triggers the dialog to accept or decline it.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.on("dialog", lambda dialog: dialog.accept())
+page.click("button")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+page.on("dialog", lambda dialog: dialog.accept())
+await page.click("button")
+```
+
+</TabItem>
+</Tabs>
+
+:::note
+If your action, be it [page.click(selector, **options)](./api/class-page.mdx#pageclickselector-options), [page.evaluate(expression, **options)](./api/class-page.mdx#pageevaluateexpression-options) or any other, results in a dialog, the action will stall until the dialog is handled. That's because dialogs in Web are modal and block further page execution until they are handled.
+:::
+
+As a result, following snippet will never resolve:
+
+:::warn
+WRONG!
+:::
+
+:::warn
+WRONG!
+:::
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.click("button") # Will hang here
+page.on("dialog", lambda dialog: dialog.accept())
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.click("button") # Will hang here
+page.on("dialog", lambda dialog: dialog.accept())
+```
+
+</TabItem>
+</Tabs>
+
+### API reference
+- [`Dialog`]
+- [dialog.accept(**options)](./api/class-dialog.mdx#dialogacceptoptions)
+- [dialog.dismiss()](./api/class-dialog.mdx#dialogdismiss)
+
+## beforeunload dialog
+
+When [page.close(**options)](./api/class-page.mdx#pagecloseoptions) is invoked with the truthy `run_before_unload` value, it page runs its unload handlers. This is the only case when [page.close(**options)](./api/class-page.mdx#pagecloseoptions) does not wait for the page to actually close, because it might be that the page stays open in the end of the operation.
+
+You can register a dialog handler to handle the beforeunload dialog yourself:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+def handle_dialog(dialog):
+    assert dialog.type == 'beforeunload'
+    dialog.dismiss()
+
+page.on('dialog', lambda: handle_dialog)
+page.close(run_before_unload=True)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+async def handle_dialog(dialog):
+    assert dialog.type == 'beforeunload'
+    await dialog.dismiss()
+
+page.on('dialog', lambda: handle_dialog)
+await page.close(run_before_unload=True)
+```
+
+</TabItem>
+</Tabs>
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ChromiumBrowserContext]: ./api/class-chromiumbrowsercontext.mdx "ChromiumBrowserContext"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[Evaluation Argument]: ./core-concepts.mdx#evaluationargument "Evaluation Argument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
+[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
+[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
+[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
+[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
+[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
+[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
+[URL]: https://en.wikipedia.org/wiki/URL "URL"
+[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
+[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
+[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"
