@@ -49,7 +49,7 @@ const Version: React.FC = () => {
             <table>
               <tbody>
                 <tr>
-                  <th>master</th>
+                  <th>Next</th>
                   <td>
                     <Link to={currentVersion.path + '/api/class-playwright'}>Documentation</Link>
                   </td>
