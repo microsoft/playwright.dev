@@ -26,7 +26,11 @@ const features = [
     title: "Use in your preferred language",
     description: (
       <>
-        Use the Playwright API in JavaScript, TypeScript, Python, C# and Java.
+        Use the Playwright API in <a
+        href="https://playwright.dev">JavaScript &amp; TypeScript</a>, <a
+        href="https://playwright.dev/python/docs/intro">Python</a>, <a
+        href="https://github.com/microsoft/playwright-sharp">C#</a> and, <a
+        href="https://github.com/microsoft/playwright-java">Java</a>.
       </>
     ),
     link: "docs/languages",
