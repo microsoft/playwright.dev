@@ -40,7 +40,7 @@ module.exports = {
       defaultMode: "dark",
     },
     navbar: {
-      title: "Playwright",
+      title: "Playwright for Python",
       logo: {
         alt: "Playwright logo",
         src: "img/playwright-logo.svg",
@@ -63,6 +63,15 @@ module.exports = {
           position: "right",
           className: "header-github-link",
           "aria-label": "GitHub repository",
+        },
+        {
+          type: "docsVersionDropdown",
+          position: "left",
+          // Add additional dropdown items at the beginning/end of the dropdown.
+          dropdownItemsBefore: [],
+          dropdownItemsAfter: [{ to: "/versions", label: "All versions" }],
+          // Do not add the link active class when browsing docs.
+          dropdownActiveClassDisabled: true,
         },
       ],
     },
@@ -104,20 +113,13 @@ module.exports = {
           items: [
             {
               label: "GitHub",
-              href: "https://github.com/microsoft/playwright",
+              href: "https://github.com/microsoft/playwright-python",
             },
           ],
         },
       ],
       copyright: `Copyright © ${new Date().getFullYear()} Microsoft`,
-    },
-    algolia: {
-      apiKey: "c85f496c6eea71808027d42111ac550c",
-      indexName: "playwright",
-      // Disabling contextual search to ensure search works even if the
-      // latest version is not indexed (there seems to be >24h delay).
-      // contextualSearch: true,
-    },
+    }
   },
   themes: [
     [

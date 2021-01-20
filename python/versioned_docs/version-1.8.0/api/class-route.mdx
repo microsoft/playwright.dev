@@ -1,0 +1,208 @@
+---
+id: class-route
+title: "Route"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Whenever a network route is set up with [page.route(url, handler)](./api/class-page.mdx#pagerouteurl-handler) or [browser_context.route(url, handler)](./api/class-browsercontext.mdx#browser_contextrouteurl-handler), the `Route` object allows to handle the route.
+
+
+- [route.abort(**options)](./api/class-route.mdx#routeabortoptions)
+- [route.continue_(**options)](./api/class-route.mdx#routecontinue_options)
+- [route.fulfill(**options)](./api/class-route.mdx#routefulfilloptions)
+- [route.request](./api/class-route.mdx#routerequest)
+
+## route.abort(**options)
+- `error_code` <[str]> Optional error code. Defaults to `failed`, could be one of the following:
+  * `'aborted'` - An operation was aborted (due to user action)
+  * `'accessdenied'` - Permission to access a resource, other than the network, was denied
+  * `'addressunreachable'` - The IP address is unreachable. This usually means that there is no route to the specified host or network.
+  * `'blockedbyclient'` - The client chose to block the request.
+  * `'blockedbyresponse'` - The request failed because the response was delivered along with requirements which are not met ('X-Frame-Options' and 'Content-Security-Policy' ancestor checks, for instance).
+  * `'connectionaborted'` - A connection timed out as a result of not receiving an ACK for data sent.
+  * `'connectionclosed'` - A connection was closed (corresponding to a TCP FIN).
+  * `'connectionfailed'` - A connection attempt failed.
+  * `'connectionrefused'` - A connection attempt was refused.
+  * `'connectionreset'` - A connection was reset (corresponding to a TCP RST).
+  * `'internetdisconnected'` - The Internet connection has been lost.
+  * `'namenotresolved'` - The host name could not be resolved.
+  * `'timedout'` - An operation timed out.
+  * `'failed'` - A generic failure occurred.
+
+Aborts the route's request.
+
+## route.continue_(**options)
+- `headers` <[Dict]\[[str], [str]\]> If set changes the request HTTP headers. Header values will be converted to a string.
+- `method` <[str]> If set changes the request method (e.g. GET or POST)
+- `post_data` <[str]|[Buffer]> If set changes the post data of request
+- `url` <[str]> If set changes the request URL. New URL must have same protocol as original one.
+
+Continues route's request with optional overrides.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+def handle(route, request):
+    # override headers
+    headers = {
+        **request.headers,
+        "foo": "bar" # set "foo" header
+        "origin": None # remove "origin" header
+    }
+    route.continue(headers=headers)
+}
+page.route("**/*", handle)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+async def handle(route, request):
+    # override headers
+    headers = {
+        **request.headers,
+        "foo": "bar" # set "foo" header
+        "origin": None # remove "origin" header
+    }
+    await route.continue(headers=headers)
+}
+await page.route("**/*", handle)
+```
+
+</TabItem>
+</Tabs>
+
+## route.fulfill(**options)
+- `body` <[str]|[Buffer]> Response body.
+- `content_type` <[str]> If set, equals to setting `Content-Type` response header.
+- `headers` <[Dict]\[[str], [str]\]> Response headers. Header values will be converted to a string.
+- `path` <[Union]\[[str], [pathlib.Path]\]> File path to respond with. The content type will be inferred from file extension. If `path` is a relative path, then it is resolved relative to the current working directory.
+- `status` <[int]> Response status code, defaults to `200`.
+
+Fulfills route's request with given response.
+
+An example of fulfilling all requests with 404 responses:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.route("**/*", lambda route: route.fulfill(
+    status=404,
+    content_type="text/plain",
+    body="not found!"))
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.route("**/*", lambda route: route.fulfill(
+    status=404,
+    content_type="text/plain",
+    body="not found!"))
+```
+
+</TabItem>
+</Tabs>
+
+An example of serving static file:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.route("**/xhr_endpoint", lambda route: route.fulfill(path="mock_data.json"))
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.route("**/xhr_endpoint", lambda route: route.fulfill(path="mock_data.json"))
+```
+
+</TabItem>
+</Tabs>
+
+## route.request
+- returns: <[Request]>
+
+A request to be routed.
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ChromiumBrowserContext]: ./api/class-chromiumbrowsercontext.mdx "ChromiumBrowserContext"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[Evaluation Argument]: ./core-concepts.mdx#evaluationargument "Evaluation Argument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
+[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
+[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
+[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
+[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
+[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
+[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
+[URL]: https://en.wikipedia.org/wiki/URL "URL"
+[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
+[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
+[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"

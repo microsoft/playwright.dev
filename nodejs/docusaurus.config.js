@@ -119,14 +119,7 @@ module.exports = {
         },
       ],
       copyright: `Copyright © ${new Date().getFullYear()} Microsoft`,
-    },
-    algolia: {
-      apiKey: "c85f496c6eea71808027d42111ac550c",
-      indexName: "playwright",
-      // Disabling contextual search to ensure search works even if the
-      // latest version is not indexed (there seems to be >24h delay).
-      // contextualSearch: true,
-    },
+    }
   },
   themes: [
     [
