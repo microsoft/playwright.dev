@@ -17,8 +17,19 @@ Playwright tests can be executed in CI environments. We have created sample conf
 
 3 steps to get your tests running on CI:
 1. **Ensure CI agent can run browsers**: Use [our Docker image](./docker.mdx) in Linux agents. Windows and macOS agents do not require any additional dependencies.
-1. **Install Playwright**: In most projects, this would be done with `npm ci` (or `npm install`). Playwright would install the relevant browsers automatically.
-1. **Run your tests**: Use `npm test` or equivalent to execute your tests.
+1. **Install Playwright**:
+
+   ```sh
+   $ npm ci
+   # or
+   $ npm install
+   ```
+
+1. **Run your tests**:
+
+   ```sh
+   $ npm test
+   ```
 
 ## CI configurations
 
@@ -66,13 +77,10 @@ pool:
 container: mcr.microsoft.com/playwright:bionic
 
 steps:
-- script: npm install
-- script: npm run test
+...
 ```
 
 ### Travis CI
-
-We run our tests on Travis CI over a Linux agent (Ubuntu 18.04).
 
 Suggested configuration
 1. [User namespace cloning](http://man7.org/linux/man-pages/man7/user_namespaces.7.html) should be enabled to support proper sandboxing
@@ -124,7 +132,7 @@ before_install:
 
 ### CircleCI
 
-We run our tests on CircleCI, with our [pre-built Docker image](./docker.mdx). Running Playwright smoothly on CircleCI requires the following steps:
+Running Playwright on CircleCI requires the following steps:
 1. Use the pre-built [Docker image](./docker.mdx) in your config like so:
 
    ```yml
@@ -189,8 +197,7 @@ tests:
   stage: test
   image: mcr.microsoft.com/playwright:bionic
   script:
-    - npm install # This should install playwright
-    - npm run test
+  ...
 ```
 
 ## Caching browsers
@@ -199,7 +206,7 @@ By default, Playwright downloads browser binaries when the Playwright NPM packag
 
 Caching browsers on CI is **strictly optional**: The `postinstall` hooks should execute and download the browser binaries on every run.
 
-#### Exception: `node_modules` are cached
+#### Exception: `node_modules` are cached (Node-specific)
 
 Most CI providers cache the [npm-cache](https://docs.npmjs.com/cli-commands/cache.html) directory (located at `$HOME/.npm`). If your CI pipelines caches the `node_modules` directory and you run `npm install` (instead of `npm ci`), the default configuration
 
@@ -226,7 +233,7 @@ To cache the browser downloads between CI runs, cache this location in your CI c
 
 Playwright supports the `DEBUG` environment variable to output debug logs during execution. Setting it to `pw:browser*` is helpful while debugging `Error: Failed to launch browser` errors.
 
-```
+```sh
 DEBUG=pw:browser* npm run test
 ```
 
@@ -242,7 +249,7 @@ const browser = await chromium.launch({ headless: false });
 
 On Linux agents, headful execution requires [Xvfb](https://en.wikipedia.org/wiki/Xvfb) to be installed. Our [Docker image](./docker.mdx) and GitHub Action have Xvfb pre-installed. To run browsers in headful mode with Xvfb, add `xvfb-run` before the Node.js command.
 
-```
+```sh
 xvfb-run node index.js
 ```
 
