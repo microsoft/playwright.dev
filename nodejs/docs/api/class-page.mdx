@@ -90,7 +90,7 @@ page.remove_listener("request", log_request)
 - [page.context()](./api/class-page.mdx#pagecontext)
 - [page.dblclick(selector[, options])](./api/class-page.mdx#pagedblclickselector-options)
 - [page.dispatchEvent(selector, type[, eventInit, options])](./api/class-page.mdx#pagedispatcheventselector-type-eventinit-options)
-- [page.emulateMedia(params)](./api/class-page.mdx#pageemulatemediaparams)
+- [page.emulateMedia([options])](./api/class-page.mdx#pageemulatemediaoptions)
 - [page.evaluate(pageFunction[, arg])](./api/class-page.mdx#pageevaluatepagefunction-arg)
 - [page.evaluateHandle(pageFunction[, arg])](./api/class-page.mdx#pageevaluatehandlepagefunction-arg)
 - [page.exposeBinding(name, callback[, options])](./api/class-page.mdx#pageexposebindingname-callback-options)
@@ -152,6 +152,7 @@ page.remove_listener("request", log_request)
 - [page.touchscreen](./api/class-page.mdx#pagetouchscreen)
 
 ## page.on('close')
+- type: <[Page]>
 
 Emitted when the page closes.
 
@@ -173,6 +174,7 @@ page.evaluate(() => console.log('hello', 5, {foo: 'bar'}));
 ```
 
 ## page.on('crash')
+- type: <[Page]>
 
 Emitted when the page crashes. Browser pages might crash if they try to allocate too much memory. When the page crashes, ongoing and subsequent operations will throw.
 
@@ -195,6 +197,7 @@ try {
 Emitted when a JavaScript dialog appears, such as `alert`, `prompt`, `confirm` or `beforeunload`. Playwright can respond to the dialog via [dialog.accept([promptText])](./api/class-dialog.mdx#dialogacceptprompttext) or [dialog.dismiss()](./api/class-dialog.mdx#dialogdismiss) methods.
 
 ## page.on('domcontentloaded')
+- type: <[Page]>
 
 Emitted when the JavaScript [`DOMContentLoaded`](https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded) event is dispatched.
 
@@ -238,6 +241,7 @@ Emitted when a frame is detached.
 Emitted when a frame is navigated to a new url.
 
 ## page.on('load')
+- type: <[Page]>
 
 Emitted when the JavaScript [`load`](https://developer.mozilla.org/en-US/docs/Web/Events/load) event is dispatched.
 
@@ -533,10 +537,10 @@ const dataTransfer = await page.evaluateHandle(() => new DataTransfer());
 await page.dispatchEvent('#source', 'dragstart', { dataTransfer });
 ```
 
-## page.emulateMedia(params)
-- `params` <[Object]>
-  - `media` <[null]|"screen"|"print"> Changes the CSS media type of the page. The only allowed values are `'screen'`, `'print'` and `null`. Passing `null` disables CSS media emulation. Omitting `media` or passing `undefined` does not change the emulated value. Optional.
-  - `colorScheme` <[null]|"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. Passing `null` disables color scheme emulation. Omitting `colorScheme` or passing `undefined` does not change the emulated value. Optional.
+## page.emulateMedia([options])
+- `options` <[Object]>
+  - `colorScheme` <[null]|"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. Passing `null` disables color scheme emulation.
+  - `media` <[null]|"screen"|"print"> Changes the CSS media type of the page. The only allowed values are `'screen'`, `'print'` and `null`. Passing `null` disables CSS media emulation.
 
 ```js
 await page.evaluate(() => matchMedia('screen').matches);
@@ -734,7 +738,7 @@ const crypto = require('crypto');
   - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
 
-This method waits for an element matching `selector`, waits for [actionability](./actionability.mdx) checks, focuses the element, fills it and triggers an `input` event after filling. If the element matching `selector` is not an `<input>`, `<textarea>` or `[contenteditable]` element, this method throws an error. Note that you can pass an empty string to clear the input field.
+This method waits for an element matching `selector`, waits for [actionability](./actionability.mdx) checks, focuses the element, fills it and triggers an `input` event after filling. If the element is inside the `<label>` element that has associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), that control will be filled instead. If the element to be filled is not an `<input>`, `<textarea>` or `[contenteditable]` element, this method throws an error. Note that you can pass an empty string to clear the input field.
 
 To send fine-grained keyboard events, use [page.type(selector, text[, options])](./api/class-page.mdx#pagetypeselector-text-options).
 
@@ -977,7 +981,7 @@ Returns the PDF buffer.
 Generating a pdf is currently only supported in Chromium headless.
 :::
 
-`page.pdf()` generates a pdf of the page with `print` css media. To generate a pdf with `screen` media, call [page.emulateMedia(params)](./api/class-page.mdx#pageemulatemediaparams) before calling `page.pdf()`:
+`page.pdf()` generates a pdf of the page with `print` css media. To generate a pdf with `screen` media, call [page.emulateMedia([options])](./api/class-page.mdx#pageemulatemediaoptions) before calling `page.pdf()`:
 
 :::note
 By default, `page.pdf()` generates a pdf with modified colors for printing. Use the [`-webkit-print-color-adjust`](https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-print-color-adjust) property to force rendering of exact colors.
