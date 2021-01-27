@@ -17,6 +17,7 @@ Selectors are strings that point to the elements in the page. They are used to p
 - [Selecting elements based on layout](#selecting-elements-based-on-layout)
 - [XPath selectors](#xpath-selectors)
 - [id, data-testid, data-test-id, data-test selectors](#id-data-testid-data-test-id-data-test-selectors)
+- [Pick n-th match from the query result](#pick-n-th-match-from-the-query-result)
 - [Chaining selectors](#chaining-selectors)
 - [Best practices](#best-practices)
 
@@ -95,23 +96,56 @@ The `:is()` pseudo-class is an [experimental CSS pseudo-class](https://developer
 
 ```js
 // Clicks a <button> that has either a "Log in" or "Sign in" text.
-await page.click('button:is(:text("Log in"), :text("Sign in"))');
+await page.click(':is(button:has-text("Log in"), button:has-text("Sign in"))');
 ```
 
 ## Selecting elements by text
 
-The `:text` pseudo-class matches elements that have a text node child with specific text. It is similar to the [text] engine, but can be used in combination with other `css` selector extensions. There are a few variations that support different arguments:
-* `:text("substring")` - Matches when element's text contains "substring" somewhere. Matching is case-insensitive. Matching also normalizes whitespace, for example it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
-* `:text-is("string")` - Matches when element's text equals the "string". Matching is case-insensitive and normalizes whitespace.
-* `button:text("Sign in")` - Text selector may be combined with regular CSS.
-* `:text-matches("[+-]?\\d+")` - Matches text against a regular expression. Note that special characters like back-slash `\`, quotes `"`, square brackets `[]` and more should be escaped. Learn more about [regular expressions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp).
-* `:text-matches("value", "i")` - Matches text against a regular expression with specified flags.
+The `:has-text` pseudo-class matches elements that have specific text somewhere inside, possibly in a child or a descendant element. It is approximately equivalent to `element.textContent.includes(textToSearchFor)`.
 
-Click a button with text "Sign in":
+The `:text` pseudo-class matches elements that have a text node child with specific text. It is similar to the [text] engine.
+
+`:has-text` and `:text` should be used differently. Consider the following page:
+
+```html
+<div class=nav-item>Home</div>
+<div class=nav-item>
+  <span class=bold>New</span> products
+</div>
+<div class=nav-item>
+  <span class=bold>All</span> products
+</div>
+<div class=nav-item>Contact us</div>
+```
+
+Use `:has-text()` to click a navigation item that contains text "All products".
 
 ```js
-await page.click('button:text("Sign in")');
+await page.click('.nav-item:has-text("All products")');
 ```
+
+```js
+// Wrong, will match many elements including <body>
+await page.click(':has-text("All products")');
+// Correct, only matches the navigation item
+await page.click('.nav-item:has-text("All products")');
+```
+
+Use `:text()` to click an element that directly contains text "Home".
+
+```js
+await page.click(':text("Home")');
+```
+
+:::note
+Both `:has-text()` and `:text()` perform case-insensitive match. They also normalize whitespace, for example turn multiple spaces into one, turn line breaks into spaces and ignore leading and trailing whitespace.
+:::
+
+There are a few `:text()` variations that support different arguments:
+* `:text("substring")` - Matches when a text node inside the element contains "substring". Matching is case-insensitive and normalizes whitespace.
+* `:text-is("string")` - Matches when all text nodes inside the element combined have the text value equal to "string". Matching is case-insensitive and normalizes whitespace.
+* `:text-matches("[+-]?\\d+")` - Matches text nodes against a regular expression. Note that special characters like back-slash `\`, quotes `"`, square brackets `[]` and more should be escaped. Learn more about [regular expressions](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp).
+* `:text-matches("value", "i")` - Matches text nodes against a regular expression with specified flags.
 
 ## Selecting elements in Shadow DOM
 
@@ -190,6 +224,38 @@ Selector starting with `//` or `..` is assumed to be an xpath selector. For exam
 ## id, data-testid, data-test-id, data-test selectors
 
 Attribute engines are selecting based on the corresponding attribute value. For example: `data-test-id=foo` is equivalent to `css=[data-test-id="foo"]`, and `id:light=foo` is equivalent to `css:light=[id="foo"]`.
+
+## Pick n-th match from the query result
+
+Sometimes page contains a number of similar elements, and it is hard to select a particular one. For example:
+
+```html
+<section> <button>Buy</button> </section>
+<article><div> <button>Buy</button> </div></article>
+<div><div> <button>Buy</button> </div></div>
+```
+
+In this case, `:nth-match(:text("Buy"), 3)` will select the third button from the snippet above. Note that index is one-based.
+
+```js
+// Click the third "Buy" button
+await page.click(':nth-match(:text("Buy"), 3)');
+```
+
+`:nth-match()` is also useful to wait until a specified number of elements appear, using [page.waitForSelector(selector[, options])](./api/class-page.mdx#pagewaitforselectorselector-options).
+
+```js
+// Wait until all three buttons are visible
+await page.waitForSelector(':nth-match(:text("Buy"), 3)');
+```
+
+:::note
+Unlike [`:nth-child()`](https://developer.mozilla.org/en-US/docs/Web/CSS/:nth-child), elements do not have to be siblings, they could be anywhere on the page. In the snippet above, all three buttons match `:text("Buy")` selector, and `:nth-match()` selects the third button.
+:::
+
+:::note
+It is usually possible to distinguish elements by some attribute or text content. In this case, prefer using [text] or [css] selectors over the `:nth-match()`.
+:::
 
 ## Chaining selectors
 
