@@ -26,7 +26,7 @@ const Documentation = require('./documentation');
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
 
 const DIR_SRC = path.join(process.env.SRC_DIR, 'docs', 'src');
-const commonSnippets = new Set(['html', 'yml', 'yaml', 'json', 'groovy', 'html', 'sh', 'py']);
+const commonSnippets = new Set(['html', 'yml', 'yaml', 'json', 'groovy', 'html', 'sh']);
 
 class Generator {
   links = new Map();
@@ -202,7 +202,7 @@ ${md.render([spec[i]])}
         return true;
 
       // Our lang - Ok.
-      if (c.codeLang === this.lang) {
+      if (c.codeLang === this.lang || c.codeLang === highlighterName(this.lang)) {
         c.codeLang = highlighterName(this.lang);
         return true;
       }
