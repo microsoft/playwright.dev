@@ -401,7 +401,7 @@ function renderJSSignature(args) {
 function renderPythonSignature(args) {
   const argNames = args.filter(a => a.required).map(a => toSnakeCase(a.name));
   if (args.find(a => !a.required))
-    argNames.push('**options');
+    argNames.push('**kwargs');
   return argNames.join(', ');
 }
 
