@@ -123,7 +123,7 @@ import TabItem from '@theme/TabItem';
       const memberNode = { type: 'h2', children: [] };
       const { text, args } = this.config.formatMember(member);
       memberNode.text = text;
-      memberNode.children.push(...args.map(a => this.renderProperty(`\`${this.config.formatArgumentName(a.name)}\``, a.type, a.spec, 'in')));
+      memberNode.children.push(...args.map(a => this.renderProperty(`\`${this.config.formatArgumentName(a.alias)}\``, a.type, a.spec, 'in')));
 
       // Append type
       if (member.type && member.type.name !== 'void') {
@@ -374,7 +374,7 @@ function renderJSSignature(args) {
   const tokens = [];
   let hasOptional = false;
   for (const arg of args) {
-    const name = arg.name;
+    const name = arg.alias;
     const optional = !arg.required;
     if (tokens.length) {
       if (optional && !hasOptional)
