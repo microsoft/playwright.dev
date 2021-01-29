@@ -426,7 +426,7 @@ new Generator('js', path.join(__dirname, '..', 'nodejs', 'docs'), {
     if (member.kind === 'method') {
       args = member.argsArray;
       const signature = renderJSSignature(args);
-      text = `${member.clazz.varName}.${member.name}(${signature})`;
+      text = `${member.clazz.varName}.${member.alias}(${signature})`;
     }
     return { text, args };
   },
