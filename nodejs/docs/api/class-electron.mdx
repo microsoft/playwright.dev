@@ -1,62 +1,64 @@
 ---
-id: dialogs
-title: "Dialogs"
+id: class-electron
+title: "Electron"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright can interact with the web page dialogs such as [`alert`](https://developer.mozilla.org/en-US/docs/Web/API/Window/alert), [`confirm`](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm), [`prompt`](https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt) as well as [`beforeunload`](https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event) confirmation.
-
-- [alert(), confirm(), prompt() dialogs](#alert-confirm-prompt-dialogs)
-- [beforeunload dialog](#beforeunload-dialog)
-
-## alert(), confirm(), prompt() dialogs
-
-You can register a dialog handler before the action that triggers the dialog to accept or decline it.
+Playwright has **experimental** support for Electron automation. You can access electron namespace via:
 
 ```js
-page.on('dialog', dialog => dialog.accept());
-await page.click('button');
+const { _electron } = require('playwright');
 ```
 
-:::note
-If your action, be it [page.click(selector[, options])](./api/class-page.mdx#pageclickselector-options), [page.evaluate(pageFunction[, arg])](./api/class-page.mdx#pageevaluatepagefunction-arg) or any other, results in a dialog, the action will stall until the dialog is handled. That's because dialogs in Web are modal and block further page execution until they are handled.
-:::
-
-As a result, following snippet will never resolve:
-
-:::warn
-WRONG!
-:::
+An example of the Electron automation script would be:
 
 ```js
-await page.click('button'); // Will hang here
-page.on('dialog', dialog => dialog.accept())
+const { _electron: electron } = require('playwright');
+
+(async () => {
+  // Launch Electron app.
+  const electronApp = await electron.launch({ args: ['main.js'] });
+
+  // Evaluation expression in the Electron context.
+  const appPath = await electronApp.evaluate(async (electron) => {
+    // This runs in the main Electron process, |electron| parameter
+    // here is always the result of the require('electron') in the main
+    // app script.
+    return electron.getAppPath();
+  });
+
+  // Get the first window that the app opens, wait if necessary.
+  const window = await electronApp.firstWindow();
+  // Print the title.
+  console.log(await window.title());
+  // Capture a screenshot.
+  await window.screenshot({ path: 'intro.png' });
+  // Direct Electron console to Node terminal.
+  window.on('console', console.log);
+  // Click button.
+  await window.click('text=Click me');
+})();
 ```
 
-:::warn
-WRONG!
-:::
+Note that since you don't need Playwright to install web browsers when testing Electron, you can omit browser download via setting the following environment variable when installing Playwright:
 
-### API reference
-- [`Dialog`]
-- [dialog.accept([promptText])](./api/class-dialog.mdx#dialogacceptprompttext)
-- [dialog.dismiss()](./api/class-dialog.mdx#dialogdismiss)
-
-## beforeunload dialog
-
-When [page.close([options])](./api/class-page.mdx#pagecloseoptions) is invoked with the truthy `runBeforeUnload` value, it page runs its unload handlers. This is the only case when [page.close([options])](./api/class-page.mdx#pagecloseoptions) does not wait for the page to actually close, because it might be that the page stays open in the end of the operation.
-
-You can register a dialog handler to handle the beforeunload dialog yourself:
-
-```js
-page.on('dialog', async dialog => {
-  assert(dialog.type() === 'beforeunload');
-  await dialog.dismiss();
-});
-await page.close({runBeforeUnload: true});
+```sh
+$ PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm i -D playwright
 ```
 
+
+- [electron.launch([options])](./api/class-electron.mdx#electronlaunchoptions)
+
+## electron.launch([options])
+- `options` <[Object]>
+  - `args` <[Array]<[string]>> Additional arguments to pass to the application when launching. You typically pass the main script name here.
+  - `cwd` <[string]> Current working directory to launch application from.
+  - `env` <[Object]<[string], [string]>> Specifies environment variables that will be visible to the browser. Defaults to `process.env`.
+  - `executablePath` <[string]> Launches given Electron application. If not specified, launches the default Electron executable installed in this package, located at `node_modules/.bin/electron`.
+- returns: <[Promise]<[ElectronApplication]>>
+
+Launches electron application specified with the `executablePath`.
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Browser]: ./api/class-browser.mdx "Browser"

@@ -99,6 +99,15 @@ module.exports = {
           ],
           "collapsed": false
         },
+        {
+          "type": "category",
+          "label": "Experimental",
+          "items": [
+            { "type": "doc", "id": "api/class-electron" },
+            { "type": "doc", "id": "api/class-electronapplication" },
+          ],
+          "collapsed": false
+        },
       ],
       "collapsed": false
     }
