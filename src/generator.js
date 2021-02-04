@@ -453,7 +453,7 @@ new Generator('python', path.join(__dirname, '..', 'python', 'docs'), {
       text = `${toSnakeCase(member.clazz.varName)}.${toSnakeCase(member.alias)}`;
   
     if (member.kind === 'event')
-      text = `${toSnakeCase(member.clazz.varName)}.on("${toSnakeCase(member.alias.toLowerCase())}")`;
+      text = `${toSnakeCase(member.clazz.varName)}.on("${member.alias.toLowerCase()}")`;
   
     if (member.kind === 'method') {
       for (const arg of member.argsArray)
