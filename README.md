@@ -32,3 +32,31 @@ Note that search indexes are only populated for prod build.
 npm run build
 npm run serve
 ```
+
+### Running this on Windows
+
+If you don't already, you might need to set the default shell to `bash`. 
+
+```powershell
+npm config set script-shell "C:\\Program Files\\git\\bin\\bash.exe"
+```
+
+You can revert it later, if you have issues, by doing:
+
+```powershell
+npm config delete script-shell
+```
+
+In some cases, the `postinstall` script doesn't auto-run after `npm install`, in which case, you can run that manually:
+
+```sh
+npm run postinstall
+```
+
+That should bring your environment to a state ready for testing.
+
+To roll the docs in PowerShell, make sure you set the env variable correctly, i.e.:
+
+```powershell
+$env:SRC_DIR="C:\Users\user\src\playwright"; npm run roll
+```
