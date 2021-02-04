@@ -421,7 +421,7 @@ new Generator('js', path.join(__dirname, '..', 'nodejs', 'docs'), {
       text = `${member.clazz.varName}.${member.name}`;
   
     if (member.kind === 'event')
-      text = `${member.clazz.varName}.on('${member.name}')`;
+      text = `${member.clazz.varName}.on('${member.name.toLowerCase()}')`;
   
     if (member.kind === 'method') {
       args = member.argsArray;
@@ -453,7 +453,7 @@ new Generator('python', path.join(__dirname, '..', 'python', 'docs'), {
       text = `${toSnakeCase(member.clazz.varName)}.${toSnakeCase(member.alias)}`;
   
     if (member.kind === 'event')
-      text = `${toSnakeCase(member.clazz.varName)}.on("${toSnakeCase(member.alias)}")`;
+      text = `${toSnakeCase(member.clazz.varName)}.on("${toSnakeCase(member.alias.toLowerCase())}")`;
   
     if (member.kind === 'method') {
       for (const arg of member.argsArray)
