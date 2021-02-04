@@ -103,6 +103,7 @@ page.removeListener('request', logRequest);
 - [page.isVisible(selector[, options])](./api/class-page.mdx#pageisvisibleselector-options)
 - [page.mainFrame()](./api/class-page.mdx#pagemainframe)
 - [page.opener()](./api/class-page.mdx#pageopener)
+- [page.pause()](./api/class-page.mdx#pagepause)
 - [page.pdf([options])](./api/class-page.mdx#pagepdfoptions)
 - [page.press(selector, key[, options])](./api/class-page.mdx#pagepressselector-key-options)
 - [page.reload([options])](./api/class-page.mdx#pagereloadoptions)
@@ -310,7 +311,7 @@ Shortcut for main frame's [frame.$$(selector)](./api/class-frame.mdx#frameselect
 ## page.$eval(selector, pageFunction[, arg])
 - `selector` <[string]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
 - `pageFunction` <[function]\([Element]\)> Function to be evaluated in the page context.
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`.
 - returns: <[Promise]<[Serializable]>>
 
 The method finds an element matching the specified selector within the page and passes it as a first argument to `pageFunction`. If no elements match the selector, the method throws an error. Returns the value of `pageFunction`.
@@ -330,7 +331,7 @@ Shortcut for main frame's [frame.$eval(selector, pageFunction[, arg])](./api/cla
 ## page.$$eval(selector, pageFunction[, arg])
 - `selector` <[string]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
 - `pageFunction` <[function]\([Array]<[Element]>\)> Function to be evaluated in the page context.
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`.
 - returns: <[Promise]<[Serializable]>>
 
 The method finds all elements matching the specified selector within the page and passes an array of matched elements as a first argument to `pageFunction`. Returns the result of `pageFunction` invocation.
@@ -561,7 +562,7 @@ await page.evaluate(() => matchMedia('(prefers-color-scheme: no-preference)').ma
 
 ## page.evaluate(pageFunction[, arg])
 - `pageFunction` <[function]|[string]> Function to be evaluated in the page context.
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`.
 - returns: <[Promise]<[Serializable]>>
 
 Returns the value of the `pageFunction` invocation.
@@ -599,7 +600,7 @@ Shortcut for main frame's [frame.evaluate(pageFunction[, arg])](./api/class-fram
 
 ## page.evaluateHandle(pageFunction[, arg])
 - `pageFunction` <[function]|[string]> Function to be evaluated in the page context.
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`.
 - returns: <[Promise]<[JSHandle]>>
 
 Returns the value of the `pageFunction` invocation as a [JSHandle].
@@ -928,6 +929,16 @@ The page's main frame. Page is guaranteed to have a main frame which persists du
 - returns: <[Promise]<[null]|[Page]>>
 
 Returns the opener for popup pages and `null` for others. If the opener has been closed already the returns `null`.
+
+## page.pause()
+
+Pauses script execution. Playwright will stop executing the script and wait for the user to either press 'Resume' button in the page overlay or to call `playwright.resume()` in the DevTools console.
+
+User can inspect selectors or perform manual steps while paused. Resume will continue running the original script from the place it was paused.
+
+:::note
+This method requires Playwright to be started in a headed mode, with a falsy [`options: headless`] value in the [browserType.launch([options])](./api/class-browsertype.mdx#browsertypelaunchoptions).
+:::
 
 ## page.pdf([options])
 - `options` <[Object]>
@@ -1327,7 +1338,7 @@ const [frame, _] = await Promise.all([
 
 ## page.waitForFunction(pageFunction[, arg, options])
 - `pageFunction` <[function]|[string]> Function to be evaluated in the page context.
-- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`
+- `arg` <[EvaluationArgument]> Optional argument to pass to `pageFunction`.
 - `options` <[Object]>
   - `polling` <[number]|"raf"> If `polling` is `'raf'`, then `pageFunction` is constantly executed in `requestAnimationFrame` callback. If `polling` is a number, then it is treated as an interval in milliseconds at which the function would be executed. Defaults to `raf`.
   - `timeout` <[number]> maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout).
