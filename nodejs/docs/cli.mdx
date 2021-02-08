@@ -58,6 +58,27 @@ $ npx playwright --load-storage=auth.json codegen my.web.app
 # Perform actions in authenticated state.
 ```
 
+### Codegen with custom setup
+
+If you would like to use codegen in some non-standard setup (for example, use [browserContext.route(url, handler)](./api/class-browsercontext.mdx#browsercontextrouteurl-handler)), it is possible to call [page.pause()](./api/class-page.mdx#pagepause) that will open a separate window with codegen controls.
+
+```js
+const { chromium } = require('playwright');
+
+(async () => {
+  // Make sure to run headed.
+  const browser = await chromium.launch({ headless: false });
+
+  // Setup context however you like.
+  const context = await browser.newContext({ /* pass any options */ });
+  await context.route('**/*', route => route.continue());
+
+  // Pause the page, and start recording manually.
+  const page = await context.newPage();
+  await page.pause();
+})();
+```
+
 ## Open pages
 
 With `open`, you can use Playwright bundled browsers to browse web pages. Playwright provides cross-platform WebKit builds that can be used to reproduce Safari rendering across Windows, Linux and macOS.
