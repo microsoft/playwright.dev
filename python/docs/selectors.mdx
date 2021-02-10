@@ -7,6 +7,7 @@ import TabItem from '@theme/TabItem';
 
 Selectors are strings that point to the elements in the page. They are used to perform actions on those elements by means of methods such as [page.click(selector, **kwargs)](./api/class-page.mdx#pageclickselector-kwargs), [page.fill(selector, value, **kwargs)](./api/class-page.mdx#pagefillselector-value-kwargs) and alike. All those methods accept `selector` as their first argument.
 
+- [Quick guide](#quick-guide)
 - [Basic text selectors](#basic-text-selectors)
 - [Basic CSS selectors](#basic-css-selectors)
 - [Selecting visible elements](#selecting-visible-elements)
@@ -20,6 +21,239 @@ Selectors are strings that point to the elements in the page. They are used to p
 - [Pick n-th match from the query result](#pick-n-th-match-from-the-query-result)
 - [Chaining selectors](#chaining-selectors)
 - [Best practices](#best-practices)
+
+## Quick guide
+- Text selector
+
+  <Tabs
+    groupId="python-flavor"
+    defaultValue="sync"
+    values={[
+      {label: 'Sync', value: 'sync'},
+      {label: 'Async', value: 'async'}
+    ]
+  }>
+  <TabItem value="sync">
+  
+  ```py
+  page.click("text=Log in")
+  ```
+  
+  </TabItem>
+  <TabItem value="async">
+  
+  ```py
+  await page.click("text=Log in")
+  ```
+  
+  </TabItem>
+  </Tabs>
+- CSS selector
+
+  <Tabs
+    groupId="python-flavor"
+    defaultValue="sync"
+    values={[
+      {label: 'Sync', value: 'sync'},
+      {label: 'Async', value: 'async'}
+    ]
+  }>
+  <TabItem value="sync">
+  
+  ```py
+  page.click("button")
+  page.click("#nav-bar .contact-us-item")
+  ```
+  
+  </TabItem>
+  <TabItem value="async">
+  
+  ```py
+  await page.click("button")
+  await page.click("#nav-bar .contact-us-item")
+  ```
+  
+  </TabItem>
+  </Tabs>
+- Select by attribute, with css selector
+
+  <Tabs
+    groupId="python-flavor"
+    defaultValue="sync"
+    values={[
+      {label: 'Sync', value: 'sync'},
+      {label: 'Async', value: 'async'}
+    ]
+  }>
+  <TabItem value="sync">
+  
+  ```py
+  page.click("[data-test=login-button]")
+  page.click("[aria-label='Sign in']")
+  ```
+  
+  </TabItem>
+  <TabItem value="async">
+  
+  ```py
+  await page.click("[data-test=login-button]")
+  await page.click("[aria-label='Sign in']")
+  ```
+  
+  </TabItem>
+  </Tabs>
+- Combine css and text selectors
+
+  <Tabs
+    groupId="python-flavor"
+    defaultValue="sync"
+    values={[
+      {label: 'Sync', value: 'sync'},
+      {label: 'Async', value: 'async'}
+    ]
+  }>
+  <TabItem value="sync">
+  
+  ```py
+  page.click("article:has-text('Playwright')")
+  page.click("#nav-bar :text('Contact us')")
+  ```
+  
+  </TabItem>
+  <TabItem value="async">
+  
+  ```py
+  await page.click("article:has-text('Playwright')")
+  await page.click("#nav-bar :text('Contact us')")
+  ```
+  
+  </TabItem>
+  </Tabs>
+- Element that contains another, with css selector
+
+  <Tabs
+    groupId="python-flavor"
+    defaultValue="sync"
+    values={[
+      {label: 'Sync', value: 'sync'},
+      {label: 'Async', value: 'async'}
+    ]
+  }>
+  <TabItem value="sync">
+  
+  ```py
+  page.click(".item-description:has(.item-promo-banner)")
+  ```
+  
+  </TabItem>
+  <TabItem value="async">
+  
+  ```py
+  await page.click(".item-description:has(.item-promo-banner)")
+  ```
+  
+  </TabItem>
+  </Tabs>
+- Selecting based on layout, with css selector
+
+  <Tabs
+    groupId="python-flavor"
+    defaultValue="sync"
+    values={[
+      {label: 'Sync', value: 'sync'},
+      {label: 'Async', value: 'async'}
+    ]
+  }>
+  <TabItem value="sync">
+  
+  ```py
+  page.click("input:right-of(:text('Username'))")
+  ```
+  
+  </TabItem>
+  <TabItem value="async">
+  
+  ```py
+  await page.click("input:right-of(:text('Username'))")
+  ```
+  
+  </TabItem>
+  </Tabs>
+- Only visible elements, with css selector
+
+  <Tabs
+    groupId="python-flavor"
+    defaultValue="sync"
+    values={[
+      {label: 'Sync', value: 'sync'},
+      {label: 'Async', value: 'async'}
+    ]
+  }>
+  <TabItem value="sync">
+  
+  ```py
+  page.click(".login-button:visible")
+  ```
+  
+  </TabItem>
+  <TabItem value="async">
+  
+  ```py
+  await page.click(".login-button:visible")
+  ```
+  
+  </TabItem>
+  </Tabs>
+- Pick n-th match
+
+  <Tabs
+    groupId="python-flavor"
+    defaultValue="sync"
+    values={[
+      {label: 'Sync', value: 'sync'},
+      {label: 'Async', value: 'async'}
+    ]
+  }>
+  <TabItem value="sync">
+  
+  ```py
+  page.click(":nth-match(:text('Buy'), 3)"
+  ```
+  
+  </TabItem>
+  <TabItem value="async">
+  
+  ```py
+  await page.click(":nth-match(:text('Buy'), 3)"
+  ```
+  
+  </TabItem>
+  </Tabs>
+- XPath selector
+
+  <Tabs
+    groupId="python-flavor"
+    defaultValue="sync"
+    values={[
+      {label: 'Sync', value: 'sync'},
+      {label: 'Async', value: 'async'}
+    ]
+  }>
+  <TabItem value="sync">
+  
+  ```py
+  page.click("xpath=//button")
+  ```
+  
+  </TabItem>
+  <TabItem value="async">
+  
+  ```py
+  await page.click("xpath=//button")
+  ```
+  
+  </TabItem>
+  </Tabs>
 
 ## Basic text selectors
 
@@ -417,7 +651,7 @@ Layout selectors use [bounding client rect](https://developer.mozilla.org/en-US/
 
 ```py
 # Fill an input to the right of "Username".
-page.fill('input:right-of(:text("Username"))')
+page.fill('input:right-of(:text("Username"))', 'value')
 
 # Click a button near the promo card.
 page.click('button:near(.promo-card)')
@@ -428,7 +662,7 @@ page.click('button:near(.promo-card)')
 
 ```py
 # Fill an input to the right of "Username".
-await page.fill('input:right-of(:text("Username"))')
+await page.fill('input:right-of(:text("Username"))', 'value')
 
 # Click a button near the promo card.
 await page.click('button:near(.promo-card)')
