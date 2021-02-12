@@ -1,62 +1,88 @@
 ---
-id: dialogs
-title: "Dialogs"
+id: class-android
+title: "Android"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright can interact with the web page dialogs such as [`alert`](https://developer.mozilla.org/en-US/docs/Web/API/Window/alert), [`confirm`](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm), [`prompt`](https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt) as well as [`beforeunload`](https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event) confirmation.
-
-- [alert(), confirm(), prompt() dialogs](#alert-confirm-prompt-dialogs)
-- [beforeunload dialog](#beforeunload-dialog)
-
-## alert(), confirm(), prompt() dialogs
-
-By default, dialogs are auto-dismissed by Playwright, so you don't have to handle them. However, you can register a dialog handler before the action that triggers the dialog to accept or decline it.
+Playwright has **experimental** support for Android automation. You can access android namespace via:
 
 ```js
-page.on('dialog', dialog => dialog.accept());
-await page.click('button');
+const { _android } = require('playwright');
 ```
 
-:::note
-[page.on('dialog')](./api/class-page.mdx#pageondialog) listener **must handle** the dialog. Otherwise your action will stall, be it [page.click(selector[, options])](./api/class-page.mdx#pageclickselector-options), [page.evaluate(pageFunction[, arg])](./api/class-page.mdx#pageevaluatepagefunction-arg) or any other. That's because dialogs in Web are modal and block further page execution until they are handled.
-:::
-
-As a result, following snippet will never resolve:
-
-:::warn
-WRONG!
-:::
+An example of the Android automation script would be:
 
 ```js
-page.on('dialog', dialog => console.log(dialog.message()));
-await page.click('button'); // Will hang here
+const { _android } = require('playwright');
+
+(async () => {
+  // Connect to the device.
+  const [device] = await playwright._android.devices();
+  console.log(`Model: ${device.model()}`);
+  console.log(`Serial: ${device.serial()}`);
+  // Take screenshot of the whole device.
+  await device.screenshot({ path: 'device.png' });
+
+  {
+    // --------------------- WebView -----------------------
+
+    // Launch an application with WebView.
+    await device.shell('am force-stop org.chromium.webview_shell');
+    await device.shell('am start org.chromium.webview_shell/.WebViewBrowserActivity');
+    // Get the WebView.
+    const webview = await device.webView({ pkg: 'org.chromium.webview_shell' });
+
+    // Fill the input box.
+    await device.fill({ res: 'org.chromium.webview_shell:id/url_field' }, 'github.com/microsoft/playwright');
+    await device.press({ res: 'org.chromium.webview_shell:id/url_field' }, 'Enter');
+
+    // Work with WebView's page as usual.
+    const page = await webview.page();
+    await page.page.waitForNavigation({ url: /.*microsoft\/playwright.*/ });
+    console.log(await page.title());
+  }
+
+  {
+    // --------------------- Browser -----------------------
+
+    // Launch Chrome browser.
+    await device.shell('am force-stop com.android.chrome');
+    const context = await device.launchBrowser();
+
+    // Use BrowserContext as usual.
+    const page = await context.newPage();
+    await page.goto('https://webkit.org/');
+    console.log(await page.evaluate(() => window.location.href));
+    await page.screenshot({ path: 'page.png' });
+
+    await context.close();
+  }
+
+  // Close the device.
+  await device.close();
+})();
 ```
 
-:::note
-If there is no listener for [page.on('dialog')](./api/class-page.mdx#pageondialog), all dialogs are automatically dismissed.
-:::
+Note that since you don't need Playwright to install web browsers when testing Android, you can omit browser download via setting the following environment variable when installing Playwright:
 
-### API reference
-- [`Dialog`]
-- [dialog.accept([promptText])](./api/class-dialog.mdx#dialogacceptprompttext)
-- [dialog.dismiss()](./api/class-dialog.mdx#dialogdismiss)
-
-## beforeunload dialog
-
-When [page.close([options])](./api/class-page.mdx#pagecloseoptions) is invoked with the truthy `runBeforeUnload` value, it page runs its unload handlers. This is the only case when [page.close([options])](./api/class-page.mdx#pagecloseoptions) does not wait for the page to actually close, because it might be that the page stays open in the end of the operation.
-
-You can register a dialog handler to handle the beforeunload dialog yourself:
-
-```js
-page.on('dialog', async dialog => {
-  assert(dialog.type() === 'beforeunload');
-  await dialog.dismiss();
-});
-await page.close({runBeforeUnload: true});
+```sh
+$ PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm i -D playwright
 ```
 
+
+- [android.devices()](./api/class-android.mdx#androiddevices)
+- [android.setDefaultTimeout(timeout)](./api/class-android.mdx#androidsetdefaulttimeouttimeout)
+
+## android.devices()
+- returns: <[Promise]<[Array]<[AndroidDevice]>>>
+
+Returns the list of detected Android devices.
+
+## android.setDefaultTimeout(timeout)
+- `timeout` <[number]> Maximum time in milliseconds
+
+This setting will change the default maximum time for all the methods accepting `timeout` option.
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"
