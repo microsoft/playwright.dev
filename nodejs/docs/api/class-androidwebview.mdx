@@ -1,62 +1,36 @@
 ---
-id: dialogs
-title: "Dialogs"
+id: class-androidwebview
+title: "AndroidWebView"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright can interact with the web page dialogs such as [`alert`](https://developer.mozilla.org/en-US/docs/Web/API/Window/alert), [`confirm`](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm), [`prompt`](https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt) as well as [`beforeunload`](https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event) confirmation.
+[AndroidWebView] represents a WebView open on the [AndroidDevice]. WebView is usually obtained using [androidDevice.webView(selector[, options])](./api/class-androiddevice.mdx#androiddevicewebviewselector-options).
 
-- [alert(), confirm(), prompt() dialogs](#alert-confirm-prompt-dialogs)
-- [beforeunload dialog](#beforeunload-dialog)
 
-## alert(), confirm(), prompt() dialogs
+- [androidWebView.on('close')](./api/class-androidwebview.mdx#androidwebviewonclose)
+- [androidWebView.page()](./api/class-androidwebview.mdx#androidwebviewpage)
+- [androidWebView.pid()](./api/class-androidwebview.mdx#androidwebviewpid)
+- [androidWebView.pkg()](./api/class-androidwebview.mdx#androidwebviewpkg)
 
-By default, dialogs are auto-dismissed by Playwright, so you don't have to handle them. However, you can register a dialog handler before the action that triggers the dialog to accept or decline it.
+## androidWebView.on('close')
 
-```js
-page.on('dialog', dialog => dialog.accept());
-await page.click('button');
-```
+Emitted when the WebView is closed.
 
-:::note
-[page.on('dialog')](./api/class-page.mdx#pageondialog) listener **must handle** the dialog. Otherwise your action will stall, be it [page.click(selector[, options])](./api/class-page.mdx#pageclickselector-options), [page.evaluate(pageFunction[, arg])](./api/class-page.mdx#pageevaluatepagefunction-arg) or any other. That's because dialogs in Web are modal and block further page execution until they are handled.
-:::
+## androidWebView.page()
+- returns: <[Promise]<[Page]>>
 
-As a result, following snippet will never resolve:
+Connects to the WebView and returns a regular Playwright [Page] to interact with.
 
-:::warn
-WRONG!
-:::
+## androidWebView.pid()
+- returns: <[number]>
 
-```js
-page.on('dialog', dialog => console.log(dialog.message()));
-await page.click('button'); // Will hang here
-```
+WebView process PID.
 
-:::note
-If there is no listener for [page.on('dialog')](./api/class-page.mdx#pageondialog), all dialogs are automatically dismissed.
-:::
+## androidWebView.pkg()
+- returns: <[string]>
 
-### API reference
-- [`Dialog`]
-- [dialog.accept([promptText])](./api/class-dialog.mdx#dialogacceptprompttext)
-- [dialog.dismiss()](./api/class-dialog.mdx#dialogdismiss)
-
-## beforeunload dialog
-
-When [page.close([options])](./api/class-page.mdx#pagecloseoptions) is invoked with the truthy `runBeforeUnload` value, it page runs its unload handlers. This is the only case when [page.close([options])](./api/class-page.mdx#pagecloseoptions) does not wait for the page to actually close, because it might be that the page stays open in the end of the operation.
-
-You can register a dialog handler to handle the beforeunload dialog yourself:
-
-```js
-page.on('dialog', async dialog => {
-  assert(dialog.type() === 'beforeunload');
-  await dialog.dismiss();
-});
-await page.close({runBeforeUnload: true});
-```
-
+WebView package identifier.
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"

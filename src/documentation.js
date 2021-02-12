@@ -49,7 +49,7 @@ const md = require('./markdown');
   *   option?: string
   * }): string} Renderer
   */
- 
+
 class Documentation {
   /**
    * @param {!Array<!Documentation.Class>} classesArray
@@ -254,7 +254,7 @@ Documentation.Class = class {
     }
   }
 
-  /** 
+  /**
    * @param {function(Documentation.Member|Documentation.Class): void} visitor
    */
   visit(visitor) {
@@ -383,7 +383,7 @@ Documentation.Member = class {
     return new Documentation.Member('event', langs, name, type, [], spec);
   }
 
-  /** 
+  /**
    * @param {function(Documentation.Member|Documentation.Class): void} visitor
    */
   visit(visitor) {
@@ -429,11 +429,14 @@ Documentation.Type = class {
    */
   static fromParsedType(parsedType, inUnion = false) {
     if (!inUnion && parsedType.union) {
-      const name = parsedType.unionName || '';
-      const type = new Documentation.Type(name);
+      const type = new Documentation.Type(parsedType.unionName || '');
       type.union = [];
-      for (let t = parsedType; t; t = t.union)
-        type.union.push(Documentation.Type.fromParsedType(t, true));
+      for (let t = parsedType; t; t = t.union) {
+        const nestedUnion = !!t.unionName && t !== parsedType;
+        type.union.push(Documentation.Type.fromParsedType(t, !nestedUnion));
+        if (nestedUnion)
+          break;
+      }
       return type;
     }
 
@@ -634,13 +637,14 @@ function patchLinks(classOrMember, spec, classesMap, membersMap, linkRenderer) {
   md.visitAll(spec, node => {
     if (!node.text)
       return;
-    node.text = node.text.replace(/\[`((?:event|method|property): [^\]]+)`\]/g, (match, p1) => {
-      const member = membersMap.get(p1);
-      if (!member)
-        throw new Error('Undefined member references: ' + match);
-      return linkRenderer({ member }) || match;
-    });
-    node.text = node.text.replace(/\[`(param|option): ([^\]]+)`\]/g, (match, p1, p2) => {
+    node.text = node.text.replace(/\[`(\w+): ([^\]]+)`\]/g, (match, p1, p2) => {
+      if (['event', 'method', 'property'].includes(p1)) {
+        const memberName = p1 + ': ' + p2;
+        const member = membersMap.get(memberName);
+        if (!member)
+          throw new Error('Undefined member references: ' + match);
+        return linkRenderer({ member }) || match;
+      }
       if (p1 === 'param') {
         let alias = p2;
         if (classOrMember) {
@@ -656,6 +660,7 @@ function patchLinks(classOrMember, spec, classesMap, membersMap, linkRenderer) {
       }
       if (p1 === 'option')
         return linkRenderer({ option: p2 }) || match;
+      throw new Error(`Undefined link prefix, expected event|method|property|param|option, got: ` + match);
     });
     node.text = node.text.replace(/\[([\w]+)\]/g, (match, p1) => {
       const clazz = classesMap.get(p1);
