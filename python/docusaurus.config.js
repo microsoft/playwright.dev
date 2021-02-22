@@ -125,12 +125,12 @@ module.exports = {
     [
       require.resolve("@docusaurus/theme-classic"),
       {
-        customCss: require.resolve("./src/css/custom.css"),
+        customCss: require.resolve("../src/css/custom.css"),
       },
     ],
     [
       require.resolve(
-        "./third_party/docusaurus-search-local/dist/server/server/index"
+        "../third_party/docusaurus-search-local/dist/server/server/index"
       ),
       {
         hashed: true,
