@@ -125,15 +125,13 @@ function buildTree(lines) {
       };
       line = lines[++i];
       while (!line.trim().startsWith('```')) {
-        if (line && !line.startsWith(indent)) {
+        if (!line.startsWith(indent)) {
           const from = Math.max(0, i - 5)
           const to = Math.min(lines.length, from + 10);
           const snippet = lines.slice(from, to);
           throw new Error(`Bad code block: ${snippet.join('\n')}`);
         }
-        if (line)
-          line = line.substring(indent.length);
-        node.lines.push(line);
+        node.lines.push(line.substring(indent.length));
         line = lines[++i];
       }
       appendNode(indent, node);
