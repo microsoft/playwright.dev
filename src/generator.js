@@ -264,7 +264,6 @@ import TabItem from '@theme/TabItem';`);
         const child = node.children[i];
         if (child.type !== 'li' || child.liType !== 'bullet' || !child.text.startsWith('langs:'))
           continue;
-        console.log(child.text);
         const only = child.text.substring('langs:'.length).split(',').map(l => l.trim());
         node.children.splice(i, 1);
         return only.includes(this.lang);
