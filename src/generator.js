@@ -84,9 +84,6 @@ class Generator {
     }
   }
 
-  collectLinks() {
-  }
-
   /**
    * @param {Documentation.Class} clazz 
    */
@@ -233,7 +230,7 @@ ${md.render([spec[i]])}
       if (!name.includes('-' + this.lang))
         return;
     const content = fs.readFileSync(path.join(DIR_SRC, name)).toString();
-    let nodes = md.parse(content);
+    let nodes = this.filterForLanguage(md.parse(content));
     this.documentation.renderLinksInText(nodes);
     for (const node of nodes) {
       if (node.text === '<!-- TOC -->')
@@ -253,6 +250,27 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';`);
     const outName = name.replace(new RegExp('-' + this.lang), '') + 'x';
     fs.writeFileSync(path.join(this.outDir, outName), this.mdxLinks(output));
+  }
+
+  /**
+   * @param {MarkdownNode[]} nodes
+   * @return {MarkdownNode[]}
+   */
+  filterForLanguage(nodes) {
+    return nodes.filter(node => {
+      if (!node.children)
+        return true;
+      for (let i = 0; i < node.children.length; i++) {
+        const child = node.children[i];
+        if (child.type !== 'li' || child.liType !== 'bullet' || !child.text.startsWith('langs:'))
+          continue;
+        console.log(child.text);
+        const only = child.text.substring('langs:'.length).split(',').map(l => l.trim());
+        node.children.splice(i, 1);
+        return only.includes(this.lang);
+      }
+      return true;
+    });
   }
 
   /**
