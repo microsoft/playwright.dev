@@ -1,0 +1,514 @@
+---
+id: emulation
+title: "Emulation"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Playwright allows overriding various parameters of the device where the browser is running:
+- viewport size, device scale factor, touch support
+- locale, timezone
+- color scheme
+- geolocation
+
+Most of these parameters are configured during the browser context construction, but some of them such as viewport size can be changed for individual pages.
+
+- [Devices](#devices)
+- [User agent](#user-agent)
+- [Viewport](#viewport)
+- [Locale & timezone](#locale--timezone)
+- [Permissions](#permissions)
+- [Geolocation](#geolocation)
+- [Color scheme and media](#color-scheme-and-media)
+
+<br/>
+
+## Devices
+
+Playwright comes with a registry of device parameters for selected mobile devices. It can be used to simulate browser behavior on a mobile device:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+from playwright.sync_api import sync_playwright
+
+def run(playwright):
+    pixel_2 = playwright.devices['Pixel 2']
+    browser = playwright.webkit.launch(headless=False)
+    context = browser.new_context(
+        **pixel_2,
+    )
+
+with sync_playwright() as playwright:
+    run(playwright)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+import asyncio
+from playwright.async_api import async_playwright
+
+async def run(playwright):
+    pixel_2 = playwright.devices['Pixel 2']
+    browser = await playwright.webkit.launch(headless=False)
+    context = await browser.new_context(
+        **pixel_2,
+    )
+
+async def main():
+    async with async_playwright() as playwright:
+        await run(playwright)
+asyncio.run(main())
+```
+
+</TabItem>
+</Tabs>
+
+All pages created in the context above will share the same device parameters.
+
+### API reference
+- [playwright.devices](./api/class-playwright.mdx#playwrightdevices)
+- [browser.new_context(**kwargs)](./api/class-browser.mdx#browsernew_contextkwargs)
+
+<br/>
+
+## User agent
+
+All pages created in the context above will share the user agent specified:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+context = browser.new_context(
+  user_agent='My user agent'
+)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+context = await browser.new_context(
+  user_agent='My user agent'
+)
+```
+
+</TabItem>
+</Tabs>
+
+### API reference
+- [browser.new_context(**kwargs)](./api/class-browser.mdx#browsernew_contextkwargs)
+
+<br/>
+
+## Viewport
+
+Create a context with custom viewport size:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Create context with given viewport
+context = browser.new_context(
+  viewport={ 'width': 1280, 'height': 1024 }
+)
+
+# Resize viewport for individual page
+page.set_viewport_size(width=1600, height=1200)
+
+# Emulate high-DPI
+context = browser.new_context(
+  viewport={ 'width': 2560, 'height': 1440 },
+  device_scale_factor=2,
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Create context with given viewport
+context = await browser.new_context(
+  viewport={ 'width': 1280, 'height': 1024 }
+)
+
+# Resize viewport for individual page
+await page.set_viewport_size(width=1600, height=1200)
+
+# Emulate high-DPI
+context = await browser.new_context(
+  viewport={ 'width': 2560, 'height': 1440 },
+  device_scale_factor=2,
+)
+```
+
+</TabItem>
+</Tabs>
+
+### API reference
+- [browser.new_context(**kwargs)](./api/class-browser.mdx#browsernew_contextkwargs)
+- [page.set_viewport_size(viewport_size)](./api/class-page.mdx#pageset_viewport_sizeviewport_size)
+
+<br/>
+
+## Locale & timezone
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Emulate locale and time
+context = browser.new_context(
+  locale='de-DE',
+  timezone_id='Europe/Berlin',
+)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Emulate locale and time
+context = await browser.new_context(
+  locale='de-DE',
+  timezone_id='Europe/Berlin',
+)
+```
+
+</TabItem>
+</Tabs>
+
+### API reference
+- [browser.new_context(**kwargs)](./api/class-browser.mdx#browsernew_contextkwargs)
+
+<br/>
+
+## Permissions
+
+Allow all pages in the context to show system notifications:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+context = browser.new_context(
+  permissions=['notifications'],
+)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+context = await browser.new_context(
+  permissions=['notifications'],
+)
+```
+
+</TabItem>
+</Tabs>
+
+Grant all pages in the existing context access to current location:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+context.grant_permissions(['geolocation'])
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await context.grant_permissions(['geolocation'])
+```
+
+</TabItem>
+</Tabs>
+
+Grant notifications access from a specific domain:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+context.grant_permissions(['notifications'], origin='https://skype.com')
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await context.grant_permissions(['notifications'], origin='https://skype.com')
+```
+
+</TabItem>
+</Tabs>
+
+Revoke all permissions:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+context.clear_permissions()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await context.clear_permissions()
+```
+
+</TabItem>
+</Tabs>
+
+### API reference
+- [browser.new_context(**kwargs)](./api/class-browser.mdx#browsernew_contextkwargs)
+- [browser_context.grant_permissions(permissions, **kwargs)](./api/class-browsercontext.mdx#browser_contextgrant_permissionspermissions-kwargs)
+- [browser_context.clear_permissions()](./api/class-browsercontext.mdx#browser_contextclear_permissions)
+
+<br/>
+
+## Geolocation
+
+Create a context with `"geolocation"` permissions granted:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+context = browser.new_context(
+  geolocation={"longitude": 48.858455, "latitude": 2.294474},
+  permissions=["geolocation"]
+)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+context = await browser.new_context(
+  geolocation={"longitude": 48.858455, "latitude": 2.294474},
+  permissions=["geolocation"]
+)
+```
+
+</TabItem>
+</Tabs>
+
+Change the location later:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+context.set_geolocation({"longitude": 29.979097, "latitude": 31.134256})
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await context.set_geolocation({"longitude": 29.979097, "latitude": 31.134256})
+```
+
+</TabItem>
+</Tabs>
+
+**Note** you can only change geolocation for all pages in the context.
+
+### API reference
+- [browser.new_context(**kwargs)](./api/class-browser.mdx#browsernew_contextkwargs)
+- [browser_context.set_geolocation(geolocation)](./api/class-browsercontext.mdx#browser_contextset_geolocationgeolocation)
+
+<br/>
+
+## Color scheme and media
+
+Create a context with dark or light mode. Pages created in this context will follow this color scheme preference.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Create context with dark mode
+context = browser.new_context(
+  color_scheme='dark' # or 'light'
+)
+
+# Create page with dark mode
+page = browser.new_page(
+  color_scheme='dark' # or 'light'
+)
+
+# Change color scheme for the page
+page.emulate_media(color_scheme='dark')
+
+# Change media for page
+page.emulate_media(media='print')
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Create context with dark mode
+context = await browser.new_context(
+  color_scheme='dark' # or 'light'
+)
+
+# Create page with dark mode
+page = await browser.new_page(
+  color_scheme='dark' # or 'light'
+)
+
+# Change color scheme for the page
+await page.emulate_media(color_scheme='dark')
+
+# Change media for page
+await page.emulate_media(media='print')
+```
+
+</TabItem>
+</Tabs>
+
+### API reference
+- [browser.new_context(**kwargs)](./api/class-browser.mdx#browsernew_contextkwargs)
+- [page.emulate_media(**kwargs)](./api/class-page.mdx#pageemulate_mediakwargs)
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ChromiumBrowserContext]: ./api/class-chromiumbrowsercontext.mdx "ChromiumBrowserContext"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[Evaluation Argument]: ./core-concepts.mdx#evaluationargument "Evaluation Argument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
+[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
+[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
+[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
+[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
+[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
+[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
+[URL]: https://en.wikipedia.org/wiki/URL "URL"
+[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
+[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
+[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"

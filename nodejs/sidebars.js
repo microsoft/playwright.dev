@@ -8,7 +8,8 @@ module.exports = {
         { "type": "doc", "id": "intro" },
         { "type": "doc", "id": "core-concepts" },
         { "type": "doc", "id": "debug" },
-        { "type": "doc", "id": "languages" }
+        { "type": "doc", "id": "languages" },
+        { "type": "doc", "id": "release-notes" }
       ],
       "collapsed": false
     },
@@ -104,6 +105,11 @@ module.exports = {
           "type": "category",
           "label": "Experimental",
           "items": [
+            { "type": "doc", "id": "api/class-android" },
+            { "type": "doc", "id": "api/class-androiddevice" },
+            { "type": "doc", "id": "api/class-androidinput" },
+            { "type": "doc", "id": "api/class-androidsocket" },
+            { "type": "doc", "id": "api/class-androidwebview" },
             { "type": "doc", "id": "api/class-electron" },
             { "type": "doc", "id": "api/class-electronapplication" },
           ],
