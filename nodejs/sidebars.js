@@ -104,6 +104,11 @@ module.exports = {
           "type": "category",
           "label": "Experimental",
           "items": [
+            { "type": "doc", "id": "api/class-android" },
+            { "type": "doc", "id": "api/class-androiddevice" },
+            { "type": "doc", "id": "api/class-androidinput" },
+            { "type": "doc", "id": "api/class-androidsocket" },
+            { "type": "doc", "id": "api/class-androidwebview" },
             { "type": "doc", "id": "api/class-electron" },
             { "type": "doc", "id": "api/class-electronapplication" },
           ],
