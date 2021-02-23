@@ -1,52 +1,84 @@
 ---
-id: why-playwright
-title: "Why Playwright?"
+id: inspector
+title: "Inspector"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright enables fast, reliable and capable automation across all modern browsers. This guide covers those key differentiators to help you decide on the right tool for your automated tests.
+Playwright Inspector is a GUI tool that helps authoring and debugging Playwright scripts.
 
-- [Support for all browsers](#support-for-all-browsers)
-- [Fast and reliable execution](#fast-and-reliable-execution)
-- [Powerful automation capabilities](#powerful-automation-capabilities)
-- [Integrates with your workflow](#integrates-with-your-workflow)
-- [Limitations](#limitations)
-- [Release notes](./release-notes.mdx)
+<img width="712" alt="Playwright Inspector" src="https://user-images.githubusercontent.com/883973/108614092-8c478a80-73ac-11eb-9597-67dfce110e00.png"></img>
 
-## Support for all browsers
-* **Test on Chromium, Firefox and WebKit**. Playwright has full API coverage for all modern browsers, including Google Chrome and Microsoft Edge (with [Chromium](https://www.chromium.org/)), Apple Safari (with [WebKit](https://webkit.org/)) and Mozilla Firefox.
-* **Cross-platform WebKit testing**. With Playwright, test how your app behaves in Apple Safari with WebKit builds for Windows, Linux and macOS. Test locally and on CI.
-* **Test for mobile**. Use [device emulation](./emulation.mdx) to test your responsive web apps in mobile web browsers.
-* **Headless and headful**. Playwright supports headless (without browser UI) and headful (with browser UI) modes for all browsers and all platforms. Headful is great for debugging, and headless is faster and suited for CI/cloud executions.
+- [Open Playwright Inspector](#open-playwright-inspector)
+- [Stepping through the Playwright script](#stepping-through-the-playwright-script)
+- [Debugging Selectors](#debugging-selectors)
+- [Recording scripts](#recording-scripts)
 
-## Fast and reliable execution
-* **Auto-wait APIs**. Playwright interactions [auto-wait for elements](./actionability.mdx) to be ready. This improves reliability and simplifies test authoring.
-* **Timeout-free automation**. Playwright receives browser signals, like network requests, page navigations and page load events to eliminate the need for sleep timeouts that cause flakiness.
-* **Lean parallelization with browser contexts**. Reuse a single browser instance for multiple parallelized, isolated execution environments with [browser contexts](./core-concepts.mdx).
-* **Resilient element selectors**. Playwright can rely on user-facing strings, like text content and accessibility labels to [select elements](./selectors.mdx). These strings are more resilient than selectors tightly-coupled to the DOM structure.
+## Open Playwright Inspector
 
-## Powerful automation capabilities
-* **Multiple domains, pages and frames**. Playwright is an out-of-process automation driver that is not limited by the scope of in-page JavaScript execution and can automate scenarios with [multiple pages](./multi-pages.mdx).
-* **Powerful network control**. Playwright introduces context-wide [network interception](./network.mdx) to stub and mock network requests.
-* **Modern web features**. Playwright supports web components through [shadow-piercing selectors](./selectors.mdx), [geolocation, permissions](./emulation.mdx), web workers and other modern web APIs.
-* **Capabilities to cover all scenarios**. Support for [file downloads](./downloads.mdx) and [uploads](./input.mdx), out-of-process iframes, native [input events](./input.mdx), and even [dark mode](./emulation.mdx).
-
-## Integrates with your workflow
-* **One-line installation**. Installing Playwright auto-downloads browser dependencies for your team to be onboarded quickly.
+There are several ways of opening Playwright Inspector:
+- Set the `PWDEBUG` environment variable to run your scripts in debug mode. This configures Playwright for debugging and opens the inspector.
 
   ```sh
-  $ npm i playwright
+  # Linux/macOS
+  $ PWDEBUG=1 npm run test
+  
+  # Windows
+  $ set PWDEBUG=1
+  $ npm run test
   ```
 
-* **TypeScript support**. Playwright ships with built-in types for auto-completion and other benefits.
-* **Debugging tools**. Playwright works with the [editor debugger and browser developer tools](./debug.mdx) to pause execution and inspect the web page.
-* **Language bindings**. Playwright is available for [Node.js](https://github.com/microsoft/playwright) [Python](https://github.com/microsoft/playwright-python), [C#](https://github.com/microsoft/playwright-sharp) and [Java](https://github.com/microsoft/playwright-java). Learn more about [supported languages](./languages.mdx).
-* **Deploy tests to CI**. First-party [Docker image](./docker.mdx) and [GitHub Actions](https://github.com/microsoft/playwright-github-action) to deploy tests to [your preferred CI/CD provider](./ci.mdx).
+  Additional useful defaults are configured when `PWDEBUG` is set:
+  - Browsers launch in the headed mode
+  - Default timeout is set to 0 (= no timeout)
+- Call [page.pause()](./api/class-page.mdx#pagepause) method from your script when running in headed browser.
 
-## Limitations
-* **Legacy Edge and IE11 support**. Playwright does not support legacy Microsoft Edge or IE11 ([deprecation notice](https://techcommunity.microsoft.com/t5/microsoft-365-blog/microsoft-365-apps-say-farewell-to-internet-explorer-11-and/ba-p/1591666)). The new Microsoft Edge (on Chromium) is supported.
-* **Test on real mobile devices**: Playwright uses desktop browsers to emulate mobile devices. If you are interested in running on real mobile devices, please [upvote this issue](https://github.com/microsoft/playwright/issues/1122).
+  ```js
+  // Pause on the following line.
+  await page.pause();
+  ```
+
+- Use `open` or `codegen` commands in the Playwright [CLI](./cli.mdx):
+
+  ```sh
+  $ npx playwright codegen wikipedia.org
+  ```
+
+## Stepping through the Playwright script
+
+When `PWDEBUG` is set, Playwright Inspector window will be opened and the script will be paused on the first Playwright statement:
+
+<img width="557" alt="Paused on line" src="https://user-images.githubusercontent.com/883973/108614337-71761580-73ae-11eb-9f61-3d29c52c9520.png"></img>
+
+Now we know what action is about to be performed and we can look into the details on that action. For example, when stopped on an input action such as `click`, the exact point Playwright is about to click is highlighted with the large red dot on the inspected page:
+
+<img width="344" alt="Red dot on inspected page" src="https://user-images.githubusercontent.com/883973/108614363-b69a4780-73ae-11eb-8f5e-51f9c91ec9b4.png"></img>
+
+By the time Playwright has paused on that click action, it has already performed actionability checks that can be found in the log:
+
+<img width="712" alt="Action log" src="https://user-images.githubusercontent.com/883973/108614564-72a84200-73b0-11eb-9de2-828b28d78b36.png"></img>
+
+If actionability can't be reached, it'll show action as pending:
+
+<img width="712" alt="Screen Shot 2021-02-20 at 7 36 06 PM" src="https://user-images.githubusercontent.com/883973/108614840-e6e3e500-73b2-11eb-998f-0cf31b2aa9a2.png"></img>
+
+You can step over each action using the "Step over" action or resume script without further pauses:
+
+<center><img width="98" alt="Stepping toolbar" src="https://user-images.githubusercontent.com/883973/108614389-f9f4b600-73ae-11eb-8df2-8d9ce9da5d5c.png"></img></center>
+
+## Debugging Selectors
+- Click the Explore button to hover over elements in the screen and click them to automatically generate selectors for those elements.
+- To verify where selector points, paste it into the inspector input field:
+
+<img width="602" alt="Screen Shot 2021-02-20 at 7 27 20 PM" src="https://user-images.githubusercontent.com/883973/108614696-ad5eaa00-73b1-11eb-81f5-9eebe62543a2.png"></img>
+
+## Recording scripts
+
+At any moment, clicking Record action enables recorder (codegen) mode. Every action on the target page is turned into the generated script:
+
+<img width="712" alt="Screen Shot 2021-02-20 at 7 40 02 PM" src="https://user-images.githubusercontent.com/883973/108614897-85704600-73b3-11eb-8bcd-f2e129786c49.png"></img>
+
+You can copy entire generated script or clear it using toolbar actions.
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"
