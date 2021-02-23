@@ -26,6 +26,7 @@ module.exports = {
         { "type": "doc", "id": "extensibility" },
         { "type": "doc", "id": "handles" },
         { "type": "doc", "id": "input" },
+        { "type": "doc", "id": "inspector" },
         { "type": "doc", "id": "installation" },
         { "type": "doc", "id": "multi-pages" },
         { "type": "doc", "id": "navigations" },
