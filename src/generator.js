@@ -333,7 +333,7 @@ import TabItem from '@theme/TabItem';`);
     let children;
     const properties = type.deepProperties();
     if (properties && properties.length)
-      children = properties.map(p => this.renderProperty(`\`${p.name}\``, p.type, p.spec, direction, false))
+      children = properties.map(p => this.renderProperty(`\`${p.alias}\``, p.type, p.spec, direction, false))
     else if (spec && spec.length > 1)
       children = spec.slice(1).map(s => md.clone(s));
 
@@ -437,10 +437,10 @@ new Generator('js', path.join(__dirname, '..', 'nodejs', 'docs'), {
     let text;
     let args = [];
     if (member.kind === 'property')
-      text = `${member.clazz.varName}.${member.name}`;
+      text = `${member.clazz.varName}.${member.alias}`;
   
     if (member.kind === 'event')
-      text = `${member.clazz.varName}.on('${member.name.toLowerCase()}')`;
+      text = `${member.clazz.varName}.on('${member.alias.toLowerCase()}')`;
   
     if (member.kind === 'method') {
       args = member.argsArray;
