@@ -21,6 +21,7 @@ const path = require('path');
 const md = require('./markdown');
 const { parseApi } = require('./api_parser');
 const Documentation = require('./documentation');
+const { Member } = require('./documentation');
 
 /** @typedef {import('./documentation').Type} Type */
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
@@ -41,7 +42,7 @@ class Generator {
    *   formatTemplate: function(string): string,
    *   formatFunction: function(string): string,
    *   formatPromise: function(string): string,
-   *   renderType: function(string, string): string,
+   *   renderType: function(Documentation.Type, string, Documentation.Member): string,
    * }} config
    */
   constructor(lang, outDir, config) {
@@ -338,21 +339,11 @@ import TabItem from '@theme/TabItem';`);
     else if (spec && spec.length > 1)
       children = spec.slice(1).map(s => md.clone(s));
 
-    let typeText = this.renderType(type, direction);
+    let typeText = this.renderType(type, direction, member);
     if (async)
       typeText = this.config.formatPromise(typeText);
 
     typeText = `<${typeText}>`;
-
-    if (this.lang === 'java' && member && member.kind === 'property') {
-      // console.log(member.name + ' ' + member.kind + ' ' + member.type.name);
-      const method = member.enclosingMethod;
-      if (member.name === 'options')
-        typeText = `\`new ${toTitleCase(method.clazz.varName)}.${toTitleCase(method.alias)}Options()\``;
-      else if (member.type.name === 'Object' && !member.type.templates) {
-        typeText = `\`new ${toTitleCase(member.alias)}()\``;
-      }
-    }
 
     /** @type {MarkdownNode} */
     const result = {
@@ -368,25 +359,27 @@ import TabItem from '@theme/TabItem';`);
   /**
    * @param {Documentation.Type} type
    * @param {'in'|'out'} direction
+   * @param {Documentation.Member} member
    */
-  renderType(type, direction) {
+  renderType(type, direction, member) {
     if (type.union)
-      return type.union.map(l => this.renderType(l, direction)).join('|');
+      return type.union.map(l => this.renderType(l, direction, member)).join('|');
     if (type.templates)
-      return `${this.renderTypeName(type.name, direction)}${this.config.formatTemplate(type.templates.map(l => this.renderType(l, direction)).join(', '))}`;
+      return `${this.renderTypeName(type, direction, member)}${this.config.formatTemplate(type.templates.map(l => this.renderType(l, direction, member)).join(', '))}`;
     if (type.args)
-      return `${this.config.formatFunction(type.args.map(l => this.renderType(l, direction)).join(', '))}${type.returnType ? ':' + this.renderType(type.returnType, direction) : ''}`;
+      return `${this.config.formatFunction(type.args.map(l => this.renderType(l, direction, member)).join(', '))}${type.returnType ? ':' + this.renderType(type.returnType, direction, member) : ''}`;
     if (type.name.startsWith('"'))
       return type.name;
-    return `${this.renderTypeName(type.name, direction)}`;
+    return `${this.renderTypeName(type, direction, member)}`;
   }
 
   /**
-   * @param {string} typeName
+   * @param {Documentation.Type} type
    * @param {'in'|'out'} direction
+   * @param {Documentation.Member} member
    */
-  renderTypeName(typeName, direction) {
-    return `[${this.config.renderType(typeName, direction)}]`;
+  renderTypeName(type, direction, member) {
+    return this.config.renderType(type, direction, member);
   }
 }
 
@@ -466,14 +459,15 @@ new Generator('js', path.join(__dirname, '..', 'nodejs', 'docs'), {
   formatTemplate: text => `<${text}>`,
   formatFunction: text => `[function]\\(${text}\\)`,
   formatPromise: text => `[Promise]<${text}>`,
-  renderType: text => {
+  renderType: type => {
+    const text = type.name;
     switch (text) {
-      case 'int': return 'number';
-      case 'float': return 'number';
-      case 'path': return 'string';
-      case 'any': return 'Object';
+      case 'int': return '[number]';
+      case 'float': return '[number]';
+      case 'path': return '[string]';
+      case 'any': return '[Object]';
     }
-    return text;
+    return `[${text}]`;
   },
 });
 
@@ -505,20 +499,21 @@ new Generator('python', path.join(__dirname, '..', 'python', 'docs'), {
   formatTemplate: text => `\\[${text}\\]`,
   formatFunction: text => `[Callable]\\[${text}\\]`,
   formatPromise: text => text,
-  renderType: (text, direction) => {
+  renderType: (type, direction) => {
+    const text = type.name;
     switch (text) {
-      case 'RegExp': return 'Pattern';
-      case 'any': return 'Any';
-      case 'function': return 'Callable';
-      case 'path': return direction === 'out' ? 'pathlib.Path' : 'Union]\\[[str], [pathlib.Path]\\';
-      case 'Array': return 'List';
-      case 'Object': return 'Dict';
-      case 'null': return 'NoneType';
-      case 'void': return 'NoneType';
-      case 'boolean': return 'bool';
-      case 'string': return 'str';
+      case 'RegExp': return '[Pattern]';
+      case 'any': return '[Any]';
+      case 'function': return '[Callable]';
+      case 'path': return direction === 'out' ? '[pathlib.Path]' : '[Union]\\[[str], [pathlib.Path]\\]';
+      case 'Array': return '[List]';
+      case 'Object': return '[Dict]';
+      case 'null': return '[NoneType]';
+      case 'void': return '[NoneType]';
+      case 'boolean': return '[bool]';
+      case 'string': return '[str]';
     }
-    return text;
+    return `[${text}]`;
   },
 });
 
@@ -543,25 +538,51 @@ new Generator('java', path.join(__dirname, '..', 'java', 'docs'), {
   formatTemplate: text => `<${text}>`,
   formatFunction: text => `[function]\\(${text}\\)`,
   formatPromise: text => text,
-  renderType: (text, direction) => {
-    switch (text) {
-      case 'any': return 'Object';
-      case 'Array': return 'List';
-      case 'float': return 'double';
-      case 'function': return 'Predicate';
-      case 'null': return 'null';
-      case 'Object': return 'Map';
-      case 'path': return 'Path';
-      case 'RegExp': return 'Pattern';
-      case 'string': return 'String';
-      // Escape '[' and ']' so that they don't break markdown links like [byte[]](link)
-      case "Buffer": return "byte&#91;&#93;";
-      case "EvaluationArgument": return "Object";
-      case "Readable": return "InputStream";
-      case "Serializable": return "Object";
-      case "URL": return "String";
+  renderType: (type, direction, member) => {
+    if (member.kind === 'property' && member.name === 'options') {
+      const method = member.enclosingMethod;
+      return `\`${toTitleCase(method.clazz.varName)}.${toTitleCase(method.alias)}Options\``;
     }
-    return text;
+    const text = type.name;
+    switch (text) {
+      case 'any': return '[Object]';
+      case 'Array': return '[List]';
+      case 'float': return '[double]';
+      case 'function': return '[Predicate]';
+      case 'null': return '[null]';
+      case 'Object': {
+        if (member.enclosingMethod) {
+          const method = member.enclosingMethod;
+          let fqn = `${toTitleCase(method.clazz.varName)}.${method.name}`;
+          if (member.kind === 'property')
+            fqn += '.' + member.name;
+          switch (fqn) {
+            case 'BrowserContext.addCookies.cookies': return '`Cookie`';
+            case 'BrowserContext.cookies': return '`Cookie`';
+            case 'ElementHandle.selectOption.values': return '`SelectOption`';
+            case 'Frame.selectOption.values': return '`SelectOption`';
+            case 'Page.selectOption.values': return '`SelectOption`';
+            case 'ElementHandle.setInputFiles.files': return '`FilePayload`';
+            case 'FileChooser.setFiles.files': return '`FilePayload`';
+            case 'Frame.setInputFiles.files': return '`FilePayload`';
+            case 'Page.setInputFiles.files': return '`FilePayload`';
+          }
+        }
+        if (!type.templates && member.kind === 'property')
+          return `\`${toTitleCase(member.alias)}\``;
+        return '[Map]';
+      }
+      case 'path': return '[Path]';
+      case 'RegExp': return '[Pattern]';
+      case 'string': return '[String]';
+      // Escape '[' and ']' so that they don't break markdown links like [byte[]](link)
+      case 'Buffer': return '[byte&#91;&#93;]';
+      case 'EvaluationArgument': return '[Object]';
+      case 'Readable': return '[InputStream]';
+      case 'Serializable': return '[Object]';
+      case 'URL': return '[String]';
+    }
+    return `[${text}]`;
   },
 });
 
