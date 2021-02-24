@@ -548,25 +548,27 @@ new Generator('java', path.join(__dirname, '..', 'java', 'docs'), {
       case 'any': return '[Object]';
       case 'Array': return '[List]';
       case 'float': return '[double]';
-      case 'function': return '[Predicate]';
+      case 'function': {
+        switch (fullName(member)) {
+          case 'BrowserContext.exposeBinding.callback': return '`BindingCallback`';
+          case 'BrowserContext.exposeFunction.callback': return '`FunctionCallback`';
+          case 'Page.exposeBinding.callback': return '`BindingCallback`';
+          case 'Page.exposeFunction.callback': return '`FunctionCallback`';
+        }
+        throw new Error('Unknwon java type for ' + fullName(member));
+      };
       case 'null': return '[null]';
       case 'Object': {
-        if (member.enclosingMethod) {
-          const method = member.enclosingMethod;
-          let fqn = `${toTitleCase(method.clazz.varName)}.${method.name}`;
-          if (member.kind === 'property')
-            fqn += '.' + member.name;
-          switch (fqn) {
-            case 'BrowserContext.addCookies.cookies': return '`Cookie`';
-            case 'BrowserContext.cookies': return '`Cookie`';
-            case 'ElementHandle.selectOption.values': return '`SelectOption`';
-            case 'Frame.selectOption.values': return '`SelectOption`';
-            case 'Page.selectOption.values': return '`SelectOption`';
-            case 'ElementHandle.setInputFiles.files': return '`FilePayload`';
-            case 'FileChooser.setFiles.files': return '`FilePayload`';
-            case 'Frame.setInputFiles.files': return '`FilePayload`';
-            case 'Page.setInputFiles.files': return '`FilePayload`';
-          }
+        switch (fullName(member)) {
+          case 'BrowserContext.addCookies.cookies': return '`Cookie`';
+          case 'BrowserContext.cookies': return '`Cookie`';
+          case 'ElementHandle.selectOption.values': return '`SelectOption`';
+          case 'Frame.selectOption.values': return '`SelectOption`';
+          case 'Page.selectOption.values': return '`SelectOption`';
+          case 'ElementHandle.setInputFiles.files': return '`FilePayload`';
+          case 'FileChooser.setFiles.files': return '`FilePayload`';
+          case 'Frame.setInputFiles.files': return '`FilePayload`';
+          case 'Page.setInputFiles.files': return '`FilePayload`';
         }
         if (!type.templates && member.kind === 'property')
           return `\`${toTitleCase(member.alias)}\``;
@@ -585,6 +587,21 @@ new Generator('java', path.join(__dirname, '..', 'java', 'docs'), {
     return `[${text}]`;
   },
 });
+
+/**
+ * @param {Documentation.Member} member
+ * @returns {string}
+ */
+function fullName(member) {
+  if (member.enclosingMethod) {
+    const method = member.enclosingMethod;
+    let fqn = `${toTitleCase(method.clazz.varName)}.${method.name}`;
+    if (member.kind === 'property')
+      fqn += '.' + member.name;
+    return fqn;
+  }
+  return `${toTitleCase(member.clazz.varName)}.${member.name}`;
+}
 
 /**
  * @param {string} name
