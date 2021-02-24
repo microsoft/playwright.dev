@@ -8,7 +8,8 @@ module.exports = {
         { "type": "doc", "id": "intro" },
         { "type": "doc", "id": "core-concepts" },
         { "type": "doc", "id": "debug" },
-        { "type": "doc", "id": "languages" }
+        { "type": "doc", "id": "languages" },
+        { "type": "doc", "id": "release-notes" }
       ],
       "collapsed": false
     },
