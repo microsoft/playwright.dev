@@ -127,7 +127,7 @@ import TabItem from '@theme/TabItem';
         let name;
         switch (member.kind) {
           case 'event': name = 'type:'; break;
-          case 'property': name = this.lang === 'java' ? 'returns:' : 'type:'; break;
+          case 'property': name = 'type:'; break;
           case 'method': name = 'returns:'; break;
         }
         memberNode.children.push(this.renderProperty(name, member.type, undefined, 'out', member.async));
@@ -192,8 +192,6 @@ ${md.render([spec[i]])}
         }
       }
       spec = newSpec;
-    } else if (this.lang === 'java') {
-      spec = spec.filter(n => !n.text || !n.text.startsWith('extends: [EventEmitter]'));
     }
     spec = spec.filter(c => {
       // No lang or common lang - Ok.
@@ -333,7 +331,7 @@ import TabItem from '@theme/TabItem';`);
     let children;
     const properties = type.deepProperties();
     if (properties && properties.length)
-      children = properties.map(p => this.renderProperty(`\`${p.alias}\``, p.type, p.spec, direction, false))
+      children = properties.map(p => this.renderProperty(`\`${p.name}\``, p.type, p.spec, direction, false))
     else if (spec && spec.length > 1)
       children = spec.slice(1).map(s => md.clone(s));
 
@@ -437,10 +435,10 @@ new Generator('js', path.join(__dirname, '..', 'nodejs', 'docs'), {
     let text;
     let args = [];
     if (member.kind === 'property')
-      text = `${member.clazz.varName}.${member.alias}`;
+      text = `${member.clazz.varName}.${member.name}`;
   
     if (member.kind === 'event')
-      text = `${member.clazz.varName}.on('${member.alias.toLowerCase()}')`;
+      text = `${member.clazz.varName}.on('${member.name.toLowerCase()}')`;
   
     if (member.kind === 'method') {
       args = member.argsArray;
@@ -508,57 +506,6 @@ new Generator('python', path.join(__dirname, '..', 'python', 'docs'), {
     return text;
   },
 });
-
-new Generator('java', path.join(__dirname, '..', 'java', 'docs'), {
-  formatMember: member => {
-    let text;
-    let args = [];
-    if (member.kind === 'property')
-      text = `${toTitleCase(member.clazz.varName)}.${member.alias}()`;
-  
-    if (member.kind === 'event')
-      text = `${toTitleCase(member.clazz.varName)}.on${toTitleCase(member.alias)}(handler)`;
-  
-    if (member.kind === 'method' ) {
-      args = member.argsArray;
-      const signature = renderJSSignature(args);
-      text = `${toTitleCase(member.clazz.varName)}.${member.alias}(${signature})`;
-    }
-    return { text, args };
-  },
-  formatArgumentName: name => name,
-  formatTemplate: text => `<${text}>`,
-  formatFunction: text => `[function]\\(${text}\\)`,
-  formatPromise: text => text,
-  renderType: (text, direction) => {
-    switch (text) {
-      case 'any': return 'Object';
-      case 'Array': return 'List';
-      case 'float': return 'double';
-      case 'function': return 'Predicate';
-      case 'null': return 'null';
-      case 'Object': return 'Map';
-      case 'path': return 'Path';
-      case 'RegExp': return 'Pattern';
-      case 'string': return 'String';
-      // Escape '[' and ']' so that they don't break markdown links like [byte[]](link)
-      case "Buffer": return "byte&#91;&#93;";
-      case "EvaluationArgument": return "Object";
-      case "Readable": return "InputStream";
-      case "Serializable": return "Object";
-      case "URL": return "String";
-    }
-    return text;
-  },
-});
-
-/**
- * @param {string} name
- */
-function toTitleCase(name) {
-  return name[0].toUpperCase() + name.substring(1);
-}
-
 
 /**
  * @param {string} lang
