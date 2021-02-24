@@ -120,7 +120,7 @@ import TabItem from '@theme/TabItem';
       const memberNode = { type: 'h2', children: [] };
       const { text, args } = this.config.formatMember(member);
       memberNode.text = text;
-      memberNode.children.push(...args.map(a => this.renderProperty(`\`${this.config.formatArgumentName(a.alias)}\``, a.type, a.spec, 'in')));
+      memberNode.children.push(...args.map(a => this.renderProperty(`\`${this.config.formatArgumentName(a.alias)}\``, a, a.spec, 'in')));
 
       // Append type
       if (member.type && member.type.name !== 'void') {
@@ -130,7 +130,7 @@ import TabItem from '@theme/TabItem';
           case 'property': name = this.lang === 'java' ? 'returns:' : 'type:'; break;
           case 'method': name = 'returns:'; break;
         }
-        memberNode.children.push(this.renderProperty(name, member.type, undefined, 'out', member.async));
+        memberNode.children.push(this.renderProperty(name, member, undefined, 'out', member.async));
       }
 
       // Append member doc
@@ -321,19 +321,20 @@ import TabItem from '@theme/TabItem';`);
 
   /**
    * @param {string} name
-   * @param {Type} type
+   * @param {Documentation.Member} member
    * @param {MarkdownNode[]} spec
    * @param {'in'|'out'} direction
    * @param {boolean=} async
    */
-  renderProperty(name, type, spec, direction, async) {
+  renderProperty(name, member, spec, direction, async) {
     let comment = '';
     if (spec && spec.length)
       comment = spec[0].text;
-    let children;
+    const type = member.type;
     const properties = type.deepProperties();
+    let children;
     if (properties && properties.length)
-      children = properties.map(p => this.renderProperty(`\`${p.alias}\``, p.type, p.spec, direction, false))
+      children = properties.map(p => this.renderProperty(`\`${p.alias}\``, p, p.spec, direction, false));
     else if (spec && spec.length > 1)
       children = spec.slice(1).map(s => md.clone(s));
 
@@ -341,11 +342,23 @@ import TabItem from '@theme/TabItem';`);
     if (async)
       typeText = this.config.formatPromise(typeText);
 
+    typeText = `<${typeText}>`;
+
+    if (this.lang === 'java' && member && member.kind === 'property') {
+      // console.log(member.name + ' ' + member.kind + ' ' + member.type.name);
+      const method = member.enclosingMethod;
+      if (member.name === 'options')
+        typeText = `\`new ${toTitleCase(method.clazz.varName)}.${toTitleCase(method.alias)}Options()\``;
+      else if (member.type.name === 'Object' && !member.type.templates) {
+        typeText = `\`new ${toTitleCase(member.alias)}()\``;
+      }
+    }
+
     /** @type {MarkdownNode} */
     const result = {
       type: 'li',
       liType: 'default',
-      text: `${name} <${typeText}>${comment ? ' ' + comment : ''}`,
+      text: `${name} ${typeText}${comment ? ' ' + comment : ''}`,
       children
     };
     return result;
