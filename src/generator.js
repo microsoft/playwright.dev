@@ -544,7 +544,15 @@ new Generator('java', path.join(__dirname, '..', 'java', 'docs'), {
   },
   formatArgumentName: name => name,
   formatTemplate: text => `<${text}>`,
-  formatFunction: (args, ret, type) =>`[function]\\(${args}\\)`,
+  formatFunction: (args, ret, type) => {
+    if (type.args.length !== 1)
+      throw new Error('Unsupported number of arguments in function: ' + type);
+    if (!type.returnType)
+      return "[Consumer]<" + args + ">";
+    if (type.returnType.name === 'boolean')
+      return "[Predicate]<" + args + ">";
+    throw new Error('Unknown java type for function: ' + type);
+  },
   formatPromise: text => text,
   renderType: (type, direction, member) => {
     if (member.kind === 'property' && member.name === 'options') {
