@@ -575,7 +575,7 @@ new Generator('java', path.join(__dirname, '..', 'java', 'docs'), {
           case 'Frame.setInputFiles.files': return '`FilePayload`';
           case 'Page.setInputFiles.files': return '`FilePayload`';
         }
-        if (!type.templates && member.kind === 'property')
+        if (!type.templates)
           return `\`${toTitleCase(member.alias)}\``;
         return '[Map]';
       }
