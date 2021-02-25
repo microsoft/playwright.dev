@@ -40,7 +40,7 @@ class Generator {
    *   formatMember: function(Documentation.Member): { text: string, args: Documentation.Member[] },
    *   formatArgumentName: function(string): string,
    *   formatTemplate: function(string): string,
-   *   formatFunction: function(string): string,
+   *   formatFunction: function(string, string, Documentation.Type): string,
    *   formatPromise: function(string): string,
    *   renderType: function(Documentation.Type, string, Documentation.Member): string,
    * }} config
@@ -335,7 +335,12 @@ import TabItem from '@theme/TabItem';`);
     const properties = type.deepProperties();
     let children;
     if (properties && properties.length)
-      children = properties.map(p => this.renderProperty(`\`${p.alias}\``, p, p.spec, direction, false));
+      children = properties.map(p => {
+        let alias = p.alias;
+        if (this.lang === 'java' && member.kind === 'property' && direction === 'in')
+          alias = `with${toTitleCase(alias)}`;
+        return this.renderProperty(`\`${alias}\``, p, p.spec, direction, false)
+      });
     else if (spec && spec.length > 1)
       children = spec.slice(1).map(s => md.clone(s));
 
@@ -343,13 +348,11 @@ import TabItem from '@theme/TabItem';`);
     if (async)
       typeText = this.config.formatPromise(typeText);
 
-    typeText = `<${typeText}>`;
-
     /** @type {MarkdownNode} */
     const result = {
       type: 'li',
       liType: 'default',
-      text: `${name} ${typeText}${comment ? ' ' + comment : ''}`,
+      text: `${name} <${typeText}>${comment ? ' ' + comment : ''}`,
       children
     };
     return result;
@@ -372,7 +375,7 @@ import TabItem from '@theme/TabItem';`);
     if (type.templates)
       return `${this.renderTypeName(type, direction, member)}${this.config.formatTemplate(type.templates.map(l => this.renderType(l, direction, member)).join(', '))}`;
     if (type.args)
-      return `${this.config.formatFunction(type.args.map(l => this.renderType(l, direction, member)).join(', '))}${type.returnType ? ':' + this.renderType(type.returnType, direction, member) : ''}`;
+      return `${this.config.formatFunction(type.args.map(l => this.renderType(l, direction, member)).join(', '), type.returnType ? ':' + this.renderType(type.returnType, direction, member) : '', type)}`;
     if (type.name.startsWith('"'))
       return type.name;
     return `${this.renderTypeName(type, direction, member)}`;
@@ -462,7 +465,7 @@ new Generator('js', path.join(__dirname, '..', 'nodejs', 'docs'), {
   },
   formatArgumentName: name => name,
   formatTemplate: text => `<${text}>`,
-  formatFunction: text => `[function]\\(${text}\\)`,
+  formatFunction: (args, ret) => `[function]\\(${args}\\)${ret}`,
   formatPromise: text => `[Promise]<${text}>`,
   renderType: type => {
     const text = type.name;
@@ -502,7 +505,7 @@ new Generator('python', path.join(__dirname, '..', 'python', 'docs'), {
   },
   formatArgumentName: name => toSnakeCase(name),
   formatTemplate: text => `\\[${text}\\]`,
-  formatFunction: text => `[Callable]\\[${text}\\]`,
+  formatFunction: (args, ret) => `[Callable]\\[${args}\\]${ret}`,
   formatPromise: text => text,
   renderType: (type, direction) => {
     const text = type.name;
@@ -541,7 +544,7 @@ new Generator('java', path.join(__dirname, '..', 'java', 'docs'), {
   },
   formatArgumentName: name => name,
   formatTemplate: text => `<${text}>`,
-  formatFunction: text => `[function]\\(${text}\\)`,
+  formatFunction: (args, ret, type) =>`[function]\\(${args}\\)`,
   formatPromise: text => text,
   renderType: (type, direction, member) => {
     if (member.kind === 'property' && member.name === 'options') {
