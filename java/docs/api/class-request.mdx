@@ -40,6 +40,12 @@ The method returns `null` unless this request has failed, as reported by `reques
 
 Example of logging of all the failed requests:
 
+```java
+page.onRequestFailed(request -> {
+  System.out.println(request.url() + " " + request.failure());
+});
+```
+
 ## Request.frame()
 - returns: <[Frame]>
 
@@ -79,7 +85,17 @@ When the server responds with a redirect, Playwright creates a new [Request] obj
 
 For example, if the website `http://example.com` redirects to `https://example.com`:
 
+```java
+Response response = page.navigate("http://example.com");
+System.out.println(response.request().redirectedFrom().url()); // "http://example.com"
+```
+
 If the website `https://google.com` has no redirects:
+
+```java
+Response response = page.navigate("https://google.com");
+System.out.println(response.request().redirectedFrom()); // null
+```
 
 ## Request.redirectedTo()
 - returns: <[null]|[Request]>
@@ -87,6 +103,10 @@ If the website `https://google.com` has no redirects:
 New request issued by the browser if the server responded with redirect.
 
 This method is the opposite of [Request.redirectedFrom()](./api/class-request.mdx#requestredirectedfrom):
+
+```java
+System.out.println(request.redirectedFrom().redirectedTo() == request); // true
+```
 
 ## Request.resourceType()
 - returns: <[String]>
@@ -111,6 +131,14 @@ Returns the matching [Response] object, or `null` if the response was not receiv
   - `responseEnd` <[double]> Time immediately after the browser receives the last byte of the resource or immediately before the transport connection is closed, whichever comes first. The value is given in milliseconds relative to `startTime`, -1 if not available.
 
 Returns resource timing information for given request. Most of the timing values become available upon the response, `responseEnd` becomes available when request finishes. Find more information at [Resource Timing API](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceResourceTiming).
+
+```java
+page.onRequestFinished(request -> {
+  Timing timing = request.timing();
+  System.out.println(timing.responseEnd - timing.startTime);
+});
+page.navigate("http://example.com");
+```
 
 ## Request.url()
 - returns: <[String]>

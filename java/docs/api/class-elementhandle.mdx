@@ -9,6 +9,24 @@ import TabItem from '@theme/TabItem';
 
 ElementHandle represents an in-page DOM element. ElementHandles can be created with the [Page.querySelector(selector)](./api/class-page.mdx#pagequeryselectorselector) method.
 
+```java
+import com.microsoft.playwright.*;
+
+public class Example {
+  public static void main(String[] args) {
+    try (Playwright playwright = Playwright.create()) {
+      BrowserType chromium = playwright.chromium();
+      Browser browser = chromium.launch();
+      Page page = browser.newPage();
+      page.navigate("https://example.com");
+      ElementHandle hrefElement = page.querySelector("a");
+      hrefElement.click();
+      // ...
+    }
+  }
+}
+```
+
 ElementHandle prevents DOM element from garbage collection unless the handle is disposed with [JsHandle.dispose()](./api/class-jshandle.mdx#jshandledispose). ElementHandles are auto-disposed when their origin frame gets navigated.
 
 ElementHandle instances can be used as an argument in [Page.evalOnSelector(selector, expression[, arg])](./api/class-page.mdx#pageevalonselectorselector-expression-arg) and [Page.evaluate(expression[, arg])](./api/class-page.mdx#pageevaluateexpression-arg) methods.
@@ -71,6 +89,11 @@ Scrolling affects the returned bonding box, similarly to [Element.getBoundingCli
 Elements from child frames return the bounding box relative to the main frame, unlike the [Element.getBoundingClientRect](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect).
 
 Assuming the page is static, it is safe to use bounding box coordinates to perform input. For example, the following snippet should click the center of the element.
+
+```java
+BoundingBox box = elementHandle.boundingBox();
+page.mouse().click(box.x + box.width / 2, box.y + box.height / 2);
+```
 
 ## ElementHandle.check([options])
 - `options` <`ElementHandle.CheckOptions`>
@@ -150,6 +173,10 @@ When all steps combined have not finished during the specified `timeout`, this m
 
 The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the elment, `click` is dispatched. This is equivalend to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
 
+```java
+elementHandle.dispatchEvent("click");
+```
+
 Under the hood, it creates an instance of an event based on the given `type`, initializes it with `eventInit` properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
 
 Since `eventInit` is event-specific, please refer to the events documentation for the lists of initial properties:
@@ -162,6 +189,14 @@ Since `eventInit` is event-specific, please refer to the events documentation fo
 * [Event](https://developer.mozilla.org/en-US/docs/Web/API/Event/Event)
 
 You can also specify `JSHandle` as the property value if you want live objects to be passed into the event:
+
+```java
+// Note you can only create DataTransfer in Chromium and Firefox
+JSHandle dataTransfer = page.evaluateHandle("() => new DataTransfer()");
+Map<String, Object> arg = new HashMap<>();
+arg.put("dataTransfer", dataTransfer);
+elementHandle.dispatchEvent("dragstart", arg);
+```
 
 ## ElementHandle.evalOnSelector(selector, expression[, arg])
 - `selector` <[String]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
@@ -176,6 +211,12 @@ The method finds an element matching the specified selector in the `ElementHandl
 If `expression` returns a [Promise], then [ElementHandle.evalOnSelector(selector, expression[, arg])](./api/class-elementhandle.mdx#elementhandleevalonselectorselector-expression-arg) would wait for the promise to resolve and return its value.
 
 Examples:
+
+```java
+ElementHandle tweetHandle = page.querySelector(".tweet");
+assertEquals("100", tweetHandle.evalOnSelector(".like", "node => node.innerText"));
+assertEquals("10", tweetHandle.evalOnSelector(".retweets", "node => node.innerText"));
+```
 
 ## ElementHandle.evalOnSelectorAll(selector, expression[, arg])
 - `selector` <[String]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
@@ -196,6 +237,11 @@ Examples:
   <div class="tweet">Hello!</div>
   <div class="tweet">Hi!</div>
 </div>
+```
+
+```java
+ElementHandle feedHandle = page.querySelector(".feed");
+assertEquals(Arrays.asList("Hello!", "Hi!"), feedHandle.evalOnSelectorAll(".tweet", "nodes => nodes.map(n => n.innerText)"));
 ```
 
 ## ElementHandle.fill(value[, options])
@@ -350,6 +396,15 @@ Triggers a `change` and `input` event once all the provided options have been se
 
 Will wait until all specified options are present in the `<select>` element.
 
+```java
+// single selection matching the value
+handle.selectOption("blue");
+// single selection matching the label
+handle.selectOption(new SelectOption().withLabel("Blue"));
+// multiple selection
+handle.selectOption(new String[] {"red", "green", "blue"});
+```
+
 ## ElementHandle.selectText([options])
 - `options` <`ElementHandle.SelectTextOptions`>
   - `withTimeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
@@ -409,7 +464,18 @@ Focuses the element, and then sends a `keydown`, `keypress`/`input`, and `keyup`
 
 To press a special key, like `Control` or `ArrowDown`, use [ElementHandle.press(key[, options])](./api/class-elementhandle.mdx#elementhandlepresskey-options).
 
+```java
+elementHandle.type("Hello"); // Types instantly
+elementHandle.type("World", new ElementHandle.TypeOptions().withDelay(100)); // Types slower, like a user
+```
+
 An example of typing into a text field and then submitting the form:
+
+```java
+ElementHandle elementHandle = page.querySelector("input");
+elementHandle.type("some text");
+elementHandle.press("Enter");
+```
 
 ## ElementHandle.uncheck([options])
 - `options` <`ElementHandle.UncheckOptions`>
@@ -460,6 +526,14 @@ If the element does not satisfy the condition for the `timeout` milliseconds, th
 Returns element specified by selector when it satisfies `state` option. Returns `null` if waiting for `hidden` or `detached`.
 
 Wait for the `selector` relative to the element handle to satisfy `state` option (either appear/disappear from dom, or become visible/hidden). If at the moment of calling the method `selector` already satisfies the condition, the method will return immediately. If the selector doesn't satisfy the condition for the `timeout` milliseconds, the function will throw.
+
+```java
+page.setContent("<div><span></span></div>");
+ElementHandle div = page.querySelector("div");
+// Waiting for the "span" selector relative to the div.
+ElementHandle span = div.waitForSelector("span", new ElementHandle.WaitForSelectorOptions()
+  .withState(WaitForSelectorState.ATTACHED));
+```
 
 :::note
 This method does not work across navigations, use [Page.waitForSelector(selector[, options])](./api/class-page.mdx#pagewaitforselectorselector-options) instead.

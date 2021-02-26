@@ -11,6 +11,16 @@ If a page opens another page, e.g. with a `window.open` call, the popup will bel
 
 Playwright allows creation of "incognito" browser contexts with `browser.newContext()` method. "Incognito" browser contexts don't write any browsing data to disk.
 
+```java
+// Create a new incognito browser context
+BrowserContext context = browser.newContext();
+// Create a new page inside context.
+Page page = context.newPage();
+page.navigate("https://example.com");
+// Dispose context once it"s no longer needed.
+context.close();
+```
+
 
 - [BrowserContext.onClose(handler)](./api/class-browsercontext.mdx#browsercontextonclosehandler)
 - [BrowserContext.onPage(handler)](./api/class-browsercontext.mdx#browsercontextonpagehandler)
@@ -51,6 +61,13 @@ The event is emitted when a new Page is created in the BrowserContext. The page 
 
 The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
 
+```java
+Page newPage = context.waitForPage(() -> {
+  page.click("a[target=_blank]");
+});
+System.out.println(newPage.evaluate("location.href"));
+```
+
 :::note
 Use [Page.waitForLoadState([state, options])](./api/class-page.mdx#pagewaitforloadstatestate-options) to wait until the page gets to a particular state (you should not need it in most cases).
 :::
@@ -69,6 +86,10 @@ Use [Page.waitForLoadState([state, options])](./api/class-page.mdx#pagewaitforlo
 
 Adds cookies into this browser context. All pages within this context will have these cookies installed. Cookies can be obtained via [BrowserContext.cookies([urls])](./api/class-browsercontext.mdx#browsercontextcookiesurls).
 
+```java
+browserContext.addCookies(Arrays.asList(cookieObject1, cookieObject2));
+```
+
 ## BrowserContext.addInitScript(script)
 - `script` <[String]|[Path]> Script to be evaluated in all pages in the browser context.
 
@@ -83,6 +104,11 @@ An example of overriding `Math.random` before the page loads:
 ```js
 // preload.js
 Math.random = () => 42;
+```
+
+```java
+// In your playwright script, assuming the preload.js file is in same directory.
+browserContext.addInitScript(Paths.get("preload.js"));
 ```
 
 :::note
@@ -101,6 +127,13 @@ Clears context cookies.
 ## BrowserContext.clearPermissions()
 
 Clears all permission overrides for the browser context.
+
+```java
+BrowserContext context = browser.newContext();
+context.grantPermissions(Arrays.asList("clipboard-read"));
+// do stuff ..
+context.clearPermissions();
+```
 
 ## BrowserContext.close()
 
@@ -138,7 +171,45 @@ See [Page.exposeBinding(name, callback[, options])](./api/class-page.mdx#pageexp
 
 An example of exposing page URL to all frames in all pages in the context:
 
+```java
+import com.microsoft.playwright.*;
+
+public class Example {
+  public static void main(String[] args) {
+    try (Playwright playwright = Playwright.create()) {
+      BrowserType webkit = playwright.webkit()
+      Browser browser = webkit.launch(new BrowserType.LaunchOptions().withHeadless(false));
+      BrowserContext context = browser.newContext();
+      context.exposeBinding("pageURL", (source, args) -> source.page().url());
+      Page page = context.newPage();
+      page.setContent("<script>\n" +
+        "  async function onClick() {\n" +
+        "    document.querySelector('div').textContent = await window.pageURL();\n" +
+        "  }\n" +
+        "</script>\n" +
+        "<button onclick=\"onClick()\">Click me</button>\n" +
+        "<div></div>");
+      page.click("button");
+    }
+  }
+}
+```
+
 An example of passing an element handle:
+
+```java
+context.exposeBinding("clicked", (source, args) -> {
+  ElementHandle element = (ElementHandle) args[0];
+  System.out.println(element.textContent());
+  return null;
+}, new BrowserContext.ExposeBindingOptions().withHandle(true));
+page.setContent("" +
+  "<script>\n" +
+  "  document.addEventListener('click', event => window.clicked(event.target));\n" +
+  "</script>\n" +
+  "<div>Click me</div>\n" +
+  "<div>Or click me</div>\n");
+```
 
 ## BrowserContext.exposeFunction(name, callback)
 - `name` <[String]> Name of the function on the window object.
@@ -151,6 +222,44 @@ If the `callback` returns a [Promise], it will be awaited.
 See [Page.exposeFunction(name, callback)](./api/class-page.mdx#pageexposefunctionname-callback) for page-only version.
 
 An example of adding an `md5` function to all pages in the context:
+
+```java
+import com.microsoft.playwright.*;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+
+public class Example {
+  public static void main(String[] args) {
+    try (Playwright playwright = Playwright.create()) {
+      BrowserType webkit = playwright.webkit()
+      Browser browser = webkit.launch(new BrowserType.LaunchOptions().withHeadless(false));
+      context.exposeFunction("sha1", args -> {
+        String text = (String) args[0];
+        MessageDigest crypto;
+        try {
+          crypto = MessageDigest.getInstance("SHA-1");
+        } catch (NoSuchAlgorithmException e) {
+          return null;
+        }
+        byte[] token = crypto.digest(text.getBytes(StandardCharsets.UTF_8));
+        return Base64.getEncoder().encodeToString(token);
+      });
+      Page page = context.newPage();
+      page.setContent("<script>\n" +
+        "  async function onClick() {\n" +
+        "    document.querySelector('div').textContent = await window.sha1('PLAYWRIGHT');\n" +
+        "  }\n" +
+        "</script>\n" +
+        "<button onclick=\"onClick()\">Click me</button>\n" +
+        "<div></div>\n");
+      page.click("button");
+    }
+  }
+}
+```
 
 ## BrowserContext.grantPermissions(permissions[, options])
 - `permissions` <[List]<[String]>> A permission or an array of permissions to grant. Permissions can be one of the following values:
@@ -193,7 +302,23 @@ Routing provides the capability to modify network requests that are made by any 
 
 An example of a naïve handler that aborts all image requests:
 
+```java
+BrowserContext context = browser.newContext();
+context.route("**/*.{png,jpg,jpeg}", route -> route.abort());
+Page page = context.newPage();
+page.navigate("https://example.com");
+browser.close();
+```
+
 or the same snippet using a regex pattern instead:
+
+```java
+BrowserContext context = browser.newContext();
+context.route(Pattern.compile("(\\.png$)|(\\.jpg$)"), route -> route.abort());
+Page page = context.newPage();
+page.navigate("https://example.com");
+browser.close();
+```
 
 Page routes (set up with [Page.route(url, handler)](./api/class-page.mdx#pagerouteurl-handler)) take precedence over browser context routes when request matches both handlers.
 
@@ -241,6 +366,10 @@ The extra HTTP headers will be sent with every request initiated by any page in 
   - `withAccuracy` <[double]> Non-negative accuracy value. Defaults to `0`.
 
 Sets the context's geolocation. Passing `null` or `undefined` emulates position unavailable.
+
+```java
+browserContext.setGeolocation(new Geolocation(59.95, 30.31667));
+```
 
 :::note
 Consider using [BrowserContext.grantPermissions(permissions[, options])](./api/class-browsercontext.mdx#browsercontextgrantpermissionspermissions-options) to grant permissions for the browser context pages to read its geolocation.

@@ -45,7 +45,21 @@ Fulfills route's request with given response.
 
 An example of fulfilling all requests with 404 responses:
 
+```java
+page.route("**/*", route -> {
+  route.fulfill(new Route.FulfillOptions()
+    .withStatus(404)
+    .withContentType("text/plain")
+    .withBody("Not Found!"));
+});
+```
+
 An example of serving static file:
+
+```java
+page.route("**/xhr_endpoint", route -> route.fulfill(
+  new Route.FulfillOptions().withPath(Paths.get("mock_data.json")));
+```
 
 ## Route.request()
 - returns: <[Request]>
@@ -60,6 +74,17 @@ A request to be routed.
   - `withUrl` <[String]> If set changes the request URL. New URL must have same protocol as original one.
 
 Continues route's request with optional overrides.
+
+```java
+page.route("**/*", route -> {
+  // Override headers
+  Map<String, String> headers = new HashMap<>(route.request().headers());
+  headers.put("foo", "bar"); // set "foo" header
+  headers.remove("origin"); // remove "origin" header
+  route.resume(new Route.ResumeOptions().withHeaders(headers));
+});
+```
+
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Browser]: ./api/class-browser.mdx "Browser"

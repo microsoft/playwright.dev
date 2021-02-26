@@ -14,6 +14,29 @@ At every point of time, page exposes its current frame tree via the [Page.mainFr
 
 An example of dumping frame tree:
 
+```java
+import com.microsoft.playwright.*;
+
+public class Example {
+  public static void main(String[] args) {
+    try (Playwright playwright = Playwright.create()) {
+      BrowserType firefox = playwright.firefox();
+      Browser browser = firefox.launch();
+      Page page = browser.newPage();
+      page.navigate("https://www.google.com/chrome/browser/canary.html");
+      dumpFrameTree(page.mainFrame(), "");
+      browser.close();
+    }
+  }
+  static void dumpFrameTree(Frame frame, String indent) {
+    System.out.println(indent + frame.url());
+    for (Frame child : frame.childFrames()) {
+      dumpFrameTree(child, indent + "  ");
+    }
+  }
+}
+```
+
 
 - [Frame.addScriptTag([options])](./api/class-frame.mdx#frameaddscripttagoptions)
 - [Frame.addStyleTag([options])](./api/class-frame.mdx#frameaddstyletagoptions)
@@ -170,6 +193,10 @@ When all steps combined have not finished during the specified `timeout`, this m
 
 The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the elment, `click` is dispatched. This is equivalend to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
 
+```java
+frame.dispatchEvent("button#submit", "click");
+```
+
 Under the hood, it creates an instance of an event based on the given `type`, initializes it with `eventInit` properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
 
 Since `eventInit` is event-specific, please refer to the events documentation for the lists of initial properties:
@@ -182,6 +209,14 @@ Since `eventInit` is event-specific, please refer to the events documentation fo
 * [Event](https://developer.mozilla.org/en-US/docs/Web/API/Event/Event)
 
 You can also specify `JSHandle` as the property value if you want live objects to be passed into the event:
+
+```java
+// Note you can only create DataTransfer in Chromium and Firefox
+JSHandle dataTransfer = frame.evaluateHandle("() => new DataTransfer()");
+Map<String, Object> arg = new HashMap<>();
+arg.put("dataTransfer", dataTransfer);
+frame.dispatchEvent("#source", "dragstart", arg);
+```
 
 ## Frame.evalOnSelector(selector, expression[, arg])
 - `selector` <[String]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
@@ -197,6 +232,12 @@ If `expression` returns a [Promise], then [Frame.evalOnSelector(selector, expres
 
 Examples:
 
+```java
+String searchValue = (String) frame.evalOnSelector("#search", "el => el.value");
+String preloadHref = (String) frame.evalOnSelector("link[rel=preload]", "el => el.href");
+String html = (String) frame.evalOnSelector(".main-container", "(e, suffix) => e.outerHTML + suffix", "hello");
+```
+
 ## Frame.evalOnSelectorAll(selector, expression[, arg])
 - `selector` <[String]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
 - `expression` <[String]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
@@ -211,6 +252,10 @@ If `expression` returns a [Promise], then [Frame.evalOnSelectorAll(selector, exp
 
 Examples:
 
+```java
+boolean divsCounts = (boolean) page.evalOnSelectorAll("div", "(divs, min) => divs.length >= min", 10);
+```
+
 ## Frame.evaluate(expression[, arg])
 - `expression` <[String]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `arg` <[Object]> Optional argument to pass to `expression`.
@@ -222,9 +267,26 @@ If the function passed to the [Frame.evaluate(expression[, arg])](./api/class-fr
 
 If the function passed to the [Frame.evaluate(expression[, arg])](./api/class-frame.mdx#frameevaluateexpression-arg) returns a non-[Serializable] value, then [Frame.evaluate(expression[, arg])](./api/class-frame.mdx#frameevaluateexpression-arg) returns `undefined`. Playwright also supports transferring some additional values that are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`.
 
+```java
+Object result = frame.evaluate("([x, y]) => {\n" +
+  "  return Promise.resolve(x * y);\n" +
+  "}", Arrays.asList(7, 8));
+System.out.println(result); // prints "56"
+```
+
 A string can also be passed in instead of a function.
 
+```java
+System.out.println(frame.evaluate("1 + 2")); // prints "3"
+```
+
 [ElementHandle] instances can be passed as an argument to the [Frame.evaluate(expression[, arg])](./api/class-frame.mdx#frameevaluateexpression-arg):
+
+```java
+ElementHandle bodyHandle = frame.querySelector("body");
+String html = (String) frame.evaluate("([body, suffix]) => body.innerHTML + suffix", Arrays.asList(bodyHandle, "hello"));
+bodyHandle.dispose();
+```
 
 ## Frame.evaluateHandle(expression[, arg])
 - `expression` <[String]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
@@ -237,9 +299,25 @@ The only difference between [Frame.evaluate(expression[, arg])](./api/class-fram
 
 If the function, passed to the [Frame.evaluateHandle(expression[, arg])](./api/class-frame.mdx#frameevaluatehandleexpression-arg), returns a [Promise], then [Frame.evaluateHandle(expression[, arg])](./api/class-frame.mdx#frameevaluatehandleexpression-arg) would wait for the promise to resolve and return its value.
 
+```java
+// Handle for the window object.
+JSHandle aWindowHandle = frame.evaluateHandle("() => Promise.resolve(window)");
+```
+
 A string can also be passed in instead of a function.
 
+```java
+JSHandle aHandle = frame.evaluateHandle("document"); // Handle for the "document".
+```
+
 [JSHandle] instances can be passed as an argument to the [Frame.evaluateHandle(expression[, arg])](./api/class-frame.mdx#frameevaluatehandleexpression-arg):
+
+```java
+JSHandle aHandle = frame.evaluateHandle("() => document.body");
+JSHandle resultHandle = frame.evaluateHandle("([body, suffix]) => body.innerHTML + suffix", Arrays.asList(aHandle, "hello"));
+System.out.println(resultHandle.jsonValue());
+resultHandle.dispose();
+```
 
 ## Frame.fill(selector, value[, options])
 - `selector` <[String]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
@@ -267,6 +345,12 @@ Returns the `frame` or `iframe` element handle which corresponds to this frame.
 This is an inverse of [ElementHandle.contentFrame()](./api/class-elementhandle.mdx#elementhandlecontentframe). Note that returned handle actually belongs to the parent frame.
 
 This method throws an error if the frame has been detached before `frameElement()` returns.
+
+```java
+ElementHandle frameElement = frame.frameElement();
+Frame contentFrame = frameElement.contentFrame();
+System.out.println(frame == contentFrame);  // -> true
+```
 
 ## Frame.getAttribute(selector, name[, options])
 - `selector` <[String]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
@@ -469,6 +553,15 @@ Triggers a `change` and `input` event once all the provided options have been se
 
 Will wait until all specified options are present in the `<select>` element.
 
+```java
+// single selection matching the value
+frame.selectOption("select#colors", "blue");
+// single selection matching both the value and the label
+frame.selectOption("select#colors", new SelectOption().withLabel("Blue"));
+// multiple selection
+frame.selectOption("select#colors", new String[] {"red", "green", "blue"});
+```
+
 ## Frame.setContent(html[, options])
 - `html` <[String]> HTML markup to assign to the page.
 - `options` <`Frame.SetContentOptions`>
@@ -541,6 +634,13 @@ Sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in t
 
 To press a special key, like `Control` or `ArrowDown`, use [Keyboard.press(key[, options])](./api/class-keyboard.mdx#keyboardpresskey-options).
 
+```java
+// Types instantly
+frame.type("#mytextarea", "Hello");
+// Types slower, like a user
+frame.type("#mytextarea", "World", new Frame.TypeOptions().withDelay(100)); 
+```
+
 ## Frame.uncheck(selector[, options])
 - `selector` <[String]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
 - `options` <`Frame.UncheckOptions`>
@@ -576,7 +676,29 @@ Returns when the `expression` returns a truthy value, returns that value.
 
 The [Frame.waitForFunction(expression[, arg, options])](./api/class-frame.mdx#framewaitforfunctionexpression-arg-options) can be used to observe viewport size change:
 
+```java
+import com.microsoft.playwright.*;
+
+public class Example {
+  public static void main(String[] args) {
+    try (Playwright playwright = Playwright.create()) {
+      BrowserType firefox = playwright.firefox();
+      Browser browser = firefox.launch();
+      Page page = browser.newPage();
+      page.setViewportSize(50, 50);
+      page.mainFrame().waitForFunction("window.innerWidth < 100");
+      browser.close();
+    }
+  }
+}
+```
+
 To pass an argument to the predicate of `frame.waitForFunction` function:
+
+```java
+String selector = ".foo";
+frame.waitForFunction("selector => !!document.querySelector(selector)", selector);
+```
 
 ## Frame.waitForLoadState([state, options])
 - `state` <`enum LoadState { LOAD, DOMCONTENTLOADED, NETWORKIDLE }`> Optional load state to wait for, defaults to `load`. If the state has been already reached while loading current document, the method resolves immediately. Can be one of:
@@ -589,6 +711,11 @@ To pass an argument to the predicate of `frame.waitForFunction` function:
 Waits for the required load state to be reached.
 
 This returns when the frame reaches a required load state, `load` by default. The navigation must have been committed when this method is called. If current document has already reached the required state, resolves immediately.
+
+```java
+frame.click("button"); // Click triggers navigation.
+frame.waitForLoadState(); // Waits for "load" state by default.
+```
 
 ## Frame.waitForNavigation([options, callback])
 - `options` <`Frame.WaitForNavigationOptions`>
@@ -604,6 +731,14 @@ This returns when the frame reaches a required load state, `load` by default. Th
 Waits for the frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
 
 This method waits for the frame to navigate to a new URL. It is useful for when you run code which will indirectly cause the frame to navigate. Consider this example:
+
+```java
+// The method returns after navigation has finished
+Response response = frame.waitForNavigation(() -> {
+  // Clicking the link will indirectly cause a navigation
+  frame.click("a.delayed-navigation");
+});
+```
 
 :::note
 Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
@@ -625,6 +760,26 @@ Returns when element specified by selector satisfies `state` option. Returns `nu
 Wait for the `selector` to satisfy `state` option (either appear/disappear from dom, or become visible/hidden). If at the moment of calling the method `selector` already satisfies the condition, the method will return immediately. If the selector doesn't satisfy the condition for the `timeout` milliseconds, the function will throw.
 
 This method works across navigations:
+
+```java
+import com.microsoft.playwright.*;
+
+public class Example {
+  public static void main(String[] args) {
+    try (Playwright playwright = Playwright.create()) {
+      BrowserType chromium = playwright.chromium();
+      Browser browser = chromium.launch();
+      Page page = browser.newPage();
+      for (String currentURL : Arrays.asList("https://google.com", "https://bbc.com")) {
+        page.navigate(currentURL);
+        ElementHandle element = page.mainFrame().waitForSelector("img");
+        System.out.println("Loaded image: " + element.getAttribute("src"));
+      }
+      browser.close();
+    }
+  }
+}
+```
 
 ## Frame.waitForTimeout(timeout)
 - `timeout` <[double]> A timeout to wait for

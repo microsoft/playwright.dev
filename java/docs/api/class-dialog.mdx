@@ -9,6 +9,26 @@ import TabItem from '@theme/TabItem';
 
 An example of using `Dialog` class:
 
+```java
+import com.microsoft.playwright.*;
+
+public class Example {
+  public static void main(String[] args) {
+    try (Playwright playwright = Playwright.create()) {
+      BrowserType chromium = playwright.chromium();
+      Browser browser = chromium.launch();
+      Page page = browser.newPage();
+      page.onDialog(dialog -> {
+        System.out.println(dialog.message());
+        dialog.dismiss();
+      });
+      page.evaluate("alert('1')");
+      browser.close();
+    }
+  }
+}
+```
+
 :::note
 Dialogs are dismissed automatically, unless there is a [Page.onDialog(handler)](./api/class-page.mdx#pageondialoghandler) listener. When listener is present, it **must** either [Dialog.accept([promptText])](./api/class-dialog.mdx#dialogacceptprompttext) or [Dialog.dismiss()](./api/class-dialog.mdx#dialogdismiss) the dialog - otherwise the page will [freeze](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#never_blocking) waiting for the dialog, and actions like click will never finish.
 :::

@@ -7,6 +7,11 @@ import TabItem from '@theme/TabItem';
 
 JSHandle represents an in-page JavaScript object. JSHandles can be created with the [Page.evaluateHandle(expression[, arg])](./api/class-page.mdx#pageevaluatehandleexpression-arg) method.
 
+```java
+JSHandle windowHandle = page.evaluateHandle("() => window");
+// ...
+```
+
 JSHandle prevents the referenced JavaScript object being garbage collected unless the handle is exposed with [JsHandle.dispose()](./api/class-jshandle.mdx#jshandledispose). JSHandles are auto-disposed when their origin frame gets navigated or the parent context gets destroyed.
 
 JSHandle instances can be used as an argument in [Page.evalOnSelector(selector, expression[, arg])](./api/class-page.mdx#pageevalonselectorselector-expression-arg), [Page.evaluate(expression[, arg])](./api/class-page.mdx#pageevaluateexpression-arg) and [Page.evaluateHandle(expression[, arg])](./api/class-page.mdx#pageevaluatehandleexpression-arg) methods.
@@ -42,6 +47,11 @@ If `expression` returns a [Promise], then `handle.evaluate` would wait for the p
 
 Examples:
 
+```java
+ElementHandle tweetHandle = page.querySelector(".tweet .retweets");
+assertEquals("10 retweets", tweetHandle.evaluate("node => node.innerText"));
+```
+
 ## JsHandle.evaluateHandle(expression[, arg])
 - `expression` <[String]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `arg` <[Object]> Optional argument to pass to `expression`.
@@ -61,6 +71,14 @@ See [Page.evaluateHandle(expression[, arg])](./api/class-page.mdx#pageevaluateha
 - returns: <[Map]<[String], [JSHandle]>>
 
 The method returns a map with **own property names** as keys and JSHandle instances for the property values.
+
+```java
+JSHandle handle = page.evaluateHandle("() => ({window, document}"););
+Map<String, JSHandle> properties = handle.getProperties();
+JSHandle windowHandle = properties.get("window");
+JSHandle documentHandle = properties.get("document");
+handle.dispose();
+```
 
 ## JsHandle.getProperty(propertyName)
 - `propertyName` <[String]> property to get
