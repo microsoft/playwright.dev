@@ -9,11 +9,42 @@ Page provides methods to interact with a single tab in a [Browser], or an [exten
 
 This example creates a page, navigates it to a URL, and then saves a screenshot:
 
+```java
+import com.microsoft.playwright.*;
+
+public class Example {
+  public static void main(String[] args) {
+    try (Playwright playwright = Playwright.create()) {
+      BrowserType webkit = playwright.webkit();
+      Browser browser = webkit.launch();
+      BrowserContext context = browser.newContext();
+      Page page = context.newPage();
+      page.navigate("https://example.com");
+      page.screenshot(new Page.ScreenshotOptions().withPath(Paths.get("screenshot.png")));
+      browser.close();
+    }
+  }
+}
+```
+
 The Page class emits various events (described below) which can be handled using any of Node's native [`EventEmitter`](https://nodejs.org/api/events.html#events_class_eventemitter) methods, such as `on`, `once` or `removeListener`.
 
 This example logs a message for a single page `load` event:
 
+```java
+page.onLoad(p -> System.out.println("Page loaded!"));
+```
+
 To unsubscribe from events use the `removeListener` method:
+
+```java
+Consumer<Request> logRequest = interceptedRequest -> {
+  System.out.println("A request was made: " + interceptedRequest.url());
+};
+page.onRequest(logRequest);
+// Sometime later...
+page.offRequest(logRequest);
+```
 
 
 - [Page.onClose(handler)](./api/class-page.mdx#pageonclosehandler)
@@ -132,12 +163,31 @@ The arguments passed into `console.log` appear as arguments on the event handler
 
 An example of handling `console` event:
 
+```java
+page.onConsole(msg -> {
+  for (int i = 0; i < msg.args().size(); ++i)
+    System.out.println(i + ": " + msg.args().get(i).jsonValue());
+});
+page.evaluate("() => console.log('hello', 5, {foo: 'bar'})");
+```
+
 ## Page.onCrash(handler)
 - type: <[Page]>
 
 Emitted when the page crashes. Browser pages might crash if they try to allocate too much memory. When the page crashes, ongoing and subsequent operations will throw.
 
 The most common way to deal with crashes is to catch an exception:
+
+```java
+try {
+  // Crash might happen during a click.
+  page.click("button");
+  // Or while waiting for an event.
+  page.waitForPopup(() -> {});
+} catch (PlaywrightException e) {
+  // When the page crashes, exception message contains "crash".
+}
+```
 
 ## Page.onDialog(handler)
 - type: <[Dialog]>
@@ -166,6 +216,12 @@ Browser context **must** be created with the `acceptDownloads` set to `true` whe
 - type: <[FileChooser]>
 
 Emitted when a file chooser is supposed to appear, such as after clicking the  `<input type=file>`. Playwright can respond to it via setting the input files using [FileChooser.setFiles(files[, options])](./api/class-filechooser.mdx#filechoosersetfilesfiles-options) that can be uploaded after that.
+
+```java
+page.onFileChooser(fileChooser -> {
+  fileChooser.setFiles(Paths.get("/tmp/myfile.pdf"));
+});
+```
 
 ## Page.onFrameAttached(handler)
 - type: <[Frame]>
@@ -198,6 +254,13 @@ Emitted when an uncaught exception happens within the page.
 Emitted when the page opens a new tab or window. This event is emitted in addition to the [BrowserContext.onPage(handler)](./api/class-browsercontext.mdx#browsercontextonpagehandler), but only for popups relevant to this page.
 
 The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
+
+```java
+Page popup = page.waitForPopup(() -> {
+  page.evaluate("() => window.open('https://example.com')");
+});
+System.out.println(popup.evaluate("location.href"));
+```
 
 :::note
 Use [Page.waitForLoadState([state, options])](./api/class-page.mdx#pagewaitforloadstatestate-options) to wait until the page gets to a particular state (you should not need it in most cases).
@@ -251,6 +314,11 @@ An example of overriding `Math.random` before the page loads:
 ```js
 // preload.js
 Math.random = () => 42;
+```
+
+```java
+// In your playwright script, assuming the preload.js file is in same directory
+page.addInitScript(Paths.get("./preload.js"));
 ```
 
 :::note
@@ -388,6 +456,10 @@ Shortcut for main frame's [Frame.dblclick(selector[, options])](./api/class-fram
 
 The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the elment, `click` is dispatched. This is equivalend to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
 
+```java
+page.dispatchEvent("button#submit", "click");
+```
+
 Under the hood, it creates an instance of an event based on the given `type`, initializes it with `eventInit` properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
 
 Since `eventInit` is event-specific, please refer to the events documentation for the lists of initial properties:
@@ -401,10 +473,47 @@ Since `eventInit` is event-specific, please refer to the events documentation fo
 
 You can also specify `JSHandle` as the property value if you want live objects to be passed into the event:
 
+```java
+// Note you can only create DataTransfer in Chromium and Firefox
+JSHandle dataTransfer = page.evaluateHandle("() => new DataTransfer()");
+Map<String, Object> arg = new HashMap<>();
+arg.put("dataTransfer", dataTransfer);
+page.dispatchEvent("#source", "dragstart", arg);
+```
+
 ## Page.emulateMedia([options])
 - `options` <`Page.EmulateMediaOptions`>
   - `withColorScheme` <[null]|`enum ColorScheme { LIGHT, DARK, NO_PREFERENCE }`> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. Passing `null` disables color scheme emulation.
   - `withMedia` <[null]|`enum Media { SCREEN, PRINT }`> Changes the CSS media type of the page. The only allowed values are `'screen'`, `'print'` and `null`. Passing `null` disables CSS media emulation.
+
+```java
+page.evaluate("() => matchMedia('screen').matches");
+// → true
+page.evaluate("() => matchMedia('print').matches");
+// → false
+
+page.emulateMedia(new Page.EmulateMediaOptions().withMedia(Media.PRINT));
+page.evaluate("() => matchMedia('screen').matches");
+// → false
+page.evaluate("() => matchMedia('print').matches");
+// → true
+
+page.emulateMedia(new Page.EmulateMediaOptions());
+page.evaluate("() => matchMedia('screen').matches");
+// → true
+page.evaluate("() => matchMedia('print').matches");
+// → false
+```
+
+```java
+page.emulateMedia(new Page.EmulateMediaOptions().withColorScheme(ColorScheme.DARK));
+page.evaluate("() => matchMedia('(prefers-color-scheme: dark)').matches");
+// → true
+page.evaluate("() => matchMedia('(prefers-color-scheme: light)').matches");
+// → false
+page.evaluate("() => matchMedia('(prefers-color-scheme: no-preference)').matches");
+// → false
+```
 
 ## Page.evalOnSelector(selector, expression[, arg])
 - `selector` <[String]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
@@ -417,6 +526,12 @@ The method finds an element matching the specified selector within the page and 
 If `expression` returns a [Promise], then [Page.evalOnSelector(selector, expression[, arg])](./api/class-page.mdx#pageevalonselectorselector-expression-arg) would wait for the promise to resolve and return its value.
 
 Examples:
+
+```java
+String searchValue = (String) page.evalOnSelector("#search", "el => el.value");
+String preloadHref = (String) page.evalOnSelector("link[rel=preload]", "el => el.href");
+String html = (String) page.evalOnSelector(".main-container", "(e, suffix) => e.outerHTML + suffix", "hello");
+```
 
 Shortcut for main frame's [Frame.evalOnSelector(selector, expression[, arg])](./api/class-frame.mdx#frameevalonselectorselector-expression-arg).
 
@@ -432,6 +547,10 @@ If `expression` returns a [Promise], then [Page.evalOnSelectorAll(selector, expr
 
 Examples:
 
+```java
+boolean divCounts = (boolean) page.evalOnSelectorAll("div", "(divs, min) => divs.length >= min", 10);
+```
+
 ## Page.evaluate(expression[, arg])
 - `expression` <[String]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `arg` <[Object]> Optional argument to pass to `expression`.
@@ -445,9 +564,26 @@ If the function passed to the [Page.evaluate(expression[, arg])](./api/class-pag
 
 Passing argument to `expression`:
 
+```java
+Object result = page.evaluate("([x, y]) => {\n" +
+  "  return Promise.resolve(x * y);\n" +
+  "}", Arrays.asList(7, 8));
+System.out.println(result); // prints "56"
+```
+
 A string can also be passed in instead of a function:
 
+```java
+System.out.println(page.evaluate("1 + 2")); // prints "3"
+```
+
 [ElementHandle] instances can be passed as an argument to the [Page.evaluate(expression[, arg])](./api/class-page.mdx#pageevaluateexpression-arg):
+
+```java
+ElementHandle bodyHandle = page.querySelector("body");
+String html = (String) page.evaluate("([body, suffix]) => body.innerHTML + suffix", Arrays.asList(bodyHandle, "hello"));
+bodyHandle.dispose();
+```
 
 Shortcut for main frame's [Frame.evaluate(expression[, arg])](./api/class-frame.mdx#frameevaluateexpression-arg).
 
@@ -462,9 +598,25 @@ The only difference between [Page.evaluate(expression[, arg])](./api/class-page.
 
 If the function passed to the [Page.evaluateHandle(expression[, arg])](./api/class-page.mdx#pageevaluatehandleexpression-arg) returns a [Promise], then [Page.evaluateHandle(expression[, arg])](./api/class-page.mdx#pageevaluatehandleexpression-arg) would wait for the promise to resolve and return its value.
 
+```java
+// Handle for the window object.
+JSHandle aWindowHandle = page.evaluateHandle("() => Promise.resolve(window)");
+```
+
 A string can also be passed in instead of a function:
 
+```java
+JSHandle aHandle = page.evaluateHandle("document"); // Handle for the "document".
+```
+
 [JSHandle] instances can be passed as an argument to the [Page.evaluateHandle(expression[, arg])](./api/class-page.mdx#pageevaluatehandleexpression-arg):
+
+```java
+JSHandle aHandle = page.evaluateHandle("() => document.body");
+JSHandle resultHandle = page.evaluateHandle("([body, suffix]) => body.innerHTML + suffix", Arrays.asList(aHandle, "hello"));
+System.out.println(resultHandle.jsonValue());
+resultHandle.dispose();
+```
 
 ## Page.exposeBinding(name, callback[, options])
 - `name` <[String]> Name of the function on the window object.
@@ -484,7 +636,45 @@ Functions installed via [Page.exposeBinding(name, callback[, options])](./api/cl
 
 An example of exposing page URL to all frames in a page:
 
+```java
+import com.microsoft.playwright.*;
+
+public class Example {
+  public static void main(String[] args) {
+    try (Playwright playwright = Playwright.create()) {
+      BrowserType webkit = playwright.webkit();
+      Browser browser = webkit.launch({ headless: false });
+      BrowserContext context = browser.newContext();
+      Page page = context.newPage();
+      page.exposeBinding("pageURL", (source, args) -> source.page().url());
+      page.setContent("<script>\n" +
+        "  async function onClick() {\n" +
+        "    document.querySelector('div').textContent = await window.pageURL();\n" +
+        "  }\n" +
+        "</script>\n" +
+        "<button onclick=\"onClick()\">Click me</button>\n" +
+        "<div></div>");
+      page.click("button");
+    }
+  }
+}
+```
+
 An example of passing an element handle:
+
+```java
+page.exposeBinding("clicked", (source, args) -> {
+  ElementHandle element = (ElementHandle) args[0];
+  System.out.println(element.textContent());
+  return null;
+}, new Page.ExposeBindingOptions().withHandle(true));
+page.setContent("" +
+  "<script>\n" +
+  "  document.addEventListener('click', event => window.clicked(event.target));\n" +
+  "</script>\n" +
+  "<div>Click me</div>\n" +
+  "<div>Or click me</div>\n");
+```
 
 ## Page.exposeFunction(name, callback)
 - `name` <[String]> Name of the function on the window object
@@ -501,6 +691,44 @@ Functions installed via [Page.exposeFunction(name, callback)](./api/class-page.m
 :::
 
 An example of adding an `sha1` function to the page:
+
+```java
+import com.microsoft.playwright.*;
+
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
+import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
+
+public class Example {
+  public static void main(String[] args) {
+    try (Playwright playwright = Playwright.create()) {
+      BrowserType webkit = playwright.webkit();
+      Browser browser = webkit.launch({ headless: false });
+      Page page = browser.newPage();
+      page.exposeFunction("sha1", args -> {
+        String text = (String) args[0];
+        MessageDigest crypto;
+        try {
+          crypto = MessageDigest.getInstance("SHA-1");
+        } catch (NoSuchAlgorithmException e) {
+          return null;
+        }
+        byte[] token = crypto.digest(text.getBytes(StandardCharsets.UTF_8));
+        return Base64.getEncoder().encodeToString(token);
+      });
+      page.setContent("<script>\n" +
+        "  async function onClick() {\n" +
+        "    document.querySelector('div').textContent = await window.sha1('PLAYWRIGHT');\n" +
+        "  }\n" +
+        "</script>\n" +
+        "<button onclick=\"onClick()\">Click me</button>\n" +
+        "<div></div>\n");
+      page.click("button");
+    }
+  }
+}
+```
 
 ## Page.fill(selector, value[, options])
 - `selector` <[String]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
@@ -529,6 +757,14 @@ Shortcut for main frame's [Frame.focus(selector[, options])](./api/class-frame.m
 - returns: <[null]|[Frame]>
 
 Returns frame matching the specified criteria. Either `name` or `url` must be specified.
+
+```java
+Frame frame = page.frame("frame-name");
+```
+
+```java
+Frame frame = page.frameByUrl(Pattern.compile(".*domain.*");
+```
 
 ## Page.frameByUrl(url)
 - `url` <[String]|[Pattern]|[Predicate]<[String]>> A glob pattern, regex pattern or predicate receiving frame's `url` as a [URL] object.
@@ -756,6 +992,12 @@ Generating a pdf is currently only supported in Chromium headless.
 By default, `page.pdf()` generates a pdf with modified colors for printing. Use the [`-webkit-print-color-adjust`](https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-print-color-adjust) property to force rendering of exact colors.
 :::
 
+```java
+// Generates a PDF with "screen" media type.
+page.emulateMedia(new Page.EmulateMediaOptions().withMedia(Media.SCREEN));
+page.pdf(new Page.PdfOptions().withPath(Paths.get("page.pdf")));
+```
+
 The `width`, `height`, and `margin` options accept values labeled with units. Unlabeled values are treated as pixels.
 
 A few examples:
@@ -808,6 +1050,17 @@ If `key` is a single character, it is case-sensitive, so the values `a` and `A` 
 
 Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported as well. When speficied with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
 
+```java
+Page page = browser.newPage();
+page.navigate("https://keycode.info");
+page.press("body", "A");
+page.screenshot(new Page.ScreenshotOptions().withPath(Paths.get("A.png")));
+page.press("body", "ArrowLeft");
+page.screenshot(new Page.ScreenshotOptions().withPath(Paths.get("ArrowLeft.png" )));
+page.press("body", "Shift+O");
+page.screenshot(new Page.ScreenshotOptions().withPath(Paths.get("O.png" )));
+```
+
 ## Page.querySelector(selector)
 - `selector` <[String]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
 - returns: <[null]|[ElementHandle]>
@@ -849,7 +1102,21 @@ The handler will only be called for the first url if the response is a redirect.
 
 An example of a naïve handler that aborts all image requests:
 
+```java
+Page page = browser.newPage();
+page.route("**/*.{png,jpg,jpeg}", route -> route.abort());
+page.navigate("https://example.com");
+browser.close();
+```
+
 or the same snippet using a regex pattern instead:
+
+```java
+Page page = browser.newPage();
+page.route(Pattern.compile("(\\.png$)|(\\.jpg$)"),route -> route.abort());
+page.navigate("https://example.com");
+browser.close();
+```
 
 Page routes take precedence over browser context routes (set up with [BrowserContext.route(url, handler)](./api/class-browsercontext.mdx#browsercontextrouteurl-handler)) when request matches both handlers.
 
@@ -894,6 +1161,15 @@ Returns the array of option values that have been successfully selected.
 Triggers a `change` and `input` event once all the provided options have been selected. If there's no `<select>` element matching `selector`, the method throws an error.
 
 Will wait until all specified options are present in the `<select>` element.
+
+```java
+// single selection matching the value
+page.selectOption("select#colors", "blue");
+// single selection matching both the value and the label
+page.selectOption("select#colors", new SelectOption().withLabel("Blue"));
+// multiple selection
+page.selectOption("select#colors", new String[] {"red", "green", "blue"});
+```
 
 Shortcut for main frame's [Frame.selectOption(selector, values[, options])](./api/class-frame.mdx#frameselectoptionselector-values-options)
 
@@ -962,6 +1238,12 @@ In the case of multiple pages in a single browser, each page can have its own vi
 
 `page.setViewportSize` will resize the page. A lot of websites don't expect phones to change size, so you should set the viewport size before navigating to the page.
 
+```java
+Page page = browser.newPage();
+page.setViewportSize(640, 480);
+page.navigate("https://example.com");
+```
+
 ## Page.tap(selector[, options])
 - `selector` <[String]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
 - `options` <`Page.TapOptions`>
@@ -1012,6 +1294,13 @@ Returns the page's title. Shortcut for main frame's [Frame.title()](./api/class-
 Sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in the text. `page.type` can be used to send fine-grained keyboard events. To fill values in form fields, use [Page.fill(selector, value[, options])](./api/class-page.mdx#pagefillselector-value-options).
 
 To press a special key, like `Control` or `ArrowDown`, use [Keyboard.press(key[, options])](./api/class-keyboard.mdx#keyboardpresskey-options).
+
+```java
+// Types instantly
+page.type("#mytextarea", "Hello");
+// Types slower, like a user
+page.type("#mytextarea", "World", new Page.TypeOptions().withDelay(100));
+```
 
 Shortcut for main frame's [Frame.type(selector, text[, options])](./api/class-frame.mdx#frametypeselector-text-options).
 
@@ -1103,7 +1392,29 @@ Returns when the `expression` returns a truthy value. It resolves to a JSHandle 
 
 The [Page.waitForFunction(expression[, arg, options])](./api/class-page.mdx#pagewaitforfunctionexpression-arg-options) can be used to observe viewport size change:
 
+```java
+import com.microsoft.playwright.*;
+
+public class Example {
+  public static void main(String[] args) {
+    try (Playwright playwright = Playwright.create()) {
+      BrowserType webkit = playwright.webkit();
+      Browser browser = webkit.launch();
+      Page page = browser.newPage();
+      page.setViewportSize(50,  50);
+      page.waitForFunction("() => window.innerWidth < 100");
+      browser.close();
+    }
+  }
+}
+```
+
 To pass an argument to the predicate of [Page.waitForFunction(expression[, arg, options])](./api/class-page.mdx#pagewaitforfunctionexpression-arg-options) function:
+
+```java
+String selector = ".foo";
+page.waitForFunction("selector => !!document.querySelector(selector)", selector);
+```
 
 Shortcut for main frame's [Frame.waitForFunction(expression[, arg, options])](./api/class-frame.mdx#framewaitforfunctionexpression-arg-options).
 
@@ -1118,6 +1429,19 @@ Shortcut for main frame's [Frame.waitForFunction(expression[, arg, options])](./
 Returns when the required load state has been reached.
 
 This resolves when the page reaches a required load state, `load` by default. The navigation must have been committed when this method is called. If current document has already reached the required state, resolves immediately.
+
+```java
+page.click("button"); // Click triggers navigation.
+page.waitForLoadState(); // The promise resolves after "load" event.
+```
+
+```java
+Page popup = page.waitForPopup(() -> {
+  page.click("button"); // Click triggers a popup.
+});
+popup.waitForLoadState(LoadState.DOMCONTENTLOADED);
+System.out.println(popup.title()); // Popup is ready to use.
+```
 
 Shortcut for main frame's [Frame.waitForLoadState([state, options])](./api/class-frame.mdx#framewaitforloadstatestate-options).
 
@@ -1135,6 +1459,13 @@ Shortcut for main frame's [Frame.waitForLoadState([state, options])](./api/class
 Waits for the main frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
 
 This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
+
+```java
+// The method returns after navigation has finished
+Response response = page.waitForNavigation(() -> {
+  page.click("a.delayed-navigation"); // Clicking the link will indirectly cause a navigation
+});
+```
 
 :::note
 Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
@@ -1160,6 +1491,13 @@ Performs action and waits for a popup [Page]. If predicate is provided, it passe
 
 Waits for the matching request and returns it.
 
+```java
+Request firstRequest = page.waitForRequest("http://example.com/resource");
+Object finalRequest = page.waitForRequest(
+  request -> "http://example.com".equals(request.url()) && "GET".equals(request.method()), () -> {});
+return firstRequest.url();
+```
+
 ## Page.waitForResponse(urlOrPredicate[, options, callback])
 - `urlOrPredicate` <[String]|[Pattern]|[Predicate]<[Response]>> Request URL string, regex or predicate receiving [Response] object.
 - `options` <`Page.WaitForResponseOptions`>
@@ -1168,6 +1506,12 @@ Waits for the matching request and returns it.
 - returns: <[Response]>
 
 Returns the matched response.
+
+```java
+Response firstResponse = page.waitForResponse("https://example.com/resource", () -> {});
+Response finalResponse = page.waitForResponse(response -> "https://example.com".equals(response.url()) && response.status() == 200, () -> {});
+return finalResponse.ok();
+```
 
 ## Page.waitForSelector(selector[, options])
 - `selector` <[String]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
@@ -1186,12 +1530,37 @@ Wait for the `selector` to satisfy `state` option (either appear/disappear from 
 
 This method works across navigations:
 
+```java
+import com.microsoft.playwright.*;
+
+public class Example {
+  public static void main(String[] args) {
+    try (Playwright playwright = Playwright.create()) {
+      BrowserType chromium = playwright.chromium();
+      Browser browser = chromium.launch();
+      Page page = browser.newPage();
+      for (String currentURL : Arrays.asList("https://google.com", "https://bbc.com")) {
+        page.navigate(currentURL);
+        ElementHandle element = page.waitForSelector("img");
+        System.out.println("Loaded image: " + element.getAttribute("src"));
+      }
+      browser.close();
+    }
+  }
+}
+```
+
 ## Page.waitForTimeout(timeout)
 - `timeout` <[double]> A timeout to wait for
 
 Waits for the given `timeout` in milliseconds.
 
 Note that `page.waitForTimeout()` should only be used for debugging. Tests using the timer in production are going to be flaky. Use signals such as network events, selectors becoming visible and others instead.
+
+```java
+// wait for 1 second
+page.waitForTimeout(1000);
+```
 
 Shortcut for main frame's [Frame.waitForTimeout(timeout)](./api/class-frame.mdx#framewaitfortimeouttimeout).
 

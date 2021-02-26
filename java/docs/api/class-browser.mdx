@@ -7,6 +7,22 @@ import TabItem from '@theme/TabItem';
 
 A Browser is created via [BrowserType.launch([options])](./api/class-browsertype.mdx#browsertypelaunchoptions). An example of using a [Browser] to create a [Page]:
 
+```java
+import com.microsoft.playwright.*;
+
+public class Example {
+  public static void main(String[] args) {
+    try (Playwright playwright = Playwright.create()) {
+      BrowserType firefox = playwright.firefox()
+      Browser browser = firefox.launch();
+      Page page = browser.newPage();
+      page.navigate('https://example.com');
+      browser.close();
+    }
+  }
+}
+```
+
 
 - [Browser.onDisconnected(handler)](./api/class-browser.mdx#browserondisconnectedhandler)
 - [Browser.close()](./api/class-browser.mdx#browserclose)
@@ -35,6 +51,13 @@ The [Browser] object itself is considered to be disposed and cannot be used anym
 - returns: <[List]<[BrowserContext]>>
 
 Returns an array of all open browser contexts. In a newly created browser, this will return zero browser contexts.
+
+```java
+Browser browser = pw.webkit().launch();
+System.out.println(browser.contexts().size()); // prints "0"
+BrowserContext context = browser.newContext();
+System.out.println(browser.contexts().size()); // prints "1"
+```
 
 ## Browser.isConnected()
 - returns: <[boolean]>
@@ -83,6 +106,15 @@ Indicates that the browser is connected.
 - returns: <[BrowserContext]>
 
 Creates a new browser context. It won't share cookies/cache with other browser contexts.
+
+```java
+Browser browser = playwright.firefox().launch();  // Or 'chromium' or 'webkit'.
+// Create a new incognito browser context.
+BrowserContext context = browser.newContext();
+// Create a new page in a pristine context.
+Page page = context.newPage();
+page.navigate('https://example.com');
+```
 
 ## Browser.newPage([options])
 - `options` <`Browser.NewPageOptions`>
