@@ -26,6 +26,11 @@ Most of these parameters are configured during the browser context construction,
 
 All pages created in the context above will share the user agent specified:
 
+```java
+BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+  .withUserAgent("My user agent"));
+```
+
 ### API reference
 - [Browser.newContext([options])](./api/class-browser.mdx#browsernewcontextoptions)
 
@@ -35,6 +40,20 @@ All pages created in the context above will share the user agent specified:
 
 Create a context with custom viewport size:
 
+```java
+// Create context with given viewport
+BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+  .withViewportSize(1280, 1024));
+
+// Resize viewport for individual page
+page.setViewportSize(1600, 1200);
+
+// Emulate high-DPI
+BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+  .withViewportSize(2560, 1440)
+  .withDeviceScaleFactor(2);
+```
+
 ### API reference
 - [Browser.newContext([options])](./api/class-browser.mdx#browsernewcontextoptions)
 - [Page.setViewportSize(viewportSize)](./api/class-page.mdx#pagesetviewportsizeviewportsize)
@@ -42,6 +61,13 @@ Create a context with custom viewport size:
 <br/>
 
 ## Locale & timezone
+
+```java
+// Emulate locale and time
+BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+  .withLocale("de-DE")
+  .withTimezoneId("Europe/Berlin"));
+```
 
 ### API reference
 - [Browser.newContext([options])](./api/class-browser.mdx#browsernewcontextoptions)
@@ -52,11 +78,29 @@ Create a context with custom viewport size:
 
 Allow all pages in the context to show system notifications:
 
+```java
+BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+  .withPermissions(Arrays.asList("notifications"));
+```
+
 Grant all pages in the existing context access to current location:
+
+```java
+context.grantPermissions(Arrays.asList("geolocation"));
+```
 
 Grant notifications access from a specific domain:
 
+```java
+context.grantPermissions(Arrays.asList("notifications"),
+  new BrowserContext.GrantPermissionsOptions().withOrigin("https://skype.com"));
+```
+
 Revoke all permissions:
+
+```java
+context.clearPermissions();
+```
 
 ### API reference
 - [Browser.newContext([options])](./api/class-browser.mdx#browsernewcontextoptions)
@@ -69,7 +113,17 @@ Revoke all permissions:
 
 Create a context with `"geolocation"` permissions granted:
 
+```java
+BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+  .withGeolocation(48.858455, 2.294474)
+  .withPermissions(Arrays.asList("geolocation")));
+```
+
 Change the location later:
+
+```java
+context.setGeolocation(new Geolocation(29.979097, 31.134256));
+```
 
 **Note** you can only change geolocation for all pages in the context.
 
@@ -82,6 +136,22 @@ Change the location later:
 ## Color scheme and media
 
 Create a context with dark or light mode. Pages created in this context will follow this color scheme preference.
+
+```java
+// Create context with dark mode
+BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+  .withColorScheme(ColorScheme.DARK)); // or "light"
+
+// Create page with dark mode
+Page page = browser.newPage(new Browser.NewPageOptions()
+  .withColorScheme(ColorScheme.DARK)); // or "light"
+
+// Change color scheme for the page
+page.emulateMedia(new Page.EmulateMediaOptions().withColorScheme(ColorScheme.DARK));
+
+// Change media for page
+page.emulateMedia(new Page.EmulateMediaOptions().withMedia(Media.PRINT));
+```
 
 ### API reference
 - [Browser.newContext([options])](./api/class-browser.mdx#browsernewcontextoptions)

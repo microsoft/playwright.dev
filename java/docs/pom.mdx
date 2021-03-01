@@ -22,7 +22,43 @@ Page objects **simplify maintenance**. They capture element selectors in one pla
 
 Page object models wrap over a Playwright [Page].
 
+```java
+// models/SearchPage.java
+package models;
+
+import com.microsoft.playwright;
+
+public class SearchPage {
+  private final Page page;
+
+  public SearchPage(Page page) {
+    this.page = page;
+  }
+
+  public void navigate() {
+    page.navigate("https://bing.com");
+  }
+
+  public void search(String text) {
+    page.fill("[aria-label='Enter your search term']", text);
+    page.press("[aria-label='Enter your search term']", "Enter");
+  }
+}
+```
+
 Page objects can then be used inside a test.
+
+```java
+import models.SearchPage;
+import com.microsoft.playwright.*;
+...
+
+// In the test
+Page page = browser.newPage();
+SearchPage searchPage = new SearchPage(page);
+searchPage.navigate();
+searchPage.search("search query");
+```
 
 ### API reference
 - [Page]

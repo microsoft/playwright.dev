@@ -19,11 +19,21 @@ Playwright provides convenience APIs for common tasks, like reading the text con
 
 ## Text content
 
+```java
+String content = page.textContent("nav:first-child");
+assertEquals("home", content);
+```
+
 ### API reference
 - [Page.textContent(selector[, options])](./api/class-page.mdx#pagetextcontentselector-options)
 - [ElementHandle.textContent()](./api/class-elementhandle.mdx#elementhandletextcontent)
 
 ## Inner text
+
+```java
+String text = page.innerText(".selected");
+assertEquals("value", text);
+```
 
 ### API reference
 - [Page.innerText(selector[, options])](./api/class-page.mdx#pageinnertextselector-options)
@@ -31,7 +41,17 @@ Playwright provides convenience APIs for common tasks, like reading the text con
 
 ## Attribute value
 
+```java
+String alt = page.getAttribute("input", "alt");
+assertEquals("Text", alt);
+```
+
 ## Checkbox state
+
+```java
+boolean checked = page.isChecked("input");
+assertTrue(checked);
+```
 
 ### API reference
 - [Page.isChecked(selector[, options])](./api/class-page.mdx#pageischeckedselector-options)
@@ -39,11 +59,21 @@ Playwright provides convenience APIs for common tasks, like reading the text con
 
 ## JS expression
 
+```java
+Object content = page.evalOnSelector("nav:first-child", "e => e.textContent");
+assertEquals("home", content);
+```
+
 ### API reference
 - [Page.evalOnSelector(selector, expression[, arg])](./api/class-page.mdx#pageevalonselectorselector-expression-arg)
 - [JsHandle.evaluate(expression[, arg])](./api/class-jshandle.mdx#jshandleevaluateexpression-arg)
 
 ## Inner HTML
+
+```java
+String html = page.innerHTML("div.result");
+assertEquals("<p>Result</p>", html);
+```
 
 ### API reference
 - [Page.innerHTML(selector[, options])](./api/class-page.mdx#pageinnerhtmlselector-options)
@@ -51,11 +81,21 @@ Playwright provides convenience APIs for common tasks, like reading the text con
 
 ## Visibility
 
+```java
+boolean visible = page.isVisible("input");
+assertTrue(visible);
+```
+
 ### API reference
 - [Page.isVisible(selector[, options])](./api/class-page.mdx#pageisvisibleselector-options)
 - [ElementHandle.isVisible()](./api/class-elementhandle.mdx#elementhandleisvisible)
 
 ## Enabled state
+
+```java
+boolean enabled = page.isEnabled("input");
+assertTrue(enabled);
+```
 
 ### API reference
 - [Page.isEnabled(selector[, options])](./api/class-page.mdx#pageisenabledselector-options)
@@ -64,6 +104,25 @@ Playwright provides convenience APIs for common tasks, like reading the text con
 ## Custom assertions
 
 With Playwright, you can also write custom JavaScript to run in the context of the browser. This is useful in situations where you want to assert for values that are not covered by the convenience APIs above.
+
+```java
+// Assert local storage value
+Object userId = page.evaluate("() => window.localStorage.getItem('userId')");
+assertNotNull(userId);
+
+// Assert value for input element
+page.waitForSelector("#search");
+Object value = page.evalOnSelector("#search", "el => el.value");
+assertEquals("query", value);
+
+// Assert computed style
+Object fontSize = page.evalOnSelector("div", "el => window.getComputedStyle(el).fontSize");
+assertEquals("16px", fontSize);
+
+// Assert list length
+Object length = page.evalOnSelectorAll("li.selected",  "items => items.length");
+assertEquals(3, length);
+```
 
 ### API reference
 - [Page.evaluate(expression[, arg])](./api/class-page.mdx#pageevaluateexpression-arg)

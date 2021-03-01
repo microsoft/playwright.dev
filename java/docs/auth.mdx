@@ -22,6 +22,17 @@ The Playwright API can automate interaction with a login form. See [Input guide]
 
 The following example automates login on GitHub. Once these steps are executed, the browser context will be authenticated.
 
+```java
+Page page = context.newPage();
+page.navigate("https://github.com/login");
+// Interact with login form
+page.click("text=Login");
+page.fill("input[name='login']", USERNAME);
+page.fill("input[name='password']", PASSWORD);
+page.click("text=Submit");
+// Verify app is logged in
+```
+
 These steps can be executed for every browser context. However, redoing login for every test can slow down test execution. To prevent that, we will reuse existing authentication state in new browser contexts.
 
 ## Reuse authentication state
@@ -31,6 +42,16 @@ Web apps use cookie-based or token-based authentication, where authenticated sta
 Cookies and local storage state can be used across different browsers. They depend on your application's authentication model: some apps might require both cookies and local storage.
 
 The following code snippet retrieves state from an authenticated context and creates a new context with that state.
+
+```java
+// Save storage state and store as an env variable
+String storage = context.storageState();
+System.getenv().put("STORAGE", storage);
+
+// Create a new context with the saved storage state
+BrowserContext context = browser.newContext(
+  new Browser.NewContextOptions().withStorageState(storage));
+```
 
 Logging in via the UI and then reusing authentication state can be combined to implement **login once and run multiple scenarios**. The lifecycle looks like:
 1. Run tests (for example, with `npm run test`).
@@ -48,6 +69,23 @@ This approach will also **work in CI environments**, since it does not rely on a
 
 Rarely, [session storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage) is used for storing information associated with the logged-in state. Session storage is specific to a particular domain and is not persisted across page loads. Playwright does not provide API to persist session storage, but the following snippet can be used to save/load session storage.
 
+```java
+// Get session storage and store as env variable
+String sessionStorage = (String) page.evaluate("() => JSON.stringify(sessionStorage");
+System.getenv().put("SESSION_STORAGE", sessionStorage);
+
+// Set session storage in a new context
+String sessionStorage = System.getenv("SESSION_STORAGE");
+context.addInitScript("(storage => {\n" +
+  "  if (window.location.hostname === 'example.com') {\n" +
+  "    const entries = JSON.parse(storage);\n" +
+  "    Object.keys(entries).forEach(key => {\n" +
+  "      window.sessionStorage.setItem(key, entries[key]);\n" +
+  "    });\n" +
+  "  }\n" +
+  "})(" + sessionStorage + ")");
+```
+
 ### API reference
 - [BrowserContext.storageState([options])](./api/class-browsercontext.mdx#browsercontextstoragestateoptions)
 - [Browser.newContext([options])](./api/class-browser.mdx#browsernewcontextoptions)
@@ -60,11 +98,25 @@ Accounts with multi-factor authentication (MFA) cannot be fully automated, and n
 
 ### Persistent authentication
 
-Web browsers use a directory on disk to store user history, cookies, IndexedDB and other local state. This disk location is called the [User data directory](https://chromium.googlesource.com/chromium/src/+/master/docs/user_data_dir.md).
-
 Note that persistent authentication is not suited for CI environments since it relies on a disk location. User data directories are specific to browser types and cannot be shared across browser types.
 
 User data directories can be used with the [BrowserType.launchPersistentContext(userDataDir[, options])](./api/class-browsertype.mdx#browsertypelaunchpersistentcontextuserdatadir-options) API.
+
+```java
+import com.microsoft.playwright.*;
+
+public class Example {
+  public static void main(String[] args) {
+    try (Playwright playwright = Playwright.create()) {
+      BrowserType chromium = playwright.chromium();
+      Path userDataDir = Paths.get("/path/to/directory");
+      BrowserContext context = chromium.launchPersistentContext(userDataDir,
+        new BrowserType.LaunchPersistentContextOptions().withHeadless(false));
+      // Execute login steps manually in the browser window
+    }
+  }
+}
+```
 
 ### Lifecycle
 1. Create a user data directory on disk 2. Launch a persistent context with the user data directory and login the MFA account. 3. Reuse user data directory to run automation scenarios.

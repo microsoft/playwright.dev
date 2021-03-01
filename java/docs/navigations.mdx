@@ -35,13 +35,35 @@ Navigations can be initiated by changing the URL bar, reloading the page or goin
 
 Navigating to a URL auto-waits for the page to fire the `load` event. If the page does a client-side redirect before `load`, `page.goto` will auto-wait for the redirected page to fire the `load` event.
 
+```java
+// Navigate the page
+page.navigate("https://example.com");
+```
+
 ### Custom wait
 
 Override the default behavior to wait until a specific event, like `networkidle`.
 
+```java
+// Navigate and wait until network is idle
+page.navigate("https://example.com", new Page.NavigateOptions()
+  .withWaitUntil(WaitUntilState.NETWORKIDLE));
+```
+
 ### Wait for element
 
 In lazy-loaded pages, it can be useful to wait until an element is visible with [Page.waitForSelector(selector[, options])](./api/class-page.mdx#pagewaitforselectorselector-options). Alternatively, page interactions like [Page.click(selector[, options])](./api/class-page.mdx#pageclickselector-options) auto-wait for elements.
+
+```java
+// Navigate and wait for element
+page.navigate("https://example.com");
+page.waitForSelector("text=Example Domain");
+
+// Navigate and click element
+// Click will auto-wait for the element
+page.navigate("https://example.com");
+page.click("text=Example Domain");
+```
 
 ### API reference
 - [Page.navigate(url[, options])](./api/class-page.mdx#pagenavigateurl-options)
@@ -57,13 +79,38 @@ In the scenarios below, [Page.click(selector[, options])](./api/class-page.mdx#p
 
 By default, [Page.click(selector[, options])](./api/class-page.mdx#pageclickselector-options) will wait for the navigation step to complete. This can be combined with a page interaction on the navigated page which would auto-wait for an element.
 
+```java
+// Click will auto-wait for navigation to complete
+page.click("text=Login");
+
+// Fill will auto-wait for element on navigated page
+page.fill("#username", "John Doe");
+```
+
 ### Custom wait
 
 `page.click` can be combined with [Page.waitForLoadState([state, options])](./api/class-page.mdx#pagewaitforloadstatestate-options) to wait for a loading event.
 
+```java
+page.click("button"); // Click triggers navigation
+page.waitForLoadState(LoadState.NETWORKIDLE); // This resolves after "networkidle"
+```
+
 ### Wait for element
 
 In lazy-loaded pages, it can be useful to wait until an element is visible with [Page.waitForSelector(selector[, options])](./api/class-page.mdx#pagewaitforselectorselector-options). Alternatively, page interactions like [Page.click(selector[, options])](./api/class-page.mdx#pageclickselector-options) auto-wait for elements.
+
+```java
+// Click will auto-wait for the element and trigger navigation
+page.click("text=Login");
+// Wait for the element
+page.waitForSelector("#username");
+
+// Click triggers navigation
+page.click("text=Login");
+// Fill will auto-wait for element
+page.fill("#username", "John Doe");
+```
 
 ### Asynchronous navigation
 
@@ -71,15 +118,38 @@ Clicking an element could trigger asynchronous processing before initiating the 
 * Navigation is triggered from a `setTimeout`
 * Page waits for network requests before navigation
 
+```java
+// Using waitForNavigation with a callback prevents a race condition
+// between clicking and waiting for a navigation.
+page.waitForNavigation(() -> { // Waits for the next navigation
+  page.click("a"); // Triggers a navigation after a timeout
+});
+```
+
 ### Multiple navigations
 
 Clicking an element could trigger multiple navigations. In these cases, it is recommended to explicitly [Page.waitForNavigation([options, callback])](./api/class-page.mdx#pagewaitfornavigationoptions-callback) to a specific url. For example:
 * Client-side redirects issued after the `load` event
 * Multiple pushes to history state
 
+```java
+// Running action in the callback of waitForNavigation prevents a race
+// condition between clicking and waiting for a navigation.
+page.waitForNavigation(new Page.WaitForNavigationOptions().withUrl("**/login"), () -> {
+  page.click("a"); // Triggers a navigation with a script redirect
+});
+```
+
 ### Loading a popup
 
 When popup is opened, explicitly calling [Page.waitForLoadState([state, options])](./api/class-page.mdx#pagewaitforloadstatestate-options) ensures that popup is loaded to the desired state.
+
+```java
+Page popup = page.waitForPopup(() -> {
+  page.click("a[target='_blank']"); // Opens popup
+});
+popup.waitForLoadState(LoadState.LOAD);
+```
 
 ### API reference
 - [Page.click(selector[, options])](./api/class-page.mdx#pageclickselector-options)
@@ -91,6 +161,13 @@ When popup is opened, explicitly calling [Page.waitForLoadState([state, options]
 ## Advanced patterns
 
 For pages that have complicated loading patterns, [Page.waitForFunction(expression[, arg, options])](./api/class-page.mdx#pagewaitforfunctionexpression-arg-options) is a powerful and extensible approach to define a custom wait criteria.
+
+```java
+page.navigate("http://example.com");
+page.waitForFunction("() => window.amILoadedYet()");
+// Ready to take a screenshot, according to the page itself.
+page.screenshot();
+```
 
 ### API reference
 - [Page.waitForFunction(expression[, arg, options])](./api/class-page.mdx#pagewaitforfunctionexpression-arg-options)

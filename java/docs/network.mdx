@@ -17,6 +17,13 @@ Playwright provides APIs to **monitor** and **modify** network traffic, both HTT
 
 ## HTTP Authentication
 
+```java
+BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+  .withHttpCredentials("bill", "pa55w0rd"));
+Page page = context.newPage();
+page.navigate("https://example.com");
+```
+
 ### API reference
 - [Browser.newContext([options])](./api/class-browser.mdx#browsernewcontextoptions)
 
@@ -24,9 +31,46 @@ Playwright provides APIs to **monitor** and **modify** network traffic, both HTT
 
 You can monitor all the requests and responses:
 
+```java
+import com.microsoft.playwright.*;
+
+public class Example {
+  public static void main(String[] args) {
+    try (Playwright playwright = Playwright.create()) {
+      BrowserType chromium = playwright.chromium();
+      Browser browser = chromium.launch();
+      Page page = browser.newPage();
+      page.onRequest(request -> System.out.println(">> " + request.method() + " " + request.url()));
+      page.onResponse(response -> System.out.println("<<" + response.status() + " " + response.url()));
+      page.navigate("https://example.com");
+      browser.close();
+    }
+  }
+}
+```
+
 Or wait for a network response after the button click:
 
+```java
+// Use a glob URL pattern
+Response response = page.waitForResponse("**/api/fetch_data", () -> {
+  page.click("button#update");
+});
+```
+
 #### Variations
+
+```java
+// Use a RegExp
+Response response = page.waitForResponse(Pattern.compile("\\.jpeg$"), () -> {
+  page.click("button#update");
+});
+
+// Use a predicate taking a Response object
+Response response = page.waitForResponse(r -> r.url().contains(token), () -> {
+  page.click("button#update");
+});
+```
 
 ### API reference
 - [Request]
@@ -40,9 +84,23 @@ Or wait for a network response after the button click:
 
 ## Handle requests
 
+```java
+page.route("**/api/fetch_data", route -> route.fulfill(new Route.FulfillOptions()
+  .withStatus(200)
+  .withBody(testData)));
+page.navigate("https://example.com");
+```
+
 You can mock API endpoints via handling the network quests in your Playwright script.
 
 #### Variations
+
+```java
+browserContext.route("**/api/login", route -> route.fulfill(new Route.FulfillOptions()
+  .withStatus(200)
+  .withBody("accept")));
+page.navigate("https://example.com");
+```
 
 ### API reference
 - [BrowserContext.route(url, handler)](./api/class-browsercontext.mdx#browsercontextrouteurl-handler)
@@ -55,9 +113,33 @@ You can mock API endpoints via handling the network quests in your Playwright sc
 
 ## Modify requests
 
+```java
+// Delete header
+page.route("**/*", route -> {
+  Map<String, String> headers = new HashMap<>(route.request().headers());
+  headers.remove("X-Secret");
+    route.resume(new Route.ResumeOptions().withHeaders(headers));
+});
+
+// Continue requests as POST.
+page.route("**/*", route -> route.resume(new Route.ResumeOptions().withMethod("POST")));
+```
+
 You can continue requests with modifications. Example above removes an HTTP header from the outgoing requests.
 
 ## Abort requests
+
+```java
+page.route("**/*.{png,jpg,jpeg}", route -> route.abort());
+
+// Abort based on the request type
+page.route("**/*", route -> {
+  if ("image".equals(route.request().resourceType()))
+    route.abort();
+  else
+    route.resume();
+});
+```
 
 ### API reference
 - [Page.route(url, handler)](./api/class-page.mdx#pagerouteurl-handler)

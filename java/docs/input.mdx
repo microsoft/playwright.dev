@@ -18,6 +18,23 @@ import TabItem from '@theme/TabItem';
 
 This is the easiest way to fill out the form fields. It focuses the element and triggers an `input` event with the entered text. It works for `<input>`, `<textarea>`, `[contenteditable]` and `<label>` associated with an input or textarea.
 
+```java
+// Text input
+page.fill("#name", "Peter");
+
+// Date input
+page.fill("#date", "2020-02-02");
+
+// Time input
+page.fill("#time", "13-15");
+
+// Local datetime input
+page.fill("#local", "2020-03-02T05:15");
+
+// Input through label
+page.fill("text=First Name", "Peter");
+```
+
 ### API reference
 - [Page.fill(selector, value[, options])](./api/class-page.mdx#pagefillselector-value-options)
 - [Frame.fill(selector, value[, options])](./api/class-frame.mdx#framefillselector-value-options)
@@ -28,6 +45,20 @@ This is the easiest way to fill out the form fields. It focuses the element and 
 ## Checkboxes and radio buttons
 
 This is the easiest way to check and uncheck a checkbox or a radio button. This method can be used with `input[type=checkbox]`, `input[type=radio]`, `[role=checkbox]` or `label` associated with checkbox or radio button.
+
+```java
+// Check the checkbox
+page.check("#agree");
+
+// Assert the checked state
+assertTrue(page.isChecked("#agree"));
+
+// Uncheck by input <label>.
+page.uncheck("#subscribe-label");
+
+// Select the radio button
+page.check("text=XL");
+```
 
 ### API reference
 - [Page.check(selector[, options])](./api/class-page.mdx#pagecheckselector-options)
@@ -43,6 +74,21 @@ This is the easiest way to check and uncheck a checkbox or a radio button. This 
 
 Selects one or multiple options in the `<select>` element. You can specify option `value`, `label` or `elementHandle` to select. Multiple options can be selected.
 
+```java
+// Single selection matching the value
+page.selectOption("select#colors", "blue");
+
+// Single selection matching the label
+page.selectOption("select#colors", new SelectOption().withLabel("Blue"));
+
+// Multiple selected items
+page.selectOption("select#colors", new String[] {"red", "green", "blue"});
+
+// Select the option via element handle
+ElementHandle option = page.querySelector("#best-option");
+page.selectOption("select#colors", option);
+```
+
 ### API reference
 - [Page.selectOption(selector, values[, options])](./api/class-page.mdx#pageselectoptionselector-values-options)
 - [Frame.selectOption(selector, values[, options])](./api/class-frame.mdx#frameselectoptionselector-values-options)
@@ -53,6 +99,26 @@ Selects one or multiple options in the `<select>` element. You can specify optio
 ## Mouse click
 
 Performs a simple human click.
+
+```java
+// Generic click
+page.click("button#submit");
+
+// Double click
+page.dblclick("#item");
+
+// Right click
+page.click("#item", new Page.ClickOptions().withButton(MouseButton.RIGHT));
+
+// Shift + click
+page.click("#item", new Page.ClickOptions().withModifiers(Arrays.asList(KeyboardModifier.SHIFT)));
+
+// Hover over element
+page.hover("#item");
+
+// Click the top left corner
+page.click("#item", new Page.ClickOptions().withPosition(0, 0));
+```
 
 Under the hood, this and other pointer-related methods:
 - wait for element with given selector to be in DOM
@@ -66,9 +132,17 @@ Under the hood, this and other pointer-related methods:
 
 Sometimes, apps use non-trivial logic where hovering the element overlays it with another element that intercepts the click. This behavior is indistinguishable from a bug where element gets covered and the click is dispatched elsewhere. If you know this is taking place, you can bypass the [actionability](./actionability.mdx) checks and force the click:
 
+```java
+page.click("button#submit", new Page.ClickOptions().withForce(true));
+```
+
 #### Programmatic click
 
 If you are not interested in testing your app under the real conditions and want to simulate the click by any means possible, you can trigger the [`HTMLElement.click()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click) behavior via simply dispatching a click event on the element:
+
+```java
+page.dispatchEvent("button#submit", "click");
+```
 
 ### API reference
 - [Page.click(selector[, options])](./api/class-page.mdx#pageclickselector-options)
@@ -90,6 +164,11 @@ If you are not interested in testing your app under the real conditions and want
 
 Type into the field character by character, as if it was a user with a real keyboard.
 
+```java
+// Type character by character
+page.type("#area", "Hello World!");
+```
+
 This method will emit all the necessary keyboard events, with all the `keydown`, `keyup`, `keypress` events in place. You can even specify the optional `delay` between the key presses to simulate real user behavior.
 
 :::note
@@ -106,6 +185,17 @@ Most of the time, [Page.fill(selector, value[, options])](./api/class-page.mdx#p
 
 ## Keys and shortcuts
 
+```java
+// Hit Enter
+page.press("#submit", "Enter");
+
+// Dispatch Control+Right
+page.press("#name", "Control+ArrowRight");
+
+// Press $ sign on keyboard
+page.press("#value", "$");
+```
+
 This method focuses the selected element and produces a single keystroke. It accepts the logical key names that are emitted in the [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) property of the keyboard events:
 
 ```
@@ -118,6 +208,14 @@ ArrowUp, F1 - F12, Digit0 - Digit9, KeyA - KeyZ, etc.
 - Following modification shortcuts are also supported: `Shift, Control, Alt, Meta`.
 
 Simple version produces a single character. This character is case-sensitive, so `"a"` and `"A"` will produce different results.
+
+```java
+// <input id=name>
+page.press("#name", "Shift+A");
+
+// <input id=name>
+page.press("#name", "Shift+ArrowLeft");
+```
 
 Shortcuts such as `"Control+o"` or `"Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
 
@@ -135,7 +233,29 @@ Note that you still need to specify the capital `A` in `Shift-A` to produce the 
 
 You can select input files for upload using the [Page.setInputFiles(selector, files[, options])](./api/class-page.mdx#pagesetinputfilesselector-files-options) method. It expects first argument to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input) with the type `"file"`. Multiple files can be passed in the array. If some of the file paths are relative, they are resolved relative to the current working directory. Empty array clears the selected files.
 
+```java
+// Select one file
+page.setInputFiles("input#upload", Paths.get("myfile.pdf"));
+
+// Select multiple files
+page.setInputFiles("input#upload", new Path[] {Paths.get("file1.txt"), Paths.get("file2.txt")});
+
+// Remove all the selected files
+page.setInputFiles("input#upload", new Path[0]);
+
+// Upload buffer from memory
+page.setInputFiles("input#upload", new FilePayload(
+  "file.txt", "text/plain", "this is test".getBytes(StandardCharsets.UTF_8)));
+```
+
 If you don't have input element in hand (it is created dynamically), you can handle the [Page.onFileChooser(handler)](./api/class-page.mdx#pageonfilechooserhandler) event or use a corresponding waiting method upon your action:
+
+```java
+FileChooser fileChooser = page.waitForFileChooser(() -> {
+  page.click("upload");
+});
+fileChooser.setFiles(Paths.get("myfile.pdf"));
+```
 
 ### API reference
 - [FileChooser]
@@ -148,6 +268,10 @@ If you don't have input element in hand (it is created dynamically), you can han
 ## Focus element
 
 For the dynamic pages that handle focus events, you can focus the given element.
+
+```java
+page.focus("input#name");
+```
 
 ### API reference
 - [Page.focus(selector[, options])](./api/class-page.mdx#pagefocusselector-options)
