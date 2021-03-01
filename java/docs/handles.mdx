@@ -19,6 +19,16 @@ Handles are used to perform operations on those actual objects in the page. You 
 
 Here is the easiest way to obtain a [JSHandle].
 
+```java
+JSHandle jsHandle = page.evaluateHandle("window");
+//  Use jsHandle for evaluations.
+```
+
+```java
+ElementHandle ulElementHandle = page.waitForSelector("ul");
+//  Use ulElementHandle for actions and evaluation.
+```
+
 ## Element Handles
 
 :::note
@@ -27,9 +37,43 @@ It is recommended to use selector-based actions like [Page.click(selector[, opti
 
 When [ElementHandle] is required, it is recommended to fetch it with the [Page.waitForSelector(selector[, options])](./api/class-page.mdx#pagewaitforselectorselector-options) or [Frame.waitForSelector(selector[, options])](./api/class-frame.mdx#framewaitforselectorselector-options) methods. These APIs wait for the element to be attached and visible.
 
+```java
+// Get the element handle
+JSHandle jsHandle = page.waitForSelector("#box");
+ElementHandle elementHandle = jsHandle.asElement();
+
+// Assert bounding box for the element
+BoundingBox boundingBox = elementHandle.boundingBox();
+assertEquals(100, boundingBox.width);
+
+// Assert attribute for the element
+String classNames = elementHandle.getAttribute("class");
+assertTrue(classNames.contains("highlighted"));
+```
+
 ## Handles as parameters
 
 Handles can be passed into the [Page.evaluate(expression[, arg])](./api/class-page.mdx#pageevaluateexpression-arg) and similar methods. The following snippet creates a new array in the page, initializes it with data and returns a handle to this array into Playwright. It then uses the handle in subsequent evaluations:
+
+```java
+// Create new array in page.
+JSHandle myArrayHandle = page.evaluateHandle("() => {\n" +
+  "  window.myArray = [1];\n" +
+  "  return myArray;\n" +
+  "}");
+
+// Get the length of the array.
+int length = (int) page.evaluate("a => a.length", myArrayHandle);
+
+// Add one more element to the array using the handle
+Map<String, Object> arg = new HashMap<>();
+arg.put("myArray", myArrayHandle);
+arg.put("newElement", 2);
+page.evaluate("arg => arg.myArray.add(arg.newElement)", arg);
+
+// Release the object when it"s no longer needed.
+myArrayHandle.dispose();
+```
 
 ## Handle Lifecycle
 

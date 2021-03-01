@@ -13,6 +13,27 @@ import TabItem from '@theme/TabItem';
 
 Console messages logged in the page can be brought into the Playwright context.
 
+```java
+// Listen for all System.out.printlns
+page.onConsole(msg -> System.out.println(msg.text()));
+
+// Listen for all console events and handle errors
+page.onConsole(msg -> {
+  if ("error".equals(msg.type()))
+    System.out.println("Error text: " + msg.text());
+});
+
+// Get the next System.out.println
+ConsoleMessage msg = page.waitForConsoleMessage(() -> {
+  // Issue console.log inside the page
+  page.evaluate("console.log('hello', 42, { foo: 'bar' });");
+});
+
+// Deconstruct console.log arguments
+msg.args().get(0).jsonValue() // hello
+msg.args().get(1).jsonValue() // 42
+```
+
 ### API reference
 - [ConsoleMessage]
 - [Page]
@@ -24,6 +45,16 @@ Console messages logged in the page can be brought into the Playwright context.
 
 Listen for uncaught exceptions in the page with the `pagerror` event.
 
+```java
+// Log all uncaught errors to the terminal
+page.onPageError(exception -> {
+  System.out.println("Uncaught exception: " + exception);
+});
+
+// Navigate to a page with an exception.
+page.navigate("data:text/html,<script>throw new Error('Test')</script>");
+```
+
 ### API reference
 - [Page]
 - [Page.onPageError(handler)](./api/class-page.mdx#pageonpageerrorhandler)
@@ -34,9 +65,27 @@ Listen for uncaught exceptions in the page with the `pagerror` event.
 
 #### `"requestfailed"`
 
+```java
+page.onRequestFailed(request -> {
+  System.out.println(request.url() + " " + request.failure());
+});
+```
+
 #### `"dialog"` - handle alert, confirm, prompt
 
+```java
+page.onDialog(dialog -> {
+  dialog.accept();
+});
+```
+
 #### `"popup"` - handle popup windows
+
+```java
+Page popup = page.waitForPopup(() -> {
+  page.click("#open");
+});
+```
 
 ### API reference
 - [Page]
