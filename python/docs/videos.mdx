@@ -19,17 +19,36 @@ Playwright can record videos for all pages in a [browser context](./core-concept
 <TabItem value="sync">
 
 ```py
-# With browser.new_context()
 context = browser.new_context(record_video_dir="videos/")
 # Make sure to close, so that videos are saved.
 context.close()
+```
 
-# With browser.new_page()
-page = browser.new_page(record_video_dir="videos/")
-# Make sure to close, so that videos are saved.
-page.close()
+</TabItem>
+<TabItem value="async">
 
-# [Optional] specify video size; defaults to viewport size scaled down to fit 800x800
+```py
+context = await browser.new_context(record_video_dir="videos/")
+# Make sure to await close, so that videos are saved.
+await context.close()
+```
+
+</TabItem>
+</Tabs>
+
+You can also specify video size, it defaults to viewport size scaled down to fit 800x800.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
 context = browser.new_context(
     record_video_dir="videos/",
     record_video_size={"width": 1024, "height": 768}
@@ -40,17 +59,6 @@ context = browser.new_context(
 <TabItem value="async">
 
 ```py
-# With browser.new_context()
-context = await browser.new_context(record_video_dir="videos/")
-# Make sure to await close, so that videos are saved.
-await context.close()
-
-# With browser.new_page()
-page = await browser.new_page(record_video_dir="videos/")
-# Make sure to await close, so that videos are saved.
-await page.close()
-
-# [Optional] specify video size; defaults to viewport size scaled down to fit 800x800
 context = await browser.new_context(
     record_video_dir="videos/",
     record_video_size={"width": 1024, "height": 768}
@@ -59,6 +67,36 @@ context = await browser.new_context(
 
 </TabItem>
 </Tabs>
+
+Saved video files will appear in the specified folder. They all have generated unique names. For the multi-page scenarios, you can access the video file associated with the page via the [page.video](./api/class-page.mdx#pagevideo).
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+path = page.video.path()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+path = await page.video.path()
+```
+
+</TabItem>
+</Tabs>
+
+:::note
+Note that the video is only available after the page or browser context is closed.
+:::
 
 ### API reference
 - [BrowserContext]

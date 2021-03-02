@@ -6,6 +6,7 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
 - [Managing browser binaries](#managing-browser-binaries)
+- [Install behind the firewall or proxy](#install-behind-the-firewall-or-proxy)
 - [Download from artifact repository](#download-from-artifact-repository)
 - [Skip browser downloads](#skip-browser-downloads)
 - [Download single browser binary](#download-single-browser-binary)
@@ -44,7 +45,7 @@ $ pip install playwright
 $ playwright install
 ```
 
-When running Playwright scripts, ask it to search for browsers in a shared location:
+When running Playwright scripts, ask it to search for browsers in a shared location.
 
 ```sh
 # Linux/macOS
@@ -55,12 +56,12 @@ $ set PLAYWRIGHT_BROWSERS_PATH=%USERPROFILE%\pw-browsers
 $ python playwright_script.py
 ```
 
-Or you can opt into the hermetic install and place binaries under the `site-packages/playwright` folder:
+Or you can opt into the hermetic install and place binaries in the local folder:
 
 ```sh
 # Linux/macOS
 $ pip install playwright
-$ PLAYWRIGHT_BROWSERS_PATH=0 python -m playwright install
+$ PLAYWRIGHT_BROWSERS_PATH=0 playwright install
 
 # Windows
 $ set PLAYWRIGHT_BROWSERS_PATH=0
@@ -74,22 +75,41 @@ Playwright keeps track of packages that need those browsers and will garbage col
 Developers can opt-in in this mode via exporting `PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers` in their `.bashrc`.
 :::
 
+## Install behind the firewall or proxy
+
+By default, Playwright downloads browsers from Microsoft CDN.
+
+Sometimes companies maintain an internal proxy that blocks direct access to the public resources. In this case, Playwright can be configured to download browsers via a proxy server.
+
+```sh
+# Linux/macOS
+$ pip install playwright
+$ HTTPS_PROXY=https://192.168.1.78 playwright install
+
+# Windows
+$ set HTTPS_PROXY=https://192.168.1.78
+$ pip install playwright
+$ playwright install
+```
+
 ## Download from artifact repository
 
-By default, Playwright downloads browsers from Microsoft and Google public CDNs.
+By default, Playwright downloads browsers from Microsoft CDN.
 
 Sometimes companies maintain an internal artifact repository to host browser binaries. In this case, Playwright can be configured to download from a custom location using the `PLAYWRIGHT_DOWNLOAD_HOST` env variable.
 
 ```sh
 # Linux/macOS
 $ pip install playwright
-$ PLAYWRIGHT_DOWNLOAD_HOST=192.168.1.78 python -m playwright install
+$ PLAYWRIGHT_DOWNLOAD_HOST=192.168.1.78 playwright install
 
 # Windows
 $ set PLAYWRIGHT_DOWNLOAD_HOST=192.168.1.78
 $ pip install playwright
 $ playwright install
 ```
+
+It is also possible to use a per-browser download hosts using `PLAYWRIGHT_CHROMIUM_DOWNLOAD_HOST`, `PLAYWRIGHT_FIREFOX_DOWNLOAD_HOST` and `PLAYWRIGHT_WEBKIT_DOWNLOAD_HOST` env variables that take precedence over `PLAYWRIGHT_DOWNLOAD_HOST`.
 
 It is also possible to use a per-browser download hosts using `PLAYWRIGHT_CHROMIUM_DOWNLOAD_HOST`, `PLAYWRIGHT_FIREFOX_DOWNLOAD_HOST` and `PLAYWRIGHT_WEBKIT_DOWNLOAD_HOST` env variables that take precedence over `PLAYWRIGHT_DOWNLOAD_HOST`.
 
