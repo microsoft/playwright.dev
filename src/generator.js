@@ -405,24 +405,25 @@ function toSnakeCase(name) {
  */
 function renderJSSignature(args) {
   const tokens = [];
-  let hasOptional = false;
+  let lastIsOptional = false;
   for (const arg of args) {
     const name = arg.alias;
     const optional = !arg.required;
     if (tokens.length) {
-      if (optional && !hasOptional)
-        tokens.push(`[, ${name}`);
-      else
-        tokens.push(`, ${name}`);
+      if (optional && !lastIsOptional)
+        tokens.push(`[`);
+      // In java callback goes last, after optional 'options'
+      if (!optional && lastIsOptional)
+        tokens.push(`]`);
+      tokens.push(`, `);
     } else {
-      if (optional && !hasOptional)
-        tokens.push(`[${name}`);
-      else
-        tokens.push(`${name}`);
+      if (optional)
+        tokens.push(`[`);
     }
-    hasOptional = hasOptional || optional;
+    tokens.push(name);
+    lastIsOptional = optional;
   }
-  if (hasOptional)
+  if (lastIsOptional)
     tokens.push(']');
   return tokens.join('');
 }
