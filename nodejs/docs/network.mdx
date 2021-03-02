@@ -8,6 +8,7 @@ import TabItem from '@theme/TabItem';
 Playwright provides APIs to **monitor** and **modify** network traffic, both HTTP and HTTPS. Any requests that page does, including [XHRs](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) requests, can be tracked, modified and handled.
 
 - [HTTP Authentication](#http-authentication)
+- [HTTP Proxy](#http-proxy)
 - [Network events](#network-events)
 - [Handle requests](#handle-requests)
 - [Modify requests](#modify-requests)
@@ -30,6 +31,35 @@ await page.goto('https://example.com');
 
 ### API reference
 - [browser.newContext([options])](./api/class-browser.mdx#browsernewcontextoptions)
+
+## HTTP Proxy
+
+You can configure pages to load over the HTTP(S) proxy or SOCKSv5. Proxy can be either set globally for the entire browser, or for each browser context individually.
+
+You can optionally specify username and password for HTTP(S) proxy, you can also specify hosts to bypass proxy for.
+
+Here is an example of a global proxy:
+
+```js
+const browser = await chromium.launch({
+  proxy: {
+    server: 'http://myproxy.com:3128',
+    user: 'usr',
+    password: 'pwd'
+  }
+});
+```
+
+When specifying proxy for each context individually, you need to give Playwright a hint that proxy will be set. This is done via passing a non-empty proxy server to the browser itself. Here is an example of a context-specific proxy:
+
+```js
+const browser = await chromium.launch({
+  proxy: { server: 'per-context' }
+});
+const context = await browser.newContext({
+  proxy: { server: 'http://myproxy.com:3128' }
+})
+```
 
 ## Network events
 
