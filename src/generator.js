@@ -338,7 +338,7 @@ import TabItem from '@theme/TabItem';`);
       children = properties.map(p => {
         let alias = p.alias;
         if (this.lang === 'java' && member.kind === 'property' && direction === 'in')
-          alias = `with${toTitleCase(alias)}`;
+          alias = `set${toTitleCase(alias)}`;
         return this.renderProperty(`\`${alias}\``, p, p.spec, direction, false)
       });
     else if (spec && spec.length > 1)
