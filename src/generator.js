@@ -111,7 +111,7 @@ import TabItem from '@theme/TabItem';
       return k1.localeCompare(k2);
     });
     result.push(...this.generateClassToc(clazz));
-    if (clazz.extends && clazz.extends !== 'EventEmitter' && clazz.extends !== 'Error') {
+    if (clazz.extends && clazz.extends !== 'EventEmitter' && clazz.extends !== 'Error' && clazz.extends !== 'RuntimeException') {
       const superClass = this.documentation.classes.get(clazz.extends);
       result.push(...this.generateClassToc(superClass));
     }
@@ -195,6 +195,10 @@ ${md.render([spec[i]])}
       spec = newSpec;
     } else if (this.lang === 'java') {
       spec = spec.filter(n => !n.text || !n.text.startsWith('extends: [EventEmitter]'));
+      spec.forEach(n => {
+        if (n.text === 'extends: [Error]')
+          n.text = 'extends: [PlaywrightException]';
+      });
     }
     spec = spec.filter(c => {
       // No lang or common lang - Ok.
