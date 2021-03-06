@@ -1,0 +1,168 @@
+---
+id: docker
+title: "Docker"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+[Dockerfile.bionic](https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.bionic) and [Dockerfile.focal](https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal) can be used to run Playwright scripts in Docker environments. These images includes all the dependencies needed to run browsers in a Docker container, and also include the browsers themselves.
+
+- [Usage](#usage)
+- [Image tags](#image-tags)
+- [Development](#development)
+- [Base images](#base-images)
+
+## Usage
+
+[![docker hub](https://img.shields.io/badge/docker-mcr.microsoft.com%2Fplaywright-blue)](https://hub.docker.com/_/microsoft-playwright)
+
+This image is published on [Docker Hub](https://hub.docker.com/_/microsoft-playwright).
+
+### Pull the image
+
+```
+$ docker pull mcr.microsoft.com/playwright:bionic
+```
+
+### Run the image
+
+By default, the Docker image will use the `root` user to run the browsers. This will disable the Chromium sandbox which is not available with root. If you run trusted code (e.g. End-to-end tests) and want to avoid the hassle of managing separate user then the root user may be fine. For web scraping or crawling, we recommend to create a separate user inside the Docker container and use the seccomp profile.
+
+#### End-to-end tests
+
+On trusted websites, you can avoid creating a separate user and use root for it since you trust the code which will run on the browsers.
+
+```
+docker run -it --rm --ipc=host mcr.microsoft.com/playwright:bionic /bin/bash
+```
+
+#### Crawling and scraping
+
+On untrusted websites, it's recommended to use a separate user for launching the browsers in combination with the seccomp profile. Inside the container or if you are using the Docker image as a base image you have to use `adduser` for it.
+
+```
+$ docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_profile.json mcr.microsoft.com/playwright:bionic /bin/bash
+```
+
+[`seccomp_profile.json`](https://github.com/microsoft/playwright/blob/master/utils/docker/seccomp_profile.json) is needed to run Chromium with sandbox. This is a [default Docker seccomp profile](https://github.com/docker/engine/blob/d0d99b04cf6e00ed3fc27e81fc3d94e7eda70af3/profiles/seccomp/default.json) with extra user namespace cloning permissions:
+
+```json
+[
+  {
+    "comment": "Allow create user namespaces",
+    "names": [
+      "clone",
+      "setns",
+      "unshare"
+    ],
+    "action": "SCMP_ACT_ALLOW",
+    "args": [],
+    "includes": {},
+    "excludes": {}
+  }
+]
+```
+
+:::note
+Using `--ipc=host` is recommended when using Chrome ([Docker docs](https://docs.docker.com/engine/reference/run/#ipc-settings---ipc)). Chrome can run out of memory without this flag.
+:::
+
+### Using on CI
+
+See our [Continuous Integration guides](./ci.mdx) for sample configs.
+
+## Image tags
+
+See [all available image tags](https://mcr.microsoft.com/v2/playwright/tags/list).
+
+## Development
+
+### Build the image
+
+Use [`//utils/docker/build.sh`](https://github.com/microsoft/playwright/blob/master/utils/docker/build.sh) to build the image.
+
+```
+$ ./utils/docker/build.sh bionic playwright:localbuild-bionic
+```
+
+The image will be tagged as `playwright:localbuild-bionic` and could be run as:
+
+```
+$ docker run --rm -it playwright:localbuild /bin/bash
+```
+
+### Push
+
+Docker images are published automatically by GitHub Actions. We currently publish the following images:
+- `mcr.microsoft.com/playwright:next` - tip-of-tree image version.
+- `mcr.microsoft.com/playwright:bionic` - last Playwright release docker image.
+- `mcr.microsoft.com/playwright:sha-XXXXXXX` - docker image for every commit that changed docker files or browsers, marked with a [short sha](https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection#Short-SHA-1) (first 7 digits of the SHA commit).
+
+Status of push to MCR can be [verified here](https://mcrflow-status-ui.azurewebsites.net/) (internal link).
+
+## Base images
+
+### Ubuntu 20
+
+`mcr.microsoft.com/playwright:focal` is based on Ubuntu 20.04 LTS (Focal Fossa).
+
+### Ubuntu 18
+
+`mcr.microsoft.com/playwright:bionic` is based on Ubuntu 18.04 LTS (Bionic Beaver).
+
+### Alpine
+
+Browser builds for Firefox and WebKit are built for the [glibc](https://en.wikipedia.org/wiki/GNU_C_Library) library. Alpine Linux and other distributions that are based on the [musl](https://en.wikipedia.org/wiki/Musl) standard library are not supported.
+
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[PlaywrightException]: ./api/class-playwrightexception.mdx "PlaywrightException"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[Evaluation Argument]: ./core-concepts.mdx#evaluationargument "Evaluation Argument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
+[byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
+[Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
+[double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
+[InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
+[int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"
+[Map]: https://docs.oracle.com/javase/8/docs/api/java/util/Map.html "Map"
+[null]: https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.7 "null"
+[Object]: https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html "Object"
+[Path]: https://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html "Path"
+[Pattern]: https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html "Pattern"
+[Predicate]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Predicate.html "Predicate"
+[Runnable]: https://docs.oracle.com/javase/8/docs/api/java/lang/Runnable.html "Runnable"
+[RuntimeException]: https://docs.oracle.com/javase/8/docs/api/java/lang/RuntimeException.html "RuntimeException"
+[String]: https://docs.oracle.com/javase/8/docs/api/java/lang/String.html "String"
