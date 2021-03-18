@@ -20,6 +20,7 @@ module.exports = {
         { "type": "doc", "id": "actionability" },
         { "type": "doc", "id": "assertions" },
         { "type": "doc", "id": "auth" },
+        { "type": "doc", "id": "browsers" },
         { "type": "doc", "id": "dialogs" },
         { "type": "doc", "id": "downloads" },
         { "type": "doc", "id": "selectors" },
