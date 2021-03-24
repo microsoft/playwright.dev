@@ -264,7 +264,7 @@ import TabItem from '@theme/TabItem';`);
    * @return {MarkdownNode[]}
    */
   filterForLanguage(nodes) {
-    return nodes.filter(node => {
+    const result = nodes.filter(node => {
       if (!node.children)
         return true;
       for (let i = 0; i < node.children.length; i++) {
@@ -277,6 +277,12 @@ import TabItem from '@theme/TabItem';`);
       }
       return true;
     });
+    result.forEach(n => {
+      if (!n.children)
+        return;
+      n.children = this.filterForLanguage(n.children);
+    });
+    return result;
   }
 
   /**
