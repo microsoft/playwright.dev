@@ -1,0 +1,189 @@
+---
+id: assertions
+title: "Assertions"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Playwright provides convenience APIs for common tasks, like reading the text content of an element. These APIs can be used in your test assertions.
+
+- [Text content](#text-content)
+- [Inner text](#inner-text)
+- [Attribute value](#attribute-value)
+- [Checkbox state](#checkbox-state)
+- [JS expression](#js-expression)
+- [Inner HTML](#inner-html)
+- [Visibility](#visibility)
+- [Enabled state](#enabled-state)
+- [Custom assertions](#custom-assertions)
+
+## Text content
+
+```java
+String content = page.textContent("nav:first-child");
+assertEquals("home", content);
+```
+
+### API reference
+- [Page.textContent(selector[, options])](./api/class-page.mdx#pagetextcontentselector-options)
+- [ElementHandle.textContent()](./api/class-elementhandle.mdx#elementhandletextcontent)
+
+## Inner text
+
+```java
+String text = page.innerText(".selected");
+assertEquals("value", text);
+```
+
+### API reference
+- [Page.innerText(selector[, options])](./api/class-page.mdx#pageinnertextselector-options)
+- [ElementHandle.innerText()](./api/class-elementhandle.mdx#elementhandleinnertext)
+
+## Attribute value
+
+```java
+String alt = page.getAttribute("input", "alt");
+assertEquals("Text", alt);
+```
+
+## Checkbox state
+
+```java
+boolean checked = page.isChecked("input");
+assertTrue(checked);
+```
+
+### API reference
+- [Page.isChecked(selector[, options])](./api/class-page.mdx#pageischeckedselector-options)
+- [ElementHandle.isChecked()](./api/class-elementhandle.mdx#elementhandleischecked)
+
+## JS expression
+
+```java
+Object content = page.evalOnSelector("nav:first-child", "e => e.textContent");
+assertEquals("home", content);
+```
+
+### API reference
+- [Page.evalOnSelector(selector, expression[, arg])](./api/class-page.mdx#pageevalonselectorselector-expression-arg)
+- [JsHandle.evaluate(expression[, arg])](./api/class-jshandle.mdx#jshandleevaluateexpression-arg)
+
+## Inner HTML
+
+```java
+String html = page.innerHTML("div.result");
+assertEquals("<p>Result</p>", html);
+```
+
+### API reference
+- [Page.innerHTML(selector[, options])](./api/class-page.mdx#pageinnerhtmlselector-options)
+- [ElementHandle.innerHTML()](./api/class-elementhandle.mdx#elementhandleinnerhtml)
+
+## Visibility
+
+```java
+boolean visible = page.isVisible("input");
+assertTrue(visible);
+```
+
+### API reference
+- [Page.isVisible(selector[, options])](./api/class-page.mdx#pageisvisibleselector-options)
+- [ElementHandle.isVisible()](./api/class-elementhandle.mdx#elementhandleisvisible)
+
+## Enabled state
+
+```java
+boolean enabled = page.isEnabled("input");
+assertTrue(enabled);
+```
+
+### API reference
+- [Page.isEnabled(selector[, options])](./api/class-page.mdx#pageisenabledselector-options)
+- [ElementHandle.isEnabled()](./api/class-elementhandle.mdx#elementhandleisenabled)
+
+## Custom assertions
+
+With Playwright, you can also write custom JavaScript to run in the context of the browser. This is useful in situations where you want to assert for values that are not covered by the convenience APIs above.
+
+```java
+// Assert local storage value
+Object userId = page.evaluate("() => window.localStorage.getItem('userId')");
+assertNotNull(userId);
+
+// Assert value for input element
+page.waitForSelector("#search");
+Object value = page.evalOnSelector("#search", "el => el.value");
+assertEquals("query", value);
+
+// Assert computed style
+Object fontSize = page.evalOnSelector("div", "el => window.getComputedStyle(el).fontSize");
+assertEquals("16px", fontSize);
+
+// Assert list length
+Object length = page.evalOnSelectorAll("li.selected",  "items => items.length");
+assertEquals(3, length);
+```
+
+### API reference
+- [Page.evaluate(expression[, arg])](./api/class-page.mdx#pageevaluateexpression-arg)
+- [Page.evalOnSelector(selector, expression[, arg])](./api/class-page.mdx#pageevalonselectorselector-expression-arg)
+- [Page.evalOnSelectorAll(selector, expression[, arg])](./api/class-page.mdx#pageevalonselectorallselector-expression-arg)
+- [Frame.evaluate(expression[, arg])](./api/class-frame.mdx#frameevaluateexpression-arg)
+- [Frame.evalOnSelector(selector, expression[, arg])](./api/class-frame.mdx#frameevalonselectorselector-expression-arg)
+- [Frame.evalOnSelectorAll(selector, expression[, arg])](./api/class-frame.mdx#frameevalonselectorallselector-expression-arg)
+- [ElementHandle.evalOnSelector(selector, expression[, arg])](./api/class-elementhandle.mdx#elementhandleevalonselectorselector-expression-arg)
+- [ElementHandle.evalOnSelectorAll(selector, expression[, arg])](./api/class-elementhandle.mdx#elementhandleevalonselectorallselector-expression-arg)
+- [EvaluationArgument]
+
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[PlaywrightException]: ./api/class-playwrightexception.mdx "PlaywrightException"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[Evaluation Argument]: ./core-concepts.mdx#evaluationargument "Evaluation Argument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
+[byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
+[Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
+[double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
+[InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
+[int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"
+[Map]: https://docs.oracle.com/javase/8/docs/api/java/util/Map.html "Map"
+[null]: https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.7 "null"
+[Object]: https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html "Object"
+[Path]: https://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html "Path"
+[Pattern]: https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html "Pattern"
+[Predicate]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Predicate.html "Predicate"
+[Runnable]: https://docs.oracle.com/javase/8/docs/api/java/lang/Runnable.html "Runnable"
+[RuntimeException]: https://docs.oracle.com/javase/8/docs/api/java/lang/RuntimeException.html "RuntimeException"
+[String]: https://docs.oracle.com/javase/8/docs/api/java/lang/String.html "String"
