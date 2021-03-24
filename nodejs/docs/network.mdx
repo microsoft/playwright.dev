@@ -13,6 +13,7 @@ Playwright provides APIs to **monitor** and **modify** network traffic, both HTT
 - [Handle requests](#handle-requests)
 - [Modify requests](#modify-requests)
 - [Abort requests](#abort-requests)
+- [WebSockets](#websockets)
 
 <br/>
 
@@ -185,6 +186,28 @@ await page.route('**/*', route => {
 - [page.route(url, handler)](./api/class-page.mdx#pagerouteurl-handler)
 - [browserContext.route(url, handler)](./api/class-browsercontext.mdx#browsercontextrouteurl-handler)
 - [route.abort([errorCode])](./api/class-route.mdx#routeaborterrorcode)
+
+<br/>
+
+## WebSockets
+
+Playwright supports [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) inspection out of the box. Every time WebSocket is created, [page.on('websocket')](./api/class-page.mdx#pageonwebsocket) event is fired. This event contains the [WebSocket] instance for further web socket frames inspection:
+
+```js
+page.on('websocket', ws => {
+  console.log(`WebSocket opened: ${ws.url()}>`);
+  ws.on('framesent', event => console.log(event.payload));
+  ws.on('framereceived', event => console.log(event.payload));
+  ws.on('close', () => console.log('WebSocket closed'));
+});
+```
+
+### API reference
+- [WebSocket]
+- [page.on('websocket')](./api/class-page.mdx#pageonwebsocket)
+- [webSocket.on('framesent')](./api/class-websocket.mdx#websocketonframesent)
+- [webSocket.on('framereceived')](./api/class-websocket.mdx#websocketonframereceived)
+- [webSocket.on('close')](./api/class-websocket.mdx#websocketonclose)
 
 <br/>
 
