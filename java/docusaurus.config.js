@@ -39,6 +39,10 @@ module.exports = {
     colorMode: {
       defaultMode: "dark",
     },
+    prism: {
+      theme: require('prism-react-renderer/themes/dracula'),
+      additionalLanguages: ['java'],
+    },
     navbar: {
       title: "Playwright for Java",
       logo: {
