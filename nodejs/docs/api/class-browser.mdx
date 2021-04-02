@@ -25,8 +25,11 @@ const { firefox } = require('playwright');  // Or 'chromium' or 'webkit'.
 - [browser.close()](./api/class-browser.mdx#browserclose)
 - [browser.contexts()](./api/class-browser.mdx#browsercontexts)
 - [browser.isConnected()](./api/class-browser.mdx#browserisconnected)
+- [browser.newBrowserCDPSession()](./api/class-browser.mdx#browsernewbrowsercdpsession)
 - [browser.newContext([options])](./api/class-browser.mdx#browsernewcontextoptions)
 - [browser.newPage([options])](./api/class-browser.mdx#browsernewpageoptions)
+- [browser.startTracing([page, options])](./api/class-browser.mdx#browserstarttracingpage-options)
+- [browser.stopTracing()](./api/class-browser.mdx#browserstoptracing)
 - [browser.version()](./api/class-browser.mdx#browserversion)
 
 ## browser.on('disconnected')
@@ -61,6 +64,15 @@ console.log(browser.contexts().length); // prints `1`
 - returns: <[boolean]>
 
 Indicates that the browser is connected.
+
+## browser.newBrowserCDPSession()
+- returns: <[Promise]<[CDPSession]>>
+
+:::note
+CDP Sessions are only supported on Chromium-based browsers.
+:::
+
+Returns the newly created browser session.
 
 ## browser.newContext([options])
 - `options` <[Object]>
@@ -97,6 +109,9 @@ Indicates that the browser is connected.
     - `size` <[Object]> Optional dimensions of the recorded videos. If not specified the size will be equal to `viewport` scaled down to fit into 800x800. If `viewport` is not configured explicitly the video size defaults to 800x450. Actual picture of each page will be scaled down if necessary to fit the specified size.
       - `width` <[number]> Video frame width.
       - `height` <[number]> Video frame height.
+  - `screen` <[Object]> Emulates consistent window screen size available inside web page via `window.screen`. Is only used when the `viewport` is set.
+    - `width` <[number]> page width in pixels.
+    - `height` <[number]> page height in pixels.
   - `storageState` <[string]|[Object]> Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [browserContext.storageState([options])](./api/class-browsercontext.mdx#browsercontextstoragestateoptions). Either a path to the file with saved storage, or an object with the following fields:
     - `cookies` <[Array]<[Object]>> Optional cookies to set for context
       - `name` <[string]>
@@ -119,7 +134,7 @@ Indicates that the browser is connected.
     - `width` <[number]> Video frame width.
     - `height` <[number]> Video frame height.
   - `videosPath` <[string]> **DEPRECATED** Use `recordVideo` instead.
-  - `viewport` <[null]|[Object]> Sets a consistent viewport for each page. Defaults to an 1280x720 viewport. `null` disables the default viewport.
+  - `viewport` <[null]|[Object]> Emulates consistent viewport for each page. Defaults to an 1280x720 viewport. `null` disables the default viewport.
     - `width` <[number]> page width in pixels.
     - `height` <[number]> page height in pixels.
 - returns: <[Promise]<[BrowserContext]>>
@@ -172,6 +187,9 @@ Creates a new browser context. It won't share cookies/cache with other browser c
     - `size` <[Object]> Optional dimensions of the recorded videos. If not specified the size will be equal to `viewport` scaled down to fit into 800x800. If `viewport` is not configured explicitly the video size defaults to 800x450. Actual picture of each page will be scaled down if necessary to fit the specified size.
       - `width` <[number]> Video frame width.
       - `height` <[number]> Video frame height.
+  - `screen` <[Object]> Emulates consistent window screen size available inside web page via `window.screen`. Is only used when the `viewport` is set.
+    - `width` <[number]> page width in pixels.
+    - `height` <[number]> page height in pixels.
   - `storageState` <[string]|[Object]> Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [browserContext.storageState([options])](./api/class-browsercontext.mdx#browsercontextstoragestateoptions). Either a path to the file with saved storage, or an object with the following fields:
     - `cookies` <[Array]<[Object]>> Optional cookies to set for context
       - `name` <[string]>
@@ -194,7 +212,7 @@ Creates a new browser context. It won't share cookies/cache with other browser c
     - `width` <[number]> Video frame width.
     - `height` <[number]> Video frame height.
   - `videosPath` <[string]> **DEPRECATED** Use `recordVideo` instead.
-  - `viewport` <[null]|[Object]> Sets a consistent viewport for each page. Defaults to an 1280x720 viewport. `null` disables the default viewport.
+  - `viewport` <[null]|[Object]> Emulates consistent viewport for each page. Defaults to an 1280x720 viewport. `null` disables the default viewport.
     - `width` <[number]> page width in pixels.
     - `height` <[number]> page height in pixels.
 - returns: <[Promise]<[Page]>>
@@ -202,6 +220,34 @@ Creates a new browser context. It won't share cookies/cache with other browser c
 Creates a new page in a new browser context. Closing this page will close the context as well.
 
 This is a convenience API that should only be used for the single-page scenarios and short snippets. Production code and testing frameworks should explicitly create [browser.newContext([options])](./api/class-browser.mdx#browsernewcontextoptions) followed by the [browserContext.newPage()](./api/class-browsercontext.mdx#browsercontextnewpage) to control their exact life times.
+
+## browser.startTracing([page, options])
+- `page` <[Page]> Optional, if specified, tracing includes screenshots of the given page.
+- `options` <[Object]>
+  - `categories` <[Array]<[string]>> specify custom categories to use instead of default.
+  - `path` <[string]> A path to write the trace file to.
+  - `screenshots` <[boolean]> captures screenshots in the trace.
+
+:::note
+Tracing is only supported on Chromium-based browsers.
+:::
+
+You can use [browser.startTracing([page, options])](./api/class-browser.mdx#browserstarttracingpage-options) and [browser.stopTracing()](./api/class-browser.mdx#browserstoptracing) to create a trace file that can be opened in Chrome DevTools performance panel.
+
+```js
+await browser.startTracing(page, {path: 'trace.json'});
+await page.goto('https://www.google.com');
+await browser.stopTracing();
+```
+
+## browser.stopTracing()
+- returns: <[Promise]<[Buffer]>>
+
+:::note
+Tracing is only supported on Chromium-based browsers.
+:::
+
+Returns the buffer with trace data.
 
 ## browser.version()
 - returns: <[string]>
@@ -219,17 +265,14 @@ Returns the browser version.
 [BrowserServer]: ./api/class-browserserver.mdx "BrowserServer"
 [BrowserType]: ./api/class-browsertype.mdx "BrowserType"
 [CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
-[ChromiumBrowser]: ./api/class-chromiumbrowser.mdx "ChromiumBrowser"
-[ChromiumBrowserContext]: ./api/class-chromiumbrowsercontext.mdx "ChromiumBrowserContext"
-[ChromiumCoverage]: ./api/class-chromiumcoverage.mdx "ChromiumCoverage"
 [ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: ./api/class-coverage.mdx "Coverage"
 [Dialog]: ./api/class-dialog.mdx "Dialog"
 [Download]: ./api/class-download.mdx "Download"
 [Electron]: ./api/class-electron.mdx "Electron"
 [ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: ./api/class-filechooser.mdx "FileChooser"
-[FirefoxBrowser]: ./api/class-firefoxbrowser.mdx "FirefoxBrowser"
 [Frame]: ./api/class-frame.mdx "Frame"
 [JSHandle]: ./api/class-jshandle.mdx "JSHandle"
 [Keyboard]: ./api/class-keyboard.mdx "Keyboard"
@@ -244,7 +287,6 @@ Returns the browser version.
 [TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
 [Video]: ./api/class-video.mdx "Video"
-[WebKitBrowser]: ./api/class-webkitbrowser.mdx "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.mdx "WebSocket"
 [Worker]: ./api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"

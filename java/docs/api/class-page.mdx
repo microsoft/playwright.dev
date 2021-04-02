@@ -142,6 +142,7 @@ page.offRequest(logRequest);
 - [Page.waitForResponse(urlOrPredicate[, options], callback)](./api/class-page.mdx#pagewaitforresponseurlorpredicate-options-callback)
 - [Page.waitForSelector(selector[, options])](./api/class-page.mdx#pagewaitforselectorselector-options)
 - [Page.waitForTimeout(timeout)](./api/class-page.mdx#pagewaitfortimeouttimeout)
+- [Page.waitForURL(url[, options])](./api/class-page.mdx#pagewaitforurlurl-options)
 - [Page.waitForWebSocket([options], callback)](./api/class-page.mdx#pagewaitforwebsocketoptions-callback)
 - [Page.waitForWorker([options], callback)](./api/class-page.mdx#pagewaitforworkeroptions-callback)
 - [Page.workers()](./api/class-page.mdx#pageworkers)
@@ -454,7 +455,7 @@ Shortcut for main frame's [Frame.dblclick(selector[, options])](./api/class-fram
 - `options` <`Page.DispatchEventOptions`>
   - `setTimeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
 
-The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the elment, `click` is dispatched. This is equivalend to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
+The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the element, `click` is dispatched. This is equivalent to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
 
 ```java
 page.dispatchEvent("button#submit", "click");
@@ -1084,7 +1085,7 @@ Holding down `Shift` will type the text that corresponds to the `key` in the upp
 
 If `key` is a single character, it is case-sensitive, so the values `a` and `A` will generate different respective texts.
 
-Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported as well. When speficied with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
+Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
 
 ```java
 Page page = browser.newPage();
@@ -1136,7 +1137,7 @@ Once routing is enabled, every request matching the url pattern will stall unles
 The handler will only be called for the first url if the response is a redirect.
 :::
 
-An example of a naïve handler that aborts all image requests:
+An example of a naive handler that aborts all image requests:
 
 ```java
 Page page = browser.newPage();
@@ -1155,6 +1156,8 @@ browser.close();
 ```
 
 Page routes take precedence over browser context routes (set up with [BrowserContext.route(url, handler)](./api/class-browsercontext.mdx#browsercontextrouteurl-handler)) when request matches both handlers.
+
+To remove a route with its handler you can use [Page.unroute(url[, handler])](./api/class-page.mdx#pageunrouteurl-handler).
 
 :::note
 Enabling routing disables http cache.
@@ -1176,10 +1179,6 @@ Enabling routing disables http cache.
 - returns: <[byte&#91;&#93;]>
 
 Returns the buffer with the captured screenshot.
-
-:::note
-Screenshots take at least 1/6 second on Chromium OS X and Chromium Windows. See https://crbug.com/741689 for discussion.
-:::
 
 ## Page.selectOption(selector, values[, options])
 - `selector` <[String]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
@@ -1228,6 +1227,7 @@ This setting will change the default maximum navigation time for the following m
 * [Page.reload([options])](./api/class-page.mdx#pagereloadoptions)
 * [Page.setContent(html[, options])](./api/class-page.mdx#pagesetcontenthtml-options)
 * [Page.waitForNavigation([options], callback)](./api/class-page.mdx#pagewaitfornavigationoptions-callback)
+* [Page.waitForURL(url[, options])](./api/class-page.mdx#pagewaitforurlurl-options)
 
 :::note
 [Page.setDefaultNavigationTimeout(timeout)](./api/class-page.mdx#pagesetdefaultnavigationtimeouttimeout) takes priority over [Page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout), [BrowserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) and [BrowserContext.setDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaultnavigationtimeouttimeout).
@@ -1598,6 +1598,24 @@ page.waitForTimeout(1000);
 ```
 
 Shortcut for main frame's [Frame.waitForTimeout(timeout)](./api/class-frame.mdx#framewaitfortimeouttimeout).
+
+## Page.waitForURL(url[, options])
+- `url` <[String]|[Pattern]|[Predicate]<[String]>> A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation.
+- `options` <`Page.WaitForURLOptions`>
+  - `setTimeout` <[double]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaultnavigationtimeouttimeout), [BrowserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout), [Page.setDefaultNavigationTimeout(timeout)](./api/class-page.mdx#pagesetdefaultnavigationtimeouttimeout) or [Page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+  - `setWaitUntil` <`enum WaitUntilState { LOAD, DOMCONTENTLOADED, NETWORKIDLE }`> When to consider operation succeeded, defaults to `load`. Events can be either:
+    * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+    * `'load'` - consider operation to be finished when the `load` event is fired.
+    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+
+Waits for the main frame to navigate to the given URL.
+
+```java
+page.click("a.delayed-navigation"); // Clicking the link will indirectly cause a navigation
+page.waitForURL("**/target.html");
+```
+
+Shortcut for main frame's [Frame.waitForURL(url[, options])](./api/class-frame.mdx#framewaitforurlurl-options).
 
 ## Page.waitForWebSocket([options], callback)
 - `options` <`Page.WaitForWebSocketOptions`>
