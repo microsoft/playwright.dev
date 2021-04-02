@@ -85,6 +85,7 @@ public class Example {
 - [Frame.waitForNavigation([options], callback)](./api/class-frame.mdx#framewaitfornavigationoptions-callback)
 - [Frame.waitForSelector(selector[, options])](./api/class-frame.mdx#framewaitforselectorselector-options)
 - [Frame.waitForTimeout(timeout)](./api/class-frame.mdx#framewaitfortimeouttimeout)
+- [Frame.waitForURL(url[, options])](./api/class-frame.mdx#framewaitforurlurl-options)
 
 ## Frame.addScriptTag([options])
 - `options` <`Frame.AddScriptTagOptions`>
@@ -191,7 +192,7 @@ When all steps combined have not finished during the specified `timeout`, this m
 - `options` <`Frame.DispatchEventOptions`>
   - `setTimeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
 
-The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the elment, `click` is dispatched. This is equivalend to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
+The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the element, `click` is dispatched. This is equivalent to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
 
 ```java
 frame.dispatchEvent("button#submit", "click");
@@ -518,7 +519,7 @@ Holding down `Shift` will type the text that corresponds to the `key` in the upp
 
 If `key` is a single character, it is case-sensitive, so the values `a` and `A` will generate different respective texts.
 
-Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported as well. When speficied with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
+Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
 
 ## Frame.querySelector(selector)
 - `selector` <[String]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
@@ -787,6 +788,23 @@ public class Example {
 Waits for the given `timeout` in milliseconds.
 
 Note that `frame.waitForTimeout()` should only be used for debugging. Tests using the timer in production are going to be flaky. Use signals such as network events, selectors becoming visible and others instead.
+
+## Frame.waitForURL(url[, options])
+- `url` <[String]|[Pattern]|[Predicate]<[String]>> A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation.
+- `options` <`Frame.WaitForURLOptions`>
+  - `setTimeout` <[double]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaultnavigationtimeouttimeout), [BrowserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout), [Page.setDefaultNavigationTimeout(timeout)](./api/class-page.mdx#pagesetdefaultnavigationtimeouttimeout) or [Page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+  - `setWaitUntil` <`enum WaitUntilState { LOAD, DOMCONTENTLOADED, NETWORKIDLE }`> When to consider operation succeeded, defaults to `load`. Events can be either:
+    * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+    * `'load'` - consider operation to be finished when the `load` event is fired.
+    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+
+Waits for the frame to navigate to the given URL.
+
+```java
+frame.click("a.delayed-navigation"); // Clicking the link will indirectly cause a navigation
+frame.waitForURL("**/target.html");
+```
+
 
 [Browser]: ./api/class-browser.mdx "Browser"
 [BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"

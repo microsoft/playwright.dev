@@ -81,6 +81,7 @@ const { firefox } = require('playwright');  // Or 'chromium' or 'webkit'.
 - [frame.waitForNavigation([options])](./api/class-frame.mdx#framewaitfornavigationoptions)
 - [frame.waitForSelector(selector[, options])](./api/class-frame.mdx#framewaitforselectorselector-options)
 - [frame.waitForTimeout(timeout)](./api/class-frame.mdx#framewaitfortimeouttimeout)
+- [frame.waitForURL(url[, options])](./api/class-frame.mdx#framewaitforurlurl-options)
 
 ## frame.$(selector)
 - `selector` <[string]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
@@ -241,7 +242,7 @@ When all steps combined have not finished during the specified `timeout`, this m
 - `options` <[Object]>
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
 
-The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the elment, `click` is dispatched. This is equivalend to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
+The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the element, `click` is dispatched. This is equivalent to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
 
 ```js
 await frame.dispatchEvent('button#submit', 'click');
@@ -528,7 +529,7 @@ Holding down `Shift` will type the text that corresponds to the `key` in the upp
 
 If `key` is a single character, it is case-sensitive, so the values `a` and `A` will generate different respective texts.
 
-Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported as well. When speficied with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
+Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
 
 ## frame.selectOption(selector, values[, options])
 - `selector` <[string]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
@@ -771,6 +772,23 @@ Waits for the given `timeout` in milliseconds.
 
 Note that `frame.waitForTimeout()` should only be used for debugging. Tests using the timer in production are going to be flaky. Use signals such as network events, selectors becoming visible and others instead.
 
+## frame.waitForURL(url[, options])
+- `url` <[string]|[RegExp]|[function]\([URL]\):[boolean]> A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation.
+- `options` <[Object]>
+  - `timeout` <[number]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaultnavigationtimeouttimeout), [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout), [page.setDefaultNavigationTimeout(timeout)](./api/class-page.mdx#pagesetdefaultnavigationtimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+  - `waitUntil` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
+    * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+    * `'load'` - consider operation to be finished when the `load` event is fired.
+    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+
+Waits for the frame to navigate to the given URL.
+
+```js
+await frame.click('a.delayed-navigation'); // Clicking the link will indirectly cause a navigation
+await frame.waitForURL('**/target.html');
+```
+
+
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"
 [AndroidDevice]: ./api/class-androiddevice.mdx "AndroidDevice"
@@ -782,17 +800,14 @@ Note that `frame.waitForTimeout()` should only be used for debugging. Tests usin
 [BrowserServer]: ./api/class-browserserver.mdx "BrowserServer"
 [BrowserType]: ./api/class-browsertype.mdx "BrowserType"
 [CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
-[ChromiumBrowser]: ./api/class-chromiumbrowser.mdx "ChromiumBrowser"
-[ChromiumBrowserContext]: ./api/class-chromiumbrowsercontext.mdx "ChromiumBrowserContext"
-[ChromiumCoverage]: ./api/class-chromiumcoverage.mdx "ChromiumCoverage"
 [ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: ./api/class-coverage.mdx "Coverage"
 [Dialog]: ./api/class-dialog.mdx "Dialog"
 [Download]: ./api/class-download.mdx "Download"
 [Electron]: ./api/class-electron.mdx "Electron"
 [ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: ./api/class-filechooser.mdx "FileChooser"
-[FirefoxBrowser]: ./api/class-firefoxbrowser.mdx "FirefoxBrowser"
 [Frame]: ./api/class-frame.mdx "Frame"
 [JSHandle]: ./api/class-jshandle.mdx "JSHandle"
 [Keyboard]: ./api/class-keyboard.mdx "Keyboard"
@@ -807,7 +822,6 @@ Note that `frame.waitForTimeout()` should only be used for debugging. Tests usin
 [TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
 [Video]: ./api/class-video.mdx "Video"
-[WebKitBrowser]: ./api/class-webkitbrowser.mdx "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.mdx "WebSocket"
 [Worker]: ./api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"

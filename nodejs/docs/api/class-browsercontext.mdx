@@ -24,10 +24,13 @@ await context.close();
 ```
 
 
+- [browserContext.on('backgroundpage')](./api/class-browsercontext.mdx#browsercontextonbackgroundpage)
 - [browserContext.on('close')](./api/class-browsercontext.mdx#browsercontextonclose)
 - [browserContext.on('page')](./api/class-browsercontext.mdx#browsercontextonpage)
+- [browserContext.on('serviceworker')](./api/class-browsercontext.mdx#browsercontextonserviceworker)
 - [browserContext.addCookies(cookies)](./api/class-browsercontext.mdx#browsercontextaddcookiescookies)
 - [browserContext.addInitScript(script[, arg])](./api/class-browsercontext.mdx#browsercontextaddinitscriptscript-arg)
+- [browserContext.backgroundPages()](./api/class-browsercontext.mdx#browsercontextbackgroundpages)
 - [browserContext.browser()](./api/class-browsercontext.mdx#browsercontextbrowser)
 - [browserContext.clearCookies()](./api/class-browsercontext.mdx#browsercontextclearcookies)
 - [browserContext.clearPermissions()](./api/class-browsercontext.mdx#browsercontextclearpermissions)
@@ -36,9 +39,11 @@ await context.close();
 - [browserContext.exposeBinding(name, callback[, options])](./api/class-browsercontext.mdx#browsercontextexposebindingname-callback-options)
 - [browserContext.exposeFunction(name, callback)](./api/class-browsercontext.mdx#browsercontextexposefunctionname-callback)
 - [browserContext.grantPermissions(permissions[, options])](./api/class-browsercontext.mdx#browsercontextgrantpermissionspermissions-options)
+- [browserContext.newCDPSession(page)](./api/class-browsercontext.mdx#browsercontextnewcdpsessionpage)
 - [browserContext.newPage()](./api/class-browsercontext.mdx#browsercontextnewpage)
 - [browserContext.pages()](./api/class-browsercontext.mdx#browsercontextpages)
 - [browserContext.route(url, handler)](./api/class-browsercontext.mdx#browsercontextrouteurl-handler)
+- [browserContext.serviceWorkers()](./api/class-browsercontext.mdx#browsercontextserviceworkers)
 - [browserContext.setDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaultnavigationtimeouttimeout)
 - [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout)
 - [browserContext.setExtraHTTPHeaders(headers)](./api/class-browsercontext.mdx#browsercontextsetextrahttpheadersheaders)
@@ -48,6 +53,19 @@ await context.close();
 - [browserContext.storageState([options])](./api/class-browsercontext.mdx#browsercontextstoragestateoptions)
 - [browserContext.unroute(url[, handler])](./api/class-browsercontext.mdx#browsercontextunrouteurl-handler)
 - [browserContext.waitForEvent(event[, optionsOrPredicate])](./api/class-browsercontext.mdx#browsercontextwaitforeventevent-optionsorpredicate)
+
+## browserContext.on('backgroundpage')
+- type: <[Page]>
+
+:::note
+Only works with Chromium browser's persistent context.
+:::
+
+Emitted when new background page is created in the context.
+
+```js
+const backgroundPage = await context.waitForEvent('backgroundpage');
+```
 
 ## browserContext.on('close')
 - type: <[BrowserContext]>
@@ -75,6 +93,15 @@ console.log(await newPage.evaluate('location.href'));
 :::note
 Use [page.waitForLoadState([state, options])](./api/class-page.mdx#pagewaitforloadstatestate-options) to wait until the page gets to a particular state (you should not need it in most cases).
 :::
+
+## browserContext.on('serviceworker')
+- type: <[Worker]>
+
+:::note
+Service workers are only supported on Chromium-based browsers.
+:::
+
+Emitted when new service worker is created in the context.
 
 ## browserContext.addCookies(cookies)
 - `cookies` <[Array]<[Object]>>
@@ -123,6 +150,15 @@ await browserContext.addInitScript({
 :::note
 The order of evaluation of multiple scripts installed via [browserContext.addInitScript(script[, arg])](./api/class-browsercontext.mdx#browsercontextaddinitscriptscript-arg) and [page.addInitScript(script[, arg])](./api/class-page.mdx#pageaddinitscriptscript-arg) is not defined.
 :::
+
+## browserContext.backgroundPages()
+- returns: <[Array]<[Page]>>
+
+:::note
+Background pages are only supported on Chromium-based browsers.
+:::
+
+All existing background pages in the context.
 
 ## browserContext.browser()
 - returns: <[null]|[Browser]>
@@ -273,6 +309,16 @@ const crypto = require('crypto');
 
 Grants specified permissions to the browser context. Only grants corresponding permissions to the given origin if specified.
 
+## browserContext.newCDPSession(page)
+- `page` <[Page]> Page to create new session for.
+- returns: <[Promise]<[CDPSession]>>
+
+:::note
+CDP sessions are only supported on Chromium-based browsers.
+:::
+
+Returns the newly created session.
+
 ## browserContext.newPage()
 - returns: <[Promise]<[Page]>>
 
@@ -289,7 +335,7 @@ Returns all open pages in the context.
 
 Routing provides the capability to modify network requests that are made by any page in the browser context. Once route is enabled, every request matching the url pattern will stall unless it's continued, fulfilled or aborted.
 
-An example of a naïve handler that aborts all image requests:
+An example of a naive handler that aborts all image requests:
 
 ```js
 const context = await browser.newContext();
@@ -311,9 +357,20 @@ await browser.close();
 
 Page routes (set up with [page.route(url, handler)](./api/class-page.mdx#pagerouteurl-handler)) take precedence over browser context routes when request matches both handlers.
 
+To remove a route with its handler you can use [browserContext.unroute(url[, handler])](./api/class-browsercontext.mdx#browsercontextunrouteurl-handler).
+
 :::note
 Enabling routing disables http cache.
 :::
+
+## browserContext.serviceWorkers()
+- returns: <[Array]<[Worker]>>
+
+:::note
+Service workers are only supported on Chromium-based browsers.
+:::
+
+All existing service workers in the context.
 
 ## browserContext.setDefaultNavigationTimeout(timeout)
 - `timeout` <[number]> Maximum navigation time in milliseconds
@@ -429,17 +486,14 @@ const [page, _] = await Promise.all([
 [BrowserServer]: ./api/class-browserserver.mdx "BrowserServer"
 [BrowserType]: ./api/class-browsertype.mdx "BrowserType"
 [CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
-[ChromiumBrowser]: ./api/class-chromiumbrowser.mdx "ChromiumBrowser"
-[ChromiumBrowserContext]: ./api/class-chromiumbrowsercontext.mdx "ChromiumBrowserContext"
-[ChromiumCoverage]: ./api/class-chromiumcoverage.mdx "ChromiumCoverage"
 [ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: ./api/class-coverage.mdx "Coverage"
 [Dialog]: ./api/class-dialog.mdx "Dialog"
 [Download]: ./api/class-download.mdx "Download"
 [Electron]: ./api/class-electron.mdx "Electron"
 [ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: ./api/class-filechooser.mdx "FileChooser"
-[FirefoxBrowser]: ./api/class-firefoxbrowser.mdx "FirefoxBrowser"
 [Frame]: ./api/class-frame.mdx "Frame"
 [JSHandle]: ./api/class-jshandle.mdx "JSHandle"
 [Keyboard]: ./api/class-keyboard.mdx "Keyboard"
@@ -454,7 +508,6 @@ const [page, _] = await Promise.all([
 [TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
 [Video]: ./api/class-video.mdx "Video"
-[WebKitBrowser]: ./api/class-webkitbrowser.mdx "WebKitBrowser"
 [WebSocket]: ./api/class-websocket.mdx "WebSocket"
 [Worker]: ./api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"

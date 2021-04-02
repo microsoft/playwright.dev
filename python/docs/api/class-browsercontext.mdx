@@ -50,10 +50,13 @@ await context.close()
 </Tabs>
 
 
+- [browser_context.on("backgroundpage")](./api/class-browsercontext.mdx#browser_contextonbackgroundpage)
 - [browser_context.on("close")](./api/class-browsercontext.mdx#browser_contextonclose)
 - [browser_context.on("page")](./api/class-browsercontext.mdx#browser_contextonpage)
+- [browser_context.on("serviceworker")](./api/class-browsercontext.mdx#browser_contextonserviceworker)
 - [browser_context.add_cookies(cookies)](./api/class-browsercontext.mdx#browser_contextadd_cookiescookies)
 - [browser_context.add_init_script(**kwargs)](./api/class-browsercontext.mdx#browser_contextadd_init_scriptkwargs)
+- [browser_context.background_pages](./api/class-browsercontext.mdx#browser_contextbackground_pages)
 - [browser_context.browser](./api/class-browsercontext.mdx#browser_contextbrowser)
 - [browser_context.clear_cookies()](./api/class-browsercontext.mdx#browser_contextclear_cookies)
 - [browser_context.clear_permissions()](./api/class-browsercontext.mdx#browser_contextclear_permissions)
@@ -64,9 +67,11 @@ await context.close()
 - [browser_context.expose_binding(name, callback, **kwargs)](./api/class-browsercontext.mdx#browser_contextexpose_bindingname-callback-kwargs)
 - [browser_context.expose_function(name, callback)](./api/class-browsercontext.mdx#browser_contextexpose_functionname-callback)
 - [browser_context.grant_permissions(permissions, **kwargs)](./api/class-browsercontext.mdx#browser_contextgrant_permissionspermissions-kwargs)
+- [browser_context.new_cdp_session(page)](./api/class-browsercontext.mdx#browser_contextnew_cdp_sessionpage)
 - [browser_context.new_page()](./api/class-browsercontext.mdx#browser_contextnew_page)
 - [browser_context.pages](./api/class-browsercontext.mdx#browser_contextpages)
 - [browser_context.route(url, handler)](./api/class-browsercontext.mdx#browser_contextrouteurl-handler)
+- [browser_context.service_workers](./api/class-browsercontext.mdx#browser_contextservice_workers)
 - [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_navigation_timeouttimeout)
 - [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout)
 - [browser_context.set_extra_http_headers(headers)](./api/class-browsercontext.mdx#browser_contextset_extra_http_headersheaders)
@@ -75,6 +80,39 @@ await context.close()
 - [browser_context.storage_state(**kwargs)](./api/class-browsercontext.mdx#browser_contextstorage_statekwargs)
 - [browser_context.unroute(url, **kwargs)](./api/class-browsercontext.mdx#browser_contextunrouteurl-kwargs)
 - [browser_context.wait_for_event(event, **kwargs)](./api/class-browsercontext.mdx#browser_contextwait_for_eventevent-kwargs)
+
+## browser_context.on("backgroundpage")
+- type: <[Page]>
+
+:::note
+Only works with Chromium browser's persistent context.
+:::
+
+Emitted when new background page is created in the context.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+background_page = context.wait_for_event("backgroundpage")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+background_page = await context.wait_for_event("backgroundpage")
+```
+
+</TabItem>
+</Tabs>
 
 ## browser_context.on("close")
 - type: <[BrowserContext]>
@@ -124,6 +162,15 @@ print(await page.evaluate("location.href"))
 :::note
 Use [page.wait_for_load_state(**kwargs)](./api/class-page.mdx#pagewait_for_load_statekwargs) to wait until the page gets to a particular state (you should not need it in most cases).
 :::
+
+## browser_context.on("serviceworker")
+- type: <[Worker]>
+
+:::note
+Service workers are only supported on Chromium-based browsers.
+:::
+
+Emitted when new service worker is created in the context.
 
 ## browser_context.add_cookies(cookies)
 - `cookies` <[List]\[[Dict]\]>
@@ -209,6 +256,15 @@ await browser_context.add_init_script(path="preload.js")
 :::note
 The order of evaluation of multiple scripts installed via [browser_context.add_init_script(**kwargs)](./api/class-browsercontext.mdx#browser_contextadd_init_scriptkwargs) and [page.add_init_script(**kwargs)](./api/class-page.mdx#pageadd_init_scriptkwargs) is not defined.
 :::
+
+## browser_context.background_pages
+- returns: <[List]\[[Page]\]>
+
+:::note
+Background pages are only supported on Chromium-based browsers.
+:::
+
+All existing background pages in the context.
 
 ## browser_context.browser
 - returns: <[NoneType]|[Browser]>
@@ -560,6 +616,16 @@ asyncio.run(main())
 
 Grants specified permissions to the browser context. Only grants corresponding permissions to the given origin if specified.
 
+## browser_context.new_cdp_session(page)
+- `page` <[Page]> Page to create new session for.
+- returns: <[CDPSession]>
+
+:::note
+CDP sessions are only supported on Chromium-based browsers.
+:::
+
+Returns the newly created session.
+
 ## browser_context.new_page()
 - returns: <[Page]>
 
@@ -576,7 +642,7 @@ Returns all open pages in the context.
 
 Routing provides the capability to modify network requests that are made by any page in the browser context. Once route is enabled, every request matching the url pattern will stall unless it's continued, fulfilled or aborted.
 
-An example of a naïve handler that aborts all image requests:
+An example of a naive handler that aborts all image requests:
 
 <Tabs
   groupId="python-flavor"
@@ -649,9 +715,20 @@ await browser.close()
 
 Page routes (set up with [page.route(url, handler)](./api/class-page.mdx#pagerouteurl-handler)) take precedence over browser context routes when request matches both handlers.
 
+To remove a route with its handler you can use [browser_context.unroute(url, **kwargs)](./api/class-browsercontext.mdx#browser_contextunrouteurl-kwargs).
+
 :::note
 Enabling routing disables http cache.
 :::
+
+## browser_context.service_workers
+- returns: <[List]\[[Worker]\]>
+
+:::note
+Service workers are only supported on Chromium-based browsers.
+:::
+
+All existing service workers in the context.
 
 ## browser_context.set_default_navigation_timeout(timeout)
 - `timeout` <[float]> Maximum navigation time in milliseconds
@@ -768,7 +845,6 @@ Waits for given `event` to fire. If predicate is provided, it passes event's val
 [BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
 [BrowserType]: ./api/class-browsertype.mdx "BrowserType"
 [CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
-[ChromiumBrowserContext]: ./api/class-chromiumbrowsercontext.mdx "ChromiumBrowserContext"
 [ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
 [Dialog]: ./api/class-dialog.mdx "Dialog"
 [Download]: ./api/class-download.mdx "Download"

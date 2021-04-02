@@ -176,6 +176,7 @@ page.remove_listener("request", log_request)
 - [page.wait_for_load_state(**kwargs)](./api/class-page.mdx#pagewait_for_load_statekwargs)
 - [page.wait_for_selector(selector, **kwargs)](./api/class-page.mdx#pagewait_for_selectorselector-kwargs)
 - [page.wait_for_timeout(timeout)](./api/class-page.mdx#pagewait_for_timeouttimeout)
+- [page.wait_for_url(url, **kwargs)](./api/class-page.mdx#pagewait_for_urlurl-kwargs)
 - [page.workers](./api/class-page.mdx#pageworkers)
 - [page.accessibility](./api/class-page.mdx#pageaccessibility)
 - [page.keyboard](./api/class-page.mdx#pagekeyboard)
@@ -574,7 +575,7 @@ Shortcut for main frame's [frame.dblclick(selector, **kwargs)](./api/class-frame
 - `event_init` <[EvaluationArgument]> Optional event-specific initialization properties.
 - `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.mdx#pageset_default_timeouttimeout) methods.
 
-The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the elment, `click` is dispatched. This is equivalend to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
+The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the element, `click` is dispatched. This is equivalent to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
 
 <Tabs
   groupId="python-flavor"
@@ -1761,7 +1762,7 @@ Holding down `Shift` will type the text that corresponds to the `key` in the upp
 
 If `key` is a single character, it is case-sensitive, so the values `a` and `A` will generate different respective texts.
 
-Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported as well. When speficied with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
+Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
 
 <Tabs
   groupId="python-flavor"
@@ -1841,7 +1842,7 @@ Once routing is enabled, every request matching the url pattern will stall unles
 The handler will only be called for the first url if the response is a redirect.
 :::
 
-An example of a naïve handler that aborts all image requests:
+An example of a naive handler that aborts all image requests:
 
 <Tabs
   groupId="python-flavor"
@@ -1907,6 +1908,8 @@ await browser.close()
 
 Page routes take precedence over browser context routes (set up with [browser_context.route(url, handler)](./api/class-browsercontext.mdx#browser_contextrouteurl-handler)) when request matches both handlers.
 
+To remove a route with its handler you can use [page.unroute(url, **kwargs)](./api/class-page.mdx#pageunrouteurl-kwargs).
+
 :::note
 Enabling routing disables http cache.
 :::
@@ -1926,10 +1929,6 @@ Enabling routing disables http cache.
 - returns: <[Buffer]>
 
 Returns the buffer with the captured screenshot.
-
-:::note
-Screenshots take at least 1/6 second on Chromium OS X and Chromium Windows. See https://crbug.com/741689 for discussion.
-:::
 
 ## page.select_option(selector, **kwargs)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
@@ -2001,6 +2000,7 @@ This setting will change the default maximum navigation time for the following m
 * [page.reload(**kwargs)](./api/class-page.mdx#pagereloadkwargs)
 * [page.set_content(html, **kwargs)](./api/class-page.mdx#pageset_contenthtml-kwargs)
 * [page.expect_navigation(**kwargs)](./api/class-page.mdx#pageexpect_navigationkwargs)
+* [page.wait_for_url(url, **kwargs)](./api/class-page.mdx#pagewait_for_urlurl-kwargs)
 
 :::note
 [page.set_default_navigation_timeout(timeout)](./api/class-page.mdx#pageset_default_navigation_timeouttimeout) takes priority over [page.set_default_timeout(timeout)](./api/class-page.mdx#pageset_default_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout) and [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_navigation_timeouttimeout).
@@ -2469,6 +2469,44 @@ await page.wait_for_timeout(1000)
 
 Shortcut for main frame's [frame.wait_for_timeout(timeout)](./api/class-frame.mdx#framewait_for_timeouttimeout).
 
+## page.wait_for_url(url, **kwargs)
+- `url` <[str]|[Pattern]|[Callable]\[[URL]\]:[bool]> A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation.
+- `timeout` <[float]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_navigation_timeouttimeout), [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout), [page.set_default_navigation_timeout(timeout)](./api/class-page.mdx#pageset_default_navigation_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.mdx#pageset_default_timeouttimeout) methods.
+- `wait_until` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
+  * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+  * `'load'` - consider operation to be finished when the `load` event is fired.
+  * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+
+Waits for the main frame to navigate to the given URL.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.click("a.delayed-navigation") # clicking the link will indirectly cause a navigation
+page.wait_for_url("**/target.html")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.click("a.delayed-navigation") # clicking the link will indirectly cause a navigation
+await page.wait_for_url("**/target.html")
+```
+
+</TabItem>
+</Tabs>
+
+Shortcut for main frame's [frame.wait_for_url(url, **kwargs)](./api/class-frame.mdx#framewait_for_urlurl-kwargs).
+
 ## page.workers
 - returns: <[List]\[[Worker]\]>
 
@@ -2495,7 +2533,6 @@ This does not contain ServiceWorkers
 [BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
 [BrowserType]: ./api/class-browsertype.mdx "BrowserType"
 [CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
-[ChromiumBrowserContext]: ./api/class-chromiumbrowsercontext.mdx "ChromiumBrowserContext"
 [ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
 [Dialog]: ./api/class-dialog.mdx "Dialog"
 [Download]: ./api/class-download.mdx "Download"

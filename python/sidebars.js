@@ -71,7 +71,6 @@ module.exports = {
             { "type": "doc", "id": "api/class-browsercontext" },
             { "type": "doc", "id": "api/class-browsertype" },
             { "type": "doc", "id": "api/class-cdpsession" },
-            { "type": "doc", "id": "api/class-chromiumbrowsercontext" },
             { "type": "doc", "id": "api/class-consolemessage" },
             { "type": "doc", "id": "api/class-dialog" },
             { "type": "doc", "id": "api/class-download" },

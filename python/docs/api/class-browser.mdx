@@ -61,8 +61,11 @@ asyncio.run(main())
 - [browser.close()](./api/class-browser.mdx#browserclose)
 - [browser.contexts](./api/class-browser.mdx#browsercontexts)
 - [browser.is_connected()](./api/class-browser.mdx#browseris_connected)
+- [browser.new_browser_cdp_session()](./api/class-browser.mdx#browsernew_browser_cdp_session)
 - [browser.new_context(**kwargs)](./api/class-browser.mdx#browsernew_contextkwargs)
 - [browser.new_page(**kwargs)](./api/class-browser.mdx#browsernew_pagekwargs)
+- [browser.start_tracing(**kwargs)](./api/class-browser.mdx#browserstart_tracingkwargs)
+- [browser.stop_tracing()](./api/class-browser.mdx#browserstop_tracing)
 - [browser.version](./api/class-browser.mdx#browserversion)
 
 ## browser.on("disconnected")
@@ -120,6 +123,15 @@ print(len(browser.contexts())) # prints `1`
 
 Indicates that the browser is connected.
 
+## browser.new_browser_cdp_session()
+- returns: <[CDPSession]>
+
+:::note
+CDP Sessions are only supported on Chromium-based browsers.
+:::
+
+Returns the newly created browser session.
+
 ## browser.new_context(**kwargs)
 - `accept_downloads` <[bool]> Whether to automatically download all the attachments. Defaults to `false` where all the downloads are canceled.
 - `bypass_csp` <[bool]> Toggles bypassing page's Content-Security-Policy.
@@ -152,6 +164,9 @@ Indicates that the browser is connected.
 - `record_video_size` <[Dict]> Dimensions of the recorded videos. If not specified the size will be equal to `viewport` scaled down to fit into 800x800. If `viewport` is not configured explicitly the video size defaults to 800x450. Actual picture of each page will be scaled down if necessary to fit the specified size.
   - `width` <[int]> Video frame width.
   - `height` <[int]> Video frame height.
+- `screen` <[Dict]> Emulates consistent window screen size available inside web page via `window.screen`. Is only used when the `viewport` is set.
+  - `width` <[int]> page width in pixels.
+  - `height` <[int]> page height in pixels.
 - `storage_state` <[Union]\[[str], [pathlib.Path]\]|[Dict]> Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [browser_context.storage_state(**kwargs)](./api/class-browsercontext.mdx#browser_contextstorage_statekwargs). Either a path to the file with saved storage, or an object with the following fields:
   - `cookies` <[List]\[[Dict]\]> Optional cookies to set for context
     - `name` <[str]>
@@ -243,6 +258,9 @@ await page.goto("https://example.com")
 - `record_video_size` <[Dict]> Dimensions of the recorded videos. If not specified the size will be equal to `viewport` scaled down to fit into 800x800. If `viewport` is not configured explicitly the video size defaults to 800x450. Actual picture of each page will be scaled down if necessary to fit the specified size.
   - `width` <[int]> Video frame width.
   - `height` <[int]> Video frame height.
+- `screen` <[Dict]> Emulates consistent window screen size available inside web page via `window.screen`. Is only used when the `viewport` is set.
+  - `width` <[int]> page width in pixels.
+  - `height` <[int]> page height in pixels.
 - `storage_state` <[Union]\[[str], [pathlib.Path]\]|[Dict]> Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [browser_context.storage_state(**kwargs)](./api/class-browsercontext.mdx#browser_contextstorage_statekwargs). Either a path to the file with saved storage, or an object with the following fields:
   - `cookies` <[List]\[[Dict]\]> Optional cookies to set for context
     - `name` <[str]>
@@ -270,6 +288,55 @@ Creates a new page in a new browser context. Closing this page will close the co
 
 This is a convenience API that should only be used for the single-page scenarios and short snippets. Production code and testing frameworks should explicitly create [browser.new_context(**kwargs)](./api/class-browser.mdx#browsernew_contextkwargs) followed by the [browser_context.new_page()](./api/class-browsercontext.mdx#browser_contextnew_page) to control their exact life times.
 
+## browser.start_tracing(**kwargs)
+- `page` <[Page]> Optional, if specified, tracing includes screenshots of the given page.
+- `categories` <[List]\[[str]\]> specify custom categories to use instead of default.
+- `path` <[Union]\[[str], [pathlib.Path]\]> A path to write the trace file to.
+- `screenshots` <[bool]> captures screenshots in the trace.
+
+:::note
+Tracing is only supported on Chromium-based browsers.
+:::
+
+You can use [browser.start_tracing(**kwargs)](./api/class-browser.mdx#browserstart_tracingkwargs) and [browser.stop_tracing()](./api/class-browser.mdx#browserstop_tracing) to create a trace file that can be opened in Chrome DevTools performance panel.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+browser.start_tracing(page, path="trace.json")
+page.goto("https://www.google.com")
+browser.stop_tracing()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await browser.start_tracing(page, path="trace.json")
+await page.goto("https://www.google.com")
+await browser.stop_tracing()
+```
+
+</TabItem>
+</Tabs>
+
+## browser.stop_tracing()
+- returns: <[Buffer]>
+
+:::note
+Tracing is only supported on Chromium-based browsers.
+:::
+
+Returns the buffer with trace data.
+
 ## browser.version
 - returns: <[str]>
 
@@ -280,7 +347,6 @@ Returns the browser version.
 [BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
 [BrowserType]: ./api/class-browsertype.mdx "BrowserType"
 [CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
-[ChromiumBrowserContext]: ./api/class-chromiumbrowsercontext.mdx "ChromiumBrowserContext"
 [ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
 [Dialog]: ./api/class-dialog.mdx "Dialog"
 [Download]: ./api/class-download.mdx "Download"
