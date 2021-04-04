@@ -35,6 +35,7 @@ module.exports = {
         { "type": "doc", "id": "network" },
         { "type": "doc", "id": "pom" },
         { "type": "doc", "id": "verification" },
+        { "type": "doc", "id": "videos" },
       ],
       "collapsed": false
     },
