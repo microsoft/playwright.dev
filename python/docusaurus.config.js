@@ -39,6 +39,10 @@ module.exports = {
     colorMode: {
       defaultMode: "dark",
     },
+    prism: {
+      theme: require('prism-react-renderer/themes/dracula'),
+      additionalLanguages: ['python'],
+    },
     navbar: {
       title: "Playwright for Python",
       logo: {
