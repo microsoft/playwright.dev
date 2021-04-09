@@ -1,0 +1,194 @@
+---
+id: class-browser
+title: "Browser"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+* extends: [EventEmitter]
+
+A Browser is created via [BrowserType.Launch([options])](./api/class-browsertype.mdx#browsertypelaunchoptions). An example of using a [Browser] to create a [Page]:
+
+
+- [event Browser.Disconnected](./api/class-browser.mdx#eventbrowserdisconnected)
+- [Browser.Close()](./api/class-browser.mdx#browserclose)
+- [Browser.Contexts()](./api/class-browser.mdx#browsercontexts)
+- [Browser.IsConnected()](./api/class-browser.mdx#browserisconnected)
+- [Browser.NewContext([options])](./api/class-browser.mdx#browsernewcontextoptions)
+- [Browser.NewPage([options])](./api/class-browser.mdx#browsernewpageoptions)
+- [Browser.Version()](./api/class-browser.mdx#browserversion)
+
+## event Browser.Disconnected
+- type: <[Browser]>
+
+Emitted when Browser gets disconnected from the browser application. This might happen because of one of the following:
+* Browser application is closed or crashed.
+* The [Browser.Close()](./api/class-browser.mdx#browserclose) method was called.
+
+## Browser.Close()
+
+In case this browser is obtained using [BrowserType.Launch([options])](./api/class-browsertype.mdx#browsertypelaunchoptions), closes the browser and all of its pages (if any were opened).
+
+In case this browser is connected to, clears all created contexts belonging to this browser and disconnects from the browser server.
+
+The [Browser] object itself is considered to be disposed and cannot be used anymore.
+
+## Browser.Contexts()
+- returns: <[IEnumerable]<[BrowserContext]>>
+
+Returns an array of all open browser contexts. In a newly created browser, this will return zero browser contexts.
+
+## Browser.IsConnected()
+- returns: <[boolean]>
+
+Indicates that the browser is connected.
+
+## Browser.NewContext([options])
+- `options` <`Browser.NewContextOptions`>
+  - `acceptDownloads` <[boolean]> Whether to automatically download all the attachments. Defaults to `false` where all the downloads are canceled.
+  - `bypassCSP` <[boolean]> Toggles bypassing page's Content-Security-Policy.
+  - `colorScheme` <"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [Page.EmulateMedia([options])](./api/class-page.mdx#pageemulatemediaoptions) for more details. Defaults to `'light'`.
+  - `deviceScaleFactor` <[double]> Specify device scale factor (can be thought of as dpr). Defaults to `1`.
+  - `extraHTTPHeaders` <[Map]<[string], [string]>> An object containing additional HTTP headers to be sent with every request. All header values must be strings.
+  - `geolocation` <`Geolocation`>
+    - `latitude` <[double]> Latitude between -90 and 90.
+    - `longitude` <[double]> Longitude between -180 and 180.
+    - `accuracy` <[double]> Non-negative accuracy value. Defaults to `0`.
+  - `hasTouch` <[boolean]> Specifies if viewport supports touch events. Defaults to false.
+  - `httpCredentials` <`HttpCredentials`> Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).
+    - `username` <[string]>
+    - `password` <[string]>
+  - `ignoreHTTPSErrors` <[boolean]> Whether to ignore HTTPS errors during navigation. Defaults to `false`.
+  - `isMobile` <[boolean]> Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.
+  - `javaScriptEnabled` <[boolean]> Whether or not to enable JavaScript in the context. Defaults to `true`.
+  - `locale` <[string]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
+  - `offline` <[boolean]> Whether to emulate network being offline. Defaults to `false`.
+  - `permissions` <[IEnumerable]<[string]>> A list of permissions to grant to all pages in this context. See [BrowserContext.GrantPermissions(permissions[, options])](./api/class-browsercontext.mdx#browsercontextgrantpermissionspermissions-options) for more details.
+  - `proxy` <`Proxy`> Network proxy settings to use with this context. Note that browser needs to be launched with the global proxy for this option to work. If all contexts override the proxy, global proxy will be never used and can be any string, for example `launch({ proxy: { server: 'per-context' } })`.
+    - `server` <[string]> Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
+    - `bypass` <[string]> Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
+    - `username` <[string]> Optional username to use if HTTP proxy requires authentication.
+    - `password` <[string]> Optional password to use if HTTP proxy requires authentication.
+  - `recordHarOmitContent` <[boolean]> Optional setting to control whether to omit request content from the HAR. Defaults to `false`.
+  - `recordHarPath` <[string]> Enables [HAR](http://www.softwareishard.com/blog/har-12-spec) recording for all pages into the specified HAR file on the filesystem. If not specified, the HAR is not recorded. Make sure to call [BrowserContext.Close()](./api/class-browsercontext.mdx#browsercontextclose) for the HAR to be saved.
+  - `recordVideoDir` <[string]> Enables video recording for all pages into the specified directory. If not specified videos are not recorded. Make sure to call [BrowserContext.Close()](./api/class-browsercontext.mdx#browsercontextclose) for videos to be saved.
+  - `recordVideoSize` <`RecordVideoSize`> Dimensions of the recorded videos. If not specified the size will be equal to `viewport` scaled down to fit into 800x800. If `viewport` is not configured explicitly the video size defaults to 800x450. Actual picture of each page will be scaled down if necessary to fit the specified size.
+    - `width` <[int]> Video frame width.
+    - `height` <[int]> Video frame height.
+  - `screenSize` <`ScreenSize`> Emulates consistent window screen size available inside web page via `window.screen`. Is only used when the `viewport` is set.
+    - `width` <[int]> page width in pixels.
+    - `height` <[int]> page height in pixels.
+  - `storageState` <[string]> Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [BrowserContext.StorageState([options])](./api/class-browsercontext.mdx#browsercontextstoragestateoptions).
+  - `storageStatePath` <[string]> Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [BrowserContext.StorageState([options])](./api/class-browsercontext.mdx#browsercontextstoragestateoptions). Path to the file with saved storage state.
+  - `timezoneId` <[string]> Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.
+  - `userAgent` <[string]> Specific user agent to use in this context.
+- returns: <[BrowserContext]>
+
+Creates a new browser context. It won't share cookies/cache with other browser contexts.
+
+## Browser.NewPage([options])
+- `options` <`Browser.NewPageOptions`>
+  - `acceptDownloads` <[boolean]> Whether to automatically download all the attachments. Defaults to `false` where all the downloads are canceled.
+  - `bypassCSP` <[boolean]> Toggles bypassing page's Content-Security-Policy.
+  - `colorScheme` <"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [Page.EmulateMedia([options])](./api/class-page.mdx#pageemulatemediaoptions) for more details. Defaults to `'light'`.
+  - `deviceScaleFactor` <[double]> Specify device scale factor (can be thought of as dpr). Defaults to `1`.
+  - `extraHTTPHeaders` <[Map]<[string], [string]>> An object containing additional HTTP headers to be sent with every request. All header values must be strings.
+  - `geolocation` <`Geolocation`>
+    - `latitude` <[double]> Latitude between -90 and 90.
+    - `longitude` <[double]> Longitude between -180 and 180.
+    - `accuracy` <[double]> Non-negative accuracy value. Defaults to `0`.
+  - `hasTouch` <[boolean]> Specifies if viewport supports touch events. Defaults to false.
+  - `httpCredentials` <`HttpCredentials`> Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).
+    - `username` <[string]>
+    - `password` <[string]>
+  - `ignoreHTTPSErrors` <[boolean]> Whether to ignore HTTPS errors during navigation. Defaults to `false`.
+  - `isMobile` <[boolean]> Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.
+  - `javaScriptEnabled` <[boolean]> Whether or not to enable JavaScript in the context. Defaults to `true`.
+  - `locale` <[string]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
+  - `offline` <[boolean]> Whether to emulate network being offline. Defaults to `false`.
+  - `permissions` <[IEnumerable]<[string]>> A list of permissions to grant to all pages in this context. See [BrowserContext.GrantPermissions(permissions[, options])](./api/class-browsercontext.mdx#browsercontextgrantpermissionspermissions-options) for more details.
+  - `proxy` <`Proxy`> Network proxy settings to use with this context. Note that browser needs to be launched with the global proxy for this option to work. If all contexts override the proxy, global proxy will be never used and can be any string, for example `launch({ proxy: { server: 'per-context' } })`.
+    - `server` <[string]> Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
+    - `bypass` <[string]> Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
+    - `username` <[string]> Optional username to use if HTTP proxy requires authentication.
+    - `password` <[string]> Optional password to use if HTTP proxy requires authentication.
+  - `recordHarOmitContent` <[boolean]> Optional setting to control whether to omit request content from the HAR. Defaults to `false`.
+  - `recordHarPath` <[string]> Enables [HAR](http://www.softwareishard.com/blog/har-12-spec) recording for all pages into the specified HAR file on the filesystem. If not specified, the HAR is not recorded. Make sure to call [BrowserContext.Close()](./api/class-browsercontext.mdx#browsercontextclose) for the HAR to be saved.
+  - `recordVideoDir` <[string]> Enables video recording for all pages into the specified directory. If not specified videos are not recorded. Make sure to call [BrowserContext.Close()](./api/class-browsercontext.mdx#browsercontextclose) for videos to be saved.
+  - `recordVideoSize` <`RecordVideoSize`> Dimensions of the recorded videos. If not specified the size will be equal to `viewport` scaled down to fit into 800x800. If `viewport` is not configured explicitly the video size defaults to 800x450. Actual picture of each page will be scaled down if necessary to fit the specified size.
+    - `width` <[int]> Video frame width.
+    - `height` <[int]> Video frame height.
+  - `screenSize` <`ScreenSize`> Emulates consistent window screen size available inside web page via `window.screen`. Is only used when the `viewport` is set.
+    - `width` <[int]> page width in pixels.
+    - `height` <[int]> page height in pixels.
+  - `storageState` <[string]> Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [BrowserContext.StorageState([options])](./api/class-browsercontext.mdx#browsercontextstoragestateoptions).
+  - `storageStatePath` <[string]> Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [BrowserContext.StorageState([options])](./api/class-browsercontext.mdx#browsercontextstoragestateoptions). Path to the file with saved storage state.
+  - `timezoneId` <[string]> Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.
+  - `userAgent` <[string]> Specific user agent to use in this context.
+- returns: <[Page]>
+
+Creates a new page in a new browser context. Closing this page will close the context as well.
+
+This is a convenience API that should only be used for the single-page scenarios and short snippets. Production code and testing frameworks should explicitly create [Browser.NewContext([options])](./api/class-browser.mdx#browsernewcontextoptions) followed by the [BrowserContext.NewPage()](./api/class-browsercontext.mdx#browsercontextnewpage) to control their exact life times.
+
+## Browser.Version()
+- returns: <[string]>
+
+Returns the browser version.
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[Evaluation Argument]: ./core-concepts.mdx#evaluationargument "Evaluation Argument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[URL]: https://nodejs.org/api/url.html "URL"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"

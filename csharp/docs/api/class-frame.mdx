@@ -1,0 +1,702 @@
+---
+id: class-frame
+title: "Frame"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+At every point of time, page exposes its current frame tree via the [Page.MainFrame()](./api/class-page.mdx#pagemainframe) and [Frame.ChildFrames()](./api/class-frame.mdx#framechildframes) methods.
+
+[Frame] object's lifecycle is controlled by three events, dispatched on the page object:
+* [event Page.FrameAttached](./api/class-page.mdx#eventpageframeattached) - fired when the frame gets attached to the page. A Frame can be attached to the page only once.
+* [event Page.FrameNavigated](./api/class-page.mdx#eventpageframenavigated) - fired when the frame commits navigation to a different URL.
+* [event Page.FrameDetached](./api/class-page.mdx#eventpageframedetached) - fired when the frame gets detached from the page.  A Frame can be detached from the page only once.
+
+An example of dumping frame tree:
+
+
+- [Frame.AddScriptTag([options])](./api/class-frame.mdx#frameaddscripttagoptions)
+- [Frame.AddStyleTag([options])](./api/class-frame.mdx#frameaddstyletagoptions)
+- [Frame.Check(selector[, options])](./api/class-frame.mdx#framecheckselector-options)
+- [Frame.ChildFrames()](./api/class-frame.mdx#framechildframes)
+- [Frame.Click(selector[, options])](./api/class-frame.mdx#frameclickselector-options)
+- [Frame.Content()](./api/class-frame.mdx#framecontent)
+- [Frame.DblClickAsync(selector[, options])](./api/class-frame.mdx#framedblclickasyncselector-options)
+- [Frame.DispatchEvent(selector, type[, eventInit, options])](./api/class-frame.mdx#framedispatcheventselector-type-eventinit-options)
+- [Frame.EvalOnSelector(selector, expression[, arg])](./api/class-frame.mdx#frameevalonselectorselector-expression-arg)
+- [Frame.EvalOnSelectorAll(selector, expression[, arg])](./api/class-frame.mdx#frameevalonselectorallselector-expression-arg)
+- [Frame.Evaluate(expression[, arg])](./api/class-frame.mdx#frameevaluateexpression-arg)
+- [Frame.EvaluateHandle(expression[, arg])](./api/class-frame.mdx#frameevaluatehandleexpression-arg)
+- [Frame.Fill(selector, value[, options])](./api/class-frame.mdx#framefillselector-value-options)
+- [Frame.Focus(selector[, options])](./api/class-frame.mdx#framefocusselector-options)
+- [Frame.FrameElement()](./api/class-frame.mdx#frameframeelement)
+- [Frame.GetAttribute(selector, name[, options])](./api/class-frame.mdx#framegetattributeselector-name-options)
+- [Frame.GoToAsync(url[, options])](./api/class-frame.mdx#framegotoasyncurl-options)
+- [Frame.Hover(selector[, options])](./api/class-frame.mdx#framehoverselector-options)
+- [Frame.InnerHTML(selector[, options])](./api/class-frame.mdx#frameinnerhtmlselector-options)
+- [Frame.InnerText(selector[, options])](./api/class-frame.mdx#frameinnertextselector-options)
+- [Frame.IsChecked(selector[, options])](./api/class-frame.mdx#frameischeckedselector-options)
+- [Frame.IsDetached()](./api/class-frame.mdx#frameisdetached)
+- [Frame.IsDisabled(selector[, options])](./api/class-frame.mdx#frameisdisabledselector-options)
+- [Frame.IsEditable(selector[, options])](./api/class-frame.mdx#frameiseditableselector-options)
+- [Frame.IsEnabled(selector[, options])](./api/class-frame.mdx#frameisenabledselector-options)
+- [Frame.IsHidden(selector[, options])](./api/class-frame.mdx#frameishiddenselector-options)
+- [Frame.IsVisible(selector[, options])](./api/class-frame.mdx#frameisvisibleselector-options)
+- [Frame.Name()](./api/class-frame.mdx#framename)
+- [Frame.Page()](./api/class-frame.mdx#framepage)
+- [Frame.ParentFrame()](./api/class-frame.mdx#frameparentframe)
+- [Frame.Press(selector, key[, options])](./api/class-frame.mdx#framepressselector-key-options)
+- [Frame.QuerySelector(selector)](./api/class-frame.mdx#framequeryselectorselector)
+- [Frame.QuerySelectorAll(selector)](./api/class-frame.mdx#framequeryselectorallselector)
+- [Frame.SelectOption(selector[, options], values)](./api/class-frame.mdx#frameselectoptionselector-options-values)
+- [Frame.SetContent(html[, options])](./api/class-frame.mdx#framesetcontenthtml-options)
+- [Frame.SetInputFiles(selector, files[, options])](./api/class-frame.mdx#framesetinputfilesselector-files-options)
+- [Frame.Tap(selector[, options])](./api/class-frame.mdx#frametapselector-options)
+- [Frame.TextContent(selector[, options])](./api/class-frame.mdx#frametextcontentselector-options)
+- [Frame.Title()](./api/class-frame.mdx#frametitle)
+- [Frame.Type(selector, text[, options])](./api/class-frame.mdx#frametypeselector-text-options)
+- [Frame.Uncheck(selector[, options])](./api/class-frame.mdx#frameuncheckselector-options)
+- [Frame.Url()](./api/class-frame.mdx#frameurl)
+- [Frame.WaitForFunction(expression[, arg, options])](./api/class-frame.mdx#framewaitforfunctionexpression-arg-options)
+- [Frame.WaitForLoadState([state, options])](./api/class-frame.mdx#framewaitforloadstatestate-options)
+- [Frame.WaitForNavigation([options])](./api/class-frame.mdx#framewaitfornavigationoptions)
+- [Frame.WaitForSelector(selector[, options])](./api/class-frame.mdx#framewaitforselectorselector-options)
+- [Frame.WaitForTimeout(timeout)](./api/class-frame.mdx#framewaitfortimeouttimeout)
+- [Frame.WaitForURL(url[, options])](./api/class-frame.mdx#framewaitforurlurl-options)
+
+## Frame.AddScriptTag([options])
+- `options` <`Frame.AddScriptTagOptions`>
+  - `content` <[string]> Raw JavaScript content to be injected into frame.
+  - `path` <[string]> Path to the JavaScript file to be injected into frame. If `path` is a relative path, then it is resolved relative to the current working directory.
+  - `type` <[string]> Script type. Use 'module' in order to load a Javascript ES6 module. See [script](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/script) for more details.
+  - `url` <[string]> URL of a script to be added.
+- returns: <[ElementHandle]>
+
+Returns the added tag when the script's onload fires or when the script content was injected into frame.
+
+Adds a `<script>` tag into the page with the desired url or content.
+
+## Frame.AddStyleTag([options])
+- `options` <`Frame.AddStyleTagOptions`>
+  - `content` <[string]> Raw CSS content to be injected into frame.
+  - `path` <[string]> Path to the CSS file to be injected into frame. If `path` is a relative path, then it is resolved relative to the current working directory.
+  - `url` <[string]> URL of the `<link>` tag.
+- returns: <[ElementHandle]>
+
+Returns the added tag when the stylesheet's onload fires or when the CSS content was injected into frame.
+
+Adds a `<link rel="stylesheet">` tag into the page with the desired url or a `<style type="text/css">` tag with the content.
+
+## Frame.Check(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
+- `options` <`Frame.CheckOptions`>
+  - `force` <[boolean]> Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.
+  - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+
+This method checks an element matching `selector` by performing the following steps:
+1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
+1. Ensure that matched element is a checkbox or a radio input. If not, this method throws. If the element is already checked, this method returns immediately.
+1. Wait for [actionability](./actionability.mdx) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
+1. Scroll the element into view if needed.
+1. Use [Page.Mouse](./api/class-page.mdx#pagemouse) to click in the center of the element.
+1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+1. Ensure that the element is now checked. If not, this method throws.
+
+When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
+
+## Frame.ChildFrames()
+- returns: <[IEnumerable]<[Frame]>>
+
+## Frame.Click(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
+- `options` <`Frame.ClickOptions`>
+  - `button` <"left"|"right"|"middle"> Defaults to `left`.
+  - `clickCount` <[int]> defaults to 1. See [UIEvent.detail].
+  - `delay` <[double]> Time to wait between `mousedown` and `mouseup` in milliseconds. Defaults to 0.
+  - `force` <[boolean]> Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.
+  - `modifiers` <[IEnumerable]<"Alt"|"Control"|"Meta"|"Shift">> Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used.
+  - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+  - `position` <`Position`> A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+    - `x` <[double]>
+    - `y` <[double]>
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+
+This method clicks an element matching `selector` by performing the following steps:
+1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
+1. Wait for [actionability](./actionability.mdx) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
+1. Scroll the element into view if needed.
+1. Use [Page.Mouse](./api/class-page.mdx#pagemouse) to click in the center of the element, or the specified `position`.
+1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+
+When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
+
+## Frame.Content()
+- returns: <[string]>
+
+Gets the full HTML contents of the frame, including the doctype.
+
+## Frame.DblClickAsync(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
+- `options` <`Frame.DblClickAsyncOptions`>
+  - `button` <"left"|"right"|"middle"> Defaults to `left`.
+  - `delay` <[double]> Time to wait between `mousedown` and `mouseup` in milliseconds. Defaults to 0.
+  - `force` <[boolean]> Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.
+  - `modifiers` <[IEnumerable]<"Alt"|"Control"|"Meta"|"Shift">> Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used.
+  - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+  - `position` <`Position`> A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+    - `x` <[double]>
+    - `y` <[double]>
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+
+This method double clicks an element matching `selector` by performing the following steps:
+1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
+1. Wait for [actionability](./actionability.mdx) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
+1. Scroll the element into view if needed.
+1. Use [Page.Mouse](./api/class-page.mdx#pagemouse) to double click in the center of the element, or the specified `position`.
+1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set. Note that if the first click of the `dblclick()` triggers a navigation event, this method will throw.
+
+When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
+
+:::note
+`frame.dblclick()` dispatches two `click` events and a single `dblclick` event.
+:::
+
+## Frame.DispatchEvent(selector, type[, eventInit, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
+- `type` <[string]> DOM event type: `"click"`, `"dragstart"`, etc.
+- `eventInit` <[object]> Optional event-specific initialization properties.
+- `options` <`Frame.DispatchEventOptions`>
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+
+The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the element, `click` is dispatched. This is equivalent to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
+
+Under the hood, it creates an instance of an event based on the given `type`, initializes it with `eventInit` properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
+
+Since `eventInit` is event-specific, please refer to the events documentation for the lists of initial properties:
+* [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/DragEvent/DragEvent)
+* [FocusEvent](https://developer.mozilla.org/en-US/docs/Web/API/FocusEvent/FocusEvent)
+* [KeyboardEvent](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/KeyboardEvent)
+* [MouseEvent](https://developer.mozilla.org/en-US/docs/Web/API/MouseEvent/MouseEvent)
+* [PointerEvent](https://developer.mozilla.org/en-US/docs/Web/API/PointerEvent/PointerEvent)
+* [TouchEvent](https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/TouchEvent)
+* [Event](https://developer.mozilla.org/en-US/docs/Web/API/Event/Event)
+
+You can also specify `JSHandle` as the property value if you want live objects to be passed into the event:
+
+## Frame.EvalOnSelector(selector, expression[, arg])
+- `selector` <[string]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
+- `expression` <[string]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
+- `arg` <[object]> Optional argument to pass to `expression`.
+- returns: <[object]>
+
+Returns the return value of `expression`.
+
+The method finds an element matching the specified selector within the frame and passes it as a first argument to `expression`. See [Working with selectors](./selectors.mdx) for more details. If no elements match the selector, the method throws an error.
+
+If `expression` returns a [Promise], then [Frame.EvalOnSelector(selector, expression[, arg])](./api/class-frame.mdx#frameevalonselectorselector-expression-arg) would wait for the promise to resolve and return its value.
+
+Examples:
+
+## Frame.EvalOnSelectorAll(selector, expression[, arg])
+- `selector` <[string]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
+- `expression` <[string]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
+- `arg` <[object]> Optional argument to pass to `expression`.
+- returns: <[object]>
+
+Returns the return value of `expression`.
+
+The method finds all elements matching the specified selector within the frame and passes an array of matched elements as a first argument to `expression`. See [Working with selectors](./selectors.mdx) for more details.
+
+If `expression` returns a [Promise], then [Frame.EvalOnSelectorAll(selector, expression[, arg])](./api/class-frame.mdx#frameevalonselectorallselector-expression-arg) would wait for the promise to resolve and return its value.
+
+Examples:
+
+## Frame.Evaluate(expression[, arg])
+- `expression` <[string]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
+- `arg` <[object]> Optional argument to pass to `expression`.
+- returns: <[object]>
+
+Returns the return value of `expression`.
+
+If the function passed to the [Frame.Evaluate(expression[, arg])](./api/class-frame.mdx#frameevaluateexpression-arg) returns a [Promise], then [Frame.Evaluate(expression[, arg])](./api/class-frame.mdx#frameevaluateexpression-arg) would wait for the promise to resolve and return its value.
+
+If the function passed to the [Frame.Evaluate(expression[, arg])](./api/class-frame.mdx#frameevaluateexpression-arg) returns a non-[Serializable] value, then [Frame.Evaluate(expression[, arg])](./api/class-frame.mdx#frameevaluateexpression-arg) returns `undefined`. Playwright also supports transferring some additional values that are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`.
+
+A string can also be passed in instead of a function.
+
+[ElementHandle] instances can be passed as an argument to the [Frame.Evaluate(expression[, arg])](./api/class-frame.mdx#frameevaluateexpression-arg):
+
+## Frame.EvaluateHandle(expression[, arg])
+- `expression` <[string]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
+- `arg` <[object]> Optional argument to pass to `expression`.
+- returns: <[JSHandle]>
+
+Returns the return value of `expression` as a [JSHandle].
+
+The only difference between [Frame.Evaluate(expression[, arg])](./api/class-frame.mdx#frameevaluateexpression-arg) and [Frame.EvaluateHandle(expression[, arg])](./api/class-frame.mdx#frameevaluatehandleexpression-arg) is that [Frame.EvaluateHandle(expression[, arg])](./api/class-frame.mdx#frameevaluatehandleexpression-arg) returns [JSHandle].
+
+If the function, passed to the [Frame.EvaluateHandle(expression[, arg])](./api/class-frame.mdx#frameevaluatehandleexpression-arg), returns a [Promise], then [Frame.EvaluateHandle(expression[, arg])](./api/class-frame.mdx#frameevaluatehandleexpression-arg) would wait for the promise to resolve and return its value.
+
+A string can also be passed in instead of a function.
+
+[JSHandle] instances can be passed as an argument to the [Frame.EvaluateHandle(expression[, arg])](./api/class-frame.mdx#frameevaluatehandleexpression-arg):
+
+## Frame.Fill(selector, value[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
+- `value` <[string]> Value to fill for the `<input>`, `<textarea>` or `[contenteditable]` element.
+- `options` <`Frame.FillOptions`>
+  - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+
+This method waits for an element matching `selector`, waits for [actionability](./actionability.mdx) checks, focuses the element, fills it and triggers an `input` event after filling. If the element is inside the `<label>` element that has associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), that control will be filled instead. If the element to be filled is not an `<input>`, `<textarea>` or `[contenteditable]` element, this method throws an error. Note that you can pass an empty string to clear the input field.
+
+To send fine-grained keyboard events, use [Frame.Type(selector, text[, options])](./api/class-frame.mdx#frametypeselector-text-options).
+
+## Frame.Focus(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
+- `options` <`Frame.FocusOptions`>
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+
+This method fetches an element with `selector` and focuses it. If there's no element matching `selector`, the method waits until a matching element appears in the DOM.
+
+## Frame.FrameElement()
+- returns: <[ElementHandle]>
+
+Returns the `frame` or `iframe` element handle which corresponds to this frame.
+
+This is an inverse of [ElementHandle.ContentFrame()](./api/class-elementhandle.mdx#elementhandlecontentframe). Note that returned handle actually belongs to the parent frame.
+
+This method throws an error if the frame has been detached before `frameElement()` returns.
+
+## Frame.GetAttribute(selector, name[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
+- `name` <[string]> Attribute name to get the value for.
+- `options` <`Frame.GetAttributeOptions`>
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+- returns: <[null]|[string]>
+
+Returns element attribute value.
+
+## Frame.GoToAsync(url[, options])
+- `url` <[string]> URL to navigate frame to. The url should include scheme, e.g. `https://`.
+- `options` <`Frame.GoToAsyncOptions`>
+  - `referer` <[string]> Referer header value. If provided it will take preference over the referer header value set by [Page.SetExtraHTTPHeaders(headers)](./api/class-page.mdx#pagesetextrahttpheadersheaders).
+  - `timeout` <[double]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaultnavigationtimeouttimeout), [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout), [Page.SetDefaultNavigationTimeout(timeout)](./api/class-page.mdx#pagesetdefaultnavigationtimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+  - `waitUntil` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
+    * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+    * `'load'` - consider operation to be finished when the `load` event is fired.
+    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+- returns: <[null]|[Response]>
+
+Returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect.
+
+`frame.goto` will throw an error if:
+* there's an SSL error (e.g. in case of self-signed certificates).
+* target URL is invalid.
+* the `timeout` is exceeded during navigation.
+* the remote server does not respond or is unreachable.
+* the main resource failed to load.
+
+`frame.goto` will not throw an error when any valid HTTP status code is returned by the remote server, including 404 "Not Found" and 500 "Internal Server Error".  The status code for such responses can be retrieved by calling [Response.Status()](./api/class-response.mdx#responsestatus).
+
+:::note
+`frame.goto` either throws an error or returns a main resource response. The only exceptions are navigation to `about:blank` or navigation to the same URL with a different hash, which would succeed and return `null`.
+:::
+
+:::note
+Headless mode doesn't support navigation to a PDF document. See the [upstream issue](https://bugs.chromium.org/p/chromium/issues/detail?id=761295).
+:::
+
+## Frame.Hover(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
+- `options` <`Frame.HoverOptions`>
+  - `force` <[boolean]> Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.
+  - `modifiers` <[IEnumerable]<"Alt"|"Control"|"Meta"|"Shift">> Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used.
+  - `position` <`Position`> A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+    - `x` <[double]>
+    - `y` <[double]>
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+
+This method hovers over an element matching `selector` by performing the following steps:
+1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
+1. Wait for [actionability](./actionability.mdx) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
+1. Scroll the element into view if needed.
+1. Use [Page.Mouse](./api/class-page.mdx#pagemouse) to hover over the center of the element, or the specified `position`.
+1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+
+When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
+
+## Frame.InnerHTML(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
+- `options` <`Frame.InnerHTMLOptions`>
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+- returns: <[string]>
+
+Returns `element.innerHTML`.
+
+## Frame.InnerText(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
+- `options` <`Frame.InnerTextOptions`>
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+- returns: <[string]>
+
+Returns `element.innerText`.
+
+## Frame.IsChecked(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
+- `options` <`Frame.IsCheckedOptions`>
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+- returns: <[boolean]>
+
+Returns whether the element is checked. Throws if the element is not a checkbox or radio input.
+
+## Frame.IsDetached()
+- returns: <[boolean]>
+
+Returns `true` if the frame has been detached, or `false` otherwise.
+
+## Frame.IsDisabled(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
+- `options` <`Frame.IsDisabledOptions`>
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+- returns: <[boolean]>
+
+Returns whether the element is disabled, the opposite of [enabled](./actionability.mdx#enabled).
+
+## Frame.IsEditable(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
+- `options` <`Frame.IsEditableOptions`>
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+- returns: <[boolean]>
+
+Returns whether the element is [editable](./actionability.mdx#editable).
+
+## Frame.IsEnabled(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
+- `options` <`Frame.IsEnabledOptions`>
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+- returns: <[boolean]>
+
+Returns whether the element is [enabled](./actionability.mdx#enabled).
+
+## Frame.IsHidden(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
+- `options` <`Frame.IsHiddenOptions`>
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+- returns: <[boolean]>
+
+Returns whether the element is hidden, the opposite of [visible](./actionability.mdx#visible).  `selector` that does not match any elements is considered hidden.
+
+## Frame.IsVisible(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
+- `options` <`Frame.IsVisibleOptions`>
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+- returns: <[boolean]>
+
+Returns whether the element is [visible](./actionability.mdx#visible). `selector` that does not match any elements is considered not visible.
+
+## Frame.Name()
+- returns: <[string]>
+
+Returns frame's name attribute as specified in the tag.
+
+If the name is empty, returns the id attribute instead.
+
+:::note
+This value is calculated once when the frame is created, and will not update if the attribute is changed later.
+:::
+
+## Frame.Page()
+- returns: <[Page]>
+
+Returns the page containing this frame.
+
+## Frame.ParentFrame()
+- returns: <[null]|[Frame]>
+
+Parent frame, if any. Detached frames and main frames return `null`.
+
+## Frame.Press(selector, key[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
+- `key` <[string]> Name of the key to press or a character to generate, such as `ArrowLeft` or `a`.
+- `options` <`Frame.PressOptions`>
+  - `delay` <[double]> Time to wait between `keydown` and `keyup` in milliseconds. Defaults to 0.
+  - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+
+`key` can specify the intended [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) value or a single character to generate the text for. A superset of the `key` values can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values). Examples of the keys are:
+
+`F1` - `F12`, `Digit0`- `Digit9`, `KeyA`- `KeyZ`, `Backquote`, `Minus`, `Equal`, `Backslash`, `Backspace`, `Tab`, `Delete`, `Escape`, `ArrowDown`, `End`, `Enter`, `Home`, `Insert`, `PageDown`, `PageUp`, `ArrowRight`, `ArrowUp`, etc.
+
+Following modification shortcuts are also supported: `Shift`, `Control`, `Alt`, `Meta`, `ShiftLeft`.
+
+Holding down `Shift` will type the text that corresponds to the `key` in the upper case.
+
+If `key` is a single character, it is case-sensitive, so the values `a` and `A` will generate different respective texts.
+
+Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
+
+## Frame.QuerySelector(selector)
+- `selector` <[string]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
+- returns: <[null]|[ElementHandle]>
+
+Returns the ElementHandle pointing to the frame element.
+
+The method finds an element matching the specified selector within the frame. See [Working with selectors](./selectors.mdx) for more details. If no elements match the selector, returns `null`.
+
+## Frame.QuerySelectorAll(selector)
+- `selector` <[string]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
+- returns: <[IEnumerable]<[ElementHandle]>>
+
+Returns the ElementHandles pointing to the frame elements.
+
+The method finds all elements matching the specified selector within the frame. See [Working with selectors](./selectors.mdx) for more details. If no elements match the selector, returns empty array.
+
+## Frame.SelectOption(selector[, options], values)
+- `selector` <[string]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
+- `options` <`Frame.SelectOptionOptions`>
+  - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+- `values` <[IEnumerable]<`SelectOption`>> Options to select. If the `<select>` has the `multiple` attribute, all matching options are selected, otherwise only the first option matching one of the passed options is selected. String values are equivalent to `{value:'string'}`. Option is considered matching if all specified properties match.
+  - `value` <[string]> Matches by `option.value`. Optional.
+  - `label` <[string]> Matches by `option.label`. Optional.
+  - `index` <[int]> Matches by the index. Optional.
+- returns: <[IEnumerable]<[string]>>
+
+Returns the array of option values that have been successfully selected.
+
+Triggers a `change` and `input` event once all the provided options have been selected. If there's no `<select>` element matching `selector`, the method throws an error.
+
+Will wait until all specified options are present in the `<select>` element.
+
+## Frame.SetContent(html[, options])
+- `html` <[string]> HTML markup to assign to the page.
+- `options` <`Frame.SetContentOptions`>
+  - `timeout` <[double]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaultnavigationtimeouttimeout), [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout), [Page.SetDefaultNavigationTimeout(timeout)](./api/class-page.mdx#pagesetdefaultnavigationtimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+  - `waitUntil` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
+    * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+    * `'load'` - consider operation to be finished when the `load` event is fired.
+    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+
+## Frame.SetInputFiles(selector, files[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
+- `files` <[IEnumerable]<`FilePayload`>>
+  - `name` <[string]> File name
+  - `mimeType` <[string]> File type
+  - `buffer` <[byte&#91;&#93;]> File content
+- `options` <`Frame.SetInputFilesOptions`>
+  - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+
+This method expects `selector` to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input).
+
+Sets the value of the file input to these file paths or files. If some of the `filePaths` are relative paths, then they are resolved relative to the the current working directory. For empty array, clears the selected files.
+
+## Frame.Tap(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
+- `options` <`Frame.TapOptions`>
+  - `force` <[boolean]> Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.
+  - `modifiers` <[IEnumerable]<"Alt"|"Control"|"Meta"|"Shift">> Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used.
+  - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+  - `position` <`Position`> A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+    - `x` <[double]>
+    - `y` <[double]>
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+
+This method taps an element matching `selector` by performing the following steps:
+1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
+1. Wait for [actionability](./actionability.mdx) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
+1. Scroll the element into view if needed.
+1. Use [Page.Touchscreen](./api/class-page.mdx#pagetouchscreen) to tap the center of the element, or the specified `position`.
+1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+
+When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
+
+:::note
+`frame.tap()` requires that the `hasTouch` option of the browser context be set to true.
+:::
+
+## Frame.TextContent(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
+- `options` <`Frame.TextContentOptions`>
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+- returns: <[null]|[string]>
+
+Returns `element.textContent`.
+
+## Frame.Title()
+- returns: <[string]>
+
+Returns the page title.
+
+## Frame.Type(selector, text[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
+- `text` <[string]> A text to type into a focused element.
+- `options` <`Frame.TypeOptions`>
+  - `delay` <[double]> Time to wait between key presses in milliseconds. Defaults to 0.
+  - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+
+Sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in the text. `frame.type` can be used to send fine-grained keyboard events. To fill values in form fields, use [Frame.Fill(selector, value[, options])](./api/class-frame.mdx#framefillselector-value-options).
+
+To press a special key, like `Control` or `ArrowDown`, use [Keyboard.Press(key[, options])](./api/class-keyboard.mdx#keyboardpresskey-options).
+
+## Frame.Uncheck(selector[, options])
+- `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
+- `options` <`Frame.UncheckOptions`>
+  - `force` <[boolean]> Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.
+  - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+
+This method checks an element matching `selector` by performing the following steps:
+1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
+1. Ensure that matched element is a checkbox or a radio input. If not, this method throws. If the element is already unchecked, this method returns immediately.
+1. Wait for [actionability](./actionability.mdx) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
+1. Scroll the element into view if needed.
+1. Use [Page.Mouse](./api/class-page.mdx#pagemouse) to click in the center of the element.
+1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+1. Ensure that the element is now unchecked. If not, this method throws.
+
+When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
+
+## Frame.Url()
+- returns: <[string]>
+
+Returns frame's url.
+
+## Frame.WaitForFunction(expression[, arg, options])
+- `expression` <[string]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
+- `arg` <[object]> Optional argument to pass to `expression`.
+- `options` <`Frame.WaitForFunctionOptions`>
+  - `pollingInterval` <[double]> If specified, then it is treated as an interval in milliseconds at which the function would be executed. By default if the option is not specified `expression` is executed in `requestAnimationFrame` callback.
+  - `timeout` <[double]> maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout).
+- returns: <[JSHandle]>
+
+Returns when the `expression` returns a truthy value, returns that value.
+
+The [Frame.WaitForFunction(expression[, arg, options])](./api/class-frame.mdx#framewaitforfunctionexpression-arg-options) can be used to observe viewport size change:
+
+To pass an argument to the predicate of `frame.waitForFunction` function:
+
+## Frame.WaitForLoadState([state, options])
+- `state` <"load"|"domcontentloaded"|"networkidle"> Optional load state to wait for, defaults to `load`. If the state has been already reached while loading current document, the method resolves immediately. Can be one of:
+  * `'load'` - wait for the `load` event to be fired.
+  * `'domcontentloaded'` - wait for the `DOMContentLoaded` event to be fired.
+  * `'networkidle'` - wait until there are no network connections for at least `500` ms.
+- `options` <`Frame.WaitForLoadStateOptions`>
+  - `timeout` <[double]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaultnavigationtimeouttimeout), [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout), [Page.SetDefaultNavigationTimeout(timeout)](./api/class-page.mdx#pagesetdefaultnavigationtimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+
+Waits for the required load state to be reached.
+
+This returns when the frame reaches a required load state, `load` by default. The navigation must have been committed when this method is called. If current document has already reached the required state, resolves immediately.
+
+## Frame.WaitForNavigation([options])
+- `options` <`Frame.WaitForNavigationOptions`>
+  - `timeout` <[double]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaultnavigationtimeouttimeout), [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout), [Page.SetDefaultNavigationTimeout(timeout)](./api/class-page.mdx#pagesetdefaultnavigationtimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+  - `url` <[string]|[Regex]|[Func]<[string], bool>> A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation.
+  - `waitUntil` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
+    * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+    * `'load'` - consider operation to be finished when the `load` event is fired.
+    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+- returns: <[null]|[Response]>
+
+Waits for the frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
+
+This method waits for the frame to navigate to a new URL. It is useful for when you run code which will indirectly cause the frame to navigate. Consider this example:
+
+:::note
+Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::
+
+## Frame.WaitForSelector(selector[, options])
+- `selector` <[string]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
+- `options` <`Frame.WaitForSelectorOptions`>
+  - `state` <"attached"|"detached"|"visible"|"hidden"> Defaults to `'visible'`. Can be either:
+    * `'attached'` - wait for element to be present in DOM.
+    * `'detached'` - wait for element to not be present in DOM.
+    * `'visible'` - wait for element to have non-empty bounding box and no `visibility:hidden`. Note that element without any content or with `display:none` has an empty bounding box and is not considered visible.
+    * `'hidden'` - wait for element to be either detached from DOM, or have an empty bounding box or `visibility:hidden`. This is opposite to the `'visible'` option.
+  - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+- returns: <[null]|[ElementHandle]>
+
+Returns when element specified by selector satisfies `state` option. Returns `null` if waiting for `hidden` or `detached`.
+
+Wait for the `selector` to satisfy `state` option (either appear/disappear from dom, or become visible/hidden). If at the moment of calling the method `selector` already satisfies the condition, the method will return immediately. If the selector doesn't satisfy the condition for the `timeout` milliseconds, the function will throw.
+
+This method works across navigations:
+
+## Frame.WaitForTimeout(timeout)
+- `timeout` <[double]> A timeout to wait for
+
+Waits for the given `timeout` in milliseconds.
+
+Note that `frame.waitForTimeout()` should only be used for debugging. Tests using the timer in production are going to be flaky. Use signals such as network events, selectors becoming visible and others instead.
+
+## Frame.WaitForURL(url[, options])
+- `url` <[string]|[Regex]|[Func]<[string], bool>> A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation.
+- `options` <`Frame.WaitForURLOptions`>
+  - `timeout` <[double]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaultnavigationtimeouttimeout), [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout), [Page.SetDefaultNavigationTimeout(timeout)](./api/class-page.mdx#pagesetdefaultnavigationtimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+  - `waitUntil` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
+    * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+    * `'load'` - consider operation to be finished when the `load` event is fired.
+    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+
+Waits for the frame to navigate to the given URL.
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[Evaluation Argument]: ./core-concepts.mdx#evaluationargument "Evaluation Argument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[URL]: https://nodejs.org/api/url.html "URL"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
