@@ -358,7 +358,11 @@ Brings page to front (activates tab).
 - `options` <`Page.CheckOptions`>
   - `setForce` <[boolean]> Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.
   - `setNoWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+  - `setPosition` <`Position`> A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+    - `setX` <[double]>
+    - `setY` <[double]>
   - `setTimeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+  - `setTrial` <[boolean]> When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
 This method checks an element matching `selector` by performing the following steps:
 1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -386,6 +390,7 @@ Shortcut for main frame's [Frame.check(selector[, options])](./api/class-frame.m
     - `setX` <[double]>
     - `setY` <[double]>
   - `setTimeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+  - `setTrial` <[boolean]> When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
 This method clicks an element matching `selector` by performing the following steps:
 1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -432,6 +437,7 @@ Get the browser context that the page belongs to.
     - `setX` <[double]>
     - `setY` <[double]>
   - `setTimeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+  - `setTrial` <[boolean]> When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
 This method double clicks an element matching `selector` by performing the following steps:
 1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -822,6 +828,7 @@ Navigate to the next page in history.
     - `setX` <[double]>
     - `setY` <[double]>
   - `setTimeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+  - `setTrial` <[boolean]> When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
 This method hovers over an element matching `selector` by performing the following steps:
 1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -1155,6 +1162,17 @@ page.navigate("https://example.com");
 browser.close();
 ```
 
+It is possible to examine the request to decide the route action. For example, mocking all requests that contain some post data, and leaving all other requests as is:
+
+```java
+page.route("/api/**", route -> {
+  if (route.request().postData().contains("my-string"))
+    route.fulfill(new Route.FulfillOptions().setBody("mocked-data"));
+  else
+    route.resume();
+});
+```
+
 Page routes take precedence over browser context routes (set up with [BrowserContext.route(url, handler)](./api/class-browsercontext.mdx#browsercontextrouteurl-handler)) when request matches both handlers.
 
 To remove a route with its handler you can use [Page.unroute(url[, handler])](./api/class-page.mdx#pageunrouteurl-handler).
@@ -1289,6 +1307,7 @@ page.navigate("https://example.com");
     - `setX` <[double]>
     - `setY` <[double]>
   - `setTimeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+  - `setTrial` <[boolean]> When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
 This method taps an element matching `selector` by performing the following steps:
 1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -1344,7 +1363,11 @@ Shortcut for main frame's [Frame.type(selector, text[, options])](./api/class-fr
 - `options` <`Page.UncheckOptions`>
   - `setForce` <[boolean]> Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.
   - `setNoWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+  - `setPosition` <`Position`> A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+    - `setX` <[double]>
+    - `setY` <[double]>
   - `setTimeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+  - `setTrial` <[boolean]> When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
 This method unchecks an element matching `selector` by performing the following steps:
 1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -1395,7 +1418,7 @@ Performs action and waits for the Page to close.
 - `callback` <[Runnable]> Callback that performs the action triggering the event.
 - returns: <[ConsoleMessage]>
 
-Performs action and waits for a [ConoleMessage] to be logged by in the page. If predicate is provided, it passes [ConsoleMessage] value into the `predicate` function and waits for `predicate(message)` to return a truthy value. Will throw an error if the page is closed before the console event is fired.
+Performs action and waits for a [ConsoleMessage] to be logged by in the page. If predicate is provided, it passes [ConsoleMessage] value into the `predicate` function and waits for `predicate(message)` to return a truthy value. Will throw an error if the page is closed before the console event is fired.
 
 ## Page.waitForDownload([options], callback)
 - `options` <`Page.WaitForDownloadOptions`>
@@ -1524,13 +1547,20 @@ Performs action and waits for a popup [Page]. If predicate is provided, it passe
 - `callback` <[Runnable]> Callback that performs the action triggering the event.
 - returns: <[Request]>
 
-Waits for the matching request and returns it.
+Waits for the matching request and returns it.  See [waiting for event](./events.mdx#waiting-for-event) for more details about events.
 
 ```java
-Request firstRequest = page.waitForRequest("http://example.com/resource");
-Object finalRequest = page.waitForRequest(
-  request -> "http://example.com".equals(request.url()) && "GET".equals(request.method()), () -> {});
-return firstRequest.url();
+// Waits for the next response with the specified url
+Request request = page.waitForRequest("https://example.com/resource", () -> {
+  // Triggers the request
+  page.click("button.triggers-request");
+});
+
+// Waits for the next request matching some conditions
+Request request = page.waitForRequest(request -> "https://example.com".equals(request.url()) && "GET".equals(request.method()), () -> {
+  // Triggers the request
+  page.click("button.triggers-request");
+});
 ```
 
 ## Page.waitForResponse(urlOrPredicate[, options], callback)
@@ -1540,12 +1570,20 @@ return firstRequest.url();
 - `callback` <[Runnable]> Callback that performs the action triggering the event.
 - returns: <[Response]>
 
-Returns the matched response.
+Returns the matched response. See [waiting for event](./events.mdx#waiting-for-event) for more details about events.
 
 ```java
-Response firstResponse = page.waitForResponse("https://example.com/resource", () -> {});
-Response finalResponse = page.waitForResponse(response -> "https://example.com".equals(response.url()) && response.status() == 200, () -> {});
-return finalResponse.ok();
+// Waits for the next response with the specified url
+Response response = page.waitForResponse("https://example.com/resource", () -> {
+  // Triggers the response
+  page.click("button.triggers-response");
+});
+
+// Waits for the next response matching some conditions
+Response response = page.waitForResponse(response -> "https://example.com".equals(response.url()) && response.status() == 200, () -> {
+  // Triggers the response
+  page.click("button.triggers-response");
+});
 ```
 
 ## Page.waitForSelector(selector[, options])

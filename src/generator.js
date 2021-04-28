@@ -86,7 +86,7 @@ class Generator {
   }
 
   /**
-   * @param {Documentation.Class} clazz 
+   * @param {Documentation.Class} clazz
    */
   generateClassDoc(clazz) {
     /** @type {MarkdownNode[]} */
@@ -111,7 +111,7 @@ import TabItem from '@theme/TabItem';
       return k1.localeCompare(k2);
     });
     result.push(...this.generateClassToc(clazz));
-    if (clazz.extends && clazz.extends !== 'EventEmitter' && clazz.extends !== 'Error' && clazz.extends !== 'RuntimeException') {
+    if (clazz.extends && !['EventEmitter', 'Error', 'RuntimeException', 'Exception'].includes(clazz.extends)) {
       const superClass = this.documentation.classes.get(clazz.extends);
       result.push(...this.generateClassToc(superClass));
     }
@@ -230,7 +230,7 @@ ${md.render([spec[i]])}
   }
 
   /**
-   * @param {string} name 
+   * @param {string} name
    */
   generateDoc(name) {
     if (name.includes('-js') || name.includes('-python') || name.includes('-java') || name.includes('-csharp'))
@@ -463,10 +463,10 @@ new Generator('js', path.join(__dirname, '..', 'nodejs', 'docs'), {
     let args = [];
     if (member.kind === 'property')
       text = `${member.clazz.varName}.${member.alias}`;
-  
+
     if (member.kind === 'event')
       text = `${member.clazz.varName}.on('${member.alias.toLowerCase()}')`;
-  
+
     if (member.kind === 'method') {
       args = member.argsArray;
       const signature = renderJSSignature(args);
@@ -496,10 +496,10 @@ new Generator('python', path.join(__dirname, '..', 'python', 'docs'), {
     const args = [];
     if (member.kind === 'property')
       text = `${toSnakeCase(member.clazz.varName)}.${toSnakeCase(member.alias)}`;
-  
+
     if (member.kind === 'event')
       text = `${toSnakeCase(member.clazz.varName)}.on("${member.alias.toLowerCase()}")`;
-  
+
     if (member.kind === 'method') {
       for (const arg of member.argsArray)
         args.push(...expandPythonOptions(arg));
@@ -531,6 +531,8 @@ new Generator('python', path.join(__dirname, '..', 'python', 'docs'), {
       case 'void': return '[NoneType]';
       case 'boolean': return '[bool]';
       case 'string': return '[str]';
+      case 'EvaluationArgument': return '[Dict]';
+      case 'Buffer': return '[bytes]';
     }
     return `[${text}]`;
   },
@@ -542,10 +544,10 @@ new Generator('java', path.join(__dirname, '..', 'java', 'docs'), {
     let args = [];
     if (member.kind === 'property')
       text = `${toTitleCase(member.clazz.varName)}.${member.alias}()`;
-  
+
     if (member.kind === 'event')
       text = `${toTitleCase(member.clazz.varName)}.on${toTitleCase(member.alias)}(handler)`;
-  
+
     if (member.kind === 'method' ) {
       args = member.argsArray;
       const signature = renderJSSignature(args);

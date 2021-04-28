@@ -355,6 +355,17 @@ await page.goto('https://example.com');
 await browser.close();
 ```
 
+It is possible to examine the request to decide the route action. For example, mocking all requests that contain some post data, and leaving all other requests as is:
+
+```js
+await context.route('/api/**', route => {
+  if (route.request().postData().includes('my-string'))
+    route.fulfill({ body: 'mocked-data' });
+  else
+    route.continue();
+});
+```
+
 Page routes (set up with [page.route(url, handler)](./api/class-page.mdx#pagerouteurl-handler)) take precedence over browser context routes when request matches both handlers.
 
 To remove a route with its handler you can use [browserContext.unroute(url[, handler])](./api/class-browsercontext.mdx#browsercontextunrouteurl-handler).

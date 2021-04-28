@@ -713,6 +713,42 @@ await browser.close()
 </TabItem>
 </Tabs>
 
+It is possible to examine the request to decide the route action. For example, mocking all requests that contain some post data, and leaving all other requests as is:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+def handle_route(route):
+  if ("my-string" in route.request.post_data)
+    route.fulfill(body="mocked-data")
+  else
+    route.continue_()
+context.route("/api/**", handle_route)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+def handle_route(route):
+  if ("my-string" in route.request.post_data)
+    route.fulfill(body="mocked-data")
+  else
+    route.continue_()
+await context.route("/api/**", handle_route)
+```
+
+</TabItem>
+</Tabs>
+
 Page routes (set up with [page.route(url, handler)](./api/class-page.mdx#pagerouteurl-handler)) take precedence over browser context routes when request matches both handlers.
 
 To remove a route with its handler you can use [browser_context.unroute(url, **kwargs)](./api/class-browsercontext.mdx#browser_contextunrouteurl-kwargs).
@@ -849,6 +885,7 @@ Waits for given `event` to fire. If predicate is provided, it passes event's val
 [Dialog]: ./api/class-dialog.mdx "Dialog"
 [Download]: ./api/class-download.mdx "Download"
 [ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[Error]: ./api/class-error.mdx "Error"
 [FileChooser]: ./api/class-filechooser.mdx "FileChooser"
 [Frame]: ./api/class-frame.mdx "Frame"
 [JSHandle]: ./api/class-jshandle.mdx "JSHandle"
@@ -878,9 +915,11 @@ Waits for given `event` to fire. If predicate is provided, it passes event's val
 
 [Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
 [bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[bytes]: https://docs.python.org/3/library/stdtypes.html#bytes "bytes"
 [Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
 [EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
 [EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
+[Exception]: https://docs.python.org/3/library/exceptions.html#Exception "Exception"
 [Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
 [float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
