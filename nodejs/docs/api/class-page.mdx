@@ -405,7 +405,11 @@ Brings page to front (activates tab).
 - `options` <[Object]>
   - `force` <[boolean]> Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.
   - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+  - `position` <[Object]> A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+    - `x` <[number]>
+    - `y` <[number]>
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+  - `trial` <[boolean]> When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
 This method checks an element matching `selector` by performing the following steps:
 1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -433,6 +437,7 @@ Shortcut for main frame's [frame.check(selector[, options])](./api/class-frame.m
     - `x` <[number]>
     - `y` <[number]>
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+  - `trial` <[boolean]> When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
 This method clicks an element matching `selector` by performing the following steps:
 1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -479,6 +484,7 @@ Get the browser context that the page belongs to.
     - `x` <[number]>
     - `y` <[number]>
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+  - `trial` <[boolean]> When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
 This method double clicks an element matching `selector` by performing the following steps:
 1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -840,6 +846,7 @@ Shortcut for main frame's [frame.goto(url[, options])](./api/class-frame.mdx#fra
     - `x` <[number]>
     - `y` <[number]>
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+  - `trial` <[boolean]> When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
 This method hovers over an element matching `selector` by performing the following steps:
 1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -1090,6 +1097,17 @@ await page.goto('https://example.com');
 await browser.close();
 ```
 
+It is possible to examine the request to decide the route action. For example, mocking all requests that contain some post data, and leaving all other requests as is:
+
+```js
+await page.route('/api/**', route => {
+  if (route.request().postData().includes('my-string'))
+    route.fulfill({ body: 'mocked-data' });
+  else
+    route.continue();
+});
+```
+
 Page routes take precedence over browser context routes (set up with [browserContext.route(url, handler)](./api/class-browsercontext.mdx#browsercontextrouteurl-handler)) when request matches both handlers.
 
 To remove a route with its handler you can use [page.unroute(url[, handler])](./api/class-page.mdx#pageunrouteurl-handler).
@@ -1231,6 +1249,7 @@ await page.goto('https://example.com');
     - `x` <[number]>
     - `y` <[number]>
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+  - `trial` <[boolean]> When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
 This method taps an element matching `selector` by performing the following steps:
 1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -1284,7 +1303,11 @@ Shortcut for main frame's [frame.type(selector, text[, options])](./api/class-fr
 - `options` <[Object]>
   - `force` <[boolean]> Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.
   - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+  - `position` <[Object]> A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+    - `x` <[number]>
+    - `y` <[number]>
   - `timeout` <[number]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+  - `trial` <[boolean]> When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
 This method unchecks an element matching `selector` by performing the following steps:
 1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -1426,17 +1449,30 @@ Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/Hist
 Shortcut for main frame's [frame.waitForNavigation([options])](./api/class-frame.mdx#framewaitfornavigationoptions).
 
 ## page.waitForRequest(urlOrPredicate[, options])
-- `urlOrPredicate` <[string]|[RegExp]|[function]\([Request]\):[boolean]> Request URL string, regex or predicate receiving [Request] object.
+- `urlOrPredicate` <[string]|[RegExp]|[function]\([Request]\):[boolean]|[Promise]<[boolean]>> Request URL string, regex or predicate receiving [Request] object.
 - `options` <[Object]>
   - `timeout` <[number]> Maximum wait time in milliseconds, defaults to 30 seconds, pass `0` to disable the timeout. The default value can be changed by using the [page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) method.
 - returns: <[Promise]<[Request]>>
 
-Waits for the matching request and returns it.
+Waits for the matching request and returns it.  See [waiting for event](./events.mdx#waiting-for-event) for more details about events.
 
 ```js
-const firstRequest = await page.waitForRequest('http://example.com/resource');
-const finalRequest = await page.waitForRequest(request => request.url() === 'http://example.com' && request.method() === 'GET');
-return firstRequest.url();
+// Note that Promise.all prevents a race condition
+// between clicking and waiting for the request.
+const [request] = await Promise.all([
+  // Waits for the next request with the specified url
+  page.waitForRequest('https://example.com/resource'),
+  // Triggers the request
+  page.click('button.triggers-request'),
+]);
+
+// Alternative way with a predicate.
+const [request] = await Promise.all([
+  // Waits for the next request matching some conditions
+  page.waitForRequest(request => request.url() === 'https://example.com' && request.method() === 'GET'),
+  // Triggers the request
+  page.click('button.triggers-request'),
+]);
 ```
 
 ```js
@@ -1444,17 +1480,30 @@ await page.waitForRequest(request => request.url().searchParams.get('foo') === '
 ```
 
 ## page.waitForResponse(urlOrPredicate[, options])
-- `urlOrPredicate` <[string]|[RegExp]|[function]\([Response]\):[boolean]> Request URL string, regex or predicate receiving [Response] object.
+- `urlOrPredicate` <[string]|[RegExp]|[function]\([Response]\):[boolean]|[Promise]<[boolean]>> Request URL string, regex or predicate receiving [Response] object.
 - `options` <[Object]>
   - `timeout` <[number]> Maximum wait time in milliseconds, defaults to 30 seconds, pass `0` to disable the timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
 - returns: <[Promise]<[Response]>>
 
-Returns the matched response.
+Returns the matched response. See [waiting for event](./events.mdx#waiting-for-event) for more details about events.
 
 ```js
-const firstResponse = await page.waitForResponse('https://example.com/resource');
-const finalResponse = await page.waitForResponse(response => response.url() === 'https://example.com' && response.status() === 200);
-return finalResponse.ok();
+// Note that Promise.all prevents a race condition
+// between clicking and waiting for the response.
+const [response] = await Promise.all([
+  // Waits for the next response with the specified url
+  page.waitForResponse('https://example.com/resource'),
+  // Triggers the response
+  page.click('button.triggers-response'),
+]);
+
+// Alternative way with a predicate.
+const [response] = await Promise.all([
+  // Waits for the next response matching some conditions
+  page.waitForResponse(response => response.url() === 'https://example.com' && response.status() === 200),
+  // Triggers the response
+  page.click('button.triggers-response'),
+]);
 ```
 
 ## page.waitForSelector(selector[, options])

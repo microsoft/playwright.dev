@@ -482,7 +482,11 @@ Brings page to front (activates tab).
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
 - `force` <[bool]> Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.
 - `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+- `position` <[Dict]> A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `x` <[float]>
+  - `y` <[float]>
 - `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.mdx#pageset_default_timeouttimeout) methods.
+- `trial` <[bool]> When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
 This method checks an element matching `selector` by performing the following steps:
 1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -509,6 +513,7 @@ Shortcut for main frame's [frame.check(selector, **kwargs)](./api/class-frame.md
   - `x` <[float]>
   - `y` <[float]>
 - `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.mdx#pageset_default_timeouttimeout) methods.
+- `trial` <[bool]> When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
 This method clicks an element matching `selector` by performing the following steps:
 1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -553,6 +558,7 @@ Get the browser context that the page belongs to.
   - `x` <[float]>
   - `y` <[float]>
 - `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.mdx#pageset_default_timeouttimeout) methods.
+- `trial` <[bool]> When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
 This method double clicks an element matching `selector` by performing the following steps:
 1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -572,7 +578,7 @@ Shortcut for main frame's [frame.dblclick(selector, **kwargs)](./api/class-frame
 ## page.dispatch_event(selector, type, **kwargs)
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
 - `type` <[str]> DOM event type: `"click"`, `"dragstart"`, etc.
-- `event_init` <[EvaluationArgument]> Optional event-specific initialization properties.
+- `event_init` <[Dict]> Optional event-specific initialization properties.
 - `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.mdx#pageset_default_timeouttimeout) methods.
 
 The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the element, `click` is dispatched. This is equivalent to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
@@ -738,7 +744,7 @@ await page.evaluate("matchMedia('(prefers-color-scheme: no-preference)').matches
 ## page.eval_on_selector(selector, expression, **kwargs)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
-- `arg` <[EvaluationArgument]> Optional argument to pass to `expression`.
+- `arg` <[Dict]> Optional argument to pass to `expression`.
 - returns: <[Serializable]>
 
 The method finds an element matching the specified selector within the page and passes it as a first argument to `expression`. If no elements match the selector, the method throws an error. Returns the value of `expression`.
@@ -780,7 +786,7 @@ Shortcut for main frame's [frame.eval_on_selector(selector, expression, **kwargs
 ## page.eval_on_selector_all(selector, expression, **kwargs)
 - `selector` <[str]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
-- `arg` <[EvaluationArgument]> Optional argument to pass to `expression`.
+- `arg` <[Dict]> Optional argument to pass to `expression`.
 - returns: <[Serializable]>
 
 The method finds all elements matching the specified selector within the page and passes an array of matched elements as a first argument to `expression`. Returns the result of `expression` invocation.
@@ -815,7 +821,7 @@ div_counts = await page.eval_on_selector_all("div", "(divs, min) => divs.length 
 
 ## page.evaluate(expression, **kwargs)
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
-- `arg` <[EvaluationArgument]> Optional argument to pass to `expression`.
+- `arg` <[Dict]> Optional argument to pass to `expression`.
 - returns: <[Serializable]>
 
 Returns the value of the `expression` invocation.
@@ -916,7 +922,7 @@ Shortcut for main frame's [frame.evaluate(expression, **kwargs)](./api/class-fra
 
 ## page.evaluate_handle(expression, **kwargs)
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
-- `arg` <[EvaluationArgument]> Optional argument to pass to `expression`.
+- `arg` <[Dict]> Optional argument to pass to `expression`.
 - returns: <[JSHandle]>
 
 Returns the value of the `expression` invocation as a [JSHandle].
@@ -1014,7 +1020,7 @@ await result_handle.dispose()
 - `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout).
 - returns: <[EventContextManager]\[[ConsoleMessage]\]>
 
-Performs action and waits for a [ConoleMessage] to be logged by in the page. If predicate is provided, it passes [ConsoleMessage] value into the `predicate` function and waits for `predicate(message)` to return a truthy value. Will throw an error if the page is closed before the console event is fired.
+Performs action and waits for a [ConsoleMessage] to be logged by in the page. If predicate is provided, it passes [ConsoleMessage] value into the `predicate` function and waits for `predicate(message)` to return a truthy value. Will throw an error if the page is closed before the console event is fired.
 
 ## page.expect_download(**kwargs)
 - `predicate` <[Callable]\[[Download]\]:[bool]> Receives the [Download] object and resolves to truthy value when the waiting should resolve.
@@ -1125,7 +1131,7 @@ Performs action and waits for a popup [Page]. If predicate is provided, it passe
 - `timeout` <[float]> Maximum wait time in milliseconds, defaults to 30 seconds, pass `0` to disable the timeout. The default value can be changed by using the [page.set_default_timeout(timeout)](./api/class-page.mdx#pageset_default_timeouttimeout) method.
 - returns: <[EventContextManager]\[[Request]\]>
 
-Waits for the matching request and returns it.
+Waits for the matching request and returns it.  See [waiting for event](./events.mdx#waiting-for-event) for more details about events.
 
 <Tabs
   groupId="python-flavor"
@@ -1142,6 +1148,7 @@ with page.expect_request("http://example.com/resource") as first:
     page.click('button')
 first_request = first.value
 
+# or with a lambda
 with page.expect_request(lambda request: request.url == "http://example.com" and request.method == "get") as second:
     page.click('img')
 second_request = second.value
@@ -1155,6 +1162,7 @@ async with page.expect_request("http://example.com/resource") as first:
     await page.click('button')
 first_request = await first.value
 
+# or with a lambda
 async with page.expect_request(lambda request: request.url == "http://example.com" and request.method == "get") as second:
     await page.click('img')
 second_request = await second.value
@@ -1168,7 +1176,7 @@ second_request = await second.value
 - `timeout` <[float]> Maximum wait time in milliseconds, defaults to 30 seconds, pass `0` to disable the timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.mdx#pageset_default_timeouttimeout) methods.
 - returns: <[EventContextManager]\[[Response]\]>
 
-Returns the matched response.
+Returns the matched response. See [waiting for event](./events.mdx#waiting-for-event) for more details about events.
 
 <Tabs
   groupId="python-flavor"
@@ -1555,6 +1563,7 @@ Shortcut for main frame's [frame.goto(url, **kwargs)](./api/class-frame.mdx#fram
   - `x` <[float]>
   - `y` <[float]>
 - `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.mdx#pageset_default_timeouttimeout) methods.
+- `trial` <[bool]> When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
 This method hovers over an element matching `selector` by performing the following steps:
 1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -1671,7 +1680,7 @@ This method requires Playwright to be started in a headed mode, with a falsy `he
 - `print_background` <[bool]> Print background graphics. Defaults to `false`.
 - `scale` <[float]> Scale of the webpage rendering. Defaults to `1`. Scale amount must be between 0.1 and 2.
 - `width` <[str]|[float]> Paper width, accepts values labeled with units.
-- returns: <[Buffer]>
+- returns: <[bytes]>
 
 Returns the PDF buffer.
 
@@ -1906,6 +1915,42 @@ await browser.close()
 </TabItem>
 </Tabs>
 
+It is possible to examine the request to decide the route action. For example, mocking all requests that contain some post data, and leaving all other requests as is:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+def handle_route(route):
+  if ("my-string" in route.request.post_data)
+    route.fulfill(body="mocked-data")
+  else
+    route.continue_()
+page.route("/api/**", handle_route)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+def handle_route(route):
+  if ("my-string" in route.request.post_data)
+    route.fulfill(body="mocked-data")
+  else
+    route.continue_()
+await page.route("/api/**", handle_route)
+```
+
+</TabItem>
+</Tabs>
+
 Page routes take precedence over browser context routes (set up with [browser_context.route(url, handler)](./api/class-browsercontext.mdx#browser_contextrouteurl-handler)) when request matches both handlers.
 
 To remove a route with its handler you can use [page.unroute(url, **kwargs)](./api/class-page.mdx#pageunrouteurl-kwargs).
@@ -1926,7 +1971,7 @@ Enabling routing disables http cache.
 - `quality` <[int]> The quality of the image, between 0-100. Not applicable to `png` images.
 - `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.mdx#pageset_default_timeouttimeout) methods.
 - `type` <"png"|"jpeg"> Specify screenshot type, defaults to `png`.
-- returns: <[Buffer]>
+- returns: <[bytes]>
 
 Returns the buffer with the captured screenshot.
 
@@ -2029,7 +2074,7 @@ The extra HTTP headers will be sent with every request the page initiates.
 - `files` <[Union]\[[str], [pathlib.Path]\]|[List]\[[Union]\[[str], [pathlib.Path]\]\]|[Dict]|[List]\[[Dict]\]>
   - `name` <[str]> File name
   - `mimeType` <[str]> File type
-  - `buffer` <[Buffer]> File content
+  - `buffer` <[bytes]> File content
 - `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
 - `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.mdx#pageset_default_timeouttimeout) methods.
 
@@ -2083,6 +2128,7 @@ await page.goto("https://example.com")
   - `x` <[float]>
   - `y` <[float]>
 - `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.mdx#pageset_default_timeouttimeout) methods.
+- `trial` <[bool]> When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
 This method taps an element matching `selector` by performing the following steps:
 1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -2154,7 +2200,11 @@ Shortcut for main frame's [frame.type(selector, text, **kwargs)](./api/class-fra
 - `selector` <[str]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
 - `force` <[bool]> Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.
 - `no_wait_after` <[bool]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+- `position` <[Dict]> A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `x` <[float]>
+  - `y` <[float]>
 - `timeout` <[float]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.mdx#pageset_default_timeouttimeout) methods.
+- `trial` <[bool]> When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
 This method unchecks an element matching `selector` by performing the following steps:
 1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
@@ -2204,7 +2254,7 @@ Waits for given `event` to fire. If predicate is provided, it passes event's val
 
 ## page.wait_for_function(expression, **kwargs)
 - `expression` <[str]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
-- `arg` <[EvaluationArgument]> Optional argument to pass to `expression`.
+- `arg` <[Dict]> Optional argument to pass to `expression`.
 - `polling` <[float]|"raf"> If `polling` is `'raf'`, then `expression` is constantly executed in `requestAnimationFrame` callback. If `polling` is a number, then it is treated as an interval in milliseconds at which the function would be executed. Defaults to `raf`.
 - `timeout` <[float]> maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout).
 - returns: <[JSHandle]>
@@ -2537,6 +2587,7 @@ This does not contain ServiceWorkers
 [Dialog]: ./api/class-dialog.mdx "Dialog"
 [Download]: ./api/class-download.mdx "Download"
 [ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[Error]: ./api/class-error.mdx "Error"
 [FileChooser]: ./api/class-filechooser.mdx "FileChooser"
 [Frame]: ./api/class-frame.mdx "Frame"
 [JSHandle]: ./api/class-jshandle.mdx "JSHandle"
@@ -2566,9 +2617,11 @@ This does not contain ServiceWorkers
 
 [Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
 [bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[bytes]: https://docs.python.org/3/library/stdtypes.html#bytes "bytes"
 [Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
 [EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
 [EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
+[Exception]: https://docs.python.org/3/library/exceptions.html#Exception "Exception"
 [Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
 [float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
 [int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
