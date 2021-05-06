@@ -392,7 +392,7 @@ Shortcut for main frame's [Frame.DblClickAsync(selector[, options])](./api/class
 ## Page.DispatchEvent(selector, type[, eventInit, options])
 - `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
 - `type` <[string]> DOM event type: `"click"`, `"dragstart"`, etc.
-- `eventInit` <[object]> Optional event-specific initialization properties.
+- `eventInit` <[EvaluationArgument]> Optional event-specific initialization properties.
 - `options` <`Page.DispatchEventOptions`>
   - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
 
@@ -416,10 +416,12 @@ You can also specify `JSHandle` as the property value if you want live objects t
   - `colorScheme` <[null]|"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. Passing `null` disables color scheme emulation.
   - `media` <[null]|"screen"|"print"> Changes the CSS media type of the page. The only allowed values are `'screen'`, `'print'` and `null`. Passing `null` disables CSS media emulation.
 
+This method changes the `CSS media type` through the `media` argument, and/or the `'prefers-colors-scheme'` media feature, using the `colorScheme` argument.
+
 ## Page.EvalOnSelector(selector, expression[, arg])
 - `selector` <[string]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
 - `expression` <[string]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
-- `arg` <[object]> Optional argument to pass to `expression`.
+- `arg` <[EvaluationArgument]> Optional argument to pass to `expression`.
 - returns: <[object]>
 
 The method finds an element matching the specified selector within the page and passes it as a first argument to `expression`. If no elements match the selector, the method throws an error. Returns the value of `expression`.
@@ -433,7 +435,7 @@ Shortcut for main frame's [Frame.EvalOnSelector(selector, expression[, arg])](./
 ## Page.EvalOnSelectorAll(selector, expression[, arg])
 - `selector` <[string]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
 - `expression` <[string]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
-- `arg` <[object]> Optional argument to pass to `expression`.
+- `arg` <[EvaluationArgument]> Optional argument to pass to `expression`.
 - returns: <[object]>
 
 The method finds all elements matching the specified selector within the page and passes an array of matched elements as a first argument to `expression`. Returns the result of `expression` invocation.
@@ -444,7 +446,7 @@ Examples:
 
 ## Page.Evaluate(expression[, arg])
 - `expression` <[string]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
-- `arg` <[object]> Optional argument to pass to `expression`.
+- `arg` <[EvaluationArgument]> Optional argument to pass to `expression`.
 - returns: <[object]>
 
 Returns the value of the `expression` invocation.
@@ -463,7 +465,7 @@ Shortcut for main frame's [Frame.Evaluate(expression[, arg])](./api/class-frame.
 
 ## Page.EvaluateHandle(expression[, arg])
 - `expression` <[string]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
-- `arg` <[object]> Optional argument to pass to `expression`.
+- `arg` <[EvaluationArgument]> Optional argument to pass to `expression`.
 - returns: <[JSHandle]>
 
 Returns the value of the `expression` invocation as a [JSHandle].
@@ -519,11 +521,13 @@ An example of adding an `sha1` function to the page:
   - `noWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
   - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
 
-This method waits for an element matching `selector`, waits for [actionability](./actionability.mdx) checks, focuses the element, fills it and triggers an `input` event after filling. If the element is inside the `<label>` element that has associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), that control will be filled instead. If the element to be filled is not an `<input>`, `<textarea>` or `[contenteditable]` element, this method throws an error. Note that you can pass an empty string to clear the input field.
+This method waits for an element matching `selector`, waits for [actionability](./actionability.mdx) checks, focuses the element, fills it and triggers an `input` event after filling. Note that you can pass an empty string to clear the input field.
+
+If the target element is not an `<input>`, `<textarea>` or `[contenteditable]` element, this method throws an error. However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), the control will be filled instead.
 
 To send fine-grained keyboard events, use [Page.Type(selector, text[, options])](./api/class-page.mdx#pagetypeselector-text-options).
 
-Shortcut for main frame's [Frame.Fill(selector, value[, options])](./api/class-frame.mdx#framefillselector-value-options)
+Shortcut for main frame's [Frame.Fill(selector, value[, options])](./api/class-frame.mdx#framefillselector-value-options).
 
 ## Page.Focus(selector[, options])
 - `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
@@ -900,13 +904,15 @@ Returns the buffer with the captured screenshot.
   - `index` <[int]> Matches by the index. Optional.
 - returns: <[IEnumerable]<[string]>>
 
+This method waits for an element matching `selector`, waits for [actionability](./actionability.mdx) checks, waits until all specified options are present in the `<select>` element and selects these options.
+
+If the target element is not a `<select>` element, this method throws an error. However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), the control will be used instead.
+
 Returns the array of option values that have been successfully selected.
 
-Triggers a `change` and `input` event once all the provided options have been selected. If there's no `<select>` element matching `selector`, the method throws an error.
+Triggers a `change` and `input` event once all the provided options have been selected.
 
-Will wait until all specified options are present in the `<select>` element.
-
-Shortcut for main frame's [Frame.SelectOption(selector[, options], values)](./api/class-frame.mdx#frameselectoptionselector-options-values)
+Shortcut for main frame's [Frame.SelectOption(selector[, options], values)](./api/class-frame.mdx#frameselectoptionselector-options-values).
 
 ## Page.SetContent(html[, options])
 - `html` <[string]> HTML markup to assign to the page.
@@ -1113,7 +1119,7 @@ Performs action and waits for a new [FileChooser] to be created. If predicate is
 
 ## Page.WaitForFunction(expression[, arg, options])
 - `expression` <[string]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
-- `arg` <[object]> Optional argument to pass to `expression`.
+- `arg` <[EvaluationArgument]> Optional argument to pass to `expression`.
 - `options` <`Page.WaitForFunctionOptions`>
   - `pollingInterval` <[double]> If specified, then it is treated as an interval in milliseconds at which the function would be executed. By default if the option is not specified `expression` is executed in `requestAnimationFrame` callback.
   - `timeout` <[double]> maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout).
@@ -1287,7 +1293,7 @@ This does not contain ServiceWorkers
 [WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"
 [Worker]: ./api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[Evaluation Argument]: ./core-concepts.mdx#evaluationargument "Evaluation Argument"
+[EvaluationArgument]: ./core-concepts.mdx#evaluation-argument "EvaluationArgument"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"

@@ -1,5 +1,5 @@
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[Evaluation Argument]: ./core-concepts.md#evaluationargument "Evaluation Argument"
+[EvaluationArgument]: ./core-concepts.md#evaluation-argument "EvaluationArgument"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"

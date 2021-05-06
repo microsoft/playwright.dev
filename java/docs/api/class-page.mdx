@@ -165,7 +165,7 @@ The arguments passed into `console.log` appear as arguments on the event handler
 An example of handling `console` event:
 
 ```java
-page.onConsole(msg -> {
+page.onConsoleMessage(msg -> {
   for (int i = 0; i < msg.args().size(); ++i)
     System.out.println(i + ": " + msg.args().get(i).jsonValue());
 });
@@ -457,7 +457,7 @@ Shortcut for main frame's [Frame.dblclick(selector[, options])](./api/class-fram
 ## Page.dispatchEvent(selector, type[, eventInit, options])
 - `selector` <[String]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
 - `type` <[String]> DOM event type: `"click"`, `"dragstart"`, etc.
-- `eventInit` <[Object]> Optional event-specific initialization properties.
+- `eventInit` <[EvaluationArgument]> Optional event-specific initialization properties.
 - `options` <`Page.DispatchEventOptions`>
   - `setTimeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
 
@@ -493,6 +493,8 @@ page.dispatchEvent("#source", "dragstart", arg);
   - `setColorScheme` <[null]|`enum ColorScheme { LIGHT, DARK, NO_PREFERENCE }`> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. Passing `null` disables color scheme emulation.
   - `setMedia` <[null]|`enum Media { SCREEN, PRINT }`> Changes the CSS media type of the page. The only allowed values are `'screen'`, `'print'` and `null`. Passing `null` disables CSS media emulation.
 
+This method changes the `CSS media type` through the `media` argument, and/or the `'prefers-colors-scheme'` media feature, using the `colorScheme` argument.
+
 ```java
 page.evaluate("() => matchMedia('screen').matches");
 // → true
@@ -525,7 +527,7 @@ page.evaluate("() => matchMedia('(prefers-color-scheme: no-preference)').matches
 ## Page.evalOnSelector(selector, expression[, arg])
 - `selector` <[String]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
 - `expression` <[String]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
-- `arg` <[Object]> Optional argument to pass to `expression`.
+- `arg` <[EvaluationArgument]> Optional argument to pass to `expression`.
 - returns: <[Object]>
 
 The method finds an element matching the specified selector within the page and passes it as a first argument to `expression`. If no elements match the selector, the method throws an error. Returns the value of `expression`.
@@ -545,7 +547,7 @@ Shortcut for main frame's [Frame.evalOnSelector(selector, expression[, arg])](./
 ## Page.evalOnSelectorAll(selector, expression[, arg])
 - `selector` <[String]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
 - `expression` <[String]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
-- `arg` <[Object]> Optional argument to pass to `expression`.
+- `arg` <[EvaluationArgument]> Optional argument to pass to `expression`.
 - returns: <[Object]>
 
 The method finds all elements matching the specified selector within the page and passes an array of matched elements as a first argument to `expression`. Returns the result of `expression` invocation.
@@ -560,7 +562,7 @@ boolean divCounts = (boolean) page.evalOnSelectorAll("div", "(divs, min) => divs
 
 ## Page.evaluate(expression[, arg])
 - `expression` <[String]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
-- `arg` <[Object]> Optional argument to pass to `expression`.
+- `arg` <[EvaluationArgument]> Optional argument to pass to `expression`.
 - returns: <[Object]>
 
 Returns the value of the `expression` invocation.
@@ -596,7 +598,7 @@ Shortcut for main frame's [Frame.evaluate(expression[, arg])](./api/class-frame.
 
 ## Page.evaluateHandle(expression[, arg])
 - `expression` <[String]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
-- `arg` <[Object]> Optional argument to pass to `expression`.
+- `arg` <[EvaluationArgument]> Optional argument to pass to `expression`.
 - returns: <[JSHandle]>
 
 Returns the value of the `expression` invocation as a [JSHandle].
@@ -744,11 +746,13 @@ public class Example {
   - `setNoWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
   - `setTimeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
 
-This method waits for an element matching `selector`, waits for [actionability](./actionability.mdx) checks, focuses the element, fills it and triggers an `input` event after filling. If the element is inside the `<label>` element that has associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), that control will be filled instead. If the element to be filled is not an `<input>`, `<textarea>` or `[contenteditable]` element, this method throws an error. Note that you can pass an empty string to clear the input field.
+This method waits for an element matching `selector`, waits for [actionability](./actionability.mdx) checks, focuses the element, fills it and triggers an `input` event after filling. Note that you can pass an empty string to clear the input field.
+
+If the target element is not an `<input>`, `<textarea>` or `[contenteditable]` element, this method throws an error. However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), the control will be filled instead.
 
 To send fine-grained keyboard events, use [Page.type(selector, text[, options])](./api/class-page.mdx#pagetypeselector-text-options).
 
-Shortcut for main frame's [Frame.fill(selector, value[, options])](./api/class-frame.mdx#framefillselector-value-options)
+Shortcut for main frame's [Frame.fill(selector, value[, options])](./api/class-frame.mdx#framefillselector-value-options).
 
 ## Page.focus(selector[, options])
 - `selector` <[String]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
@@ -1209,11 +1213,13 @@ Returns the buffer with the captured screenshot.
   - `setTimeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.setDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
 - returns: <[List]<[String]>>
 
+This method waits for an element matching `selector`, waits for [actionability](./actionability.mdx) checks, waits until all specified options are present in the `<select>` element and selects these options.
+
+If the target element is not a `<select>` element, this method throws an error. However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), the control will be used instead.
+
 Returns the array of option values that have been successfully selected.
 
-Triggers a `change` and `input` event once all the provided options have been selected. If there's no `<select>` element matching `selector`, the method throws an error.
-
-Will wait until all specified options are present in the `<select>` element.
+Triggers a `change` and `input` event once all the provided options have been selected.
 
 ```java
 // single selection matching the value
@@ -1224,7 +1230,7 @@ page.selectOption("select#colors", new SelectOption().setLabel("Blue"));
 page.selectOption("select#colors", new String[] {"red", "green", "blue"});
 ```
 
-Shortcut for main frame's [Frame.selectOption(selector, values[, options])](./api/class-frame.mdx#frameselectoptionselector-values-options)
+Shortcut for main frame's [Frame.selectOption(selector, values[, options])](./api/class-frame.mdx#frameselectoptionselector-values-options).
 
 ## Page.setContent(html[, options])
 - `html` <[String]> HTML markup to assign to the page.
@@ -1440,7 +1446,7 @@ Performs action and waits for a new [FileChooser] to be created. If predicate is
 
 ## Page.waitForFunction(expression[, arg, options])
 - `expression` <[String]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
-- `arg` <[Object]> Optional argument to pass to `expression`.
+- `arg` <[EvaluationArgument]> Optional argument to pass to `expression`.
 - `options` <`Page.WaitForFunctionOptions`>
   - `setPollingInterval` <[double]> If specified, then it is treated as an interval in milliseconds at which the function would be executed. By default if the option is not specified `expression` is executed in `requestAnimationFrame` callback.
   - `setTimeout` <[double]> maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout).
@@ -1717,7 +1723,7 @@ This does not contain ServiceWorkers
 [WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"
 [Worker]: ./api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[Evaluation Argument]: ./core-concepts.mdx#evaluationargument "Evaluation Argument"
+[EvaluationArgument]: ./core-concepts.mdx#evaluation-argument "EvaluationArgument"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"

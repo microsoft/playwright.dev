@@ -531,7 +531,6 @@ new Generator('python', path.join(__dirname, '..', 'python', 'docs'), {
       case 'void': return '[NoneType]';
       case 'boolean': return '[bool]';
       case 'string': return '[str]';
-      case 'EvaluationArgument': return '[Dict]';
       case 'Buffer': return '[bytes]';
     }
     return `[${text}]`;
@@ -608,7 +607,6 @@ new Generator('java', path.join(__dirname, '..', 'java', 'docs'), {
       case 'string': return '[String]';
       // Escape '[' and ']' so that they don't break markdown links like [byte[]](link)
       case 'Buffer': return '[byte&#91;&#93;]';
-      case 'EvaluationArgument': return '[Object]';
       case 'Readable': return '[InputStream]';
       case 'Serializable': return '[Object]';
       case 'URL': return '[String]';
@@ -689,7 +687,6 @@ new Generator('csharp', path.join(__dirname, '..', 'csharp', 'docs'), {
       case 'string': return '[string]';
       // Escape '[' and ']' so that they don't break markdown links like [byte[]](link)
       case 'Buffer': return '[byte&#91;&#93;]';
-      case 'EvaluationArgument': return '[object]';
       case 'Readable': return '[Stream]';
       case 'Serializable': return '[object]';
       case 'URL': return '[string]';
