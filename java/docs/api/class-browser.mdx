@@ -30,6 +30,8 @@ public class Example {
 - [Browser.isConnected()](./api/class-browser.mdx#browserisconnected)
 - [Browser.newContext([options])](./api/class-browser.mdx#browsernewcontextoptions)
 - [Browser.newPage([options])](./api/class-browser.mdx#browsernewpageoptions)
+- [Browser.startTracing([page, options])](./api/class-browser.mdx#browserstarttracingpage-options)
+- [Browser.stopTracing()](./api/class-browser.mdx#browserstoptracing)
 - [Browser.version()](./api/class-browser.mdx#browserversion)
 
 ## Browser.onDisconnected(handler)
@@ -85,7 +87,7 @@ Indicates that the browser is connected.
   - `setLocale` <[String]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
   - `setOffline` <[boolean]> Whether to emulate network being offline. Defaults to `false`.
   - `setPermissions` <[List]<[String]>> A list of permissions to grant to all pages in this context. See [BrowserContext.grantPermissions(permissions[, options])](./api/class-browsercontext.mdx#browsercontextgrantpermissionspermissions-options) for more details.
-  - `setProxy` <`Proxy`> Network proxy settings to use with this context. Note that browser needs to be launched with the global proxy for this option to work. If all contexts override the proxy, global proxy will be never used and can be any string, for example `launch({ proxy: { server: 'per-context' } })`.
+  - `setProxy` <`Proxy`> Network proxy settings to use with this context.
     - `setServer` <[String]> Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
     - `setBypass` <[String]> Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
     - `setUsername` <[String]> Optional username to use if HTTP proxy requires authentication.
@@ -140,7 +142,7 @@ page.navigate('https://example.com');
   - `setLocale` <[String]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
   - `setOffline` <[boolean]> Whether to emulate network being offline. Defaults to `false`.
   - `setPermissions` <[List]<[String]>> A list of permissions to grant to all pages in this context. See [BrowserContext.grantPermissions(permissions[, options])](./api/class-browsercontext.mdx#browsercontextgrantpermissionspermissions-options) for more details.
-  - `setProxy` <`Proxy`> Network proxy settings to use with this context. Note that browser needs to be launched with the global proxy for this option to work. If all contexts override the proxy, global proxy will be never used and can be any string, for example `launch({ proxy: { server: 'per-context' } })`.
+  - `setProxy` <`Proxy`> Network proxy settings to use with this context.
     - `setServer` <[String]> Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
     - `setBypass` <[String]> Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
     - `setUsername` <[String]> Optional username to use if HTTP proxy requires authentication.
@@ -166,6 +168,35 @@ page.navigate('https://example.com');
 Creates a new page in a new browser context. Closing this page will close the context as well.
 
 This is a convenience API that should only be used for the single-page scenarios and short snippets. Production code and testing frameworks should explicitly create [Browser.newContext([options])](./api/class-browser.mdx#browsernewcontextoptions) followed by the [BrowserContext.newPage()](./api/class-browsercontext.mdx#browsercontextnewpage) to control their exact life times.
+
+## Browser.startTracing([page, options])
+- `page` <[Page]> Optional, if specified, tracing includes screenshots of the given page.
+- `options` <`Browser.StartTracingOptions`>
+  - `setCategories` <[List]<[String]>> specify custom categories to use instead of default.
+  - `setPath` <[Path]> A path to write the trace file to.
+  - `setScreenshots` <[boolean]> captures screenshots in the trace.
+
+:::note
+Tracing is only supported on Chromium-based browsers.
+:::
+
+You can use [Browser.startTracing([page, options])](./api/class-browser.mdx#browserstarttracingpage-options) and [Browser.stopTracing()](./api/class-browser.mdx#browserstoptracing) to create a trace file that can be opened in Chrome DevTools performance panel.
+
+```java
+browser.startTracing(page, new Browser.StartTracingOptions()
+  .setPath(Paths.get("trace.json")));
+page.goto('https://www.google.com');
+browser.stopTracing();
+```
+
+## Browser.stopTracing()
+- returns: <[byte&#91;&#93;]>
+
+:::note
+Tracing is only supported on Chromium-based browsers.
+:::
+
+Returns the buffer with trace data.
 
 ## Browser.version()
 - returns: <[String]>
