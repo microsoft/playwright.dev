@@ -21,7 +21,6 @@ const path = require('path');
 const md = require('./markdown');
 const { parseApi } = require('./api_parser');
 const Documentation = require('./documentation');
-const { Member } = require('./documentation');
 
 /** @typedef {import('./documentation').Type} Type */
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
@@ -124,7 +123,7 @@ import TabItem from '@theme/TabItem';
       memberNode.children.push(...args.map(a => this.renderProperty(`\`${this.config.formatArgumentName(a.alias)}\``, a, a.spec, 'in')));
 
       // Append type
-      if (member.type && member.type.name !== 'void') {
+      if (member.type && (member.type.name !== 'void' || member.kind === 'method')) {
         let name;
         switch (member.kind) {
           case 'event': name = 'type:'; break;
