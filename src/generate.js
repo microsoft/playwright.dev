@@ -26,4 +26,4 @@ const { CSharpFormatter } = require('./format_csharp');
 new Generator('js', path.join(__dirname, '..', 'nodejs', 'docs'), new JavaScriptFormatter());
 new Generator('python', path.join(__dirname, '..', 'python', 'docs'), new PythonFormatter());
 new Generator('java', path.join(__dirname, '..', 'java', 'docs'), new JavaFormatter());
-new Generator('csharp', path.join(__dirname, '..', 'csharp', 'docs'), new CSharpFormatter());
+new Generator('csharp', path.join(__dirname, '..', 'dotnet', 'docs'), new CSharpFormatter());
