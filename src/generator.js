@@ -28,6 +28,18 @@ const Documentation = require('./documentation');
 const DIR_SRC = path.join(process.env.SRC_DIR, 'docs', 'src');
 const commonSnippets = new Set(['html', 'xml', 'yml', 'yaml', 'json', 'groovy', 'html', 'sh']);
 
+/**
+ * @typedef {{
+ *   formatMember: function(Documentation.Member): { text: string, args: Documentation.Member[] },
+ *   formatArgumentName: function(string): string,
+ *   formatTemplate: function(string): string,
+ *   formatFunction: function(string, string, Documentation.Type): string,
+ *   formatPromise: function(string): string,
+ *   preprocessComment: function(MarkdownNode[]): MarkdownNode[]
+ *   renderType: function(Documentation.Type, string, Documentation.Member): string,
+ * }} GeneratorFormatter
+ */
+
 class Generator {
   links = new Map();
   rLinks = new Map();
@@ -35,30 +47,23 @@ class Generator {
   /**
    * @param {string} lang
    * @param {string} outDir
-   * @param {{
-   *   formatMember: function(Documentation.Member): { text: string, args: Documentation.Member[] },
-   *   formatArgumentName: function(string): string,
-   *   formatTemplate: function(string): string,
-   *   formatFunction: function(string, string, Documentation.Type): string,
-   *   formatPromise: function(string): string,
-   *   renderType: function(Documentation.Type, string, Documentation.Member): string,
-   * }} config
+   * @param {GeneratorFormatter} formatter
    */
-  constructor(lang, outDir, config) {
+  constructor(lang, outDir, formatter) {
     this.lang = lang;
     this.outDir = outDir;
     /** @type {Set<string>} */
     this.sourceFiles = new Set();
     listFiles(DIR_SRC, DIR_SRC, this.sourceFiles);
-    this.config = config;
+    this.formatter = formatter;
     this.documentation = parseApi(path.join(DIR_SRC, 'api'));
     this.documentation.filterForLanguage(lang);
     this.documentation.setLinkRenderer(item => {
       const { clazz, member, param, option } = item;
       if (param)
-        return `\`${config.formatArgumentName(param)}\``;
+        return `\`${formatter.formatArgumentName(param)}\``;
       if (option)
-        return `\`${config.formatArgumentName(option)}\``;
+        return `\`${formatter.formatArgumentName(option)}\``;
       if (clazz)
         return `[${clazz.name}]`;
       return this.createMemberLink(member);
@@ -118,9 +123,9 @@ import TabItem from '@theme/TabItem';
       // Iterate members
       /** @type {MarkdownNode} */
       const memberNode = { type: 'h2', children: [] };
-      const { text, args } = this.config.formatMember(member);
+      const { text, args } = this.formatter.formatMember(member);
       memberNode.text = text;
-      memberNode.children.push(...args.map(a => this.renderProperty(`\`${this.config.formatArgumentName(a.alias)}\``, a, a.spec, 'in')));
+      memberNode.children.push(...args.map(a => this.renderProperty(`\`${this.formatter.formatArgumentName(a.alias)}\``, a, a.spec, 'in')));
 
       // Append type
       if (member.type && (member.type.name !== 'void' || member.kind === 'method')) {
@@ -156,49 +161,7 @@ import TabItem from '@theme/TabItem';
    * @return {MarkdownNode[]}
    */
   formatComment(spec) {
-    if (this.lang === 'python') {
-      /** @type {MarkdownNode[]} */
-      const newSpec = [];
-      for (let i = 0; i < spec.length; ++i) {
-        if (spec[i].codeLang === 'python async') {
-          if (spec[i + 1].codeLang !== 'python sync') {
-            console.error(spec[i]);
-            throw new Error('Bad Python snippet pair');
-          }
-          spec[i].codeLang = 'py';
-          spec[i + 1].codeLang = 'py';
-          const text = `<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-${md.render([spec[i+1]])}
-</TabItem>
-<TabItem value="async">
-${md.render([spec[i]])}
-</TabItem>
-</Tabs>`;
-          newSpec.push({
-            type: 'text',
-            text
-          });
-          ++i;
-        } else {
-          newSpec.push(spec[i]);
-        }
-      }
-      spec = newSpec;
-    } else if (this.lang === 'java') {
-      spec = spec.filter(n => !n.text || !n.text.startsWith('extends: [EventEmitter]'));
-      spec.forEach(n => {
-        if (n.text === 'extends: [Error]')
-          n.text = 'extends: [PlaywrightException]';
-      });
-    }
+    spec = this.formatter.preprocessComment(spec);
     spec = spec.filter(c => {
       // No lang or common lang - Ok.
       if (!c.codeLang || commonSnippets.has(c.codeLang))
@@ -309,7 +272,7 @@ import TabItem from '@theme/TabItem';`);
    */
   createMemberLink(member) {
     const file = `./api/class-${member.clazz.name.toLowerCase()}.md`;
-    return this.createLink(file, this.config.formatMember(member).text);
+    return this.createLink(file, this.formatter.formatMember(member).text);
   }
 
   /**
@@ -355,7 +318,7 @@ import TabItem from '@theme/TabItem';`);
 
     let typeText = this.renderType(type, direction, member);
     if (async)
-      typeText = this.config.formatPromise(typeText);
+      typeText = this.formatter.formatPromise(typeText);
 
     /** @type {MarkdownNode} */
     const result = {
@@ -382,9 +345,9 @@ import TabItem from '@theme/TabItem';`);
       return type.union.map(l => this.renderType(l, direction, member)).join('|');
     }
     if (type.templates)
-      return `${this.renderTypeName(type, direction, member)}${this.config.formatTemplate(type.templates.map(l => this.renderType(l, direction, member)).join(', '))}`;
+      return `${this.renderTypeName(type, direction, member)}${this.formatter.formatTemplate(type.templates.map(l => this.renderType(l, direction, member)).join(', '))}`;
     if (type.args)
-      return `${this.config.formatFunction(type.args.map(l => this.renderType(l, direction, member)).join(', '), type.returnType ? ':' + this.renderType(type.returnType, direction, member) : '', type)}`;
+      return `${this.formatter.formatFunction(type.args.map(l => this.renderType(l, direction, member)).join(', '), type.returnType ? ':' + this.renderType(type.returnType, direction, member) : '', type)}`;
     if (type.name.startsWith('"'))
       return type.name;
     return `${this.renderTypeName(type, direction, member)}`;
@@ -396,7 +359,7 @@ import TabItem from '@theme/TabItem';`);
    * @param {Documentation.Member} member
    */
   renderTypeName(type, direction, member) {
-    return this.config.renderType(type, direction, member);
+    return this.formatter.renderType(type, direction, member);
   }
 }
 
@@ -438,278 +401,6 @@ function renderJSSignature(args) {
 }
 
 /**
- * @param {Documentation.Member[]} args
- * @return {string}
- */
-function renderPythonSignature(args) {
-  const argNames = args.filter(a => a.required).map(a => toSnakeCase(a.name));
-  if (args.find(a => !a.required))
-    argNames.push('**kwargs');
-  return argNames.join(', ');
-}
-
-/**
- * @param {Documentation.Member} arg
- * @return {Documentation.Member[]}
- */
-function expandPythonOptions(arg) {
-  return arg.name == 'options' ? arg.type.properties : [arg];
-}
-
-new Generator('js', path.join(__dirname, '..', 'nodejs', 'docs'), {
-  formatMember: member => {
-    let text;
-    let args = [];
-    if (member.kind === 'property')
-      text = `${member.clazz.varName}.${member.alias}`;
-
-    if (member.kind === 'event')
-      text = `${member.clazz.varName}.on('${member.alias.toLowerCase()}')`;
-
-    if (member.kind === 'method') {
-      args = member.argsArray;
-      const signature = renderJSSignature(args);
-      text = `${member.clazz.varName}.${member.alias}(${signature})`;
-    }
-    return { text, args };
-  },
-  formatArgumentName: name => name,
-  formatTemplate: text => `<${text}>`,
-  formatFunction: (args, ret) => `[function]\\(${args}\\)${ret}`,
-  formatPromise: text => `[Promise]<${text}>`,
-  renderType: type => {
-    const text = type.name;
-    switch (text) {
-      case 'int': return '[number]';
-      case 'float': return '[number]';
-      case 'path': return '[string]';
-      case 'any': return '[Object]';
-    }
-    return `[${text}]`;
-  },
-});
-
-new Generator('python', path.join(__dirname, '..', 'python', 'docs'), {
-  formatMember: member => {
-    let text;
-    const args = [];
-    if (member.kind === 'property')
-      text = `${toSnakeCase(member.clazz.varName)}.${toSnakeCase(member.alias)}`;
-
-    if (member.kind === 'event')
-      text = `${toSnakeCase(member.clazz.varName)}.on("${member.alias.toLowerCase()}")`;
-
-    if (member.kind === 'method') {
-      for (const arg of member.argsArray)
-        args.push(...expandPythonOptions(arg));
-      const signature = renderPythonSignature(args);
-      let isGetter = !signature && !member.async && !!member.type;
-      if (member.name.startsWith('is') || member.name.startsWith('as'))
-        isGetter = false;
-      if (isGetter)
-        text = `${toSnakeCase(member.clazz.varName)}.${toSnakeCase(member.alias)}`;
-      else
-        text = `${toSnakeCase(member.clazz.varName)}.${toSnakeCase(member.alias)}(${signature})`;
-    }
-    return { text, args };
-  },
-  formatArgumentName: name => toSnakeCase(name),
-  formatTemplate: text => `\\[${text}\\]`,
-  formatFunction: (args, ret) => `[Callable]\\[${args}\\]${ret}`,
-  formatPromise: text => text,
-  renderType: (type, direction) => {
-    const text = type.name;
-    switch (text) {
-      case 'RegExp': return '[Pattern]';
-      case 'any': return '[Any]';
-      case 'function': return '[Callable]';
-      case 'path': return direction === 'out' ? '[pathlib.Path]' : '[Union]\\[[str], [pathlib.Path]\\]';
-      case 'Array': return '[List]';
-      case 'Object': return '[Dict]';
-      case 'null': return '[NoneType]';
-      case 'void': return '[NoneType]';
-      case 'boolean': return '[bool]';
-      case 'string': return '[str]';
-      case 'Buffer': return '[bytes]';
-    }
-    return `[${text}]`;
-  },
-});
-
-new Generator('java', path.join(__dirname, '..', 'java', 'docs'), {
-  formatMember: member => {
-    let text;
-    let args = [];
-    if (member.kind === 'property')
-      text = `${toTitleCase(member.clazz.varName)}.${member.alias}()`;
-
-    if (member.kind === 'event')
-      text = `${toTitleCase(member.clazz.varName)}.on${toTitleCase(member.alias)}(handler)`;
-
-    if (member.kind === 'method' ) {
-      args = member.argsArray;
-      const signature = renderJSSignature(args);
-      text = `${toTitleCase(member.clazz.varName)}.${member.alias}(${signature})`;
-    }
-    return { text, args };
-  },
-  formatArgumentName: name => name,
-  formatTemplate: text => `<${text}>`,
-  formatFunction: (args, ret, type) => {
-    if (type.args.length !== 1)
-      throw new Error('Unsupported number of arguments in function: ' + type);
-    if (!type.returnType)
-      return "[Consumer]<" + args + ">";
-    if (type.returnType.name === 'boolean')
-      return "[Predicate]<" + args + ">";
-    throw new Error('Unknown java type for function: ' + type);
-  },
-  formatPromise: text => text,
-  renderType: (type, direction, member) => {
-    if (member.kind === 'property' && member.name === 'options') {
-      const method = member.enclosingMethod;
-      return `\`${toTitleCase(method.clazz.varName)}.${toTitleCase(method.alias)}Options\``;
-    }
-    const text = type.name;
-    switch (text) {
-      case 'any': return '[Object]';
-      case 'Array': return '[List]';
-      case 'float': return '[double]';
-      case 'function': {
-        switch (fullName(member)) {
-          case 'BrowserContext.exposeBinding.callback': return '`BindingCallback`';
-          case 'BrowserContext.exposeFunction.callback': return '`FunctionCallback`';
-          case 'Page.exposeBinding.callback': return '`BindingCallback`';
-          case 'Page.exposeFunction.callback': return '`FunctionCallback`';
-        }
-        throw new Error('Unknwon java type for ' + fullName(member));
-      };
-      case 'null': return '[null]';
-      case 'Object': {
-        switch (fullName(member)) {
-          case 'BrowserContext.addCookies.cookies': return '`Cookie`';
-          case 'BrowserContext.cookies': return '`Cookie`';
-          case 'ElementHandle.selectOption.values': return '`SelectOption`';
-          case 'Frame.selectOption.values': return '`SelectOption`';
-          case 'Page.selectOption.values': return '`SelectOption`';
-          case 'ElementHandle.setInputFiles.files': return '`FilePayload`';
-          case 'FileChooser.setFiles.files': return '`FilePayload`';
-          case 'Frame.setInputFiles.files': return '`FilePayload`';
-          case 'Page.setInputFiles.files': return '`FilePayload`';
-        }
-        if (!type.templates)
-          return `\`${toTitleCase(member.alias)}\``;
-        return '[Map]';
-      }
-      case 'path': return '[Path]';
-      case 'RegExp': return '[Pattern]';
-      case 'string': return '[String]';
-      // Escape '[' and ']' so that they don't break markdown links like [byte[]](link)
-      case 'Buffer': return '[byte&#91;&#93;]';
-      case 'Readable': return '[InputStream]';
-      case 'Serializable': return '[Object]';
-      case 'URL': return '[String]';
-    }
-    return `[${text}]`;
-  },
-});
-
-new Generator('csharp', path.join(__dirname, '..', 'csharp', 'docs'), {
-  formatMember: member => {
-    let text;
-    let args = [];
-    if (member.kind === 'property')
-      text = `${toTitleCase(member.clazz.varName)}.${toTitleCase(member.alias)}`;
-    if (member.kind === 'event')
-      text = `event ${toTitleCase(member.clazz.varName)}.${toTitleCase(member.alias)}`;
-    if (member.kind === 'method' ) {
-      args = member.argsArray;
-      const signature = renderJSSignature(args);
-      text = `${toTitleCase(member.clazz.varName)}.${toTitleCase(member.alias)}(${signature})`;
-    }
-    return { text, args };
-  },
-  formatArgumentName: name => name,
-  formatTemplate: text => `<${text}>`,
-  formatFunction: (args, ret, type) => {
-    if (type.args.length !== 1)
-      throw new Error('Unsupported number of arguments in function: ' + type);
-    if (!type.returnType)
-      return "[Action]<" + args + ">";
-    if (type.returnType.name === 'boolean')
-      return "[Func]<" + args + ", bool>";
-    throw new Error('Unknown C# type for function: ' + type);
-  },
-  formatPromise: text => text,
-  renderType: (type, direction, member) => {
-    if (member.kind === 'property' && member.name === 'options') {
-      const method = member.enclosingMethod;
-      return `\`${toTitleCase(method.clazz.varName)}.${toTitleCase(method.alias)}Options\``;
-    }
-    const text = type.name;
-    switch (text) {
-      case 'any': return '[object]';
-      case 'Array': return '[IEnumerable]';
-      case 'float': return '[double]';
-      case 'function': {
-        switch (fullName(member)) {
-          case 'BrowserContext.exposeBinding.callback': return '`Func<BindingSource, T, TResult>`';
-          case 'BrowserContext.exposeFunction.callback': return '`Func<T, TResult>`';
-          case 'Page.exposeBinding.callback': return '`Func<BindingSource, T, TResult>`';
-          case 'Page.exposeFunction.callback': return '`Func<T, TResult>`';
-        }
-        throw new Error('Unknwon C# type for ' + fullName(member));
-      };
-      case 'null': return '[null]';
-      case 'Object': {
-        // FIXME: generate correct type for accessibility snapshot children.
-        if (member.name === 'children') {
-          return '[IEnumerable]';
-        }
-        switch (fullName(member)) {
-          case 'BrowserContext.addCookies.cookies': return '`Cookie`';
-          case 'BrowserContext.cookies': return '`Cookie`';
-          case 'ElementHandle.selectOption.values': return '`SelectOption`';
-          case 'Frame.selectOption.values': return '`SelectOption`';
-          case 'Page.selectOption.values': return '`SelectOption`';
-          case 'ElementHandle.setInputFiles.files': return '`FilePayload`';
-          case 'FileChooser.setFiles.files': return '`FilePayload`';
-          case 'Frame.setInputFiles.files': return '`FilePayload`';
-          case 'Page.setInputFiles.files': return '`FilePayload`';
-        }
-        if (!type.templates)
-          return `\`${toTitleCase(member.alias)}\``;
-        return '[Map]';
-      }
-      case 'path': return '[string]';
-      case 'RegExp': return '[Regex]';
-      case 'string': return '[string]';
-      // Escape '[' and ']' so that they don't break markdown links like [byte[]](link)
-      case 'Buffer': return '[byte&#91;&#93;]';
-      case 'Readable': return '[Stream]';
-      case 'Serializable': return '[object]';
-      case 'URL': return '[string]';
-    }
-    return `[${text}]`;
-  },
-});
-
-/**
- * @param {Documentation.Member} member
- * @returns {string}
- */
-function fullName(member) {
-  if (member.enclosingMethod) {
-    const method = member.enclosingMethod;
-    let fqn = `${toTitleCase(method.clazz.varName)}.${method.name}`;
-    if (member.kind === 'property')
-      fqn += '.' + member.name;
-    return fqn;
-  }
-  return `${toTitleCase(member.clazz.varName)}.${member.name}`;
-}
-
-/**
  * @param {string} name
  */
 function toTitleCase(name) {
@@ -743,3 +434,5 @@ function listFiles(dir, base, result) {
     }
   }
 }
+
+module.exports = { Generator, toTitleCase, toSnakeCase, renderJSSignature };
