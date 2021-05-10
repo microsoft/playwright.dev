@@ -17,13 +17,16 @@
 //@ts-check
 
 const Documentation = require('./documentation');
-const { toTitleCase, renderJSSignature } = require('./generator');
+const { toTitleCase } = require('./generator');
 /** @typedef {import('./generator').GeneratorFormatter} GeneratorFormatter */
 
 /**
  * @implements {GeneratorFormatter}
  */
 class CSharpFormatter {
+  /**
+   * @param {Documentation.Member} member 
+   */
   formatMember(member) {
     let text;
     let args = [];
@@ -32,9 +35,10 @@ class CSharpFormatter {
     if (member.kind === 'event')
       text = `event ${toTitleCase(member.clazz.varName)}.${toTitleCase(member.alias)}`;
     if (member.kind === 'method' ) {
-      args = member.argsArray;
-      const signature = renderJSSignature(args);
-      text = `${toTitleCase(member.clazz.varName)}.${toTitleCase(member.alias)}(${signature})`;
+      for (const arg of member.argsArray)
+        args.push(...expandSharpOptions(arg));
+      const signature = renderSharpSignature(args);
+      text = `${toTitleCase(member.clazz.varName)}.${toAsyncTitleCase(member.async, member.alias)}(${signature})`;
     }
     return { text, args };
   }
@@ -131,6 +135,35 @@ function fullName(member) {
     return fqn;
   }
   return `${toTitleCase(member.clazz.varName)}.${member.name}`;
+}
+
+/**
+ * @param {Documentation.Member[]} args
+ * @return {string}
+ */
+ function renderSharpSignature(args) {
+  const argNames = args.filter(a => a.required).map(a => a.name);
+  if (args.find(a => !a.required))
+    argNames.push('\u2026');
+  return argNames.join(', ');
+}
+
+/**
+ * @param {boolean} isAsync
+ * @param {string} name
+ */
+function toAsyncTitleCase(isAsync, name) {
+  if (!isAsync || name.endsWith('Async'))
+    return toTitleCase(name);
+  return toTitleCase(name) + 'Async';
+}
+
+/**
+ * @param {Documentation.Member} arg
+ * @return {Documentation.Member[]}
+ */
+ function expandSharpOptions(arg) {
+  return arg.name == 'options' ? arg.type.properties : [arg];
 }
 
 module.exports = { CSharpFormatter };
