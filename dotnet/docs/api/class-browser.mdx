@@ -9,6 +9,24 @@ import TabItem from '@theme/TabItem';
 
 A Browser is created via [BrowserType.Launch([options])](./api/class-browsertype.mdx#browsertypelaunchoptions). An example of using a [Browser] to create a [Page]:
 
+```csharp
+using Microsoft.Playwright;
+using System.Threading.Tasks;
+
+class BrowserExamples
+{
+    public static async Task Main()
+    {
+        using var playwright = await Playwright.CreateAsync();
+        var firefox = playwright.Firefox;
+        var browser = await firefox.LaunchAsync(headless: false);
+        var page = await browser.NewPageAsync();
+        await page.GoToAsync("https://www.bing.com");
+        await browser.CloseAsync();
+    }
+}
+```
+
 
 - [event Browser.Disconnected](./api/class-browser.mdx#eventbrowserdisconnected)
 - [Browser.Close()](./api/class-browser.mdx#browserclose)
@@ -38,6 +56,14 @@ The [Browser] object itself is considered to be disposed and cannot be used anym
 - returns: <[IEnumerable]<[BrowserContext]>>
 
 Returns an array of all open browser contexts. In a newly created browser, this will return zero browser contexts.
+
+```csharp
+using var playwright = await Playwright.CreateAsync();
+var browser = await playwright.Webkit.LaunchAsync();
+System.Console.WriteLine(browser.Contexts.Count); // prints "0"
+var context = await browser.NewContextAsync();
+System.Console.WriteLine(browser.Contexts.Count); // prints "1"
+```
 
 ## Browser.IsConnected()
 - returns: <[boolean]>
@@ -89,6 +115,16 @@ Indicates that the browser is connected.
 - returns: <[BrowserContext]>
 
 Creates a new browser context. It won't share cookies/cache with other browser contexts.
+
+```csharp
+using var playwright = await Playwright.CreateAsync();
+var browser = await playwright.Firefox.LaunchAsync();
+// Create a new incognito browser context.
+var context = await browser.NewContextAsync();
+// Create a new page in a pristine context.
+var page = await context.NewPageAsync(); ;
+await page.GoToAsync("https://www.bing.com");
+```
 
 ## Browser.NewPage([options])
 - `options` <`Browser.NewPageOptions`>
