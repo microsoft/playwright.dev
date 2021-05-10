@@ -614,7 +614,7 @@ new Generator('java', path.join(__dirname, '..', 'java', 'docs'), {
   },
 });
 
-new Generator('csharp', path.join(__dirname, '..', 'csharp', 'docs'), {
+new Generator('csharp', path.join(__dirname, '..', 'dotnet', 'docs'), {
   formatMember: member => {
     let text;
     let args = [];

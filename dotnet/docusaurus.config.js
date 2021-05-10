@@ -28,7 +28,7 @@ module.exports = {
   tagline: "Fast and reliable end-to-end testing for modern web apps",
   // Repo config for GitHub Pages
   url: "https://playwright.dev",
-  baseUrl: "/csharp/",
+  baseUrl: "/dotnet/",
   organizationName: "microsoft",
   projectName: "playwright.dev",
   onBrokenLinks: "throw",
@@ -44,7 +44,7 @@ module.exports = {
       additionalLanguages: ['csharp'],
     },
     navbar: {
-      title: "Playwright for C#",
+      title: "Playwright for .NET",
       logo: {
         alt: "Playwright logo",
         src: "img/playwright-logo.svg",
@@ -63,7 +63,7 @@ module.exports = {
           position: "left",
         },
         {
-          href: "https://github.com/microsoft/playwright",
+          href: "https://github.com/microsoft/playwright-sharp",
           position: "right",
           className: "header-github-link",
           "aria-label": "GitHub repository",
