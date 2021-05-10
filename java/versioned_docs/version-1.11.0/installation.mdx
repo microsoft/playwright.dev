@@ -1,0 +1,169 @@
+---
+id: installation
+title: "Installation"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+- [Managing browser binaries](#managing-browser-binaries)
+- [Install behind the firewall or proxy](#install-behind-the-firewall-or-proxy)
+- [Download from artifact repository](#download-from-artifact-repository)
+- [Skip browser downloads](#skip-browser-downloads)
+- [Stale browser removal](#stale-browser-removal)
+
+## Managing browser binaries
+
+Each version of Playwright needs specific versions of browser binaries to operate. By default Playwright downloads Chromium, WebKit and Firefox browsers into the OS-specific cache folders:
+- `%USERPROFILE%\AppData\Local\ms-playwright` on Windows
+- `~/Library/Caches/ms-playwright` on MacOS
+- `~/.cache/ms-playwright` on Linux
+
+These browsers will take few hundreds of megabytes of the disk space when installed:
+
+```sh
+$ du -hs ./Library/Caches/ms-playwright/*
+281M  chromium-XXXXXX
+187M  firefox-XXXX
+180M  webkit-XXXX
+```
+
+You can override default behavior using environment variables. When installing Playwright, ask it to download browsers into a specific location:
+
+```sh
+# Linux/macOS
+$ PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers mvn test
+```
+
+When running Playwright scripts, ask it to search for browsers in a shared location.
+
+```sh
+# Windows
+$ set PLAYWRIGHT_BROWSERS_PATH=%USERPROFILE%\pw-browsers
+$ mvn test
+```
+
+Or you can opt into the hermetic install and place binaries in the local folder:
+
+Playwright keeps track of packages that need those browsers and will garbage collect them as you update Playwright to the newer versions.
+
+:::note
+Developers can opt-in in this mode via exporting `PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers` in their `.bashrc`.
+:::
+
+## Install behind the firewall or proxy
+
+By default, Playwright downloads browsers from Microsoft CDN.
+
+Sometimes companies maintain an internal proxy that blocks direct access to the public resources. In this case, Playwright can be configured to download browsers via a proxy server.
+
+```sh
+# Linux/macOS
+$ HTTPS_PROXY=https://192.168.1.78 mvn test
+
+# Windows
+$ set HTTPS_PROXY=https://192.168.1.78
+$ mvn test
+```
+
+## Download from artifact repository
+
+By default, Playwright downloads browsers from Microsoft CDN.
+
+Sometimes companies maintain an internal artifact repository to host browser binaries. In this case, Playwright can be configured to download from a custom location using the `PLAYWRIGHT_DOWNLOAD_HOST` env variable.
+
+```sh
+# Linux/macOS
+$ PLAYWRIGHT_DOWNLOAD_HOST=192.168.1.78 mvn test
+
+# Windows
+$ set PLAYWRIGHT_DOWNLOAD_HOST=192.168.1.78
+$ mvn test
+```
+
+It is also possible to use a per-browser download hosts using `PLAYWRIGHT_CHROMIUM_DOWNLOAD_HOST`, `PLAYWRIGHT_FIREFOX_DOWNLOAD_HOST` and `PLAYWRIGHT_WEBKIT_DOWNLOAD_HOST` env variables that take precedence over `PLAYWRIGHT_DOWNLOAD_HOST`.
+
+It is also possible to use a per-browser download hosts using `PLAYWRIGHT_CHROMIUM_DOWNLOAD_HOST`, `PLAYWRIGHT_FIREFOX_DOWNLOAD_HOST` and `PLAYWRIGHT_WEBKIT_DOWNLOAD_HOST` env variables that take precedence over `PLAYWRIGHT_DOWNLOAD_HOST`.
+
+```sh
+# Linux/macOS
+$ PLAYWRIGHT_FIREFOX_DOWNLOAD_HOST=192.168.1.1 PLAYWRIGHT_DOWNLOAD_HOST=192.168.1.78 mvn test
+```
+
+## Skip browser downloads
+
+In certain cases, it is desired to avoid browser downloads altogether because browser binaries are managed separately.
+
+This can be done by setting `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` variable before installation.
+
+```sh
+# Linux/macOS
+$ PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 mvn test
+
+# Windows
+$ set PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+$ mvn test
+```
+
+## Stale browser removal
+
+Playwright keeps track of the clients that use its browsers. When there are no more clients that require particular version of the browser, that version is deleted from the system. That way you can safely use Playwright instances of different versions and at the same time, you don't waste disk space for the browsers that are no longer in use.
+
+To opt-out from the unused browser removal, you can set the `PLAYWRIGHT_SKIP_BROWSER_GC=1` environment variable.
+
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[PlaywrightException]: ./api/class-playwrightexception.mdx "PlaywrightException"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./core-concepts.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
+[byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
+[Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
+[double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
+[InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
+[int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"
+[Map]: https://docs.oracle.com/javase/8/docs/api/java/util/Map.html "Map"
+[null]: https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.7 "null"
+[Object]: https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html "Object"
+[Path]: https://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html "Path"
+[Pattern]: https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html "Pattern"
+[Predicate]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Predicate.html "Predicate"
+[void]: https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html "void"
+[Runnable]: https://docs.oracle.com/javase/8/docs/api/java/lang/Runnable.html "Runnable"
+[RuntimeException]: https://docs.oracle.com/javase/8/docs/api/java/lang/RuntimeException.html "RuntimeException"
+[String]: https://docs.oracle.com/javase/8/docs/api/java/lang/String.html "String"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/java/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright-java "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright-java/blob/master/Dockerfile.focal "Dockerfile.focal"
