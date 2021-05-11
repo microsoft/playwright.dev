@@ -77,10 +77,10 @@ class CSharpFormatter {
       case 'float': return '[double]';
       case 'function': {
         switch (fullName(member)) {
-          case 'BrowserContext.exposeBinding.callback': return '`Func<BindingSource, T, TResult>`';
-          case 'BrowserContext.exposeFunction.callback': return '`Func<T, TResult>`';
-          case 'Page.exposeBinding.callback': return '`Func<BindingSource, T, TResult>`';
-          case 'Page.exposeFunction.callback': return '`Func<T, TResult>`';
+          case 'BrowserContext.exposeBinding.callback': return '[Action]<BindingSource, T, [TResult]>';
+          case 'BrowserContext.exposeFunction.callback': return '[Action]<T, [TResult]>';
+          case 'Page.exposeBinding.callback': return '[Action]<BindingSource, T, [TResult]>';
+          case 'Page.exposeFunction.callback': return '[Action]<T, [TResult]>';
         }
         throw new Error('Unknwon C# type for ' + fullName(member));
       };
