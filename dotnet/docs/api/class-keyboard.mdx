@@ -5,9 +5,9 @@ title: "Keyboard"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Keyboard provides an api for managing a virtual keyboard. The high level api is [Keyboard.Type(text[, options])](./api/class-keyboard.mdx#keyboardtypetext-options), which takes raw characters and generates proper keydown, keypress/input, and keyup events on your page.
+Keyboard provides an api for managing a virtual keyboard. The high level api is [Keyboard.TypeAsync(text, …)](./api/class-keyboard.mdx#keyboardtypeasynctext-), which takes raw characters and generates proper keydown, keypress/input, and keyup events on your page.
 
-For finer control, you can use [Keyboard.Down(key)](./api/class-keyboard.mdx#keyboarddownkey), [Keyboard.Up(key)](./api/class-keyboard.mdx#keyboardupkey), and [Keyboard.InsertText(text)](./api/class-keyboard.mdx#keyboardinserttexttext) to manually fire events as if they were generated from a real keyboard.
+For finer control, you can use [Keyboard.DownAsync(key)](./api/class-keyboard.mdx#keyboarddownasynckey), [Keyboard.UpAsync(key)](./api/class-keyboard.mdx#keyboardupasynckey), and [Keyboard.InsertTextAsync(text)](./api/class-keyboard.mdx#keyboardinserttextasynctext) to manually fire events as if they were generated from a real keyboard.
 
 An example of holding down `Shift` in order to select and delete some text:
 
@@ -16,13 +16,13 @@ An example of pressing uppercase `A`
 An example to trigger select-all with the keyboard
 
 
-- [Keyboard.Down(key)](./api/class-keyboard.mdx#keyboarddownkey)
-- [Keyboard.InsertText(text)](./api/class-keyboard.mdx#keyboardinserttexttext)
-- [Keyboard.Press(key[, options])](./api/class-keyboard.mdx#keyboardpresskey-options)
-- [Keyboard.Type(text[, options])](./api/class-keyboard.mdx#keyboardtypetext-options)
-- [Keyboard.Up(key)](./api/class-keyboard.mdx#keyboardupkey)
+- [Keyboard.DownAsync(key)](./api/class-keyboard.mdx#keyboarddownasynckey)
+- [Keyboard.InsertTextAsync(text)](./api/class-keyboard.mdx#keyboardinserttextasynctext)
+- [Keyboard.PressAsync(key, …)](./api/class-keyboard.mdx#keyboardpressasynckey-)
+- [Keyboard.TypeAsync(text, …)](./api/class-keyboard.mdx#keyboardtypeasynctext-)
+- [Keyboard.UpAsync(key)](./api/class-keyboard.mdx#keyboardupasynckey)
 
-## Keyboard.Down(key)
+## Keyboard.DownAsync(key)
 - `key` <[string]> Name of the key to press or a character to generate, such as `ArrowLeft` or `a`.
 - returns: <[void]>
 
@@ -38,15 +38,15 @@ Holding down `Shift` will type the text that corresponds to the `key` in the upp
 
 If `key` is a single character, it is case-sensitive, so the values `a` and `A` will generate different respective texts.
 
-If `key` is a modifier key, `Shift`, `Meta`, `Control`, or `Alt`, subsequent key presses will be sent with that modifier active. To release the modifier key, use [Keyboard.Up(key)](./api/class-keyboard.mdx#keyboardupkey).
+If `key` is a modifier key, `Shift`, `Meta`, `Control`, or `Alt`, subsequent key presses will be sent with that modifier active. To release the modifier key, use [Keyboard.UpAsync(key)](./api/class-keyboard.mdx#keyboardupasynckey).
 
-After the key is pressed once, subsequent calls to [Keyboard.Down(key)](./api/class-keyboard.mdx#keyboarddownkey) will have [repeat](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/repeat) set to true. To release the key, use [Keyboard.Up(key)](./api/class-keyboard.mdx#keyboardupkey).
+After the key is pressed once, subsequent calls to [Keyboard.DownAsync(key)](./api/class-keyboard.mdx#keyboarddownasynckey) will have [repeat](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/repeat) set to true. To release the key, use [Keyboard.UpAsync(key)](./api/class-keyboard.mdx#keyboardupasynckey).
 
 :::note
 Modifier keys DO influence `keyboard.down`. Holding down `Shift` will type the text in upper case.
 :::
 
-## Keyboard.InsertText(text)
+## Keyboard.InsertTextAsync(text)
 - `text` <[string]> Sets input to the specified text value.
 - returns: <[void]>
 
@@ -56,10 +56,9 @@ Dispatches only `input` event, does not emit the `keydown`, `keyup` or `keypress
 Modifier keys DO NOT effect `keyboard.insertText`. Holding down `Shift` will not type the text in upper case.
 :::
 
-## Keyboard.Press(key[, options])
+## Keyboard.PressAsync(key, …)
 - `key` <[string]> Name of the key to press or a character to generate, such as `ArrowLeft` or `a`.
-- `options` <`Keyboard.PressOptions`>
-  - `delay` <[double]> Time to wait between `keydown` and `keyup` in milliseconds. Defaults to 0.
+- `delay` <[double]> Time to wait between `keydown` and `keyup` in milliseconds. Defaults to 0.
 - returns: <[void]>
 
 `key` can specify the intended [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) value or a single character to generate the text for. A superset of the `key` values can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values). Examples of the keys are:
@@ -74,17 +73,16 @@ If `key` is a single character, it is case-sensitive, so the values `a` and `A` 
 
 Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
 
-Shortcut for [Keyboard.Down(key)](./api/class-keyboard.mdx#keyboarddownkey) and [Keyboard.Up(key)](./api/class-keyboard.mdx#keyboardupkey).
+Shortcut for [Keyboard.DownAsync(key)](./api/class-keyboard.mdx#keyboarddownasynckey) and [Keyboard.UpAsync(key)](./api/class-keyboard.mdx#keyboardupasynckey).
 
-## Keyboard.Type(text[, options])
+## Keyboard.TypeAsync(text, …)
 - `text` <[string]> A text to type into a focused element.
-- `options` <`Keyboard.TypeOptions`>
-  - `delay` <[double]> Time to wait between key presses in milliseconds. Defaults to 0.
+- `delay` <[double]> Time to wait between key presses in milliseconds. Defaults to 0.
 - returns: <[void]>
 
 Sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in the text.
 
-To press a special key, like `Control` or `ArrowDown`, use [Keyboard.Press(key[, options])](./api/class-keyboard.mdx#keyboardpresskey-options).
+To press a special key, like `Control` or `ArrowDown`, use [Keyboard.PressAsync(key, …)](./api/class-keyboard.mdx#keyboardpressasynckey-).
 
 :::note
 Modifier keys DO NOT effect `keyboard.type`. Holding down `Shift` will not type the text in upper case.
@@ -94,7 +92,7 @@ Modifier keys DO NOT effect `keyboard.type`. Holding down `Shift` will not type 
 For characters that are not on a US keyboard, only an `input` event will be sent.
 :::
 
-## Keyboard.Up(key)
+## Keyboard.UpAsync(key)
 - `key` <[string]> Name of the key to press or a character to generate, such as `ArrowLeft` or `a`.
 - returns: <[void]>
 
