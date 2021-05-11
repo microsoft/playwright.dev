@@ -34,6 +34,7 @@ module.exports = {
         { "type": "doc", "id": "navigations" },
         { "type": "doc", "id": "network" },
         { "type": "doc", "id": "pom" },
+        { "type": "doc", "id": "threading" },
         { "type": "doc", "id": "verification" },
         { "type": "doc", "id": "videos" },
       ],
