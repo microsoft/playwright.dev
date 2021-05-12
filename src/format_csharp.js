@@ -38,7 +38,13 @@ class CSharpFormatter {
       for (const arg of member.argsArray)
         args.push(...expandSharpOptions(arg));
       const signature = renderSharpSignature(args);
-      text = `${toTitleCase(member.clazz.varName)}.${toAsyncTitleCase(member.async, member.alias)}(${signature})`;
+
+      let isGetter = !signature && !member.async && !!member.type;
+      if (member.name.startsWith('is') || member.name.startsWith('as'))
+        isGetter = false;
+      text = `${toTitleCase(member.clazz.varName)}.${toAsyncTitleCase(member.async, member.alias)}`;
+      if (!isGetter)
+        text += `(${signature})`;
     }
     return { text, args };
   }

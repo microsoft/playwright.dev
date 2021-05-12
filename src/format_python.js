@@ -42,10 +42,9 @@ class PythonFormatter {
       let isGetter = !signature && !member.async && !!member.type;
       if (member.name.startsWith('is') || member.name.startsWith('as'))
         isGetter = false;
-      if (isGetter)
-        text = `${toSnakeCase(member.clazz.varName)}.${toSnakeCase(member.alias)}`;
-      else
-        text = `${toSnakeCase(member.clazz.varName)}.${toSnakeCase(member.alias)}(${signature})`;
+      text = `${toSnakeCase(member.clazz.varName)}.${toSnakeCase(member.alias)}`;
+      if (!isGetter)
+        text += `(${signature})`;
     }
     return { text, args };
   }
