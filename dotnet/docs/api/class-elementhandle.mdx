@@ -9,6 +9,24 @@ import TabItem from '@theme/TabItem';
 
 ElementHandle represents an in-page DOM element. ElementHandles can be created with the [Page.QuerySelectorAsync(selector)](./api/class-page.mdx#pagequeryselectorasyncselector) method.
 
+```csharp
+using Microsoft.Playwright;
+using System.Threading.Tasks;
+
+class HandleExamples
+{
+    public static async Task Run()
+    {
+        using var playwright = await Playwright.CreateAsync();
+        var browser = await playwright.Chromium.LaunchAsync(headless: false);
+        var page = await browser.NewPageAsync();
+        await page.GotoAsync("https://www.bing.com");
+        var handle = await page.QuerySelectorAsync("a");
+        await handle.ClickAsync();
+    }
+}
+```
+
 ElementHandle prevents DOM element from garbage collection unless the handle is disposed with [JsHandle.DisposeAsync()](./api/class-jshandle.mdx#jshandledisposeasync). ElementHandles are auto-disposed when their origin frame gets navigated.
 
 ElementHandle instances can be used as an argument in [Page.EvalOnSelectorAsync(selector, expression, …)](./api/class-page.mdx#pageevalonselectorasyncselector-expression-) and [Page.EvaluateAsync(expression, …)](./api/class-page.mdx#pageevaluateasyncexpression-) methods.
@@ -71,6 +89,11 @@ Scrolling affects the returned bonding box, similarly to [Element.getBoundingCli
 Elements from child frames return the bounding box relative to the main frame, unlike the [Element.getBoundingClientRect](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect).
 
 Assuming the page is static, it is safe to use bounding box coordinates to perform input. For example, the following snippet should click the center of the element.
+
+```csharp
+var box = await elementHandle.BoundingBoxAsync();
+await page.Mouse.ClickAsync(box.X + box.Width / 2, box.Y + box.Height / 2);
+```
 
 ## ElementHandle.CheckAsync(…)
 - `force` <[boolean]> Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.
@@ -157,6 +180,10 @@ When all steps combined have not finished during the specified `timeout`, this m
 
 The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the element, `click` is dispatched. This is equivalent to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
 
+```csharp
+await elementHandle.DispatchEventAsync("click");
+```
+
 Under the hood, it creates an instance of an event based on the given `type`, initializes it with `eventInit` properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
 
 Since `eventInit` is event-specific, please refer to the events documentation for the lists of initial properties:
@@ -169,6 +196,14 @@ Since `eventInit` is event-specific, please refer to the events documentation fo
 * [Event](https://developer.mozilla.org/en-US/docs/Web/API/Event/Event)
 
 You can also specify `JSHandle` as the property value if you want live objects to be passed into the event:
+
+```csharp
+var handle = await page.EvaluateHandleAsync("() => new DataTransfer()");
+await handle.AsElement.DispatchEventAsync("dragstart", new Dictionary<string, object>
+{
+    { "dataTransfer", dataTransfer }
+});
+```
 
 ## ElementHandle.EvalOnSelectorAsync(selector, expression, …)
 - `selector` <[string]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
@@ -183,6 +218,12 @@ The method finds an element matching the specified selector in the `ElementHandl
 If `expression` returns a [Promise], then [ElementHandle.EvalOnSelectorAsync(selector, expression, …)](./api/class-elementhandle.mdx#elementhandleevalonselectorasyncselector-expression-) would wait for the promise to resolve and return its value.
 
 Examples:
+
+```csharp
+var tweetHandle = await page.QuerySelectorAsync(".tweet");
+Assert.Equals("100", await tweetHandle.EvalOnSelectorAsync(".like", "node => node.innerText"));
+Assert.Equals("10", await tweetHandle.EvalOnSelectorAsync(".retweets", "node => node.innerText"));
+```
 
 ## ElementHandle.EvalOnSelectorAllAsync(selector, expression, …)
 - `selector` <[string]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
@@ -203,6 +244,11 @@ Examples:
   <div class="tweet">Hello!</div>
   <div class="tweet">Hi!</div>
 </div>
+```
+
+```csharp
+var feedHandle = await page.QuerySelectorAsync(".feed");
+Assert.Equals(new [] { "Hello!", "Hi!" }, await feedHandle.EvalOnSelectorAllAsync<string[]>(".tweet", "nodes => nodes.map(n => n.innerText)"));
 ```
 
 ## ElementHandle.FillAsync(value, …)
@@ -363,6 +409,20 @@ Returns the array of option values that have been successfully selected.
 
 Triggers a `change` and `input` event once all the provided options have been selected.
 
+```csharp
+// single selection matching the value
+await handle.SelectOptionAsync(new[] { "blue" });
+// single selection matching the label
+await handle.SelectOptionAsync(new[] { new SelectOptionValue() { Label = "blue" } });
+// multiple selection
+await handle.SelectOptionAsync(new[] { "red", "green", "blue" });
+// multiple selection for blue, red and second option
+await handle.SelectOptionAsync(new[] {
+    new SelectOptionValue() { Label = "blue" },
+    new SelectOptionValue() { Index = 2 },
+    new SelectOptionValue() { Value = "red" }});
+```
+
 ## ElementHandle.SelectTextAsync(…)
 - `timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
 - returns: <[void]>
@@ -423,7 +483,18 @@ Focuses the element, and then sends a `keydown`, `keypress`/`input`, and `keyup`
 
 To press a special key, like `Control` or `ArrowDown`, use [ElementHandle.PressAsync(key, …)](./api/class-elementhandle.mdx#elementhandlepressasynckey-).
 
+```csharp
+await elementHandle.TypeAsync("Hello"); // Types instantly
+await elementHandle.TypeAsync("World", delay: 100); // Types slower, like a user
+```
+
 An example of typing into a text field and then submitting the form:
+
+```csharp
+var elementHandle = await page.QuerySelectorAsync("input");
+await elementHandle.TypeAsync("some text");
+await elementHandle.PressAsync("Enter");
+```
 
 ## ElementHandle.UncheckAsync(…)
 - `force` <[boolean]> Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.
@@ -478,6 +549,13 @@ Returns element specified by selector when it satisfies `state` option. Returns 
 
 Wait for the `selector` relative to the element handle to satisfy `state` option (either appear/disappear from dom, or become visible/hidden). If at the moment of calling the method `selector` already satisfies the condition, the method will return immediately. If the selector doesn't satisfy the condition for the `timeout` milliseconds, the function will throw.
 
+```csharp
+await page.SetContentAsync("<div><span></span></div>");
+var div = await page.QuerySelectorAsync("div");
+// Waiting for the "span" selector relative to the div.
+var span = await page.WaitForSelectorAsync("span", WaitForSelectorState.Attached);
+```
+
 :::note
 This method does not work across navigations, use [Page.WaitForSelectorAsync(selector, …)](./api/class-page.mdx#pagewaitforselectorasyncselector-) instead.
 :::
@@ -504,6 +582,7 @@ This method does not work across navigations, use [Page.WaitForSelectorAsync(sel
 [Selectors]: ./api/class-selectors.mdx "Selectors"
 [TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
 [Video]: ./api/class-video.mdx "Video"
 [WebSocket]: ./api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"

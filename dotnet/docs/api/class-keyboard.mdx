@@ -11,9 +11,36 @@ For finer control, you can use [Keyboard.DownAsync(key)](./api/class-keyboard.md
 
 An example of holding down `Shift` in order to select and delete some text:
 
+```csharp
+await page.Keyboard.TypeAsync("Hello World!");
+await page.Keyboard.PressAsync("ArrowLeft");
+
+await page.Keyboard.DownAsync("Shift");
+for (int i = 0; i < " World".Length; i++)
+    await page.Keyboard.PressAsync("ArrowLeft");
+
+await page.Keyboard.UpAsync("Shift");
+
+await page.Keyboard.PressAsync("Backspace");
+// Result text will end up saying "Hello!"
+```
+
 An example of pressing uppercase `A`
 
+```csharp
+await page.Keyboard.PressAsync("Shift+KeyA");
+// or 
+await page.Keyboard.PressAsync("Shift+A");
+```
+
 An example to trigger select-all with the keyboard
+
+```csharp
+// on Windows and Linux
+await page.Keyboard.PressAsync("Control+A");
+// on macOS
+await page.Keyboard.PressAsync("Meta+A");
+```
 
 
 - [Keyboard.DownAsync(key)](./api/class-keyboard.mdx#keyboarddownasynckey)
@@ -52,6 +79,10 @@ Modifier keys DO influence `keyboard.down`. Holding down `Shift` will type the t
 
 Dispatches only `input` event, does not emit the `keydown`, `keyup` or `keypress` events.
 
+```csharp
+await page.Keyboard.PressAsync("嗨");
+```
+
 :::note
 Modifier keys DO NOT effect `keyboard.insertText`. Holding down `Shift` will not type the text in upper case.
 :::
@@ -73,6 +104,17 @@ If `key` is a single character, it is case-sensitive, so the values `a` and `A` 
 
 Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
 
+```csharp
+await page.GotoAsync("https://keycode.info");
+await page.Keyboard.PressAsync("A");
+await page.ScreenshotAsync("A.png");
+await page.Keyboard.PressAsync("ArrowLeft");
+await page.ScreenshotAsync("ArrowLeft.png");
+await page.Keyboard.PressAsync("Shift+O");
+await page.ScreenshotAsync("O.png");
+await browser.CloseAsync();
+```
+
 Shortcut for [Keyboard.DownAsync(key)](./api/class-keyboard.mdx#keyboarddownasynckey) and [Keyboard.UpAsync(key)](./api/class-keyboard.mdx#keyboardupasynckey).
 
 ## Keyboard.TypeAsync(text, …)
@@ -83,6 +125,11 @@ Shortcut for [Keyboard.DownAsync(key)](./api/class-keyboard.mdx#keyboarddownasyn
 Sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in the text.
 
 To press a special key, like `Control` or `ArrowDown`, use [Keyboard.PressAsync(key, …)](./api/class-keyboard.mdx#keyboardpressasynckey-).
+
+```csharp
+await page.Keyboard.TypeAsync("Hello"); // types instantly
+await page.Keyboard.TypeAsync("World"); // types slower, like a user
+```
 
 :::note
 Modifier keys DO NOT effect `keyboard.type`. Holding down `Shift` will not type the text in upper case.
@@ -119,6 +166,7 @@ Dispatches a `keyup` event.
 [Selectors]: ./api/class-selectors.mdx "Selectors"
 [TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
 [Video]: ./api/class-video.mdx "Video"
 [WebSocket]: ./api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"

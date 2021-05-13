@@ -11,11 +11,42 @@ Page provides methods to interact with a single tab in a [Browser], or an [exten
 
 This example creates a page, navigates it to a URL, and then saves a screenshot:
 
+```csharp
+using Microsoft.Playwright;
+using System.Threading.Tasks;
+
+class PageExamples
+{
+    public static async Task Run()
+    {
+        using var playwright = await Playwright.CreateAsync();
+        await using var browser = await playwright.Webkit.LaunchAsync();
+        var page = await browser.NewPageAsync();
+        await page.GotoAsync("https://www.theverge.com");
+        await page.ScreenshotAsync("theverge.png");
+    }
+}
+```
+
 The Page class emits various events (described below) which can be handled using any of Node's native [`EventEmitter`](https://nodejs.org/api/events.html#events_class_eventemitter) methods, such as `on`, `once` or `removeListener`.
 
 This example logs a message for a single page `load` event:
 
+```csharp
+page.Load += (_, _) => { Console.WriteLine("Page loaded!"); };
+```
+
 To unsubscribe from events use the `removeListener` method:
+
+```csharp
+void PageLoadHandler(object _, IPage p) {
+    Console.WriteLine("Page loaded!");
+};
+
+page.Load += PageLoadHandler;
+// Do some work...
+page.Load -= PageLoadHandler;
+```
 
 
 - [event Page.Close](./api/class-page.mdx#eventpageclose)
@@ -68,7 +99,7 @@ To unsubscribe from events use the `removeListener` method:
 - [Page.InnerHTMLAsync(selector, …)](./api/class-page.mdx#pageinnerhtmlasyncselector-)
 - [Page.InnerTextAsync(selector, …)](./api/class-page.mdx#pageinnertextasyncselector-)
 - [Page.IsCheckedAsync(selector, …)](./api/class-page.mdx#pageischeckedasyncselector-)
-- [Page.IsClosed()](./api/class-page.mdx#pageisclosed)
+- [Page.IsClosed](./api/class-page.mdx#pageisclosed)
 - [Page.IsDisabledAsync(selector, …)](./api/class-page.mdx#pageisdisabledasyncselector-)
 - [Page.IsEditableAsync(selector, …)](./api/class-page.mdx#pageiseditableasyncselector-)
 - [Page.IsEnabledAsync(selector, …)](./api/class-page.mdx#pageisenabledasyncselector-)
@@ -136,12 +167,33 @@ The arguments passed into `console.log` appear as arguments on the event handler
 
 An example of handling `console` event:
 
+```csharp
+page.Console += async (_, msg) =>
+{
+    foreach (var arg in msg.Args)
+        Console.WriteLine(await arg.JsonValueAsync<object>());
+};
+
+await page.EvaluateAsync("console.log('hello', 5, { foo: 'bar' })");
+```
+
 ## event Page.Crash
 - type: <[Page]>
 
 Emitted when the page crashes. Browser pages might crash if they try to allocate too much memory. When the page crashes, ongoing and subsequent operations will throw.
 
 The most common way to deal with crashes is to catch an exception:
+
+```csharp
+try {
+  // Crash might happen during a click.
+  await page.ClickAsync("button");
+  // Or while waiting for an event.
+  await page.WaitForPopupAsync(() -> {});
+} catch (PlaywrightException e) {
+  // When the page crashes, exception message contains "crash".
+}
+```
 
 ## event Page.Dialog
 - type: <[Dialog]>
@@ -170,6 +222,13 @@ Browser context **must** be created with the `acceptDownloads` set to `true` whe
 - type: <[FileChooser]>
 
 Emitted when a file chooser is supposed to appear, such as after clicking the  `<input type=file>`. Playwright can respond to it via setting the input files using [FileChooser.SetFilesAsync(files, …)](./api/class-filechooser.mdx#filechoosersetfilesasyncfiles-) that can be uploaded after that.
+
+```csharp
+page.FileChooser += (_, fileChooser) =>
+{
+    fileChooser.SetFilesAsync(@"C:\temp\myfile.pdf");
+};
+```
 
 ## event Page.FrameAttached
 - type: <[Frame]>
@@ -202,6 +261,12 @@ Emitted when an uncaught exception happens within the page.
 Emitted when the page opens a new tab or window. This event is emitted in addition to the [event BrowserContext.Page](./api/class-browsercontext.mdx#eventbrowsercontextpage), but only for popups relevant to this page.
 
 The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
+
+```csharp
+var popupTask = page.WaitForPopupAsync();
+await Task.WhenAll(popupTask, page.EvaluateAsync("() => window.open('https://microsoft.com')"));
+Console.WriteLine(await popupTask.Result.EvaluateAsync<string>("location.href"));
+```
 
 :::note
 Use [Page.WaitForLoadStateAsync(…)](./api/class-page.mdx#pagewaitforloadstateasync) to wait until the page gets to a particular state (you should not need it in most cases).
@@ -256,6 +321,10 @@ An example of overriding `Math.random` before the page loads:
 ```js
 // preload.js
 Math.random = () => 42;
+```
+
+```csharp
+await page.AddInitScriptAsync(scriptPath: "./preload.js");
 ```
 
 :::note
@@ -398,6 +467,10 @@ Shortcut for main frame's [Frame.DblClickAsync(selector, …)](./api/class-frame
 
 The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the element, `click` is dispatched. This is equivalent to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
 
+```csharp
+await page.DispatchEventAsync("button#submit", "click");
+```
+
 Under the hood, it creates an instance of an event based on the given `type`, initializes it with `eventInit` properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
 
 Since `eventInit` is event-specific, please refer to the events documentation for the lists of initial properties:
@@ -411,12 +484,46 @@ Since `eventInit` is event-specific, please refer to the events documentation fo
 
 You can also specify `JSHandle` as the property value if you want live objects to be passed into the event:
 
+```csharp
+var dataTransfer = await page.EvaluateHandleAsync("() => new DataTransfer()");
+await page.DispatchEventAsync("#source", "dragstart", new { dataTransfer });
+```
+
 ## Page.EmulateMediaAsync(…)
 - `colorScheme` <[null]|"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. Passing `null` disables color scheme emulation.
 - `media` <[null]|"screen"|"print"> Changes the CSS media type of the page. The only allowed values are `'screen'`, `'print'` and `null`. Passing `null` disables CSS media emulation.
 - returns: <[void]>
 
 This method changes the `CSS media type` through the `media` argument, and/or the `'prefers-colors-scheme'` media feature, using the `colorScheme` argument.
+
+```csharp
+await page.EvaluateAsync("() => matchMedia('screen').matches");
+// → true
+await page.EvaluateAsync("() => matchMedia('print').matches");
+// → false
+
+await page.EmulateMediaAsync(Media.Print);
+await page.EvaluateAsync("() => matchMedia('screen').matches");
+// → false
+await page.EvaluateAsync("() => matchMedia('print').matches");
+// → true
+
+await page.EmulateMediaAsync(Media.Screen);
+await page.EvaluateAsync("() => matchMedia('screen').matches");
+// → true
+await page.EvaluateAsync("() => matchMedia('print').matches");
+// → false
+```
+
+```csharp
+await page.EmulateMediaAsync(colorScheme: ColorScheme.Dark);
+await page.EvaluateAsync("matchMedia('(prefers-color-scheme: dark)').matches");
+// → true
+await page.EvaluateAsync("matchMedia('(prefers-color-scheme: light)').matches");
+// → false
+await page.EvaluateAsync("matchMedia('(prefers-color-scheme: no-preference)').matches");
+// → false
+```
 
 ## Page.EvalOnSelectorAsync(selector, expression, …)
 - `selector` <[string]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
@@ -429,6 +536,12 @@ The method finds an element matching the specified selector within the page and 
 If `expression` returns a [Promise], then [Page.EvalOnSelectorAsync(selector, expression, …)](./api/class-page.mdx#pageevalonselectorasyncselector-expression-) would wait for the promise to resolve and return its value.
 
 Examples:
+
+```csharp
+var searchValue = await page.EvalOnSelectorAsync<string>("#search", "el => el.value");
+var preloadHref = await page.EvalOnSelectorAsync<string>("link[rel=preload]", "el => el.href");
+var html = await page.EvalOnSelectorAsync(".main-container", "(e, suffix) => e.outerHTML + suffix", "hello");
+```
 
 Shortcut for main frame's [Frame.EvalOnSelectorAsync(selector, expression, …)](./api/class-frame.mdx#frameevalonselectorasyncselector-expression-).
 
@@ -444,6 +557,10 @@ If `expression` returns a [Promise], then [Page.EvalOnSelectorAllAsync(selector,
 
 Examples:
 
+```csharp
+var divsCount = await page.EvalOnSelectorAllAsync<bool>("div", "(divs, min) => divs.length >= min", 10);
+```
+
 ## Page.EvaluateAsync(expression, …)
 - `expression` <[string]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `arg` <[EvaluationArgument]> Optional argument to pass to `expression`.
@@ -457,9 +574,24 @@ If the function passed to the [Page.EvaluateAsync(expression, …)](./api/class-
 
 Passing argument to `expression`:
 
+```csharp
+var result = await page.EvaluateAsync<int>("([x, y]) => Promise.resolve(x * y)", new[] { 7, 8 });
+Console.WriteLine(result);
+```
+
 A string can also be passed in instead of a function:
 
+```csharp
+Console.WriteLine(await page.EvaluateAsync<int>("1 + 2")); // prints "3"
+```
+
 [ElementHandle] instances can be passed as an argument to the [Page.EvaluateAsync(expression, …)](./api/class-page.mdx#pageevaluateasyncexpression-):
+
+```csharp
+var bodyHandle = await page.QuerySelectorAsync("body");
+var html = await page.EvaluateAsync<string>("([body, suffix]) => body.innerHTML + suffix", new object [] { bodyHandle, "hello" });
+await bodyHandle.DisposeAsync();
+```
 
 Shortcut for main frame's [Frame.EvaluateAsync(expression, …)](./api/class-frame.mdx#frameevaluateasyncexpression-).
 
@@ -474,9 +606,25 @@ The only difference between [Page.EvaluateAsync(expression, …)](./api/class-pa
 
 If the function passed to the [Page.EvaluateHandleAsync(expression, …)](./api/class-page.mdx#pageevaluatehandleasyncexpression-) returns a [Promise], then [Page.EvaluateHandleAsync(expression, …)](./api/class-page.mdx#pageevaluatehandleasyncexpression-) would wait for the promise to resolve and return its value.
 
+```csharp
+// Handle for the window object.
+var aWindowHandle = await page.EvaluateHandleAsync("() => Promise.resolve(window)");
+```
+
 A string can also be passed in instead of a function:
 
+```csharp
+var docHandle = await page.EvalueHandleAsync("document"); // Handle for the `document`
+```
+
 [JSHandle] instances can be passed as an argument to the [Page.EvaluateHandleAsync(expression, …)](./api/class-page.mdx#pageevaluatehandleasyncexpression-):
+
+```csharp
+var handle = await page.EvaluateHandleAsync("() => document.body");
+var resultHandle = await page.EvaluateHandleAsync("([body, suffix]) => body.innerHTML + suffix", new object[] { handle, "hello" });
+Console.WriteLine(await resultHandle.JsonValueAsync<string>());
+await resultHandle.DisposeAsync();
+```
 
 ## Page.ExposeBindingAsync(name, callback, …)
 - `name` <[string]> Name of the function on the window object.
@@ -496,7 +644,50 @@ Functions installed via [Page.ExposeBindingAsync(name, callback, …)](./api/cla
 
 An example of exposing page URL to all frames in a page:
 
+```csharp
+using Microsoft.Playwright;
+using System.Threading.Tasks;
+
+class PageExamples
+{
+  public static async Task Main()
+  {
+      using var playwright = await Playwright.CreateAsync();
+      await using var browser = await playwright.Webkit.LaunchAsync(headless: false);
+      var page = await browser.NewPageAsync();
+
+      await page.ExposeBindingAsync("pageUrl", (source) => source.Page.Url);
+      await page.SetContentAsync("<script>\n" +
+      "  async function onClick() {\n" +
+      "    document.querySelector('div').textContent = await window.pageURL();\n" +
+      "  }\n" +
+      "</script>\n" +
+      "<button onclick=\"onClick()\">Click me</button>\n" +
+      "<div></div>");
+
+      await page.ClickAsync("button");
+  }
+}
+```
+
 An example of passing an element handle:
+
+```csharp
+var result = new TaskCompletionSource<string>();
+await page.ExposeBindingAsync("clicked", async (BindingSource _, IJSHandle t) =>
+{
+    return result.TrySetResult(await t.AsElement.TextContentAsync());
+});
+
+await page.SetContentAsync("<script>\n" +
+  "  document.addEventListener('click', event => window.clicked(event.target));\n" +
+  "</script>\n" +
+  "<div>Click me</div>\n" +
+  "<div>Or click me</div>\n");
+
+await page.ClickAsync("div");
+Console.WriteLine(await result.Task);
+```
 
 ## Page.ExposeFunctionAsync(name, callback)
 - `name` <[string]> Name of the function on the window object
@@ -514,6 +705,42 @@ Functions installed via [Page.ExposeFunctionAsync(name, callback)](./api/class-p
 :::
 
 An example of adding an `sha1` function to the page:
+
+```csharp
+using Microsoft.Playwright;
+using System;
+using System.Security.Cryptography;
+using System.Threading.Tasks;
+
+class PageExamples
+{
+  public static async Task Main()
+  {
+      using var playwright = await Playwright.CreateAsync();
+      await using var browser = await playwright.Webkit.LaunchAsync(headless: false); 
+      var page = await browser.NewPageAsync();
+
+      // NOTE: md5 is inherently insecure, and we strongly discourage using
+      // this in production in any shape or form
+      await page.ExposeFunctionAsync("sha1", (string input) =>
+      {
+          return Convert.ToBase64String(
+              MD5.Create().ComputeHash(System.Text.Encoding.UTF8.GetBytes(input)));
+      });
+
+      await page.SetContentAsync("<script>\n" +
+      "  async function onClick() {\n" +
+      "    document.querySelector('div').textContent = await window.sha1('PLAYWRIGHT');\n" +
+      "  }\n" +
+      "</script>\n" +
+      "<button onclick=\"onClick()\">Click me</button>\n" +
+      "<div></div>");
+
+      await page.ClickAsync("button");
+      Console.WriteLine(await page.TextContentAsync("div"));
+  }
+}
+```
 
 ## Page.FillAsync(selector, value, …)
 - `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
@@ -544,6 +771,14 @@ Shortcut for main frame's [Frame.FocusAsync(selector, …)](./api/class-frame.md
 - returns: <[null]|[Frame]>
 
 Returns frame matching the specified criteria. Either `name` or `url` must be specified.
+
+```csharp
+var frame = page.Frame("frame-name");
+```
+
+```csharp
+var frame = page.FrameByUrl(".*domain.*");
+```
 
 ## Page.FrameByUrl(url)
 - `url` <[string]|[Regex]|[Func]<[string], bool>> A glob pattern, regex pattern or predicate receiving frame's `url` as a [URL] object.
@@ -662,7 +897,7 @@ Returns `element.innerText`.
 
 Returns whether the element is checked. Throws if the element is not a checkbox or radio input.
 
-## Page.IsClosed()
+## Page.IsClosed
 - returns: <[boolean]>
 
 Indicates that the page has been closed.
@@ -760,6 +995,12 @@ Generating a pdf is currently only supported in Chromium headless.
 By default, `page.pdf()` generates a pdf with modified colors for printing. Use the [`-webkit-print-color-adjust`](https://developer.mozilla.org/en-US/docs/Web/CSS/-webkit-print-color-adjust) property to force rendering of exact colors.
 :::
 
+```csharp
+// Generates a PDF with 'screen' media type
+await page.EmulateMediaAsync(Media.Screen);
+await page.PdfAsync("page.pdf");
+```
+
 The `width`, `height`, and `margin` options accept values labeled with units. Unlabeled values are treated as pixels.
 
 A few examples:
@@ -812,6 +1053,18 @@ If `key` is a single character, it is case-sensitive, so the values `a` and `A` 
 
 Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
 
+```csharp
+await using var browser = await playwright.Webkit.LaunchAsync(headless: false);
+var page = await browser.NewPageAsync();
+await page.GotoAsync("https://keycode.info");
+await page.PressAsync("body", "A");
+await page.ScreenshotAsync("A.png");
+await page.PressAsync("body", "ArrowLeft");
+await page.ScreenshotAsync("ArrowLeft.png");
+await page.PressAsync("body", "Shift+O");
+await page.ScreenshotAsync("O.png");
+```
+
 ## Page.QuerySelectorAsync(selector)
 - `selector` <[string]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
 - returns: <[null]|[ElementHandle]>
@@ -853,9 +1106,33 @@ The handler will only be called for the first url if the response is a redirect.
 
 An example of a naive handler that aborts all image requests:
 
+```csharp
+await using var browser = await playwright.Webkit.LaunchAsync();
+var page = await browser.NewPageAsync();
+await page.RouteAsync("**/*.{png,jpg,jpeg}", async r => await r.AbortAsync());
+await page.GotoAsync("https://www.microsoft.com");
+```
+
 or the same snippet using a regex pattern instead:
 
+```csharp
+await using var browser = await playwright.Webkit.LaunchAsync();
+var page = await browser.NewPageAsync();
+await page.RouteAsync(new Regex("(\\.png$)|(\\.jpg$)"), async r => await r.AbortAsync());
+await page.GotoAsync("https://www.microsoft.com");
+```
+
 It is possible to examine the request to decide the route action. For example, mocking all requests that contain some post data, and leaving all other requests as is:
+
+```csharp
+await page.RouteAsync("/api/**", async r =>
+{
+  if (r.Request.PostData.Contains("my-string"))
+      await r.FulfillAsync(body: "mocked-data");
+  else
+      await r.ResumeAsync();
+});
+```
 
 Page routes take precedence over browser context routes (set up with [BrowserContext.RouteAsync(url, handler)](./api/class-browsercontext.mdx#browsercontextrouteasyncurl-handler)) when request matches both handlers.
 
@@ -898,6 +1175,15 @@ If the target element is not a `<select>` element, this method throws an error. 
 Returns the array of option values that have been successfully selected.
 
 Triggers a `change` and `input` event once all the provided options have been selected.
+
+```csharp
+// single selection matching the value
+await page.SelectOptionAsync("select#colors", new[] { "blue" });
+// single selection matching both the value and the label
+await page.SelectOptionAsync("select#colors", new[] { new SelectOptionValue() { Label = "blue" } });
+// multiple 
+await page.SelectOptionAsync("select#colors", new[] { "red", "green", "blue" });
+```
 
 Shortcut for main frame's [Frame.SelectOptionAsync(selector, values, …)](./api/class-frame.mdx#frameselectoptionasyncselector-values-).
 
@@ -970,6 +1256,12 @@ In the case of multiple pages in a single browser, each page can have its own vi
 
 `page.setViewportSize` will resize the page. A lot of websites don't expect phones to change size, so you should set the viewport size before navigating to the page.
 
+```csharp
+var page = await browser.NewPageAsync();
+await page.SetViewportSizeAsync(640, 480);
+await page.GotoAsync("https://www.microsoft.com");
+```
+
 ## Page.TapAsync(selector, …)
 - `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
 - `force` <[boolean]> Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.
@@ -1020,6 +1312,11 @@ Returns the page's title. Shortcut for main frame's [Frame.TitleAsync()](./api/c
 Sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in the text. `page.type` can be used to send fine-grained keyboard events. To fill values in form fields, use [Page.FillAsync(selector, value, …)](./api/class-page.mdx#pagefillasyncselector-value-).
 
 To press a special key, like `Control` or `ArrowDown`, use [Keyboard.PressAsync(key, …)](./api/class-keyboard.mdx#keyboardpressasynckey-).
+
+```csharp
+await page.TypeAsync("#mytextarea", "hello"); // types instantly
+await page.TypeAsync("#mytextarea", "world"); // types slower, like a user
+```
 
 Shortcut for main frame's [Frame.TypeAsync(selector, text, …)](./api/class-frame.mdx#frametypeasyncselector-text-).
 
@@ -1096,6 +1393,12 @@ Performs action and waits for a new [Download]. If predicate is provided, it pas
 
 Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the page is closed before the event is fired. Returns the event data value.
 
+```csharp
+var waitTask = page.WaitForEventAsync(PageEvent.FrameNavigated);
+await Task.WhenAll(waitTask, page.ClickAsync("button"));
+var frame = waitTask.Result;
+```
+
 ## Page.WaitForFileChooserAsync(…)
 - `predicate` <[Func]<[FileChooser], bool>> Receives the [FileChooser] object and resolves to truthy value when the waiting should resolve.
 - `timeout` <[double]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout).
@@ -1114,7 +1417,29 @@ Returns when the `expression` returns a truthy value. It resolves to a JSHandle 
 
 The [Page.WaitForFunctionAsync(expression, …)](./api/class-page.mdx#pagewaitforfunctionasyncexpression-) can be used to observe viewport size change:
 
+```csharp
+using Microsoft.Playwright;
+using System.Threading.Tasks;
+
+class FrameExamples
+{
+  public static async Task WaitForFunction()
+  {
+    using var playwright = await Playwright.CreateAsync();
+    await using var browser = await playwright.Webkit.LaunchAsync();
+    var page = await browser.NewPageAsync();
+    await page.SetViewportSizeAsync(50, 50);
+    await page.MainFrame.WaitForFunctionAsync("window.innerWidth < 100");
+  }
+}
+```
+
 To pass an argument to the predicate of [Page.WaitForFunctionAsync(expression, …)](./api/class-page.mdx#pagewaitforfunctionasyncexpression-) function:
+
+```csharp
+var selector = ".foo";
+await page.WaitForFunctionAsync("selector => !!document.querySelector(selector)", selector);
+```
 
 Shortcut for main frame's [Frame.WaitForFunctionAsync(expression, …)](./api/class-frame.mdx#framewaitforfunctionasyncexpression-).
 
@@ -1130,6 +1455,18 @@ Returns when the required load state has been reached.
 
 This resolves when the page reaches a required load state, `load` by default. The navigation must have been committed when this method is called. If current document has already reached the required state, resolves immediately.
 
+```csharp
+await page.ClickAsync("button"); // Click triggers navigation.
+await page.WaitForLoadStateAsync(); // The promise resolves after 'load' event.
+```
+
+```csharp
+var popupTask = page.WaitForPopupAsync();
+await Task.WhenAll(popupTask, page.ClickAsync("button")); // click triggers the popup/
+await popupTask.Result.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
+Console.WriteLine(await popupTask.Result.TitleAsync()); // popup is ready to use.
+```
+
 Shortcut for main frame's [Frame.WaitForLoadStateAsync(…)](./api/class-frame.mdx#framewaitforloadstateasync).
 
 ## Page.WaitForNavigationAsync(…)
@@ -1144,6 +1481,12 @@ Shortcut for main frame's [Frame.WaitForLoadStateAsync(…)](./api/class-frame.m
 Waits for the main frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
 
 This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
+
+```csharp
+await Task.WhenAll(page.WaitForNavigationAsync(),
+    frame.ClickAsync("a.delayed-navigation")); // clicking the link will indirectly cause a navigation
+// The method continues after navigation has finished
+```
 
 :::note
 Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
@@ -1165,12 +1508,32 @@ Performs action and waits for a popup [Page]. If predicate is provided, it passe
 
 Waits for the matching request and returns it.  See [waiting for event](./events.mdx#waiting-for-event) for more details about events.
 
+```csharp
+// Waits for the next response with the specified url
+await Task.WhenAll(page.WaitForRequestAsync("https://example.com/resource"),
+    page.ClickAsync("button.triggers-request"));
+
+// Waits for the next request matching some conditions
+await Task.WhenAll(page.WaitForRequestAsync(r => "https://example.com".Equals(r.Url) && "GET" == r.Method),
+    page.ClickAsync("button.triggers-request"));
+```
+
 ## Page.WaitForResponseAsync(urlOrPredicate, …)
 - `urlOrPredicate` <[string]|[Regex]|[Func]<[Response], bool>> Request URL string, regex or predicate receiving [Response] object.
 - `timeout` <[double]> Maximum wait time in milliseconds, defaults to 30 seconds, pass `0` to disable the timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
 - returns: <[Response]>
 
 Returns the matched response. See [waiting for event](./events.mdx#waiting-for-event) for more details about events.
+
+```csharp
+// Waits for the next response with the specified url
+await Task.WhenAll(page.WaitForResponseAsync("https://example.com/resource"),
+    page.ClickAsync("button.triggers-response"));
+
+// Waits for the next response matching some conditions
+await Task.WhenAll(page.WaitForResponseAsync(r => "https://example.com".Equals(r.Url) && r.Status == 200),
+    page.ClickAsync("button.triggers-response"));
+```
 
 ## Page.WaitForSelectorAsync(selector, …)
 - `selector` <[string]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
@@ -1188,6 +1551,31 @@ Wait for the `selector` to satisfy `state` option (either appear/disappear from 
 
 This method works across navigations:
 
+```csharp
+using Microsoft.Playwright;
+using System;
+using System.Threading.Tasks;
+
+class FrameExamples
+{
+  public static async Task Images()
+  {
+      using var playwright = await Playwright.CreateAsync();
+      await using var browser = await playwright.Chromium.LaunchAsync();
+      var page = await browser.NewPageAsync();
+
+      foreach (var currentUrl in new[] { "https://www.google.com", "https://bbc.com" })
+      {
+          await page.GotoAsync(currentUrl);
+          var element = await page.WaitForSelectorAsync("img");
+          Console.WriteLine($"Loaded image: {await element.GetAttributeAsync("src")}");
+      }
+
+      await browser.CloseAsync();
+  }
+}
+```
+
 ## Page.WaitForTimeoutAsync(timeout)
 - `timeout` <[double]> A timeout to wait for
 - returns: <[void]>
@@ -1195,6 +1583,11 @@ This method works across navigations:
 Waits for the given `timeout` in milliseconds.
 
 Note that `page.waitForTimeout()` should only be used for debugging. Tests using the timer in production are going to be flaky. Use signals such as network events, selectors becoming visible and others instead.
+
+```csharp
+// Wait for 1 second
+await page.WaitForTimeoutAsync(1000);
+```
 
 Shortcut for main frame's [Frame.WaitForTimeoutAsync(timeout)](./api/class-frame.mdx#framewaitfortimeoutasynctimeout).
 
@@ -1208,6 +1601,11 @@ Shortcut for main frame's [Frame.WaitForTimeoutAsync(timeout)](./api/class-frame
 - returns: <[void]>
 
 Waits for the main frame to navigate to the given URL.
+
+```csharp
+await page.ClickAsync("a.delayed-navigation"); // clicking the link will indirectly cause a navigation
+await page.WaitForURLAsync("**/target.html");
+```
 
 Shortcut for main frame's [Frame.WaitForURLAsync(url, …)](./api/class-frame.mdx#framewaitforurlasyncurl-).
 
@@ -1267,6 +1665,7 @@ This does not contain ServiceWorkers
 [Selectors]: ./api/class-selectors.mdx "Selectors"
 [TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
 [Video]: ./api/class-video.mdx "Video"
 [WebSocket]: ./api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"

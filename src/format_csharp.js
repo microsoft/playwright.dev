@@ -40,7 +40,7 @@ class CSharpFormatter {
       const signature = renderSharpSignature(args);
 
       let isGetter = !signature && !member.async && !!member.type;
-      if (member.name.startsWith('is') || member.name.startsWith('as'))
+      if (member.name.startsWith('as'))
         isGetter = false;
       text = `${toTitleCase(member.clazz.varName)}.${toAsyncTitleCase(member.async, member.alias)}`;
       if (!isGetter)

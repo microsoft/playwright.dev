@@ -7,6 +7,10 @@ import TabItem from '@theme/TabItem';
 
 JSHandle represents an in-page JavaScript object. JSHandles can be created with the [Page.EvaluateHandleAsync(expression, …)](./api/class-page.mdx#pageevaluatehandleasyncexpression-) method.
 
+```csharp
+var windowHandle = await page.EvaluateHandleAsync("() => window");
+```
+
 JSHandle prevents the referenced JavaScript object being garbage collected unless the handle is exposed with [JsHandle.DisposeAsync()](./api/class-jshandle.mdx#jshandledisposeasync). JSHandles are auto-disposed when their origin frame gets navigated or the parent context gets destroyed.
 
 JSHandle instances can be used as an argument in [Page.EvalOnSelectorAsync(selector, expression, …)](./api/class-page.mdx#pageevalonselectorasyncselector-expression-), [Page.EvaluateAsync(expression, …)](./api/class-page.mdx#pageevaluateasyncexpression-) and [Page.EvaluateHandleAsync(expression, …)](./api/class-page.mdx#pageevaluatehandleasyncexpression-) methods.
@@ -43,6 +47,11 @@ If `expression` returns a [Promise], then `handle.evaluate` would wait for the p
 
 Examples:
 
+```csharp
+var tweetHandle = await page.QuerySelectorAsync(".tweet .retweets");
+Assert.Equals("10 retweets", await tweetHandle.EvaluateAsync("node => node.innerText"));
+```
+
 ## JsHandle.EvaluateHandleAsync(expression, …)
 - `expression` <[string]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `arg` <[EvaluationArgument]> Optional argument to pass to `expression`.
@@ -62,6 +71,14 @@ See [Page.EvaluateHandleAsync(expression, …)](./api/class-page.mdx#pageevaluat
 - returns: <[Map]<[string], [JSHandle]>>
 
 The method returns a map with **own property names** as keys and JSHandle instances for the property values.
+
+```csharp
+var handle = await page.EvaluateHandleAsync("() => ({window, document}");
+var properties = await handle.GetPropertiesAsync();
+var windowHandle = properties["window"];
+var documentHandle = properties["document"];
+await handle.DisposeAsync();
+```
 
 ## JsHandle.GetPropertyAsync(propertyName)
 - `propertyName` <[string]> property to get
@@ -100,6 +117,7 @@ The method will return an empty JSON object if the referenced object is not stri
 [Selectors]: ./api/class-selectors.mdx "Selectors"
 [TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
 [Video]: ./api/class-video.mdx "Video"
 [WebSocket]: ./api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"
