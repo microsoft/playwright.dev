@@ -27,6 +27,10 @@ await context.close();
 - [browserContext.on('backgroundpage')](./api/class-browsercontext.mdx#browsercontextonbackgroundpage)
 - [browserContext.on('close')](./api/class-browsercontext.mdx#browsercontextonclose)
 - [browserContext.on('page')](./api/class-browsercontext.mdx#browsercontextonpage)
+- [browserContext.on('request')](./api/class-browsercontext.mdx#browsercontextonrequest)
+- [browserContext.on('requestfailed')](./api/class-browsercontext.mdx#browsercontextonrequestfailed)
+- [browserContext.on('requestfinished')](./api/class-browsercontext.mdx#browsercontextonrequestfinished)
+- [browserContext.on('response')](./api/class-browsercontext.mdx#browsercontextonresponse)
 - [browserContext.on('serviceworker')](./api/class-browsercontext.mdx#browsercontextonserviceworker)
 - [browserContext.addCookies(cookies)](./api/class-browsercontext.mdx#browsercontextaddcookiescookies)
 - [browserContext.addInitScript(script[, arg])](./api/class-browsercontext.mdx#browsercontextaddinitscriptscript-arg)
@@ -53,6 +57,7 @@ await context.close();
 - [browserContext.storageState([options])](./api/class-browsercontext.mdx#browsercontextstoragestateoptions)
 - [browserContext.unroute(url[, handler])](./api/class-browsercontext.mdx#browsercontextunrouteurl-handler)
 - [browserContext.waitForEvent(event[, optionsOrPredicate])](./api/class-browsercontext.mdx#browsercontextwaitforeventevent-optionsorpredicate)
+- [browserContext.tracing](./api/class-browsercontext.mdx#browsercontexttracing)
 
 ## browserContext.on('backgroundpage')
 - type: <[Page]>
@@ -93,6 +98,32 @@ console.log(await newPage.evaluate('location.href'));
 :::note
 Use [page.waitForLoadState([state, options])](./api/class-page.mdx#pagewaitforloadstatestate-options) to wait until the page gets to a particular state (you should not need it in most cases).
 :::
+
+## browserContext.on('request')
+- type: <[Request]>
+
+Emitted when a request is issued from any pages created through this context. The [request] object is read-only. To only listen for requests from a particular page, use [page.on('request')](./api/class-page.mdx#pageonrequest).
+
+In order to intercept and mutate requests, see [browserContext.route(url, handler)](./api/class-browsercontext.mdx#browsercontextrouteurl-handler) or [page.route(url, handler)](./api/class-page.mdx#pagerouteurl-handler).
+
+## browserContext.on('requestfailed')
+- type: <[Request]>
+
+Emitted when a request fails, for example by timing out. To only listen for failed requests from a particular page, use [page.on('requestfailed')](./api/class-page.mdx#pageonrequestfailed).
+
+:::note
+HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [browserContext.on('requestfinished')](./api/class-browsercontext.mdx#browsercontextonrequestfinished) event and not with [browserContext.on('requestfailed')](./api/class-browsercontext.mdx#browsercontextonrequestfailed).
+:::
+
+## browserContext.on('requestfinished')
+- type: <[Request]>
+
+Emitted when a request finishes successfully after downloading the response body. For a successful response, the sequence of events is `request`, `response` and `requestfinished`. To listen for successful requests from a particular page, use [page.on('requestfinished')](./api/class-page.mdx#pageonrequestfinished).
+
+## browserContext.on('response')
+- type: <[Response]>
+
+Emitted when [response] status and headers are received for a request. For a successful response, the sequence of events is `request`, `response` and `requestfinished`. To listen for response events from a particular page, use [page.on('response')](./api/class-page.mdx#pageonresponse).
 
 ## browserContext.on('serviceworker')
 - type: <[Worker]>
@@ -501,6 +532,8 @@ const [page, _] = await Promise.all([
 ]);
 ```
 
+## browserContext.tracing
+- type: <[Tracing]>
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"
@@ -534,6 +567,7 @@ const [page, _] = await Promise.all([
 [Selectors]: ./api/class-selectors.mdx "Selectors"
 [TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
 [Video]: ./api/class-video.mdx "Video"
 [WebSocket]: ./api/class-websocket.mdx "WebSocket"
 [Worker]: ./api/class-worker.mdx "Worker"

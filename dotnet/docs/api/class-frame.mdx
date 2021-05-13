@@ -14,6 +14,32 @@ At every point of time, page exposes its current frame tree via the [Page.MainFr
 
 An example of dumping frame tree:
 
+```csharp
+using Microsoft.Playwright;
+using System;
+using System.Threading.Tasks;
+
+class FrameExamples
+{
+    public static async Task Main()
+    {
+        using var playwright = await Playwright.CreateAsync();
+        await using var browser = await playwright.Firefox.LaunchAsync();
+        var page = await browser.NewPageAsync();
+
+        await page.GotoAsync("https://www.bing.com");
+        DumpFrameTree(page.MainFrame, string.Empty);
+    }
+
+    private static void DumpFrameTree(IFrame frame, string indent)
+    {
+        Console.WriteLine($"{indent}{frame.Url}");
+        foreach (var child in frame.ChildFrames)
+            DumpFrameTree(child, indent + " ");
+    }
+}
+```
+
 
 - [Frame.AddScriptTagAsync(…)](./api/class-frame.mdx#frameaddscripttagasync)
 - [Frame.AddStyleTagAsync(…)](./api/class-frame.mdx#frameaddstyletagasync)
@@ -36,7 +62,7 @@ An example of dumping frame tree:
 - [Frame.InnerHTMLAsync(selector, …)](./api/class-frame.mdx#frameinnerhtmlasyncselector-)
 - [Frame.InnerTextAsync(selector, …)](./api/class-frame.mdx#frameinnertextasyncselector-)
 - [Frame.IsCheckedAsync(selector, …)](./api/class-frame.mdx#frameischeckedasyncselector-)
-- [Frame.IsDetached()](./api/class-frame.mdx#frameisdetached)
+- [Frame.IsDetached](./api/class-frame.mdx#frameisdetached)
 - [Frame.IsDisabledAsync(selector, …)](./api/class-frame.mdx#frameisdisabledasyncselector-)
 - [Frame.IsEditableAsync(selector, …)](./api/class-frame.mdx#frameiseditableasyncselector-)
 - [Frame.IsEnabledAsync(selector, …)](./api/class-frame.mdx#frameisenabledasyncselector-)
@@ -175,6 +201,10 @@ When all steps combined have not finished during the specified `timeout`, this m
 
 The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the element, `click` is dispatched. This is equivalent to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
 
+```csharp
+await frame.DispatchEventAsync("button#submit", "click");
+```
+
 Under the hood, it creates an instance of an event based on the given `type`, initializes it with `eventInit` properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
 
 Since `eventInit` is event-specific, please refer to the events documentation for the lists of initial properties:
@@ -187,6 +217,12 @@ Since `eventInit` is event-specific, please refer to the events documentation fo
 * [Event](https://developer.mozilla.org/en-US/docs/Web/API/Event/Event)
 
 You can also specify `JSHandle` as the property value if you want live objects to be passed into the event:
+
+```csharp
+// Note you can only create DataTransfer in Chromium and Firefox
+var dataTransfer = await frame.EvaluateHandleAsync("() => new DataTransfer()");
+await frame.DispatchEventAsync("#source", "dragstart", new { dataTransfer });
+```
 
 ## Frame.EvalOnSelectorAsync(selector, expression, …)
 - `selector` <[string]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
@@ -202,6 +238,12 @@ If `expression` returns a [Promise], then [Frame.EvalOnSelectorAsync(selector, e
 
 Examples:
 
+```csharp
+var searchValue = await frame.EvalOnSelectorAsync<string>("#search", "el => el.value");
+var preloadHref = await frame.EvalOnSelectorAsync<string>("link[rel=preload]", "el => el.href");
+var html = await frame.EvalOnSelectorAsync(".main-container", "(e, suffix) => e.outerHTML + suffix", "hello");
+```
+
 ## Frame.EvalOnSelectorAllAsync(selector, expression, …)
 - `selector` <[string]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
 - `expression` <[string]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
@@ -216,6 +258,10 @@ If `expression` returns a [Promise], then [Frame.EvalOnSelectorAllAsync(selector
 
 Examples:
 
+```csharp
+var divsCount = await frame.EvalOnSelectorAllAsync<bool>("div", "(divs, min) => divs.length >= min", 10);
+```
+
 ## Frame.EvaluateAsync(expression, …)
 - `expression` <[string]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
 - `arg` <[EvaluationArgument]> Optional argument to pass to `expression`.
@@ -227,9 +273,24 @@ If the function passed to the [Frame.EvaluateAsync(expression, …)](./api/class
 
 If the function passed to the [Frame.EvaluateAsync(expression, …)](./api/class-frame.mdx#frameevaluateasyncexpression-) returns a non-[Serializable] value, then [Frame.EvaluateAsync(expression, …)](./api/class-frame.mdx#frameevaluateasyncexpression-) returns `undefined`. Playwright also supports transferring some additional values that are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`.
 
+```csharp
+var result = await frame.EvaluateAsync<int>("([x, y]) => Promise.resolve(x * y)", new[] { 7, 8 });
+Console.WriteLine(result);
+```
+
 A string can also be passed in instead of a function.
 
+```csharp
+Console.WriteLine(await frame.EvaluateAsync<int>("1 + 2")); // prints "3"
+```
+
 [ElementHandle] instances can be passed as an argument to the [Frame.EvaluateAsync(expression, …)](./api/class-frame.mdx#frameevaluateasyncexpression-):
+
+```csharp
+var bodyHandle = await frame.QuerySelectorAsync("body");
+var html = await frame.EvaluateAsync<string>("([body, suffix]) => body.innerHTML + suffix", new object [] { bodyHandle, "hello" });
+await bodyHandle.DisposeAsync();
+```
 
 ## Frame.EvaluateHandleAsync(expression, …)
 - `expression` <[string]> JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.
@@ -242,9 +303,25 @@ The only difference between [Frame.EvaluateAsync(expression, …)](./api/class-f
 
 If the function, passed to the [Frame.EvaluateHandleAsync(expression, …)](./api/class-frame.mdx#frameevaluatehandleasyncexpression-), returns a [Promise], then [Frame.EvaluateHandleAsync(expression, …)](./api/class-frame.mdx#frameevaluatehandleasyncexpression-) would wait for the promise to resolve and return its value.
 
+```csharp
+// Handle for the window object.
+var aWindowHandle = await frame.EvaluateHandleAsync("() => Promise.resolve(window)");
+```
+
 A string can also be passed in instead of a function.
 
+```csharp
+var docHandle = await frame.EvalueHandleAsync("document"); // Handle for the `document`
+```
+
 [JSHandle] instances can be passed as an argument to the [Frame.EvaluateHandleAsync(expression, …)](./api/class-frame.mdx#frameevaluatehandleasyncexpression-):
+
+```csharp
+var handle = await frame.EvaluateHandleAsync("() => document.body");
+var resultHandle = await frame.EvaluateHandleAsync("([body, suffix]) => body.innerHTML + suffix", new object[] { handle, "hello" });
+Console.WriteLine(await resultHandle.JsonValueAsync<string>());
+await resultHandle.DisposeAsync();
+```
 
 ## Frame.FillAsync(selector, value, …)
 - `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
@@ -274,6 +351,12 @@ Returns the `frame` or `iframe` element handle which corresponds to this frame.
 This is an inverse of [ElementHandle.ContentFrameAsync()](./api/class-elementhandle.mdx#elementhandlecontentframeasync). Note that returned handle actually belongs to the parent frame.
 
 This method throws an error if the frame has been detached before `frameElement()` returns.
+
+```csharp
+var frameElement = await frame.FrameElementAsync();
+var contentFrame = await frameElement.ContentFrameAsync();
+Console.WriteLine(frame == contentFrame); // -> True
+```
 
 ## Frame.GetAttributeAsync(selector, name, …)
 - `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
@@ -353,7 +436,7 @@ Returns `element.innerText`.
 
 Returns whether the element is checked. Throws if the element is not a checkbox or radio input.
 
-## Frame.IsDetached()
+## Frame.IsDetached
 - returns: <[boolean]>
 
 Returns `true` if the frame has been detached, or `false` otherwise.
@@ -468,6 +551,15 @@ Returns the array of option values that have been successfully selected.
 
 Triggers a `change` and `input` event once all the provided options have been selected.
 
+```csharp
+// single selection matching the value
+await frame.SelectOptionAsync("select#colors", new[] { "blue" });
+// single selection matching both the value and the label
+await frame.SelectOptionAsync("select#colors", new[] { new SelectOptionValue() { Label = "blue" } });
+// multiple selection
+await frame.SelectOptionAsync("select#colors", new[] { "red", "green", "blue" });
+```
+
 ## Frame.SetContentAsync(html, …)
 - `html` <[string]> HTML markup to assign to the page.
 - `timeout` <[double]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaultnavigationtimeouttimeout), [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout), [Page.SetDefaultNavigationTimeout(timeout)](./api/class-page.mdx#pagesetdefaultnavigationtimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
@@ -540,6 +632,11 @@ Sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in t
 
 To press a special key, like `Control` or `ArrowDown`, use [Keyboard.PressAsync(key, …)](./api/class-keyboard.mdx#keyboardpressasynckey-).
 
+```csharp
+await frame.TypeAsync("#mytextarea", "hello"); // types instantly
+await frame.TypeAsync("#mytextarea", "world", delay: 100); // types slower, like a user
+```
+
 ## Frame.UncheckAsync(selector, …)
 - `selector` <[string]> A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.
 - `force` <[boolean]> Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.
@@ -578,7 +675,29 @@ Returns when the `expression` returns a truthy value, returns that value.
 
 The [Frame.WaitForFunctionAsync(expression, …)](./api/class-frame.mdx#framewaitforfunctionasyncexpression-) can be used to observe viewport size change:
 
+```csharp
+using Microsoft.Playwright;
+using System.Threading.Tasks;
+
+class FrameExamples
+{
+    public static async Task Main()
+    {
+        using var playwright = await Playwright.CreateAsync();
+        await using var browser = await playwright.Firefox.LaunchAsync();
+        var page = await browser.NewPageAsync();
+        await page.SetViewportSizeAsync(50, 50);
+        await page.MainFrame.WaitForFunctionAsync("window.innerWidth < 100");
+    }
+}
+```
+
 To pass an argument to the predicate of `frame.waitForFunction` function:
+
+```csharp
+var selector = ".foo";
+await page.MainFrame.WaitForFunctionAsync("selector => !!document.querySelector(selector)", selector);
+```
 
 ## Frame.WaitForLoadStateAsync(…)
 - `state` <"load"|"domcontentloaded"|"networkidle"> Optional load state to wait for, defaults to `load`. If the state has been already reached while loading current document, the method resolves immediately. Can be one of:
@@ -592,6 +711,11 @@ Waits for the required load state to be reached.
 
 This returns when the frame reaches a required load state, `load` by default. The navigation must have been committed when this method is called. If current document has already reached the required state, resolves immediately.
 
+```csharp
+await frame.ClickAsync("button");
+await frame.WaitForLoadStateAsync(); // Defaults to LoadState.Load
+```
+
 ## Frame.WaitForNavigationAsync(…)
 - `timeout` <[double]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaultnavigationtimeouttimeout), [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout), [Page.SetDefaultNavigationTimeout(timeout)](./api/class-page.mdx#pagesetdefaultnavigationtimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
 - `url` <[string]|[Regex]|[Func]<[string], bool>> A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation.
@@ -604,6 +728,12 @@ This returns when the frame reaches a required load state, `load` by default. Th
 Waits for the frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
 
 This method waits for the frame to navigate to a new URL. It is useful for when you run code which will indirectly cause the frame to navigate. Consider this example:
+
+```csharp
+Task.WaitAll(frame.WaitForNavigationAsync(),
+            frame.ClickAsync("a.delayed-navigation")); // clicking the link will indirectly cause a navigation
+// Resolves after navigation has finished
+```
 
 :::note
 Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
@@ -625,6 +755,29 @@ Wait for the `selector` to satisfy `state` option (either appear/disappear from 
 
 This method works across navigations:
 
+```csharp
+using Microsoft.Playwright;
+using System;
+using System.Threading.Tasks;
+
+class FrameExamples
+{
+  public static async Task Main()
+  {
+    using var playwright = await Playwright.CreateAsync();
+    await using var browser = await playwright.Chromium.LaunchAsync();
+    var page = await browser.NewPageAsync();
+
+    foreach (var currentUrl in new[] { "https://www.google.com", "https://bbc.com" })
+    {
+      await page.GotoAsync(currentUrl);
+      element = await page.MainFrame.WaitForSelectorAsync("img");
+      Console.WriteLine($"Loaded image: {await element.GetAttributeAsync("src")}");
+    }
+  }
+}
+```
+
 ## Frame.WaitForTimeoutAsync(timeout)
 - `timeout` <[double]> A timeout to wait for
 - returns: <[void]>
@@ -643,6 +796,12 @@ Note that `frame.waitForTimeout()` should only be used for debugging. Tests usin
 - returns: <[void]>
 
 Waits for the frame to navigate to the given URL.
+
+```csharp
+await frame.ClickAsync("a.delayed-navigation"); // clicking the link will indirectly cause a navigation
+await frame.WaitForURLAsync("**/target.html");
+```
+
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Browser]: ./api/class-browser.mdx "Browser"
@@ -665,6 +824,7 @@ Waits for the frame to navigate to the given URL.
 [Selectors]: ./api/class-selectors.mdx "Selectors"
 [TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
 [Video]: ./api/class-video.mdx "Video"
 [WebSocket]: ./api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"

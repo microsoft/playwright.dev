@@ -9,6 +9,29 @@ import TabItem from '@theme/TabItem';
 
 An example of using `Dialog` class:
 
+```csharp
+using Microsoft.Playwright;
+using System.Threading.Tasks;
+
+class DialogExample
+{
+    public static async Task Run()
+    {
+        using var playwright = await Playwright.CreateAsync();
+        await using var browser = await playwright.Chromium.LaunchAsync();
+        var page = await browser.NewPageAsync();
+
+        page.Dialog += async (_, dialog) =>
+        {
+            System.Console.WriteLine(dialog.Message);
+            await dialog.DismissAsync();
+        };
+
+        await page.EvaluateAsync("alert('1');");
+    }
+}
+```
+
 :::note
 Dialogs are dismissed automatically, unless there is a [event Page.Dialog](./api/class-page.mdx#eventpagedialog) listener. When listener is present, it **must** either [Dialog.AcceptAsync(…)](./api/class-dialog.mdx#dialogacceptasync) or [Dialog.DismissAsync()](./api/class-dialog.mdx#dialogdismissasync) the dialog - otherwise the page will [freeze](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#never_blocking) waiting for the dialog, and actions like click will never finish.
 :::
@@ -67,6 +90,7 @@ Returns dialog's type, can be one of `alert`, `beforeunload`, `confirm` or `prom
 [Selectors]: ./api/class-selectors.mdx "Selectors"
 [TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
 [Video]: ./api/class-video.mdx "Video"
 [WebSocket]: ./api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"

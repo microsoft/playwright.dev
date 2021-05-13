@@ -7,6 +7,25 @@ import TabItem from '@theme/TabItem';
 
 BrowserType provides methods to launch a specific browser instance or connect to an existing one. The following is a typical example of using Playwright to drive automation:
 
+```csharp
+using Microsoft.Playwright;
+using System.Threading.Tasks;
+
+class BrowserTypeExamples
+{
+    public static async Task Run()
+    {
+        using var playwright = await Playwright.CreateAsync();
+        var chromium = playwright.Chromium;
+        var browser = await chromium.LaunchAsync();
+        var page = await browser.NewPageAsync();
+        await page.GoToAsync("https://www.bing.com");
+        // other actions
+        await browser.CloseAsync();
+    }
+}
+```
+
 
 - [BrowserType.ExecutablePath](./api/class-browsertype.mdx#browsertypeexecutablepath)
 - [BrowserType.LaunchAsync(…)](./api/class-browsertype.mdx#browsertypelaunchasync)
@@ -21,7 +40,7 @@ A path where Playwright expects to find a bundled browser executable.
 ## BrowserType.LaunchAsync(…)
 - `args` <[IEnumerable]<[string]>> Additional arguments to pass to the browser instance. The list of Chromium flags can be found [here](http://peter.sh/experiments/chromium-command-line-switches/).
 - `channel` <"chrome"|"chrome-beta"|"chrome-dev"|"chrome-canary"|"msedge"|"msedge-beta"|"msedge-dev"|"msedge-canary"|"firefox-stable"> Browser distribution channel. Read more about using [Google Chrome and Microsoft Edge](./browsers.mdx#google-chrome--microsoft-edge).
-- `chromiumSandbox` <[boolean]> Enable Chromium sandboxing. Defaults to `false`.
+- `chromiumSandbox` <[boolean]> Enable Chromium sandboxing. Defaults to `true`.
 - `devtools` <[boolean]> **Chromium-only** Whether to auto-open a Developer Tools panel for each tab. If this option is `true`, the `headless` option will be set `false`.
 - `downloadsPath` <[string]> If specified, accepted downloads are downloaded into this directory. Otherwise, temporary directory is created and is deleted when browser is closed.
 - `env` <[Map]<[string], [string]>> Specify environment variables that will be visible to the browser. Defaults to `process.env`.
@@ -40,11 +59,16 @@ A path where Playwright expects to find a bundled browser executable.
   - `password` <[string]> Optional password to use if HTTP proxy requires authentication.
 - `slowMo` <[double]> Slows down Playwright operations by the specified amount of milliseconds. Useful so that you can see what is going on.
 - `timeout` <[double]> Maximum time in milliseconds to wait for the browser instance to start. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
+- `traceDir` <[string]> If specified, traces are saved into this directory.
 - returns: <[Browser]>
 
 Returns the browser instance.
 
 You can use `ignoreDefaultArgs` to filter out `--mute-audio` from default arguments:
+
+```csharp
+var browser = await playwright.Chromium.LaunchAsync(ignoreDefaultArgs: new[] { "--mute-audio" })
+```
 
 > **Chromium-only** Playwright can also be used to control the Google Chrome or Microsoft Edge browsers, but it works best with the version of Chromium it is bundled with. There is no guarantee it will work with any other version. Use `executablePath` option with extreme caution.
 >
@@ -64,7 +88,7 @@ You can use `ignoreDefaultArgs` to filter out `--mute-audio` from default argume
 - `devtools` <[boolean]> **Chromium-only** Whether to auto-open a Developer Tools panel for each tab. If this option is `true`, the `headless` option will be set `false`.
 - `downloadsPath` <[string]> If specified, accepted downloads are downloaded into this directory. Otherwise, temporary directory is created and is deleted when browser is closed.
 - `env` <[Map]<[string], [string]>> Specify environment variables that will be visible to the browser. Defaults to `process.env`.
-- `executablePath` <[string]> Path to a browser executable to run instead of the bundled one. If `executablePath` is a relative path, then it is resolved relative to the current working directory. **BEWARE**: Playwright is only guaranteed to work with the bundled Chromium, Firefox or WebKit, use at your own risk.
+- `executablePath` <[string]> Path to a browser executable to run instead of the bundled one. If `executablePath` is a relative path, then it is resolved relative to the current working directory. Note that Playwright only works with the bundled Chromium, Firefox or WebKit, use at your own risk.
 - `extraHTTPHeaders` <[Map]<[string], [string]>> An object containing additional HTTP headers to be sent with every request. All header values must be strings.
 - `geolocation` <`Geolocation`>
   - `latitude` <[double]> Latitude between -90 and 90.
@@ -100,9 +124,10 @@ You can use `ignoreDefaultArgs` to filter out `--mute-audio` from default argume
 - `screenSize` <`ScreenSize`> Emulates consistent window screen size available inside web page via `window.screen`. Is only used when the `viewport` is set.
   - `width` <[int]> page width in pixels.
   - `height` <[int]> page height in pixels.
-- `slowMo` <[double]> Slows down Playwright operations by the specified amount of milliseconds. Useful so that you can see what is going on. Defaults to 0.
+- `slowMo` <[double]> Slows down Playwright operations by the specified amount of milliseconds. Useful so that you can see what is going on.
 - `timeout` <[double]> Maximum time in milliseconds to wait for the browser instance to start. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
 - `timezoneId` <[string]> Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.
+- `traceDir` <[string]> If specified, traces are saved into this directory.
 - `userAgent` <[string]> Specific user agent to use in this context.
 - `viewportSize` <[null]|`ViewportSize`> Emulates consistent viewport for each page. Defaults to an 1280x720 viewport. Use `ViewportSize.NoViewport` to disable the default viewport.
   - `width` <[int]> page width in pixels.
@@ -139,6 +164,7 @@ Returns browser name. For example: `'chromium'`, `'webkit'` or `'firefox'`.
 [Selectors]: ./api/class-selectors.mdx "Selectors"
 [TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
 [Video]: ./api/class-video.mdx "Video"
 [WebSocket]: ./api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"

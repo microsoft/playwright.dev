@@ -87,6 +87,7 @@ module.exports = {
             { "type": "doc", "id": "api/class-selectors" },
             { "type": "doc", "id": "api/class-timeouterror" },
             { "type": "doc", "id": "api/class-touchscreen" },
+            { "type": "doc", "id": "api/class-tracing" },
             { "type": "doc", "id": "api/class-video" },
             { "type": "doc", "id": "api/class-websocket" },
             { "type": "doc", "id": "api/class-websocketframe" },

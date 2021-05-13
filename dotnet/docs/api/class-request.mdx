@@ -21,12 +21,12 @@ If request gets a 'redirect' response, the request is successfully finished with
 
 - [Request.Failure](./api/class-request.mdx#requestfailure)
 - [Request.Frame](./api/class-request.mdx#requestframe)
-- [Request.GetPayloadAsJson(…)](./api/class-request.mdx#requestgetpayloadasjson)
 - [Request.Headers](./api/class-request.mdx#requestheaders)
-- [Request.IsNavigationRequest()](./api/class-request.mdx#requestisnavigationrequest)
+- [Request.IsNavigationRequest](./api/class-request.mdx#requestisnavigationrequest)
 - [Request.Method](./api/class-request.mdx#requestmethod)
 - [Request.PostData](./api/class-request.mdx#requestpostdata)
 - [Request.PostDataBuffer](./api/class-request.mdx#requestpostdatabuffer)
+- [Request.PostDataJSON(…)](./api/class-request.mdx#requestpostdatajson)
 - [Request.RedirectedFrom](./api/class-request.mdx#requestredirectedfrom)
 - [Request.RedirectedTo](./api/class-request.mdx#requestredirectedto)
 - [Request.ResourceType](./api/class-request.mdx#requestresourcetype)
@@ -41,23 +41,24 @@ The method returns `null` unless this request has failed, as reported by `reques
 
 Example of logging of all the failed requests:
 
+```csharp
+page.RequestFailed += (_, request) =>
+{
+    Console.WriteLine(request.Failure);
+};
+```
+
 ## Request.Frame
 - returns: <[Frame]>
 
 Returns the [Frame] that initiated this request.
-
-## Request.GetPayloadAsJson(…)
-- `documentOptions` <[null]|[JsonDocumentOptions]> The options that control custom behaviour when parsing the JSON.
-- returns: <[JsonDocument]>
-
-Returns a [JsonDocument] representation of [Request.PostDataBuffer](./api/class-request.mdx#requestpostdatabuffer).
 
 ## Request.Headers
 - returns: <[Map]<[string], [string]>>
 
 An object with HTTP headers associated with the request. All header names are lower-case.
 
-## Request.IsNavigationRequest()
+## Request.IsNavigationRequest
 - returns: <[boolean]>
 
 Whether this request is driving frame's navigation.
@@ -77,6 +78,14 @@ Request's post body, if any.
 
 Request's post body in a binary form, if any.
 
+## Request.PostDataJSON(…)
+- `documentOptions` <[null]|[JsonDocumentOptions]> Optional Json options that control custom behaviour when parsing the JSON.
+- returns: <[JsonDocument]>
+
+Returns parsed request's body for `form-urlencoded` and JSON as a fallback if any.
+
+When the response is `application/x-www-form-urlencoded` then a key/value object of the values will be returned. Otherwise it will be parsed as JSON.
+
 ## Request.RedirectedFrom
 - returns: <[null]|[Request]>
 
@@ -86,7 +95,17 @@ When the server responds with a redirect, Playwright creates a new [Request] obj
 
 For example, if the website `http://example.com` redirects to `https://example.com`:
 
+```csharp
+var response = await page.GotoAsync("http://www.microsoft.com");
+Console.WriteLine(response.Request.RedirectedFrom?.Url); // http://www.microsoft.com
+```
+
 If the website `https://google.com` has no redirects:
+
+```csharp
+var response = await page.GotoAsync("https://www.google.com");
+Console.WriteLine(response.Request.RedirectedFrom?.Url); // null
+```
 
 ## Request.RedirectedTo
 - returns: <[null]|[Request]>
@@ -94,6 +113,10 @@ If the website `https://google.com` has no redirects:
 New request issued by the browser if the server responded with redirect.
 
 This method is the opposite of [Request.RedirectedFrom](./api/class-request.mdx#requestredirectedfrom):
+
+```csharp
+Console.WriteLine(request.RedirectedFrom?.RedirectedTo == request); // True
+```
 
 ## Request.ResourceType
 - returns: <[string]>
@@ -118,6 +141,12 @@ Returns the matching [Response] object, or `null` if the response was not receiv
   - `responseEnd` <[double]> Time immediately after the browser receives the last byte of the resource or immediately before the transport connection is closed, whichever comes first. The value is given in milliseconds relative to `startTime`, -1 if not available.
 
 Returns resource timing information for given request. Most of the timing values become available upon the response, `responseEnd` becomes available when request finishes. Find more information at [Resource Timing API](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceResourceTiming).
+
+```csharp
+var requestFinishedTask = page.WaitForEventAsync(PageEvent.RequestFinished);
+await Task.WhenAll(requestFinishedTask, page.GotoAsync("https://www.microsoft.com"));
+Console.WriteLine(requestFinishedTask.Result.Timing.ResponseEnd);
+```
 
 ## Request.Url
 - returns: <[string]>
@@ -145,6 +174,7 @@ URL of the request.
 [Selectors]: ./api/class-selectors.mdx "Selectors"
 [TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
 [Video]: ./api/class-video.mdx "Video"
 [WebSocket]: ./api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"
