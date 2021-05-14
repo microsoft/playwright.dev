@@ -46,7 +46,18 @@ Fulfills route's request with given response.
 
 An example of fulfilling all requests with 404 responses:
 
+```csharp
+await page.RouteAsync("**/*", route => route.FulfillAsync(
+    status: 404,
+    contentType: "text/plain", 
+    body: "Not Found!"));
+```
+
 An example of serving static file:
+
+```csharp
+await page.RouteAsync("**/xhr_endpoint", route => route.FulfillAsync(path: "mock_data.json"));
+```
 
 ## Route.Request
 - returns: <[Request]>
@@ -61,6 +72,16 @@ A request to be routed.
 - returns: <[void]>
 
 Continues route's request with optional overrides.
+
+```csharp
+await page.RouteAsync("**/*", route =>
+{
+    var headers = new Dictionary<string, string>(route.Request.Headers) { { "foo", "bar" } };
+    headers.Remove("origin");
+    route.ResumeAsync(headers);
+});
+```
+
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Browser]: ./api/class-browser.mdx "Browser"
