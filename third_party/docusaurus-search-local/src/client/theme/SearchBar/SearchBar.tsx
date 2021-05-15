@@ -15,22 +15,33 @@ import { SearchSourceFactory } from "../../utils/SearchSourceFactory";
 import { SuggestionTemplate } from "./SuggestionTemplate";
 import { EmptyTemplate } from "./EmptyTemplate";
 import { SearchResult } from "../../../shared/interfaces";
-import { searchResultLimits, Mark } from "../../utils/proxiedGenerated";
+import {
+  searchResultLimits,
+  Mark,
+  translations,
+} from "../../utils/proxiedGenerated";
 import LoadingRing from "../LoadingRing/LoadingRing";
 
 import styles from "./SearchBar.module.css";
 
 async function fetchAutoCompleteJS(): Promise<any> {
-  const autoComplete = await import("@easyops-cn/autocomplete.js");
-  autoComplete.noConflict();
-  return autoComplete.default;
+  const autoCompleteModule = await import("@easyops-cn/autocomplete.js");
+  const autoComplete = autoCompleteModule.default;
+  if (autoComplete.noConflict) {
+    // For webpack v5 since docusaurus v2.0.0-alpha.75
+    autoComplete.noConflict();
+  } else if (autoCompleteModule.noConflict) {
+    // For webpack v4 before docusaurus v2.0.0-alpha.74
+    autoCompleteModule.noConflict();
+  }
+  return autoComplete;
 }
 
 const SEARCH_PARAM_HIGHLIGHT = "_highlight";
 
 interface SearchBarProps {
   isSearchBarExpanded: boolean;
-  handleSearchBarToggle: (expanded: boolean) => void;
+  handleSearchBarToggle?: (expanded: boolean) => void;
 }
 
 export default function SearchBar({
@@ -96,7 +107,7 @@ export default function SearchBar({
               const a = document.createElement("a");
               const url = `${baseUrl}search?q=${encodeURIComponent(query)}`;
               a.href = url;
-              a.textContent = "See all results";
+              a.textContent = translations.see_all_results;
               a.addEventListener("click", (e) => {
                 if (!e.ctrlKey && !e.metaKey) {
                   e.preventDefault();
@@ -157,17 +168,18 @@ export default function SearchBar({
       return;
     }
     const mark = new Mark(root);
+    mark.unmark();
     mark.mark(keywords);
   }, [location.search]);
 
   const onInputFocus = useCallback(() => {
     focusAfterIndexLoaded.current = true;
     loadIndex();
-    handleSearchBarToggle(true);
+    handleSearchBarToggle?.(true);
   }, [handleSearchBarToggle, loadIndex]);
 
   const onInputBlur = useCallback(() => {
-    handleSearchBarToggle(false);
+    handleSearchBarToggle?.(false);
   }, [handleSearchBarToggle]);
 
   const onInputMouseEnter = useCallback(() => {
@@ -190,7 +202,7 @@ export default function SearchBar({
       })}
     >
       <input
-        placeholder="Search"
+        placeholder={translations.search_placeholder}
         aria-label="Search"
         className="navbar__search-input"
         onMouseEnter={onInputMouseEnter}
