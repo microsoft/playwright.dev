@@ -12,6 +12,8 @@ import { highlight } from "../../utils/highlight";
 import { highlightStemmed } from "../../utils/highlightStemmed";
 import { getStemmedPositions } from "../../utils/getStemmedPositions";
 import LoadingRing from "../LoadingRing/LoadingRing";
+import { translations } from "../../utils/proxiedGenerated";
+import { simpleTemplate } from "../../utils/simpleTemplate";
 
 import styles from "./SearchPage.module.css";
 
@@ -29,8 +31,10 @@ export default function SearchPage(): React.ReactElement {
   const pageTitle = useMemo(
     () =>
       searchQuery
-        ? `Search results for "${searchQuery}"`
-        : "Search the documentation",
+        ? simpleTemplate(translations.search_results_for, {
+            keyword: searchQuery,
+          })
+        : translations.search_the_documentation,
     [searchQuery]
   );
 
@@ -84,18 +88,16 @@ export default function SearchPage(): React.ReactElement {
       <div className="container margin-vert--lg">
         <h1>{pageTitle}</h1>
 
-        <form>
-          <input
-            type="search"
-            name="q"
-            className={styles.searchQueryInput}
-            aria-label="Search"
-            onChange={handleSearchInputChange}
-            value={searchQuery}
-            autoComplete="off"
-            autoFocus
-          />
-        </form>
+        <input
+          type="search"
+          name="q"
+          className={styles.searchQueryInput}
+          aria-label="Search"
+          onChange={handleSearchInputChange}
+          value={searchQuery}
+          autoComplete="off"
+          autoFocus
+        />
 
         {!searchSource && searchQuery && (
           <div>
@@ -106,11 +108,17 @@ export default function SearchPage(): React.ReactElement {
         {searchResults &&
           (searchResults.length > 0 ? (
             <p>
-              {searchResults.length} document
-              {searchResults.length === 1 ? "" : "s"} found
+              {simpleTemplate(
+                searchResults.length === 1
+                  ? translations.count_documents_found
+                  : translations.count_documents_found_plural,
+                {
+                  count: searchResults.length,
+                }
+              )}
             </p>
           ) : process.env.NODE_ENV === "production" ? (
-            <p>No documents were found</p>
+            <p>{translations.no_documents_were_found}</p>
           ) : (
             <p>
               ⚠️ The search index is only available when you run docusaurus
