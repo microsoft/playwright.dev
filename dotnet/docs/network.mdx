@@ -19,6 +19,19 @@ Playwright provides APIs to **monitor** and **modify** network traffic, both HTT
 
 ## HTTP Authentication
 
+```csharp
+using var context = await Browser.NewContextAsync(new BrowserContextOptions
+{
+    HttpCredentials = new HttpCredentials
+    {
+        Username = "bill",
+        Password = "pa55w0rd"
+    },
+});
+var page = await context.NewPageAsync();
+await page.GotoAsync("https://example.com");
+```
+
 ### API reference
 - [Browser.NewContextAsync(…)](./api/class-browser.mdx#browsernewcontextasync)
 
@@ -30,15 +43,68 @@ You can optionally specify username and password for HTTP(S) proxy, you can also
 
 Here is an example of a global proxy:
 
+```csharp
+var proxy = new Proxy
+{
+    Server = "http://myproxy.com:3128",
+    Username = "user",
+    Password = "pwd"
+};
+await using var browser = await BrowserType.LaunchAsync(proxy: proxy);
+```
+
 When specifying proxy for each context individually, you need to give Playwright a hint that proxy will be set. This is done via passing a non-empty proxy server to the browser itself. Here is an example of a context-specific proxy:
+
+```csharp
+var proxy = new Proxy { Server = "per-context" };
+await using var browser = await BrowserType.LaunchAsync(proxy: proxy);
+using var context = await Browser.NewContextAsync(proxy: new Proxy { Server = "http://myproxy.com:3128" });
+```
 
 ## Network events
 
 You can monitor all the requests and responses:
 
+```csharp
+using Microsoft.Playwright;
+using System;
+
+class Example
+{
+  public async void Main()
+  {
+    using var playwright = await Playwright.CreateAsync();
+    await using var browser = await playwright.Chromium.LaunchAsync();
+    var page = await browser.NewPageAsync();
+    page.Request += (_, request) => Console.WriteLine(">> " + request.Method + " " + request.Url);
+    page.Response += (_, response) => Console.WriteLine("<<" + response.Status + " " + response.Url);
+    await page.GotoAsync("https://example.com");
+  }
+}
+```
+
 Or wait for a network response after the button click:
 
+```csharp
+// Use a glob URL pattern
+var waitForResponseTask = page.WaitForResponseAsync("**/api/fetch_data");
+await page.ClickAsync("button#update");
+var response = await waitForResponseTask;
+```
+
 #### Variations
+
+```csharp
+// Use a regular expression
+var waitForResponseTask = page.WaitForResponseAsync(new Regex("\\.jpeg$"));
+await page.ClickAsync("button#update");
+var response = await waitForResponseTask;
+
+// Use a predicate taking a Response object
+var waitForResponseTask = page.WaitForResponseAsync(r => r.Url.Contains(token));
+await page.ClickAsync("button#update");
+var response = await waitForResponseTask;
+```
 
 ### API reference
 - [Request]
@@ -56,6 +122,13 @@ You can mock API endpoints via handling the network quests in your Playwright sc
 
 #### Variations
 
+```csharp
+await page.RouteAsync("**/api/fetch_data", async route => {
+  await route.FulfillAsync(status: 200, body: testData);
+});
+await page.GotoAsync("https://example.com");
+```
+
 ### API reference
 - [BrowserContext.RouteAsync(url, handler)](./api/class-browsercontext.mdx#browsercontextrouteasyncurl-handler)
 - [BrowserContext.UnrouteAsync(url, …)](./api/class-browsercontext.mdx#browsercontextunrouteasyncurl-)
@@ -67,9 +140,33 @@ You can mock API endpoints via handling the network quests in your Playwright sc
 
 ## Modify requests
 
+```csharp
+// Delete header
+await page.RouteAsync("**/*", async route => {
+    var headers = new Dictionary<string, string>(route.Request.Headers.ToDictionary(x => x.Key, x => x.Value));
+    headers.Remove("X-Secret");
+    await route.ContinueAsync(headers: headers);
+});
+
+// Continue requests as POST.
+await page.RouteAsync("**/*", async route => await route.ContinueAsync(method: "POST"));
+```
+
 You can continue requests with modifications. Example above removes an HTTP header from the outgoing requests.
 
 ## Abort requests
+
+```csharp
+await page.RouteAsync("**/*.{png,jpg,jpeg}", route => route.AbortAsync());
+
+// Abort based on the request type
+await page.RouteAsync("**/*", async route => {
+if ("image".Equals(route.Request.ResourceType))
+    await route.AbortAsync();
+else
+    await route.ContinueAsync();
+});
+```
 
 ### API reference
 - [Page.RouteAsync(url, handler)](./api/class-page.mdx#pagerouteasyncurl-handler)
@@ -81,6 +178,16 @@ You can continue requests with modifications. Example above removes an HTTP head
 ## WebSockets
 
 Playwright supports [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) inspection out of the box. Every time WebSocket is created, [event Page.WebSocket](./api/class-page.mdx#eventpagewebsocket) event is fired. This event contains the [WebSocket] instance for further web socket frames inspection:
+
+```csharp
+page.WebSocket += (_, ws) =>
+{
+    Console.WriteLine("WebSocket opened: " + ws.Url);
+    ws.FrameSent += (_, f) => Console.WriteLine(f.Text);
+    ws.FrameReceived += (_, f) => Console.WriteLine(f.Text);
+    ws.Close += (_, ws1) => Console.WriteLine("WebSocket closed");
+};
+```
 
 ### API reference
 - [WebSocket]

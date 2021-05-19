@@ -9,9 +9,9 @@ Whenever a network route is set up with [Page.RouteAsync(url, handler)](./api/cl
 
 
 - [Route.AbortAsync(…)](./api/class-route.mdx#routeabortasync)
+- [Route.ContinueAsync(…)](./api/class-route.mdx#routecontinueasync)
 - [Route.FulfillAsync(…)](./api/class-route.mdx#routefulfillasync)
 - [Route.Request](./api/class-route.mdx#routerequest)
-- [Route.ResumeAsync(…)](./api/class-route.mdx#routeresumeasync)
 
 ## Route.AbortAsync(…)
 - `errorCode` <[string]> Optional error code. Defaults to `failed`, could be one of the following:
@@ -32,6 +32,24 @@ Whenever a network route is set up with [Page.RouteAsync(url, handler)](./api/cl
 - returns: <[void]>
 
 Aborts the route's request.
+
+## Route.ContinueAsync(…)
+- `headers` <[Map]<[string], [string]>> If set changes the request HTTP headers. Header values will be converted to a string.
+- `method` <[string]> If set changes the request method (e.g. GET or POST)
+- `postData` <[string]|[byte&#91;&#93;]> If set changes the post data of request
+- `url` <[string]> If set changes the request URL. New URL must have same protocol as original one.
+- returns: <[void]>
+
+Continues route's request with optional overrides.
+
+```csharp
+await page.RouteAsync("**/*", route =>
+{
+    var headers = new Dictionary<string, string>(route.Request.Headers) { { "foo", "bar" } };
+    headers.Remove("origin");
+    route.ContinueAsync(headers);
+});
+```
 
 ## Route.FulfillAsync(…)
 - `body` <[string]> Optional response body as text.
@@ -63,25 +81,6 @@ await page.RouteAsync("**/xhr_endpoint", route => route.FulfillAsync(path: "mock
 - returns: <[Request]>
 
 A request to be routed.
-
-## Route.ResumeAsync(…)
-- `headers` <[Map]<[string], [string]>> If set changes the request HTTP headers. Header values will be converted to a string.
-- `method` <[string]> If set changes the request method (e.g. GET or POST)
-- `postData` <[string]|[byte&#91;&#93;]> If set changes the post data of request
-- `url` <[string]> If set changes the request URL. New URL must have same protocol as original one.
-- returns: <[void]>
-
-Continues route's request with optional overrides.
-
-```csharp
-await page.RouteAsync("**/*", route =>
-{
-    var headers = new Dictionary<string, string>(route.Request.Headers) { { "foo", "bar" } };
-    headers.Remove("origin");
-    route.ResumeAsync(headers);
-});
-```
-
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Browser]: ./api/class-browser.mdx "Browser"

@@ -35,13 +35,34 @@ Navigations can be initiated by changing the URL bar, reloading the page or goin
 
 Navigating to a URL auto-waits for the page to fire the `load` event. If the page does a client-side redirect before `load`, `page.goto` will auto-wait for the redirected page to fire the `load` event.
 
+```csharp
+// Navigate the page
+await page.GotoAsync("https://example.com");
+```
+
 ### Custom wait
 
 Override the default behavior to wait until a specific event, like `networkidle`.
 
+```csharp
+// Navigate and wait until network is idle
+await page.GotoAsync("https://example.com", waitUntil: WaitUntilState.NetworkIdle);
+```
+
 ### Wait for element
 
 In lazy-loaded pages, it can be useful to wait until an element is visible with [Page.WaitForSelectorAsync(selector, …)](./api/class-page.mdx#pagewaitforselectorasyncselector-). Alternatively, page interactions like [Page.ClickAsync(selector, …)](./api/class-page.mdx#pageclickasyncselector-) auto-wait for elements.
+
+```csharp
+// Navigate and wait for element
+await page.GotoAsync("https://example.com");
+await page.WaitForSelectorAsync("text=Example Domain");
+
+// Navigate and click element
+// Click will auto-wait for the element
+await page.GotoAsync("https://example.com");
+await page.ClickAsync("text=Example Domain");
+```
 
 ### API reference
 - [Page.GotoAsync(url, …)](./api/class-page.mdx#pagegotoasyncurl-)
@@ -57,13 +78,38 @@ In the scenarios below, [Page.ClickAsync(selector, …)](./api/class-page.mdx#pa
 
 By default, [Page.ClickAsync(selector, …)](./api/class-page.mdx#pageclickasyncselector-) will wait for the navigation step to complete. This can be combined with a page interaction on the navigated page which would auto-wait for an element.
 
+```csharp
+// Click will auto-wait for navigation to complete
+await page.ClickAsync("text=Login");
+
+// Fill will auto-wait for element on navigated page
+await page.FillAsync("#username", "John Doe");
+```
+
 ### Custom wait
 
 `page.click` can be combined with [Page.WaitForLoadStateAsync(…)](./api/class-page.mdx#pagewaitforloadstateasync) to wait for a loading event.
 
+```csharp
+await page.ClickAsync("button"); // Click triggers navigation
+await page.WaitForLoadStateAsync(LoadState.NetworkIdle); // This resolves after "networkidle"
+```
+
 ### Wait for element
 
 In lazy-loaded pages, it can be useful to wait until an element is visible with [Page.WaitForSelectorAsync(selector, …)](./api/class-page.mdx#pagewaitforselectorasyncselector-). Alternatively, page interactions like [Page.ClickAsync(selector, …)](./api/class-page.mdx#pageclickasyncselector-) auto-wait for elements.
+
+```csharp
+// Click will auto-wait for the element and trigger navigation
+await page.ClickAsync("text=Login");
+// Wait for the element
+await page.WaitForSelectorAsync("#username");
+
+// Click triggers navigation
+await page.ClickAsync("text=Login");
+// Fill will auto-wait for element
+await page.FillAsync("#username", "John Doe");
+```
 
 ### Asynchronous navigation
 
@@ -71,15 +117,40 @@ Clicking an element could trigger asynchronous processing before initiating the 
 * Navigation is triggered from a `setTimeout`
 * Page waits for network requests before navigation
 
+```csharp
+// Using waitForNavigation with a callback prevents a race condition
+// between clicking and waiting for a navigation.
+await Task.WhenAll(
+    page.WaitForNavigationAsync(), // Waits for the next navigation
+    page.ClickAsync("div.delayed-navigation"); // Triggers a navigation after a timeout
+);
+```
+
 ### Multiple navigations
 
 Clicking an element could trigger multiple navigations. In these cases, it is recommended to explicitly [Page.WaitForNavigationAsync(…)](./api/class-page.mdx#pagewaitfornavigationasync) to a specific url. For example:
 * Client-side redirects issued after the `load` event
 * Multiple pushes to history state
 
+```csharp
+// Running action in the callback of waitForNavigation prevents a race
+// condition between clicking and waiting for a navigation.
+await Task.WhenAll(
+    page.WaitForNavigationAsync("**/login"), // Waits for the next navigation
+    page.ClickAsync("a") // Triggers a navigation with a script redirect
+);
+```
+
 ### Loading a popup
 
 When popup is opened, explicitly calling [Page.WaitForLoadStateAsync(…)](./api/class-page.mdx#pagewaitforloadstateasync) ensures that popup is loaded to the desired state.
+
+```csharp
+var waitForPopupTask = page.WaitForPopupAsync();
+await page.ClickAsync("a[target='_blank']"); // Opens popup
+var popup = await waitForPopupTask;
+popup.WaitForLoadStateAsync(LoadState.Load);
+```
 
 ### API reference
 - [Page.ClickAsync(selector, …)](./api/class-page.mdx#pageclickasyncselector-)
@@ -91,6 +162,13 @@ When popup is opened, explicitly calling [Page.WaitForLoadStateAsync(…)](./api
 ## Advanced patterns
 
 For pages that have complicated loading patterns, [Page.WaitForFunctionAsync(expression, …)](./api/class-page.mdx#pagewaitforfunctionasyncexpression-) is a powerful and extensible approach to define a custom wait criteria.
+
+```csharp
+await page.GotoAsync("http://example.com");
+await page.WaitForFunctionAsync("() => window.amILoadedYet()");
+// Ready to take a screenshot, according to the page itself.
+await page.ScreenshotAsync();
+```
 
 ### API reference
 - [Page.WaitForFunctionAsync(expression, …)](./api/class-page.mdx#pagewaitforfunctionasyncexpression-)
