@@ -26,7 +26,7 @@ If request gets a 'redirect' response, the request is successfully finished with
 - [Request.Method](./api/class-request.mdx#requestmethod)
 - [Request.PostData](./api/class-request.mdx#requestpostdata)
 - [Request.PostDataBuffer](./api/class-request.mdx#requestpostdatabuffer)
-- [Request.PostDataJSON(…)](./api/class-request.mdx#requestpostdatajson)
+- [Request.PostDataJSON](./api/class-request.mdx#requestpostdatajson)
 - [Request.RedirectedFrom](./api/class-request.mdx#requestredirectedfrom)
 - [Request.RedirectedTo](./api/class-request.mdx#requestredirectedto)
 - [Request.ResourceType](./api/class-request.mdx#requestresourcetype)
@@ -78,8 +78,7 @@ Request's post body, if any.
 
 Request's post body in a binary form, if any.
 
-## Request.PostDataJSON(…)
-- `documentOptions` <[null]|[JsonDocumentOptions]> Optional Json options that control custom behaviour when parsing the JSON.
+## Request.PostDataJSON
 - returns: <[JsonDocument]>
 
 Returns parsed request's body for `form-urlencoded` and JSON as a fallback if any.
@@ -143,9 +142,10 @@ Returns the matching [Response] object, or `null` if the response was not receiv
 Returns resource timing information for given request. Most of the timing values become available upon the response, `responseEnd` becomes available when request finishes. Find more information at [Resource Timing API](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceResourceTiming).
 
 ```csharp
-var requestFinishedTask = page.WaitForEventAsync(PageEvent.RequestFinished);
-await Task.WhenAll(requestFinishedTask, page.GotoAsync("https://www.microsoft.com"));
-Console.WriteLine(requestFinishedTask.Result.Timing.ResponseEnd);
+var waitForEventTask = page.WaitForEventAsync(PageEvent.RequestFinished);
+await page.GotoAsync("https://www.microsoft.com");
+var request = await waitForEventTask;
+Console.WriteLine(request.Timing.ResponseEnd);
 ```
 
 ## Request.Url

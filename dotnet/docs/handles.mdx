@@ -19,21 +19,63 @@ Handles are used to perform operations on those actual objects in the page. You 
 
 Here is the easiest way to obtain a [JSHandle].
 
+```csharp
+var jsHandle = await page.EvaluateHandleAsync("window");
+//  Use jsHandle for evaluations.
+```
+
+```csharp
+var ulElementHandle = await page.WaitForSelectorAsync("ul");
+//  Use ulElementHandle for actions and evaluation.
+```
+
 ## Element Handles
 
 :::note
-It is recommended to use selector-based actions like [Page.ClickAsync(selector, …)](./api/class-page.mdx#pageclickasyncselector-) rather than using the [ElementHandle] for input actions, unless your use case specifically requires the use of handles.
+It is recommended to use selector-based actions like [Page.ClickAsync(selector, options)](./api/class-page.mdx#pageclickasyncselector-options) rather than using the [ElementHandle] for input actions, unless your use case specifically requires the use of handles.
 :::
 
-When [ElementHandle] is required, it is recommended to fetch it with the [Page.WaitForSelectorAsync(selector, …)](./api/class-page.mdx#pagewaitforselectorasyncselector-) or [Frame.WaitForSelectorAsync(selector, …)](./api/class-frame.mdx#framewaitforselectorasyncselector-) methods. These APIs wait for the element to be attached and visible.
+When [ElementHandle] is required, it is recommended to fetch it with the [Page.WaitForSelectorAsync(selector, options)](./api/class-page.mdx#pagewaitforselectorasyncselector-options) or [Frame.WaitForSelectorAsync(selector, options)](./api/class-frame.mdx#framewaitforselectorasyncselector-options) methods. These APIs wait for the element to be attached and visible.
+
+```csharp
+// Get the element handle
+var jsHandle = await page.WaitForSelectorAsync("#box");
+var elementHandle = jsHandle as ElementHandle;
+
+// Assert bounding box for the element
+var boundingBox = await elementHandle.BoundingBoxAsync();
+Assert.Equal(100, boundingBox.Width);
+
+// Assert attribute for the element
+var classNames = await elementHandle.GetAttributeAsync("class");
+Assert.True(classNames.Contains("highlighted"));
+```
 
 ## Handles as parameters
 
-Handles can be passed into the [Page.EvaluateAsync(expression, …)](./api/class-page.mdx#pageevaluateasyncexpression-) and similar methods. The following snippet creates a new array in the page, initializes it with data and returns a handle to this array into Playwright. It then uses the handle in subsequent evaluations:
+Handles can be passed into the [Page.EvaluateAsync(expression, arg)](./api/class-page.mdx#pageevaluateasyncexpression-arg) and similar methods. The following snippet creates a new array in the page, initializes it with data and returns a handle to this array into Playwright. It then uses the handle in subsequent evaluations:
+
+```csharp
+// Create new array in page.
+var myArrayHandle = await page.EvaluateHandleAsync(@"() => {
+    window.myArray = [1];
+    return myArray;
+}");
+
+// Get the length of the array.
+var length = await page.EvaluateAsync<int>("a => a.length", myArrayHandle);
+
+// Add one more element to the array using the handle
+await page.EvaluateAsync("arg => arg.myArray.add(arg.newElement)",
+    new { myArray = myArrayHandle, newElement = 2 });
+
+// Release the object when it is no longer needed.
+await myArrayHandle.DisposeAsync();
+```
 
 ## Handle Lifecycle
 
-Handles can be acquired using the page methods such as [Page.EvaluateHandleAsync(expression, …)](./api/class-page.mdx#pageevaluatehandleasyncexpression-), [Page.QuerySelectorAsync(selector)](./api/class-page.mdx#pagequeryselectorasyncselector) or [Page.QuerySelectorAllAsync(selector)](./api/class-page.mdx#pagequeryselectorallasyncselector) or their frame counterparts [Frame.EvaluateHandleAsync(expression, …)](./api/class-frame.mdx#frameevaluatehandleasyncexpression-), [Frame.QuerySelectorAsync(selector)](./api/class-frame.mdx#framequeryselectorasyncselector) or [Frame.QuerySelectorAllAsync(selector)](./api/class-frame.mdx#framequeryselectorallasyncselector). Once created, handles will retain object from [garbage collection](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_Management) unless page navigates or the handle is manually disposed via the [JsHandle.DisposeAsync()](./api/class-jshandle.mdx#jshandledisposeasync) method.
+Handles can be acquired using the page methods such as [Page.EvaluateHandleAsync(expression, arg)](./api/class-page.mdx#pageevaluatehandleasyncexpression-arg), [Page.QuerySelectorAsync(selector)](./api/class-page.mdx#pagequeryselectorasyncselector) or [Page.QuerySelectorAllAsync(selector)](./api/class-page.mdx#pagequeryselectorallasyncselector) or their frame counterparts [Frame.EvaluateHandleAsync(expression, arg)](./api/class-frame.mdx#frameevaluatehandleasyncexpression-arg), [Frame.QuerySelectorAsync(selector)](./api/class-frame.mdx#framequeryselectorasyncselector) or [Frame.QuerySelectorAllAsync(selector)](./api/class-frame.mdx#framequeryselectorallasyncselector). Once created, handles will retain object from [garbage collection](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_Management) unless page navigates or the handle is manually disposed via the [JsHandle.DisposeAsync()](./api/class-jshandle.mdx#jshandledisposeasync) method.
 
 ### API reference
 - [JSHandle]
@@ -43,8 +85,8 @@ Handles can be acquired using the page methods such as [Page.EvaluateHandleAsync
 - [ElementHandle.InnerTextAsync()](./api/class-elementhandle.mdx#elementhandleinnertextasync)
 - [ElementHandle.InnerHTMLAsync()](./api/class-elementhandle.mdx#elementhandleinnerhtmlasync)
 - [ElementHandle.TextContentAsync()](./api/class-elementhandle.mdx#elementhandletextcontentasync)
-- [JsHandle.EvaluateAsync(expression, …)](./api/class-jshandle.mdx#jshandleevaluateasyncexpression-)
-- [Page.EvaluateHandleAsync(expression, …)](./api/class-page.mdx#pageevaluatehandleasyncexpression-)
+- [JsHandle.EvaluateAsync(expression, arg)](./api/class-jshandle.mdx#jshandleevaluateasyncexpression-arg)
+- [Page.EvaluateHandleAsync(expression, arg)](./api/class-page.mdx#pageevaluatehandleasyncexpression-arg)
 - [Page.QuerySelectorAsync(selector)](./api/class-page.mdx#pagequeryselectorasyncselector)
 - [Page.QuerySelectorAllAsync(selector)](./api/class-page.mdx#pagequeryselectorallasyncselector)
 

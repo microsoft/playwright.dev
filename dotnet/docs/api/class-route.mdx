@@ -8,12 +8,12 @@ import TabItem from '@theme/TabItem';
 Whenever a network route is set up with [Page.RouteAsync(url, handler)](./api/class-page.mdx#pagerouteasyncurl-handler) or [BrowserContext.RouteAsync(url, handler)](./api/class-browsercontext.mdx#browsercontextrouteasyncurl-handler), the `Route` object allows to handle the route.
 
 
-- [Route.AbortAsync(…)](./api/class-route.mdx#routeabortasync)
-- [Route.FulfillAsync(…)](./api/class-route.mdx#routefulfillasync)
+- [Route.AbortAsync(errorCode)](./api/class-route.mdx#routeabortasyncerrorcode)
+- [Route.ContinueAsync(options)](./api/class-route.mdx#routecontinueasyncoptions)
+- [Route.FulfillAsync(options)](./api/class-route.mdx#routefulfillasyncoptions)
 - [Route.Request](./api/class-route.mdx#routerequest)
-- [Route.ResumeAsync(…)](./api/class-route.mdx#routeresumeasync)
 
-## Route.AbortAsync(…)
+## Route.AbortAsync(errorCode)
 - `errorCode` <[string]> Optional error code. Defaults to `failed`, could be one of the following:
   * `'aborted'` - An operation was aborted (due to user action)
   * `'accessdenied'` - Permission to access a resource, other than the network, was denied
@@ -33,13 +33,33 @@ Whenever a network route is set up with [Page.RouteAsync(url, handler)](./api/cl
 
 Aborts the route's request.
 
-## Route.FulfillAsync(…)
-- `body` <[string]> Optional response body as text.
-- `bodyBytes` <[byte&#91;&#93;]> Optional response body as raw bytes.
-- `contentType` <[string]> If set, equals to setting `Content-Type` response header.
-- `headers` <[Map]<[string], [string]>> Response headers. Header values will be converted to a string.
-- `path` <[string]> File path to respond with. The content type will be inferred from file extension. If `path` is a relative path, then it is resolved relative to the current working directory.
-- `status` <[int]> Response status code, defaults to `200`.
+## Route.ContinueAsync(options)
+- `options` <`RouteContinueOptions`>
+  - `Headers` <[Map]<[string], [string]>> If set changes the request HTTP headers. Header values will be converted to a string.
+  - `Method` <[string]> If set changes the request method (e.g. GET or POST)
+  - `PostData` <[string]|[byte&#91;&#93;]> If set changes the post data of request
+  - `Url` <[string]> If set changes the request URL. New URL must have same protocol as original one.
+- returns: <[void]>
+
+Continues route's request with optional overrides.
+
+```csharp
+await page.RouteAsync("**/*", route =>
+{
+    var headers = new Dictionary<string, string>(route.Request.Headers) { { "foo", "bar" } };
+    headers.Remove("origin");
+    route.ContinueAsync(headers);
+});
+```
+
+## Route.FulfillAsync(options)
+- `options` <`RouteFulfillOptions`>
+  - `Body` <[string]> Optional response body as text.
+  - `BodyBytes` <[byte&#91;&#93;]> Optional response body as raw bytes.
+  - `ContentType` <[string]> If set, equals to setting `Content-Type` response header.
+  - `Headers` <[Map]<[string], [string]>> Response headers. Header values will be converted to a string.
+  - `Path` <[string]> File path to respond with. The content type will be inferred from file extension. If `path` is a relative path, then it is resolved relative to the current working directory.
+  - `Status` <[int]> Response status code, defaults to `200`.
 - returns: <[void]>
 
 Fulfills route's request with given response.
@@ -63,25 +83,6 @@ await page.RouteAsync("**/xhr_endpoint", route => route.FulfillAsync(path: "mock
 - returns: <[Request]>
 
 A request to be routed.
-
-## Route.ResumeAsync(…)
-- `headers` <[Map]<[string], [string]>> If set changes the request HTTP headers. Header values will be converted to a string.
-- `method` <[string]> If set changes the request method (e.g. GET or POST)
-- `postData` <[string]|[byte&#91;&#93;]> If set changes the post data of request
-- `url` <[string]> If set changes the request URL. New URL must have same protocol as original one.
-- returns: <[void]>
-
-Continues route's request with optional overrides.
-
-```csharp
-await page.RouteAsync("**/*", route =>
-{
-    var headers = new Dictionary<string, string>(route.Request.Headers) { { "foo", "bar" } };
-    headers.Remove("origin");
-    route.ResumeAsync(headers);
-});
-```
-
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Browser]: ./api/class-browser.mdx "Browser"

@@ -9,7 +9,6 @@ Playwright allows listening to various types of events happening in the web page
 
 - [Waiting for event](#waiting-for-event)
 - [Adding/removing event listener](#addingremoving-event-listener)
-- [Adding one-off listeners](#adding-one-off-listeners)
 
 ## Waiting for event
 
@@ -17,21 +16,40 @@ Most of the time, scripts will need to wait for a particular event to happen. Be
 
 Wait for a request with the specified url:
 
+```csharp
+var waitForRequestTask = page.WaitForRequestAsync("**/*logo*.png");
+await page.GotoAsync("https://wikipedia.org");
+var request = await waitForRequestTask;
+Console.WriteLine(request.Url);
+```
+
 Wait for popup window:
+
+```csharp
+var waitForPopupTask = page.WaitForPopupAsync();
+await page.EvaluateAsync("window.open()");
+var popup = await waitForPopupTask;
+await popup.GotoAsync("https://wikipedia.org");
+```
 
 ## Adding/removing event listener
 
 Sometimes, events happen in random time and instead of waiting for them, they need to be handled. Playwright supports traditional language mechanisms for subscribing and unsubscribing from the events:
 
-## Adding one-off listeners
+```csharp
+page.Request += (_, request) => Console.WriteLine("Request sent: " + request.Url);
+void listener(object sender, IRequest request)
+{
+    Console.WriteLine("Request finished: " + request.Url);
+};
+page.RequestFinished += listener;
+await page.GotoAsync("https://wikipedia.org");
 
-If certain event needs to be handled once, there is a convenience API for that:
+// Remove previously added listener.
+page.RequestFinished -= listener;
+await page.GotoAsync("https://www.openstreetmap.org/");
+```
 
-### API reference
-- [Browser]
-- [BrowserContext]
-- [Page]
-- [Worker]
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Browser]: ./api/class-browser.mdx "Browser"
