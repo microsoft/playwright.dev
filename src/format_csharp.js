@@ -35,8 +35,7 @@ class CSharpFormatter {
     if (member.kind === 'event')
       text = `event ${toTitleCase(member.clazz.varName)}.${toTitleCase(member.alias)}`;
     if (member.kind === 'method' ) {
-      for (const arg of member.argsArray)
-        args.push(...expandSharpOptions(arg));
+      args = member.argsArray.slice();
       const signature = renderSharpSignature(args);
 
       let isGetter = !signature && !member.async && !!member.type;
@@ -74,7 +73,7 @@ class CSharpFormatter {
   renderType(type, direction, member) {
     if (member.kind === 'property' && member.name === 'options') {
       const method = member.enclosingMethod;
-      return `\`${toTitleCase(method.clazz.varName)}.${toTitleCase(method.alias)}Options\``;
+      return `\`${toTitleCase(method.clazz.varName)}${toTitleCase(method.alias, { omitAsync: true })}Options\``;
     }
     const text = type.name;
     switch (text) {
@@ -85,10 +84,14 @@ class CSharpFormatter {
         switch (fullName(member)) {
           case 'BrowserContext.exposeBinding.callback': return '[Action]<BindingSource, T, [TResult]>';
           case 'BrowserContext.exposeFunction.callback': return '[Action]<T, [TResult]>';
+          case 'BrowserContext.waitForEvent.predicate': return '[Func]<T, [bool]>';
+          case 'BrowserContext.waitForEvent2.predicate': return '[Func]<T, [bool]>';
           case 'Page.exposeBinding.callback': return '[Action]<BindingSource, T, [TResult]>';
           case 'Page.exposeFunction.callback': return '[Action]<T, [TResult]>';
+          case 'Page.waitForEvent.predicate': return '[Func]<T, [bool]>';
+          case 'Page.waitForEvent2.predicate': return '[Func]<T, [bool]>';
         }
-        throw new Error('Unknwon C# type for ' + fullName(member));
+        throw new Error(`Unknwon C# type for "${fullName(member)}": "${text}"`);
       };
       case 'null': return '[null]';
       case 'Object': {
@@ -147,10 +150,8 @@ function fullName(member) {
  * @param {Documentation.Member[]} args
  * @return {string}
  */
- function renderSharpSignature(args) {
-  const argNames = args.filter(a => a.required).map(a => a.name);
-  if (args.find(a => !a.required))
-    argNames.push('\u2026');
+function renderSharpSignature(args) {
+  const argNames = args.map(a => a.name);
   return argNames.join(', ');
 }
 
@@ -162,14 +163,6 @@ function toAsyncTitleCase(isAsync, name) {
   if (!isAsync || name.endsWith('Async'))
     return toTitleCase(name);
   return toTitleCase(name) + 'Async';
-}
-
-/**
- * @param {Documentation.Member} arg
- * @return {Documentation.Member[]}
- */
- function expandSharpOptions(arg) {
-  return arg.name == 'options' ? arg.type.properties : [arg];
 }
 
 module.exports = { CSharpFormatter };

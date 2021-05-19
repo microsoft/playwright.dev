@@ -18,10 +18,27 @@ import TabItem from '@theme/TabItem';
 
 This is the easiest way to fill out the form fields. It focuses the element and triggers an `input` event with the entered text. It works for `<input>`, `<textarea>`, `[contenteditable]` and `<label>` associated with an input or textarea.
 
+```csharp
+// Text input
+await page.FillAsync("#name", "Peter");
+
+// Date input
+await page.FillAsync("#date", "2020-02-02");
+
+// Time input
+await page.FillAsync("#time", "13-15");
+
+// Local datetime input
+await page.FillAsync("#local", "2020-03-02T05:15");
+
+// Input through label
+await page.FillAsync("text=First Name", "Peter");
+```
+
 ### API reference
-- [Page.FillAsync(selector, value, …)](./api/class-page.mdx#pagefillasyncselector-value-)
-- [Frame.FillAsync(selector, value, …)](./api/class-frame.mdx#framefillasyncselector-value-)
-- [ElementHandle.FillAsync(value, …)](./api/class-elementhandle.mdx#elementhandlefillasyncvalue-)
+- [Page.FillAsync(selector, value, options)](./api/class-page.mdx#pagefillasyncselector-value-options)
+- [Frame.FillAsync(selector, value, options)](./api/class-frame.mdx#framefillasyncselector-value-options)
+- [ElementHandle.FillAsync(value, options)](./api/class-elementhandle.mdx#elementhandlefillasyncvalue-options)
 
 <br/>
 
@@ -29,13 +46,27 @@ This is the easiest way to fill out the form fields. It focuses the element and 
 
 This is the easiest way to check and uncheck a checkbox or a radio button. This method can be used with `input[type=checkbox]`, `input[type=radio]`, `[role=checkbox]` or `label` associated with checkbox or radio button.
 
+```csharp
+// Check the checkbox
+await page.CheckAsync("#agree");
+
+// Assert the checked state
+Assert.True(await page.IsCheckedAsync("#agree"));
+
+// Uncheck by input <label>.
+await page.UncheckAsync("#subscribe-label");
+
+// Select the radio button
+await page.CheckAsync("text=XL");
+```
+
 ### API reference
-- [Page.CheckAsync(selector, …)](./api/class-page.mdx#pagecheckasyncselector-)
-- [Page.IsCheckedAsync(selector, …)](./api/class-page.mdx#pageischeckedasyncselector-)
-- [Page.UncheckAsync(selector, …)](./api/class-page.mdx#pageuncheckasyncselector-)
-- [ElementHandle.CheckAsync(…)](./api/class-elementhandle.mdx#elementhandlecheckasync)
+- [Page.CheckAsync(selector, options)](./api/class-page.mdx#pagecheckasyncselector-options)
+- [Page.IsCheckedAsync(selector, options)](./api/class-page.mdx#pageischeckedasyncselector-options)
+- [Page.UncheckAsync(selector, options)](./api/class-page.mdx#pageuncheckasyncselector-options)
+- [ElementHandle.CheckAsync(options)](./api/class-elementhandle.mdx#elementhandlecheckasyncoptions)
 - [ElementHandle.IsCheckedAsync()](./api/class-elementhandle.mdx#elementhandleischeckedasync)
-- [ElementHandle.UncheckAsync(…)](./api/class-elementhandle.mdx#elementhandleuncheckasync)
+- [ElementHandle.UncheckAsync(options)](./api/class-elementhandle.mdx#elementhandleuncheckasyncoptions)
 
 <br/>
 
@@ -43,16 +74,51 @@ This is the easiest way to check and uncheck a checkbox or a radio button. This 
 
 Selects one or multiple options in the `<select>` element. You can specify option `value`, `label` or `elementHandle` to select. Multiple options can be selected.
 
+```csharp
+// Single selection matching the value
+await page.SelectOptionAsync("select#colors", "blue");
+
+// Single selection matching the label
+await page.SelectOptionAsync("select#colors", new SelectOptionValue { Label = "blue" }));
+
+// Multiple selected items
+await page.SelectOptionAsync("select#colors", new[] { "blue", "green", "red" });
+
+// Select the option via element handle
+var option = await page.QuerySelectorAsync("#best-option");
+await page.SelectOptionAsync("select#colors", option);
+```
+
 ### API reference
-- [Page.SelectOptionAsync(selector, values, …)](./api/class-page.mdx#pageselectoptionasyncselector-values-)
-- [Frame.SelectOptionAsync(selector, values, …)](./api/class-frame.mdx#frameselectoptionasyncselector-values-)
-- [ElementHandle.SelectOptionAsync(values, …)](./api/class-elementhandle.mdx#elementhandleselectoptionasyncvalues-)
+- [Page.SelectOptionAsync(selector, values, options)](./api/class-page.mdx#pageselectoptionasyncselector-values-options)
+- [Frame.SelectOptionAsync(selector, values, options)](./api/class-frame.mdx#frameselectoptionasyncselector-values-options)
+- [ElementHandle.SelectOptionAsync(values, options)](./api/class-elementhandle.mdx#elementhandleselectoptionasyncvalues-options)
 
 <br/>
 
 ## Mouse click
 
 Performs a simple human click.
+
+```csharp
+// Generic click
+await page.ClickAsync("button#submit");
+
+// Double click
+await page.DblClickAsync("#item");
+
+// Right click
+await page.ClickAsync("#item", button: MouseButton.Right);
+
+// Shift + click
+await page.ClickAsync("#item", modifiers: new[] { KeyboardModifier.Shift });
+
+// Hover over element
+await page.HoverAsync("#item");
+
+// Click the top left corner
+await page.ClickAsync("#item", position: new Position { X = 0, Y = 0 });
+```
 
 Under the hood, this and other pointer-related methods:
 - wait for element with given selector to be in DOM
@@ -66,23 +132,31 @@ Under the hood, this and other pointer-related methods:
 
 Sometimes, apps use non-trivial logic where hovering the element overlays it with another element that intercepts the click. This behavior is indistinguishable from a bug where element gets covered and the click is dispatched elsewhere. If you know this is taking place, you can bypass the [actionability](./actionability.mdx) checks and force the click:
 
+```csharp
+await page.ClickAsync("button#submit", force: true);
+```
+
 #### Programmatic click
 
 If you are not interested in testing your app under the real conditions and want to simulate the click by any means possible, you can trigger the [`HTMLElement.click()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click) behavior via simply dispatching a click event on the element:
 
+```csharp
+await page.DispatchEventAsync("button#submit", "click");
+```
+
 ### API reference
-- [Page.ClickAsync(selector, …)](./api/class-page.mdx#pageclickasyncselector-)
-- [Frame.ClickAsync(selector, …)](./api/class-frame.mdx#frameclickasyncselector-)
-- [ElementHandle.ClickAsync(…)](./api/class-elementhandle.mdx#elementhandleclickasync)
-- [Page.DblClickAsync(selector, …)](./api/class-page.mdx#pagedblclickasyncselector-)
-- [Frame.DblClickAsync(selector, …)](./api/class-frame.mdx#framedblclickasyncselector-)
-- [ElementHandle.DblClickAsync(…)](./api/class-elementhandle.mdx#elementhandledblclickasync)
-- [Page.HoverAsync(selector, …)](./api/class-page.mdx#pagehoverasyncselector-)
-- [Frame.HoverAsync(selector, …)](./api/class-frame.mdx#framehoverasyncselector-)
-- [ElementHandle.HoverAsync(…)](./api/class-elementhandle.mdx#elementhandlehoverasync)
-- [Page.DispatchEventAsync(selector, type, …)](./api/class-page.mdx#pagedispatcheventasyncselector-type-)
-- [Frame.DispatchEventAsync(selector, type, …)](./api/class-frame.mdx#framedispatcheventasyncselector-type-)
-- [ElementHandle.DispatchEventAsync(type, …)](./api/class-elementhandle.mdx#elementhandledispatcheventasynctype-)
+- [Page.ClickAsync(selector, options)](./api/class-page.mdx#pageclickasyncselector-options)
+- [Frame.ClickAsync(selector, options)](./api/class-frame.mdx#frameclickasyncselector-options)
+- [ElementHandle.ClickAsync(options)](./api/class-elementhandle.mdx#elementhandleclickasyncoptions)
+- [Page.DblClickAsync(selector, options)](./api/class-page.mdx#pagedblclickasyncselector-options)
+- [Frame.DblClickAsync(selector, options)](./api/class-frame.mdx#framedblclickasyncselector-options)
+- [ElementHandle.DblClickAsync(options)](./api/class-elementhandle.mdx#elementhandledblclickasyncoptions)
+- [Page.HoverAsync(selector, options)](./api/class-page.mdx#pagehoverasyncselector-options)
+- [Frame.HoverAsync(selector, options)](./api/class-frame.mdx#framehoverasyncselector-options)
+- [ElementHandle.HoverAsync(options)](./api/class-elementhandle.mdx#elementhandlehoverasyncoptions)
+- [Page.DispatchEventAsync(selector, type, eventInit, options)](./api/class-page.mdx#pagedispatcheventasyncselector-type-eventinit-options)
+- [Frame.DispatchEventAsync(selector, type, eventInit, options)](./api/class-frame.mdx#framedispatcheventasyncselector-type-eventinit-options)
+- [ElementHandle.DispatchEventAsync(type, eventInit)](./api/class-elementhandle.mdx#elementhandledispatcheventasynctype-eventinit)
 
 <br/>
 
@@ -90,21 +164,37 @@ If you are not interested in testing your app under the real conditions and want
 
 Type into the field character by character, as if it was a user with a real keyboard.
 
+```csharp
+// Type character by character
+await page.TypeAsync("#area", "Hello World!");
+```
+
 This method will emit all the necessary keyboard events, with all the `keydown`, `keyup`, `keypress` events in place. You can even specify the optional `delay` between the key presses to simulate real user behavior.
 
 :::note
-Most of the time, [Page.FillAsync(selector, value, …)](./api/class-page.mdx#pagefillasyncselector-value-) will just work. You only need to type characters if there is special keyboard handling on the page.
+Most of the time, [Page.FillAsync(selector, value, options)](./api/class-page.mdx#pagefillasyncselector-value-options) will just work. You only need to type characters if there is special keyboard handling on the page.
 :::
 
 ### API reference
-- [Page.TypeAsync(selector, text, …)](./api/class-page.mdx#pagetypeasyncselector-text-)
-- [Frame.TypeAsync(selector, text, …)](./api/class-frame.mdx#frametypeasyncselector-text-)
-- [ElementHandle.TypeAsync(text, …)](./api/class-elementhandle.mdx#elementhandletypeasynctext-)
-- [Keyboard.TypeAsync(text, …)](./api/class-keyboard.mdx#keyboardtypeasynctext-)
+- [Page.TypeAsync(selector, text, options)](./api/class-page.mdx#pagetypeasyncselector-text-options)
+- [Frame.TypeAsync(selector, text, options)](./api/class-frame.mdx#frametypeasyncselector-text-options)
+- [ElementHandle.TypeAsync(text, options)](./api/class-elementhandle.mdx#elementhandletypeasynctext-options)
+- [Keyboard.TypeAsync(text, options)](./api/class-keyboard.mdx#keyboardtypeasynctext-options)
 
 <br/>
 
 ## Keys and shortcuts
+
+```csharp
+// Hit Enter
+await page.PressAsync("#submit", "Enter");
+
+// Dispatch Control+Right
+await page.PressAsync("#name", "Control+ArrowRight");
+
+// Press $ sign on keyboard
+await page.PressAsync("#value", "$");
+```
 
 This method focuses the selected element and produces a single keystroke. It accepts the logical key names that are emitted in the [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) property of the keyboard events:
 
@@ -119,29 +209,63 @@ ArrowUp, F1 - F12, Digit0 - Digit9, KeyA - KeyZ, etc.
 
 Simple version produces a single character. This character is case-sensitive, so `"a"` and `"A"` will produce different results.
 
+```csharp
+// <input id=name>
+await page.PressAsync("#name", "Shift+A");
+
+// <input id=name>
+await page.PressAsync("#name", "Shift+ArrowLeft");
+```
+
 Shortcuts such as `"Control+o"` or `"Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
 
 Note that you still need to specify the capital `A` in `Shift-A` to produce the capital character. `Shift-a` produces a lower-case one as if you had the `CapsLock` toggled.
 
 ### API reference
-- [Page.PressAsync(selector, key, …)](./api/class-page.mdx#pagepressasyncselector-key-)
-- [Frame.PressAsync(selector, key, …)](./api/class-frame.mdx#framepressasyncselector-key-)
-- [ElementHandle.PressAsync(key, …)](./api/class-elementhandle.mdx#elementhandlepressasynckey-)
-- [Keyboard.PressAsync(key, …)](./api/class-keyboard.mdx#keyboardpressasynckey-)
+- [Page.PressAsync(selector, key, options)](./api/class-page.mdx#pagepressasyncselector-key-options)
+- [Frame.PressAsync(selector, key, options)](./api/class-frame.mdx#framepressasyncselector-key-options)
+- [ElementHandle.PressAsync(key, options)](./api/class-elementhandle.mdx#elementhandlepressasynckey-options)
+- [Keyboard.PressAsync(key, options)](./api/class-keyboard.mdx#keyboardpressasynckey-options)
 
 <br/>
 
 ## Upload files
 
-You can select input files for upload using the [Page.SetInputFilesAsync(selector, files, …)](./api/class-page.mdx#pagesetinputfilesasyncselector-files-) method. It expects first argument to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input) with the type `"file"`. Multiple files can be passed in the array. If some of the file paths are relative, they are resolved relative to the current working directory. Empty array clears the selected files.
+You can select input files for upload using the [Page.SetInputFilesAsync(selector, files, options)](./api/class-page.mdx#pagesetinputfilesasyncselector-files-options) method. It expects first argument to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input) with the type `"file"`. Multiple files can be passed in the array. If some of the file paths are relative, they are resolved relative to the current working directory. Empty array clears the selected files.
+
+```csharp
+// Select one file
+await page.SetInputFilesAsync("input#upload", "myfile.pdf");
+
+// Select multiple files
+await page.SetInputFilesAsync("input#upload", new[] { "file1.txt", "file12.txt" });
+
+// Remove all the selected files
+await page.SetInputFilesAsync("input#upload", new[] {});
+
+// Upload buffer from memory
+await page.SetInputFilesAsync("input#upload", new FilePayload
+{
+    Name = "file.txt",
+    MimeType = "text/plain",
+    Buffer = "this is a test".getBytes(StandardCharsets.UTF_8),
+});
+```
 
 If you don't have input element in hand (it is created dynamically), you can handle the [event Page.FileChooser](./api/class-page.mdx#eventpagefilechooser) event or use a corresponding waiting method upon your action:
 
+```csharp
+var waitForChooserTask = page.WaitForFileChooserAsync();
+await page.ClickAsync("upload");
+var fileChooser = await waitForChooserTask;
+await fileChooser.SetFilesAsync("myfile.pdf");
+```
+
 ### API reference
 - [FileChooser]
-- [Page.SetInputFilesAsync(selector, files, …)](./api/class-page.mdx#pagesetinputfilesasyncselector-files-)
-- [Frame.SetInputFilesAsync(selector, files, …)](./api/class-frame.mdx#framesetinputfilesasyncselector-files-)
-- [ElementHandle.SetInputFilesAsync(files, …)](./api/class-elementhandle.mdx#elementhandlesetinputfilesasyncfiles-)
+- [Page.SetInputFilesAsync(selector, files, options)](./api/class-page.mdx#pagesetinputfilesasyncselector-files-options)
+- [Frame.SetInputFilesAsync(selector, files, options)](./api/class-frame.mdx#framesetinputfilesasyncselector-files-options)
+- [ElementHandle.SetInputFilesAsync(files, options)](./api/class-elementhandle.mdx#elementhandlesetinputfilesasyncfiles-options)
 
 <br/>
 
@@ -149,9 +273,13 @@ If you don't have input element in hand (it is created dynamically), you can han
 
 For the dynamic pages that handle focus events, you can focus the given element.
 
+```csharp
+await page.FocusAsync("input#name");
+```
+
 ### API reference
-- [Page.FocusAsync(selector, …)](./api/class-page.mdx#pagefocusasyncselector-)
-- [Frame.FocusAsync(selector, …)](./api/class-frame.mdx#framefocusasyncselector-)
+- [Page.FocusAsync(selector, options)](./api/class-page.mdx#pagefocusasyncselector-options)
+- [Frame.FocusAsync(selector, options)](./api/class-frame.mdx#framefocusasyncselector-options)
 - [ElementHandle.FocusAsync()](./api/class-elementhandle.mdx#elementhandlefocusasync)
 
 <br/>

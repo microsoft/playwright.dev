@@ -7,7 +7,7 @@ import TabItem from '@theme/TabItem';
 
 * extends: [EventEmitter]
 
-A Browser is created via [BrowserType.LaunchAsync(…)](./api/class-browsertype.mdx#browsertypelaunchasync). An example of using a [Browser] to create a [Page]:
+A Browser is created via [BrowserType.LaunchAsync(options)](./api/class-browsertype.mdx#browsertypelaunchasyncoptions). An example of using a [Browser] to create a [Page]:
 
 ```csharp
 using Microsoft.Playwright;
@@ -32,8 +32,8 @@ class BrowserExamples
 - [Browser.CloseAsync()](./api/class-browser.mdx#browsercloseasync)
 - [Browser.Contexts](./api/class-browser.mdx#browsercontexts)
 - [Browser.IsConnected](./api/class-browser.mdx#browserisconnected)
-- [Browser.NewContextAsync(…)](./api/class-browser.mdx#browsernewcontextasync)
-- [Browser.NewPageAsync(…)](./api/class-browser.mdx#browsernewpageasync)
+- [Browser.NewContextAsync(options)](./api/class-browser.mdx#browsernewcontextasyncoptions)
+- [Browser.NewPageAsync(options)](./api/class-browser.mdx#browsernewpageasyncoptions)
 - [Browser.Version](./api/class-browser.mdx#browserversion)
 
 ## event Browser.Disconnected
@@ -46,7 +46,7 @@ Emitted when Browser gets disconnected from the browser application. This might 
 ## Browser.CloseAsync()
 - returns: <[void]>
 
-In case this browser is obtained using [BrowserType.LaunchAsync(…)](./api/class-browsertype.mdx#browsertypelaunchasync), closes the browser and all of its pages (if any were opened).
+In case this browser is obtained using [BrowserType.LaunchAsync(options)](./api/class-browsertype.mdx#browsertypelaunchasyncoptions), closes the browser and all of its pages (if any were opened).
 
 In case this browser is connected to, clears all created contexts belonging to this browser and disconnects from the browser server.
 
@@ -70,47 +70,48 @@ System.Console.WriteLine(browser.Contexts.Count); // prints "1"
 
 Indicates that the browser is connected.
 
-## Browser.NewContextAsync(…)
-- `acceptDownloads` <[boolean]> Whether to automatically download all the attachments. Defaults to `false` where all the downloads are canceled.
-- `bypassCSP` <[boolean]> Toggles bypassing page's Content-Security-Policy.
-- `colorScheme` <"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [Page.EmulateMediaAsync(…)](./api/class-page.mdx#pageemulatemediaasync) for more details. Defaults to `'light'`.
-- `deviceScaleFactor` <[double]> Specify device scale factor (can be thought of as dpr). Defaults to `1`.
-- `extraHTTPHeaders` <[Map]<[string], [string]>> An object containing additional HTTP headers to be sent with every request. All header values must be strings.
-- `geolocation` <`Geolocation`>
-  - `latitude` <[double]> Latitude between -90 and 90.
-  - `longitude` <[double]> Longitude between -180 and 180.
-  - `accuracy` <[double]> Non-negative accuracy value. Defaults to `0`.
-- `hasTouch` <[boolean]> Specifies if viewport supports touch events. Defaults to false.
-- `httpCredentials` <`HttpCredentials`> Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).
-  - `username` <[string]>
-  - `password` <[string]>
-- `ignoreHTTPSErrors` <[boolean]> Whether to ignore HTTPS errors during navigation. Defaults to `false`.
-- `isMobile` <[boolean]> Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.
-- `javaScriptEnabled` <[boolean]> Whether or not to enable JavaScript in the context. Defaults to `true`.
-- `locale` <[string]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
-- `offline` <[boolean]> Whether to emulate network being offline. Defaults to `false`.
-- `permissions` <[IEnumerable]<[string]>> A list of permissions to grant to all pages in this context. See [BrowserContext.GrantPermissionsAsync(permissions, …)](./api/class-browsercontext.mdx#browsercontextgrantpermissionsasyncpermissions-) for more details.
-- `proxy` <`Proxy`> Network proxy settings to use with this context.
-  - `server` <[string]> Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
-  - `bypass` <[string]> Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
-  - `username` <[string]> Optional username to use if HTTP proxy requires authentication.
-  - `password` <[string]> Optional password to use if HTTP proxy requires authentication.
-- `recordHarOmitContent` <[boolean]> Optional setting to control whether to omit request content from the HAR. Defaults to `false`.
-- `recordHarPath` <[string]> Enables [HAR](http://www.softwareishard.com/blog/har-12-spec) recording for all pages into the specified HAR file on the filesystem. If not specified, the HAR is not recorded. Make sure to call [BrowserContext.CloseAsync()](./api/class-browsercontext.mdx#browsercontextcloseasync) for the HAR to be saved.
-- `recordVideoDir` <[string]> Enables video recording for all pages into the specified directory. If not specified videos are not recorded. Make sure to call [BrowserContext.CloseAsync()](./api/class-browsercontext.mdx#browsercontextcloseasync) for videos to be saved.
-- `recordVideoSize` <`RecordVideoSize`> Dimensions of the recorded videos. If not specified the size will be equal to `viewport` scaled down to fit into 800x800. If `viewport` is not configured explicitly the video size defaults to 800x450. Actual picture of each page will be scaled down if necessary to fit the specified size.
-  - `width` <[int]> Video frame width.
-  - `height` <[int]> Video frame height.
-- `screenSize` <`ScreenSize`> Emulates consistent window screen size available inside web page via `window.screen`. Is only used when the `viewport` is set.
-  - `width` <[int]> page width in pixels.
-  - `height` <[int]> page height in pixels.
-- `storageState` <[string]> Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [BrowserContext.StorageStateAsync(…)](./api/class-browsercontext.mdx#browsercontextstoragestateasync).
-- `storageStatePath` <[string]> Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [BrowserContext.StorageStateAsync(…)](./api/class-browsercontext.mdx#browsercontextstoragestateasync). Path to the file with saved storage state.
-- `timezoneId` <[string]> Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.
-- `userAgent` <[string]> Specific user agent to use in this context.
-- `viewportSize` <[null]|`ViewportSize`> Emulates consistent viewport for each page. Defaults to an 1280x720 viewport. Use `ViewportSize.NoViewport` to disable the default viewport.
-  - `width` <[int]> page width in pixels.
-  - `height` <[int]> page height in pixels.
+## Browser.NewContextAsync(options)
+- `options` <`BrowserNewContextOptions`>
+  - `AcceptDownloads` <[boolean]> Whether to automatically download all the attachments. Defaults to `false` where all the downloads are canceled.
+  - `BypassCSP` <[boolean]> Toggles bypassing page's Content-Security-Policy.
+  - `ColorScheme` <"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [Page.EmulateMediaAsync(options)](./api/class-page.mdx#pageemulatemediaasyncoptions) for more details. Defaults to `'light'`.
+  - `DeviceScaleFactor` <[double]> Specify device scale factor (can be thought of as dpr). Defaults to `1`.
+  - `ExtraHTTPHeaders` <[Map]<[string], [string]>> An object containing additional HTTP headers to be sent with every request. All header values must be strings.
+  - `Geolocation` <`Geolocation`>
+    - `Latitude` <[double]> Latitude between -90 and 90.
+    - `Longitude` <[double]> Longitude between -180 and 180.
+    - `Accuracy` <[double]> Non-negative accuracy value. Defaults to `0`.
+  - `HasTouch` <[boolean]> Specifies if viewport supports touch events. Defaults to false.
+  - `HttpCredentials` <`HttpCredentials`> Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).
+    - `Username` <[string]>
+    - `Password` <[string]>
+  - `IgnoreHTTPSErrors` <[boolean]> Whether to ignore HTTPS errors during navigation. Defaults to `false`.
+  - `IsMobile` <[boolean]> Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.
+  - `JavaScriptEnabled` <[boolean]> Whether or not to enable JavaScript in the context. Defaults to `true`.
+  - `Locale` <[string]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
+  - `Offline` <[boolean]> Whether to emulate network being offline. Defaults to `false`.
+  - `Permissions` <[IEnumerable]<[string]>> A list of permissions to grant to all pages in this context. See [BrowserContext.GrantPermissionsAsync(permissions, options)](./api/class-browsercontext.mdx#browsercontextgrantpermissionsasyncpermissions-options) for more details.
+  - `Proxy` <`Proxy`> Network proxy settings to use with this context.
+    - `Server` <[string]> Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
+    - `Bypass` <[string]> Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
+    - `Username` <[string]> Optional username to use if HTTP proxy requires authentication.
+    - `Password` <[string]> Optional password to use if HTTP proxy requires authentication.
+  - `RecordHarOmitContent` <[boolean]> Optional setting to control whether to omit request content from the HAR. Defaults to `false`.
+  - `RecordHarPath` <[string]> Enables [HAR](http://www.softwareishard.com/blog/har-12-spec) recording for all pages into the specified HAR file on the filesystem. If not specified, the HAR is not recorded. Make sure to call [BrowserContext.CloseAsync()](./api/class-browsercontext.mdx#browsercontextcloseasync) for the HAR to be saved.
+  - `RecordVideoDir` <[string]> Enables video recording for all pages into the specified directory. If not specified videos are not recorded. Make sure to call [BrowserContext.CloseAsync()](./api/class-browsercontext.mdx#browsercontextcloseasync) for videos to be saved.
+  - `RecordVideoSize` <`RecordVideoSize`> Dimensions of the recorded videos. If not specified the size will be equal to `viewport` scaled down to fit into 800x800. If `viewport` is not configured explicitly the video size defaults to 800x450. Actual picture of each page will be scaled down if necessary to fit the specified size.
+    - `Width` <[int]> Video frame width.
+    - `Height` <[int]> Video frame height.
+  - `ScreenSize` <`ScreenSize`> Emulates consistent window screen size available inside web page via `window.screen`. Is only used when the `viewport` is set.
+    - `Width` <[int]> page width in pixels.
+    - `Height` <[int]> page height in pixels.
+  - `StorageState` <[string]> Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [BrowserContext.StorageStateAsync(options)](./api/class-browsercontext.mdx#browsercontextstoragestateasyncoptions).
+  - `StorageStatePath` <[string]> Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [BrowserContext.StorageStateAsync(options)](./api/class-browsercontext.mdx#browsercontextstoragestateasyncoptions). Path to the file with saved storage state.
+  - `TimezoneId` <[string]> Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.
+  - `UserAgent` <[string]> Specific user agent to use in this context.
+  - `ViewportSize` <[null]|`ViewportSize`> Emulates consistent viewport for each page. Defaults to an 1280x720 viewport. Use `ViewportSize.NoViewport` to disable the default viewport.
+    - `Width` <[int]> page width in pixels.
+    - `Height` <[int]> page height in pixels.
 - returns: <[BrowserContext]>
 
 Creates a new browser context. It won't share cookies/cache with other browser contexts.
@@ -125,52 +126,53 @@ var page = await context.NewPageAsync(); ;
 await page.GotoAsync("https://www.bing.com");
 ```
 
-## Browser.NewPageAsync(…)
-- `acceptDownloads` <[boolean]> Whether to automatically download all the attachments. Defaults to `false` where all the downloads are canceled.
-- `bypassCSP` <[boolean]> Toggles bypassing page's Content-Security-Policy.
-- `colorScheme` <"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [Page.EmulateMediaAsync(…)](./api/class-page.mdx#pageemulatemediaasync) for more details. Defaults to `'light'`.
-- `deviceScaleFactor` <[double]> Specify device scale factor (can be thought of as dpr). Defaults to `1`.
-- `extraHTTPHeaders` <[Map]<[string], [string]>> An object containing additional HTTP headers to be sent with every request. All header values must be strings.
-- `geolocation` <`Geolocation`>
-  - `latitude` <[double]> Latitude between -90 and 90.
-  - `longitude` <[double]> Longitude between -180 and 180.
-  - `accuracy` <[double]> Non-negative accuracy value. Defaults to `0`.
-- `hasTouch` <[boolean]> Specifies if viewport supports touch events. Defaults to false.
-- `httpCredentials` <`HttpCredentials`> Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).
-  - `username` <[string]>
-  - `password` <[string]>
-- `ignoreHTTPSErrors` <[boolean]> Whether to ignore HTTPS errors during navigation. Defaults to `false`.
-- `isMobile` <[boolean]> Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.
-- `javaScriptEnabled` <[boolean]> Whether or not to enable JavaScript in the context. Defaults to `true`.
-- `locale` <[string]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
-- `offline` <[boolean]> Whether to emulate network being offline. Defaults to `false`.
-- `permissions` <[IEnumerable]<[string]>> A list of permissions to grant to all pages in this context. See [BrowserContext.GrantPermissionsAsync(permissions, …)](./api/class-browsercontext.mdx#browsercontextgrantpermissionsasyncpermissions-) for more details.
-- `proxy` <`Proxy`> Network proxy settings to use with this context.
-  - `server` <[string]> Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
-  - `bypass` <[string]> Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
-  - `username` <[string]> Optional username to use if HTTP proxy requires authentication.
-  - `password` <[string]> Optional password to use if HTTP proxy requires authentication.
-- `recordHarOmitContent` <[boolean]> Optional setting to control whether to omit request content from the HAR. Defaults to `false`.
-- `recordHarPath` <[string]> Enables [HAR](http://www.softwareishard.com/blog/har-12-spec) recording for all pages into the specified HAR file on the filesystem. If not specified, the HAR is not recorded. Make sure to call [BrowserContext.CloseAsync()](./api/class-browsercontext.mdx#browsercontextcloseasync) for the HAR to be saved.
-- `recordVideoDir` <[string]> Enables video recording for all pages into the specified directory. If not specified videos are not recorded. Make sure to call [BrowserContext.CloseAsync()](./api/class-browsercontext.mdx#browsercontextcloseasync) for videos to be saved.
-- `recordVideoSize` <`RecordVideoSize`> Dimensions of the recorded videos. If not specified the size will be equal to `viewport` scaled down to fit into 800x800. If `viewport` is not configured explicitly the video size defaults to 800x450. Actual picture of each page will be scaled down if necessary to fit the specified size.
-  - `width` <[int]> Video frame width.
-  - `height` <[int]> Video frame height.
-- `screenSize` <`ScreenSize`> Emulates consistent window screen size available inside web page via `window.screen`. Is only used when the `viewport` is set.
-  - `width` <[int]> page width in pixels.
-  - `height` <[int]> page height in pixels.
-- `storageState` <[string]> Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [BrowserContext.StorageStateAsync(…)](./api/class-browsercontext.mdx#browsercontextstoragestateasync).
-- `storageStatePath` <[string]> Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [BrowserContext.StorageStateAsync(…)](./api/class-browsercontext.mdx#browsercontextstoragestateasync). Path to the file with saved storage state.
-- `timezoneId` <[string]> Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.
-- `userAgent` <[string]> Specific user agent to use in this context.
-- `viewportSize` <[null]|`ViewportSize`> Emulates consistent viewport for each page. Defaults to an 1280x720 viewport. Use `ViewportSize.NoViewport` to disable the default viewport.
-  - `width` <[int]> page width in pixels.
-  - `height` <[int]> page height in pixels.
+## Browser.NewPageAsync(options)
+- `options` <`BrowserNewPageOptions`>
+  - `AcceptDownloads` <[boolean]> Whether to automatically download all the attachments. Defaults to `false` where all the downloads are canceled.
+  - `BypassCSP` <[boolean]> Toggles bypassing page's Content-Security-Policy.
+  - `ColorScheme` <"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [Page.EmulateMediaAsync(options)](./api/class-page.mdx#pageemulatemediaasyncoptions) for more details. Defaults to `'light'`.
+  - `DeviceScaleFactor` <[double]> Specify device scale factor (can be thought of as dpr). Defaults to `1`.
+  - `ExtraHTTPHeaders` <[Map]<[string], [string]>> An object containing additional HTTP headers to be sent with every request. All header values must be strings.
+  - `Geolocation` <`Geolocation`>
+    - `Latitude` <[double]> Latitude between -90 and 90.
+    - `Longitude` <[double]> Longitude between -180 and 180.
+    - `Accuracy` <[double]> Non-negative accuracy value. Defaults to `0`.
+  - `HasTouch` <[boolean]> Specifies if viewport supports touch events. Defaults to false.
+  - `HttpCredentials` <`HttpCredentials`> Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).
+    - `Username` <[string]>
+    - `Password` <[string]>
+  - `IgnoreHTTPSErrors` <[boolean]> Whether to ignore HTTPS errors during navigation. Defaults to `false`.
+  - `IsMobile` <[boolean]> Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.
+  - `JavaScriptEnabled` <[boolean]> Whether or not to enable JavaScript in the context. Defaults to `true`.
+  - `Locale` <[string]> Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
+  - `Offline` <[boolean]> Whether to emulate network being offline. Defaults to `false`.
+  - `Permissions` <[IEnumerable]<[string]>> A list of permissions to grant to all pages in this context. See [BrowserContext.GrantPermissionsAsync(permissions, options)](./api/class-browsercontext.mdx#browsercontextgrantpermissionsasyncpermissions-options) for more details.
+  - `Proxy` <`Proxy`> Network proxy settings to use with this context.
+    - `Server` <[string]> Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
+    - `Bypass` <[string]> Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
+    - `Username` <[string]> Optional username to use if HTTP proxy requires authentication.
+    - `Password` <[string]> Optional password to use if HTTP proxy requires authentication.
+  - `RecordHarOmitContent` <[boolean]> Optional setting to control whether to omit request content from the HAR. Defaults to `false`.
+  - `RecordHarPath` <[string]> Enables [HAR](http://www.softwareishard.com/blog/har-12-spec) recording for all pages into the specified HAR file on the filesystem. If not specified, the HAR is not recorded. Make sure to call [BrowserContext.CloseAsync()](./api/class-browsercontext.mdx#browsercontextcloseasync) for the HAR to be saved.
+  - `RecordVideoDir` <[string]> Enables video recording for all pages into the specified directory. If not specified videos are not recorded. Make sure to call [BrowserContext.CloseAsync()](./api/class-browsercontext.mdx#browsercontextcloseasync) for videos to be saved.
+  - `RecordVideoSize` <`RecordVideoSize`> Dimensions of the recorded videos. If not specified the size will be equal to `viewport` scaled down to fit into 800x800. If `viewport` is not configured explicitly the video size defaults to 800x450. Actual picture of each page will be scaled down if necessary to fit the specified size.
+    - `Width` <[int]> Video frame width.
+    - `Height` <[int]> Video frame height.
+  - `ScreenSize` <`ScreenSize`> Emulates consistent window screen size available inside web page via `window.screen`. Is only used when the `viewport` is set.
+    - `Width` <[int]> page width in pixels.
+    - `Height` <[int]> page height in pixels.
+  - `StorageState` <[string]> Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [BrowserContext.StorageStateAsync(options)](./api/class-browsercontext.mdx#browsercontextstoragestateasyncoptions).
+  - `StorageStatePath` <[string]> Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [BrowserContext.StorageStateAsync(options)](./api/class-browsercontext.mdx#browsercontextstoragestateasyncoptions). Path to the file with saved storage state.
+  - `TimezoneId` <[string]> Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.
+  - `UserAgent` <[string]> Specific user agent to use in this context.
+  - `ViewportSize` <[null]|`ViewportSize`> Emulates consistent viewport for each page. Defaults to an 1280x720 viewport. Use `ViewportSize.NoViewport` to disable the default viewport.
+    - `Width` <[int]> page width in pixels.
+    - `Height` <[int]> page height in pixels.
 - returns: <[Page]>
 
 Creates a new page in a new browser context. Closing this page will close the context as well.
 
-This is a convenience API that should only be used for the single-page scenarios and short snippets. Production code and testing frameworks should explicitly create [Browser.NewContextAsync(…)](./api/class-browser.mdx#browsernewcontextasync) followed by the [BrowserContext.NewPageAsync()](./api/class-browsercontext.mdx#browsercontextnewpageasync) to control their exact life times.
+This is a convenience API that should only be used for the single-page scenarios and short snippets. Production code and testing frameworks should explicitly create [Browser.NewContextAsync(options)](./api/class-browser.mdx#browsernewcontextasyncoptions) followed by the [BrowserContext.NewPageAsync()](./api/class-browsercontext.mdx#browsercontextnewpageasync) to control their exact life times.
 
 ## Browser.Version
 - returns: <[string]>

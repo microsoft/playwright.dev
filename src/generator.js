@@ -311,6 +311,8 @@ import TabItem from '@theme/TabItem';`);
         let alias = p.alias;
         if (this.lang === 'java' && member.kind === 'property' && direction === 'in')
           alias = `set${toTitleCase(alias)}`;
+        if (this.lang === 'csharp' && member.kind === 'property' && direction === 'in')
+          alias = toTitleCase(alias);
         return this.renderProperty(`\`${alias}\``, p, p.spec, direction, false)
       });
     else if (spec && spec.length > 1)
@@ -402,9 +404,13 @@ function renderJSSignature(args) {
 
 /**
  * @param {string} name
+ * @param {{omitAsync: boolean}=} options
  */
-function toTitleCase(name) {
-  return name[0].toUpperCase() + name.substring(1);
+function toTitleCase(name, options) {
+  let result = name[0].toUpperCase() + name.substring(1);
+  if (options && options.omitAsync && result.endsWith('Async'))
+    result = result.slice(0, result.length - 'Async'.length);
+  return result;
 }
 
 

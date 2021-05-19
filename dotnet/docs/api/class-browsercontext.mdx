@@ -21,7 +21,7 @@ var context = await browser.NewContextAsync();
 // Create a new page inside context.
 var page = await context.NewPageAsync();
 await page.GotoAsync("https://bing.com");
-// Dispose context once it"s no longer needed.
+// Dispose context once it is no longer needed.
 await context.CloseAsync();
 ```
 
@@ -34,22 +34,22 @@ await context.CloseAsync();
 - [BrowserContext.ClearCookiesAsync()](./api/class-browsercontext.mdx#browsercontextclearcookiesasync)
 - [BrowserContext.ClearPermissionsAsync()](./api/class-browsercontext.mdx#browsercontextclearpermissionsasync)
 - [BrowserContext.CloseAsync()](./api/class-browsercontext.mdx#browsercontextcloseasync)
-- [BrowserContext.ExposeBindingAsync(name, callback, …)](./api/class-browsercontext.mdx#browsercontextexposebindingasyncname-callback-)
+- [BrowserContext.CookiesAsync(urls)](./api/class-browsercontext.mdx#browsercontextcookiesasyncurls)
+- [BrowserContext.ExposeBindingAsync(name, callback, options)](./api/class-browsercontext.mdx#browsercontextexposebindingasyncname-callback-options)
 - [BrowserContext.ExposeFunctionAsync(name, callback)](./api/class-browsercontext.mdx#browsercontextexposefunctionasyncname-callback)
-- [BrowserContext.GetCookiesAsync(…)](./api/class-browsercontext.mdx#browsercontextgetcookiesasync)
-- [BrowserContext.GrantPermissionsAsync(permissions, …)](./api/class-browsercontext.mdx#browsercontextgrantpermissionsasyncpermissions-)
+- [BrowserContext.GrantPermissionsAsync(permissions, options)](./api/class-browsercontext.mdx#browsercontextgrantpermissionsasyncpermissions-options)
 - [BrowserContext.NewPageAsync()](./api/class-browsercontext.mdx#browsercontextnewpageasync)
 - [BrowserContext.Pages](./api/class-browsercontext.mdx#browsercontextpages)
 - [BrowserContext.RouteAsync(url, handler)](./api/class-browsercontext.mdx#browsercontextrouteasyncurl-handler)
+- [BrowserContext.RunAndWaitForEventAsync(event, options)](./api/class-browsercontext.mdx#browsercontextrunandwaitforeventasyncevent-options)
 - [BrowserContext.SetDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaultnavigationtimeouttimeout)
 - [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout)
 - [BrowserContext.SetExtraHTTPHeadersAsync(headers)](./api/class-browsercontext.mdx#browsercontextsetextrahttpheadersasyncheaders)
 - [BrowserContext.SetGeolocationAsync(geolocation)](./api/class-browsercontext.mdx#browsercontextsetgeolocationasyncgeolocation)
 - [BrowserContext.SetOfflineAsync(offline)](./api/class-browsercontext.mdx#browsercontextsetofflineasyncoffline)
-- [BrowserContext.StorageStateAsync(…)](./api/class-browsercontext.mdx#browsercontextstoragestateasync)
-- [BrowserContext.UnrouteAsync(url, …)](./api/class-browsercontext.mdx#browsercontextunrouteasyncurl-)
-- [BrowserContext.WaitForEventAsync(event, …)](./api/class-browsercontext.mdx#browsercontextwaitforeventasyncevent-)
-- [BrowserContext.WaitForPageAsync(…)](./api/class-browsercontext.mdx#browsercontextwaitforpageasync)
+- [BrowserContext.StorageStateAsync(options)](./api/class-browsercontext.mdx#browsercontextstoragestateasyncoptions)
+- [BrowserContext.UnrouteAsync(url, handler)](./api/class-browsercontext.mdx#browsercontextunrouteasyncurl-handler)
+- [BrowserContext.WaitForEventAsync(options)](./api/class-browsercontext.mdx#browsercontextwaitforeventasyncoptions)
 
 ## event BrowserContext.Close
 - type: <[BrowserContext]>
@@ -68,29 +68,29 @@ The earliest moment that page is available is when it has navigated to the initi
 
 ```csharp
 var popupTask = context.WaitForPageAsync();
-await Task.WhenAll(popupTask, page.ClickAsync("a"));
-
-Console.WriteLine(popupTask.Result.EvaluateAsync<string>("location.href"));
+await page.ClickAsync("a");
+var popup = await popupTask;
+Console.WriteLine(await popup.EvaluateAsync<string>("location.href"));
 ```
 
 :::note
-Use [Page.WaitForLoadStateAsync(…)](./api/class-page.mdx#pagewaitforloadstateasync) to wait until the page gets to a particular state (you should not need it in most cases).
+Use [Page.WaitForLoadStateAsync(state, options)](./api/class-page.mdx#pagewaitforloadstateasyncstate-options) to wait until the page gets to a particular state (you should not need it in most cases).
 :::
 
 ## BrowserContext.AddCookiesAsync(cookies)
 - `cookies` <[IEnumerable]<`Cookie`>>
-  - `name` <[string]>
-  - `value` <[string]>
-  - `url` <[string]> either url or domain / path are required. Optional.
-  - `domain` <[string]> either url or domain / path are required Optional.
-  - `path` <[string]> either url or domain / path are required Optional.
-  - `expires` <[double]> Unix time in seconds. Optional.
-  - `httpOnly` <[boolean]> Optional.
-  - `secure` <[boolean]> Optional.
-  - `sameSite` <"Strict"|"Lax"|"None"> Optional.
+  - `Name` <[string]>
+  - `Value` <[string]>
+  - `Url` <[string]> either url or domain / path are required. Optional.
+  - `Domain` <[string]> either url or domain / path are required Optional.
+  - `Path` <[string]> either url or domain / path are required Optional.
+  - `Expires` <[double]> Unix time in seconds. Optional.
+  - `HttpOnly` <[boolean]> Optional.
+  - `Secure` <[boolean]> Optional.
+  - `SameSite` <"Strict"|"Lax"|"None"> Optional.
 - returns: <[void]>
 
-Adds cookies into this browser context. All pages within this context will have these cookies installed. Cookies can be obtained via [BrowserContext.GetCookiesAsync(…)](./api/class-browsercontext.mdx#browsercontextgetcookiesasync).
+Adds cookies into this browser context. All pages within this context will have these cookies installed. Cookies can be obtained via [BrowserContext.CookiesAsync(urls)](./api/class-browsercontext.mdx#browsercontextcookiesasyncurls).
 
 ```csharp
 await context.AddCookiesAsync(new[] { cookie1, cookie2 });
@@ -154,17 +154,32 @@ Closes the browser context. All the pages that belong to the browser context wil
 The default browser context cannot be closed.
 :::
 
-## BrowserContext.ExposeBindingAsync(name, callback, …)
+## BrowserContext.CookiesAsync(urls)
+- `urls` <[string]|[IEnumerable]<[string]>> Optional list of URLs.
+- returns: <[IEnumerable]<`Cookie`>>
+  - `name` <[string]>
+  - `value` <[string]>
+  - `domain` <[string]>
+  - `path` <[string]>
+  - `expires` <[double]> Unix time in seconds.
+  - `httpOnly` <[boolean]>
+  - `secure` <[boolean]>
+  - `sameSite` <"Strict"|"Lax"|"None">
+
+If no URLs are specified, this method returns all cookies. If URLs are specified, only cookies that affect those URLs are returned.
+
+## BrowserContext.ExposeBindingAsync(name, callback, options)
 - `name` <[string]> Name of the function on the window object.
 - `callback` <[Action]<BindingSource, T, [TResult]>> Callback function that will be called in the Playwright's context.
-- `handle` <[boolean]> Whether to pass the argument as a handle, instead of passing by value. When passing a handle, only one argument is supported. When passing by value, multiple arguments are supported.
+- `options` <`BrowserContextExposeBindingOptions`>
+  - `Handle` <[boolean]> Whether to pass the argument as a handle, instead of passing by value. When passing a handle, only one argument is supported. When passing by value, multiple arguments are supported.
 - returns: <[void]>
 
 The method adds a function called `name` on the `window` object of every frame in every page in the context. When called, the function executes `callback` and returns a [Promise] which resolves to the return value of `callback`. If the `callback` returns a [Promise], it will be awaited.
 
 The first argument of the `callback` function contains information about the caller: `{ browserContext: BrowserContext, page: Page, frame: Frame }`.
 
-See [Page.ExposeBindingAsync(name, callback, …)](./api/class-page.mdx#pageexposebindingasyncname-callback-) for page-only version.
+See [Page.ExposeBindingAsync(name, callback, options)](./api/class-page.mdx#pageexposebindingasyncname-callback-options) for page-only version.
 
 An example of exposing page URL to all frames in all pages in the context:
 
@@ -266,21 +281,7 @@ class BrowserContextExamples
 }
 ```
 
-## BrowserContext.GetCookiesAsync(…)
-- `urls` <[string]|[IEnumerable]<[string]>> Optional list of URLs.
-- returns: <[IEnumerable]<`Cookie`>>
-  - `name` <[string]>
-  - `value` <[string]>
-  - `domain` <[string]>
-  - `path` <[string]>
-  - `expires` <[double]> Unix time in seconds.
-  - `httpOnly` <[boolean]>
-  - `secure` <[boolean]>
-  - `sameSite` <"Strict"|"Lax"|"None">
-
-If no URLs are specified, this method returns all cookies. If URLs are specified, only cookies that affect those URLs are returned.
-
-## BrowserContext.GrantPermissionsAsync(permissions, …)
+## BrowserContext.GrantPermissionsAsync(permissions, options)
 - `permissions` <[IEnumerable]<[string]>> A permission or an array of permissions to grant. Permissions can be one of the following values:
   * `'geolocation'`
   * `'midi'`
@@ -298,7 +299,8 @@ If no URLs are specified, this method returns all cookies. If URLs are specified
   * `'clipboard-read'`
   * `'clipboard-write'`
   * `'payment-handler'`
-- `origin` <[string]> The [origin] to grant permissions to, e.g. "https://example.com".
+- `options` <`BrowserContextGrantPermissionsOptions`>
+  - `Origin` <[string]> The [origin] to grant permissions to, e.g. "https://example.com".
 - returns: <[void]>
 
 Grants specified permissions to the browser context. Only grants corresponding permissions to the given origin if specified.
@@ -348,29 +350,45 @@ await page.RouteAsync("/api/**", async r =>
     if (r.Request.PostData.Contains("my-string"))
         await r.FulfillAsync(body: "mocked-data");
     else
-        await r.ResumeAsync();
+        await r.ContinueAsync();
 });
 ```
 
 Page routes (set up with [Page.RouteAsync(url, handler)](./api/class-page.mdx#pagerouteasyncurl-handler)) take precedence over browser context routes when request matches both handlers.
 
-To remove a route with its handler you can use [BrowserContext.UnrouteAsync(url, …)](./api/class-browsercontext.mdx#browsercontextunrouteasyncurl-).
+To remove a route with its handler you can use [BrowserContext.UnrouteAsync(url, handler)](./api/class-browsercontext.mdx#browsercontextunrouteasyncurl-handler).
 
 :::note
 Enabling routing disables http cache.
 :::
+
+## BrowserContext.RunAndWaitForEventAsync(event, options)
+- `event` <[string]> Event name, same one would pass into `browserContext.on(event)`.
+- `options` <`BrowserContextRunAndWaitForEventOptions`>
+  - `Predicate` <[Func]<T, [bool]>> Receives the event data and resolves to truthy value when the waiting should resolve.
+  - `Timeout` <[double]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout).
+- returns: <[object]>
+
+Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the context closes before the event is fired. Returns the event data value.
+
+```csharp
+var page = await context.RunAndWaitForEventAsync(ContextEvent.Page, async () =>
+{
+    await page.ClickAsync("button");
+});
+```
 
 ## BrowserContext.SetDefaultNavigationTimeout(timeout)
 - `timeout` <[double]> Maximum navigation time in milliseconds
 - returns: <[void]>
 
 This setting will change the default maximum navigation time for the following methods and related shortcuts:
-* [Page.GoBackAsync(…)](./api/class-page.mdx#pagegobackasync)
-* [Page.GoForwardAsync(…)](./api/class-page.mdx#pagegoforwardasync)
-* [Page.GotoAsync(url, …)](./api/class-page.mdx#pagegotoasyncurl-)
-* [Page.ReloadAsync(…)](./api/class-page.mdx#pagereloadasync)
-* [Page.SetContentAsync(html, …)](./api/class-page.mdx#pagesetcontentasynchtml-)
-* [Page.WaitForNavigationAsync(…)](./api/class-page.mdx#pagewaitfornavigationasync)
+* [Page.GoBackAsync(options)](./api/class-page.mdx#pagegobackasyncoptions)
+* [Page.GoForwardAsync(options)](./api/class-page.mdx#pagegoforwardasyncoptions)
+* [Page.GotoAsync(url, options)](./api/class-page.mdx#pagegotoasyncurl-options)
+* [Page.ReloadAsync(options)](./api/class-page.mdx#pagereloadasyncoptions)
+* [Page.SetContentAsync(html, options)](./api/class-page.mdx#pagesetcontentasynchtml-options)
+* [Page.WaitForNavigationAsync(options)](./api/class-page.mdx#pagewaitfornavigationasyncoptions)
 
 :::note
 [Page.SetDefaultNavigationTimeout(timeout)](./api/class-page.mdx#pagesetdefaultnavigationtimeouttimeout) and [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) take priority over [BrowserContext.SetDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaultnavigationtimeouttimeout).
@@ -398,9 +416,9 @@ The extra HTTP headers will be sent with every request initiated by any page in 
 
 ## BrowserContext.SetGeolocationAsync(geolocation)
 - `geolocation` <[null]|`Geolocation`>
-  - `latitude` <[double]> Latitude between -90 and 90.
-  - `longitude` <[double]> Longitude between -180 and 180.
-  - `accuracy` <[double]> Non-negative accuracy value. Defaults to `0`.
+  - `Latitude` <[double]> Latitude between -90 and 90.
+  - `Longitude` <[double]> Longitude between -180 and 180.
+  - `Accuracy` <[double]> Non-negative accuracy value. Defaults to `0`.
 - returns: <[void]>
 
 Sets the context's geolocation. Passing `null` or `undefined` emulates position unavailable.
@@ -414,44 +432,38 @@ await context.SetGeolocationAsync(new Geolocation()
 ```
 
 :::note
-Consider using [BrowserContext.GrantPermissionsAsync(permissions, …)](./api/class-browsercontext.mdx#browsercontextgrantpermissionsasyncpermissions-) to grant permissions for the browser context pages to read its geolocation.
+Consider using [BrowserContext.GrantPermissionsAsync(permissions, options)](./api/class-browsercontext.mdx#browsercontextgrantpermissionsasyncpermissions-options) to grant permissions for the browser context pages to read its geolocation.
 :::
 
 ## BrowserContext.SetOfflineAsync(offline)
 - `offline` <[boolean]> Whether to emulate network being offline for the browser context.
 - returns: <[void]>
 
-## BrowserContext.StorageStateAsync(…)
-- `path` <[string]> The file path to save the storage state to. If `path` is a relative path, then it is resolved relative to current working directory. If no path is provided, storage state is still returned, but won't be saved to the disk.
+## BrowserContext.StorageStateAsync(options)
+- `options` <`BrowserContextStorageStateOptions`>
+  - `Path` <[string]> The file path to save the storage state to. If `path` is a relative path, then it is resolved relative to current working directory. If no path is provided, storage state is still returned, but won't be saved to the disk.
 - returns: <[string]>
 
 Returns storage state for this browser context, contains current cookies and local storage snapshot.
 
-## BrowserContext.UnrouteAsync(url, …)
+## BrowserContext.UnrouteAsync(url, handler)
 - `url` <[string]|[Regex]|[Func]<[string], bool>> A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with [BrowserContext.RouteAsync(url, handler)](./api/class-browsercontext.mdx#browsercontextrouteasyncurl-handler).
 - `handler` <[Action]<[Route]>> Optional handler function used to register a routing with [BrowserContext.RouteAsync(url, handler)](./api/class-browsercontext.mdx#browsercontextrouteasyncurl-handler).
 - returns: <[void]>
 
 Removes a route created with [BrowserContext.RouteAsync(url, handler)](./api/class-browsercontext.mdx#browsercontextrouteasyncurl-handler). When `handler` is not specified, removes all routes for the `url`.
 
-## BrowserContext.WaitForEventAsync(event, …)
-- `event` <[string]> Event name, same one would pass into `browserContext.on(event)`.
-- `timeout` <[double]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout).
+## BrowserContext.WaitForEventAsync(options)
+- `options` <`BrowserContextWaitForEventOptions`>
+  - `Predicate` <[Func]<T, [bool]>> Receives the event data and resolves to truthy value when the waiting should resolve.
+  - `Timeout` <[double]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout).
 - returns: <[object]>
 
-Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the context closes before the event is fired. Returns the event data value.
+:::note
+In most cases, you should use [BrowserContext.RunAndWaitForEventAsync(event, options)](./api/class-browsercontext.mdx#browsercontextrunandwaitforeventasyncevent-options).
+:::
 
-```csharp
-var t = page.WaitForEventAsync("page");
-await Task.WhenAll(t, page.ClickAsync("button"));
-```
-
-## BrowserContext.WaitForPageAsync(…)
-- `predicate` <[Func]<[Page], bool>> Receives the [Page] object and resolves to truthy value when the waiting should resolve.
-- `timeout` <[double]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout).
-- returns: <[Page]>
-
-Performs action and waits for a new [Page] to be created in the context. If predicate is provided, it passes [Page] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the context closes before new [Page] is created.
+Waits for given `event` to fire. If predicate is provided, it passes event's value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the browser context is closed before the `event` is fired.
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Browser]: ./api/class-browser.mdx "Browser"

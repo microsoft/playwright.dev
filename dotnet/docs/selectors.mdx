@@ -5,7 +5,7 @@ title: "Element selectors"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Selectors are strings that point to the elements in the page. They are used to perform actions on those elements by means of methods such as [Page.ClickAsync(selector, …)](./api/class-page.mdx#pageclickasyncselector-), [Page.FillAsync(selector, value, …)](./api/class-page.mdx#pagefillasyncselector-value-) and alike. All those methods accept `selector` as their first argument.
+Selectors are strings that point to the elements in the page. They are used to perform actions on those elements by means of methods such as [Page.ClickAsync(selector, options)](./api/class-page.mdx#pageclickasyncselector-options), [Page.FillAsync(selector, value, options)](./api/class-page.mdx#pagefillasyncselector-value-options) and alike. All those methods accept `selector` as their first argument.
 
 - [Quick guide](#quick-guide)
 - [Text selector](#text-selector)
@@ -23,30 +23,114 @@ Selectors are strings that point to the elements in the page. They are used to p
 
 ## Quick guide
 - Text selector
+
+  ```csharp
+  await page.ClickAsync("text=Log in");
+  ```
+
 - CSS selector
+
+  ```csharp
+  await page.ClickAsync("button");
+  await page.ClickAsync("#nav-bar .contact-us-item");
+  ```
+
 - Select by attribute, with css selector
+
+  ```csharp
+  await page.ClickAsync("[data-test=login-button]");
+  await page.ClickAsync("[aria-label='Sign in']");
+  ```
+
 - Combine css and text selectors
+
+  ```csharp
+  await page.ClickAsync("article:has-text(\"Playwright\")");
+  await page.ClickAsync("#nav-bar :text(\"Contact us\")");
+  ```
+
 - Element that contains another, with css selector
+
+  ```csharp
+  await page.ClickAsync(".item-description:has(.item-promo-banner)");
+  ```
+
 - Selecting based on layout, with css selector
+
+  ```csharp
+  await page.ClickAsync("input:right-of(:text(\"Username\"))");
+  ```
+
 - Only visible elements, with css selector
+
+  ```csharp
+  await page.ClickAsync(".login-button:visible");
+  ```
+
 - Pick n-th match
+
+  ```csharp
+  await page.ClickAsync(":nth-match(:text('Buy'), 3)");
+  ```
+
 - XPath selector
+
+  ```csharp
+  await page.ClickAsync("xpath=//button");
+  ```
 
 ## Text selector
 
 Text selector locates elements that contain passed text.
 
+```csharp
+await page.ClickAsync("text=Log in");
+```
+
 Text selector has a few variations:
 - `text=Log in` - default matching is case-insensitive and searches for a substring. For example, `text=Log` matches `<button>Log in</button>`.
+
+  ```csharp
+  await page.ClickAsync("text=Log in");
+  ```
+
 - `text="Log in"` - text body can be escaped with single or double quotes to search for a text node with exact content. For example, `text="Log"` does not match `<button>Log in</button>` because `<button>` contains a single text node `"Log in"` that is not equal to `"Log"`. However, `text="Log"` matches `<button>Log<span>in</span></button>`, because `<button>` contains a text node `"Log"`.
 
   Quoted body follows the usual escaping rules, e.g. use `\"` to escape double quote in a double-quoted string: `text="foo\"bar"`.
+
+  ```csharp
+  await page.ClickAsync("text='Log in'");
+  ```
+
 - `"Log in"` - selector starting and ending with a quote (either `"` or `'`) is assumed to be a text selector. For example, `"Log in"` is converted to `text="Log in"` internally.
+
+  ```csharp
+  await page.ClickAsync("'Log in'");
+  ```
+
 - `/Log\s*in/i` - body can be a [JavaScript-like regex](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp) wrapped in `/` symbols. For example, `text=/Log\s*in/i` matches `<button>Login</button>` and `<button>log IN</button>`.
+
+  ```csharp
+  await page.ClickAsync("text=/Log\\s*in/i");
+  ```
+
 - `article:has-text("Playwright")` - the `:has-text()` pseudo-class can be used inside a [css] selector. It matches any element containing specified text somewhere inside, possibly in a child or a descendant element. For example, `article:has-text("Playwright")` matches `<article><div>Playwright</div></article>`.
 
   Note that `:has-text()` should be used together with other `css` specifiers, otherwise it will match all the elements containing specified text, including the `<body>`.
+
+  ```csharp
+  // Wrong, will match many elements including <body>
+  await page.ClickAsync(":has-text(\"Playwright\")");
+  // Correct, only matches the <article> element
+  await page.ClickAsync("article:has-text(\"Playwright\")");
+  ```
+
 - `#nav-bar :text("Home")` - the `:text()` pseudo-class can be used inside a [css] selector. It matches the smallest element containing specified text. This example is equivalent to `text=Home`, but inside the `#nav-bar` element.
+
+  ```csharp
+  await page.ClickAsync("#nav-bar :text('Home')");
+  ```
+
 - `#nav-bar :text-is("Home")` - the `:text-is()` pseudo-class can be used inside a [css] selector, for strict text node match. This example is equivalent to `text="Home"` (note quotes), but inside the `#nav-bar` element.
 * `#nav-bar :text-matches("reg?ex", "i")` - the `:text-matches()` pseudo-class can be used inside a [css] selector, for regex-based match. This example is equivalent to `text=/reg?ex/i`, but inside the `#nav-bar` element.
 
@@ -64,6 +148,10 @@ Playwright augments standard CSS selectors in two ways:
 * `css` engine pierces open shadow DOM by default.
 * Playwright adds custom pseudo-classes like `:visible`, `:text` and more.
 
+```csharp
+await page.ClickAsync("button");
+```
+
 ## Selecting visible elements
 
 The `:visible` pseudo-class in CSS selectors matches the elements that are [visible](./actionability.mdx#visible). For example, `input` matches all the inputs on the page, while `input:visible` matches only visible inputs. This is useful to distinguish elements that are very similar but differ in visibility.
@@ -80,7 +168,16 @@ Consider a page with two buttons, first invisible and second visible.
 ```
 
 * This will find the first button, because it is the first one in DOM order. Then it will wait for the button to become visible before clicking, or timeout while waiting:
+
+  ```csharp
+  await page.ClickAsync("button");
+  ```
+
 * This will find a second button, because it is visible, and then click it.
+
+  ```csharp
+  await page.ClickAsync("button:visible");
+  ```
 
 Use `:visible` with caution, because it has two major drawbacks:
 * When elements change their visibility dynamically, `:visible` will give unpredictable results based on the timing.
@@ -92,9 +189,18 @@ The `:has()` pseudo-class is an [experimental CSS pseudo-class](https://develope
 
 Following snippet returns text content of an `<article>` element that has a `<div class=promo>` inside.
 
+```csharp
+await page.TextContentAsync("article:has(div.promo)");
+```
+
 ## Selecting elements matching one of the conditions
 
 The `:is()` pseudo-class is an [experimental CSS pseudo-class](https://developer.mozilla.org/en-US/docs/Web/CSS/:is). It is a function that takes a selector list as its argument, and selects any element that can be selected by one of the selectors in that list. This is useful for writing large selectors in a more compact form.
+
+```csharp
+// Clicks a <button> that has either a "Log in" or "Sign in" text.
+await page.ClickAsync(":is(button:has-text(\"Log in\"), button:has-text(\"Sign in\"))");
+```
 
 ## Selecting elements in Shadow DOM
 
@@ -105,6 +211,10 @@ Our `css` and `text` engines pierce the [Shadow DOM](https://developer.mozilla.o
 In particular, in `css` engine, any [Descendant combinator](https://developer.mozilla.org/en-US/docs/Web/CSS/Descendant_combinator) or [Child combinator](https://developer.mozilla.org/en-US/docs/Web/CSS/Child_combinator) pierces an arbitrary number of open shadow roots, including the implicit descendant combinator at the start of the selector. It does not search inside closed shadow roots or iframes.
 
 If you'd like to opt-out of this behavior, you can use `:light` CSS extension or `text:light` selector engine. They do not pierce shadow roots.
+
+```csharp
+await page.ClickAsync(":light(.article > .header)");
+```
 
 More advanced Shadow DOM use cases:
 
@@ -148,6 +258,14 @@ Layout selectors use [bounding client rect](https://developer.mozilla.org/en-US/
 * `:below(inner > selector)` - Matches elements that are below any of the elements matching the inner selector.
 * `:near(inner > selector)` - Matches elements that are near (within 50 CSS pixels) any of the elements matching the inner selector.
 
+```csharp
+// Fill an input to the right of "Username".
+await page.FillAsync("input:right-of(:text(\"Username\"))", "value");
+
+// Click a button near the promo card.
+await page.ClickAsync("button:near(.promo-card)");
+```
+
 All layout selectors support optional maximum pixel distance as the last argument. For example `button:near(:text("Username"), 120)` matches a button that is at most 120 pixels away from the element with the text "Username".
 
 ## XPath selectors
@@ -168,6 +286,14 @@ Playwright supports a shorthand for selecting elements using certain attributes.
 - `data-test-id`
 - `data-test`
 
+```csharp
+// Fill an input with the id "username"
+await page.FillAsync("id=username", "value");
+
+// Click an element with data-test-id "submit"
+await page.ClickAsync("data-test-id=submit");
+```
+
 :::note
 Attribute selectors pierce shadow DOM. To opt-out from this behavior, use `:light` suffix after attribute, for example `page.click('data-test-id:light=submit')
 :::
@@ -184,7 +310,17 @@ Sometimes page contains a number of similar elements, and it is hard to select a
 
 In this case, `:nth-match(:text("Buy"), 3)` will select the third button from the snippet above. Note that index is one-based.
 
-`:nth-match()` is also useful to wait until a specified number of elements appear, using [Page.WaitForSelectorAsync(selector, …)](./api/class-page.mdx#pagewaitforselectorasyncselector-).
+```csharp
+// Click the third "Buy" button
+await page.ClickAsync(":nth-match(:text('Buy'), 3)");
+```
+
+`:nth-match()` is also useful to wait until a specified number of elements appear, using [Page.WaitForSelectorAsync(selector, options)](./api/class-page.mdx#pagewaitforselectorasyncselector-options).
+
+```csharp
+// Wait until all three buttons are visible
+await page.WaitForSelectorAsync(":nth-match(:text('Buy'), 3)");
+```
 
 :::note
 Unlike [`:nth-child()`](https://developer.mozilla.org/en-US/docs/Web/CSS/:nth-child), elements do not have to be siblings, they could be anywhere on the page. In the snippet above, all three buttons match `:text("Buy")` selector, and `:nth-match()` selects the third button.
@@ -222,6 +358,23 @@ Attributes like text content, input placeholder, accessibility roles and labels 
 
 The following examples use the built-in [text] and [css] selector engines.
 
+```csharp
+// queries "Login" text selector
+await page.ClickAsync("text=\"Login\"");
+await page.ClickAsync("\"Login\""); // short-form
+
+// queries "Search GitHub" placeholder attribute
+await page.FillAsync("css=[placeholder='Search GitHub']", "query");
+await page.FillAsync("[placeholder='Search GitHub']", "query"); // short-form
+
+// queries "Close" accessibility label
+await page.ClickAsync("css=[aria-label='Close']");
+await page.ClickAsync("[aria-label='Close']"); // short-form
+
+// combine role and text queries
+await page.ClickAsync("css=nav >> text=Login");
+```
+
 ### Define explicit contract
 
 When user-facing attributes change frequently, it is recommended to use explicit test ids, like `data-test-id`. These `data-*` attributes are supported by the [css] and [id selectors][id].
@@ -230,9 +383,24 @@ When user-facing attributes change frequently, it is recommended to use explicit
 <button data-test-id="directions">Itinéraire</button>
 ```
 
+```csharp
+// queries data-test-id attribute with css
+await page.ClickAsync("css=[data-test-id=directions]");
+await page.ClickAsync("[data-test-id=directions]"); // short-form
+
+// queries data-test-id with id
+await page.ClickAsync("data-test-id=directions");
+```
+
 ### Avoid selectors tied to implementation
 
 [xpath] and [css] can be tied to the DOM structure or implementation. These selectors can break when the DOM structure changes.
+
+```csharp
+// avoid long css or xpath chains
+await page.ClickAsync("#tsf > div:nth-child(2) > div.A8SBwf > div.RNNXgb > div > div.a4bIc > input");
+await page.ClickAsync("//*[@id='tsf']/div[2]/div[1]/div[1]/div/div[2]/input");
+```
 
 [text]: #text-selector
 [css]: #css-selector
