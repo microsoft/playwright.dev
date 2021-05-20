@@ -19,11 +19,21 @@ Playwright provides convenience APIs for common tasks, like reading the text con
 
 ## Text content
 
+```csharp
+var content = await page.TextContentAsync("nav:first-child");
+Assert.Equals("home", content);
+```
+
 ### API reference
 - [Page.TextContentAsync(selector, options)](./api/class-page.mdx#pagetextcontentasyncselector-options)
 - [ElementHandle.TextContentAsync()](./api/class-elementhandle.mdx#elementhandletextcontentasync)
 
 ## Inner text
+
+```csharp
+var content = await page.InnerTextAsync(".selected");
+Assert.Equals("value", content);
+```
 
 ### API reference
 - [Page.InnerTextAsync(selector, options)](./api/class-page.mdx#pageinnertextasyncselector-options)
@@ -31,7 +41,17 @@ Playwright provides convenience APIs for common tasks, like reading the text con
 
 ## Attribute value
 
+```csharp
+var value = await page.GetAttributeAsync("input", "alt");
+Assert.Equals("Text", value);
+```
+
 ## Checkbox state
+
+```csharp
+var checked = await page.IsCheckedAsync("input");
+Assert.True(checked);
+```
 
 ### API reference
 - [Page.IsCheckedAsync(selector, options)](./api/class-page.mdx#pageischeckedasyncselector-options)
@@ -39,11 +59,21 @@ Playwright provides convenience APIs for common tasks, like reading the text con
 
 ## JS expression
 
+```csharp
+var content = await page.EvalOnSelectorAsync("nav:first-child", "e => e.textContent");
+Assert.Equals("home", content);
+```
+
 ### API reference
 - [Page.EvalOnSelectorAsync(selector, expression, arg)](./api/class-page.mdx#pageevalonselectorasyncselector-expression-arg)
 - [JsHandle.EvaluateAsync(expression, arg)](./api/class-jshandle.mdx#jshandleevaluateasyncexpression-arg)
 
 ## Inner HTML
+
+```csharp
+var html = await page.InnerHTMLAsync("div.result");
+Assert.Equals(html, "<p>Result</p>");
+```
 
 ### API reference
 - [Page.InnerHTMLAsync(selector, options)](./api/class-page.mdx#pageinnerhtmlasyncselector-options)
@@ -51,11 +81,21 @@ Playwright provides convenience APIs for common tasks, like reading the text con
 
 ## Visibility
 
+```csharp
+var visibility = await page.IsVisibleAsync("input");
+Assert.True(visibility);
+```
+
 ### API reference
 - [Page.IsVisibleAsync(selector, options)](./api/class-page.mdx#pageisvisibleasyncselector-options)
 - [ElementHandle.IsVisibleAsync()](./api/class-elementhandle.mdx#elementhandleisvisibleasync)
 
 ## Enabled state
+
+```csharp
+var enabled = await page.IsEnabledAsync("input");
+Assert.True(enabled);
+```
 
 ### API reference
 - [Page.IsEnabledAsync(selector, options)](./api/class-page.mdx#pageisenabledasyncselector-options)
@@ -64,6 +104,25 @@ Playwright provides convenience APIs for common tasks, like reading the text con
 ## Custom assertions
 
 With Playwright, you can also write custom JavaScript to run in the context of the browser. This is useful in situations where you want to assert for values that are not covered by the convenience APIs above.
+
+```csharp
+// Assert local storage value
+var userId = await page.EvaluateAsync<string>("() => window.localStorage.getItem('userId')");
+Assert.NotNull(userId);
+
+// Assert value for input element
+await page.WaitForSelectorAsync("#search");
+var value = await page.EvalOnSelectorAsync("#search", "el => el.value");
+Assert.Equals("query", value);
+
+// Assert computed style
+var fontSize = await page.EvalOnSelectorAsync<string>("div", "el => window.getComputedStyle(el).fontSize");
+Assert.Equals("16px", fontSize);
+
+// Assert list length
+var length = await page.EvalOnSelectorAllAsync<int>("li.selected", "items => items.length");
+Assert.Equals(3, length);
+```
 
 ### API reference
 - [Page.EvaluateAsync(expression, arg)](./api/class-page.mdx#pageevaluateasyncexpression-arg)
