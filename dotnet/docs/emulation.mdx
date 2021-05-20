@@ -13,6 +13,7 @@ Playwright allows overriding various parameters of the device where the browser 
 
 Most of these parameters are configured during the browser context construction, but some of them such as viewport size can be changed for individual pages.
 
+- [Devices](#devices)
 - [User agent](#user-agent)
 - [Viewport](#viewport)
 - [Locale & timezone](#locale--timezone)
@@ -22,9 +23,44 @@ Most of these parameters are configured during the browser context construction,
 
 <br/>
 
+## Devices
+
+Playwright comes with a registry of device parameters for selected mobile devices. It can be used to simulate browser behavior on a mobile device:
+
+```csharp
+using Microsoft.Playwright;
+using System.Threading.Tasks;
+
+class Example
+{
+  public async void Main()
+  {
+      using var playwright = await Playwright.CreateAsync();
+      await using var browser = await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
+      {
+          Headless: False
+      });
+      var pixel2 = playwright.Devices["Pixel 2"];
+      await using var context = await browser.NewContextAsync(pixel2);
+  }
+}
+```
+
+All pages created in the context above will share the same device parameters.
+
+### API reference
+- [Playwright.Devices](./api/class-playwright.mdx#playwrightdevices)
+- [Browser.NewContextAsync(options)](./api/class-browser.mdx#browsernewcontextasyncoptions)
+
+<br/>
+
 ## User agent
 
 All pages created in the context above will share the user agent specified:
+
+```csharp
+var context = await browser.NewContextAsync(new BrowserNewContextOptions { UserAgent = "My User Agent" });
+```
 
 ### API reference
 - [Browser.NewContextAsync(options)](./api/class-browser.mdx#browsernewcontextasyncoptions)
@@ -35,6 +71,24 @@ All pages created in the context above will share the user agent specified:
 
 Create a context with custom viewport size:
 
+```csharp
+// Create context with given viewport
+await using var context = await browser.NewContextAsync(new BrowserNewContextOptions
+{
+    ViewportSize = new ViewportSize() { Width = 1280, Height = 1024 }
+});
+
+// Resize viewport for individual page
+await page.SetViewportSizeAsync(1600, 1200);
+
+// Emulate high-DPI
+await using var context = await browser.NewContextAsync(new BrowserNewContextOptions
+{
+    ViewportSize = new ViewportSize() { Width = 2560, Height = 1440 },
+    DeviceScaleFactor = 2
+});
+```
+
 ### API reference
 - [Browser.NewContextAsync(options)](./api/class-browser.mdx#browsernewcontextasyncoptions)
 - [Page.SetViewportSizeAsync(width, height)](./api/class-page.mdx#pagesetviewportsizeasyncwidth-height)
@@ -42,6 +96,14 @@ Create a context with custom viewport size:
 <br/>
 
 ## Locale & timezone
+
+```csharp
+await using var context = await browser.NewContextAsync(new BrowserNewContextOptions
+{
+    Locale = "de-DE",
+    TimezoneId = "Europe/Berlin"
+});
+```
 
 ### API reference
 - [Browser.NewContextAsync(options)](./api/class-browser.mdx#browsernewcontextasyncoptions)
@@ -54,9 +116,21 @@ Allow all pages in the context to show system notifications:
 
 Grant all pages in the existing context access to current location:
 
+```csharp
+await context.GrantPermissionsAsync(new[] { "geolocation" });
+```
+
 Grant notifications access from a specific domain:
 
+```csharp
+await context.GrantPermissionsAsync(new[] { "notifications" },origin: "https://skype.com");
+```
+
 Revoke all permissions:
+
+```csharp
+await context.ClearPermissionsAsync();
+```
 
 ### API reference
 - [Browser.NewContextAsync(options)](./api/class-browser.mdx#browsernewcontextasyncoptions)
@@ -69,7 +143,19 @@ Revoke all permissions:
 
 Create a context with `"geolocation"` permissions granted:
 
+```csharp
+await using var context = await browser.NewContextAsync(new BrowserNewContextOptions
+{
+    Permissions = new[] { "geolocation" },
+    Geolocation = new Geolocation() { Longitude = 48.858455f, Latitude = 2.294474f }
+});
+```
+
 Change the location later:
+
+```csharp
+await context.SetGeolocationAsync(new Geolocation() { Longitude = 48.858455f, Latitude = 2.294474f });
+```
 
 **Note** you can only change geolocation for all pages in the context.
 
@@ -82,6 +168,32 @@ Change the location later:
 ## Color scheme and media
 
 Create a context with dark or light mode. Pages created in this context will follow this color scheme preference.
+
+```csharp
+// Create context with dark mode
+await using var context = await browser.NewContextAsync(new BrowserNewContextOptions
+{
+    ColorScheme = ColorScheme.Dark
+});
+
+// Create page with dark mode
+var page = await browser.NewPageAsync(new BrowserNewPageOptions
+{
+    ColorScheme = ColorScheme.Dark
+});
+
+// Change color scheme for the page
+await page.EmulateMediaAsync(new PageEmulateMediaOptions
+{
+    ColorScheme = ColorScheme.Dark
+});
+
+// Change media for page
+await page.EmulateMediaAsync(new PageEmulateMediaOptions
+{
+    Media = Media.Print
+});
+```
 
 ### API reference
 - [Browser.NewContextAsync(options)](./api/class-browser.mdx#browsernewcontextasyncoptions)
