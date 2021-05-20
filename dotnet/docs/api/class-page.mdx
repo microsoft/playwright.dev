@@ -183,7 +183,7 @@ try {
   // Crash might happen during a click.
   await page.ClickAsync("button");
   // Or while waiting for an event.
-  await page.WaitForPopupAsync(() -> {});
+  await page.WaitForEventAsync(PageEvent.Popup);
 } catch (PlaywrightException e) {
   // When the page crashes, exception message contains "crash".
 }
@@ -257,9 +257,10 @@ Emitted when the page opens a new tab or window. This event is emitted in additi
 The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
 
 ```csharp
-var waitForPopupTask = page.WaitForPopupAsync();
-await page.EvaluateAsync("() => window.open('https://microsoft.com')");
-var popup = await waitForPopupTask;
+var popup = await page.RunAndWaitForEventAsync(PageEvent.Popup, async () =>
+{
+    await page.EvaluateAsync("() => window.open('https://microsoft.com')");
+});
 Console.WriteLine(await popup.EvaluateAsync<string>("location.href"));
 ```
 
@@ -319,7 +320,7 @@ Math.random = () => 42;
 ```
 
 ```csharp
-await page.AddInitScriptAsync(scriptPath: "./preload.js");
+await page.AddInitScriptAsync(new PageAddInitScriptOption { ScriptPath = "./preload.js" });
 ```
 
 :::note
@@ -505,13 +506,13 @@ await page.EvaluateAsync("() => matchMedia('screen').matches");
 await page.EvaluateAsync("() => matchMedia('print').matches");
 // → false
 
-await page.EmulateMediaAsync(Media.Print);
+await page.EmulateMediaAsync(new PageEmulateMediaOptions { Media = Media.Print });
 await page.EvaluateAsync("() => matchMedia('screen').matches");
 // → false
 await page.EvaluateAsync("() => matchMedia('print').matches");
 // → true
 
-await page.EmulateMediaAsync(Media.Screen);
+await page.EmulateMediaAsync(new PageEmulateMediaOptions { Media = Media.Screen });
 await page.EvaluateAsync("() => matchMedia('screen').matches");
 // → true
 await page.EvaluateAsync("() => matchMedia('print').matches");
@@ -519,7 +520,7 @@ await page.EvaluateAsync("() => matchMedia('print').matches");
 ```
 
 ```csharp
-await page.EmulateMediaAsync(colorScheme: ColorScheme.Dark);
+await page.EmulateMediaAsync(new PageEmulateMediaOptions { ColorScheme = ColorScheme.Dark });
 await page.EvaluateAsync("matchMedia('(prefers-color-scheme: dark)').matches");
 // → true
 await page.EvaluateAsync("matchMedia('(prefers-color-scheme: light)').matches");
@@ -657,7 +658,10 @@ class PageExamples
   public static async Task Main()
   {
       using var playwright = await Playwright.CreateAsync();
-      await using var browser = await playwright.Webkit.LaunchAsync(headless: false);
+      await using var browser = await playwright.Webkit.LaunchAsync(new BrowserTypeLaunchOptions
+      {
+          Headless: false
+      });
       var page = await browser.NewPageAsync();
 
       await page.ExposeBindingAsync("pageUrl", (source) => source.Page.Url);
@@ -721,7 +725,10 @@ class PageExamples
   public static async Task Main()
   {
       using var playwright = await Playwright.CreateAsync();
-      await using var browser = await playwright.Webkit.LaunchAsync(headless: false); 
+      await using var browser = await playwright.Webkit.LaunchAsync(new BrowserTypeLaunchOptions
+      {
+          Headless: false
+      }); 
       var page = await browser.NewPageAsync();
 
       // NOTE: md5 is inherently insecure, and we strongly discourage using
@@ -1017,8 +1024,8 @@ By default, `page.pdf()` generates a pdf with modified colors for printing. Use 
 
 ```csharp
 // Generates a PDF with 'screen' media type
-await page.EmulateMediaAsync(Media.Screen);
-await page.PdfAsync("page.pdf");
+await page.EmulateMediaAsync(new PageEmulateMediaOptions { Media = Media.Screen });
+await page.PdfAsync(new PagePdfOptions { Path = "page.pdf" });
 ```
 
 The `width`, `height`, and `margin` options accept values labeled with units. Unlabeled values are treated as pixels.
@@ -1075,7 +1082,6 @@ If `key` is a single character, it is case-sensitive, so the values `a` and `A` 
 Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
 
 ```csharp
-await using var browser = await playwright.Webkit.LaunchAsync(headless: false);
 var page = await browser.NewPageAsync();
 await page.GotoAsync("https://keycode.info");
 await page.PressAsync("body", "A");
@@ -1129,7 +1135,6 @@ The handler will only be called for the first url if the response is a redirect.
 An example of a naive handler that aborts all image requests:
 
 ```csharp
-await using var browser = await playwright.Webkit.LaunchAsync();
 var page = await browser.NewPageAsync();
 await page.RouteAsync("**/*.{png,jpg,jpeg}", async r => await r.AbortAsync());
 await page.GotoAsync("https://www.microsoft.com");
@@ -1138,7 +1143,6 @@ await page.GotoAsync("https://www.microsoft.com");
 or the same snippet using a regex pattern instead:
 
 ```csharp
-await using var browser = await playwright.Webkit.LaunchAsync();
 var page = await browser.NewPageAsync();
 await page.RouteAsync(new Regex("(\\.png$)|(\\.jpg$)"), async r => await r.AbortAsync());
 await page.GotoAsync("https://www.microsoft.com");
@@ -1150,7 +1154,7 @@ It is possible to examine the request to decide the route action. For example, m
 await page.RouteAsync("/api/**", async r =>
 {
   if (r.Request.PostData.Contains("my-string"))
-      await r.FulfillAsync(body: "mocked-data");
+      await r.FulfillAsync(new RouteFulfillOptions { Body = "mocked-data" });
   else
       await r.ContinueAsync();
 });
@@ -1173,9 +1177,10 @@ Enabling routing disables http cache.
 Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the page is closed before the event is fired. Returns the event data value.
 
 ```csharp
-var waitTask = page.WaitForEventAsync(PageEvent.FrameNavigated);
-await page.ClickAsync("button");
-var frame = await waitTask;
+var frame = await page.RunAndWaitForEventAsync(PageEvent.FrameNavigated, async () =>
+{
+    await page.ClickAsync("button");
+}
 ```
 
 ## Page.ScreenshotAsync(options)
@@ -1479,9 +1484,10 @@ await page.WaitForLoadStateAsync(); // The promise resolves after 'load' event.
 ```
 
 ```csharp
-var popupTask = page.WaitForPopupAsync();
-await page.ClickAsync("button"); // click triggers the popup/
-var popup = await popupTask;
+var popup = await page.RunAndWaitForEventAsync(PageEvent.Popup, async () =>
+{
+    await page.ClickAsync("button"); // click triggers the popup/
+});
 await popup.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
 Console.WriteLine(await popup.TitleAsync()); // popup is ready to use.
 ```

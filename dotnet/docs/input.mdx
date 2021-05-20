@@ -108,16 +108,16 @@ await page.ClickAsync("button#submit");
 await page.DblClickAsync("#item");
 
 // Right click
-await page.ClickAsync("#item", button: MouseButton.Right);
+await page.ClickAsync("#item", new PageClickOptions { Button = MouseButton.Right });
 
 // Shift + click
-await page.ClickAsync("#item", modifiers: new[] { KeyboardModifier.Shift });
+await page.ClickAsync("#item", new PageClickOptions { Modifiers = new[] { KeyboardModifier.Shift } });
 
 // Hover over element
 await page.HoverAsync("#item");
 
 // Click the top left corner
-await page.ClickAsync("#item", position: new Position { X = 0, Y = 0 });
+await page.ClickAsync("#item", new PageClickOptions { position = new Position { X = 0, Y = 0 } });
 ```
 
 Under the hood, this and other pointer-related methods:
@@ -133,7 +133,7 @@ Under the hood, this and other pointer-related methods:
 Sometimes, apps use non-trivial logic where hovering the element overlays it with another element that intercepts the click. This behavior is indistinguishable from a bug where element gets covered and the click is dispatched elsewhere. If you know this is taking place, you can bypass the [actionability](./actionability.mdx) checks and force the click:
 
 ```csharp
-await page.ClickAsync("button#submit", force: true);
+await page.ClickAsync("button#submit", new PageClickOptions { Force = true });
 ```
 
 #### Programmatic click
@@ -255,9 +255,10 @@ await page.SetInputFilesAsync("input#upload", new FilePayload
 If you don't have input element in hand (it is created dynamically), you can handle the [event Page.FileChooser](./api/class-page.mdx#eventpagefilechooser) event or use a corresponding waiting method upon your action:
 
 ```csharp
-var waitForChooserTask = page.WaitForFileChooserAsync();
-await page.ClickAsync("upload");
-var fileChooser = await waitForChooserTask;
+var fileChooser = page.RunAndWaitForAsync(PageEvent.FileChooser, async () =>
+{
+    await page.ClickAsync("upload");
+});
 await fileChooser.SetFilesAsync("myfile.pdf");
 ```
 
