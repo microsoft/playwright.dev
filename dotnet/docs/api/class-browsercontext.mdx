@@ -41,7 +41,7 @@ await context.CloseAsync();
 - [BrowserContext.NewPageAsync()](./api/class-browsercontext.mdx#browsercontextnewpageasync)
 - [BrowserContext.Pages](./api/class-browsercontext.mdx#browsercontextpages)
 - [BrowserContext.RouteAsync(url, handler)](./api/class-browsercontext.mdx#browsercontextrouteasyncurl-handler)
-- [BrowserContext.RunAndWaitForEventAsync(event, options)](./api/class-browsercontext.mdx#browsercontextrunandwaitforeventasyncevent-options)
+- [BrowserContext.RunAndWaitForPageAsync(action, options)](./api/class-browsercontext.mdx#browsercontextrunandwaitforpageasyncaction-options)
 - [BrowserContext.SetDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaultnavigationtimeouttimeout)
 - [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout)
 - [BrowserContext.SetExtraHTTPHeadersAsync(headers)](./api/class-browsercontext.mdx#browsercontextsetextrahttpheadersasyncheaders)
@@ -49,7 +49,7 @@ await context.CloseAsync();
 - [BrowserContext.SetOfflineAsync(offline)](./api/class-browsercontext.mdx#browsercontextsetofflineasyncoffline)
 - [BrowserContext.StorageStateAsync(options)](./api/class-browsercontext.mdx#browsercontextstoragestateasyncoptions)
 - [BrowserContext.UnrouteAsync(url, handler)](./api/class-browsercontext.mdx#browsercontextunrouteasyncurl-handler)
-- [BrowserContext.WaitForEventAsync(options)](./api/class-browsercontext.mdx#browsercontextwaitforeventasyncoptions)
+- [BrowserContext.WaitForPageAsync(action, options)](./api/class-browsercontext.mdx#browsercontextwaitforpageasyncaction-options)
 
 ## event BrowserContext.Close
 - type: <[BrowserContext]>
@@ -67,7 +67,7 @@ The event is emitted when a new Page is created in the BrowserContext. The page 
 The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
 
 ```csharp
-var popup = await context.RunAndWaitForEventAsync(BrowserContextEvent.Page, async =>
+var popup = await context.RunAndWaitForPageAsync(async =>
 {
     await page.ClickAsync("a");
 });
@@ -363,21 +363,20 @@ To remove a route with its handler you can use [BrowserContext.UnrouteAsync(url,
 Enabling routing disables http cache.
 :::
 
-## BrowserContext.RunAndWaitForEventAsync(event, options)
-- `event` <[string]> Event name, same one would pass into `browserContext.on(event)`.
-- `options` <`BrowserContextRunAndWaitForEventOptions`>
-  - `Predicate` <[Func]<T, [bool]>> Receives the event data and resolves to truthy value when the waiting should resolve.
+## BrowserContext.RunAndWaitForPageAsync(action, options)
+- `options` <`BrowserContextRunAndWaitForPageOptions`>
+  - `Predicate` <[Func]<[Page], bool>> Receives the [Page] object and resolves to truthy value when the waiting should resolve.
   - `Timeout` <[double]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout).
-- returns: <[object]>
+- `action` <[Func]<[Task]>> Action that triggers the event.
+- returns: <[Page]>
 
-Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the context closes before the event is fired. Returns the event data value.
+Performs action and waits for a new [Page] to be created in the context. If predicate is provided, it passes [Page] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the context closes before new [Page] is created.
 
-```csharp
-var page = await context.RunAndWaitForEventAsync(ContextEvent.Page, async () =>
-{
-    await page.ClickAsync("button");
-});
-```
+## BrowserContext.WaitForPageAsync(action, options)
+- `action` <[Func]<[Task]>> Action that triggers the event.
+- returns: <[Page]>
+
+Performs action and waits for a new [Page] to be created in the context. If predicate is provided, it passes [Page] value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the context closes before new [Page] is created.
 
 ## BrowserContext.SetDefaultNavigationTimeout(timeout)
 - `timeout` <[double]> Maximum navigation time in milliseconds
@@ -389,7 +388,7 @@ This setting will change the default maximum navigation time for the following m
 * [Page.GotoAsync(url, options)](./api/class-page.mdx#pagegotoasyncurl-options)
 * [Page.ReloadAsync(options)](./api/class-page.mdx#pagereloadasyncoptions)
 * [Page.SetContentAsync(html, options)](./api/class-page.mdx#pagesetcontentasynchtml-options)
-* [Page.WaitForNavigationAsync(options)](./api/class-page.mdx#pagewaitfornavigationasyncoptions)
+* [Page.RunAndWaitForNavigationAsync(action, options)](./api/class-page.mdx#pagerunandwaitfornavigationasyncaction-options)
 
 :::note
 [Page.SetDefaultNavigationTimeout(timeout)](./api/class-page.mdx#pagesetdefaultnavigationtimeouttimeout) and [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) take priority over [BrowserContext.SetDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaultnavigationtimeouttimeout).
@@ -453,18 +452,6 @@ Returns storage state for this browser context, contains current cookies and loc
 - returns: <[void]>
 
 Removes a route created with [BrowserContext.RouteAsync(url, handler)](./api/class-browsercontext.mdx#browsercontextrouteasyncurl-handler). When `handler` is not specified, removes all routes for the `url`.
-
-## BrowserContext.WaitForEventAsync(options)
-- `options` <`BrowserContextWaitForEventOptions`>
-  - `Predicate` <[Func]<T, [bool]>> Receives the event data and resolves to truthy value when the waiting should resolve.
-  - `Timeout` <[double]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout).
-- returns: <[object]>
-
-:::note
-In most cases, you should use [BrowserContext.RunAndWaitForEventAsync(event, options)](./api/class-browsercontext.mdx#browsercontextrunandwaitforeventasyncevent-options).
-:::
-
-Waits for given `event` to fire. If predicate is provided, it passes event's value into the `predicate` function and waits for `predicate(event)` to return a truthy value. Will throw an error if the browser context is closed before the `event` is fired.
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Browser]: ./api/class-browser.mdx "Browser"

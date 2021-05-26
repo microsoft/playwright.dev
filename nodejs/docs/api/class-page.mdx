@@ -65,8 +65,8 @@ page.removeListener('request', logRequest);
 - [page.on('worker')](./api/class-page.mdx#pageonworker)
 - [page.$(selector)](./api/class-page.mdx#pageselector)
 - [page.$$(selector)](./api/class-page.mdx#pageselector-1)
-- [page.$eval(selector, pageFunction[, arg])](./api/class-page.mdx#pageevalselector-pagefunction-arg)
 - [page.$$eval(selector, pageFunction[, arg])](./api/class-page.mdx#pageevalselector-pagefunction-arg-1)
+- [page.$eval(selector, pageFunction[, arg])](./api/class-page.mdx#pageevalselector-pagefunction-arg)
 - [page.addInitScript(script[, arg])](./api/class-page.mdx#pageaddinitscriptscript-arg)
 - [page.addScriptTag([options])](./api/class-page.mdx#pageaddscripttagoptions)
 - [page.addStyleTag([options])](./api/class-page.mdx#pageaddstyletagoptions)
@@ -270,7 +270,7 @@ Emitted when a page issues a request. The [request] object is read-only. In orde
 Emitted when a request fails, for example by timing out.
 
 :::note
-HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [page.on('requestfinished')](./api/class-page.mdx#pageonrequestfinished) event and not with [page.on('requestfailed')](./api/class-page.mdx#pageonrequestfailed).
+HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [page.on('requestfinished')](./api/class-page.mdx#pageonrequestfinished) event and not with [page.on('requestfailed')](./api/class-page.mdx#pageonrequestfailed). A request will only be considered failed when the client cannot get an HTTP response from the server, e.g. due to network error net::ERR_FAILED.
 :::
 
 ## page.on('requestfinished')
@@ -544,6 +544,7 @@ await page.dispatchEvent('#source', 'dragstart', { dataTransfer });
 - `options` <[Object]>
   - `colorScheme` <[null]|"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. Passing `null` disables color scheme emulation.
   - `media` <[null]|"screen"|"print"> Changes the CSS media type of the page. The only allowed values are `'screen'`, `'print'` and `null`. Passing `null` disables CSS media emulation.
+  - `reducedMotion` <[null]|"reduce"|"no-preference"> Emulates `'prefers-reduced-motion'` media feature, supported values are `'reduce'`, `'no-preference'`. Passing `null` disables reduced motion emulation.
 - returns: <[Promise]<[void]>>
 
 This method changes the `CSS media type` through the `media` argument, and/or the `'prefers-colors-scheme'` media feature, using the `colorScheme` argument.
@@ -1508,10 +1509,6 @@ const [request] = await Promise.all([
   // Triggers the request
   page.click('button.triggers-request'),
 ]);
-```
-
-```js
-await page.waitForRequest(request => request.url().searchParams.get('foo') === 'bar' && request.url().searchParams.get('foo2') === 'bar2');
 ```
 
 ## page.waitForResponse(urlOrPredicate[, options])

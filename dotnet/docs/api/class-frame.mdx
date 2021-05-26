@@ -49,8 +49,8 @@ class FrameExamples
 - [Frame.ContentAsync()](./api/class-frame.mdx#framecontentasync)
 - [Frame.DblClickAsync(selector, options)](./api/class-frame.mdx#framedblclickasyncselector-options)
 - [Frame.DispatchEventAsync(selector, type, eventInit, options)](./api/class-frame.mdx#framedispatcheventasyncselector-type-eventinit-options)
-- [Frame.EvalOnSelectorAsync(selector, expression, arg)](./api/class-frame.mdx#frameevalonselectorasyncselector-expression-arg)
 - [Frame.EvalOnSelectorAllAsync(selector, expression, arg)](./api/class-frame.mdx#frameevalonselectorallasyncselector-expression-arg)
+- [Frame.EvalOnSelectorAsync(selector, expression, arg)](./api/class-frame.mdx#frameevalonselectorasyncselector-expression-arg)
 - [Frame.EvaluateAsync(expression, arg)](./api/class-frame.mdx#frameevaluateasyncexpression-arg)
 - [Frame.EvaluateHandleAsync(expression, arg)](./api/class-frame.mdx#frameevaluatehandleasyncexpression-arg)
 - [Frame.FillAsync(selector, value, options)](./api/class-frame.mdx#framefillasyncselector-value-options)
@@ -72,8 +72,9 @@ class FrameExamples
 - [Frame.Page](./api/class-frame.mdx#framepage)
 - [Frame.ParentFrame](./api/class-frame.mdx#frameparentframe)
 - [Frame.PressAsync(selector, key, options)](./api/class-frame.mdx#framepressasyncselector-key-options)
-- [Frame.QuerySelectorAsync(selector)](./api/class-frame.mdx#framequeryselectorasyncselector)
 - [Frame.QuerySelectorAllAsync(selector)](./api/class-frame.mdx#framequeryselectorallasyncselector)
+- [Frame.QuerySelectorAsync(selector)](./api/class-frame.mdx#framequeryselectorasyncselector)
+- [Frame.RunAndWaitForNavigationAsync(action, options)](./api/class-frame.mdx#framerunandwaitfornavigationasyncaction-options)
 - [Frame.SelectOptionAsync(selector, values, options)](./api/class-frame.mdx#frameselectoptionasyncselector-values-options)
 - [Frame.SetContentAsync(html, options)](./api/class-frame.mdx#framesetcontentasynchtml-options)
 - [Frame.SetInputFilesAsync(selector, files, options)](./api/class-frame.mdx#framesetinputfilesasyncselector-files-options)
@@ -85,7 +86,7 @@ class FrameExamples
 - [Frame.Url](./api/class-frame.mdx#frameurl)
 - [Frame.WaitForFunctionAsync(expression, arg, options)](./api/class-frame.mdx#framewaitforfunctionasyncexpression-arg-options)
 - [Frame.WaitForLoadStateAsync(state, options)](./api/class-frame.mdx#framewaitforloadstateasyncstate-options)
-- [Frame.WaitForNavigationAsync(options)](./api/class-frame.mdx#framewaitfornavigationasyncoptions)
+- [Frame.WaitForNavigationAsync(action, options)](./api/class-frame.mdx#framewaitfornavigationasyncaction-options)
 - [Frame.WaitForSelectorAsync(selector, options)](./api/class-frame.mdx#framewaitforselectorasyncselector-options)
 - [Frame.WaitForTimeoutAsync(timeout)](./api/class-frame.mdx#framewaitfortimeoutasynctimeout)
 - [Frame.WaitForURLAsync(url, options)](./api/class-frame.mdx#framewaitforurlasyncurl-options)
@@ -553,6 +554,57 @@ Returns the ElementHandles pointing to the frame elements.
 
 The method finds all elements matching the specified selector within the frame. See [Working with selectors](./selectors.mdx) for more details. If no elements match the selector, returns empty array.
 
+## Frame.RunAndWaitForNavigationAsync(action, options)
+- `options` <`FrameRunAndWaitForNavigationOptions`>
+  - `Timeout` <[double]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaultnavigationtimeouttimeout), [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout), [Page.SetDefaultNavigationTimeout(timeout)](./api/class-page.mdx#pagesetdefaultnavigationtimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
+  - `Url` <[string]|[Regex]|[Func]<[string], bool>> A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation.
+  - `WaitUntil` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
+    * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+    * `'load'` - consider operation to be finished when the `load` event is fired.
+    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+- `action` <[Func]<[Task]>> Action that triggers the event.
+- returns: <[null]|[Response]>
+
+Waits for the frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
+
+This method waits for the frame to navigate to a new URL. It is useful for when you run code which will indirectly cause the frame to navigate. Consider this example:
+
+```csharp
+await frame.RunAndWaitForNavigationAsync(async () =>
+{
+    // Clicking the link will indirectly cause a navigation.
+    await frame.ClickAsync("a.delayed-navigation");
+});
+
+// Resolves after navigation has finished
+```
+
+:::note
+Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::
+
+## Frame.WaitForNavigationAsync(action, options)
+- `action` <[Func]<[Task]>> Action that triggers the event.
+- returns: <[null]|[Response]>
+
+Waits for the frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
+
+This method waits for the frame to navigate to a new URL. It is useful for when you run code which will indirectly cause the frame to navigate. Consider this example:
+
+```csharp
+await frame.RunAndWaitForNavigationAsync(async () =>
+{
+    // Clicking the link will indirectly cause a navigation.
+    await frame.ClickAsync("a.delayed-navigation");
+});
+
+// Resolves after navigation has finished
+```
+
+:::note
+Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::
+
 ## Frame.SelectOptionAsync(selector, values, options)
 - `selector` <[string]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
 - `values` <[null]|[string]|[ElementHandle]|[IEnumerable]<[string]>|`SelectOption`|[IEnumerable]<[ElementHandle]>|[IEnumerable]<`SelectOption`>> Options to select. If the `<select>` has the `multiple` attribute, all matching options are selected, otherwise only the first option matching one of the passed options is selected. String values are equivalent to `{value:'string'}`. Option is considered matching if all specified properties match.
@@ -745,32 +797,6 @@ await frame.ClickAsync("button");
 await frame.WaitForLoadStateAsync(); // Defaults to LoadState.Load
 ```
 
-## Frame.WaitForNavigationAsync(options)
-- `options` <`FrameWaitForNavigationOptions`>
-  - `Timeout` <[double]> Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaultnavigationtimeouttimeout), [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout), [Page.SetDefaultNavigationTimeout(timeout)](./api/class-page.mdx#pagesetdefaultnavigationtimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
-  - `Url` <[string]|[Regex]|[Func]<[string], bool>> A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation.
-  - `WaitUntil` <"load"|"domcontentloaded"|"networkidle"> When to consider operation succeeded, defaults to `load`. Events can be either:
-    * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
-    * `'load'` - consider operation to be finished when the `load` event is fired.
-    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
-- returns: <[null]|[Response]>
-
-Waits for the frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
-
-This method waits for the frame to navigate to a new URL. It is useful for when you run code which will indirectly cause the frame to navigate. Consider this example:
-
-```csharp
-await Task.WhenAll(
-    frame.WaitForNavigationAsync(),
-    // clicking the link will indirectly cause a navigation
-    frame.ClickAsync("a.delayed-navigation"));
-// Resolves after navigation has finished
-```
-
-:::note
-Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
-:::
-
 ## Frame.WaitForSelectorAsync(selector, options)
 - `selector` <[string]> A selector to query for. See [working with selectors](./selectors.mdx) for more details.
 - `options` <`FrameWaitForSelectorOptions`>
@@ -795,19 +821,19 @@ using System.Threading.Tasks;
 
 class FrameExamples
 {
-  public static async Task Main()
-  {
-    using var playwright = await Playwright.CreateAsync();
-    await using var browser = await playwright.Chromium.LaunchAsync();
-    var page = await browser.NewPageAsync();
-
-    foreach (var currentUrl in new[] { "https://www.google.com", "https://bbc.com" })
+    public static async Task Main()
     {
-      await page.GotoAsync(currentUrl);
-      element = await page.MainFrame.WaitForSelectorAsync("img");
-      Console.WriteLine($"Loaded image: {await element.GetAttributeAsync("src")}");
+        using var playwright = await Playwright.CreateAsync();
+        await using var browser = await playwright.Chromium.LaunchAsync();
+        var page = await browser.NewPageAsync();
+
+        foreach (var currentUrl in new[] { "https://www.google.com", "https://bbc.com" })
+        {
+            await page.GotoAsync(currentUrl);
+            element = await page.MainFrame.WaitForSelectorAsync("img");
+            Console.WriteLine($"Loaded image: {await element.GetAttributeAsync("src")}");
+        }
     }
-  }
 }
 ```
 

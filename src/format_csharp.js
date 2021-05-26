@@ -44,8 +44,10 @@ class CSharpFormatter {
       text = `${toTitleCase(member.clazz.varName)}.${toAsyncTitleCase(member.async, member.alias)}`;
       if (!isGetter)
         text += `(${signature})`;
+      if (member.alias.startsWith('RunAnd'))
+        return [{ text, args }, { text: text.replace('RunAnd', ''), args: args.slice(1) }];
     }
-    return { text, args };
+    return [{ text, args }];
   }
 
   formatArgumentName(name) {
@@ -151,7 +153,9 @@ function fullName(member) {
  * @return {string}
  */
 function renderSharpSignature(args) {
-  const argNames = args.map(a => a.name);
+  const copy = args.slice();
+  copy.sort((a, b) => (b.required ? 1 : 0) - (a.required ? 1 : 0));
+  const argNames = copy.map(a => a.name);
   return argNames.join(', ');
 }
 

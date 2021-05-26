@@ -38,7 +38,7 @@ class JavaScriptFormatter {
       const signature = renderJSSignature(args);
       text = `${member.clazz.varName}.${member.alias}(${signature})`;
     }
-    return { text, args };
+    return [{ text, args }];
   }
 
   formatArgumentName(name) {
