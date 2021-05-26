@@ -25,7 +25,6 @@ describe("generate", () => {
         'export const indexHash = "abc";',
         "export const searchResultLimits = 8;",
         "export const searchResultContextMaxLength = 50;",
-        'export const translations = {"hello":"hola"};',
       ],
     ],
     [
@@ -42,7 +41,6 @@ describe("generate", () => {
         'export const indexHash = "abc";',
         "export const searchResultLimits = 8;",
         "export const searchResultContextMaxLength = 50;",
-        'export const translations = {"hello":"hola"};',
       ],
     ],
     [
@@ -61,7 +59,6 @@ describe("generate", () => {
         'export const indexHash = "abc";',
         "export const searchResultLimits = 8;",
         "export const searchResultContextMaxLength = 50;",
-        'export const translations = {"hello":"hola"};',
       ],
     ],
     [
@@ -83,7 +80,6 @@ describe("generate", () => {
         'export const indexHash = "abc";',
         "export const searchResultLimits = 8;",
         "export const searchResultContextMaxLength = 50;",
-        'export const translations = {"hello":"hola"};',
       ],
     ],
     [
@@ -103,7 +99,6 @@ describe("generate", () => {
         'export const indexHash = "abc";',
         "export const searchResultLimits = 8;",
         "export const searchResultContextMaxLength = 50;",
-        'export const translations = {"hello":"hola"};',
       ],
     ],
     [
@@ -126,7 +121,6 @@ describe("generate", () => {
         'export const indexHash = "abc";',
         "export const searchResultLimits = 8;",
         "export const searchResultContextMaxLength = 50;",
-        'export const translations = {"hello":"hola"};',
       ],
     ],
   ])("generate({ language: %j }, dir) should work", (language, contents) => {
@@ -136,9 +130,6 @@ describe("generate", () => {
         removeDefaultStopWordFilter: false,
         searchResultLimits: 8,
         searchResultContextMaxLength: 50,
-        translations: {
-          "hello": "hola"
-        },
       } as ProcessedPluginOptions,
       "/tmp"
     );
@@ -160,9 +151,6 @@ describe("generate", () => {
         highlightSearchTermsOnTargetPage: true,
         searchResultLimits: 8,
         searchResultContextMaxLength: 50,
-        translations: {
-          "hello": "hola"
-        }
       } as ProcessedPluginOptions,
       "/tmp"
     );

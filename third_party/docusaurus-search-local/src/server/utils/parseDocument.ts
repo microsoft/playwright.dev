@@ -3,7 +3,7 @@ import { getCondensedText } from "./getCondensedText";
 
 const HEADINGS = "h1, h2, h3";
 
-export function parseDocument($: cheerio.Root): ParsedDocument {
+export function parseDocument($: any): ParsedDocument {
   const $pageTitle = $("article header h1").first();
   const pageTitle = $pageTitle.text();
 
@@ -22,14 +22,14 @@ export function parseDocument($: cheerio.Root): ParsedDocument {
       .eq(0)
       .find(".menu__link--sublist.menu__link--active");
     // console.log("activeMenuItem.length", activeMenuItem.length);
-    activeMenuItem.each((_, element) => {
+    activeMenuItem.each((_: any, element: any) => {
       breadcrumb.push($(element).text().trim());
     });
   }
 
   $("article")
     .find(HEADINGS)
-    .each((_, element) => {
+    .each((_: any, element: any) => {
       const $h = $(element);
       // Remove elements that are marked as aria-hidden.
       // This is mainly done to remove anchors like this:

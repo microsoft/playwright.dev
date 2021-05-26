@@ -1,7 +1,5 @@
 import { EmptyTemplate } from "./EmptyTemplate";
 
-jest.mock("../../utils/proxiedGenerated");
-
 describe("EmptyTemplate", () => {
   const OLD_ENV = process.env;
 

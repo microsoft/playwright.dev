@@ -1,7 +1,10 @@
+- Fork at [this commit](https://github.com/easyops-cn/docusaurus-search-local/commit/bb2143d49cf84497106c4d8b821dae472b9b171b)
+- Modifications in processDocInfos.ts to restrict doc search to stable version
+
 # @easyops-cn/docusaurus-search-local
 
 [![Npm Version](https://img.shields.io/npm/v/@easyops-cn/docusaurus-search-local)](https://www.npmjs.com/package/@easyops-cn/docusaurus-search-local)
-[![CI Status](https://github.com/easyops-cn/docusaurus-search-local/workflows/CI/badge.svg?event=push)](https://github.com/easyops-cn/docusaurus-search-local/actions?query=workflow%3ACI)
+[![Build Status](https://travis-ci.com/easyops-cn/docusaurus-search-local.svg?branch=master)](https://travis-ci.com/easyops-cn/docusaurus-search-local)
 [![Coverage Status](https://coveralls.io/repos/github/easyops-cn/docusaurus-search-local/badge.svg?branch=master)](https://coveralls.io/github/easyops-cn/docusaurus-search-local?branch=master)
 
 An offline/local search plugin for [Docusaurus v2](https://v2.docusaurus.io/), which supports multiple languages, especially optimized for language of zh.
@@ -92,26 +95,6 @@ yarn add nodejieba
 | highlightSearchTermsOnTargetPage | boolean            | `false`   | Highlight search terms on target page.                                                                                                       |
 | searchResultLimits               | number             | `8`       | Limit the search results.                                                                                                                    |
 | searchResultContextMaxLength     | number             | `50`      | Set the max length of characters of each search result to show.                                                                              |
-| translations                     | TranslationMap     | -         | Set translations of this plugin, see [docs below](#translations).                                                                            |
-
-### Translations
-
-To make this plugin localized, pass a `translations` option which defaults to:
-
-```json
-{
-  "search_placeholder": "Search",
-  "see_all_results": "See all results",
-  "no_results": "No results.",
-  "search_results_for": "Search results for \"{{ keyword }}\"",
-  "search_the_documentation": "Search the documentation",
-  "count_documents_found": "{{ count }} document found",
-  "count_documents_found_plural": "{{ count }} documents found",
-  "no_documents_were_found": "No documents were found"
-}
-```
-
-Note that `*_plural` can be omitted if it is the same as singular.
 
 ## Custom Styles
 
@@ -158,12 +141,8 @@ DEBUG=search-local:* yarn build
 In case some specific errors occurred:
 
 - `Error: Cannot mix different versions of joi schemas`:
-  - Try using @easyops-cn/docusaurus-search-local >= v0.16.0 with Docusaurus >= v2.0.0-alpha.73
-  - Try using @easyops-cn/docusaurus-search-local between v0.14.0 and v0.15.1 with Docusaurus between v2.0.0-alpha.68 and v2.0.0-alpha.72
+  - Try using @easyops-cn/docusaurus-search-local >= v0.14.0 with Docusaurus >= v2.0.0-alpha.68
   - Or try using @easyops-cn/docusaurus-search-local <= v0.13.1 with Docusaurus <= v2.0.0-alpha.66
-- `Error: Command failed with signal "SIGSEGV"`:
-  - This is probably caused by a [known issue](https://github.com/yanyiwu/nodejieba/issues/187) introduced by `nodejieba@2.5.2`, if you enabled language of zh.
-  - Try downgrading `nodejieba` to `2.4.2` and it will work again, see discussions in [#47](https://github.com/easyops-cn/docusaurus-search-local/issues/47).
 
 ## Further Reading
 

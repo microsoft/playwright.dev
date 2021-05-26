@@ -74,10 +74,14 @@ export function SearchSourceFactory(
       }
     }
 
-    sortSearchResults(results);
+    // Filter out results from docs/api.md since that is covered via the
+    // docs/api/... pages (api.md exists for redirections from previous website)
+    const filteredResults = results.filter(r => r.document.u !== "/docs/api");
 
-    processTreeStatusOfSearchResults(results);
+    sortSearchResults(filteredResults);
 
-    callback(results as SearchResult[]);
+    processTreeStatusOfSearchResults(filteredResults);
+
+    callback(filteredResults as SearchResult[]);
   };
 }

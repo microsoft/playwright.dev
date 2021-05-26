@@ -144,9 +144,6 @@ export interface PluginOptions {
 
   searchResultLimits?: number;
   searchResultContextMaxLength?: number;
-
-  translations?: TranslationMap;
-
   // searchInputPlaceholder?: string;
   // searchNoResults?: string;
   // searchSeeAllResults?: string;
