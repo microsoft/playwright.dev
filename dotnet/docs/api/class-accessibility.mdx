@@ -20,33 +20,7 @@ Most of the accessibility tree gets filtered out when converting from internal b
 - `options` <`AccessibilitySnapshotOptions`>
   - `InterestingOnly` <[boolean]> Prune uninteresting nodes from the tree. Defaults to `true`.
   - `Root` <[ElementHandle]> The root DOM element for the snapshot. Defaults to the whole page.
-- returns: <[null]|`Snapshot`>
-  - `role` <[string]> The [role](https://www.w3.org/TR/wai-aria/#usage_intro).
-  - `name` <[string]> A human readable name for the node.
-  - `value` <[string]|[double]> The current value of the node, if applicable.
-  - `description` <[string]> An additional human readable description of the node, if applicable.
-  - `keyshortcuts` <[string]> Keyboard shortcuts associated with this node, if applicable.
-  - `roledescription` <[string]> A human readable alternative to the role, if applicable.
-  - `valuetext` <[string]> A description of the current value, if applicable.
-  - `disabled` <[boolean]> Whether the node is disabled, if applicable.
-  - `expanded` <[boolean]> Whether the node is expanded or collapsed, if applicable.
-  - `focused` <[boolean]> Whether the node is focused, if applicable.
-  - `modal` <[boolean]> Whether the node is [modal](https://en.wikipedia.org/wiki/Modal_window), if applicable.
-  - `multiline` <[boolean]> Whether the node text input supports multiline, if applicable.
-  - `multiselectable` <[boolean]> Whether more than one child can be selected, if applicable.
-  - `readonly` <[boolean]> Whether the node is read only, if applicable.
-  - `required` <[boolean]> Whether the node is required, if applicable.
-  - `selected` <[boolean]> Whether the node is selected in its parent node, if applicable.
-  - `checked` <[boolean]|"mixed"> Whether the checkbox is checked, or "mixed", if applicable.
-  - `pressed` <[boolean]|"mixed"> Whether the toggle button is checked, or "mixed", if applicable.
-  - `level` <[int]> The level of a heading, if applicable.
-  - `valuemin` <[double]> The minimum value in a node, if applicable.
-  - `valuemax` <[double]> The maximum value in a node, if applicable.
-  - `autocomplete` <[string]> What kind of autocomplete is supported by a control, if applicable.
-  - `haspopup` <[string]> What kind of popup is currently being shown for a node, if applicable.
-  - `invalid` <[string]> Whether and in what way this node's value is invalid, if applicable.
-  - `orientation` <[string]> Whether the node is oriented horizontally or vertically, if applicable.
-  - `children` <[IEnumerable]<[IEnumerable]>> Child nodes, if any, if applicable.
+- returns: <[JsonElement?]>
 
 Captures the current state of the accessibility tree. The returned object represents the root accessible node of the page.
 
@@ -64,27 +38,8 @@ Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(accessibilitySnapsho
 An example of logging the focused node's name:
 
 ```csharp
-static AccessibilitySnapshotResult findFocusedNode(AccessibilitySnapshotResult root)
-{
-    var nodes = new Stack<AccessibilitySnapshotResult>(new[] { root });
-    while (nodes.Count > 0)
-    {
-        var node = nodes.Pop();
-        if (node.Focused) return node;
-        foreach (var innerNode in node.Children)
-        {
-            nodes.Push(innerNode);
-        }
-    }
-
-    return null;
-}
-
 var accessibilitySnapshot = await page.Accessibility.SnapshotAsync();
 Console.WriteLine(System.Text.Json.JsonSerializer.Serialize(accessibilitySnapshot));
-var focusedNode = findFocusedNode(accessibilitySnapshot);
-if (focusedNode != null)
-    Console.WriteLine(focusedNode.Name);
 ```
 
 

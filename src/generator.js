@@ -30,7 +30,7 @@ const commonSnippets = new Set(['html', 'xml', 'yml', 'yaml', 'json', 'groovy', 
 
 /**
  * @typedef {{
- *   formatMember: function(Documentation.Member): { text: string, args: Documentation.Member[] },
+ *   formatMember: function(Documentation.Member): { text: string, args: Documentation.Member[] }[],
  *   formatArgumentName: function(string): string,
  *   formatTemplate: function(string): string,
  *   formatFunction: function(string, string, Documentation.Type): string,
@@ -66,7 +66,7 @@ class Generator {
         return `\`${formatter.formatArgumentName(option)}\``;
       if (clazz)
         return `[${clazz.name}]`;
-      return this.createMemberLink(member);
+      return this.createMemberLink(member)[0];
     });
 
     this.generatedLinksSuffix = '';
@@ -121,26 +121,27 @@ import TabItem from '@theme/TabItem';
     }
     for (const member of clazz.membersArray) {
       // Iterate members
-      /** @type {MarkdownNode} */
-      const memberNode = { type: 'h2', children: [] };
-      const { text, args } = this.formatter.formatMember(member);
-      memberNode.text = text;
-      memberNode.children.push(...args.map(a => this.renderProperty(`\`${this.formatter.formatArgumentName(a.alias)}\``, a, a.spec, 'in')));
-
-      // Append type
-      if (member.type && (member.type.name !== 'void' || member.kind === 'method')) {
-        let name;
-        switch (member.kind) {
-          case 'event': name = 'type:'; break;
-          case 'property': name = this.lang === 'java' ? 'returns:' : 'type:'; break;
-          case 'method': name = 'returns:'; break;
+      for (const { text, args } of this.formatter.formatMember(member)) {
+        /** @type {MarkdownNode} */
+        const memberNode = { type: 'h2', children: [] };
+        memberNode.text = text;
+        memberNode.children.push(...args.map(a => this.renderProperty(`\`${this.formatter.formatArgumentName(a.alias)}\``, a, a.spec, 'in')));
+  
+        // Append type
+        if (member.type && (member.type.name !== 'void' || member.kind === 'method')) {
+          let name;
+          switch (member.kind) {
+            case 'event': name = 'type:'; break;
+            case 'property': name = this.lang === 'java' ? 'returns:' : 'type:'; break;
+            case 'method': name = 'returns:'; break;
+          }
+          memberNode.children.push(this.renderProperty(name, member, undefined, 'out', member.async));
         }
-        memberNode.children.push(this.renderProperty(name, member, undefined, 'out', member.async));
+  
+        // Append member doc
+        memberNode.children.push(...this.formatComment(member.spec));
+        result.push(memberNode);
       }
-
-      // Append member doc
-      memberNode.children.push(...this.formatComment(member.spec));
-      result.push(memberNode);
     }
     fs.mkdirSync(path.join(this.outDir, 'api'), { recursive: true });
     const output = [md.render(result), this.generatedLinksSuffix].join('\n');
@@ -268,11 +269,11 @@ import TabItem from '@theme/TabItem';`);
 
   /**
    * @param {Documentation.Member} member
-   * @return {string}
+   * @return {string[]}
    */
   createMemberLink(member) {
     const file = `./api/class-${member.clazz.name.toLowerCase()}.md`;
-    return this.createLink(file, this.formatter.formatMember(member).text);
+    return this.formatter.formatMember(member).map(f => this.createLink(file, f.text));
   }
 
   /**
@@ -280,15 +281,22 @@ import TabItem from '@theme/TabItem';`);
    * @return {MarkdownNode[]}
    */
   generateClassToc(clazz) {
-    /** @type {MarkdownNode[]} */
     const result = [];
     for (const member of clazz.membersArray) {
-      result.push({
-        type: 'li',
-        liType: 'default',
-        text: this.createMemberLink(member)
-      });
+      for (const text of this.createMemberLink(member)) {
+        result.push(/** @type {*} */ ({
+          type: 'li',
+          liType: 'default',
+          text,
+          kind: member.kind
+        }));
+      }
     }
+    result.sort((a, b) => {
+      const atext = a.text.replace(/\[(.*)\].*/, '$1').replace(/\(.*\)/, '');
+      const btext = b.text.replace(/\[(.*)\].*/, '$1').replace(/\(.*\)/, '');
+      return a.kind.localeCompare(b.kind) || atext.localeCompare(btext);
+    });
     return result;
   }
 

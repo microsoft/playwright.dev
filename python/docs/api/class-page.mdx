@@ -123,7 +123,9 @@ page.remove_listener("request", log_request)
 - [page.expect_navigation(**kwargs)](./api/class-page.mdx#pageexpect_navigationkwargs)
 - [page.expect_popup(**kwargs)](./api/class-page.mdx#pageexpect_popupkwargs)
 - [page.expect_request(url_or_predicate, **kwargs)](./api/class-page.mdx#pageexpect_requesturl_or_predicate-kwargs)
+- [page.expect_request_finished(**kwargs)](./api/class-page.mdx#pageexpect_request_finishedkwargs)
 - [page.expect_response(url_or_predicate, **kwargs)](./api/class-page.mdx#pageexpect_responseurl_or_predicate-kwargs)
+- [page.expect_websocket(**kwargs)](./api/class-page.mdx#pageexpect_websocketkwargs)
 - [page.expect_worker(**kwargs)](./api/class-page.mdx#pageexpect_workerkwargs)
 - [page.expose_binding(name, callback, **kwargs)](./api/class-page.mdx#pageexpose_bindingname-callback-kwargs)
 - [page.expose_function(name, callback)](./api/class-page.mdx#pageexpose_functionname-callback)
@@ -383,7 +385,7 @@ Emitted when a page issues a request. The [request] object is read-only. In orde
 Emitted when a request fails, for example by timing out.
 
 :::note
-HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [page.on("requestfinished")](./api/class-page.mdx#pageonrequestfinished) event and not with [page.on("requestfailed")](./api/class-page.mdx#pageonrequestfailed).
+HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [page.on("requestfinished")](./api/class-page.mdx#pageonrequestfinished) event and not with [page.on("requestfailed")](./api/class-page.mdx#pageonrequestfailed). A request will only be considered failed when the client cannot get an HTTP response from the server, e.g. due to network error net::ERR_FAILED.
 :::
 
 ## page.on("requestfinished")
@@ -658,6 +660,7 @@ await page.dispatch_event("#source", "dragstart", { "dataTransfer": data_transfe
 ## page.emulate_media(**kwargs)
 - `color_scheme` <[NoneType]|"light"|"dark"|"no-preference"> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. Passing `null` disables color scheme emulation.
 - `media` <[NoneType]|"screen"|"print"> Changes the CSS media type of the page. The only allowed values are `'screen'`, `'print'` and `null`. Passing `null` disables CSS media emulation.
+- `reduced_motion` <[NoneType]|"reduce"|"no-preference"> Emulates `'prefers-reduced-motion'` media feature, supported values are `'reduce'`, `'no-preference'`. Passing `null` disables reduced motion emulation.
 - returns: <[NoneType]>
 
 This method changes the `CSS media type` through the `media` argument, and/or the `'prefers-colors-scheme'` media feature, using the `colorScheme` argument.
@@ -1030,7 +1033,7 @@ await result_handle.dispose()
 - `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout).
 - returns: <[EventContextManager]\[[ConsoleMessage]\]>
 
-Performs action and waits for a [ConsoleMessage] to be logged by in the page. If predicate is provided, it passes [ConsoleMessage] value into the `predicate` function and waits for `predicate(message)` to return a truthy value. Will throw an error if the page is closed before the console event is fired.
+Performs action and waits for a [ConsoleMessage] to be logged by in the page. If predicate is provided, it passes [ConsoleMessage] value into the `predicate` function and waits for `predicate(message)` to return a truthy value. Will throw an error if the page is closed before the [page.on("console")](./api/class-page.mdx#pageonconsole) event is fired.
 
 ## page.expect_download(**kwargs)
 - `predicate` <[Callable]\[[Download]\]:[bool]> Receives the [Download] object and resolves to truthy value when the waiting should resolve.
@@ -1181,6 +1184,13 @@ second_request = await second.value
 </TabItem>
 </Tabs>
 
+## page.expect_request_finished(**kwargs)
+- `predicate` <[Callable]\[[Request]\]:[bool]> Receives the [ConsoleMessage] object and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout).
+- returns: <[Request]>
+
+Performs action and waits for a [Request] to finish loading. If predicate is provided, it passes [Request] value into the `predicate` function and waits for `predicate(request)` to return a truthy value. Will throw an error if the page is closed before the [page.on("requestfinished")](./api/class-page.mdx#pageonrequestfinished) event is fired.
+
 ## page.expect_response(url_or_predicate, **kwargs)
 - `url_or_predicate` <[str]|[Pattern]|[Callable]\[[Response]\]:[bool]> Request URL string, regex or predicate receiving [Response] object.
 - `timeout` <[float]> Maximum wait time in milliseconds, defaults to 30 seconds, pass `0` to disable the timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout) or [page.set_default_timeout(timeout)](./api/class-page.mdx#pageset_default_timeouttimeout) methods.
@@ -1229,6 +1239,13 @@ return response.ok
 
 </TabItem>
 </Tabs>
+
+## page.expect_websocket(**kwargs)
+- `predicate` <[Callable]\[[WebSocket]\]:[bool]> Receives the [WebSocket] object and resolves to truthy value when the waiting should resolve.
+- `timeout` <[float]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser_contextset_default_timeouttimeout).
+- returns: <[WebSocket]>
+
+Performs action and waits for a new [WebSocket]. If predicate is provided, it passes [WebSocket] value into the `predicate` function and waits for `predicate(webSocket)` to return a truthy value. Will throw an error if the page is closed before the WebSocket event is fired.
 
 ## page.expect_worker(**kwargs)
 - `predicate` <[Callable]\[[Worker]\]:[bool]> Receives the [Worker] object and resolves to truthy value when the waiting should resolve.

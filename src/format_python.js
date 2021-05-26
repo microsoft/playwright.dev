@@ -46,7 +46,7 @@ class PythonFormatter {
       if (!isGetter)
         text += `(${signature})`;
     }
-    return { text, args };
+    return [{ text, args }];
   }
 
   formatArgumentName(name) {

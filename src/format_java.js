@@ -38,7 +38,7 @@ class JavaFormatter {
       const signature = renderJSSignature(args);
       text = `${toTitleCase(member.clazz.varName)}.${member.alias}(${signature})`;
     }
-    return { text, args };
+    return [{ text, args }];
   }
 
   formatArgumentName(name) {

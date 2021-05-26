@@ -139,6 +139,7 @@ page.offRequest(logRequest);
 - [Page.waitForNavigation([options], callback)](./api/class-page.mdx#pagewaitfornavigationoptions-callback)
 - [Page.waitForPopup([options], callback)](./api/class-page.mdx#pagewaitforpopupoptions-callback)
 - [Page.waitForRequest(urlOrPredicate[, options], callback)](./api/class-page.mdx#pagewaitforrequesturlorpredicate-options-callback)
+- [Page.waitForRequestFinished([options])](./api/class-page.mdx#pagewaitforrequestfinishedoptions)
 - [Page.waitForResponse(urlOrPredicate[, options], callback)](./api/class-page.mdx#pagewaitforresponseurlorpredicate-options-callback)
 - [Page.waitForSelector(selector[, options])](./api/class-page.mdx#pagewaitforselectorselector-options)
 - [Page.waitForTimeout(timeout)](./api/class-page.mdx#pagewaitfortimeouttimeout)
@@ -278,7 +279,7 @@ Emitted when a page issues a request. The [request] object is read-only. In orde
 Emitted when a request fails, for example by timing out.
 
 :::note
-HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [Page.onRequestFinished(handler)](./api/class-page.mdx#pageonrequestfinishedhandler) event and not with [Page.onRequestFailed(handler)](./api/class-page.mdx#pageonrequestfailedhandler).
+HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [Page.onRequestFinished(handler)](./api/class-page.mdx#pageonrequestfinishedhandler) event and not with [Page.onRequestFailed(handler)](./api/class-page.mdx#pageonrequestfailedhandler). A request will only be considered failed when the client cannot get an HTTP response from the server, e.g. due to network error net::ERR_FAILED.
 :::
 
 ## Page.onRequestFinished(handler)
@@ -499,6 +500,7 @@ page.dispatchEvent("#source", "dragstart", arg);
 - `options` <`Page.EmulateMediaOptions`>
   - `setColorScheme` <[null]|`enum ColorScheme { LIGHT, DARK, NO_PREFERENCE }`> Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. Passing `null` disables color scheme emulation.
   - `setMedia` <[null]|`enum Media { SCREEN, PRINT }`> Changes the CSS media type of the page. The only allowed values are `'screen'`, `'print'` and `null`. Passing `null` disables CSS media emulation.
+  - `setReducedMotion` <[null]|`enum ReducedMotion { REDUCE, NO_PREFERENCE }`> Emulates `'prefers-reduced-motion'` media feature, supported values are `'reduce'`, `'no-preference'`. Passing `null` disables reduced motion emulation.
 - returns: <[void]>
 
 This method changes the `CSS media type` through the `media` argument, and/or the `'prefers-colors-scheme'` media feature, using the `colorScheme` argument.
@@ -1451,7 +1453,7 @@ Performs action and waits for the Page to close.
 - `callback` <[Runnable]> Callback that performs the action triggering the event.
 - returns: <[ConsoleMessage]>
 
-Performs action and waits for a [ConsoleMessage] to be logged by in the page. If predicate is provided, it passes [ConsoleMessage] value into the `predicate` function and waits for `predicate(message)` to return a truthy value. Will throw an error if the page is closed before the console event is fired.
+Performs action and waits for a [ConsoleMessage] to be logged by in the page. If predicate is provided, it passes [ConsoleMessage] value into the `predicate` function and waits for `predicate(message)` to return a truthy value. Will throw an error if the page is closed before the [Page.onConsoleMessage(handler)](./api/class-page.mdx#pageonconsolemessagehandler) event is fired.
 
 ## Page.waitForDownload([options], callback)
 - `options` <`Page.WaitForDownloadOptions`>
@@ -1584,7 +1586,7 @@ Performs action and waits for a popup [Page]. If predicate is provided, it passe
 Waits for the matching request and returns it.  See [waiting for event](./events.mdx#waiting-for-event) for more details about events.
 
 ```java
-// Waits for the next response with the specified url
+// Waits for the next request with the specified url
 Request request = page.waitForRequest("https://example.com/resource", () -> {
   // Triggers the request
   page.click("button.triggers-request");
@@ -1596,6 +1598,14 @@ Request request = page.waitForRequest(request -> "https://example.com".equals(re
   page.click("button.triggers-request");
 });
 ```
+
+## Page.waitForRequestFinished([options])
+- `options` <`Page.WaitForRequestFinishedOptions`>
+  - `setPredicate` <[Predicate]<[Request]>> Receives the [ConsoleMessage] object and resolves to truthy value when the waiting should resolve.
+  - `setTimeout` <[double]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout).
+- returns: <[Request]>
+
+Performs action and waits for a [Request] to finish loading. If predicate is provided, it passes [Request] value into the `predicate` function and waits for `predicate(request)` to return a truthy value. Will throw an error if the page is closed before the [Page.onRequestFinished(handler)](./api/class-page.mdx#pageonrequestfinishedhandler) event is fired.
 
 ## Page.waitForResponse(urlOrPredicate[, options], callback)
 - `urlOrPredicate` <[String]|[Pattern]|[Predicate]<[Response]>> Request URL string, regex or predicate receiving [Response] object.
