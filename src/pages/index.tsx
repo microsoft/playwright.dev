@@ -29,7 +29,7 @@ const features = [
         Use the Playwright API in <a
         href="https://playwright.dev">JavaScript &amp; TypeScript</a>, <a
         href="https://playwright.dev/python/docs/intro">Python</a>, <a
-        href="https://github.com/microsoft/playwright-sharp">C#</a> and, <a
+        href="https://playwright.dev/dotnet/docs/intro">C#</a> and, <a
         href="https://playwright.dev/java/docs/intro">Java</a>.
       </>
     ),
