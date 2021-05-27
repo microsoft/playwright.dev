@@ -1,117 +1,144 @@
 ---
-id: test-runners
-title: "Third party runners"
+id: test-runner-examples
+title: "Examples"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-With a few lines of code, you can hook up Playwright to your existing JavaScript test runner.
+- [Multiple pages](#multiple-pages)
+- [Mobile emulation](#mobile-emulation)
+- [Network mocking](#network-mocking)
+- [Visual comparisons](#visual-comparisons)
 
-- [@playwright/test](#playwrighttest)
-- [Jest / Jasmine](#jest--jasmine)
-- [AVA](#ava)
-- [Mocha](#mocha)
-- [Multiple Browsers](#multiple-browsers)
+## Multiple pages
 
-## @playwright/test
-
-[@playwright/test](./test-runner-intro.mdx) is our first-party recommended test runner to be used with Playwright. Learn more about it [here](./test-runner-intro.mdx).
-
-## Jest / Jasmine
-
-For Jest, [jest-playwright](https://github.com/playwright-community/jest-playwright) can be used. However for a light-weight solution, requiring playwright directly works fine. Jest shares it's syntax with Jasmine, so this applies to Jasmine as well.
+The default `context` argument is a [BrowserContext][browser-context]. Browser contexts are isolated execution environments that can host multiple pages. See [multi-page scenarios](./multi-pages.mdx) for more examples.
 
 ```js
-const {chromium} = require('playwright');
-const expect = require('expect');
-let browser;
-let page;
-beforeAll(async () => {
-  browser = await chromium.launch();
-});
-afterAll(async () => {
-  await browser.close();
-});
-beforeEach(async () => {
-  page = await browser.newPage();
-});
-afterEach(async () => {
-  await page.close();
-});
+import { test } from "@playwright/test";
 
-it('should work', async () => {
-  await page.goto('https://www.example.com/');
-  expect(await page.title()).toBe('Example Domain');
+test("tests on multiple web pages", async ({ context }) => {
+  const pageFoo = await context.newPage();
+  const pageBar = await context.newPage();
+  // Test function
 });
 ```
 
-## AVA
+## Mobile emulation
 
-Tests run concurrently in AVA, so a single page variable cannot be shared between tests. Instead, create new pages with a macro function.
+`use` section in the configuration file can be used to configure mobile emulation in the default `context`.
 
 ```js
-const {chromium} = require('playwright');
-const test = require('ava').default;
-const browserPromise = chromium.launch();
+// config.ts
+import { PlaywrightTestConfig } from "@playwright/test";
+import { devices } from "playwright";
 
-async function pageMacro(t, callback) {
-  const browser = await browserPromise;
-  const page = await browser.newPage();
-  try {
-    await callback(t, page);
-  } finally {
-    await page.close();
+const config: PlaywrightTestConfig = {
+  timeout: 30000,
+  projects: [
+    {
+      name: 'chromium',
+      use: {
+        browserName: 'chromium',
+        headless: true,
+        ...devices["Pixel 2"],
+      },
+    },
+  ],
+};
+export default config;
+```
+
+## Network mocking
+
+Define a custom route that mocks network calls for a browser context.
+
+```js
+// In foo.spec.ts
+import { test, expect } from "@playwright/test";
+
+test.beforeEach(async ({ context }) => {
+  // Block any css requests for each test in this file.
+  await context.route(/.css/, route => route.abort());
+});
+
+test("loads page without css", async ({ page }) => {
+  // Alternatively, block any png requests just for this test.
+  await page.route(/.png/, route => route.abort());
+
+  // Test function code.
+  await page.goto("https://stackoverflow.com");
+});
+```
+
+## Visual comparisons
+
+The `expect` API supports visual comparisons with `toMatchSnapshot`. This uses the [pixelmatch](https://github.com/mapbox/pixelmatch) library, and you can pass `threshold` as an option.
+
+```js
+import { test, expect } from "@playwright/test";
+
+test("compares page screenshot", async ({ page }) => {
+  await page.goto("https://stackoverflow.com");
+  const screenshot = await page.screenshot();
+  expect(screenshot).toMatchSnapshot(`test.png`, { threshold: 0.2 });
+});
+```
+
+On first execution, this will generate golden snapshots. Subsequent runs will compare against the golden snapshots. To update golden snapshots with new actual values, run with the `--update-snapshots` flag.
+
+```sh
+# Update golden snapshots when they differ from actual
+npx folio --update-snapshots
+```
+
+### Page object model
+
+To introduce a Page Object for a particular page, create a class that will use the `page` object.
+
+Create a `LoginPage` helper class to encapsulate common operations on the login page.
+
+```js
+// login-page.ts
+import type { Page } from "playwright";
+
+export class LoginPage {
+  page: Page;
+
+  constructor(page: Page) {
+    this.page = page;
+  }
+
+  async goto() {
+    await this.page.goto("https://example.com/login");
+  }
+
+  async login() {
+    await this.page.fill("#username", TEST_USERNAME);
+    await this.page.fill("#password", TEST_PASSWORD);
+    await this.page.click("text=Login");
   }
 }
-
-test('should work', pageMacro, async (t, page) => {
-  await page.goto('https://www.example.com/');
-  t.is(await page.title(), 'Example Domain');
-});
 ```
 
-## Mocha
-
-Mocha looks very similar to the Jest/Jasmine setup, and functions in the same way.
+Use the `LoginPage` class in the tests.
 
 ```js
-const {chromium} = require('playwright');
-const assert = require('assert');
-let browser;
-before(async() => {
-  browser = await chromium.launch();
-});
-after(async () => {
-  await browser.close();
-});
-let page;
-beforeEach(async() => {
-  page = await browser.newPage();
-});
-afterEach(async () => {
-  await page.close();
-});
+// my.spec.ts
+import { test, expect } from "@playwright/test";
+import { LoginPage } from "./login-page";
 
-it('should work', async () => {
-  await page.goto('https://www.example.com/');
-  assert.equal(await page.title(), 'Example Domain');
+test('login works', async ({ page }) => {
+  // Create the login page and perform operations.
+  const loginPage = new LoginPage(page);
+  await loginPage.goto();
+  await loginPage.login();
+
+  // Verify it worked.
+  expect(await page.textContent("#user-info")).toBe("Welcome, Test User!");
 });
 ```
 
-## Multiple Browsers
-
-These simple examples can be extended to support multiple browsers using an environment variable.
-
-```js
-const {chromium, webkit, firefox} = require('playwright');
-const browserName = process.env.BROWSER || 'webkit';
-let browser;
-beforeAll(async() => {
-  browser = await {chromium, webkit, firefox}[browserName].launch();
-});
-```
-
-Then set `BROWSER=firefox` to run your tests with firefox, or any other browser.
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"

@@ -21,6 +21,7 @@ module.exports = {
         { "type": "doc", "id": "assertions" },
         { "type": "doc", "id": "auth" },
         { "type": "doc", "id": "browsers" },
+        { "type": "doc", "id": "cli" },
         { "type": "doc", "id": "dialogs" },
         { "type": "doc", "id": "downloads" },
         { "type": "doc", "id": "selectors" },
@@ -43,12 +44,21 @@ module.exports = {
     },
     {
       "type": "category",
+      "label": "Test runner",
+      "items": [
+        { "type": "doc", "id": "test-runner-intro" },
+        { "type": "doc", "id": "test-runner-configuration" },
+        { "type": "doc", "id": "test-runner-examples" },
+      ],
+      "collapsed": false
+    },
+    {
+      "type": "category",
       "label": "Integrations",
       "items": [
-        { "type": "doc", "id": "test-runners" },
         { "type": "doc", "id": "docker" },
         { "type": "doc", "id": "ci" },
-        { "type": "doc", "id": "cli" }
+        { "type": "doc", "id": "test-runners" },
       ],
       "collapsed": false
     },
