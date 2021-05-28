@@ -1,117 +1,48 @@
 ---
-id: test-runners
-title: "Third party runners"
+id: test-fixtures
+title: "Fixtures"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-With a few lines of code, you can hook up Playwright to your existing JavaScript test runner.
+- [Introduction to fixtures](#introduction-to-fixtures)
+- [Test fixtures](#test-fixtures)
+- [Worker fixtures](#worker-fixtures)
 
-- [playwright/test](#playwrighttest)
-- [Jest / Jasmine](#jest--jasmine)
-- [AVA](#ava)
-- [Mocha](#mocha)
-- [Multiple Browsers](#multiple-browsers)
+## Introduction to fixtures
 
-## playwright/test
+Playwright Test is based on the concept of the test fixtures. Test fixtures are used to establish environment for each test, giving the test everything it needs and nothing else. Test fixtures are isolated between tests, which gives Playwright Test following benefits:
+- Playwright Test runs tests in parallel by default, making your test suite much faster.
+- Playwright Test can efficiently retry the flaky failures, instead of re-running the whole suite.
+- You can group tests based on their meaning, instead of their common setup.
 
-[playwright/test](./test-intro.mdx) is our first-party recommended test runner to be used with Playwright. Learn more about it [here](./test-intro.mdx).
+Here is how typical test environment setup differs between traditional test style and the fixture-based one:
 
-## Jest / Jasmine
+### Without fixtures
 
-For Jest, [jest-playwright](https://github.com/playwright-community/jest-playwright) can be used. However for a light-weight solution, requiring playwright directly works fine. Jest shares it's syntax with Jasmine, so this applies to Jasmine as well.
+### With fixtures
 
-```js
-const {chromium} = require('playwright');
-const expect = require('expect');
-let browser;
-let page;
-beforeAll(async () => {
-  browser = await chromium.launch();
-});
-afterAll(async () => {
-  await browser.close();
-});
-beforeEach(async () => {
-  page = await browser.newPage();
-});
-afterEach(async () => {
-  await page.close();
-});
+You declare exact fixtures that the test needs and the runner initializes them for each test individually. Tests can use any combinations of the fixtures to tailor precise environment they need. You no longer need to wrap tests in `describe`s that set up environment, everything is declarative and typed.
 
-it('should work', async () => {
-  await page.goto('https://www.example.com/');
-  expect(await page.title()).toBe('Example Domain');
-});
-```
+There are two types of fixtures: `test` and `worker`. Test fixtures are set up for each test and worker fixtures are set up for each process that runs test files.
 
-## AVA
+## Test fixtures
 
-Tests run concurrently in AVA, so a single page variable cannot be shared between tests. Instead, create new pages with a macro function.
+Test fixtures are set up for each test. Consider the following test file:
 
-```js
-const {chromium} = require('playwright');
-const test = require('ava').default;
-const browserPromise = chromium.launch();
+It uses fixtures `hello` and `helloWorld` that are set up by the framework for each test run.
 
-async function pageMacro(t, callback) {
-  const browser = await browserPromise;
-  const page = await browser.newPage();
-  try {
-    await callback(t, page);
-  } finally {
-    await page.close();
-  }
-}
+Here is how test fixtures are declared and defined. Fixtures can use other fixtures - note how `helloWorld` uses `hello`.
 
-test('should work', pageMacro, async (t, page) => {
-  await page.goto('https://www.example.com/');
-  t.is(await page.title(), 'Example Domain');
-});
-```
+With fixtures, test organization becomes flexible - you can put tests that make sense next to each other based on what they test, not based on the environment they need.
 
-## Mocha
+## Worker fixtures
 
-Mocha looks very similar to the Jest/Jasmine setup, and functions in the same way.
+Playwright Test uses worker processes to run test files. You can specify the maximum number of workers using `--workers` command line option. Similarly to how test fixtures are set up for individual test runs, worker fixtures are set up for each worker process. That's where you can set up services, run servers, etc. Playwright Test will reuse the worker process for as many test files as it can, provided their worker fixtures match and hence environments are identical.
 
-```js
-const {chromium} = require('playwright');
-const assert = require('assert');
-let browser;
-before(async() => {
-  browser = await chromium.launch();
-});
-after(async () => {
-  await browser.close();
-});
-let page;
-beforeEach(async() => {
-  page = await browser.newPage();
-});
-afterEach(async () => {
-  await page.close();
-});
+Here is how the test looks:
 
-it('should work', async () => {
-  await page.goto('https://www.example.com/');
-  assert.equal(await page.title(), 'Example Domain');
-});
-```
-
-## Multiple Browsers
-
-These simple examples can be extended to support multiple browsers using an environment variable.
-
-```js
-const {chromium, webkit, firefox} = require('playwright');
-const browserName = process.env.BROWSER || 'webkit';
-let browser;
-beforeAll(async() => {
-  browser = await {chromium, webkit, firefox}[browserName].launch();
-});
-```
-
-Then set `BROWSER=firefox` to run your tests with firefox, or any other browser.
+And here is how fixtures are declared and defined:
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"
