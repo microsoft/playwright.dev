@@ -1,117 +1,35 @@
 ---
-id: test-runners
-title: "Third party runners"
+id: test-cli
+title: "Command Line"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-With a few lines of code, you can hook up Playwright to your existing JavaScript test runner.
-
-- [playwright/test](#playwrighttest)
-- [Jest / Jasmine](#jest--jasmine)
-- [AVA](#ava)
-- [Mocha](#mocha)
-- [Multiple Browsers](#multiple-browsers)
-
-## playwright/test
-
-[playwright/test](./test-intro.mdx) is our first-party recommended test runner to be used with Playwright. Learn more about it [here](./test-intro.mdx).
-
-## Jest / Jasmine
-
-For Jest, [jest-playwright](https://github.com/playwright-community/jest-playwright) can be used. However for a light-weight solution, requiring playwright directly works fine. Jest shares it's syntax with Jasmine, so this applies to Jasmine as well.
-
-```js
-const {chromium} = require('playwright');
-const expect = require('expect');
-let browser;
-let page;
-beforeAll(async () => {
-  browser = await chromium.launch();
-});
-afterAll(async () => {
-  await browser.close();
-});
-beforeEach(async () => {
-  page = await browser.newPage();
-});
-afterEach(async () => {
-  await page.close();
-});
-
-it('should work', async () => {
-  await page.goto('https://www.example.com/');
-  expect(await page.title()).toBe('Example Domain');
-});
+```sh
+# Ask for help!
+npx playwright test --help
 ```
 
-## AVA
+Arguments passed to `npx playwright test` are treated as a filter for test files. For example, `npx playwright test my-spec` will only run tests from files with `my-spec` in the name.
 
-Tests run concurrently in AVA, so a single page variable cannot be shared between tests. Instead, create new pages with a macro function.
-
-```js
-const {chromium} = require('playwright');
-const test = require('ava').default;
-const browserPromise = chromium.launch();
-
-async function pageMacro(t, callback) {
-  const browser = await browserPromise;
-  const page = await browser.newPage();
-  try {
-    await callback(t, page);
-  } finally {
-    await page.close();
-  }
-}
-
-test('should work', pageMacro, async (t, page) => {
-  await page.goto('https://www.example.com/');
-  t.is(await page.title(), 'Example Domain');
-});
-```
-
-## Mocha
-
-Mocha looks very similar to the Jest/Jasmine setup, and functions in the same way.
-
-```js
-const {chromium} = require('playwright');
-const assert = require('assert');
-let browser;
-before(async() => {
-  browser = await chromium.launch();
-});
-after(async () => {
-  await browser.close();
-});
-let page;
-beforeEach(async() => {
-  page = await browser.newPage();
-});
-afterEach(async () => {
-  await page.close();
-});
-
-it('should work', async () => {
-  await page.goto('https://www.example.com/');
-  assert.equal(await page.title(), 'Example Domain');
-});
-```
-
-## Multiple Browsers
-
-These simple examples can be extended to support multiple browsers using an environment variable.
-
-```js
-const {chromium, webkit, firefox} = require('playwright');
-const browserName = process.env.BROWSER || 'webkit';
-let browser;
-beforeAll(async() => {
-  browser = await {chromium, webkit, firefox}[browserName].launch();
-});
-```
-
-Then set `BROWSER=firefox` to run your tests with firefox, or any other browser.
+All the options are available in the [configuration file](#writing-a-configuration-file). However, selected options can be passed to a command line and take a priority over the configuration file:
+- `--config <file>` or `-c <file>`: Configuration file. Defaults to `pwtest.config.ts` or `pwtest.config.js` in the current directory.
+- `--forbid-only`: Whether to disallow `test.only` exclusive tests. Useful on CI. Overrides `config.forbidOnly` option from the configuration file.
+- `--grep <grep>` or `-g <grep>`: Only run tests matching this regular expression, for example `/my.*test/i` or `my-test`. Overrides `config.grep` option from the configuration file.
+- `--global-timeout <number>`: Total timeout in milliseconds for the whole test run. By default, there is no global timeout. Overrides `config.globalTimeout` option from the configuration file.
+- `--help`: Display help.
+- `--list`: List all the tests, but do not run them.
+- `--max-failures <N>` or `-x`: Stop after the first `N` test failures. Passing `-x` stops after the first failure. Overrides `config.maxFailures` option from the configuration file.
+- `--output <dir>`: Directory for artifacts produced by tests, defaults to `test-results`. Overrides `config.outputDir` option from the configuration file.
+- `--quiet`: Whether to suppress stdout and stderr from the tests. Overrides `config.quiet` option from the configuration file.
+- `--repeat-each <number>`: Specifies how many times to run each test. Defaults to one. Overrides `config.repeatEach` option from the configuration file.
+- `--reporter <reporter>`. Specify reporter to use, comma-separated, can be some combination of `dot`, `json`, `junit`, `line`, `list` and `null`. See [reporters](#reporters) for more information.
+- `--retries <number>`: The maximum number of retries for each [flaky test](#flaky-tests), defaults to zero (no retries). Overrides `config.retries` option from the configuration file.
+- `--shard <shard>`: [Shard](#shards) tests and execute only selected shard, specified in the form `current/all`, 1-based, for example `3/5`. Overrides `config.shard` option from the configuration file.
+- `--project <project...>`: Only run tests from one of the specified [projects](#projects). Defaults to running all projects defined in the configuration file.
+- `--timeout <number>`: Maximum timeout in milliseconds for each test, defaults to 10 seconds. Overrides `config.timeout` option from the configuration file.
+- `--update-snapshots` or `-u`: Whether to update snapshots with actual results instead of comparing them. Use this when snapshot expectations have changed. Overrides `config.updateSnapshots` option from the configuration file.
+- `--workers <workers>` or `-j <workers>`: The maximum number of concurrent worker processes.  Overrides `config.workers` option from the configuration file.
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"

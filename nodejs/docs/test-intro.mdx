@@ -1,6 +1,6 @@
 ---
-id: test-runner-intro
-title: "Playwright Tests"
+id: test-intro
+title: "Introduction"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -12,19 +12,20 @@ Playwright Test Runner was created specifically to accommodate the needs of the 
 - Capture videos, screenshots and other artifacts on failure.
 - Integrate your POMs as extensible fixtures.
 
-There are many more exciting features, so read on!
+<br/>
 
 - [Installation](#installation)
 - [First test](#first-test)
 - [Test fixtures](#test-fixtures)
 - [Test and assertion features](#test-and-assertion-features)
 - [Write a configuration file](#write-a-configuration-file)
-- [Run the test suite](#run-the-test-suite)
 
 ## Installation
 
+Playwright already includes a test runner for end-to-end tests.
+
 ```sh
-npm i -D @playwright/test@1.0.0-alpha
+npm i -D playwright
 ```
 
 ## First test
@@ -32,7 +33,7 @@ npm i -D @playwright/test@1.0.0-alpha
 Create `tests/foo.spec.ts` to define your test.
 
 ```js
-import { test, expect } from '@playwright/test';
+import { test, expect } from 'playwright/test';
 
 test('is a basic test with the page', async ({ page }) => {
   await page.goto('https://playwright.dev/');
@@ -45,8 +46,31 @@ Now run your tests:
 
 ```sh
 # Assuming that test files are in the tests directory.
-npx folio -c tests
+npx pwtest -c tests
 ```
+
+Playwright Test just ran a test using Chromium browser, in a headless manner. Let's tell it to use headed browser:
+
+```sh
+# Assuming that test files are in the tests directory.
+npx pwtest -c tests --headed
+```
+
+What about other browsers? Let's run the same test using Firefox:
+
+```sh
+# Assuming that test files are in the tests directory.
+npx pwtest -c tests --browser=firefox
+```
+
+And finally, on all three browsers:
+
+```sh
+# Assuming that test files are in the tests directory.
+npx pwtest -c tests --browser=all
+```
+
+Refer to [configuration](./test-configuration.mdx) section for configuring test runs in different modes with different browsers.
 
 ## Test fixtures
 
@@ -57,33 +81,47 @@ test('basic test', async ({ page }) => {
   ...
 ```
 
-We call these arguments `fixtures`. Playwright Test comes loaded with those fixtures, and you can add your own fixtures as well. Here is a list of the pre-defined fixtures that you are likely to use most of the time:
-- `page`: [Page] - Isolated page for this test run.
-- `context`: [BrowserContext] - Isolated context for this test run. The `page` fixture belongs to this context as well. Learn how to [configure context](#modify-options) below.
-- `browser`: [Browser] - Browsers are shared across tests to optimize resources. Learn how to [configure browser](#modify-options) below.
-- `browserName` - The name of the browser currently running the test. Either `chromium`, `firefox` or `webkit`.
+We call these arguments `fixtures`. Fixtures are objects that are created for each test run. Playwright Test comes loaded with those fixtures, and you can add your own fixtures as well. When running tests, Playwright Test looks at each test declaration, analyses the set of fixtures the test needs and prepares those fixtures specifically for the test.
+
+Here is a list of the pre-defined fixtures that you are likely to use most of the time:
+
+|Fixture    |Type             |Description                      |
+|:----------|:----------------|:--------------------------------|
+|page       |[Page]           |Isolated page for this test run. |
+|context    |[BrowserContext] |Isolated context for this test run. The `page` fixture belongs to this context as well. Learn how to [configure context](#modify-options) below. |
+|browser    |[Browser]        |Browsers are shared across tests to optimize resources. Learn how to [configure browser](#modify-options) below. |
+|browserName|[string]         |The name of the browser currently running the test. Either `chromium`, `firefox` or `webkit`.|
 
 ## Test and assertion features
 
-### Focus or skip tests
+If you are familiar with test runners like Jest, Mocha and Ava, you will find the Playwright Test syntax familiar. These are the basic things you can do with the test:
+
+### Focus a test
+
+You can focus some tests. When there are focused tests, only they run.
 
 ```js
-import { test, expect } from '@playwright/test';
-
-// You can focus single test.
 test.only('focus this test', async ({ page }) => {
-  // Only this test in the entire project runs.
-});
-
-// You can skip tests.
-test.skip('skip this test', async ({ page }) => {
+  // Run only focused tests in the entire project.
 });
 ```
 
-### Group tests together
+### Skip a test
+
+You can skip certain test based on the condition.
 
 ```js
-import { test, expect } from '@playwright/test';
+test('skip this test', async ({ page, browserName }) => {
+  test.skip(browserName === 'firefox', 'Still working on it');
+});
+```
+
+### Group tests
+
+You can group tests to give them a logical name or to scope before/after hooks to the group.
+
+```js
+import { test, expect } from 'playwright/test';
 
 test.describe('two tests', () => {
   test.only('one', async ({ page }) => {
@@ -101,7 +139,7 @@ test.describe('two tests', () => {
 You can use `test.beforeAll` and `test.afterAll` hooks to set up and tear down resources shared between tests. And you can use `test.beforeEach` and `test.afterEach` hooks to set up and tear down resources for each test individually.
 
 ```js
-import { test, expect } from '@playwright/test';
+import { test, expect } from 'playwright/test';
 
 test.describe('feature foo', () => {
   test.beforeEach(async ({ page }) => {
@@ -118,10 +156,12 @@ test.describe('feature foo', () => {
 
 ## Write a configuration file
 
-Create `config.ts` to configure your tests: specify browser launch options, run tests in multiple browsers and much more. Here is an example configuration that runs every test in Chromium, Firefox and WebKit.
+So far, we've looked at the zero-config operation of Playwright Test. For a real world application, it is likely that you would want to use a config.
+
+Create `pwtest.config.ts` to configure your tests. You can specify browser launch options, run tests in multiple browsers and much more with the config. Here is an example configuration that runs every test in Chromium, Firefox and WebKit.
 
 ```js
-import { PlaywrightTestConfig } from '@playwright/test';
+import { PlaywrightTestConfig } from 'playwright/test';
 
 const config: PlaywrightTestConfig = {
   timeout: 30000,  // Each test is given 30 seconds.
@@ -159,45 +199,16 @@ const config: PlaywrightTestConfig = {
 export default config;
 ```
 
-## Run the test suite
-
-Tests can be run in single or multiple browsers, in parallel or sequentially.
-
-```sh
-# Run all tests across Chromium, Firefox and WebKit
-npx folio --config=config.ts
-
-# Run tests on a single browser
-npx folio --config=config.ts --project=chromium
-
-# Run tests sequentially
-npx folio --config=config.ts --workers=1
-
-# Retry failing tests
-npx folio --config=config.ts --retries=2
-
-# See all options
-npx folio --help
-```
-
-Refer to the [command line documentation][folio-cli] for all options.
-
-### Configure NPM scripts
-
-Save the run command as an NPM script.
+Configure NPM script to use config.
 
 ```json
 {
   "scripts": {
-    "test": "npx folio --config=config.ts"
+    "test": "npx pwtest -c config.ts"
   }
 }
 ```
 
-[folio]: https://github.com/microsoft/folio
-[folio-annotations]: https://github.com/microsoft/folio#annotations
-[folio-cli]: https://github.com/microsoft/folio#command-line
-[folio-reporters]: https://github.com/microsoft/folio#reporters
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"

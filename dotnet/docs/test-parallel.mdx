@@ -1,141 +1,46 @@
 ---
-id: test-runners
-title: "Third party runners"
+id: test-parallel
+title: "Parallelism and sharding"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-With a few lines of code, you can hook up Playwright to your existing JavaScript test runner.
+Playwright Test runs tests in parallel by default, using multiple worker processes.
 
-- [playwright/test](#playwrighttest)
-- [Jest / Jasmine](#jest--jasmine)
-- [AVA](#ava)
-- [Mocha](#mocha)
-- [Multiple Browsers](#multiple-browsers)
+- [Workers](#workers)
+- [Shards](#shards)
 
-## playwright/test
+## Workers
 
-[playwright/test](./test-intro.mdx) is our first-party recommended test runner to be used with Playwright. Learn more about it [here](./test-intro.mdx).
+Each worker process creates a new environment to run tests. Different projects always run in different workers. By default, runner reuses the worker as much as it can to make testing faster, but it will create a new worker when retrying tests, after any test failure, to initialize a new environment, or just to speed up test execution if the worker limit is not reached.
 
-## Jest / Jasmine
+The maximum number of worker processes is controlled via [command line](#command-line) or [configuration object](#configuration-object).
 
-For Jest, [jest-playwright](https://github.com/playwright-community/jest-playwright) can be used. However for a light-weight solution, requiring playwright directly works fine. Jest shares it's syntax with Jasmine, so this applies to Jasmine as well.
+Each worker process is assigned a unique sequential index that is accessible through [`workerInfo`](#workerinfo) object.
 
-```js
-const {chromium} = require('playwright');
-const expect = require('expect');
-let browser;
-let page;
-beforeAll(async () => {
-  browser = await chromium.launch();
-});
-afterAll(async () => {
-  await browser.close();
-});
-beforeEach(async () => {
-  page = await browser.newPage();
-});
-afterEach(async () => {
-  await page.close();
-});
+## Shards
 
-it('should work', async () => {
-  await page.goto('https://www.example.com/');
-  expect(await page.title()).toBe('Example Domain');
-});
+Playwright Test can shard a test suite, so that it can be executed on multiple machines. For that,  pass `--shard=x/y` to the command line. For example, to split the suite into three shards, each running one third of the tests:
+
+```sh
+npx playwright test --shard=1/3
+npx playwright test --shard=2/3
+npx playwright test --shard=3/3
 ```
 
-## AVA
-
-Tests run concurrently in AVA, so a single page variable cannot be shared between tests. Instead, create new pages with a macro function.
-
-```js
-const {chromium} = require('playwright');
-const test = require('ava').default;
-const browserPromise = chromium.launch();
-
-async function pageMacro(t, callback) {
-  const browser = await browserPromise;
-  const page = await browser.newPage();
-  try {
-    await callback(t, page);
-  } finally {
-    await page.close();
-  }
-}
-
-test('should work', pageMacro, async (t, page) => {
-  await page.goto('https://www.example.com/');
-  t.is(await page.title(), 'Example Domain');
-});
-```
-
-## Mocha
-
-Mocha looks very similar to the Jest/Jasmine setup, and functions in the same way.
-
-```js
-const {chromium} = require('playwright');
-const assert = require('assert');
-let browser;
-before(async() => {
-  browser = await chromium.launch();
-});
-after(async () => {
-  await browser.close();
-});
-let page;
-beforeEach(async() => {
-  page = await browser.newPage();
-});
-afterEach(async () => {
-  await page.close();
-});
-
-it('should work', async () => {
-  await page.goto('https://www.example.com/');
-  assert.equal(await page.title(), 'Example Domain');
-});
-```
-
-## Multiple Browsers
-
-These simple examples can be extended to support multiple browsers using an environment variable.
-
-```js
-const {chromium, webkit, firefox} = require('playwright');
-const browserName = process.env.BROWSER || 'webkit';
-let browser;
-beforeAll(async() => {
-  browser = await {chromium, webkit, firefox}[browserName].launch();
-});
-```
-
-Then set `BROWSER=firefox` to run your tests with firefox, or any other browser.
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
-[Android]: ./api/class-android.mdx "Android"
-[AndroidDevice]: ./api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: ./api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: ./api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: ./api/class-androidwebview.mdx "AndroidWebView"
 [Browser]: ./api/class-browser.mdx "Browser"
 [BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
-[BrowserServer]: ./api/class-browserserver.mdx "BrowserServer"
 [BrowserType]: ./api/class-browsertype.mdx "BrowserType"
-[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
 [ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
-[Coverage]: ./api/class-coverage.mdx "Coverage"
 [Dialog]: ./api/class-dialog.mdx "Dialog"
 [Download]: ./api/class-download.mdx "Download"
-[Electron]: ./api/class-electron.mdx "Electron"
-[ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: ./api/class-filechooser.mdx "FileChooser"
 [Frame]: ./api/class-frame.mdx "Frame"
 [JSHandle]: ./api/class-jshandle.mdx "JSHandle"
 [Keyboard]: ./api/class-keyboard.mdx "Keyboard"
-[Logger]: ./api/class-logger.mdx "Logger"
 [Mouse]: ./api/class-mouse.mdx "Mouse"
 [Page]: ./api/class-page.mdx "Page"
 [Playwright]: ./api/class-playwright.mdx "Playwright"
@@ -145,9 +50,9 @@ Then set `BROWSER=firefox` to run your tests with firefox, or any other browser.
 [Selectors]: ./api/class-selectors.mdx "Selectors"
 [TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
-[Tracing]: ./api/class-tracing.mdx "Tracing"
 [Video]: ./api/class-video.mdx "Video"
 [WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"
 [Worker]: ./api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: ./core-concepts.mdx#evaluation-argument "EvaluationArgument"
@@ -174,9 +79,14 @@ Then set `BROWSER=firefox` to run your tests with firefox, or any other browser.
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
 [RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [URL]: https://nodejs.org/api/url.html "URL"
+
+[Action]: https://docs.microsoft.com/en-us/dotnet/api/system.action-1?view=net-5.0 "Action"
+[Func]: https://docs.microsoft.com/en-us/dotnet/api/system.func-2?view=net-5.0 "Func"
+[IEnumerable]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.ienumerable?view=net-5.0 "IEnumerable"
+[TResult]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1?view=net-5.0 "TResult"
 
 [all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
 [Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"

@@ -1,117 +1,103 @@
 ---
-id: test-runners
-title: "Third party runners"
+id: test-reporters
+title: "Reporters"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-With a few lines of code, you can hook up Playwright to your existing JavaScript test runner.
+- [Using reporters](#using-reporters)
+- [Built-in reporters](#built-in-reporters)
 
-- [playwright/test](#playwrighttest)
-- [Jest / Jasmine](#jest--jasmine)
-- [AVA](#ava)
-- [Mocha](#mocha)
-- [Multiple Browsers](#multiple-browsers)
+## Using reporters
 
-## playwright/test
+Playwright Test comes with a few built-in reporters for different needs and ability to provide custom reporters. The easiest way to try out built-in reporters is to pass `--reporter` [command line option](./cli.mdx).
 
-[playwright/test](./test-intro.mdx) is our first-party recommended test runner to be used with Playwright. Learn more about it [here](./test-intro.mdx).
-
-## Jest / Jasmine
-
-For Jest, [jest-playwright](https://github.com/playwright-community/jest-playwright) can be used. However for a light-weight solution, requiring playwright directly works fine. Jest shares it's syntax with Jasmine, so this applies to Jasmine as well.
-
-```js
-const {chromium} = require('playwright');
-const expect = require('expect');
-let browser;
-let page;
-beforeAll(async () => {
-  browser = await chromium.launch();
-});
-afterAll(async () => {
-  await browser.close();
-});
-beforeEach(async () => {
-  page = await browser.newPage();
-});
-afterEach(async () => {
-  await page.close();
-});
-
-it('should work', async () => {
-  await page.goto('https://www.example.com/');
-  expect(await page.title()).toBe('Example Domain');
-});
+```sh
+npx playwright test --reporter=line
 ```
 
-## AVA
+For more control, you can specify reporters programmatically in the [configuration file](#writing-a-configuration-file).
 
-Tests run concurrently in AVA, so a single page variable cannot be shared between tests. Instead, create new pages with a macro function.
+## Built-in reporters
 
-```js
-const {chromium} = require('playwright');
-const test = require('ava').default;
-const browserPromise = chromium.launch();
+All built-in reporters show detailed information about failures, and mostly differ in verbosity for successful runs.
 
-async function pageMacro(t, callback) {
-  const browser = await browserPromise;
-  const page = await browser.newPage();
-  try {
-    await callback(t, page);
-  } finally {
-    await page.close();
-  }
-}
+### List reporter
 
-test('should work', pageMacro, async (t, page) => {
-  await page.goto('https://www.example.com/');
-  t.is(await page.title(), 'Example Domain');
-});
+List reporter is default. It prints a line for each test being run. Use it with `--reporter=list` or `reporter: 'list'`.
+
+Here is an example output in the middle of a test run. Failures will be listed at the end.
+
+```sh
+npx playwright test --reporter=list
+Running 124 tests using 6 workers
+
+  ✓ should access error in env (438ms)
+  ✓ handle long test names (515ms)
+  x 1) render expected (691ms)
+  ✓ should timeout (932ms)
+    should repeat each:
+  ✓ should respect enclosing .gitignore (569ms)
+    should teardown env after timeout:
+    should respect excluded tests:
+  ✓ should handle env beforeEach error (638ms)
+    should respect enclosing .gitignore:
 ```
 
-## Mocha
+### Line reporter
 
-Mocha looks very similar to the Jest/Jasmine setup, and functions in the same way.
+Line reporter is more concise than the list reporter. It uses a single line to report last finished test, and prints failures when they occur. Line reporter is useful for large test suites where it shows the progress but does not spam the output by listing all the tests. Use it with `--reporter=line` or `reporter: 'line'`.
 
-```js
-const {chromium} = require('playwright');
-const assert = require('assert');
-let browser;
-before(async() => {
-  browser = await chromium.launch();
-});
-after(async () => {
-  await browser.close();
-});
-let page;
-beforeEach(async() => {
-  page = await browser.newPage();
-});
-afterEach(async () => {
-  await page.close();
-});
+Here is an example output in the middle of a test run. Failures are reported inline.
 
-it('should work', async () => {
-  await page.goto('https://www.example.com/');
-  assert.equal(await page.title(), 'Example Domain');
-});
+```sh
+npx playwright test --reporter=line
+Running 124 tests using 6 workers
+  1) dot-reporter.spec.ts:20:1 › render expected ===================================================
+
+    Error: expect(received).toBe(expected) // Object.is equality
+
+    Expected: 1
+    Received: 0
+
+[23/124] gitignore.spec.ts - should respect nested .gitignore
 ```
 
-## Multiple Browsers
+### Dot reporter
 
-These simple examples can be extended to support multiple browsers using an environment variable.
+Dot reporter is very concise - it only produces a single character per successful test run. It is useful on CI where you don't want a lot of output. Use it with `--reporter=dot` or `reporter: 'dot'`.
 
-```js
-const {chromium, webkit, firefox} = require('playwright');
-const browserName = process.env.BROWSER || 'webkit';
-let browser;
-beforeAll(async() => {
-  browser = await {chromium, webkit, firefox}[browserName].launch();
-});
+Here is an example output in the middle of a test run. Failures will be listed at the end.
+
+```sh
+npx playwright test --reporter=dot
+Running 124 tests using 6 workers
+······F·············································
 ```
 
-Then set `BROWSER=firefox` to run your tests with firefox, or any other browser.
+### JSON reporter
+
+JSON reporter produces an object with all information about the test run. It is usually used together with some terminal reporter like `dot` or `line`.
+
+Most likely you want to write the JSON to a file. When running with `--reporter=json`, use `FOLIO_JSON_OUTPUT_NAME` environment variable:
+
+```sh
+FOLIO_JSON_OUTPUT_NAME=results.json npx playwright test --reporter=json,dot
+```
+
+In configuration file, pass options directly:
+
+### JUnit reporter
+
+JUnit reporter produces a JUnit-style xml report. It is usually used together with some terminal reporter like `dot` or `line`.
+
+Most likely you want to write the report to an xml file. When running with `--reporter=junit`, use `FOLIO_JUNIT_OUTPUT_NAME` environment variable:
+
+```sh
+FOLIO_JUNIT_OUTPUT_NAME=results.xml npx playwright test --reporter=junit,line
+```
+
+In configuration file, pass options directly:
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"
