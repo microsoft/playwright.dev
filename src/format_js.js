@@ -16,9 +16,11 @@
 
 //@ts-check
 
+const md = require('./markdown');
 const Documentation = require('./documentation');
 const { toTitleCase, renderJSSignature } = require('./generator');
 /** @typedef {import('./generator').GeneratorFormatter} GeneratorFormatter */
+/** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
 
 /**
  * @implements {GeneratorFormatter}
@@ -68,8 +70,44 @@ class JavaScriptFormatter {
     return `[${text}]`;
   }
 
+  /**
+   * @param {MarkdownNode[]} spec
+   * @returns {MarkdownNode[]}
+   */
   preprocessComment(spec) {
-    return spec;
+    /** @type {MarkdownNode[]} */
+    const newSpec = [];
+    for (let i = 0; i < spec.length; ++i) {
+      if (spec[i + 1] && spec[i + 1].codeLang === 'ts') {
+        if (spec[i].codeLang !== 'js') {
+          console.error(spec[i + 1]);
+          throw new Error('Bad js/ts snippet pair');
+        }
+        const text = `<Tabs
+  groupId="js-flavor"
+  defaultValue="js"
+  values={[
+    {label: 'JavaScript', value: 'js'},
+    {label: 'TypeScript', value: 'ts'}
+  ]
+}>
+<TabItem value="js">
+${md.render([spec[i]])}
+</TabItem>
+<TabItem value="ts">
+${md.render([spec[i + 1]])}
+</TabItem>
+</Tabs>`;
+        newSpec.push({
+          type: 'text',
+          text
+        });
+        ++i;
+      } else {
+        newSpec.push(spec[i]);
+      }
+    }
+    return newSpec;
   }
 }
 
