@@ -5,72 +5,98 @@ title: "Configuration"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-- [Configuration object](#configuration-object)
-- [Global configuration](#global-configuration)
-- [Local configuration](#local-configuration)
-- [Test Options](#test-options)
-- [Test run options](#test-run-options)
+- [Configure browser, context, videos and screenshots](#configure-browser-context-videos-and-screenshots)
+- [Testing options](#testing-options)
+- [Different options for each browser](#different-options-for-each-browser)
 
-<br/>
+## Configure browser, context, videos and screenshots
 
-## Configuration object
+Playwright Tests supports browser and context options that you typically pass to [BrowserType.launch([options])](./api/class-browsertype.mdx#browsertypelaunchoptions) and [Browser.newContext([options])](./api/class-browser.mdx#browsernewcontextoptions) methods, for example `headless`, `viewport` or `ignoreHTTPSErrors`. It also provides options to record video for the test or capture screenshot at the end.
 
-Configuration file exports a single configuration object.
+You can specify any options either locally in a test file, or globally in the configuration file.
+- Browser options match [BrowserType.launch([options])](./api/class-browsertype.mdx#browsertypelaunchoptions) method.
+- Context options match [Browser.newContext([options])](./api/class-browser.mdx#browsernewcontextoptions) method.
+- `screenshot` option - whether to capture a screenshot after each test, off by default. Screenshot will appear in the test output directory, typically `test-results`.
+  - `'off'` - Do not capture screenshots.
+  - `'on'` - Capture screenshot after each test.
+  - `'only-on-failure'` - Capture screenshot after each test failure.
+- `video` option - whether to record video for each test, off by default. Video will appear in the test output directory, typically `test-results`.
+  - `'off'` - Do not record video.
+  - `'on'` - Record video for each test.
+  - `'retain-on-failure'` - Record video for each test, but remove all videos from successful test runs.
+  - `'retry-with-video'` - Record video only when retrying a test.
 
-You can modify browser launch options, context creation options and testing options either globally in the configuration file, or locally in the test file.
+### Global configuration
 
-See the full list of launch options in [`browserType.launch()`](https://playwright.dev/docs/api/class-browsertype#browsertypelaunchoptions) documentation.
+Create `playwright.config.js` (or `playwright.config.ts`) and specify options in the `use` section.
 
-See the full list of context options in [`browser.newContext()`](https://playwright.dev/docs/api/class-browser#browsernewcontextoptions) documentation.
+Now run tests as usual, Playwright Test will pick up the configuration file automatically.
 
-## Global configuration
+```sh
+npx playwright test --browser=firefox
+```
 
-You can specify different options for each browser using projects in the configuration file. Below is an example that changes some global testing options, and Chromium browser configuration.
+If you put your configuration file in a different place, pass it with `--config` option.
 
-## Local configuration
+```sh
+npx playwright test --config=tests/my.config.js
+```
 
-With `test.use()` you can override some options for a file, or a `describe` block.
+### Local configuration
 
-## Test Options
-- `metadata: any` - Any JSON-serializable metadata that will be put directly to the test report.
-- `name: string` - Project name, useful when defining multiple [test projects](#projects).
-- `outputDir: string` - Output directory for files created during the test run.
-- `repeatEach: number` - The number of times to repeat each test, useful for debugging flaky tests. Overridden by `--repeat-each` command line option.
-- `retries: number` - The maximum number of retry attempts given to failed tests. Overridden by `--retries` command line option.
-- `screenshot: 'off' | 'on' | 'only-on-failure'` - Whether to capture a screenshot after each test, off by default.
-  - `off` - Do not capture screenshots.
-  - `on` - Capture screenshot after each test.
-  - `only-on-failure` - Capture screenshot after each test failure.
-- `snapshotDir: string` - [Snapshots](#snapshots) directory. Overridden by `--snapshot-dir` command line option.
-- `testDir: string` - Directory that will be recursively scanned for test files.
-- `testIgnore: string | RegExp | (string | RegExp)[]` - Files matching one of these patterns are not considered test files.
-- `testMatch: string | RegExp | (string | RegExp)[]` - Only the files matching one of these patterns are considered test files.
-- `timeout: number` - Timeout for each test in milliseconds. Overridden by `--timeout` command line option.
-- `video: 'off' | 'on' | 'retain-on-failure' | 'retry-with-video'` - Whether to record video for each test, off by default.
-  - `off` - Do not record video.
-  - `on` - Record video for each test.
-  - `retain-on-failure`  - Record video for each test, but remove all videos from successful test runs.
-  - `retry-with-video` - Record video only when retrying a test.
+With `test.use()` you can override some options for a file or a `test.describe` block.
 
-## Test run options
+## Testing options
 
-These options would be typically different between local development and CI operation:
-- `forbidOnly: boolean` - Whether to exit with an error if any tests are marked as `test.only`. Useful on CI. Overridden by `--forbid-only` command line option.
-- `globalSetup: string` - Path to the global setup file. This file will be required and run before all the tests. It must export a single function.
-- `globalTeardown: string` - Path to the global teardown file. This file will be required and run after all the tests. It must export a single function.
-- `globalTimeout: number` - Total timeout in milliseconds for the whole test run. Overridden by `--global-timeout` command line option.
-- `grep: RegExp | RegExp[]` - Patterns to filter tests based on their title. Overridden by `--grep` command line option.
-- `maxFailures: number` - The maximum number of test failures for this test run. After reaching this number, testing will stop and exit with an error. Setting to zero (default) disables this behavior. Overridden by `--max-failures` and `-x` command line options.
-- `preserveOutput: 'always' | 'never' | 'failures-only'` - Whether to preserve test output in the `outputDir`:
-  - `'always'` - preserve output for all tests;
-  - `'never'` - do not preserve output for any tests;
-  - `'failures-only'` - only preserve output for failed tests.
-- `projects: Project[]` - Multiple [projects](#projects) configuration.
-- `reporter: 'list' | 'line' | 'dot' | 'json' | 'junit'` - The reporter to use. See [reporters](#reporters) for details.
-- `quiet: boolean` - Whether to suppress stdout and stderr from the tests. Overridden by `--quiet` command line option.
-- `shard: { total: number, current: number } | null` - [Shard](#shards) information. Overridden by `--shard` command line option.
-- `updateSnapshots: boolean` - Whether to update expected snapshots with the actual results produced by the test run. Overridden by `--update-snapshots` command line option.
-- `workers: number` - The maximum number of concurrent worker processes to use for parallelizing tests. Overridden by `--workers` command line option.
+In addition to configuring [Browser] or [BrowserContext], videos or screenshots, Playwright Test has many options to configure how your tests are run. Below are the most common ones, see [advanced configuration](./test-advanced.mdx) for the full list.
+- `forbidOnly`: Whether to exit with an error if any tests are marked as `test.only`. Useful on CI.
+- `globalSetup`: Path to the global setup file. This file will be required and run before all the tests. It must export a single function.
+- `globalTeardown`: Path to the global teardown file. This file will be required and run after all the tests. It must export a single function.
+- `retries`: The maximum number of retry attempts per test.
+- `testDir`: Directory with the test files.
+- `testIgnore`: Glob patterns or regular expressions that should be ignored when looking for the test files. For example, `'**/test-assets'`.
+- `testMatch`: Glob patterns or regular expressions that match test files. For example, `'**/todo-tests/*.spec.ts'`. By default, Playwright Test runs `.*(test|spec)\.(js|ts|mjs)` files.
+- `timeout`: Time in milliseconds given to each test.
+- `workers`: The maximum number of concurrent worker processes to use for parallelizing tests.
+
+You can specify these options in the configuration file.
+
+## Different options for each browser
+
+To specify different options per browser, for example command line arguments for Chromium, create multiple projects in your configuration file. Below is an example that runs all tests in three browsers, with different options.
+
+Playwright Test will run all projects by default.
+
+```sh
+$ npx playwright test
+
+Running 3 tests using 3 workers
+
+  ✓ example.spec.ts:3:1 › [Chromium] should work (2s)
+  ✓ example.spec.ts:3:1 › [Firefox] should work (2s)
+  ✓ example.spec.ts:3:1 › [WebKit] should work (2s)
+```
+
+Use `--project` command line option to run a single project.
+
+```sh
+$ npx playwright test --project=webkit
+
+Running 1 test using 1 worker
+
+  ✓ example.spec.ts:3:1 › [WebKit] should work (2s)
+```
+
+There are many more things you can do with projects:
+- Run a subset of test by specifying different `testDir` for each project.
+- Run tests in multiple configurations, for example with desktop Chromium and emulating Chrome for Android.
+- Run "core" tests without retries to ensure stability of the core functionality, and use `retries` for other tests.
+- And much more! See [advanced configuration](./test-advanced.mdx) for more details.
+
+:::note
+`--browser` command line option is not compatible with projects. Specify `browserName` in each project instead.
+:::
+
 
 [Browser]: ./api/class-browser.mdx "Browser"
 [BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
