@@ -48,13 +48,13 @@ module.exports = {
       "items": [
         { "type": "doc", "id": "test-intro" },
         { "type": "doc", "id": "test-annotations" },
-        { "type": "doc", "id": "test-cli" },
         { "type": "doc", "id": "test-configuration" },
-        { "type": "doc", "id": "test-examples" },
-        { "type": "doc", "id": "test-fixtures" },
         { "type": "doc", "id": "test-parallel" },
         { "type": "doc", "id": "test-reporters" },
         { "type": "doc", "id": "test-retries" },
+        { "type": "doc", "id": "test-examples" },
+        { "type": "doc", "id": "test-fixtures" },
+        { "type": "doc", "id": "test-cli" },
         { "type": "doc", "id": "test-advanced" },
       ],
       "collapsed": false

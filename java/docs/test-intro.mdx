@@ -18,7 +18,8 @@ Playwright Test Runner was created specifically to accommodate the needs of the 
 - [First test](#first-test)
 - [Test fixtures](#test-fixtures)
 - [Test and assertion features](#test-and-assertion-features)
-- [Write a configuration file](#write-a-configuration-file)
+- [Learn the command line](#learn-the-command-line)
+- [Create a configuration file](#create-a-configuration-file)
 
 <br/>
 
@@ -34,31 +35,27 @@ npm i -D playwright
 
 Create `tests/foo.spec.js` (or `tests/foo.spec.ts` for TypeScript) to define your test.
 
-Now run your tests:
+Now run your tests, assuming that test files are in the `tests` directory.
 
 ```sh
-# Assuming that test files are in the tests directory.
 npx playwright test -c tests
 ```
 
 Playwright Test just ran a test using Chromium browser, in a headless manner. Let's tell it to use headed browser:
 
 ```sh
-# Assuming that test files are in the tests directory.
 npx playwright test -c tests --headed
 ```
 
 What about other browsers? Let's run the same test using Firefox:
 
 ```sh
-# Assuming that test files are in the tests directory.
 npx playwright test -c tests --browser=firefox
 ```
 
 And finally, on all three browsers:
 
 ```sh
-# Assuming that test files are in the tests directory.
 npx playwright test -c tests --browser=all
 ```
 
@@ -75,8 +72,8 @@ Here is a list of the pre-defined fixtures that you are likely to use most of th
 |Fixture    |Type             |Description                      |
 |:----------|:----------------|:--------------------------------|
 |page       |[Page]           |Isolated page for this test run. |
-|context    |[BrowserContext] |Isolated context for this test run. The `page` fixture belongs to this context as well. Learn how to [configure context](#modify-options) below. |
-|browser    |[Browser]        |Browsers are shared across tests to optimize resources. Learn how to [configure browser](#modify-options) below. |
+|context    |[BrowserContext] |Isolated context for this test run. The `page` fixture belongs to this context as well. Learn how to [configure context](./test-configuration.mdx). |
+|browser    |[Browser]        |Browsers are shared across tests to optimize resources. Learn how to [configure browser](./test-configuration.mdx). |
 |browserName|[string]         |The name of the browser currently running the test. Either `chromium`, `firefox` or `webkit`.|
 
 ## Test and assertion features
@@ -99,11 +96,79 @@ You can group tests to give them a logical name or to scope before/after hooks t
 
 You can use `test.beforeAll` and `test.afterAll` hooks to set up and tear down resources shared between tests. And you can use `test.beforeEach` and `test.afterEach` hooks to set up and tear down resources for each test individually.
 
-## Write a configuration file
+### Write assertions
+
+Playwright Test uses [expect](https://jestjs.io/docs/expect) library for test assertions. It provides a lot of matchers like `toEqual`, `toContain`, `toMatch` and many more.
+
+Combine `expect` with various Playwright methods to create expectations for your test:
+- [Page.isVisible(selector[, options])](./api/class-page.mdx#pageisvisibleselector-options)
+- [Page.waitForSelector(selector[, options])](./api/class-page.mdx#pagewaitforselectorselector-options)
+- [Page.textContent(selector[, options])](./api/class-page.mdx#pagetextcontentselector-options)
+- [Page.getAttribute(selector, name[, options])](./api/class-page.mdx#pagegetattributeselector-name-options)
+- Find out more in the [assertions](./assertions.mdx) guide
+
+## Learn the command line
+
+Here are the most common options available in the [command line](./test-cli.mdx).
+- Run tests in headed browsers
+
+  ```sh
+  npx playwright test --headed
+  ```
+
+- Run tests in a particular browser
+
+  ```sh
+  npx playwright test --browser=webkit
+  ```
+
+- Run tests in all browsers
+
+  ```sh
+  npx playwright test --browser=all
+  ```
+
+- Run a single test file
+
+  ```sh
+  npx playwright test tests/todo-page.spec.ts
+  ```
+
+- Run a set of test files
+
+  ```sh
+  npx playwright test tests/todo-page/ tests/landing-page/
+  ```
+
+- Run a test with specific title
+
+  ```sh
+  npx playwright test -g "add a todo item"
+  ```
+
+- Run tests [in parallel](./test-parallel.mdx) - that's the default
+
+  ```sh
+  npx playwright test
+  ```
+
+- Disable [parallelization](./test-parallel.mdx)
+
+  ```sh
+  npx playwright test --workers=1
+  ```
+
+- Choose a [reporter](./test-reporters.mdx)
+
+  ```sh
+  npx playwright test --reporter=dot
+  ```
+
+## Create a configuration file
 
 So far, we've looked at the zero-config operation of Playwright Test. For a real world application, it is likely that you would want to use a config.
 
-Create `playwright.config.js` (or `playwright.config.ts`) to configure your tests. You can specify browser launch options, run tests in multiple browsers and much more with the config. Here is an example configuration that runs every test in Chromium, Firefox and WebKit.
+Create `playwright.config.js` (or `playwright.config.ts`) to configure your tests. You can specify browser launch options, run tests in multiple browsers and much more with the config. Here is an example configuration that runs every test in Chromium, Firefox and WebKit. Look for more options in the [configuration section](./test-configuration.mdx).
 
 Configure NPM script to run tests. Test runner will automatically pick up `playwright.config.js` or `playwright.config.ts`.
 
