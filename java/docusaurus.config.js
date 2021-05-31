@@ -138,7 +138,7 @@ module.exports = {
       ),
       {
         hashed: true,
-        language: ["en"],
+        language: ["en", "zh"],
         searchResultLimits: 10,
         highlightSearchTermsOnTargetPage: true,
       },
