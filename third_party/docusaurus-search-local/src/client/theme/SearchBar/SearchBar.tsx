@@ -123,23 +123,23 @@ export default function SearchBar({
           },
         },
       ]
-    ).on(
-      "autocomplete:selected",
-      function (event: any, { document: { u, h }, tokens }: SearchResult) {
-        let url = u;
-        if (Mark && tokens.length > 0) {
-          const params = new URLSearchParams();
-          for (const token of tokens) {
-            params.append(SEARCH_PARAM_HIGHLIGHT, token);
-          }
-          url += `?${params.toString()}`;
+    ).on("autocomplete:selected", function (
+      event: any,
+      { document: { u, h }, tokens }: SearchResult
+    ) {
+      let url = u;
+      if (Mark && tokens.length > 0) {
+        const params = new URLSearchParams();
+        for (const token of tokens) {
+          params.append(SEARCH_PARAM_HIGHLIGHT, token);
         }
-        if (h) {
-          url += h;
-        }
-        history.push(url);
+        url += `?${params.toString()}`;
       }
-    );
+      if (h) {
+        url += h;
+      }
+      history.push(url);
+    });
 
     indexState.current = "done";
     setLoading(false);

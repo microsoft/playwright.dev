@@ -137,7 +137,7 @@ describe("generate", () => {
         searchResultLimits: 8,
         searchResultContextMaxLength: 50,
         translations: {
-          hello: "hola",
+          "hello": "hola"
         },
       } as ProcessedPluginOptions,
       "/tmp"
@@ -161,8 +161,8 @@ describe("generate", () => {
         searchResultLimits: 8,
         searchResultContextMaxLength: 50,
         translations: {
-          hello: "hola",
-        },
+          "hello": "hola"
+        }
       } as ProcessedPluginOptions,
       "/tmp"
     );

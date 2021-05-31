@@ -73,7 +73,9 @@ export function generate(config: ProcessedPluginOptions, dir: string): void {
       searchResultContextMaxLength
     )};`
   );
-  contents.push(`export const translations = ${JSON.stringify(translations)};`);
+  contents.push(
+    `export const translations = ${JSON.stringify(translations)};`
+  );
 
   fs.writeFileSync(path.join(dir, "generated.js"), contents.join("\n"));
 }
