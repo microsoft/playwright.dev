@@ -711,7 +711,7 @@ See [BrowserContext.exposeFunction(name, callback)](./api/class-browsercontext.m
 Functions installed via [Page.exposeFunction(name, callback)](./api/class-page.mdx#pageexposefunctionname-callback) survive navigations.
 :::
 
-An example of adding an `sha1` function to the page:
+An example of adding a `sha256` function to the page:
 
 ```java
 import com.microsoft.playwright.*;
@@ -727,11 +727,11 @@ public class Example {
       BrowserType webkit = playwright.webkit();
       Browser browser = webkit.launch({ headless: false });
       Page page = browser.newPage();
-      page.exposeFunction("sha1", args -> {
+      page.exposeFunction("sha256", args -> {
         String text = (String) args[0];
         MessageDigest crypto;
         try {
-          crypto = MessageDigest.getInstance("SHA-1");
+          crypto = MessageDigest.getInstance("SHA-256");
         } catch (NoSuchAlgorithmException e) {
           return null;
         }
@@ -740,7 +740,7 @@ public class Example {
       });
       page.setContent("<script>\n" +
         "  async function onClick() {\n" +
-        "    document.querySelector('div').textContent = await window.sha1('PLAYWRIGHT');\n" +
+        "    document.querySelector('div').textContent = await window.sha256('PLAYWRIGHT');\n" +
         "  }\n" +
         "</script>\n" +
         "<button onclick=\"onClick()\">Click me</button>\n" +
@@ -1601,7 +1601,7 @@ Request request = page.waitForRequest(request -> "https://example.com".equals(re
 
 ## Page.waitForRequestFinished([options])
 - `options` <`Page.WaitForRequestFinishedOptions`>
-  - `setPredicate` <[Predicate]<[Request]>> Receives the [ConsoleMessage] object and resolves to truthy value when the waiting should resolve.
+  - `setPredicate` <[Predicate]<[Request]>> Receives the [Request] object and resolves to truthy value when the waiting should resolve.
   - `setTimeout` <[double]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout).
 - returns: <[Request]>
 

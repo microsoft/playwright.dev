@@ -8,6 +8,8 @@ import TabItem from '@theme/TabItem';
 - [Configure browser, context, videos and screenshots](#configure-browser-context-videos-and-screenshots)
 - [Testing options](#testing-options)
 - [Different options for each browser](#different-options-for-each-browser)
+- [Mobile emulation](#mobile-emulation)
+- [Network mocking](#network-mocking)
 
 ## Configure browser, context, videos and screenshots
 
@@ -50,6 +52,10 @@ module.exports = {
     // Context options
     viewport: { width: 1280, height: 720 },
     ignoreHTTPSErrors: true,
+
+    // Artifacts
+    screenshot: 'only-on-failure',
+    video: 'retry-with-video',
   },
 };
 ```
@@ -68,6 +74,10 @@ const config: PlaywrightTestConfig = {
     // Context options
     viewport: { width: 1280, height: 720 },
     ignoreHTTPSErrors: true,
+
+    // Artifacts
+    screenshot: 'only-on-failure',
+    video: 'retry-with-video',
   },
 };
 export default config;
@@ -379,6 +389,177 @@ There are many more things you can do with projects:
 `--browser` command line option is not compatible with projects. Specify `browserName` in each project instead.
 :::
 
+## Mobile emulation
+
+You can use configuration file to make default `context` emulate a mobile device.
+
+Here is an example configuration that runs tests in "Pixel 4" and "iPhone 11" emulation modes. Note that it uses the [projects](./test-advanced.mdx#projects) feature to run the same set of tests in multiple configurations.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="js"
+  values={[
+    {label: 'JavaScript', value: 'js'},
+    {label: 'TypeScript', value: 'ts'}
+  ]
+}>
+<TabItem value="js">
+
+```js
+// playwright.config.js
+const { devices } = require('playwright');
+
+module.exports = {
+  projects: [
+    // "Pixel 4" tests use Chromium browser.
+    {
+      name: 'Pixel 4',
+      use: {
+        browserName: 'chromium',
+        ...devices['Pixel 4'],
+      },
+    },
+
+    // "iPhone 11" tests use WebKit browser.
+    {
+      name: 'iPhone 11',
+      use: {
+        browserName: 'webkit',
+        ...devices['iPhone 11'],
+      },
+    },
+  ],
+};
+```
+
+</TabItem>
+<TabItem value="ts">
+
+```ts
+// playwright.config.ts
+import { PlaywrightTestConfig } from 'playwright/test';
+import { devices } from 'playwright';
+
+const config: PlaywrightTestConfig = {
+  projects: [
+    // "Pixel 4" tests use Chromium browser.
+    {
+      name: 'Pixel 4',
+      use: {
+        browserName: 'chromium',
+        ...devices['Pixel 4'],
+      },
+    },
+
+    // "iPhone 11" tests use WebKit browser.
+    {
+      name: 'iPhone 11',
+      use: {
+        browserName: 'webkit',
+        ...devices['iPhone 11'],
+      },
+    },
+  ],
+};
+export default config;
+```
+
+</TabItem>
+</Tabs>
+
+## Network mocking
+
+You don't have to configure anything to mock network requests. Just define a custom [Route] that mocks network for a browser context.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="js"
+  values={[
+    {label: 'JavaScript', value: 'js'},
+    {label: 'TypeScript', value: 'ts'}
+  ]
+}>
+<TabItem value="js">
+
+```js
+// example.spec.js
+const { test, expect } = require('playwright/test');
+
+test.beforeEach(async ({ context }) => {
+  // Block any css requests for each test in this file.
+  await context.route(/.css/, route => route.abort());
+});
+
+test('loads page without css', async ({ page }) => {
+  await page.goto('https://playwright.dev');
+  // ... test goes here
+});
+```
+
+</TabItem>
+<TabItem value="ts">
+
+```ts
+// example.spec.ts
+import { test, expect } from 'playwright/test';
+
+test.beforeEach(async ({ context }) => {
+  // Block any css requests for each test in this file.
+  await context.route(/.css/, route => route.abort());
+});
+
+test('loads page without css', async ({ page }) => {
+  await page.goto('https://playwright.dev');
+  // ... test goes here
+});
+```
+
+</TabItem>
+</Tabs>
+
+Alternatively, you can use [page.route(url, handler)](./api/class-page.mdx#pagerouteurl-handler) to mock network in a single test.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="js"
+  values={[
+    {label: 'JavaScript', value: 'js'},
+    {label: 'TypeScript', value: 'ts'}
+  ]
+}>
+<TabItem value="js">
+
+```js
+// example.spec.js
+const { test, expect } = require('playwright/test');
+
+test('loads page without images', async ({ page }) => {
+  // Block png and jpeg images.
+  await page.route(/(png|jpeg)$/, route => route.abort());
+
+  await page.goto('https://playwright.dev');
+  // ... test goes here
+});
+```
+
+</TabItem>
+<TabItem value="ts">
+
+```ts
+// example.spec.ts
+import { test, expect } from 'playwright/test';
+
+test('loads page without images', async ({ page }) => {
+  // Block png and jpeg images.
+  await page.route(/(png|jpeg)$/, route => route.abort());
+
+  await page.goto('https://playwright.dev');
+  // ... test goes here
+});
+```
+
+</TabItem>
+</Tabs>
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"
