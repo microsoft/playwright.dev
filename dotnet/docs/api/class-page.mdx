@@ -727,7 +727,7 @@ See [BrowserContext.ExposeFunctionAsync(name, callback)](./api/class-browsercont
 Functions installed via [Page.ExposeFunctionAsync(name, callback)](./api/class-page.mdx#pageexposefunctionasyncname-callback) survive navigations.
 :::
 
-An example of adding an `sha1` function to the page:
+An example of adding a `sha256` function to the page:
 
 ```csharp
 using Microsoft.Playwright;
@@ -746,17 +746,15 @@ class PageExamples
         });
         var page = await browser.NewPageAsync();
 
-        // NOTE: md5 is inherently insecure, and we strongly discourage using
-        // this in production in any shape or form
-        await page.ExposeFunctionAsync("sha1", (string input) =>
+        await page.ExposeFunctionAsync("sha256", (string input) =>
         {
             return Convert.ToBase64String(
-                MD5.Create().ComputeHash(System.Text.Encoding.UTF8.GetBytes(input)));
+                SHA256.Create().ComputeHash(System.Text.Encoding.UTF8.GetBytes(input)));
         });
 
         await page.SetContentAsync("<script>\n" +
         "  async function onClick() {\n" +
-        "    document.querySelector('div').textContent = await window.sha1('PLAYWRIGHT');\n" +
+        "    document.querySelector('div').textContent = await window.sha256('PLAYWRIGHT');\n" +
         "  }\n" +
         "</script>\n" +
         "<button onclick=\"onClick()\">Click me</button>\n" +
@@ -1345,7 +1343,7 @@ await page.RunAndWaitForRequestAsync(async () =>
 
 ## Page.RunAndWaitForRequestFinishedAsync(action, options)
 - `options` <`PageRunAndWaitForRequestFinishedOptions`>
-  - `Predicate` <[Func]<[Request], bool>> Receives the [ConsoleMessage] object and resolves to truthy value when the waiting should resolve.
+  - `Predicate` <[Func]<[Request], bool>> Receives the [Request] object and resolves to truthy value when the waiting should resolve.
   - `Timeout` <[double]> Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout).
 - `action` <[Func]<[Task]>> Action that triggers the event.
 - returns: <[Request]>

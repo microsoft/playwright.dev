@@ -1,13 +1,25 @@
 ---
 id: test-snapshots
-title: "Snapshots"
+title: "Visual comparisons"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright Test includes the ability to produce and compare snapshots. For that, use `expect(value).toMatchSnapshot()`. Test runner auto-detects the content type, and includes built-in matchers for text, png and jpeg images, and arbitrary binary data.
+Playwright Test includes the ability to produce and visually compare screenshots using `expect(value).toMatchSnapshot()`. On first execution, Playwright test will generate reference screenshots. Subsequent runs will compare against the reference.
 
-Snapshots are stored under `__snapshots__` directory by default, and can be specified in the [configuration object](#configuration-object).
+Sometimes you need to update the reference screenshot, for example when the page has changed. Do this with the  `--update-snapshots` flag.
+
+```sh
+npx playwright test --update-snapshots
+```
+
+Playwright Test uses the [pixelmatch](https://github.com/mapbox/pixelmatch) library. You can pass comparison `threshold` as an option.
+
+Apart from screenshots, `expect(value).toMatchSnapshot()` can also be used to compare text, png and jpeg images, or arbitrary binary data. Playwright Test auto-detects the content type and uses the appropriate comparison algorithm.
+
+Here we compare text content against the reference.
+
+Snapshots are stored next to the test file, in a separate directory. For example, `my.spec.js` file will produce and store snapshots in the `my.spec.js-snapshots` directory. You should commit this directory to your version control (e.g. `git`), and review any changes to it.
 
 [Browser]: ./api/class-browser.mdx "Browser"
 [BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"

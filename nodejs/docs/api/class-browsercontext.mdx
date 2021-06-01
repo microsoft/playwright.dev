@@ -300,7 +300,7 @@ If the `callback` returns a [Promise], it will be awaited.
 
 See [page.exposeFunction(name, callback)](./api/class-page.mdx#pageexposefunctionname-callback) for page-only version.
 
-An example of adding an `md5` function to all pages in the context:
+An example of adding a `sha256` function to all pages in the context:
 
 ```js
 const { webkit } = require('playwright');  // Or 'chromium' or 'firefox'.
@@ -309,12 +309,12 @@ const crypto = require('crypto');
 (async () => {
   const browser = await webkit.launch({ headless: false });
   const context = await browser.newContext();
-  await context.exposeFunction('md5', text => crypto.createHash('md5').update(text).digest('hex'));
+  await context.exposeFunction('sha256', text => crypto.createHash('sha256').update(text).digest('hex'));
   const page = await context.newPage();
   await page.setContent(`
     <script>
       async function onClick() {
-        document.querySelector('div').textContent = await window.md5('PLAYWRIGHT');
+        document.querySelector('div').textContent = await window.sha256('PLAYWRIGHT');
       }
     </script>
     <button onclick="onClick()">Click me</button>
