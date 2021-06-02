@@ -25,8 +25,11 @@ const Documentation = require('./documentation');
 /** @typedef {import('./documentation').Type} Type */
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
 
+if (!process.env.SRC_DIR)
+  throw new Error(`'SRC_DIR' environment variable needs to be set`);
+
 const DIR_SRC = path.join(process.env.SRC_DIR, 'docs', 'src');
-const commonSnippets = new Set(['html', 'xml', 'yml', 'yaml', 'json', 'groovy', 'html', 'sh']);
+const commonSnippets = new Set(['html', 'xml', 'yml', 'yaml', 'json', 'groovy', 'html', 'bash']);
 
 /**
  * @typedef {{
