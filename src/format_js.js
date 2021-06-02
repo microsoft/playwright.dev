@@ -78,37 +78,61 @@ class JavaScriptFormatter {
     /** @type {MarkdownNode[]} */
     const newSpec = [];
     for (let i = 0; i < spec.length; ++i) {
-      if (spec[i + 1] && spec[i + 1].codeLang === 'ts') {
-        if (spec[i].codeLang !== 'js') {
-          console.error(spec[i + 1]);
-          throw new Error('Bad js/ts snippet pair');
+      const tabs = [];
+      let match = spec[i].codeLang && spec[i].codeLang.match(/^js ([\w+-_]+)=([\w+-_]+)/);
+      while (match) {
+        spec[i].codeLang = 'js';
+        tabs.push({ groupId: match[1], value: match[2], spec: spec[i] });
+        ++i;
+        if (i >= spec.length)
+          break;
+        match = spec[i].codeLang && spec[i].codeLang.match(/^js ([\w+-_]+)=([\w+-_]+)/);
+      }
+      if (tabs.length) {
+        if (tabs.length === 1)
+          throw new Error('Bad js tab group: ' + md.render(spec));
+
+        // Validate group consistency.
+        const groupId = tabs[0].groupId;
+        const values = new Set();
+        for (const tab of tabs) {
+          if (tab.groupId !== groupId)
+            throw new Error('Mixed group ids: ' + md.render(spec));
+          if (values.has(tab.value))
+            throw new Error('Dupe tabs: ' + md.render(spec));
+          values.add(tab.value);
         }
-        const text = `<Tabs
-  groupId="js-flavor"
-  defaultValue="js"
-  values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'}
-  ]
-}>
-<TabItem value="js">
-${md.render([spec[i]])}
-</TabItem>
-<TabItem value="ts">
-${md.render([spec[i + 1]])}
-</TabItem>
-</Tabs>`;
+
+        const tokens = [];
+        tokens.push(`<Tabs
+  groupId="${groupId}"
+  defaultValue="${tabs[0].value}"
+  values={[`);
+        tokens.push(...tabs.map((t, i) => `    {label: '${tabLabel(t.value)}', value: '${t.value}'}${ i === tabs.length - 1 ? '' : ','}`))
+        tokens.push(`  ]
+}>`);
+        tokens.push(...tabs.map(t => `<TabItem value="${t.value}">
+${md.render([t.spec])}
+</TabItem>`));
+        tokens.push(`</Tabs>`);
+
         newSpec.push({
           type: 'text',
-          text
+          text: tokens.join('\n')
         });
-        ++i;
-      } else {
-        newSpec.push(spec[i]);
       }
+      if (i < spec.length)
+        newSpec.push(spec[i]);
     }
     return newSpec;
   }
+}
+
+function tabLabel(type) {
+  if (type === 'ts')
+    return 'TypeScript';
+  if (type === 'js')
+    return 'JavaScript';
 }
 
 module.exports = { JavaScriptFormatter };
