@@ -6,11 +6,11 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
 Whenever the page sends a request for a network resource the following sequence of events are emitted by [Page]:
-* [event Page.Request](./api/class-page.mdx#eventpagerequest) emitted when the request is issued by the page.
-* [event Page.Response](./api/class-page.mdx#eventpageresponse) emitted when/if the response status and headers are received for the request.
-* [event Page.RequestFinished](./api/class-page.mdx#eventpagerequestfinished) emitted when the response body is downloaded and the request is complete.
+* [event Page.Request](./api/class-page.mdx#page-event-request) emitted when the request is issued by the page.
+* [event Page.Response](./api/class-page.mdx#page-event-response) emitted when/if the response status and headers are received for the request.
+* [event Page.RequestFinished](./api/class-page.mdx#page-event-request-finished) emitted when the response body is downloaded and the request is complete.
 
-If request fails at some point, then instead of `'requestfinished'` event (and possibly instead of 'response' event), the  [event Page.RequestFailed](./api/class-page.mdx#eventpagerequestfailed) event is emitted.
+If request fails at some point, then instead of `'requestfinished'` event (and possibly instead of 'response' event), the  [event Page.RequestFailed](./api/class-page.mdx#page-event-request-failed) event is emitted.
 
 :::note
 HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with `'requestfinished'` event.
@@ -19,22 +19,22 @@ HTTP Error responses, such as 404 or 503, are still successful responses from HT
 If request gets a 'redirect' response, the request is successfully finished with the 'requestfinished' event, and a new request is  issued to a redirected url.
 
 
-- [Request.Failure](./api/class-request.mdx#requestfailure)
-- [Request.Frame](./api/class-request.mdx#requestframe)
-- [Request.Headers](./api/class-request.mdx#requestheaders)
-- [Request.IsNavigationRequest](./api/class-request.mdx#requestisnavigationrequest)
-- [Request.Method](./api/class-request.mdx#requestmethod)
-- [Request.PostData](./api/class-request.mdx#requestpostdata)
-- [Request.PostDataBuffer](./api/class-request.mdx#requestpostdatabuffer)
-- [Request.PostDataJSON](./api/class-request.mdx#requestpostdatajson)
-- [Request.RedirectedFrom](./api/class-request.mdx#requestredirectedfrom)
-- [Request.RedirectedTo](./api/class-request.mdx#requestredirectedto)
-- [Request.ResourceType](./api/class-request.mdx#requestresourcetype)
-- [Request.ResponseAsync()](./api/class-request.mdx#requestresponseasync)
-- [Request.Timing](./api/class-request.mdx#requesttiming)
-- [Request.Url](./api/class-request.mdx#requesturl)
+- [Request.Failure](./api/class-request.mdx#request-failure)
+- [Request.Frame](./api/class-request.mdx#request-frame)
+- [Request.Headers](./api/class-request.mdx#request-headers)
+- [Request.IsNavigationRequest](./api/class-request.mdx#request-is-navigation-request)
+- [Request.Method](./api/class-request.mdx#request-method)
+- [Request.PostData](./api/class-request.mdx#request-post-data)
+- [Request.PostDataBuffer](./api/class-request.mdx#request-post-data-buffer)
+- [Request.PostDataJSON](./api/class-request.mdx#request-post-data-json)
+- [Request.RedirectedFrom](./api/class-request.mdx#request-redirected-from)
+- [Request.RedirectedTo](./api/class-request.mdx#request-redirected-to)
+- [Request.ResourceType](./api/class-request.mdx#request-resource-type)
+- [Request.ResponseAsync()](./api/class-request.mdx#request-response)
+- [Request.Timing](./api/class-request.mdx#request-timing)
+- [Request.Url](./api/class-request.mdx#request-url)
 
-## Request.Failure
+## Request.Failure {#request-failure}
 - returns: <[null]|[string]>
 
 The method returns `null` unless this request has failed, as reported by `requestfailed` event.
@@ -48,44 +48,44 @@ page.RequestFailed += (_, request) =>
 };
 ```
 
-## Request.Frame
+## Request.Frame {#request-frame}
 - returns: <[Frame]>
 
 Returns the [Frame] that initiated this request.
 
-## Request.Headers
+## Request.Headers {#request-headers}
 - returns: <[Map]<[string], [string]>>
 
 An object with HTTP headers associated with the request. All header names are lower-case.
 
-## Request.IsNavigationRequest
+## Request.IsNavigationRequest {#request-is-navigation-request}
 - returns: <[boolean]>
 
 Whether this request is driving frame's navigation.
 
-## Request.Method
+## Request.Method {#request-method}
 - returns: <[string]>
 
 Request's method (GET, POST, etc.)
 
-## Request.PostData
+## Request.PostData {#request-post-data}
 - returns: <[null]|[string]>
 
 Request's post body, if any.
 
-## Request.PostDataBuffer
+## Request.PostDataBuffer {#request-post-data-buffer}
 - returns: <[null]|[byte&#91;&#93;]>
 
 Request's post body in a binary form, if any.
 
-## Request.PostDataJSON
+## Request.PostDataJSON {#request-post-data-json}
 - returns: <[JsonElement?]>
 
 Returns parsed request's body for `form-urlencoded` and JSON as a fallback if any.
 
 When the response is `application/x-www-form-urlencoded` then a key/value object of the values will be returned. Otherwise it will be parsed as JSON.
 
-## Request.RedirectedFrom
+## Request.RedirectedFrom {#request-redirected-from}
 - returns: <[null]|[Request]>
 
 Request that was redirected by the server to this one, if any.
@@ -106,28 +106,28 @@ var response = await page.GotoAsync("https://www.google.com");
 Console.WriteLine(response.Request.RedirectedFrom?.Url); // null
 ```
 
-## Request.RedirectedTo
+## Request.RedirectedTo {#request-redirected-to}
 - returns: <[null]|[Request]>
 
 New request issued by the browser if the server responded with redirect.
 
-This method is the opposite of [Request.RedirectedFrom](./api/class-request.mdx#requestredirectedfrom):
+This method is the opposite of [Request.RedirectedFrom](./api/class-request.mdx#request-redirected-from):
 
 ```csharp
 Console.WriteLine(request.RedirectedFrom?.RedirectedTo == request); // True
 ```
 
-## Request.ResourceType
+## Request.ResourceType {#request-resource-type}
 - returns: <[string]>
 
 Contains the request's resource type as it was perceived by the rendering engine. ResourceType will be one of the following: `document`, `stylesheet`, `image`, `media`, `font`, `script`, `texttrack`, `xhr`, `fetch`, `eventsource`, `websocket`, `manifest`, `other`.
 
-## Request.ResponseAsync()
+## Request.ResponseAsync() {#request-response}
 - returns: <[null]|[Response]>
 
 Returns the matching [Response] object, or `null` if the response was not received due to error.
 
-## Request.Timing
+## Request.Timing {#request-timing}
 - returns: <`Timing`>
   - `startTime` <[double]> Request start time in milliseconds elapsed since January 1, 1970 00:00:00 UTC
   - `domainLookupStart` <[double]> Time immediately before the browser starts the domain name lookup for the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
@@ -149,7 +149,7 @@ var request = await page.RunAndWaitForRequestFinishedAsync(async () =>
 Console.WriteLine(request.Timing.ResponseEnd);
 ```
 
-## Request.Url
+## Request.Url {#request-url}
 - returns: <[string]>
 
 URL of the request.

@@ -9,7 +9,7 @@ Playwright can be used to automate scenarios that require authentication.
 
 Tests written with Playwright execute in isolated clean-slate environments called [browser contexts](./core-concepts.mdx#browser-contexts). This isolation model improves reproducibility and prevents cascading test failures. New browser contexts can load existing authentication state. This eliminates the need to login in every context and speeds up test execution.
 
-> Note: This guide covers cookie/token-based authentication (logging in via the app UI). For [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication) use [browser.new_context(**kwargs)](./api/class-browser.mdx#browsernew_contextkwargs).
+> Note: This guide covers cookie/token-based authentication (logging in via the app UI). For [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication) use [browser.new_context(**kwargs)](./api/class-browser.mdx#browser-new-context).
 
 - [Automate logging in](#automate-logging-in)
 - [Reuse authentication state](#reuse-authentication-state)
@@ -66,7 +66,7 @@ These steps can be executed for every browser context. However, redoing login fo
 
 ## Reuse authentication state
 
-Web apps use cookie-based or token-based authentication, where authenticated state is stored as [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) or in [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage). Playwright provides [browser_context.storage_state(**kwargs)](./api/class-browsercontext.mdx#browser_contextstorage_statekwargs) method that can be used to retrieve storage state from authenticated contexts and then create new contexts with prepopulated state.
+Web apps use cookie-based or token-based authentication, where authenticated state is stored as [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) or in [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage). Playwright provides [browser_context.storage_state(**kwargs)](./api/class-browsercontext.mdx#browser-context-storage-state) method that can be used to retrieve storage state from authenticated contexts and then create new contexts with prepopulated state.
 
 Cookies and local storage state can be used across different browsers. They depend on your application's authentication model: some apps might require both cookies and local storage.
 
@@ -121,8 +121,8 @@ Logging in via the UI and then reusing authentication state can be combined to i
 This approach will also **work in CI environments**, since it does not rely on any external state.
 
 ### API reference
-- [browser_context.storage_state(**kwargs)](./api/class-browsercontext.mdx#browser_contextstorage_statekwargs)
-- [browser.new_context(**kwargs)](./api/class-browser.mdx#browsernew_contextkwargs)
+- [browser_context.storage_state(**kwargs)](./api/class-browsercontext.mdx#browser-context-storage-state)
+- [browser.new_context(**kwargs)](./api/class-browser.mdx#browser-new-context)
 
 ## Session storage
 
@@ -146,14 +146,14 @@ os.environ["SESSION_STORAGE"] = session_storage
 
 # Set session storage in a new context
 session_storage = os.environ["SESSION_STORAGE"]
-context.add_init_script(storage => {
+context.add_init_script("""storage => {
   if (window.location.hostname == 'example.com') {
     entries = JSON.parse(storage)
     Object.keys(entries).forEach(key => {
       window.sessionStorage.setItem(key, entries[key])
     })
   }
-}, session_storage)
+}""", session_storage)
 ```
 
 </TabItem>
@@ -167,24 +167,24 @@ os.environ["SESSION_STORAGE"] = session_storage
 
 # Set session storage in a new context
 session_storage = os.environ["SESSION_STORAGE"]
-await context.add_init_script(storage => {
+await context.add_init_script("""storage => {
   if (window.location.hostname == 'example.com') {
     entries = JSON.parse(storage)
     Object.keys(entries).forEach(key => {
       window.sessionStorage.setItem(key, entries[key])
     })
   }
-}, session_storage)
+}""", session_storage)
 ```
 
 </TabItem>
 </Tabs>
 
 ### API reference
-- [browser_context.storage_state(**kwargs)](./api/class-browsercontext.mdx#browser_contextstorage_statekwargs)
-- [browser.new_context(**kwargs)](./api/class-browser.mdx#browsernew_contextkwargs)
-- [page.evaluate(expression, **kwargs)](./api/class-page.mdx#pageevaluateexpression-kwargs)
-- [browser_context.add_init_script(**kwargs)](./api/class-browsercontext.mdx#browser_contextadd_init_scriptkwargs)
+- [browser_context.storage_state(**kwargs)](./api/class-browsercontext.mdx#browser-context-storage-state)
+- [browser.new_context(**kwargs)](./api/class-browser.mdx#browser-new-context)
+- [page.evaluate(expression, **kwargs)](./api/class-page.mdx#page-evaluate)
+- [browser_context.add_init_script(**kwargs)](./api/class-browsercontext.mdx#browser-context-add-init-script)
 
 ## Multi-factor authentication
 
@@ -194,7 +194,7 @@ Accounts with multi-factor authentication (MFA) cannot be fully automated, and n
 
 Note that persistent authentication is not suited for CI environments since it relies on a disk location. User data directories are specific to browser types and cannot be shared across browser types.
 
-User data directories can be used with the [browser_type.launch_persistent_context(user_data_dir, **kwargs)](./api/class-browsertype.mdx#browser_typelaunch_persistent_contextuser_data_dir-kwargs) API.
+User data directories can be used with the [browser_type.launch_persistent_context(user_data_dir, **kwargs)](./api/class-browsertype.mdx#browser-type-launch-persistent-context) API.
 
 <Tabs
   groupId="python-flavor"
@@ -225,7 +225,7 @@ from playwright.async_api import async_playwright
 async def main():
     async with async_playwright() as p:
         user_data_dir = '/path/to/directory'
-        browser = await p.chromium.launch_persistent_context(userDataDir, headless=False)
+        browser = await p.chromium.launch_persistent_context(user_data_dir, headless=False)
         # Execute login steps manually in the browser window
 
 asyncio.run(main())
@@ -239,7 +239,7 @@ asyncio.run(main())
 
 ### API reference
 - [BrowserContext]
-- [browser_type.launch_persistent_context(user_data_dir, **kwargs)](./api/class-browsertype.mdx#browser_typelaunch_persistent_contextuser_data_dir-kwargs)
+- [browser_type.launch_persistent_context(user_data_dir, **kwargs)](./api/class-browsertype.mdx#browser-type-launch-persistent-context)
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Browser]: ./api/class-browser.mdx "Browser"

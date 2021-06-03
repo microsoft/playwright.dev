@@ -77,6 +77,24 @@ module.exports = {
           // Do not add the link active class when browsing docs.
           dropdownActiveClassDisabled: true,
         },
+        {
+          label: 'Python',
+          position: 'left',
+          items: [
+            {
+              label: 'Python',
+              'data-language-prefix': '/python/',
+            },
+            {
+              label: 'Node.js',
+              'data-language-prefix': '/',
+            },
+            {
+              label: 'Java',
+              'data-language-prefix': '/java/',
+            },
+          ],
+        },
       ],
     },
     footer: {
