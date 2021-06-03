@@ -5,7 +5,7 @@ title: "Command Line Interface"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright comes with the command line tools that run via `npx` or as a part of the `npm` scripts.
+Playwright comes with the command line tools.
 
 - [Usage](#usage)
 - [Generate code](#generate-code)
@@ -18,7 +18,18 @@ Playwright comes with the command line tools that run via `npx` or as a part of 
 
 ## Usage
 
+```bash
+# Install the CLI once.
+dotnet add package Microsoft.Playwright.CLI
+# Use the tools.
+playwright
+```
+
 ## Generate code
+
+```bash
+playwright codegen wikipedia.org
+```
 
 Run `codegen` and perform actions in the browser. Playwright CLI will generate JavaScript code for the user interactions. `codegen` will attempt to generate resilient text-based selectors.
 
@@ -28,7 +39,19 @@ Run `codegen` and perform actions in the browser. Playwright CLI will generate J
 
 Run `codegen` with `--save-storage` to save [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) and [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) at the end. This is useful to separately record authentication step and reuse it later.
 
+```bash
+playwright codegen --save-storage=auth.json
+# Perform authentication and exit.
+# auth.json will contain the storage state.
+```
+
 Run with `--load-storage` to consume previously loaded storage. This way, all [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) and [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) will be restored, bringing most web apps to the authenticated state.
+
+```bash
+playwright open --load-storage=auth.json my.web.app
+playwright codegen --load-storage=auth.json my.web.app
+# Perform actions in authenticated state.
+```
 
 ### Codegen with custom setup
 
@@ -62,13 +85,39 @@ class Program
 
 With `open`, you can use Playwright bundled browsers to browse web pages. Playwright provides cross-platform WebKit builds that can be used to reproduce Safari rendering across Windows, Linux and macOS.
 
+```bash
+# Open page in Chromium
+playwright open example.com
+```
+
+```bash
+# Open page in WebKit
+playwright wk example.com
+```
+
 ### Emulate devices
 
 `open` can emulate mobile and tablet devices from the [`playwright.devices`](https://playwright.dev/docs/api/class-playwright#playwrightdevices) list.
 
+```bash
+# Emulate iPhone 11.
+playwright open --device="iPhone 11" wikipedia.org
+```
+
 ### Emulate color scheme and viewport size
 
+```bash
+# Emulate screen size and color scheme.
+playwright open --viewport-size=800,600 --color-scheme=dark twitter.com
+```
+
 ### Emulate geolocation, language and timezone
+
+```bash
+# Emulate timezone, language & location
+# Once page opens, click the "my location" button to see geolocation in action
+playwright open --timezone="Europe/Rome" --geolocation="41.890221,12.492348" --lang="it-IT" maps.google.com
+```
 
 ## Inspect selectors
 
@@ -94,15 +143,43 @@ Generates selector for the given element.
 
 ## Take screenshot
 
+```bash
+# Wait 3 seconds before capturing a screenshot after page loads ('load' event fires)
+playwright screenshot \
+    --device="iPhone 11" \
+    --color-scheme=dark \
+    --wait-for-timeout=3000 \
+    twitter.com twitter-iphone.png
+```
+
+```bash
+# Capture a full page screenshot
+playwright screenshot --full-page en.wikipedia.org wiki-full.png
+```
+
 ## Generate PDF
 
 PDF generation only works in Headless Chromium.
+
+```bash
+# See command help
+playwright pdf https://en.wikipedia.org/wiki/PDF wiki.pdf
+```
 
 ## Install system dependencies
 
 Ubuntu 18.04 and Ubuntu 20.04 system dependencies can get installed automatically. This is useful for CI environments.
 
+```bash
+# See command help
+playwright install-deps
+```
+
 You can also install the dependencies for a single browser only by passing it as an argument:
+
+```bash
+playwright install-deps chromium
+```
 
 ## Known limitations
 
@@ -129,6 +206,7 @@ Opening WebKit Web Inspector will disconnect Playwright from the browser. In suc
 [Selectors]: ./api/class-selectors.mdx "Selectors"
 [TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
 [Video]: ./api/class-video.mdx "Video"
 [WebSocket]: ./api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"

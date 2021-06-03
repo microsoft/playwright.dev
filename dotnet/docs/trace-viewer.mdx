@@ -1,52 +1,100 @@
 ---
-id: class-filechooser
-title: "FileChooser"
+id: trace-viewer
+title: "Trace Viewer"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-[FileChooser] objects are dispatched by the page in the [event Page.FileChooser](./api/class-page.mdx#eventpagefilechooser) event.
+Playwright Trace Viewer is a GUI tool that helps exploring recorded Playwright traces after the script ran.
+
+<img width="1212" alt="Playwright Trace Viewer" src="https://user-images.githubusercontent.com/883973/120585896-6a1bca80-c3e7-11eb-951a-bd84002480f5.png"></img>
+
+- [Recording a trace](#recording-a-trace)
+- [Viewing the trace](#viewing-the-trace)
+- [Actions](#actions)
+- [Screenshots](#screenshots)
+- [Snapshots](#snapshots)
+
+## Recording a trace
+
+Traces can be recorded using the [BrowserContext.Tracing](./api/class-browsercontext.mdx#browsercontexttracing) API as follows:
 
 ```csharp
-var fileChooser = await page.RunAndWaitForFileChooserAsync(async () =>
+await using var browser = playwright.Chromium.LaunchAsync();
+await using var context = await browser.NewContextAsync();
+
+// Start tracing before creating / navigating a page.
+await context.Tracing.StartAsync(new TracingStartOptions
 {
-    await page.ClickAsync("upload");
+  Screenshots: true,
+  Snapshots: true
 });
-await fileChooser.SetFilesAsync("temp.txt");
+
+var page = context.NewPageAsync();
+await page.GotoAsync("https://playwright.dev");
+
+// Stop tracing and export it into a zip archive.
+await context.Tracing.StopAsync(new TracingStopOptions
+{
+  Path: "trace.zip"
+});
 ```
 
+This will record the trace and place it into the file named `trace.zip`.
 
-- [FileChooser.Element](./api/class-filechooser.mdx#filechooserelement)
-- [FileChooser.IsMultiple](./api/class-filechooser.mdx#filechooserismultiple)
-- [FileChooser.Page](./api/class-filechooser.mdx#filechooserpage)
-- [FileChooser.SetFilesAsync(files, options)](./api/class-filechooser.mdx#filechoosersetfilesasyncfiles-options)
+## Viewing the trace
 
-## FileChooser.Element
-- returns: <[ElementHandle]>
+You can open the saved trace using Playwright CLI:
 
-Returns input element associated with this file chooser.
+```bash
+playwright show-trace trace.zip
+```
 
-## FileChooser.IsMultiple
-- returns: <[boolean]>
+## Actions
 
-Returns whether this file chooser accepts multiple files.
+Once trace is opened, you will see the list of actions Playwright performed on the left hand side:
 
-## FileChooser.Page
-- returns: <[Page]>
+<img width="301" alt="Actions" src="https://user-images.githubusercontent.com/883973/120588303-d39dd800-c3eb-11eb-9e8b-bfea8b775354.png"></img>
 
-Returns page this file chooser belongs to.
+Selecting each action reveals:
+- action snapshots,
+- action log,
+- source code location,
+- network log for this action
 
-## FileChooser.SetFilesAsync(files, options)
-- `files` <[string]|[IEnumerable]<[string]>|`FilePayload`|[IEnumerable]<`FilePayload`>>
-  - `Name` <[string]> File name
-  - `MimeType` <[string]> File type
-  - `Buffer` <[byte&#91;&#93;]> File content
-- `options` <`FileChooserSetFilesOptions`>
-  - `NoWaitAfter` <[boolean]> Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-  - `Timeout` <[double]> Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browsercontextsetdefaulttimeouttimeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#pagesetdefaulttimeouttimeout) methods.
-- returns: <[void]>
+in the properties pane. You will also see rendered DOM snapshots associated with each action.
 
-Sets the value of the file input this chooser is associated with. If some of the `filePaths` are relative paths, then they are resolved relative to the the current working directory. For empty array, clears the selected files.
+## Screenshots
+
+When tracing with the `screenshots` option turned on, each trace records screencast and renders it as a film strip:
+
+<img width="353" alt="Film strip" src="https://user-images.githubusercontent.com/883973/120588069-5d997100-c3eb-11eb-97a3-acbd5e0eb358.png"></img>
+
+You can hover over the film strip to see a magnified image:
+
+<img width="617" alt="Magnify" src="https://user-images.githubusercontent.com/883973/120588147-8f123c80-c3eb-11eb-864b-19d800619234.png"></img>
+
+That helps locating the action of interest very quickly.
+
+## Snapshots
+
+When tracing with the `snapshots` option turned on, Playwright captures a set of complete DOM snapshots for each action. Depending on the typ of the action, it will capture:
+
+| Type | Description |
+|------|-------------|
+|Before|A snapshot at the time action is called.|
+|Action|A snapshot at the moment of the performed input. This type of snapshot is especially useful when exploring where exactly Playwright clicked.|
+|After|A snapshot after the action.|
+
+<br/>
+
+Here is what the typical Action snapshot looks like:
+
+<img width="682" alt="Snapshots" src="https://user-images.githubusercontent.com/883973/120588728-879f6300-c3ec-11eb-85d6-e67b0e92e4e3.png">
+
+</img>
+
+Notice how it highlights both, the DOM Node as well as the exact click position.
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Browser]: ./api/class-browser.mdx "Browser"
