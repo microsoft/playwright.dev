@@ -17,6 +17,15 @@ if (path) {
   window.location.href = `${param("path").replace(".md", "")}#${param("q")}`;
 }
 
+const availableIds = [...document.querySelectorAll("[id]")].map(e => e.id)
+const currentHash = window.location.hash.length > 0 ? window.location.hash.substring(1) : '';
+const currentHashIsFound = availableIds.includes(currentHash)
+if (currentHash && !currentHashIsFound) {
+  const alternativeHash = availableIds.find(id => id.replace(/-/g, '') === currentHash);
+  if (alternativeHash)
+    window.location.hash = alternativeHash
+}
+
 window.addEventListener("load", () => {
   if ("serviceWorker" in navigator) {
     navigator.serviceWorker.register("./sw.js");
