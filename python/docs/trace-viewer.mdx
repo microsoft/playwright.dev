@@ -1,13 +1,23 @@
 ---
-id: class-tracing
-title: "Tracing"
+id: trace-viewer
+title: "Trace Viewer"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-API for collecting and saving Playwright traces. Playwright traces can be opened using the Playwright CLI after Playwright script runs.
+Playwright Trace Viewer is a GUI tool that helps exploring recorded Playwright traces after the script ran.
 
-Start with specifying the folder traces will be stored in:
+<img width="1212" alt="Playwright Trace Viewer" src="https://user-images.githubusercontent.com/883973/120585896-6a1bca80-c3e7-11eb-951a-bd84002480f5.png"></img>
+
+- [Recording a trace](#recording-a-trace)
+- [Viewing the trace](#viewing-the-trace)
+- [Actions](#actions)
+- [Screenshots](#screenshots)
+- [Snapshots](#snapshots)
+
+## Recording a trace
+
+Traces can be recorded using the [browser_context.tracing](./api/class-browsercontext.mdx#browser_contexttracing) API as follows:
 
 <Tabs
   groupId="python-flavor"
@@ -22,8 +32,13 @@ Start with specifying the folder traces will be stored in:
 ```py
 browser = chromium.launch()
 context = browser.new_context()
+
+# Start tracing before creating / navigating a page.
 context.tracing.start(screenshots=True, snapshots=True)
+
 page.goto("https://playwright.dev")
+
+# Stop tracing and export it into a zip archive.
 context.tracing.stop(path = "trace.zip")
 ```
 
@@ -33,61 +48,74 @@ context.tracing.stop(path = "trace.zip")
 ```py
 browser = await chromium.launch()
 context = await browser.new_context()
+
+# Start tracing before creating / navigating a page.
 await context.tracing.start(screenshots=True, snapshots=True)
+
 await page.goto("https://playwright.dev")
+
+# Stop tracing and export it into a zip archive.
 await context.tracing.stop(path = "trace.zip")
 ```
 
 </TabItem>
 </Tabs>
 
+This will record the trace and place it into the file named `trace.zip`.
 
-- [tracing.start(**kwargs)](./api/class-tracing.mdx#tracingstartkwargs)
-- [tracing.stop(**kwargs)](./api/class-tracing.mdx#tracingstopkwargs)
+## Viewing the trace
 
-## tracing.start(**kwargs)
-- `name` <[str]> If specified, the trace is going to be saved into the file with the given name inside the `traces_dir` folder specified in [browser_type.launch(**kwargs)](./api/class-browsertype.mdx#browser_typelaunchkwargs).
-- `screenshots` <[bool]> Whether to capture screenshots during tracing. Screenshots are used to build a timeline preview.
-- `snapshots` <[bool]> Whether to capture DOM snapshot on every action.
-- returns: <[NoneType]>
+You can open the saved trace using Playwright CLI:
 
-Start tracing.
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-context.tracing.start(name="trace", screenshots=True, snapshots=True)
-page.goto("https://playwright.dev")
-context.tracing.stop()
-context.tracing.stop(path = "trace.zip")
+```bash
+playwright show-trace trace.zip
 ```
 
-</TabItem>
-<TabItem value="async">
+## Actions
 
-```py
-await context.tracing.start(name="trace", screenshots=True, snapshots=True)
-await page.goto("https://playwright.dev")
-await context.tracing.stop()
-await context.tracing.stop(path = "trace.zip")
-```
+Once trace is opened, you will see the list of actions Playwright performed on the left hand side:
 
-</TabItem>
-</Tabs>
+<img width="301" alt="Actions" src="https://user-images.githubusercontent.com/883973/120588303-d39dd800-c3eb-11eb-9e8b-bfea8b775354.png"></img>
 
-## tracing.stop(**kwargs)
-- `path` <[Union]\[[str], [pathlib.Path]\]> Export trace into the file with the given name.
-- returns: <[NoneType]>
+Selecting each action reveals:
+- action snapshots,
+- action log,
+- source code location,
+- network log for this action
 
-Stop tracing.
+in the properties pane. You will also see rendered DOM snapshots associated with each action.
+
+## Screenshots
+
+When tracing with the `screenshots` option turned on, each trace records screencast and renders it as a film strip:
+
+<img width="353" alt="Film strip" src="https://user-images.githubusercontent.com/883973/120588069-5d997100-c3eb-11eb-97a3-acbd5e0eb358.png"></img>
+
+You can hover over the film strip to see a magnified image:
+
+<img width="617" alt="Magnify" src="https://user-images.githubusercontent.com/883973/120588147-8f123c80-c3eb-11eb-864b-19d800619234.png"></img>
+
+That helps locating the action of interest very quickly.
+
+## Snapshots
+
+When tracing with the `snapshots` option turned on, Playwright captures a set of complete DOM snapshots for each action. Depending on the typ of the action, it will capture:
+
+| Type | Description |
+|------|-------------|
+|Before|A snapshot at the time action is called.|
+|Action|A snapshot at the moment of the performed input. This type of snapshot is especially useful when exploring where exactly Playwright clicked.|
+|After|A snapshot after the action.|
+
+<br/>
+
+Here is what the typical Action snapshot looks like:
+
+<img width="682" alt="Snapshots" src="https://user-images.githubusercontent.com/883973/120588728-879f6300-c3ec-11eb-85d6-e67b0e92e4e3.png">
+
+</img>
+
+Notice how it highlights both, the DOM Node as well as the exact click position.
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Browser]: ./api/class-browser.mdx "Browser"
