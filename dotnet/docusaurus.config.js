@@ -33,7 +33,7 @@ module.exports = {
   projectName: "playwright.dev",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "throw",
-  scripts: ["js/redirection.js"],
+  scripts: ["/dotnet/js/redirection.js"],
   favicon: "img/playwright-logo.svg",
   themeConfig: {
     colorMode: {
