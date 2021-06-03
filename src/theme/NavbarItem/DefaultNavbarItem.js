@@ -31,17 +31,18 @@ function NavLink({
   });
 
   // Start Playwright adjustment
-  if (typeof window !== 'undefined' && languagePrefix) {
-    const pathname = window.location.pathname;
-
+  const location = useLocation();
+  if (languagePrefix) {
     // Rewrite the new link
-    const newPathname = pathname.replace(/^(\/(java|dotnet|python))?\/(.*)/, '$3');
-    href = languagePrefix + newPathname + window.location.hash;
+    const newPathname = location.pathname.replace(/^(\/(java|dotnet|python))?\/(.*)/, '$3');
+    href = "pathname://" + languagePrefix + newPathname + location.hash;
+    props.autoAddBaseUrl = false
+    props.target = '_self';
 
     // Detect if the link is active
     const languagesInSubfolders = ['java', 'dotnet', 'python'];
-    const currentLanguageIsInSubfolder = languagesInSubfolders.some(l => pathname.startsWith(`/${l}`));
-    if (window.location.pathname.startsWith(languagePrefix) && currentLanguageIsInSubfolder && languagePrefix.length > 1 || languagePrefix.length === 1 && !currentLanguageIsInSubfolder) {
+    const currentLanguageIsInSubfolder = languagesInSubfolders.some(l => location.pathname.startsWith(`/${l}`));
+    if (location.pathname.startsWith(languagePrefix) && currentLanguageIsInSubfolder && languagePrefix.length > 1 || languagePrefix.length === 1 && !currentLanguageIsInSubfolder) {
       props.className += ` ${activeClassName}`;
     }
   }
