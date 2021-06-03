@@ -26,8 +26,17 @@ if (currentHash && !currentHashIsFound) {
     window.location.hash = alternativeHash
 }
 
+const languagesInSubfolders = ['java', 'dotnet', 'python'];
+
 window.addEventListener("load", () => {
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js");
+    const language = languagesInSubfolders.find(lang => window.location.pathname.startsWith(`/${lang}`));
+    let serviceWorkerPath;
+    if (language)
+      serviceWorkerPath = `/${language}/sw.js`;
+    else
+      serviceWorkerPath = `/sw.js`;
+
+    navigator.serviceWorker.register(serviceWorkerPath);
   }
 });
