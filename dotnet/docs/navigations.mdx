@@ -19,11 +19,11 @@ Playwright splits the process of showing a new document in a page into **navigat
 **Navigations** can be initiated by changing the page URL or by interacting with the page (e.g., clicking a link). Navigation ends when response headers have been parsed and session history is updated. The navigation intent may be canceled, for example, on hitting an unresolved DNS address or transformed into a file download. Only after the navigation succeeds, page starts **loading** the document.
 
 **Loading** covers getting the remaining response body over the network, parsing, executing the scripts and firing load events:
-- [Page.Url](./api/class-page.mdx#pageurl) is set to the new url
+- [Page.Url](./api/class-page.mdx#page-url) is set to the new url
 - document content is loaded over network and parsed
-- [event Page.DOMContentLoaded](./api/class-page.mdx#eventpagedomcontentloaded) event is fired
+- [event Page.DOMContentLoaded](./api/class-page.mdx#page-event-dom-content-loaded) event is fired
 - page executes some scripts and loads resources like stylesheets and images
-- [event Page.Load](./api/class-page.mdx#eventpageload) event is fired
+- [event Page.Load](./api/class-page.mdx#page-event-load) event is fired
 - page executes dynamically loaded scripts
 - `networkidle` is fired when no new network requests are made for 500 ms
 
@@ -51,7 +51,7 @@ await page.GotoAsync("https://example.com", new PageGotoOptions { WaitUntil = Wa
 
 ### Wait for element
 
-In lazy-loaded pages, it can be useful to wait until an element is visible with [Page.WaitForSelectorAsync(selector, options)](./api/class-page.mdx#pagewaitforselectorasyncselector-options). Alternatively, page interactions like [Page.ClickAsync(selector, options)](./api/class-page.mdx#pageclickasyncselector-options) auto-wait for elements.
+In lazy-loaded pages, it can be useful to wait until an element is visible with [Page.WaitForSelectorAsync(selector, options)](./api/class-page.mdx#page-wait-for-selector). Alternatively, page interactions like [Page.ClickAsync(selector, options)](./api/class-page.mdx#page-click) auto-wait for elements.
 
 ```csharp
 // Navigate and wait for element
@@ -65,18 +65,18 @@ await page.ClickAsync("text=Example Domain");
 ```
 
 ### API reference
-- [Page.GotoAsync(url, options)](./api/class-page.mdx#pagegotoasyncurl-options)
-- [Page.ReloadAsync(options)](./api/class-page.mdx#pagereloadasyncoptions)
-- [Page.GoBackAsync(options)](./api/class-page.mdx#pagegobackasyncoptions)
-- [Page.GoForwardAsync(options)](./api/class-page.mdx#pagegoforwardasyncoptions)
+- [Page.GotoAsync(url, options)](./api/class-page.mdx#page-goto)
+- [Page.ReloadAsync(options)](./api/class-page.mdx#page-reload)
+- [Page.GoBackAsync(options)](./api/class-page.mdx#page-go-back)
+- [Page.GoForwardAsync(options)](./api/class-page.mdx#page-go-forward)
 
 ## Scenarios initiated by page interaction
 
-In the scenarios below, [Page.ClickAsync(selector, options)](./api/class-page.mdx#pageclickasyncselector-options) initiates a navigation and then waits for the navigation to complete.
+In the scenarios below, [Page.ClickAsync(selector, options)](./api/class-page.mdx#page-click) initiates a navigation and then waits for the navigation to complete.
 
 ### Auto-wait
 
-By default, [Page.ClickAsync(selector, options)](./api/class-page.mdx#pageclickasyncselector-options) will wait for the navigation step to complete. This can be combined with a page interaction on the navigated page which would auto-wait for an element.
+By default, [Page.ClickAsync(selector, options)](./api/class-page.mdx#page-click) will wait for the navigation step to complete. This can be combined with a page interaction on the navigated page which would auto-wait for an element.
 
 ```csharp
 // Click will auto-wait for navigation to complete
@@ -88,7 +88,7 @@ await page.FillAsync("#username", "John Doe");
 
 ### Custom wait
 
-`page.click` can be combined with [Page.WaitForLoadStateAsync(state, options)](./api/class-page.mdx#pagewaitforloadstateasyncstate-options) to wait for a loading event.
+`page.click` can be combined with [Page.WaitForLoadStateAsync(state, options)](./api/class-page.mdx#page-wait-for-load-state) to wait for a loading event.
 
 ```csharp
 await page.ClickAsync("button"); // Click triggers navigation
@@ -97,7 +97,7 @@ await page.WaitForLoadStateAsync(LoadState.NetworkIdle); // This resolves after 
 
 ### Wait for element
 
-In lazy-loaded pages, it can be useful to wait until an element is visible with [Page.WaitForSelectorAsync(selector, options)](./api/class-page.mdx#pagewaitforselectorasyncselector-options). Alternatively, page interactions like [Page.ClickAsync(selector, options)](./api/class-page.mdx#pageclickasyncselector-options) auto-wait for elements.
+In lazy-loaded pages, it can be useful to wait until an element is visible with [Page.WaitForSelectorAsync(selector, options)](./api/class-page.mdx#page-wait-for-selector). Alternatively, page interactions like [Page.ClickAsync(selector, options)](./api/class-page.mdx#page-click) auto-wait for elements.
 
 ```csharp
 // Click will auto-wait for the element and trigger navigation
@@ -113,7 +113,7 @@ await page.FillAsync("#username", "John Doe");
 
 ### Asynchronous navigation
 
-Clicking an element could trigger asynchronous processing before initiating the navigation. In these cases, it is recommended to explicitly call [Page.RunAndWaitForNavigationAsync(action, options)](./api/class-page.mdx#pagerunandwaitfornavigationasyncaction-options). For example:
+Clicking an element could trigger asynchronous processing before initiating the navigation. In these cases, it is recommended to explicitly call [Page.RunAndWaitForNavigationAsync(action, options)](./api/class-page.mdx#page-wait-for-navigation). For example:
 * Navigation is triggered from a `setTimeout`
 * Page waits for network requests before navigation
 
@@ -129,7 +129,7 @@ await page.RunAndWaitForNavigationAsync(async () =>
 
 ### Multiple navigations
 
-Clicking an element could trigger multiple navigations. In these cases, it is recommended to explicitly [Page.RunAndWaitForNavigationAsync(action, options)](./api/class-page.mdx#pagerunandwaitfornavigationasyncaction-options) to a specific url. For example:
+Clicking an element could trigger multiple navigations. In these cases, it is recommended to explicitly [Page.RunAndWaitForNavigationAsync(action, options)](./api/class-page.mdx#page-wait-for-navigation) to a specific url. For example:
 * Client-side redirects issued after the `load` event
 * Multiple pushes to history state
 
@@ -148,7 +148,7 @@ await page.RunAndWaitForNavigationAsync(async () =>
 
 ### Loading a popup
 
-When popup is opened, explicitly calling [Page.WaitForLoadStateAsync(state, options)](./api/class-page.mdx#pagewaitforloadstateasyncstate-options) ensures that popup is loaded to the desired state.
+When popup is opened, explicitly calling [Page.WaitForLoadStateAsync(state, options)](./api/class-page.mdx#page-wait-for-load-state) ensures that popup is loaded to the desired state.
 
 ```csharp
 var popup = await page.RunAndWaitForPopupAsync(async () =>
@@ -159,15 +159,15 @@ popup.WaitForLoadStateAsync(LoadState.Load);
 ```
 
 ### API reference
-- [Page.ClickAsync(selector, options)](./api/class-page.mdx#pageclickasyncselector-options)
-- [Page.WaitForLoadStateAsync(state, options)](./api/class-page.mdx#pagewaitforloadstateasyncstate-options)
-- [Page.WaitForSelectorAsync(selector, options)](./api/class-page.mdx#pagewaitforselectorasyncselector-options)
-- [Page.RunAndWaitForNavigationAsync(action, options)](./api/class-page.mdx#pagerunandwaitfornavigationasyncaction-options)
-- [Page.WaitForFunctionAsync(expression, arg, options)](./api/class-page.mdx#pagewaitforfunctionasyncexpression-arg-options)
+- [Page.ClickAsync(selector, options)](./api/class-page.mdx#page-click)
+- [Page.WaitForLoadStateAsync(state, options)](./api/class-page.mdx#page-wait-for-load-state)
+- [Page.WaitForSelectorAsync(selector, options)](./api/class-page.mdx#page-wait-for-selector)
+- [Page.RunAndWaitForNavigationAsync(action, options)](./api/class-page.mdx#page-wait-for-navigation)
+- [Page.WaitForFunctionAsync(expression, arg, options)](./api/class-page.mdx#page-wait-for-function)
 
 ## Advanced patterns
 
-For pages that have complicated loading patterns, [Page.WaitForFunctionAsync(expression, arg, options)](./api/class-page.mdx#pagewaitforfunctionasyncexpression-arg-options) is a powerful and extensible approach to define a custom wait criteria.
+For pages that have complicated loading patterns, [Page.WaitForFunctionAsync(expression, arg, options)](./api/class-page.mdx#page-wait-for-function) is a powerful and extensible approach to define a custom wait criteria.
 
 ```csharp
 await page.GotoAsync("http://example.com");
@@ -177,7 +177,7 @@ await page.ScreenshotAsync();
 ```
 
 ### API reference
-- [Page.WaitForFunctionAsync(expression, arg, options)](./api/class-page.mdx#pagewaitforfunctionasyncexpression-arg-options)
+- [Page.WaitForFunctionAsync(expression, arg, options)](./api/class-page.mdx#page-wait-for-function)
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Browser]: ./api/class-browser.mdx "Browser"

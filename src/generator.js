@@ -16,6 +16,7 @@
 
 //@ts-check
 
+const toKebabCase = require('lodash/kebabCase')
 const fs = require('fs');
 const path = require('path');
 const md = require('./markdown');
@@ -32,6 +33,10 @@ const DIR_SRC = path.join(process.env.SRC_DIR, 'docs', 'src');
 const commonSnippets = new Set(['html', 'xml', 'yml', 'yaml', 'json', 'groovy', 'html', 'bash']);
 
 /**
+ * @typedef {import('./markdown').MarkdownNode} MarkdownNode
+ */
+
+/**
  * @typedef {{
  *   formatMember: function(Documentation.Member): { text: string, args: Documentation.Member[] }[],
  *   formatArgumentName: function(string): string,
@@ -44,8 +49,7 @@ const commonSnippets = new Set(['html', 'xml', 'yml', 'yaml', 'json', 'groovy', 
  */
 
 class Generator {
-  links = new Map();
-  rLinks = new Map();
+  heading2ExplicitId = new Map();
 
   /**
    * @param {string} lang
@@ -127,7 +131,9 @@ import TabItem from '@theme/TabItem';
       for (const { text, args } of this.formatter.formatMember(member)) {
         /** @type {MarkdownNode} */
         const memberNode = { type: 'h2', children: [] };
-        memberNode.text = text;
+        if (!this.heading2ExplicitId.has(member))
+          throw new Error(`Header ${text} needs to have an explicit ID`)
+        memberNode.text = `${text} {#${this.heading2ExplicitId.get(member)}}`;
         memberNode.children.push(...args.map(a => this.renderProperty(`\`${this.formatter.formatArgumentName(a.alias)}\``, a, a.spec, 'in')));
   
         // Append type
@@ -255,19 +261,8 @@ import TabItem from '@theme/TabItem';`);
    * @param {string} file
    * @param {string} text
    */
-  createLink(file, text) {
-    const key = file + '#' + text;
-    if (this.links.has(key))
-      return this.links.get(key);
-    const baseLink = file + '#' + text.toLowerCase().split(',').map(c => c.replace(/[^a-z_]/g, '')).join('-');
-    let link = baseLink;
-    let index = 0;
-    while (this.rLinks.has(link))
-      link = baseLink + '-' + (++index);
-    const result = `[${text}](${link})`;
-    this.links.set(key, result);
-    this.rLinks.set(link, text);
-    return result;
+  createLink(file, text, hash) {
+    return `[${text}](${file}#${hash})`;
   }
 
   /**
@@ -276,7 +271,9 @@ import TabItem from '@theme/TabItem';`);
    */
   createMemberLink(member) {
     const file = `./api/class-${member.clazz.name.toLowerCase()}.md`;
-    return this.formatter.formatMember(member).map(f => this.createLink(file, f.text));
+    const hash = calculateHeadingHash(member)
+    this.heading2ExplicitId.set(member, hash)
+    return this.formatter.formatMember(member).map(f => this.createLink(file, f.text, hash));
   }
 
   /**
@@ -450,6 +447,19 @@ function listFiles(dir, base, result) {
         result.add('./' + path.relative(base, path.join(dir, name)));
     }
   }
+}
+
+/**
+ * @param {Documentation.Member} member 
+ * @returns {String}
+ */
+function calculateHeadingHash(member) {
+  const className = toKebabCase(member.clazz.name);
+  const memberName = toKebabCase(member.name);
+  if (member.kind === 'property' || member.kind === 'method')
+    return `${className}-${memberName}`.toLowerCase();
+  else if (member.kind === 'event')
+    return `${className}-event-${memberName}`.toLowerCase();
 }
 
 module.exports = { Generator, toTitleCase, toSnakeCase, renderJSSignature };

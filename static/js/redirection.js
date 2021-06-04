@@ -18,7 +18,30 @@ if (path) {
 }
 
 window.addEventListener("load", () => {
+  const availableIds = [...document.querySelectorAll("[id]")].map(e => e.id)
+  const currentHash = window.location.hash.length > 0 ? window.location.hash.substring(1) : '';
+  const currentHashIsFound = availableIds.includes(currentHash)
+  if (currentHash && !currentHashIsFound) {
+    const headingFound = [...document.querySelectorAll("div.markdown > h2")]
+      .find(element => element.textContent.replace(/[ ]+/g, '-').replace(/[^\w-_]/g, '').replace("#", "").toLowerCase() === currentHash)
+    if (headingFound) {
+      const newHash = headingFound.querySelector("a").id
+      window.location.hash =  newHash
+    }
+  }
+})
+
+const languagesInSubfolders = ['java', 'dotnet', 'python'];
+
+window.addEventListener("load", () => {
   if ("serviceWorker" in navigator) {
-    navigator.serviceWorker.register("./sw.js");
+    const language = languagesInSubfolders.find(lang => window.location.pathname.startsWith(`/${lang}`));
+    let serviceWorkerPath;
+    if (language)
+      serviceWorkerPath = `/${language}/sw.js`;
+    else
+      serviceWorkerPath = `/sw.js`;
+
+    navigator.serviceWorker.register(serviceWorkerPath);
   }
 });

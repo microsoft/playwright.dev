@@ -33,7 +33,7 @@ module.exports = {
   projectName: "playwright.dev",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "throw",
-  scripts: ["js/redirection.js"],
+  scripts: ["/java/js/redirection.js"],
   favicon: "img/playwright-logo.svg",
   themeConfig: {
     colorMode: {
@@ -76,6 +76,24 @@ module.exports = {
           dropdownItemsAfter: [{ to: "/versions", label: "All versions" }],
           // Do not add the link active class when browsing docs.
           dropdownActiveClassDisabled: true,
+        },
+        {
+          label: 'Java',
+          position: 'left',
+          items: [
+            {
+              label: 'Java',
+              'data-language-prefix': '/java/',
+            },
+            {
+              label: 'Node.js',
+              'data-language-prefix': '/',
+            },
+            {
+              label: 'Python',
+              'data-language-prefix': '/python/',
+            },
+          ],
         },
       ],
     },
