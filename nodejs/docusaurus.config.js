@@ -154,7 +154,6 @@ module.exports = {
         hashed: true,
         language: ["en", "zh"],
         searchResultLimits: 10,
-        highlightSearchTermsOnTargetPage: true,
       },
     ],
   ],
