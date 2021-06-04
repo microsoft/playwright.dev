@@ -91,6 +91,7 @@ class JavaScriptFormatter {
       if (tabs.length) {
         if (tabs.length === 1)
           throw new Error('Bad js tab group: ' + md.render(spec));
+        tabs.sort((t1, t2) => tabWeight(t2.value) - tabWeight(t1.value));
 
         // Validate group consistency.
         const groupId = tabs[0].groupId;
@@ -133,6 +134,13 @@ function tabLabel(type) {
     return 'TypeScript';
   if (type === 'js')
     return 'JavaScript';
+}
+
+function tabWeight(type) {
+  if (type === 'ts')
+    return 2;
+  if (type === 'js')
+    return 1;
 }
 
 module.exports = { JavaScriptFormatter };
