@@ -65,22 +65,22 @@ Consider an example where we run a new http server per worker process, and use `
 
 <Tabs
   groupId="js-flavor"
-  defaultValue="js"
+  defaultValue="ts"
   values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'}
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
   ]
 }>
-<TabItem value="js">
+<TabItem value="ts">
 
 ```js
-// my-test.js
-const base = require('@playwright/test');
-const http = require('http');
+// my-test.ts
+import { test as base } from '@playwright/test';
+import * as http from 'http';
 
 // Note how we mark the fixture as { scope: 'worker' }.
 // Also note that we pass empty {} first, since we do not declare any test fixtures.
-exports.test = base.test.extend<{}, { server: http.Server }>({
+export const test = base.extend<{}, { server: http.Server }>({
   server: [ async ({}, use, workerInfo) => {
     // Start the server.
     const server = http.createServer();
@@ -97,16 +97,16 @@ exports.test = base.test.extend<{}, { server: http.Server }>({
 ```
 
 </TabItem>
-<TabItem value="ts">
+<TabItem value="js">
 
 ```js
-// my-test.ts
-import { test as base } from '@playwright/test';
-import * as http from 'http';
+// my-test.js
+const base = require('@playwright/test');
+const http = require('http');
 
 // Note how we mark the fixture as { scope: 'worker' }.
 // Also note that we pass empty {} first, since we do not declare any test fixtures.
-export const test = base.extend<{}, { server: http.Server }>({
+exports.test = base.test.extend<{}, { server: http.Server }>({
   server: [ async ({}, use, workerInfo) => {
     // Start the server.
     const server = http.createServer();
@@ -156,17 +156,17 @@ Here is an example test that saves some information:
 
 <Tabs
   groupId="js-flavor"
-  defaultValue="js"
+  defaultValue="ts"
   values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'}
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
   ]
 }>
-<TabItem value="js">
+<TabItem value="ts">
 
 ```js
-// example.spec.js
-const { test } = require('@playwright/test');
+// example.spec.ts
+import { test } from '@playwright/test';
 
 test('my test needs a file', async ({ table }, testInfo) => {
   // Do something with the table...
@@ -177,11 +177,11 @@ test('my test needs a file', async ({ table }, testInfo) => {
 ```
 
 </TabItem>
-<TabItem value="ts">
+<TabItem value="js">
 
 ```js
-// example.spec.ts
-import { test } from '@playwright/test';
+// example.spec.js
+const { test } = require('@playwright/test');
 
 test('my test needs a file', async ({ table }, testInfo) => {
   // Do something with the table...
@@ -198,23 +198,23 @@ Here is an example fixture that automatically saves debug logs when the test fai
 
 <Tabs
   groupId="js-flavor"
-  defaultValue="js"
+  defaultValue="ts"
   values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'}
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
   ]
 }>
-<TabItem value="js">
+<TabItem value="ts">
 
 ```js
-// my-test.js
-const debug = require('debug');
-const fs = require('fs');
-const base = require('@playwright/test');
+// my-test.ts
+import * as debug from 'debug';
+import * as fs from 'fs';
+import { test as base } from '@playwright/test';
 
 // Note how we mark the fixture as { auto: true }.
 // This way it is always instantiated, even if the test does not use it explicitly.
-exports.test = base.test.extend<{ saveLogs: void }>({
+export const test = base.extend<{ saveLogs: void }>({
   saveLogs: [ async ({}, use, testInfo) => {
     const logs = [];
     debug.log = (...args) => logs.push(args.map(String).join(''));
@@ -229,17 +229,17 @@ exports.test = base.test.extend<{ saveLogs: void }>({
 ```
 
 </TabItem>
-<TabItem value="ts">
+<TabItem value="js">
 
 ```js
-// my-test.ts
-import * as debug from 'debug';
-import * as fs from 'fs';
-import { test as base } from '@playwright/test';
+// my-test.js
+const debug = require('debug');
+const fs = require('fs');
+const base = require('@playwright/test');
 
 // Note how we mark the fixture as { auto: true }.
 // This way it is always instantiated, even if the test does not use it explicitly.
-export const test = base.extend<{ saveLogs: void }>({
+exports.test = base.test.extend<{ saveLogs: void }>({
   saveLogs: [ async ({}, use, testInfo) => {
     const logs = [];
     debug.log = (...args) => logs.push(args.map(String).join(''));
@@ -266,33 +266,12 @@ Here is a global setup example that runs an app.
 
 <Tabs
   groupId="js-flavor"
-  defaultValue="js"
+  defaultValue="ts"
   values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'}
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
   ]
 }>
-<TabItem value="js">
-
-```js
-// global-setup.js
-const app = require('./my-app');
-
-module.exports = async () => {
-  const server = require('http').createServer(app);
-  await new Promise(done => server.listen(done));
-
-  // Expose port to the tests.
-  process.env.SERVER_PORT = String(server.address().port);
-
-  // Return the teardown function.
-  return async () => {
-    await new Promise(done => server.close(done));
-  };
-};
-```
-
-</TabItem>
 <TabItem value="ts">
 
 ```js
@@ -316,28 +295,39 @@ export default globalSetup;
 ```
 
 </TabItem>
+<TabItem value="js">
+
+```js
+// global-setup.js
+const app = require('./my-app');
+
+module.exports = async () => {
+  const server = require('http').createServer(app);
+  await new Promise(done => server.listen(done));
+
+  // Expose port to the tests.
+  process.env.SERVER_PORT = String(server.address().port);
+
+  // Return the teardown function.
+  return async () => {
+    await new Promise(done => server.close(done));
+  };
+};
+```
+
+</TabItem>
 </Tabs>
 
 Now add `globalSetup` option to the configuration file.
 
 <Tabs
   groupId="js-flavor"
-  defaultValue="js"
+  defaultValue="ts"
   values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'}
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
   ]
 }>
-<TabItem value="js">
-
-```js
-// playwright.config.js
-module.export = {
-  globalSetup: 'global-setup.ts',
-};
-```
-
-</TabItem>
 <TabItem value="ts">
 
 ```js
@@ -351,6 +341,16 @@ export default config;
 ```
 
 </TabItem>
+<TabItem value="js">
+
+```js
+// playwright.config.js
+module.export = {
+  globalSetup: 'global-setup.ts',
+};
+```
+
+</TabItem>
 </Tabs>
 
 ## Projects
@@ -361,33 +361,12 @@ To make use of this feature, we will declare an "option fixture" for the backend
 
 <Tabs
   groupId="js-flavor"
-  defaultValue="js"
+  defaultValue="ts"
   values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'}
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
   ]
 }>
-<TabItem value="js">
-
-```js
-// my-test.js
-const base = require('@playwright/test');
-const { startBackend } = require('./my-backend');
-
-exports.test = base.test.extend<{ version: string, backendUrl: string }>({
-  // Default value for the version.
-  version: '1.0',
-
-  // Use version when starting the backend.
-  backendUrl: async ({ version }, use) => {
-    const app = await startBackend(version);
-    await use(app.baseUrl());
-    await app.close();
-  },
-});
-```
-
-</TabItem>
 <TabItem value="ts">
 
 ```js
@@ -409,23 +388,44 @@ export const test = base.extend<{ version: string, backendUrl: string }>({
 ```
 
 </TabItem>
+<TabItem value="js">
+
+```js
+// my-test.js
+const base = require('@playwright/test');
+const { startBackend } = require('./my-backend');
+
+exports.test = base.test.extend<{ version: string, backendUrl: string }>({
+  // Default value for the version.
+  version: '1.0',
+
+  // Use version when starting the backend.
+  backendUrl: async ({ version }, use) => {
+    const app = await startBackend(version);
+    await use(app.baseUrl());
+    await app.close();
+  },
+});
+```
+
+</TabItem>
 </Tabs>
 
 We can use our fixtures in the test.
 
 <Tabs
   groupId="js-flavor"
-  defaultValue="js"
+  defaultValue="ts"
   values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'}
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
   ]
 }>
-<TabItem value="js">
+<TabItem value="ts">
 
 ```js
-// example.spec.js
-const { test } = require('./my-test');
+// example.spec.ts
+import { test } from './my-test';
 
 test('test 1', async ({ page, backendUrl }) => {
   await page.goto(`${backendUrl}/index.html`);
@@ -441,11 +441,11 @@ test('test 2', async ({ version, page, backendUrl }) => {
 ```
 
 </TabItem>
-<TabItem value="ts">
+<TabItem value="js">
 
 ```js
-// example.spec.ts
-import { test } from './my-test';
+// example.spec.js
+const { test } = require('./my-test');
 
 test('test 1', async ({ page, backendUrl }) => {
   await page.goto(`${backendUrl}/index.html`);
@@ -467,32 +467,12 @@ Now, we can run test in multiple configurations by using projects.
 
 <Tabs
   groupId="js-flavor"
-  defaultValue="js"
+  defaultValue="ts"
   values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'}
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
   ]
 }>
-<TabItem value="js">
-
-```js
-// playwright.config.js
-module.exports = {
-  timeout: 20000,
-  projects: [
-    {
-      name: 'v1',
-      use: { version: '1.0' },
-    },
-    {
-      name: 'v2',
-      use: { version: '2.0' },
-    },
-  ]
-};
-```
-
-</TabItem>
 <TabItem value="ts">
 
 ```js
@@ -513,6 +493,26 @@ const config: PlaywrightTestConfig = {
   ]
 };
 export default config;
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// playwright.config.js
+module.exports = {
+  timeout: 20000,
+  projects: [
+    {
+      name: 'v1',
+      use: { version: '1.0' },
+    },
+    {
+      name: 'v2',
+      use: { version: '2.0' },
+    },
+  ]
+};
 ```
 
 </TabItem>
@@ -538,39 +538,12 @@ In this example we add a custom `toBeWithinRange` function in the configuration 
 
 <Tabs
   groupId="js-flavor"
-  defaultValue="js"
+  defaultValue="ts"
   values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'}
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
   ]
 }>
-<TabItem value="js">
-
-```js
-// playwright.config.js
-const { expect } = require('@playwright/test');
-
-expect.extend({
-  toBeWithinRange(received: number, floor: number, ceiling: number) {
-    const pass = received >= floor && received <= ceiling;
-    if (pass) {
-      return {
-        message: () => 'passed',
-        pass: true,
-      };
-    } else {
-      return {
-        message: () => 'failed',
-        pass: false,
-      };
-    }
-  },
-});
-
-module.exports = {};
-```
-
-</TabItem>
 <TabItem value="ts">
 
 ```js
@@ -599,23 +572,50 @@ export default config;
 ```
 
 </TabItem>
+<TabItem value="js">
+
+```js
+// playwright.config.js
+const { expect } = require('@playwright/test');
+
+expect.extend({
+  toBeWithinRange(received: number, floor: number, ceiling: number) {
+    const pass = received >= floor && received <= ceiling;
+    if (pass) {
+      return {
+        message: () => 'passed',
+        pass: true,
+      };
+    } else {
+      return {
+        message: () => 'failed',
+        pass: false,
+      };
+    }
+  },
+});
+
+module.exports = {};
+```
+
+</TabItem>
 </Tabs>
 
 Now we can use `toBeWithinRange` in the test.
 
 <Tabs
   groupId="js-flavor"
-  defaultValue="js"
+  defaultValue="ts"
   values={[
-    {label: 'JavaScript', value: 'js'},
-    {label: 'TypeScript', value: 'ts'}
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
   ]
 }>
-<TabItem value="js">
+<TabItem value="ts">
 
 ```js
-// example.spec.js
-const { test, expect } = require('@playwright/test');
+// example.spec.ts
+import { test, expect } from '@playwright/test';
 
 test('numeric ranges', () => {
   expect(100).toBeWithinRange(90, 110);
@@ -624,11 +624,11 @@ test('numeric ranges', () => {
 ```
 
 </TabItem>
-<TabItem value="ts">
+<TabItem value="js">
 
 ```js
-// example.spec.ts
-import { test, expect } from '@playwright/test';
+// example.spec.js
+const { test, expect } = require('@playwright/test');
 
 test('numeric ranges', () => {
   expect(100).toBeWithinRange(90, 110);
