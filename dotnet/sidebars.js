@@ -7,9 +7,11 @@ module.exports = {
         { "type": "doc", "id": "why-playwright" },
         { "type": "doc", "id": "intro" },
         { "type": "doc", "id": "core-concepts" },
+        { "type": "doc", "id": "cli" },
         { "type": "doc", "id": "debug" },
         { "type": "doc", "id": "languages" },
-        { "type": "doc", "id": "release-notes" }
+        { "type": "doc", "id": "release-notes" },
+        { "type": "doc", "id": "test-runners" }
       ],
       "collapsed": false
     },
@@ -46,8 +48,7 @@ module.exports = {
       "label": "Integrations",
       "items": [
         { "type": "doc", "id": "docker" },
-        { "type": "doc", "id": "ci" },
-        { "type": "doc", "id": "cli" }
+        { "type": "doc", "id": "ci" }
       ],
       "collapsed": false
     },
@@ -87,6 +88,7 @@ module.exports = {
             { "type": "doc", "id": "api/class-selectors" },
             { "type": "doc", "id": "api/class-timeouterror" },
             { "type": "doc", "id": "api/class-touchscreen" },
+            { "type": "doc", "id": "api/class-tracing" },
             { "type": "doc", "id": "api/class-video" },
             { "type": "doc", "id": "api/class-websocket" },
             { "type": "doc", "id": "api/class-websocketframe" },
