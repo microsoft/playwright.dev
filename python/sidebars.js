@@ -7,9 +7,11 @@ module.exports = {
         { "type": "doc", "id": "why-playwright" },
         { "type": "doc", "id": "intro" },
         { "type": "doc", "id": "core-concepts" },
+        { "type": "doc", "id": "cli" },
         { "type": "doc", "id": "debug" },
         { "type": "doc", "id": "languages" },
-        { "type": "doc", "id": "release-notes" }
+        { "type": "doc", "id": "release-notes" },
+        { "type": "doc", "id": "test-runners" }
       ],
       "collapsed": false
     },
@@ -45,10 +47,8 @@ module.exports = {
       "type": "category",
       "label": "Integrations",
       "items": [
-        { "type": "doc", "id": "test-runners" },
         { "type": "doc", "id": "docker" },
-        { "type": "doc", "id": "ci" },
-        { "type": "doc", "id": "cli" }
+        { "type": "doc", "id": "ci" }
       ],
       "collapsed": false
     },
