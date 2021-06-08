@@ -63,6 +63,11 @@ class JavaFormatter {
     return text;
   }
 
+  /**
+   * @param {Documentation.Type} type 
+   * @param {string} direction
+   * @param {Documentation.Member} member
+   */
   renderType(type, direction, member) {
     if (member.kind === 'property' && member.name === 'options') {
       const method = member.enclosingMethod;
@@ -96,7 +101,7 @@ class JavaFormatter {
           case 'Page.setInputFiles.files': return '`FilePayload`';
         }
         if (!type.templates)
-          return `\`${toTitleCase(member.alias)}\``;
+          return `${toTitleCase(member.alias)}`;
         return '[Map]';
       }
       case 'path': return '[Path]';
