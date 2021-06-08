@@ -59,9 +59,6 @@ class JavaScriptFormatter {
     return `[Promise]<${text}>`;
   }
 
-  /**
-   * @param {Documentation.Type} type 
-   */
   renderType(type) {
     const text = type.name;
     switch (text) {

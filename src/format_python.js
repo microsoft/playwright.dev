@@ -65,10 +65,6 @@ class PythonFormatter {
     return text;
   }
 
-  /**
-   * @param {Documentation.Type} type 
-   * @param {string} direction
-   */
   renderType(type, direction) {
     const text = type.name;
     switch (text) {

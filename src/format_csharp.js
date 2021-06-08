@@ -72,22 +72,16 @@ class CSharpFormatter {
     return text;
   }
 
-  /**
-   * @param {Documentation.Type} type 
-   * @param {string} direction
-   * @param {Documentation.Member} member
-   */
   renderType(type, direction, member) {
     if (member.kind === 'property' && member.name === 'options') {
       const method = member.enclosingMethod;
-      return `\`${toTitleCase(method.clazz.varName)}${toTitleCase(method.alias, { omitAsync: true })}Options?\``;
+      return `\`${toTitleCase(method.clazz.varName)}${toTitleCase(method.alias, { omitAsync: true })}Options\``;
     }
-    const optionalSuffix = member.required ? '' : '?';
     const text = type.name;
     switch (text) {
-      case 'any': return `[object]${optionalSuffix}`;
-      case 'Array': return `[IEnumerable]${optionalSuffix}`;
-      case 'float': return `[double]${optionalSuffix}`;
+      case 'any': return '[object]';
+      case 'Array': return '[IEnumerable]';
+      case 'float': return '[double]';
       case 'function': {
         switch (fullName(member)) {
           case 'BrowserContext.exposeBinding.callback': return '[Action]<BindingSource, T, [TResult]>';
@@ -105,7 +99,7 @@ class CSharpFormatter {
       case 'Object': {
         // FIXME: generate correct type for accessibility snapshot children.
         if (member.name === 'children') {
-          return `[IEnumerable]${optionalSuffix}`;
+          return '[IEnumerable]';
         }
         switch (fullName(member)) {
           case 'BrowserContext.addCookies.cookies': return '`Cookie`';
@@ -119,19 +113,19 @@ class CSharpFormatter {
           case 'Page.setInputFiles.files': return '`FilePayload`';
         }
         if (!type.templates)
-          return `${toTitleCase(member.alias)}${optionalSuffix}`;
-        return `[Map]${optionalSuffix}`;
+          return `\`${toTitleCase(member.alias)}\``;
+        return '[Map]';
       }
-      case 'path': return `[string]${optionalSuffix}`;
-      case 'RegExp': return `[Regex]${optionalSuffix}`;
-      case 'string': return `[string]${optionalSuffix}`;
+      case 'path': return '[string]';
+      case 'RegExp': return '[Regex]';
+      case 'string': return '[string]';
       // Escape '[' and ']' so that they don't break markdown links like [byte[]](link)
-      case 'Buffer': return `[byte&#91;&#93;]${optionalSuffix}`;
-      case 'Readable': return `[Stream]${optionalSuffix}`;
-      case 'Serializable': return `[object]${optionalSuffix}`;
-      case 'URL': return `[string]${optionalSuffix}`;
+      case 'Buffer': return '[byte&#91;&#93;]';
+      case 'Readable': return '[Stream]';
+      case 'Serializable': return '[object]';
+      case 'URL': return '[string]';
     }
-    return `[${text}]${optionalSuffix}`;
+    return `[${text}]`;
   }
 
   preprocessComment(spec) {
