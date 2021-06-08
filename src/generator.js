@@ -334,7 +334,7 @@ import TabItem from '@theme/TabItem';`);
     const result = {
       type: 'li',
       liType: 'default',
-      text: `${name} <${typeText}>${comment ? ' ' + comment : ''}`,
+      text: `${name} &#60;${typeText}&#62;${comment ? ' ' + comment : ''}`,
       children
     };
     return result;
@@ -352,10 +352,17 @@ import TabItem from '@theme/TabItem';`);
         const values = type.union.map(l => l.name.substring(1, l.name.length - 1).replace('-', '_').toLocaleUpperCase());
         return `\`enum ${type.name} { ${values.join(', ')} }\``;
       }
-      return type.union.map(l => this.renderType(l, direction, member)).join('|');
+      let union = type.union;
+      if (this.lang === 'csharp' && type.union.length && type.union[0].name === 'null') {
+        union = type.union.slice(1);
+        member.required = false;
+      }
+      return union.map(l => this.renderType(l, direction, member)).join('|');
     }
     if (type.templates)
-      return `${this.renderTypeName(type, direction, member)}${this.formatter.formatTemplate(type.templates.map(l => this.renderType(l, direction, member)).join(', '))}`;
+      return `${this.renderTypeName(type, direction, member)}${this.formatter.formatTemplate(type.templates.map(l => {
+        return this.renderType(l, direction, /** @type {Documentation.Member} */({ ...member, required: true }));
+      }).join(', '))}`;
     if (type.args)
       return `${this.formatter.formatFunction(type.args.map(l => this.renderType(l, direction, member)).join(', '), type.returnType ? ':' + this.renderType(type.returnType, direction, member) : '', type)}`;
     if (type.name.startsWith('"'))
