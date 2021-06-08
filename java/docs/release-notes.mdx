@@ -14,31 +14,6 @@ import TabItem from '@theme/TabItem';
 
 ## Version 1.12
 
-#### ⚡️ Introducing Playwright TestRunner
-
-[Playwright TestRunner](./test-intro.mdx) is a **new test runner** built from scratch by Playwright team specifically to accommodate end-to-end testing needs:
-- Run tests across all browsers.
-- Execute tests in parallel.
-- Enjoy context isolation and sensible defaults out of the box.
-- Capture videos, screenshots and other artifacts on failure.
-- Integrate your POMs as extensible fixtures.
-
-Installation:
-
-```bash
-npm i -D @playwright/test
-```
-
-Simple test `tests/foo.spec.ts`:
-
-Running:
-
-```bash
-npx playwright test -c tests
-```
-
-👉  Read more in [testrunner documentation](./test-intro.mdx).
-
 #### 🧟‍♂️ Introducing Playwright Trace Viewer
 
 [Playwright Trace Viewer](./trace-viewer.mdx) is a new GUI tool that helps exploring recorded Playwright traces after the script ran. Playwright traces let you examine:
@@ -47,6 +22,23 @@ npx playwright test -c tests
 - browser network during script execution
 
 Traces are recorded using the new [BrowserContext.tracing()](./api/class-browsercontext.mdx#browser-context-tracing) API:
+
+```java
+Browser browser = chromium.launch();
+BrowserContext context = browser.newContext();
+
+// Start tracing before creating / navigating a page.
+context.tracing.start(new Tracing.StartOptions()
+  .setScreenshots(true)
+  .setSnapshots(true);
+
+Page page = context.newPage();
+page.goto("https://playwright.dev");
+
+// Stop tracing and export it into a zip archive.
+context.tracing.stop(new Tracing.StopOptions()
+  .setPath(Paths.get("trace.zip")));
+```
 
 Traces are examined later with the Playwright CLI:
 
