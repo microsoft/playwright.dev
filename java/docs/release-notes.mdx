@@ -5,11 +5,67 @@ title: "Release notes"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
+- [Version 1.12](#version-112)
 - [Version 1.11](#version-111)
 - [Version 1.10](#version-110)
 - [Version 1.9](#version-19)
 - [Version 1.8](#version-18)
 - [Version 1.7](#version-17)
+
+## Version 1.12
+
+#### 🧟‍♂️ Introducing Playwright Trace Viewer
+
+[Playwright Trace Viewer](./trace-viewer.mdx) is a new GUI tool that helps exploring recorded Playwright traces after the script ran. Playwright traces let you examine:
+- page DOM before and after each Playwright action
+- page rendering before and after each Playwright action
+- browser network during script execution
+
+Traces are recorded using the new [BrowserContext.tracing()](./api/class-browsercontext.mdx#browser-context-tracing) API:
+
+```java
+Browser browser = chromium.launch();
+BrowserContext context = browser.newContext();
+
+// Start tracing before creating / navigating a page.
+context.tracing.start(new Tracing.StartOptions()
+  .setScreenshots(true)
+  .setSnapshots(true);
+
+Page page = context.newPage();
+page.goto("https://playwright.dev");
+
+// Stop tracing and export it into a zip archive.
+context.tracing.stop(new Tracing.StopOptions()
+  .setPath(Paths.get("trace.zip")));
+```
+
+Traces are examined later with the Playwright CLI:
+
+That will open the following GUI:
+
+![image](https://user-images.githubusercontent.com/746130/121109654-d66c4480-c7c0-11eb-8d4d-eb70d2b03811.png)
+
+👉 Read more in [trace viewer documentation](./trace-viewer.mdx).
+
+#### Browser Versions
+- Chromium 93.0.4530.0
+- Mozilla Firefox 89.0
+- WebKit 14.2
+
+This version of Playwright was also tested against the following stable channels:
+- Google Chrome 91
+- Microsoft Edge 91
+
+#### New APIs
+- `reducedMotion` option in [Page.emulateMedia([options])](./api/class-page.mdx#page-emulate-media), [BrowserType.launchPersistentContext(userDataDir[, options])](./api/class-browsertype.mdx#browser-type-launch-persistent-context), [Browser.newContext([options])](./api/class-browser.mdx#browser-new-context) and [Browser.newPage([options])](./api/class-browser.mdx#browser-new-page)
+- [BrowserContext.onRequest(handler)](./api/class-browsercontext.mdx#browser-context-event-request)
+- [BrowserContext.onRequestFailed(handler)](./api/class-browsercontext.mdx#browser-context-event-request-failed)
+- [BrowserContext.onRequestFinished(handler)](./api/class-browsercontext.mdx#browser-context-event-request-finished)
+- [BrowserContext.onResponse(handler)](./api/class-browsercontext.mdx#browser-context-event-response)
+- `tracesDir` option in [BrowserType.launch([options])](./api/class-browsertype.mdx#browser-type-launch) and [BrowserType.launchPersistentContext(userDataDir[, options])](./api/class-browsertype.mdx#browser-type-launch-persistent-context)
+- new [BrowserContext.tracing()](./api/class-browsercontext.mdx#browser-context-tracing) API namespace
+- new [Download.page()](./api/class-download.mdx#download-page) method
 
 ## Version 1.11
 
