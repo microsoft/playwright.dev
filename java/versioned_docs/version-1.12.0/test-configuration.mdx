@@ -1,0 +1,178 @@
+---
+id: test-configuration
+title: "Configuration"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+- [Configure browser, context, videos and screenshots](#configure-browser-context-videos-and-screenshots)
+- [Testing options](#testing-options)
+- [Different options for each browser](#different-options-for-each-browser)
+- [Mobile emulation](#mobile-emulation)
+- [Network mocking](#network-mocking)
+
+## Configure browser, context, videos and screenshots
+
+Playwright Tests supports browser and context options that you typically pass to [BrowserType.launch([options])](./api/class-browsertype.mdx#browser-type-launch) and [Browser.newContext([options])](./api/class-browser.mdx#browser-new-context) methods, for example `headless`, `viewport` or `ignoreHTTPSErrors`. It also provides options to record video for the test or capture screenshot at the end.
+
+You can specify any options either locally in a test file, or globally in the configuration file.
+- Browser options match [BrowserType.launch([options])](./api/class-browsertype.mdx#browser-type-launch) method.
+- Context options match [Browser.newContext([options])](./api/class-browser.mdx#browser-new-context) method.
+- `screenshot` option - whether to capture a screenshot after each test, off by default. Screenshot will appear in the test output directory, typically `test-results`.
+  - `'off'` - Do not capture screenshots.
+  - `'on'` - Capture screenshot after each test.
+  - `'only-on-failure'` - Capture screenshot after each test failure.
+- `trace` option - whether to record trace for each test, off by default. Trace will appear in the test output directory, typically `test-results`.
+  - `'off'` - Do not record trace.
+  - `'on'` - Record trace for each test.
+  - `'retain-on-failure'` - Record trace for each test, but remove it from successful test runs.
+  - `'retry-with-trace'` - Record trace only when retrying a test.
+- `video` option - whether to record video for each test, off by default. Video will appear in the test output directory, typically `test-results`.
+  - `'off'` - Do not record video.
+  - `'on'` - Record video for each test.
+  - `'retain-on-failure'` - Record video for each test, but remove all videos from successful test runs.
+  - `'retry-with-video'` - Record video only when retrying a test.
+
+### Global configuration
+
+Create `playwright.config.js` (or `playwright.config.ts`) and specify options in the `use` section.
+
+Now run tests as usual, Playwright Test will pick up the configuration file automatically.
+
+```bash
+npx playwright test --browser=firefox
+```
+
+If you put your configuration file in a different place, pass it with `--config` option.
+
+```bash
+npx playwright test --config=tests/my.config.js
+```
+
+### Local configuration
+
+With `test.use()` you can override some options for a file or a `test.describe` block.
+
+The same works inside describe.
+
+## Testing options
+
+In addition to configuring [Browser] or [BrowserContext], videos or screenshots, Playwright Test has many options to configure how your tests are run. Below are the most common ones, see [advanced configuration](./test-advanced.mdx) for the full list.
+- `forbidOnly`: Whether to exit with an error if any tests are marked as `test.only`. Useful on CI.
+- `globalSetup`: Path to the global setup file. This file will be required and run before all the tests. It must export a single function.
+- `globalTeardown`: Path to the global teardown file. This file will be required and run after all the tests. It must export a single function.
+- `retries`: The maximum number of retry attempts per test.
+- `testDir`: Directory with the test files.
+- `testIgnore`: Glob patterns or regular expressions that should be ignored when looking for the test files. For example, `'**/test-assets'`.
+- `testMatch`: Glob patterns or regular expressions that match test files. For example, `'**/todo-tests/*.spec.ts'`. By default, Playwright Test runs `.*(test|spec)\.(js|ts|mjs)` files.
+- `timeout`: Time in milliseconds given to each test.
+- `workers`: The maximum number of concurrent worker processes to use for parallelizing tests.
+
+You can specify these options in the configuration file.
+
+## Different options for each browser
+
+To specify different options per browser, for example command line arguments for Chromium, create multiple projects in your configuration file. Below is an example that runs all tests in three browsers, with different options.
+
+Playwright Test will run all projects by default.
+
+```bash
+$ npx playwright test
+
+Running 3 tests using 3 workers
+
+  ✓ example.spec.ts:3:1 › [Chromium] should work (2s)
+  ✓ example.spec.ts:3:1 › [Firefox] should work (2s)
+  ✓ example.spec.ts:3:1 › [WebKit] should work (2s)
+```
+
+Use `--project` command line option to run a single project.
+
+```bash
+$ npx playwright test --project=webkit
+
+Running 1 test using 1 worker
+
+  ✓ example.spec.ts:3:1 › [WebKit] should work (2s)
+```
+
+There are many more things you can do with projects:
+- Run a subset of test by specifying different `testDir` for each project.
+- Run tests in multiple configurations, for example with desktop Chromium and emulating Chrome for Android.
+- Run "core" tests without retries to ensure stability of the core functionality, and use `retries` for other tests.
+- And much more! See [advanced configuration](./test-advanced.mdx) for more details.
+
+:::note
+`--browser` command line option is not compatible with projects. Specify `browserName` in each project instead.
+:::
+
+## Mobile emulation
+
+You can use configuration file to make default `context` emulate a mobile device.
+
+Here is an example configuration that runs tests in "Pixel 4" and "iPhone 11" emulation modes. Note that it uses the [projects](./test-advanced.mdx#projects) feature to run the same set of tests in multiple configurations.
+
+## Network mocking
+
+You don't have to configure anything to mock network requests. Just define a custom [Route] that mocks network for a browser context.
+
+Alternatively, you can use [Page.route(url, handler)](./api/class-page.mdx#page-route) to mock network in a single test.
+
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[PlaywrightException]: ./api/class-playwrightexception.mdx "PlaywrightException"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./core-concepts.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
+[byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
+[Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
+[double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
+[InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
+[int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"
+[Map]: https://docs.oracle.com/javase/8/docs/api/java/util/Map.html "Map"
+[null]: https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.7 "null"
+[Object]: https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html "Object"
+[Path]: https://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html "Path"
+[Pattern]: https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html "Pattern"
+[Predicate]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Predicate.html "Predicate"
+[void]: https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html "void"
+[Runnable]: https://docs.oracle.com/javase/8/docs/api/java/lang/Runnable.html "Runnable"
+[RuntimeException]: https://docs.oracle.com/javase/8/docs/api/java/lang/RuntimeException.html "RuntimeException"
+[String]: https://docs.oracle.com/javase/8/docs/api/java/lang/String.html "String"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/java/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright-java "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright-java/blob/master/Dockerfile.focal "Dockerfile.focal"

@@ -1,0 +1,289 @@
+---
+id: test-intro
+title: "Introduction"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Playwright Test Runner was created specifically to accommodate the needs of the end-to-end testing. It does everything you would expect from the regular test runner, and more. Playwright test allows to:
+- Run tests across all browsers.
+- Execute tests in parallel.
+- Enjoy context isolation out of the box.
+- Capture videos, screenshots and other artifacts on failure.
+- Integrate your POMs as extensible fixtures.
+
+<br/>
+
+- [Installation](#installation)
+- [First test](#first-test)
+- [Test fixtures](#test-fixtures)
+- [Test and assertion features](#test-and-assertion-features)
+- [Learn the command line](#learn-the-command-line)
+- [Create a configuration file](#create-a-configuration-file)
+
+<br/>
+
+## Installation
+
+Playwright has its own test runner for end-to-end tests.
+
+```bash
+npm i -D @playwright/test
+```
+
+## First test
+
+Create `tests/foo.spec.js` (or `tests/foo.spec.ts` for TypeScript) to define your test.
+
+Now run your tests, assuming that test files are in the `tests` directory.
+
+```bash
+npx playwright test -c tests
+```
+
+Playwright Test just ran a test using Chromium browser, in a headless manner. Let's tell it to use headed browser:
+
+```bash
+npx playwright test -c tests --headed
+```
+
+What about other browsers? Let's run the same test using Firefox:
+
+```bash
+npx playwright test -c tests --browser=firefox
+```
+
+And finally, on all three browsers:
+
+```bash
+npx playwright test -c tests --browser=all
+```
+
+Refer to [configuration](./test-configuration.mdx) section for configuring test runs in different modes with different browsers.
+
+## Test fixtures
+
+You noticed an argument `{ page }` that the test above has access to:
+
+We call these arguments `fixtures`. Fixtures are objects that are created for each test run. Playwright Test comes loaded with those fixtures, and you can add your own fixtures as well. When running tests, Playwright Test looks at each test declaration, analyses the set of fixtures the test needs and prepares those fixtures specifically for the test.
+
+Here is a list of the pre-defined fixtures that you are likely to use most of the time:
+
+|Fixture    |Type             |Description                      |
+|:----------|:----------------|:--------------------------------|
+|page       |[Page]           |Isolated page for this test run. |
+|context    |[BrowserContext] |Isolated context for this test run. The `page` fixture belongs to this context as well. Learn how to [configure context](./test-configuration.mdx). |
+|browser    |[Browser]        |Browsers are shared across tests to optimize resources. Learn how to [configure browser](./test-configuration.mdx). |
+|browserName|[string]         |The name of the browser currently running the test. Either `chromium`, `firefox` or `webkit`.|
+
+## Test and assertion features
+
+If you are familiar with test runners like Jest, Mocha and Ava, you will find the Playwright Test syntax familiar. These are the basic things you can do with the test:
+
+### Focus a test
+
+You can focus some tests. When there are focused tests, only they run.
+
+### Skip a test
+
+You can skip certain test based on the condition.
+
+### Group tests
+
+You can group tests to give them a logical name or to scope before/after hooks to the group.
+
+### Use test hooks
+
+You can use `test.beforeAll` and `test.afterAll` hooks to set up and tear down resources shared between tests. And you can use `test.beforeEach` and `test.afterEach` hooks to set up and tear down resources for each test individually.
+
+### Write assertions
+
+Playwright Test uses [expect](https://jestjs.io/docs/expect) library for test assertions. It provides a lot of matchers like `toEqual`, `toContain`, `toMatch`, `toMatchSnapshot` and many more.
+
+Combine `expect` with various Playwright methods to create expectations for your test:
+- [page.is_visible(selector, **kwargs)](./api/class-page.mdx#page-is-visible)
+- [page.wait_for_selector(selector, **kwargs)](./api/class-page.mdx#page-wait-for-selector)
+- [page.text_content(selector, **kwargs)](./api/class-page.mdx#page-text-content)
+- [page.get_attribute(selector, name, **kwargs)](./api/class-page.mdx#page-get-attribute)
+- [page.screenshot(**kwargs)](./api/class-page.mdx#page-screenshot)
+- Find out more in the [assertions](./assertions.mdx) guide
+
+Notice how running this test is saying:
+
+```
+Error: example.spec.ts-snapshots/get-started-chromium-darwin.png is missing in snapshots, writing actual.
+```
+
+That's because there was no golden file for your `get-started.png` snapshot. It is now created and is ready to be added to the repository. The name of the folder with the golden expectations starts with the name of your test file:
+
+```bash
+drwxr-xr-x  5 user  group  160 Jun  4 11:46 .
+drwxr-xr-x  6 user  group  192 Jun  4 11:45 ..
+-rw-r--r--  1 user  group  231 Jun  4 11:16 example.spec.ts
+drwxr-xr-x  3 user  group   96 Jun  4 11:46 example.spec.ts-snapshots
+```
+
+To update your golden files, you can use the `--update-snapshots` parameter.
+
+```bash
+npx playwright test -c tests --update-snapshots
+```
+
+## Learn the command line
+
+Here are the most common options available in the [command line](./test-cli.mdx).
+- Run tests in headed browsers
+
+  ```bash
+  npx playwright test -c tests --headed
+  ```
+
+- Run tests in a particular browser
+
+  ```bash
+  npx playwright test -c tests --browser=webkit
+  ```
+
+- Run tests in all browsers
+
+  ```bash
+  npx playwright test -c tests --browser=all
+  ```
+
+- Run a single test file
+
+  ```bash
+  npx playwright test -c tests tests/todo-page.spec.ts
+  ```
+
+- Run a set of test files
+
+  ```bash
+  npx playwright test -c tests tests/todo-page/ tests/landing-page/
+  ```
+
+- Run a test with specific title
+
+  ```bash
+  npx playwright test -c tests -g "add a todo item"
+  ```
+
+- Run tests [in parallel](./test-parallel.mdx) - that's the default
+
+  ```bash
+  npx playwright test -c tests
+  ```
+
+- Disable [parallelization](./test-parallel.mdx)
+
+  ```bash
+  npx playwright test -c tests --workers=1
+  ```
+
+- Choose a [reporter](./test-reporters.mdx)
+
+  ```bash
+  npx playwright test -c tests --reporter=dot
+  ```
+
+- Run in debug mode with [Playwright Inspector](./inspector.mdx)
+
+  ```bash
+  # Linux/macOS
+  PWDEBUG=1 npx playwright test -c tests
+  
+  # Windows with cmd.exe
+  set PWDEBUG=1
+  npx playwright test -c tests
+  
+  # Windows with PowerShell
+  $env:PWDEBUG=1
+  npx playwright test -c tests
+  ```
+
+## Create a configuration file
+
+So far, we've looked at the zero-config operation of Playwright Test. For a real world application, it is likely that you would want to use a config.
+
+Create `playwright.config.ts` (or `playwright.config.js`) to configure your tests. You can specify browser launch options, run tests in multiple browsers and much more with the config. Here is an example configuration that runs every test in Chromium, Firefox and WebKit, both Desktop and Mobile versions. Look for more options in the [configuration section](./test-configuration.mdx).
+
+Configure NPM script to run tests. Test runner will automatically pick up `playwright.config.js` or `playwright.config.ts`.
+
+```json
+{
+  "scripts": {
+    "test": "npx playwright test"
+  }
+}
+```
+
+If you put your configuration file in a different place, pass it with `--config` option.
+
+```json
+{
+  "scripts": {
+    "test": "npx playwright test --config=tests/example.config.js"
+  }
+}
+```
+
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[Error]: ./api/class-error.mdx "Error"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./core-concepts.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
+[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[bytes]: https://docs.python.org/3/library/stdtypes.html#bytes "bytes"
+[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
+[Exception]: https://docs.python.org/3/library/exceptions.html#Exception "Exception"
+[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
+[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
+[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
+[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
+[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
+[URL]: https://en.wikipedia.org/wiki/URL "URL"
+[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
+[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
+[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
