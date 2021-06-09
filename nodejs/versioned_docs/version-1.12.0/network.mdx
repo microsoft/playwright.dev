@@ -1,0 +1,281 @@
+---
+id: network
+title: "Network"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Playwright provides APIs to **monitor** and **modify** network traffic, both HTTP and HTTPS. Any requests that page does, including [XHRs](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) requests, can be tracked, modified and handled.
+
+- [HTTP Authentication](#http-authentication)
+- [HTTP Proxy](#http-proxy)
+- [Network events](#network-events)
+- [Handle requests](#handle-requests)
+- [Modify requests](#modify-requests)
+- [Abort requests](#abort-requests)
+- [WebSockets](#websockets)
+
+<br/>
+
+## HTTP Authentication
+
+```js
+const context = await browser.newContext({
+  httpCredentials: {
+    username: 'bill',
+    password: 'pa55w0rd',
+  },
+});
+const page = await context.newPage();
+await page.goto('https://example.com');
+```
+
+### API reference
+- [browser.newContext([options])](./api/class-browser.mdx#browser-new-context)
+
+## HTTP Proxy
+
+You can configure pages to load over the HTTP(S) proxy or SOCKSv5. Proxy can be either set globally for the entire browser, or for each browser context individually.
+
+You can optionally specify username and password for HTTP(S) proxy, you can also specify hosts to bypass proxy for.
+
+Here is an example of a global proxy:
+
+```js
+const browser = await chromium.launch({
+  proxy: {
+    server: 'http://myproxy.com:3128',
+    username: 'usr',
+    password: 'pwd'
+  }
+});
+```
+
+When specifying proxy for each context individually, you need to give Playwright a hint that proxy will be set. This is done via passing a non-empty proxy server to the browser itself. Here is an example of a context-specific proxy:
+
+```js
+const browser = await chromium.launch({
+  proxy: { server: 'per-context' }
+});
+const context = await browser.newContext({
+  proxy: { server: 'http://myproxy.com:3128' }
+})
+```
+
+## Network events
+
+You can monitor all the requests and responses:
+
+```js
+const { chromium, webkit, firefox } = require('playwright');
+
+(async () => {
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+
+  // Subscribe to 'request' and 'response' events.
+  page.on('request', request =>
+      console.log('>>', request.method(), request.url()));
+  page.on('response', response =>
+      console.log('<<', response.status(), response.url()));
+  await page.goto('https://example.com');
+
+  await browser.close();
+})();
+```
+
+Or wait for a network response after the button click:
+
+```js
+// Use a glob URL pattern
+const [response] = await Promise.all([
+  page.waitForResponse('**/api/fetch_data'),
+  page.click('button#update'),
+]);
+```
+
+#### Variations
+
+```js
+// Use a RegExp
+const [response] = await Promise.all([
+  page.waitForResponse(/\.jpeg$/),
+  page.click('button#update'),
+]);
+
+// Use a predicate taking a Response object
+const [response] = await Promise.all([
+  page.waitForResponse(response => response.url().includes(token)),
+  page.click('button#update'),
+]);
+```
+
+### API reference
+- [Request]
+- [Response]
+- [page.on('request')](./api/class-page.mdx#page-event-request)
+- [page.on('response')](./api/class-page.mdx#page-event-response)
+- [page.waitForRequest(urlOrPredicate[, options])](./api/class-page.mdx#page-wait-for-request)
+- [page.waitForResponse(urlOrPredicate[, options])](./api/class-page.mdx#page-wait-for-response)
+
+<br/>
+
+## Handle requests
+
+```js
+await page.route('**/api/fetch_data', route => route.fulfill({
+  status: 200,
+  body: testData,
+}));
+await page.goto('https://example.com');
+```
+
+You can mock API endpoints via handling the network quests in your Playwright script.
+
+#### Variations
+
+```js
+// Set up route on the entire browser context.
+// It will apply to popup windows and opened links.
+
+await browserContext.route('**/api/login', route => route.fulfill({
+  status: 200,
+  body: 'accept',
+}));
+await page.goto('https://example.com');
+```
+
+### API reference
+- [browserContext.route(url, handler)](./api/class-browsercontext.mdx#browser-context-route)
+- [browserContext.unroute(url[, handler])](./api/class-browsercontext.mdx#browser-context-unroute)
+- [page.route(url, handler)](./api/class-page.mdx#page-route)
+- [page.unroute(url[, handler])](./api/class-page.mdx#page-unroute)
+- [Route]
+
+<br/>
+
+## Modify requests
+
+```js
+// Delete header
+await page.route('**/*', route => {
+  const headers = route.request().headers();
+  delete headers['X-Secret'];
+  route.continue({headers});
+});
+
+// Continue requests as POST.
+await page.route('**/*', route => route.continue({method: 'POST'}));
+```
+
+You can continue requests with modifications. Example above removes an HTTP header from the outgoing requests.
+
+## Abort requests
+
+```js
+await page.route('**/*.{png,jpg,jpeg}', route => route.abort());
+
+// Abort based on the request type
+await page.route('**/*', route => {
+  return route.request().resourceType() === 'image' ?
+      route.abort() : route.continue();
+});
+```
+
+### API reference
+- [page.route(url, handler)](./api/class-page.mdx#page-route)
+- [browserContext.route(url, handler)](./api/class-browsercontext.mdx#browser-context-route)
+- [route.abort([errorCode])](./api/class-route.mdx#route-abort)
+
+<br/>
+
+## WebSockets
+
+Playwright supports [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) inspection out of the box. Every time WebSocket is created, [page.on('websocket')](./api/class-page.mdx#page-event-web-socket) event is fired. This event contains the [WebSocket] instance for further web socket frames inspection:
+
+```js
+page.on('websocket', ws => {
+  console.log(`WebSocket opened: ${ws.url()}>`);
+  ws.on('framesent', event => console.log(event.payload));
+  ws.on('framereceived', event => console.log(event.payload));
+  ws.on('close', () => console.log('WebSocket closed'));
+});
+```
+
+### API reference
+- [WebSocket]
+- [page.on('websocket')](./api/class-page.mdx#page-event-web-socket)
+- [webSocket.on('framesent')](./api/class-websocket.mdx#web-socket-event-frame-sent)
+- [webSocket.on('framereceived')](./api/class-websocket.mdx#web-socket-event-frame-received)
+- [webSocket.on('close')](./api/class-websocket.mdx#web-socket-event-close)
+
+<br/>
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Android]: ./api/class-android.mdx "Android"
+[AndroidDevice]: ./api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: ./api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: ./api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: ./api/class-androidwebview.mdx "AndroidWebView"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: ./api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: ./api/class-coverage.mdx "Coverage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[Electron]: ./api/class-electron.mdx "Electron"
+[ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Logger]: ./api/class-logger.mdx "Logger"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./core-concepts.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
