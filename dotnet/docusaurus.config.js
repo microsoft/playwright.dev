@@ -68,15 +68,37 @@ module.exports = {
           className: "header-github-link",
           "aria-label": "GitHub repository",
         },
-        // {
-        //   type: "docsVersionDropdown",
-        //   position: "left",
-        //   // Add additional dropdown items at the beginning/end of the dropdown.
-        //   dropdownItemsBefore: [],
-        //   dropdownItemsAfter: [{ to: "/versions", label: "All versions" }],
-        //   // Do not add the link active class when browsing docs.
-        //   dropdownActiveClassDisabled: true,
-        // },
+        {
+          type: "docsVersionDropdown",
+          position: "left",
+          // Add additional dropdown items at the beginning/end of the dropdown.
+          dropdownItemsBefore: [],
+          dropdownItemsAfter: [{ to: "/versions", label: "All versions" }],
+          // Do not add the link active class when browsing docs.
+          dropdownActiveClassDisabled: true,
+        },
+        {
+          label: '.NET',
+          position: 'left',
+          items: [
+            {
+              label: '.NET',
+              'data-language-prefix': '/dotnet/',
+            },
+            {
+              label: 'Node.js',
+              'data-language-prefix': '/',
+            },
+            {
+              label: 'Python',
+              'data-language-prefix': '/python/',
+            },
+            {
+              label: 'Java',
+              'data-language-prefix': '/java/',
+            },
+          ],
+        },
       ],
     },
     footer: {

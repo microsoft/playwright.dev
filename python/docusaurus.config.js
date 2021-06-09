@@ -93,6 +93,10 @@ module.exports = {
               label: 'Java',
               'data-language-prefix': '/java/',
             },
+            {
+              label: '.NET',
+              'data-language-prefix': '/dotnet/',
+            },
           ],
         },
       ],
