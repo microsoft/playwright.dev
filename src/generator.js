@@ -332,11 +332,20 @@ import TabItem from '@theme/TabItem';`);
     if (async)
       typeText = this.formatter.formatPromise(typeText);
 
+    let linkTag = '';
+    let linkAnchor = '';
+    const shouldShowAnchor = !!member.enclosingMethod;
+    if (shouldShowAnchor) {
+      const hash = calculatePropertyHash(member, direction);
+      linkTag = shouldShowAnchor ? `<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="${hash}"/>` : '';
+      linkAnchor = shouldShowAnchor ? `<a href="#${hash}" class="list-anchor">#</a>` : '';
+    }
+
     /** @type {MarkdownNode} */
     const result = {
       type: 'li',
       liType: 'default',
-      text: `${name} &#60;${typeText}&#62;${comment ? ' ' + comment : ''}`,
+      text: `${name}${linkTag} &#60;${typeText}&#62;${comment ? ' ' + comment : ''}${linkAnchor}`,
       children
     };
     return result;
@@ -469,6 +478,21 @@ function calculateHeadingHash(member) {
     return `${className}-${memberName}`.toLowerCase();
   else if (member.kind === 'event')
     return `${className}-event-${memberName}`.toLowerCase();
+}
+
+/**
+ * @param {Documentation.Member} member 
+ * @param {'in'|'out'} direction
+ * @returns {String}
+ */
+function calculatePropertyHash(member, direction) {
+const className = toKebabCase(member.enclosingMethod.clazz.name);
+  const memberName = toKebabCase(member.name);
+  const prefix = `${className}-${memberName}`;
+  if (direction === 'out')
+    return `${prefix}-return`;
+  const propertyName = toKebabCase(member.name);
+  return `${prefix}-param-${propertyName}`.toLowerCase();
 }
 
 module.exports = { Generator, toTitleCase, toSnakeCase, renderJSSignature };
