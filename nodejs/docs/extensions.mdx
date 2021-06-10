@@ -1,37 +1,35 @@
 ---
-id: class-androidsocket
-title: "AndroidSocket"
+id: extensions
+title: "Testing extensions"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-[AndroidSocket] is a way to communicate with a process launched on the [AndroidDevice]. Use [androidDevice.open(command)](./api/class-androiddevice.mdx#android-device-open) to open a socket.
+:::note
+Extensions only work in Chrome / Chromium in non-headless mode.
+:::
 
+The following is code for getting a handle to the [background page](https://developer.chrome.com/extensions/background_pages) of an extension whose source is located in `./my-extension`:
 
-- [androidSocket.on('close')](./api/class-androidsocket.mdx#android-socket-event-close)
-- [androidSocket.on('data')](./api/class-androidsocket.mdx#android-socket-event-data)
-- [androidSocket.close()](./api/class-androidsocket.mdx#android-socket-close)
-- [androidSocket.write(data)](./api/class-androidsocket.mdx#android-socket-write)
+```js
+const { chromium } = require('playwright');
 
-## androidSocket.on('close') {#android-socket-event-close}
+(async () => {
+  const pathToExtension = require('path').join(__dirname, 'my-extension');
+  const userDataDir = '/tmp/test-user-data-dir';
+  const browserContext = await chromium.launchPersistentContext(userDataDir,{
+    headless: false,
+    args: [
+      `--disable-extensions-except=${pathToExtension}`,
+      `--load-extension=${pathToExtension}`
+    ]
+  });
+  const backgroundPage = browserContext.backgroundPages()[0];
+  // Test the background page as you would any other page.
+  await browserContext.close();
+})();
+```
 
-Emitted when the socket is closed.
-
-## androidSocket.on('data') {#android-socket-event-data}
-- type: &#60;[Buffer]&#62;
-
-Emitted when data is available to read from the socket.
-
-## androidSocket.close() {#android-socket-close}
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="android-socket-close-return"/> &#60;[Promise]<[void]>&#62;<a href="#android-socket-close-return" class="list-anchor">#</a>
-
-Closes the socket.
-
-## androidSocket.write(data) {#android-socket-write}
-- `data`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="android-socket-write-option-data"/> &#60;[Buffer]&#62; Data to write.<a href="#android-socket-write-option-data" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="android-socket-write-return"/> &#60;[Promise]<[void]>&#62;<a href="#android-socket-write-return" class="list-anchor">#</a>
-
-Writes some `data` to the socket.
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"

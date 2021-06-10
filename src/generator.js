@@ -487,12 +487,12 @@ function calculateHeadingHash(member) {
  */
 function calculatePropertyHash(member, direction) {
 const className = toKebabCase(member.enclosingMethod.clazz.name);
-  const memberName = toKebabCase(member.name);
+  const memberName = toKebabCase(member.enclosingMethod.name);
   const prefix = `${className}-${memberName}`;
   if (direction === 'out')
     return `${prefix}-return`;
   const propertyName = toKebabCase(member.name);
-  return `${prefix}-param-${propertyName}`.toLowerCase();
+  return `${prefix}-option-${propertyName}`.toLowerCase();
 }
 
 module.exports = { Generator, toTitleCase, toSnakeCase, renderJSSignature };
