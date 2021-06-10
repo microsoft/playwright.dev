@@ -14,6 +14,7 @@ module.exports = {
       ],
       "collapsed": false
     },
+    { "type": "doc", "id": "cheat-sheet" },
     {
       "type": "category",
       "label": "Guides",
@@ -40,6 +41,7 @@ module.exports = {
         { "type": "doc", "id": "trace-viewer" },
         { "type": "doc", "id": "verification" },
         { "type": "doc", "id": "videos" },
+        { "type": "doc", "id": "chrome-extensions" },
       ],
       "collapsed": false
     },

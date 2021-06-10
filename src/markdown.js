@@ -370,12 +370,13 @@ function visit(node, visitor, depth = 0) {
 
 /**
  * @param {MarkdownNode[]} nodes
+ * @param {boolean=} h3
  * @returns {string}
  */
-function generateToc(nodes) {
+function generateToc(nodes, h3) {
   const result = [];
   visitAll(nodes, (node, depth) => {
-    if (node.type === 'h1' || node.type === 'h2') {
+    if (node.type === 'h1' || node.type === 'h2' || (h3 && node.type === 'h3')) {
       let link = node.text.toLowerCase();
       link = link.replace(/[ ]+/g, '-');
       link = link.replace(/[^\w-_]/g, '');

@@ -15,6 +15,7 @@ module.exports = {
       ],
       "collapsed": false
     },
+    { "type": "doc", "id": "cheat-sheet" },
     {
       "type": "category",
       "label": "Guides",
