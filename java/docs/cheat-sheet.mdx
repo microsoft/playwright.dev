@@ -1,53 +1,107 @@
 ---
-id: languages
-title: "Supported languages"
+id: cheat-sheet
+title: "Cheat Sheet"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-The Playwright API is available in multiple languages.
+- [Download & Upload](#download--upload)
+  - [Download file](#download-file)
+  - [Upload file](#upload-file)
+  - [Upload multiple files](#upload-multiple-files)
+  - [Upload from memory](#upload-from-memory)
+  - [Remove selected files](#remove-selected-files)
+  - [Handle file picker](#handle-file-picker)
+- [Manage &#60iframe&#62s](#manage-60iframe62s)
+  - [List frames](#list-frames)
+  - [Frame by `name` attribute](#frame-by-name-attribute)
+  - [Frame by URL](#frame-by-url)
+  - [Frame by selector](#frame-by-selector)
 
-- [JavaScript and TypeScript](#javascript-and-typescript)
-- [Python](#python)
-- [Java](#java)
-- [.NET](#net)
+## Download & Upload
 
-## JavaScript and TypeScript
+### Download file
 
-[Playwright for Node.js](https://playwright.dev/docs/intro/) is available.
-* [NPM](https://www.npmjs.com/package/playwright)
-* [Documentation](https://playwright.dev/docs/intro/)
-* [API](https://playwright.dev/docs/api/class-playwright)
-* [GitHub repo](https://github.com/microsoft/playwright)
+[Learn more](./downloads.mdx)
 
-## Python
+### Upload file
 
-[Playwright for Python](https://playwright.dev/python/docs/intro/) is available.
-* [Documentation](https://playwright.dev/python/docs/intro/)
-* [API](https://playwright.dev/python/docs/api/class-playwright)
-* [Playwright on PyPI](https://pypi.org/project/playwright/)
-* [GitHub repo](https://github.com/microsoft/playwright-python)
-* [Pytest integration](https://github.com/microsoft/playwright-pytest)
-
-## Java
-
-[Playwright for Java](https://playwright.dev/java/docs/intro/) is available.
-* [Documentation](https://playwright.dev/java/docs/intro/)
-* [API](https://playwright.dev/java/docs/api/class-playwright)
-* [GitHub repo](https://github.com/microsoft/playwright-java)
-
-## .NET
-
-[Playwright for .NET](https://playwright.dev/dotnet/docs/intro/) is available.
-* [Documentation](https://playwright.dev/dotnet/docs/intro/)
-* [API](https://playwright.dev/dotnet/docs/api/class-playwright)
-* [GitHub repo](https://github.com/microsoft/playwright-dotnet)
-* [Playwright on NuGet](https://www.nuget.org/packages/Microsoft.Playwright)
-
-```
-dotnet add package Microsoft.Playwright
+```java
+page.setInputFiles("input#upload", Paths.get("myfile.pdf"));
 ```
 
+[Learn more](./input#upload-files)
+
+### Upload multiple files
+
+```java
+page.setInputFiles("input#upload", new Path[] {Paths.get("file1.txt"), Paths.get("file2.txt")});
+```
+
+[Learn more](./input#upload-files)
+
+### Upload from memory
+
+```java
+page.setInputFiles("input#upload", new FilePayload(
+  "file.txt", "text/plain", "this is test".getBytes(StandardCharsets.UTF_8)));
+```
+
+[Learn more](./input#upload-files)
+
+### Remove selected files
+
+```java
+page.setInputFiles("input#upload", new Path[0]);
+```
+
+[Learn more](./input#upload-files)
+
+### Handle file picker
+
+```java
+FileChooser fileChooser = page.waitForFileChooser(() -> {
+  page.click("upload");
+});
+fileChooser.setFiles(Paths.get("myfile.pdf"));
+```
+
+[Learn more](./input#upload-files)
+
+## Manage &#60iframe&#62s
+
+### List frames
+
+```java
+List<Frame> frames = page.frames();
+```
+
+[Learn more](./core-concepts#pages-and-frames)
+
+### Frame by `name` attribute
+
+```java
+Frame frame = page.frame("frame-login");
+```
+
+[Learn more](./core-concepts#pages-and-frames)
+
+### Frame by URL
+
+```java
+Frame frame = page.frameByUrl(Pattern.compile(".*domain.*"));
+```
+
+[Learn more](./core-concepts#pages-and-frames)
+
+### Frame by selector
+
+```java
+ElementHandle frameElementHandle = page.querySelector(".frame-class");
+Frame frame = frameElementHandle.contentFrame();
+```
+
+[Learn more](./core-concepts#pages-and-frames)
 
 [Browser]: ./api/class-browser.mdx "Browser"
 [BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"

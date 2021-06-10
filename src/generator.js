@@ -214,6 +214,8 @@ import TabItem from '@theme/TabItem';
     for (const node of nodes) {
       if (node.text === '<!-- TOC -->')
         node.text = md.generateToc(nodes);
+      if (node.text === '<!-- TOC3 -->')
+        node.text = md.generateToc(nodes, true);
     }
     nodes = this.formatComment(nodes);
     md.visitAll(nodes, node => {
