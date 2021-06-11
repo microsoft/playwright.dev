@@ -162,4 +162,7 @@ module.exports = {
     ],
   ],
   plugins,
+  customFields: {
+    repositoryName: "playwright",
+  },
 };
