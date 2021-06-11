@@ -139,7 +139,7 @@ module.exports = {
           items: [
             {
               label: "GitHub",
-              href: "https://github.com/microsoft/playwright-sharp",
+              href: "https://github.com/microsoft/playwright-dotnet",
             },
           ],
         },
@@ -166,4 +166,7 @@ module.exports = {
     ],
   ],
   plugins,
+  customFields: {
+    repositoryName: "playwright-dotnet",
+  },
 };
