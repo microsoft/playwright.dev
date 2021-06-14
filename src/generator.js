@@ -308,8 +308,9 @@ import TabItem from '@theme/TabItem';`);
    * @param {MarkdownNode[]} spec
    * @param {'in'|'out'} direction
    * @param {boolean=} async
+   * @param {Documentation.Member=} parentMember
    */
-  renderProperty(name, member, spec, direction, async) {
+  renderProperty(name, member, spec, direction, async, parentMember) {
     let comment = '';
     if (spec && spec.length)
       comment = spec[0].text;
@@ -323,7 +324,7 @@ import TabItem from '@theme/TabItem';`);
           alias = `set${toTitleCase(alias)}`;
         if (this.lang === 'csharp' && member.kind === 'property' && direction === 'in')
           alias = toTitleCase(alias);
-        return this.renderProperty(`\`${alias}\``, p, p.spec, direction, false)
+        return this.renderProperty(`\`${alias}\``, p, p.spec, direction, false, member)
       });
     else if (spec && spec.length > 1)
       children = spec.slice(1).map(s => md.clone(s));
@@ -334,11 +335,12 @@ import TabItem from '@theme/TabItem';`);
 
     let linkTag = '';
     let linkAnchor = '';
-    const shouldShowAnchor = !!member.enclosingMethod;
-    if (shouldShowAnchor) {
-      const hash = calculatePropertyHash(member, direction);
-      linkTag = shouldShowAnchor ? `<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="${hash}"/>` : '';
-      linkAnchor = shouldShowAnchor ? `<a href="#${hash}" class="list-anchor">#</a>` : '';
+    if (member.enclosingMethod) {
+      const hash = calculatePropertyHash(member, parentMember, direction);
+      if (hash === 'page-expose-binding-option-handle')
+        debugger
+      linkTag = `<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="${hash}"/>`;
+      linkAnchor = `<a href="#${hash}" class="list-anchor">#</a>`;
     }
 
     /** @type {MarkdownNode} */
@@ -482,17 +484,19 @@ function calculateHeadingHash(member) {
 
 /**
  * @param {Documentation.Member} member 
+ * @param {Documentation.Member|undefined} parentMember 
  * @param {'in'|'out'} direction
  * @returns {String}
  */
-function calculatePropertyHash(member, direction) {
-const className = toKebabCase(member.enclosingMethod.clazz.name);
+function calculatePropertyHash(member, parentMember, direction) {
+  const className = toKebabCase(member.enclosingMethod.clazz.name);
   const memberName = toKebabCase(member.enclosingMethod.name);
   const prefix = `${className}-${memberName}`;
   if (direction === 'out')
     return `${prefix}-return`;
   const propertyName = toKebabCase(member.name);
-  return `${prefix}-option-${propertyName}`.toLowerCase();
+  const propertyDescription = parentMember?.name === 'options' ? 'option': 'param';
+  return `${prefix}-${propertyDescription}-${propertyName}`.toLowerCase();
 }
 
 module.exports = { Generator, toTitleCase, toSnakeCase, renderJSSignature };
