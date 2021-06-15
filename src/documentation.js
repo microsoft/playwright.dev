@@ -304,8 +304,11 @@ Documentation.Member = class {
     };
     this.async = false;
     this.alias = name;
-    /** @type {'param' | 'option'} */
-    this.argType = null;
+    /** 
+     * Param is true and option false
+     * @type {Boolean}
+     */
+    this.paramOrOption = null;
   }
 
   index() {
@@ -347,7 +350,7 @@ Documentation.Member = class {
   clone() {
     const result = new Documentation.Member(this.kind, this.langs, this.name, this.type, this.argsArray, this.spec, this.required);
     result.async = this.async;
-    result.argType = this.argType;
+    result.paramOrOption = this.paramOrOption;
     return result;
   }
 

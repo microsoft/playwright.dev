@@ -132,7 +132,7 @@ class ApiParser {
       throw new Error('Invalid member name ' + spec.text);
     if (match[1] === 'param') {
       const arg = this.parseProperty(spec);
-      arg.argType = 'param';
+      arg.paramOrOption = true;
       arg.name = name;
       const existingArg = method.argsArray.find(m => m.name === arg.name);
       if (existingArg && isTypeOverride(existingArg, arg)) {
@@ -154,7 +154,7 @@ class ApiParser {
       }
       const p = this.parseProperty(spec);
       p.required = false;
-      p.argType = 'option';
+      p.paramOrOption = false;
       options.type.properties.push(p);
     }
   }

@@ -330,7 +330,7 @@ import TabItem from '@theme/TabItem';`);
 
     let linkTag = '';
     let linkAnchor = '';
-    if (member.enclosingMethod) {
+    if (member.enclosingMethod && member.name !== 'options') {
       const hash = calculatePropertyHash(member, direction);
       linkTag = `<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="${hash}"/>`;
       linkAnchor = `<a href="#${hash}" class="list-anchor">#</a>`;
@@ -487,7 +487,7 @@ function calculatePropertyHash(member, direction) {
   if (direction === 'out')
     return `${prefix}-return`;
   const propertyName = toKebabCase(member.name);
-  const propertyDescription = member.argType === 'option' ? 'option' : 'param';
+  const propertyDescription = member.paramOrOption ? 'param' : 'option';
   return `${prefix}-${propertyDescription}-${propertyName}`.toLowerCase();
 }
 
