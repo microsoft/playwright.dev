@@ -33,10 +33,6 @@ const DIR_SRC = path.join(process.env.SRC_DIR, 'docs', 'src');
 const commonSnippets = new Set(['html', 'xml', 'yml', 'yaml', 'json', 'groovy', 'html', 'bash']);
 
 /**
- * @typedef {import('./markdown').MarkdownNode} MarkdownNode
- */
-
-/**
  * @typedef {{
  *   formatMember: function(Documentation.Member): { text: string, args: Documentation.Member[] }[],
  *   formatArgumentName: function(string): string,
@@ -337,8 +333,6 @@ import TabItem from '@theme/TabItem';`);
     let linkAnchor = '';
     if (member.enclosingMethod) {
       const hash = calculatePropertyHash(member, parentMember, direction);
-      if (hash === 'page-expose-binding-option-handle')
-        debugger
       linkTag = `<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="${hash}"/>`;
       linkAnchor = `<a href="#${hash}" class="list-anchor">#</a>`;
     }
@@ -495,7 +489,7 @@ function calculatePropertyHash(member, parentMember, direction) {
   if (direction === 'out')
     return `${prefix}-return`;
   const propertyName = toKebabCase(member.name);
-  const propertyDescription = parentMember?.name === 'options' ? 'option': 'param';
+  const propertyDescription = parentMember?.name === 'options' ? 'option' : 'param';
   return `${prefix}-${propertyDescription}-${propertyName}`.toLowerCase();
 }
 
