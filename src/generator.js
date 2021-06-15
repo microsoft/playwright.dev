@@ -33,10 +33,6 @@ const DIR_SRC = path.join(process.env.SRC_DIR, 'docs', 'src');
 const commonSnippets = new Set(['html', 'xml', 'yml', 'yaml', 'json', 'groovy', 'html', 'bash']);
 
 /**
- * @typedef {import('./markdown').MarkdownNode} MarkdownNode
- */
-
-/**
  * @typedef {{
  *   formatMember: function(Documentation.Member): { text: string, args: Documentation.Member[] }[],
  *   formatArgumentName: function(string): string,
@@ -332,11 +328,19 @@ import TabItem from '@theme/TabItem';`);
     if (async)
       typeText = this.formatter.formatPromise(typeText);
 
+    let linkTag = '';
+    let linkAnchor = '';
+    if (member.enclosingMethod && member.name !== 'options') {
+      const hash = calculatePropertyHash(member, direction);
+      linkTag = `<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="${hash}"/>`;
+      linkAnchor = `<a href="#${hash}" class="list-anchor">#</a>`;
+    }
+
     /** @type {MarkdownNode} */
     const result = {
       type: 'li',
       liType: 'default',
-      text: `${name} &#60;${typeText}&#62;${comment ? ' ' + comment : ''}`,
+      text: `${name}${linkTag} &#60;${typeText}&#62;${comment ? ' ' + comment : ''}${linkAnchor}`,
       children
     };
     return result;
@@ -469,6 +473,22 @@ function calculateHeadingHash(member) {
     return `${className}-${memberName}`.toLowerCase();
   else if (member.kind === 'event')
     return `${className}-event-${memberName}`.toLowerCase();
+}
+
+/**
+ * @param {Documentation.Member} member 
+ * @param {'in'|'out'} direction
+ * @returns {String}
+ */
+function calculatePropertyHash(member, direction) {
+  const className = toKebabCase(member.enclosingMethod.clazz.name);
+  const memberName = toKebabCase(member.enclosingMethod.name);
+  const prefix = `${className}-${memberName}`;
+  if (direction === 'out')
+    return `${prefix}-return`;
+  const propertyName = toKebabCase(member.name);
+  const propertyDescription = member.paramOrOption ? 'param' : 'option';
+  return `${prefix}-${propertyDescription}-${propertyName}`.toLowerCase();
 }
 
 module.exports = { Generator, toTitleCase, toSnakeCase, renderJSSignature };
