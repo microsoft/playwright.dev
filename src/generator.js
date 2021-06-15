@@ -304,9 +304,8 @@ import TabItem from '@theme/TabItem';`);
    * @param {MarkdownNode[]} spec
    * @param {'in'|'out'} direction
    * @param {boolean=} async
-   * @param {Documentation.Member=} parentMember
    */
-  renderProperty(name, member, spec, direction, async, parentMember) {
+  renderProperty(name, member, spec, direction, async) {
     let comment = '';
     if (spec && spec.length)
       comment = spec[0].text;
@@ -320,7 +319,7 @@ import TabItem from '@theme/TabItem';`);
           alias = `set${toTitleCase(alias)}`;
         if (this.lang === 'csharp' && member.kind === 'property' && direction === 'in')
           alias = toTitleCase(alias);
-        return this.renderProperty(`\`${alias}\``, p, p.spec, direction, false, member)
+        return this.renderProperty(`\`${alias}\``, p, p.spec, direction, false)
       });
     else if (spec && spec.length > 1)
       children = spec.slice(1).map(s => md.clone(s));
@@ -332,7 +331,7 @@ import TabItem from '@theme/TabItem';`);
     let linkTag = '';
     let linkAnchor = '';
     if (member.enclosingMethod) {
-      const hash = calculatePropertyHash(member, parentMember, direction);
+      const hash = calculatePropertyHash(member, direction);
       linkTag = `<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="${hash}"/>`;
       linkAnchor = `<a href="#${hash}" class="list-anchor">#</a>`;
     }
@@ -478,18 +477,17 @@ function calculateHeadingHash(member) {
 
 /**
  * @param {Documentation.Member} member 
- * @param {Documentation.Member|undefined} parentMember 
  * @param {'in'|'out'} direction
  * @returns {String}
  */
-function calculatePropertyHash(member, parentMember, direction) {
+function calculatePropertyHash(member, direction) {
   const className = toKebabCase(member.enclosingMethod.clazz.name);
   const memberName = toKebabCase(member.enclosingMethod.name);
   const prefix = `${className}-${memberName}`;
   if (direction === 'out')
     return `${prefix}-return`;
   const propertyName = toKebabCase(member.name);
-  const propertyDescription = parentMember?.name === 'options' ? 'option' : 'param';
+  const propertyDescription = member.argType === 'option' ? 'option' : 'param';
   return `${prefix}-${propertyDescription}-${propertyName}`.toLowerCase();
 }
 
