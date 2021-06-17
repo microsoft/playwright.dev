@@ -143,7 +143,7 @@ In addition to everything from the [`workerInfo`](#workerinfo), the following in
 - `annotations` - [Annotations](./test-annotations.mdx) that were added to the test.
 - `snapshotSuffix: string` - Suffix used to locate snapshots for the test.
 - `snapshotPath(snapshotName: string)` - Function that returns the full path to a particular snapshot for the test.
-- `outputDir: string` - Absolute path to the output directory for this test run.
+- `outputDir: string` - Path to the output directory for this test run.
 - `outputPath(...pathSegments: string[])` - Function that returns the full path to a particular output artifact for the test.
 
 The following information is accessible after the test body has finished, in fixture teardown:
@@ -261,7 +261,7 @@ exports.test = base.test.extend<{ saveLogs: void }>({
 
 To set something up once before running all tests, use `globalSetup` option in the [configuration file](#configuration-object).
 
-Similarly, use `globalTeardown` to run something once after all the tests. Alternatively, let `globalSetup` return a function that will be used as a global teardown.
+Similarly, use `globalTeardown` to run something once after all the tests. Alternatively, let `globalSetup` return a function that will be used as a global teardown. You can pass data such as port number, authentication tokens, etc. from your global setup to your tests using environment.
 
 Here is a global setup example that runs an app.
 
@@ -349,6 +349,42 @@ export default config;
 module.export = {
   globalSetup: require.resolve('./global-setup'),
 };
+```
+
+</TabItem>
+</Tabs>
+
+Tests will now run after the global setup is done and will have access to the data created in the global setup:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+// test.spec.ts
+import { test } = from '@playwright/test';
+
+test('test', async ({ }) => {
+  console.log(process.env.SERVER_PORT);
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// test.spec.js
+const { test } = require('@playwright/test');
+
+test('test', async ({ }) => {
+  console.log(process.env.SERVER_PORT);
+});
 ```
 
 </TabItem>
