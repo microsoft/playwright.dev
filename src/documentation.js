@@ -507,6 +507,17 @@ Documentation.Type = class {
   }
 
   /**
+    * @returns {Documentation.Member[]}
+  */
+  sortedProperties() {
+    if (!this.properties)
+      return this.properties;
+    const sortedProperties = [...this.properties];
+    sortedProperties.sort((p1, p2) => p1.name.localeCompare(p2.name));
+    return sortedProperties;
+  }
+
+  /**
    * @param {string} lang
    */
   filterForLanguage(lang) {
