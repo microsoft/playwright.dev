@@ -6,6 +6,7 @@ module.exports = {
       "items": [
         { "type": "doc", "id": "why-playwright" },
         { "type": "doc", "id": "intro" },
+        { "type": "doc", "id": "library" },
         { "type": "doc", "id": "core-concepts" },
         { "type": "doc", "id": "cli" },
         { "type": "doc", "id": "debug" },
@@ -14,7 +15,23 @@ module.exports = {
       ],
       "collapsed": false
     },
-    { "type": "doc", "id": "cheat-sheet" },
+    {
+      "type": "category",
+      "label": "Playwright Test",
+      "items": [
+        { "type": "doc", "id": "test-annotations" },
+        { "type": "doc", "id": "test-configuration" },
+        { "type": "doc", "id": "test-parallel" },
+        { "type": "doc", "id": "test-snapshots" },
+        { "type": "doc", "id": "test-reporters" },
+        { "type": "doc", "id": "test-retries" },
+        { "type": "doc", "id": "test-pom" },
+        { "type": "doc", "id": "test-fixtures" },
+        { "type": "doc", "id": "test-advanced" },
+        { "type": "doc", "id": "test-cli" },
+      ],
+      "collapsed": false
+    },
     {
       "type": "category",
       "label": "Guides",
@@ -42,24 +59,6 @@ module.exports = {
         { "type": "doc", "id": "verification" },
         { "type": "doc", "id": "videos" },
         { "type": "doc", "id": "chrome-extensions" },
-      ],
-      "collapsed": false
-    },
-    {
-      "type": "category",
-      "label": "Test runner",
-      "items": [
-        { "type": "doc", "id": "test-intro" },
-        { "type": "doc", "id": "test-annotations" },
-        { "type": "doc", "id": "test-configuration" },
-        { "type": "doc", "id": "test-parallel" },
-        { "type": "doc", "id": "test-snapshots" },
-        { "type": "doc", "id": "test-reporters" },
-        { "type": "doc", "id": "test-retries" },
-        { "type": "doc", "id": "test-pom" },
-        { "type": "doc", "id": "test-fixtures" },
-        { "type": "doc", "id": "test-advanced" },
-        { "type": "doc", "id": "test-cli" },
       ],
       "collapsed": false
     },
