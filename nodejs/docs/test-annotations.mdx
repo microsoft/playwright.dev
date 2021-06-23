@@ -5,7 +5,23 @@ title: "Annotations"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Sadly, tests do not always pass. Luckily, Playwright Test supports test annotations to deal with failures, flakiness and tests that are not yet ready.
+- [Annotations](#annotations)
+- [Focus a test](#focus-a-test)
+- [Skip a test](#skip-a-test)
+- [Group tests](#group-tests)
+- [Tag tests](#tag-tests)
+
+## Annotations
+
+Playwright Test supports test annotations to deal with failures, flakiness, skip, focus and tag tests:
+- `skip` marks the test as irrelevant. Playwright Test does not run such a test. Use this annotation when the test is not applicable in some configuration.
+- `fail` marks the test as failing. Playwright Test will run this test and ensure it does indeed fail. If the test does not fail, Playwright Test will complain.
+- `fixme` marks the test as failing. Playwright Test will not run this test, as opposite to the `fail` annotation. Use `fixme` when running the test is slow or crashy.
+- `slow` marks the test as slow and triples the test timeout.
+
+## Focus a test
+
+You can focus some tests. When there are focused tests, only these tests run.
 
 <Tabs
   groupId="js-flavor"
@@ -18,17 +34,8 @@ Sadly, tests do not always pass. Luckily, Playwright Test supports test annotati
 <TabItem value="ts">
 
 ```js
-// example.spec.ts
-import { test, expect } from '@playwright/test';
-
-test('some feature', async ({ page, browserName }) => {
-  test.skip(browserName !== 'webkit', 'This feature is iOS-only');
-  // Test goes here.
-});
-
-test('broken feature', async ({ page }) => {
-  test.fail();
-  // Test goes here.
+test.only('focus this test', async ({ page }) => {
+  // Run only focused tests in the entire project.
 });
 ```
 
@@ -36,17 +43,88 @@ test('broken feature', async ({ page }) => {
 <TabItem value="js">
 
 ```js
-// example.spec.js
+test.only('focus this test', async ({ page }) => {
+  // Run only focused tests in the entire project.
+});
+```
+
+</TabItem>
+</Tabs>
+
+## Skip a test
+
+You can skip certain tests based on the condition.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+test('skip this test', async ({ page, browserName }) => {
+  test.skip(browserName === 'firefox', 'Still working on it');
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+test('skip this test', async ({ page, browserName }) => {
+  test.skip(browserName === 'firefox', 'Still working on it');
+});
+```
+
+</TabItem>
+</Tabs>
+
+## Group tests
+
+You can group tests to give them a logical name or to scope before/after hooks to the group.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import { test, expect } from '@playwright/test';
+
+test.describe('two tests', () => {
+  test('one', async ({ page }) => {
+    // ...
+  });
+
+  test('two', async ({ page }) => {
+    // ...
+  });
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
 const { test, expect } = require('@playwright/test');
 
-test('some feature', async ({ page, browserName }) => {
-  test.skip(browserName !== 'webkit', 'This feature is iOS-only');
-  // Test goes here.
-});
+test.describe('two tests', () => {
+  test('one', async ({ page }) => {
+    // ...
+  });
 
-test('another feature', async ({ page }) => {
-  test.fail(true, 'Broken, need to fix!');
-  // Test goes here.
+  test('two', async ({ page }) => {
+    // ...
+  });
 });
 ```
 
@@ -60,6 +138,63 @@ Available annotations:
 - `fail` marks the test as failing. Playwright Test will run this test and ensure it does indeed fail. If the test does not fail, Playwright Test will complain.
 - `fixme` marks the test as failing. Playwright Test will not run this test, as opposite to the `fail` annotation. Use `fixme` when running the test is slow or crashy.
 - `slow` marks the test as slow and triples the test timeout.
+
+## Tag tests
+
+Sometimes you want to tag your tests as `@fast` or `@slow` and only run the tests that have the certain tag. We recommend that you use the `--grep` and `--grep-invert` command line flags for that:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import { test, expect } from '@playwright/test';
+
+test('Test login page @fast', async ({ page }) => {
+  // ...
+});
+
+test('Test full report @slow', async ({ page }) => {
+  // ...
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+const { test, expect } = require('@playwright/test');
+
+test('Test login page @fast', async ({ page }) => {
+  // ...
+});
+
+test('Test full report @slow', async ({ page }) => {
+  // ...
+});
+```
+
+</TabItem>
+</Tabs>
+
+You will then be able to run only that test:
+
+```bash
+npx playwright test --grep @fast
+```
+
+Or if you want the opposite, you can skip the tests with a certain tag:
+
+```bash
+npx playwright test --grep-invert @slow
+```
+
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"
