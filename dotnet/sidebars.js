@@ -29,6 +29,7 @@ module.exports = {
         { "type": "doc", "id": "emulation" },
         { "type": "doc", "id": "events" },
         { "type": "doc", "id": "extensibility" },
+        { "type": "doc", "id": "handles" },
         { "type": "doc", "id": "input" },
         { "type": "doc", "id": "inspector" },
         { "type": "doc", "id": "installation" },

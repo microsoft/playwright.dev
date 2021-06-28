@@ -40,6 +40,7 @@ module.exports = {
         { "type": "doc", "id": "assertions" },
         { "type": "doc", "id": "auth" },
         { "type": "doc", "id": "browsers" },
+        { "type": "doc", "id": "chrome-extensions" },
         { "type": "doc", "id": "dialogs" },
         { "type": "doc", "id": "downloads" },
         { "type": "doc", "id": "selectors" },
@@ -58,7 +59,6 @@ module.exports = {
         { "type": "doc", "id": "trace-viewer" },
         { "type": "doc", "id": "verification" },
         { "type": "doc", "id": "videos" },
-        { "type": "doc", "id": "chrome-extensions" },
       ],
       "collapsed": false
     },
