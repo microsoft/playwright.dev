@@ -42,7 +42,7 @@ module.exports = {
         { "type": "doc", "id": "verification" },
         { "type": "doc", "id": "videos" },
       ],
-      "collapsed": false
+      "collapsed": true
     },
     {
       "type": "category",
@@ -51,14 +51,8 @@ module.exports = {
         { "type": "doc", "id": "docker" },
         { "type": "doc", "id": "ci" }
       ],
-      "collapsed": false
+      "collapsed": true
     },
-    {
-      "type": "category",
-      "label": "Get help",
-      "items": [],
-      "collapsed": false
-    }
   ],
   "api": [
     {
