@@ -24,7 +24,7 @@ if (isProd) {
 }
 
 module.exports = {
-  title: "Playwright",
+  title: "Playwright Python",
   tagline: "Fast and reliable end-to-end testing for modern web apps",
   // Repo config for GitHub Pages
   url: "https://playwright.dev",
