@@ -8,6 +8,7 @@ import TabItem from '@theme/TabItem';
 - [Configuration object](#configuration-object)
 - [workerInfo object](#workerinfo-object)
 - [testInfo object](#testinfo-object)
+- [Launching a development web server during the tests](#launching-a-development-web-server-during-the-tests)
 - [Global setup and teardown](#global-setup-and-teardown)
 - [Projects](#projects)
 - [Add custom matchers using expect.extend](#add-custom-matchers-using-expectextend)
@@ -49,6 +50,7 @@ These options would be typically different between local development and CI oper
 - `reportSlowTests: { max: number, threshold: number } | null` - Whether to report slow tests. When `null`, slow tests are not reported. Otherwise, tests that took more than `threshold` milliseconds are reported as slow, but no more than `max` number of them. Passing zero as `max` reports all slow tests that exceed the threshold.
 - `shard: { total: number, current: number } | null` - [Shard](./test-parallel.mdx#shards) information.
 - `updateSnapshots: boolean` - Whether to update expected snapshots with the actual results produced by the test run.
+- `webServer: { command: string, port?: number, cwd?: string, timeout?: number, env?: object }` - Launch a web server before the tests will start. It will automaticially detect the port when it got printed to the stdout.
 - `workers: number` - The maximum number of concurrent worker processes to use for parallelizing tests.
 
 Note that each [test project](#projects) can provide its own test suite options, for example two projects can run different tests by providing different `testDir`s. However, test run options are shared between all projects.
@@ -107,7 +109,7 @@ const http = require('http');
 
 // Note how we mark the fixture as { scope: 'worker' }.
 // Also note that we pass empty {} first, since we do not declare any test fixtures.
-exports.test = base.test.extend<{}, { server: http.Server }>({
+exports.test = base.test.extend({
   server: [ async ({}, use, workerInfo) => {
     // Start the server.
     const server = http.createServer();
@@ -240,7 +242,7 @@ const base = require('@playwright/test');
 
 // Note how we mark the fixture as { auto: true }.
 // This way it is always instantiated, even if the test does not use it explicitly.
-exports.test = base.test.extend<{ saveLogs: void }>({
+exports.test = base.test.extend({
   saveLogs: [ async ({}, use, testInfo) => {
     const logs = [];
     debug.log = (...args) => logs.push(args.map(String).join(''));
@@ -251,6 +253,106 @@ exports.test = base.test.extend<{ saveLogs: void }>({
     if (testInfo.status !== testInfo.expectedStatus)
       fs.writeFileSync(testInfo.outputPath('logs.txt'), logs.join('\n'), 'utf8');
   }, { auto: true } ]
+});
+```
+
+</TabItem>
+</Tabs>
+
+## Launching a development web server during the tests
+
+To launch a web server during the tests, use the `webServer` option in the [configuration file](#configuration-object).
+
+Playwright Test does automatically detect if a localhost URL like `http://localhost:3000` gets printed to the stdout. The port from the printed URL gets then used to check when its accepting requests and passed over to Playwright as a `baseURL` when creating the context [browser.newContext([options])](./api/class-browser.mdx#browser-new-context). You can also manually specify a `port` or additional environment variables, see [here](#configuration-object).
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+// playwright.config.ts
+import { PlaywrightTestConfig } from '@playwright/test';
+
+const config: PlaywrightTestConfig = {
+  webServer: {
+    command: 'npm run start',
+    timeout: 120 * 1000,
+  },
+};
+
+export default config;
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// playwright.config.js
+// @ts-check
+/** @type {import('@playwright/test').PlaywrightTestConfig} */
+const config = {
+  webServer: {
+    command: 'npm run start',
+    timeout: 120 * 1000,
+  },
+};
+
+mode.exports = config;
+```
+
+</TabItem>
+</Tabs>
+
+Now you can use a relative path when navigating the page, or use `baseURL` fixture:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+// test.spec.ts
+import { test } = from '@playwright/test';
+
+test('test', async ({ page, baseURL }) => {
+  // baseURL is taken directly from your web server,
+  // e.g. http://localhost:3000
+  await page.goto(baseURL + '/bar');
+
+  // Alternatively, just use relative path, because baseURL is already
+  // set for the default context and page.
+  // For example, this will result in http://localhost:3000/foo
+  await page.goto('/foo');
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// test.spec.js
+const { test } = require('@playwright/test');
+
+test('test', async ({ page, baseURL }) => {
+  // baseURL is taken directly from your web server,
+  // e.g. http://localhost:3000
+  await page.goto(baseURL + '/bar');
+
+  // Alternatively, just use relative path, because baseURL is already
+  // set for the default context and page.
+  // For example, this will result in http://localhost:3000/foo
+  await page.goto('/foo');
 });
 ```
 
@@ -346,9 +448,12 @@ export default config;
 
 ```js
 // playwright.config.js
-module.export = {
+// @ts-check
+/** @type {import('@playwright/test').PlaywrightTestConfig} */
+const config = {
   globalSetup: require.resolve('./global-setup'),
 };
+module.exports = config;
 ```
 
 </TabItem>
@@ -432,7 +537,7 @@ export const test = base.extend<{ version: string, backendUrl: string }>({
 const base = require('@playwright/test');
 const { startBackend } = require('./my-backend');
 
-exports.test = base.test.extend<{ version: string, backendUrl: string }>({
+exports.test = base.test.extend({
   // Default value for the version.
   version: '1.0',
 
@@ -537,7 +642,10 @@ export default config;
 
 ```js
 // playwright.config.js
-module.exports = {
+// @ts-check
+
+/** @type {import('@playwright/test').PlaywrightTestConfig} */
+const config = {
   timeout: 20000,
   projects: [
     {
@@ -550,6 +658,8 @@ module.exports = {
     },
   ]
 };
+
+module.exports = config;
 ```
 
 </TabItem>
@@ -616,7 +726,7 @@ export default config;
 const { expect } = require('@playwright/test');
 
 expect.extend({
-  toBeWithinRange(received: number, floor: number, ceiling: number) {
+  toBeWithinRange(received, floor, ceiling) {
     const pass = received >= floor && received <= ceiling;
     if (pass) {
       return {
