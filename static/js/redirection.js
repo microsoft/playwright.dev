@@ -15,6 +15,19 @@ if (path) {
   // TODO: use versions
   // http://localhost:3000/#version=master&path=docs%2Femulation.md&q=geolocation
   window.location.href = `${param("path").replace(".md", "")}#${param("q")}`;
+} else {
+  const redirects = [
+    // TODO: enable after publishing 1.13
+    // { from: '/docs/test-intro', to: '/docs/intro' },
+    { from: '/docs/next/test-intro', to: '/docs/next/intro' },
+  ];
+  const pathname = window.location.pathname;
+  for (const redirect of redirects) {
+    if (pathname.endsWith(redirect.from)) {
+      window.location.pathname = pathname.substring(0, pathname.length - redirect.from.length) + redirect.to;
+      break;
+    }
+  }
 }
 
 window.addEventListener("load", () => {
