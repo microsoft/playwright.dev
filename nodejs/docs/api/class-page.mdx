@@ -94,13 +94,14 @@ page.removeListener('request', logRequest);
 - [page.hover(selector[, options])](./api/class-page.mdx#page-hover)
 - [page.innerHTML(selector[, options])](./api/class-page.mdx#page-inner-html)
 - [page.innerText(selector[, options])](./api/class-page.mdx#page-inner-text)
+- [page.inputValue(selector[, options])](./api/class-page.mdx#page-input-value)
 - [page.isChecked(selector[, options])](./api/class-page.mdx#page-is-checked)
 - [page.isClosed()](./api/class-page.mdx#page-is-closed)
 - [page.isDisabled(selector[, options])](./api/class-page.mdx#page-is-disabled)
 - [page.isEditable(selector[, options])](./api/class-page.mdx#page-is-editable)
 - [page.isEnabled(selector[, options])](./api/class-page.mdx#page-is-enabled)
-- [page.isHidden(selector[, options])](./api/class-page.mdx#page-is-hidden)
-- [page.isVisible(selector[, options])](./api/class-page.mdx#page-is-visible)
+- [page.isHidden(selector)](./api/class-page.mdx#page-is-hidden)
+- [page.isVisible(selector)](./api/class-page.mdx#page-is-visible)
 - [page.mainFrame()](./api/class-page.mdx#page-main-frame)
 - [page.opener()](./api/class-page.mdx#page-opener)
 - [page.pause()](./api/class-page.mdx#page-pause)
@@ -746,6 +747,7 @@ const crypto = require('crypto');
 - `selector`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-fill-param-selector"/> &#60;[string]&#62; A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.<a href="#page-fill-param-selector" class="list-anchor">#</a>
 - `value`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-fill-param-value"/> &#60;[string]&#62; Value to fill for the `<input>`, `<textarea>` or `[contenteditable]` element.<a href="#page-fill-param-value" class="list-anchor">#</a>
 - `options` &#60;[Object]&#62;
+  - `force`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-fill-option-force"/> &#60;[boolean]&#62; Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.<a href="#page-fill-option-force" class="list-anchor">#</a>
   - `noWaitAfter`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-fill-option-no-wait-after"/> &#60;[boolean]&#62; Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.<a href="#page-fill-option-no-wait-after" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-fill-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#page-fill-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-fill-return"/> &#60;[Promise]<[void]>&#62;<a href="#page-fill-return" class="list-anchor">#</a>
@@ -825,7 +827,7 @@ Returns the main resource response. In case of multiple redirects, the navigatio
 Navigate to the next page in history.
 
 ## page.goto(url[, options]) {#page-goto}
-- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-goto-param-url"/> &#60;[string]&#62; URL to navigate page to. The url should include scheme, e.g. `https://`.<a href="#page-goto-param-url" class="list-anchor">#</a>
+- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-goto-param-url"/> &#60;[string]&#62; URL to navigate page to. The url should include scheme, e.g. `https://`. When a `baseURL` via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.<a href="#page-goto-param-url" class="list-anchor">#</a>
 - `options` &#60;[Object]&#62;
   - `referer`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-goto-option-referer"/> &#60;[string]&#62; Referer header value. If provided it will take preference over the referer header value set by [page.setExtraHTTPHeaders(headers)](./api/class-page.mdx#page-set-extra-http-headers).<a href="#page-goto-option-referer" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-goto-option-timeout"/> &#60;[number]&#62; Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.setDefaultNavigationTimeout(timeout)](./api/class-page.mdx#page-set-default-navigation-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#page-goto-option-timeout" class="list-anchor">#</a>
@@ -895,6 +897,14 @@ Returns `element.innerHTML`.
 
 Returns `element.innerText`.
 
+## page.inputValue(selector[, options]) {#page-input-value}
+- `selector`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-input-value-param-selector"/> &#60;[string]&#62; A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.<a href="#page-input-value-param-selector" class="list-anchor">#</a>
+- `options` &#60;[Object]&#62;
+  - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-input-value-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#page-input-value-option-timeout" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-input-value-return"/> &#60;[Promise]<[string]>&#62;<a href="#page-input-value-return" class="list-anchor">#</a>
+
+Returns `input.value` for the selected `<input>` or `<textarea>` element. Throws for non-input elements.
+
 ## page.isChecked(selector[, options]) {#page-is-checked}
 - `selector`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-is-checked-param-selector"/> &#60;[string]&#62; A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.<a href="#page-is-checked-param-selector" class="list-anchor">#</a>
 - `options` &#60;[Object]&#62;
@@ -932,18 +942,14 @@ Returns whether the element is [editable](./actionability.mdx#editable).
 
 Returns whether the element is [enabled](./actionability.mdx#enabled).
 
-## page.isHidden(selector[, options]) {#page-is-hidden}
+## page.isHidden(selector) {#page-is-hidden}
 - `selector`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-is-hidden-param-selector"/> &#60;[string]&#62; A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.<a href="#page-is-hidden-param-selector" class="list-anchor">#</a>
-- `options` &#60;[Object]&#62;
-  - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-is-hidden-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#page-is-hidden-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-is-hidden-return"/> &#60;[Promise]<[boolean]>&#62;<a href="#page-is-hidden-return" class="list-anchor">#</a>
 
 Returns whether the element is hidden, the opposite of [visible](./actionability.mdx#visible).  `selector` that does not match any elements is considered hidden.
 
-## page.isVisible(selector[, options]) {#page-is-visible}
+## page.isVisible(selector) {#page-is-visible}
 - `selector`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-is-visible-param-selector"/> &#60;[string]&#62; A selector to search for element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.<a href="#page-is-visible-param-selector" class="list-anchor">#</a>
-- `options` &#60;[Object]&#62;
-  - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-is-visible-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#page-is-visible-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-is-visible-return"/> &#60;[Promise]<[boolean]>&#62;<a href="#page-is-visible-return" class="list-anchor">#</a>
 
 Returns whether the element is [visible](./actionability.mdx#visible). `selector` that does not match any elements is considered not visible.
@@ -1090,7 +1096,7 @@ await browser.close();
 Returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect.
 
 ## page.route(url, handler) {#page-route}
-- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-param-url"/> &#60;[string]|[RegExp]|[function]\([URL]\):[boolean]&#62; A glob pattern, regex pattern or predicate receiving [URL] to match while routing.<a href="#page-route-param-url" class="list-anchor">#</a>
+- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-param-url"/> &#60;[string]|[RegExp]|[function]\([URL]\):[boolean]&#62; A glob pattern, regex pattern or predicate receiving [URL] to match while routing. When a `baseURL` via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.<a href="#page-route-param-url" class="list-anchor">#</a>
 - `handler`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-param-handler"/> &#60;[function]\([Route], [Request]\)&#62; handler function to route the request.<a href="#page-route-param-handler" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-return"/> &#60;[Promise]<[void]>&#62;<a href="#page-route-return" class="list-anchor">#</a>
 
@@ -1163,6 +1169,7 @@ Returns the buffer with the captured screenshot.
   - `label` &#60;[string]&#62; Matches by `option.label`. Optional.
   - `index` &#60;[number]&#62; Matches by the index. Optional.
 - `options` &#60;[Object]&#62;
+  - `force`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-select-option-option-force"/> &#60;[boolean]&#62; Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.<a href="#page-select-option-option-force" class="list-anchor">#</a>
   - `noWaitAfter`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-select-option-option-no-wait-after"/> &#60;[boolean]&#62; Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.<a href="#page-select-option-option-no-wait-after" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-select-option-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#page-select-option-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-select-option-return"/> &#60;[Promise]<[Array]<[string]>>&#62;<a href="#page-select-option-return" class="list-anchor">#</a>
@@ -1492,7 +1499,7 @@ Shortcut for main frame's [frame.waitForNavigation([options])](./api/class-frame
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-request-option-timeout"/> &#60;[number]&#62; Maximum wait time in milliseconds, defaults to 30 seconds, pass `0` to disable the timeout. The default value can be changed by using the [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) method.<a href="#page-wait-for-request-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-request-return"/> &#60;[Promise]<[Request]>&#62;<a href="#page-wait-for-request-return" class="list-anchor">#</a>
 
-Waits for the matching request and returns it.  See [waiting for event](./events.mdx#waiting-for-event) for more details about events.
+Waits for the matching request and returns it. See [waiting for event](./events.mdx#waiting-for-event) for more details about events.
 
 ```js
 // Note that Promise.all prevents a race condition
@@ -1514,7 +1521,7 @@ const [request] = await Promise.all([
 ```
 
 ## page.waitForResponse(urlOrPredicate[, options]) {#page-wait-for-response}
-- `urlOrPredicate`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-response-param-url-or-predicate"/> &#60;[string]|[RegExp]|[function]\([Response]\):[boolean]|[Promise]<[boolean]>&#62; Request URL string, regex or predicate receiving [Response] object.<a href="#page-wait-for-response-param-url-or-predicate" class="list-anchor">#</a>
+- `urlOrPredicate`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-response-param-url-or-predicate"/> &#60;[string]|[RegExp]|[function]\([Response]\):[boolean]|[Promise]<[boolean]>&#62; Request URL string, regex or predicate receiving [Response] object. When a `baseURL` via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.<a href="#page-wait-for-response-param-url-or-predicate" class="list-anchor">#</a>
 - `options` &#60;[Object]&#62;
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-response-option-timeout"/> &#60;[number]&#62; Maximum wait time in milliseconds, defaults to 30 seconds, pass `0` to disable the timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#page-wait-for-response-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-response-return"/> &#60;[Promise]<[Response]>&#62;<a href="#page-wait-for-response-return" class="list-anchor">#</a>
