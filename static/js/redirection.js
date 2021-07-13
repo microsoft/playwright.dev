@@ -17,14 +17,20 @@ if (path) {
   window.location.href = `${param("path").replace(".md", "")}#${param("q")}`;
 } else {
   const redirects = [
+    // ------------------- nodejs ---------------------
     // TODO: enable after publishing 1.13
     // { from: '/docs/test-intro', to: '/docs/intro' },
+    // { from: '/docs/installation', to: '/docs/library' },
     { from: '/docs/next/test-intro', to: '/docs/next/intro' },
+    { from: '/docs/next/installation', to: '/docs/next/library' },
+    // ------------------- python ---------------------
+    // ------------------- dotnet ---------------------
+    // ------------------- java -----------------------
   ];
   const pathname = window.location.pathname;
   for (const redirect of redirects) {
-    if (pathname.endsWith(redirect.from)) {
-      window.location.pathname = pathname.substring(0, pathname.length - redirect.from.length) + redirect.to;
+    if (pathname === redirect.from) {
+      window.location.pathname = redirect.to;
       break;
     }
   }

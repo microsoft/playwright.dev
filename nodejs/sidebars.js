@@ -6,7 +6,6 @@ module.exports = {
       "items": [
         { "type": "doc", "id": "why-playwright" },
         { "type": "doc", "id": "intro" },
-        { "type": "doc", "id": "library" },
         { "type": "doc", "id": "core-concepts" },
         { "type": "doc", "id": "cli" },
         { "type": "doc", "id": "debug" },
@@ -21,14 +20,15 @@ module.exports = {
       "items": [
         { "type": "doc", "id": "test-annotations" },
         { "type": "doc", "id": "test-configuration" },
+        { "type": "doc", "id": "test-pom" },
         { "type": "doc", "id": "test-parallel" },
-        { "type": "doc", "id": "test-snapshots" },
         { "type": "doc", "id": "test-reporters" },
         { "type": "doc", "id": "test-retries" },
-        { "type": "doc", "id": "test-pom" },
-        { "type": "doc", "id": "test-fixtures" },
-        { "type": "doc", "id": "test-advanced" },
+        { "type": "doc", "id": "test-snapshots" },
         { "type": "doc", "id": "test-cli" },
+        { "type": "doc", "id": "test-advanced" },
+        { "type": "doc", "id": "test-fixtures" },
+        { "type": "doc", "id": "test-install" },
       ],
       "collapsed": true
     },
@@ -50,7 +50,6 @@ module.exports = {
         { "type": "doc", "id": "handles" },
         { "type": "doc", "id": "input" },
         { "type": "doc", "id": "inspector" },
-        { "type": "doc", "id": "installation" },
         { "type": "doc", "id": "multi-pages" },
         { "type": "doc", "id": "navigations" },
         { "type": "doc", "id": "network" },
@@ -66,6 +65,7 @@ module.exports = {
       "type": "category",
       "label": "Integrations",
       "items": [
+        { "type": "doc", "id": "library" },
         { "type": "doc", "id": "docker" },
         { "type": "doc", "id": "ci" },
         { "type": "doc", "id": "test-runners" },

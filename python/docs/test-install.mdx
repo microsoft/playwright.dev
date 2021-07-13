@@ -1,29 +1,29 @@
 ---
-id: installation
-title: "Installation"
+id: test-install
+title: "Advanced: installing browsers"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-This is a browser installation guide for Playwright Library. If you are using Playwright Test, please refer to [installing browsers](./test-install.mdx) test guide.
-
+- [Installing browser binaries](#installing-browser-binaries)
+- [Installing a single browser binary](#installing-a-single-browser-binary)
 - [Managing browser binaries](#managing-browser-binaries)
 - [Install behind a firewall or a proxy](#install-behind-a-firewall-or-a-proxy)
 - [Download from artifact repository](#download-from-artifact-repository)
-- [Skip browser downloads](#skip-browser-downloads)
-- [Download single browser binary](#download-single-browser-binary)
 - [Stale browser removal](#stale-browser-removal)
 
-## Managing browser binaries
+## Installing browser binaries
 
-Each version of Playwright needs specific versions of browser binaries to operate. By default, Playwright downloads Chromium, WebKit and Firefox browsers into the OS-specific cache folders:
+Each version of Playwright Test needs specific versions of browser binaries to operate. Playwright Test includes [Command Line Interface](./cli.mdx) that can download these binaries. By default, Playwright Test downloads Chromium, WebKit and Firefox browsers into the OS-specific cache folders:
 - `%USERPROFILE%\AppData\Local\ms-playwright` on Windows
 - `~/Library/Caches/ms-playwright` on MacOS
 - `~/.cache/ms-playwright` on Linux
 
 ```bash
-pip install playwright
-playwright install
+# Add dependency
+npm i -D @playwright/test
+# Download browser binaries
+npx playwright install
 ```
 
 These browsers will take a few hundred megabytes of disk space when installed:
@@ -35,83 +35,83 @@ du -hs ~/Library/Caches/ms-playwright/*
 180M  webkit-XXXX
 ```
 
-You can override default behavior using environment variables. When installing Playwright, ask it to download browsers into a specific location:
+## Installing a single browser binary
+
+Playwright Test downloads Chromium, Firefox and WebKit browsers by default. To install a specific browser, pass it as an argument.
 
 ```bash
-# Linux/macOS
-pip install playwright
-PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers python -m playwright install
-
-# Windows with cmd.exe
-set PLAYWRIGHT_BROWSERS_PATH=%USERPROFILE%\pw-browsers
-pip install playwright
-playwright install
-
-# Windows with PowerShell
-$env:PLAYWRIGHT_BROWSERS_PATH="$env:USERPROFILE\pw-browsers"
-pip install playwright
-playwright install
+npx playwright install webkit
 ```
 
-When running Playwright scripts, ask it to search for browsers in a shared location.
+## Managing browser binaries
+
+You can override default installation behavior using environment variables. When installing browsers, ask Playwright Test to download them into a specific location.
 
 ```bash
 # Linux/macOS
-PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers python playwright_script.js
+PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers npx playwright install
 
 # Windows with cmd.exe
 set PLAYWRIGHT_BROWSERS_PATH=%USERPROFILE%\pw-browsers
-python playwright_script.py
+npx playwright install
 
 # Windows with PowerShell
 $env:PLAYWRIGHT_BROWSERS_PATH="$env:USERPROFILE\pw-browsers"
-python playwright_script.py
+npx playwright install
+```
+
+When running tests, ask it to search for browsers in a shared location.
+
+```bash
+# Linux/macOS
+PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers npx playwright test
+
+# Windows with cmd.exe
+set PLAYWRIGHT_BROWSERS_PATH=%USERPROFILE%\pw-browsers
+npx playwright test
+
+# Windows with PowerShell
+$env:PLAYWRIGHT_BROWSERS_PATH="$env:USERPROFILE\pw-browsers"
+npx playwright test
 ```
 
 Or you can opt into the hermetic install and place binaries in the local folder:
 
 ```bash
 # Linux/macOS
-pip install playwright
-PLAYWRIGHT_BROWSERS_PATH=0 playwright install
+# Places binaries to node_modules/@playwright/test
+PLAYWRIGHT_BROWSERS_PATH=0 npx playwright install
 
 # Windows with cmd.exe
+# Places binaries to node_modules\@playwright\test
 set PLAYWRIGHT_BROWSERS_PATH=0
-pip install playwright
-playwright install
+npx playwright install
 
 # Windows with PowerShell
+# Places binaries to node_modules\@playwright\test
 $env:PLAYWRIGHT_BROWSERS_PATH=0
-pip install playwright
-playwright install
+npx playwright install
 ```
 
-Playwright keeps track of packages that need those browsers and will garbage collect them as you update Playwright to the newer versions.
-
-:::note
-Developers can opt-in in this mode via exporting `PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers` in their `.bashrc`.
-:::
+Playwright Test keeps track of packages that need those browsers and will garbage collect them as you update Playwright Test to the newer versions.
 
 ## Install behind a firewall or a proxy
 
-By default, Playwright downloads browsers from Microsoft CDN.
+By default, Playwright Test downloads browsers from Microsoft CDN.
 
 Sometimes companies maintain an internal proxy that blocks direct access to the public resources. In this case, Playwright can be configured to download browsers via a proxy server.
 
 ```bash
 # Linux/macOS
-pip install playwright
-HTTPS_PROXY=https://192.0.2.1 playwright install
+HTTPS_PROXY=https://192.0.2.1 npx playwright install
 
 # Windows with cmd.exe
 set HTTPS_PROXY=https://192.0.2.1
-pip install playwright
-playwright install
+npx playwright install
 
 # Windows with PowerShell
 $env:HTTPS_PROXY="https://192.0.2.1"
-pip install playwright
-playwright install
+npx playwright install
 ```
 
 ## Download from artifact repository
@@ -122,62 +122,22 @@ Sometimes companies maintain an internal artifact repository to host browser bin
 
 ```bash
 # Linux/macOS
-pip install playwright
-PLAYWRIGHT_DOWNLOAD_HOST=192.0.2.1 playwright install
+PLAYWRIGHT_DOWNLOAD_HOST=192.0.2.1 npx playwright install
 
 # Windows with cmd.exe
 set PLAYWRIGHT_DOWNLOAD_HOST=192.0.2.1
-pip install playwright
-playwright install
+npx playwright install
 
 # Windows with PowerShell
 $env:PLAYWRIGHT_DOWNLOAD_HOST="192.0.2.1"
-pip install playwright
-playwright install
+npx playwright install
 ```
 
-It is also possible to use a per-browser download hosts using `PLAYWRIGHT_CHROMIUM_DOWNLOAD_HOST`, `PLAYWRIGHT_FIREFOX_DOWNLOAD_HOST` and `PLAYWRIGHT_WEBKIT_DOWNLOAD_HOST` env variables that take precedence over `PLAYWRIGHT_DOWNLOAD_HOST`.
-
-```bash
-# Linux/macOS
-pip install playwright
-PLAYWRIGHT_FIREFOX_DOWNLOAD_HOST=203.0.113.3 PLAYWRIGHT_DOWNLOAD_HOST=192.0.2.1 python -m playwright install
-```
-
-## Skip browser downloads
-
-In certain cases, it is desired to avoid browser downloads altogether because browser binaries are managed separately.
-
-This can be done by setting `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` variable before installation.
-
-```bash
-# Linux/macOS
-pip install playwright
-PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 python -m playwright install
-
-# Windows with cmd.exe
-set PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-pip install playwright
-playwright install
-
-# Windows with PowerShell
-$env:PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-pip install playwright
-playwright install
-```
-
-## Download single browser binary
-
-Playwright downloads Chromium, Firefox and WebKit browsers by default. To install a specific browser, pass it as an argument during installation.
-
-```bash
-pip install playwright
-playwright install firefox
-```
+It is also possible to choose a per-browser download host using `PLAYWRIGHT_CHROMIUM_DOWNLOAD_HOST`, `PLAYWRIGHT_FIREFOX_DOWNLOAD_HOST` and `PLAYWRIGHT_WEBKIT_DOWNLOAD_HOST` env variables that take precedence over `PLAYWRIGHT_DOWNLOAD_HOST`.
 
 ## Stale browser removal
 
-Playwright keeps track of the clients that use its browsers. When there are no more clients that require particular version of the browser, that version is deleted from the system. That way you can safely use Playwright instances of different versions and at the same time, you don't waste disk space for the browsers that are no longer in use.
+Playwright Test keeps track of the clients that use its browsers. When there are no more clients that require particular version of the browser, that version is deleted from the system. That way you can safely use Playwright Test instances of different versions and at the same time, you don't waste disk space for the browsers that are no longer in use.
 
 To opt-out from the unused browser removal, you can set the `PLAYWRIGHT_SKIP_BROWSER_GC=1` environment variable.
 
