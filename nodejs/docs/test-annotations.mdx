@@ -10,6 +10,8 @@ import TabItem from '@theme/TabItem';
 - [Skip a test](#skip-a-test)
 - [Group tests](#group-tests)
 - [Tag tests](#tag-tests)
+- [Conditionally skip a group of tests](#conditionally-skip-a-group-of-tests)
+- [Use fixme in `beforeEach` hook](#use-fixme-in-beforeeach-hook)
 
 ## Annotations
 
@@ -18,6 +20,8 @@ Playwright Test supports test annotations to deal with failures, flakiness, skip
 - `fail` marks the test as failing. Playwright Test will run this test and ensure it does indeed fail. If the test does not fail, Playwright Test will complain.
 - `fixme` marks the test as failing. Playwright Test will not run this test, as opposite to the `fail` annotation. Use `fixme` when running the test is slow or crashy.
 - `slow` marks the test as slow and triples the test timeout.
+
+Annotations can be used on a single test or a group of tests. Annotations can be conditional, in which case they apply when the condition is truthy. Annotations may depend on test fixtures. There could be multiple annotations on the same test, possibly in different configurations.
 
 ## Focus a test
 
@@ -131,14 +135,6 @@ test.describe('two tests', () => {
 </TabItem>
 </Tabs>
 
-Annotations apply when the condition is truthy, or always when no condition is passed, and may include a description. Annotations may depend on test fixtures. There could be multiple annotations on the same test, possibly in different configurations.
-
-Available annotations:
-- `skip` marks the test as irrelevant. Playwright Test does not run such a test. Use this annotation when the test is not applicable in some configuration.
-- `fail` marks the test as failing. Playwright Test will run this test and ensure it does indeed fail. If the test does not fail, Playwright Test will complain.
-- `fixme` marks the test as failing. Playwright Test will not run this test, as opposite to the `fail` annotation. Use `fixme` when running the test is slow or crashy.
-- `slow` marks the test as slow and triples the test timeout.
-
 ## Tag tests
 
 Sometimes you want to tag your tests as `@fast` or `@slow` and only run the tests that have the certain tag. We recommend that you use the `--grep` and `--grep-invert` command line flags for that:
@@ -195,6 +191,115 @@ Or if you want the opposite, you can skip the tests with a certain tag:
 npx playwright test --grep-invert @slow
 ```
 
+## Conditionally skip a group of tests
+
+For example, you can run a group of tests just in Chromium by passing a callback.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+// example.spec.ts
+
+test.describe('chromium only', () => {
+  test.skip(({ browserName }) => browserName !== 'chromium', 'Chromium only!');
+
+  test.beforeAll(async () => {
+    // This hook is only run in Chromium.
+  });
+
+  test('test 1', async ({ page }) => {
+    // This test is only run in Chromium.
+  });
+
+  test('test 2', async ({ page }) => {
+    // This test is only run in Chromium.
+  });
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// example.spec.js
+
+test.describe('chromium only', () => {
+  test.skip(({ browserName }) => browserName !== 'chromium', 'Chromium only!');
+
+  test.beforeAll(async () => {
+    // This hook is only run in Chromium.
+  });
+
+  test('test 1', async ({ page }) => {
+    // This test is only run in Chromium.
+  });
+
+  test('test 2', async ({ page }) => {
+    // This test is only run in Chromium.
+  });
+});
+```
+
+</TabItem>
+</Tabs>
+
+## Use fixme in `beforeEach` hook
+
+To avoid running `beforeEach` hooks, you can put annotations in the hook itself.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+// example.spec.ts
+
+test.beforeEach(async ({ page }) => {
+  test.fixme(isMobile, 'Settings page does not work in mobile yet');
+
+  await page.goto('http://localhost:3000/settings');
+});
+
+test('user profile', async ({ page }) => {
+  await page.click('text=My Profile');
+  // ...
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// example.spec.js
+
+test.beforeEach(async ({ page, isMobile }) => {
+  test.fixme(isMobile, 'Settings page does not work in mobile yet');
+
+  await page.goto('http://localhost:3000/settings');
+});
+
+test('user profile', async ({ page }) => {
+  await page.click('text=My Profile');
+  // ...
+});
+```
+
+</TabItem>
+</Tabs>
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"

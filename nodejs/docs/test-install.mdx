@@ -1,24 +1,30 @@
 ---
-id: installation
-title: "Installation"
+id: test-install
+title: "Advanced: installing browsers"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-This is a browser installation guide for Playwright Library. If you are using Playwright Test, please refer to [installing browsers](./test-install.mdx) test guide.
-
+- [Installing browser binaries](#installing-browser-binaries)
+- [Installing a single browser binary](#installing-a-single-browser-binary)
 - [Managing browser binaries](#managing-browser-binaries)
 - [Install behind a firewall or a proxy](#install-behind-a-firewall-or-a-proxy)
 - [Download from artifact repository](#download-from-artifact-repository)
-- [Skip browser downloads](#skip-browser-downloads)
 - [Stale browser removal](#stale-browser-removal)
 
-## Managing browser binaries
+## Installing browser binaries
 
-Each version of Playwright needs specific versions of browser binaries to operate. By default, Playwright downloads Chromium, WebKit and Firefox browsers into the OS-specific cache folders:
+Each version of Playwright Test needs specific versions of browser binaries to operate. Playwright Test includes [Command Line Interface](./cli.mdx) that can download these binaries. By default, Playwright Test downloads Chromium, WebKit and Firefox browsers into the OS-specific cache folders:
 - `%USERPROFILE%\AppData\Local\ms-playwright` on Windows
 - `~/Library/Caches/ms-playwright` on MacOS
 - `~/.cache/ms-playwright` on Linux
+
+```bash
+# Add dependency
+npm i -D @playwright/test
+# Download browser binaries
+npx playwright install
+```
 
 These browsers will take a few hundred megabytes of disk space when installed:
 
@@ -29,23 +35,84 @@ du -hs ~/Library/Caches/ms-playwright/*
 180M  webkit-XXXX
 ```
 
-You can override default behavior using environment variables. When installing Playwright, ask it to download browsers into a specific location:
+## Installing a single browser binary
 
-When running Playwright scripts, ask it to search for browsers in a shared location.
+Playwright Test downloads Chromium, Firefox and WebKit browsers by default. To install a specific browser, pass it as an argument.
+
+```bash
+npx playwright install webkit
+```
+
+## Managing browser binaries
+
+You can override default installation behavior using environment variables. When installing browsers, ask Playwright Test to download them into a specific location.
+
+```bash
+# Linux/macOS
+PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers npx playwright install
+
+# Windows with cmd.exe
+set PLAYWRIGHT_BROWSERS_PATH=%USERPROFILE%\pw-browsers
+npx playwright install
+
+# Windows with PowerShell
+$env:PLAYWRIGHT_BROWSERS_PATH="$env:USERPROFILE\pw-browsers"
+npx playwright install
+```
+
+When running tests, ask it to search for browsers in a shared location.
+
+```bash
+# Linux/macOS
+PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers npx playwright test
+
+# Windows with cmd.exe
+set PLAYWRIGHT_BROWSERS_PATH=%USERPROFILE%\pw-browsers
+npx playwright test
+
+# Windows with PowerShell
+$env:PLAYWRIGHT_BROWSERS_PATH="$env:USERPROFILE\pw-browsers"
+npx playwright test
+```
 
 Or you can opt into the hermetic install and place binaries in the local folder:
 
-Playwright keeps track of packages that need those browsers and will garbage collect them as you update Playwright to the newer versions.
+```bash
+# Linux/macOS
+# Places binaries to node_modules/@playwright/test
+PLAYWRIGHT_BROWSERS_PATH=0 npx playwright install
 
-:::note
-Developers can opt-in in this mode via exporting `PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers` in their `.bashrc`.
-:::
+# Windows with cmd.exe
+# Places binaries to node_modules\@playwright\test
+set PLAYWRIGHT_BROWSERS_PATH=0
+npx playwright install
+
+# Windows with PowerShell
+# Places binaries to node_modules\@playwright\test
+$env:PLAYWRIGHT_BROWSERS_PATH=0
+npx playwright install
+```
+
+Playwright Test keeps track of packages that need those browsers and will garbage collect them as you update Playwright Test to the newer versions.
 
 ## Install behind a firewall or a proxy
 
-By default, Playwright downloads browsers from Microsoft CDN.
+By default, Playwright Test downloads browsers from Microsoft CDN.
 
 Sometimes companies maintain an internal proxy that blocks direct access to the public resources. In this case, Playwright can be configured to download browsers via a proxy server.
+
+```bash
+# Linux/macOS
+HTTPS_PROXY=https://192.0.2.1 npx playwright install
+
+# Windows with cmd.exe
+set HTTPS_PROXY=https://192.0.2.1
+npx playwright install
+
+# Windows with PowerShell
+$env:HTTPS_PROXY="https://192.0.2.1"
+npx playwright install
+```
 
 ## Download from artifact repository
 
@@ -53,32 +120,50 @@ By default, Playwright downloads browsers from Microsoft CDN.
 
 Sometimes companies maintain an internal artifact repository to host browser binaries. In this case, Playwright can be configured to download from a custom location using the `PLAYWRIGHT_DOWNLOAD_HOST` env variable.
 
-It is also possible to use a per-browser download hosts using `PLAYWRIGHT_CHROMIUM_DOWNLOAD_HOST`, `PLAYWRIGHT_FIREFOX_DOWNLOAD_HOST` and `PLAYWRIGHT_WEBKIT_DOWNLOAD_HOST` env variables that take precedence over `PLAYWRIGHT_DOWNLOAD_HOST`.
+```bash
+# Linux/macOS
+PLAYWRIGHT_DOWNLOAD_HOST=192.0.2.1 npx playwright install
 
-## Skip browser downloads
+# Windows with cmd.exe
+set PLAYWRIGHT_DOWNLOAD_HOST=192.0.2.1
+npx playwright install
 
-In certain cases, it is desired to avoid browser downloads altogether because browser binaries are managed separately.
+# Windows with PowerShell
+$env:PLAYWRIGHT_DOWNLOAD_HOST="192.0.2.1"
+npx playwright install
+```
 
-This can be done by setting `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` variable before installation.
+It is also possible to choose a per-browser download host using `PLAYWRIGHT_CHROMIUM_DOWNLOAD_HOST`, `PLAYWRIGHT_FIREFOX_DOWNLOAD_HOST` and `PLAYWRIGHT_WEBKIT_DOWNLOAD_HOST` env variables that take precedence over `PLAYWRIGHT_DOWNLOAD_HOST`.
 
 ## Stale browser removal
 
-Playwright keeps track of the clients that use its browsers. When there are no more clients that require particular version of the browser, that version is deleted from the system. That way you can safely use Playwright instances of different versions and at the same time, you don't waste disk space for the browsers that are no longer in use.
+Playwright Test keeps track of the clients that use its browsers. When there are no more clients that require particular version of the browser, that version is deleted from the system. That way you can safely use Playwright Test instances of different versions and at the same time, you don't waste disk space for the browsers that are no longer in use.
 
 To opt-out from the unused browser removal, you can set the `PLAYWRIGHT_SKIP_BROWSER_GC=1` environment variable.
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Android]: ./api/class-android.mdx "Android"
+[AndroidDevice]: ./api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: ./api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: ./api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: ./api/class-androidwebview.mdx "AndroidWebView"
 [Browser]: ./api/class-browser.mdx "Browser"
 [BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: ./api/class-browserserver.mdx "BrowserServer"
 [BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
 [ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: ./api/class-coverage.mdx "Coverage"
 [Dialog]: ./api/class-dialog.mdx "Dialog"
 [Download]: ./api/class-download.mdx "Download"
+[Electron]: ./api/class-electron.mdx "Electron"
+[ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: ./api/class-filechooser.mdx "FileChooser"
 [Frame]: ./api/class-frame.mdx "Frame"
 [JSHandle]: ./api/class-jshandle.mdx "JSHandle"
 [Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Logger]: ./api/class-logger.mdx "Logger"
 [Mouse]: ./api/class-mouse.mdx "Mouse"
 [Page]: ./api/class-page.mdx "Page"
 [Playwright]: ./api/class-playwright.mdx "Playwright"
@@ -91,7 +176,6 @@ To opt-out from the unused browser removal, you can set the `PLAYWRIGHT_SKIP_BRO
 [Tracing]: ./api/class-tracing.mdx "Tracing"
 [Video]: ./api/class-video.mdx "Video"
 [WebSocket]: ./api/class-websocket.mdx "WebSocket"
-[WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"
 [Worker]: ./api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: ./core-concepts.mdx#evaluation-argument "EvaluationArgument"
@@ -118,14 +202,9 @@ To opt-out from the unused browser removal, you can set the `PLAYWRIGHT_SKIP_BRO
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
 [RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
 [URL]: https://nodejs.org/api/url.html "URL"
-
-[Action]: https://docs.microsoft.com/en-us/dotnet/api/system.action-1?view=net-5.0 "Action"
-[Func]: https://docs.microsoft.com/en-us/dotnet/api/system.func-2?view=net-5.0 "Func"
-[IEnumerable]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.ienumerable?view=net-5.0 "IEnumerable"
-[TResult]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task-1?view=net-5.0 "TResult"
 
 [all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
 [Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
