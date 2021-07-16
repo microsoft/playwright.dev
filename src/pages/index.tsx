@@ -168,6 +168,10 @@ const logos = [
     imageUrl: "img/logos/accessibilityinsights.png",
     href: "https://accessibilityinsights.io/",
   },
+  {
+    imageUrl: "img/logos/JSTOR.png",
+    href: "https://github.com/ithaka/pharos",
+  }
 ];
 
 const Home: React.FC = () => {
