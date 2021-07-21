@@ -1,95 +1,63 @@
 ---
-id: handles
-title: "Handles"
+id: class-workerinfo
+title: "WorkerInfo"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright can create handles to the page DOM elements or any other objects inside the page. These handles live in the Playwright process, whereas the actual objects live in the browser. There are two types of handles:
-- [JSHandle] to reference any JavaScript objects in the page
-- [ElementHandle] to reference DOM elements in the page, it has extra methods that allow performing actions on the elements and asserting their properties.
+`WorkerInfo` contains information about the worker that is running tests. It is available to [test.beforeAll(hookFunction)](./api/class-test.mdx#test-before-all) and [test.afterAll(hookFunction)](./api/class-test.mdx#test-after-all) hooks and worker-scoped fixtures.
 
-Since any DOM element in the page is also a JavaScript object, any [ElementHandle] is a [JSHandle] as well.
-
-Handles are used to perform operations on those actual objects in the page. You can evaluate on a handle, get handle properties, pass handle as an evaluation parameter, serialize page object into JSON etc. See the [JSHandle] class API for these and methods.
-
-### API reference
-- [JSHandle]
-- [ElementHandle]
-
-Here is the easiest way to obtain a [JSHandle].
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
 
 ```js
-const jsHandle = await page.evaluateHandle('window');
-//  Use jsHandle for evaluations.
-```
+import { test, expect } from '@playwright/test';
 
-```js
-const ulElementHandle = await page.waitForSelector('ul');
-//  Use ulElementHandle for actions and evaluation.
-```
-
-## Element Handles
-
-:::note
-It is recommended to use selector-based actions like [page.click(selector[, options])](./api/class-page.mdx#page-click) rather than using the [ElementHandle] for input actions, unless your use case specifically requires the use of handles.
-:::
-
-When [ElementHandle] is required, it is recommended to fetch it with the [page.waitForSelector(selector[, options])](./api/class-page.mdx#page-wait-for-selector) or [frame.waitForSelector(selector[, options])](./api/class-frame.mdx#frame-wait-for-selector) methods. These APIs wait for the element to be attached and visible.
-
-```js
-// Get the element handle
-const elementHandle = page.waitForSelector('#box');
-
-// Assert bounding box for the element
-const boundingBox = await elementHandle.boundingBox();
-expect(boundingBox.width).toBe(100);
-
-// Assert attribute for the element
-const classNames = await elementHandle.getAttribute('class');
-expect(classNames.includes('highlighted')).toBeTruthy();
-```
-
-## Handles as parameters
-
-Handles can be passed into the [page.evaluate(pageFunction[, arg])](./api/class-page.mdx#page-evaluate) and similar methods. The following snippet creates a new array in the page, initializes it with data and returns a handle to this array into Playwright. It then uses the handle in subsequent evaluations:
-
-```js
-// Create new array in page.
-const myArrayHandle = await page.evaluateHandle(() => {
-  window.myArray = [1];
-  return myArray;
+test.beforeAll(async ({ browserName }, workerInfo) => {
+  console.log(`Running ${browserName} in worker #${workerInfo.workerIndex}`);
 });
-
-// Get the length of the array.
-const length = await page.evaluate(a => a.length, myArrayHandle);
-
-// Add one more element to the array using the handle
-await page.evaluate(arg => arg.myArray.push(arg.newElement), {
-  myArray: myArrayHandle,
-  newElement: 2
-});
-
-// Release the object when it's no longer needed.
-await myArrayHandle.dispose();
 ```
 
-## Handle Lifecycle
+</TabItem>
+<TabItem value="js">
 
-Handles can be acquired using the page methods such as [page.evaluateHandle(pageFunction[, arg])](./api/class-page.mdx#page-evaluate-handle), [page.$(selector)](./api/class-page.mdx#page-query-selector) or [page.$$(selector)](./api/class-page.mdx#page-query-selector-all) or their frame counterparts [frame.evaluateHandle(pageFunction[, arg])](./api/class-frame.mdx#frame-evaluate-handle), [frame.$(selector)](./api/class-frame.mdx#frame-query-selector) or [frame.$$(selector)](./api/class-frame.mdx#frame-query-selector-all). Once created, handles will retain object from [garbage collection](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_Management) unless page navigates or the handle is manually disposed via the [jsHandle.dispose()](./api/class-jshandle.mdx#js-handle-dispose) method.
+```js
+const { test, expect } = require('@playwright/test');
 
-### API reference
-- [JSHandle]
-- [ElementHandle]
-- [elementHandle.boundingBox()](./api/class-elementhandle.mdx#element-handle-bounding-box)
-- [elementHandle.getAttribute(name)](./api/class-elementhandle.mdx#element-handle-get-attribute)
-- [elementHandle.innerText()](./api/class-elementhandle.mdx#element-handle-inner-text)
-- [elementHandle.innerHTML()](./api/class-elementhandle.mdx#element-handle-inner-html)
-- [elementHandle.textContent()](./api/class-elementhandle.mdx#element-handle-text-content)
-- [jsHandle.evaluate(pageFunction[, arg])](./api/class-jshandle.mdx#js-handle-evaluate)
-- [page.evaluateHandle(pageFunction[, arg])](./api/class-page.mdx#page-evaluate-handle)
-- [page.$(selector)](./api/class-page.mdx#page-query-selector)
-- [page.$$(selector)](./api/class-page.mdx#page-query-selector-all)
+test.beforeAll(async ({ browserName }, workerInfo) => {
+  console.log(`Running ${browserName} in worker #${workerInfo.workerIndex}`);
+});
+```
+
+</TabItem>
+</Tabs>
+
+
+- [workerInfo.config](./api/class-workerinfo.mdx#worker-info-config)
+- [workerInfo.project](./api/class-workerinfo.mdx#worker-info-project)
+- [workerInfo.workerIndex](./api/class-workerinfo.mdx#worker-info-worker-index)
+
+## workerInfo.config {#worker-info-config}
+- type: &#60;[TestConfig]&#62;
+
+Processed configuration from the [configuration file](./test-configuration.mdx).
+
+## workerInfo.project {#worker-info-project}
+- type: &#60;[TestProject]&#62;
+
+Processed project configuration from the [configuration file](./test-configuration.mdx).
+
+## workerInfo.workerIndex {#worker-info-worker-index}
+- type: &#60;[number]&#62;
+
+The unique index of the worker process that is running the test. Also available as `process.env.TEST_WORKER_INDEX`. Learn more about [parallelism and sharding](./test-parallel.mdx) with Playwright Test.
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"
