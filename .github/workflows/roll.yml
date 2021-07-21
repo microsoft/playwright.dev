@@ -1,0 +1,55 @@
+name: Build
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "10 0 */2 * *"
+  push:
+    branches:
+      - devops/add-auto-roll
+
+jobs:
+  roll-docs:
+    name: Roll Playwright to ToT
+    runs-on: ubuntu-20.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/checkout@v2
+        with:
+          repository: 'microsoft/playwright'
+          fetch-depth: 0
+          path: playwright
+      - uses: actions/setup-node@v2
+        with:
+          node-version: '14'
+      - name: Install dependencies
+        run: npm ci
+      - name: Roll
+        run: npm run roll
+        env:
+          SRC_DIR: ./playwright
+      - name: Prepare branch
+        id: prepare-branch
+        run: |
+          BRANCH_NAME="roll/$(date +"%d-%m-%y")"
+          git checkout -b "$BRANCH_NAME"
+          ! git diff -s --exit-code
+          HAS_CHANGES="$?"
+          echo "::set-output name=HAS_CHANGES::$HAS_CHANGES"
+          echo "::set-output name=BRANCH_NAME::$BRANCH_NAME"
+          if [[ HAS_CHANGES == 0 ]]; then
+            echo "No changes detected, skipping PR"
+            exit 0
+          fi
+          git push origin $BRANCH_NAME
+      - name: Create Pull Request
+        uses: actions/github-script@v4
+        if: ${{ steps.prepare-branch.outputs.HAS_CHANGES == '1' }}
+        with:
+          script: |
+            octokit.rest.pulls.create({
+              owner: 'microsoft',
+              repo: 'playwright.dev',
+              head: 'microsoft:${{ steps.prepare-branch.outputs.BRANCH_NAME }}',
+              base: 'master',
+              title: 'feat(roll): roll to ToT Playwright (${{ steps.prepare-branch.outputs.BRANCH_NAME }})
+            });
