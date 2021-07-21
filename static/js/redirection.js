@@ -18,9 +18,8 @@ if (path) {
 } else {
   const redirects = [
     // ------------------- nodejs ---------------------
-    // TODO: enable after publishing 1.13
-    // { from: '/docs/test-intro', to: '/docs/intro' },
-    // { from: '/docs/installation', to: '/docs/library' },
+    { from: '/docs/test-intro', to: '/docs/intro' },
+    { from: '/docs/installation', to: '/docs/library' },
     { from: '/docs/next/test-intro', to: '/docs/next/intro' },
     { from: '/docs/next/installation', to: '/docs/next/library' },
     // ------------------- python ---------------------

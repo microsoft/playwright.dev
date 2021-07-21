@@ -1,0 +1,286 @@
+---
+id: auth
+title: "Authentication"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Playwright can be used to automate scenarios that require authentication.
+
+Tests written with Playwright execute in isolated clean-slate environments called [browser contexts](./core-concepts.mdx#browser-contexts). This isolation model improves reproducibility and prevents cascading test failures. New browser contexts can load existing authentication state. This eliminates the need to login in every context and speeds up test execution.
+
+> Note: This guide covers cookie/token-based authentication (logging in via the app UI). For [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication) use [browser.newContext([options])](./api/class-browser.mdx#browser-new-context).
+
+- [Automate logging in](#automate-logging-in)
+- [Reuse authentication state](#reuse-authentication-state)
+- [Session storage](#session-storage)
+- [Multi-factor authentication](#multi-factor-authentication)
+
+## Automate logging in
+
+The Playwright API can automate interaction with a login form. See [Input guide](./input.mdx) for more details.
+
+The following example automates login on GitHub. Once these steps are executed, the browser context will be authenticated.
+
+```js
+const page = await context.newPage();
+await page.goto('https://github.com/login');
+
+// Interact with login form
+await page.click('text=Login');
+await page.fill('input[name="login"]', USERNAME);
+await page.fill('input[name="password"]', PASSWORD);
+await page.click('text=Submit');
+// Verify app is logged in
+```
+
+These steps can be executed for every browser context. However, redoing login for every test can slow down test execution. To prevent that, we will reuse existing authentication state in new browser contexts.
+
+## Reuse authentication state
+
+Web apps use cookie-based or token-based authentication, where authenticated state is stored as [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) or in [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage). Playwright provides [browserContext.storageState([options])](./api/class-browsercontext.mdx#browser-context-storage-state) method that can be used to retrieve storage state from authenticated contexts and then create new contexts with prepopulated state.
+
+Cookies and local storage state can be used across different browsers. They depend on your application's authentication model: some apps might require both cookies and local storage.
+
+The following code snippet retrieves state from an authenticated context and creates a new context with that state.
+
+```js
+// Save storage state into the file.
+await context.storageState({ path: 'state.json' });
+
+// Create a new context with the saved storage state.
+const context = await browser.newContext({ storageState: 'state.json' });
+```
+
+### Code generation
+
+Logging in via the UI and then reusing authentication state can be combined to implement **login once and run multiple scenarios**. The lifecycle looks like:
+1. Run tests (for example, with `npm run test`).
+1. Login via UI and retrieve authentication state.
+   * In Jest, this can be executed in [`globalSetup`](https://jestjs.io/docs/en/configuration#globalsetup-string).
+1. In each test, load authentication state in `beforeEach` or `beforeAll` step.
+
+This approach will also **work in CI environments**, since it does not rely on any external state.
+
+### Reuse authentication in Playwright Test
+
+When using [Playwright Test](./intro.mdx), you can log in once in the global setup and then reuse authentication state in tests. That way all your tests are completely isolated, yet you only waste time logging in once for the entire test suite run.
+
+First, introduce the global setup that would log in once.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+// global-setup.ts
+import { chromium } from '@playwright/test';
+
+async function globalSetup() {
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+  await page.goto('http://localhost:5000/');
+  await page.click('text=login');
+  await page.fill('input[name="user"]', 'user');
+  await page.fill('input[name="password"]', 'password');
+  await page.click('input:has-text("login")');
+  await page.context().storageState({ path: 'state.json' });
+  await browser.close();
+}
+
+export default globalSetup;
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// global-setup.js
+const { chromium } = require('@playwright/test');
+
+module.exports = async () => {
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+  await page.goto('http://localhost:5000/');
+  await page.click('text=login');
+  await page.fill('input[name="user"]', 'user');
+  await page.fill('input[name="password"]', 'password');
+  await page.click('input:has-text("login")');
+  await page.context().storageState({ path: 'state.json' });
+  await browser.close();
+};
+```
+
+</TabItem>
+</Tabs>
+
+Then reuse saved authentication state in your tests.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import { test } from '@playwright/test';
+
+test.use({ storageState: 'state.json' });
+
+test('test', async ({ page }) => {
+  await page.goto('http://localhost:5000/');
+  // You are logged in!
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+const { test } = require('@playwright/test');
+
+test.use({ storageState: 'state.json' });
+
+test('test', async ({ page }) => {
+  await page.goto('http://localhost:5000/');
+  // You are logged in!
+});
+```
+
+</TabItem>
+</Tabs>
+
+### API reference
+- [browserContext.storageState([options])](./api/class-browsercontext.mdx#browser-context-storage-state)
+- [browser.newContext([options])](./api/class-browser.mdx#browser-new-context)
+
+## Session storage
+
+Rarely, [session storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage) is used for storing information associated with the logged-in state. Session storage is specific to a particular domain and is not persisted across page loads. Playwright does not provide API to persist session storage, but the following snippet can be used to save/load session storage.
+
+```js
+// Get session storage and store as env variable
+const sessionStorage = await page.evaluate(() => JSON.stringify(sessionStorage));
+process.env.SESSION_STORAGE = sessionStorage;
+
+// Set session storage in a new context
+const sessionStorage = process.env.SESSION_STORAGE;
+await context.addInitScript(storage => {
+  if (window.location.hostname === 'example.com') {
+    const entries = JSON.parse(storage);
+    Object.keys(entries).forEach(key => {
+      window.sessionStorage.setItem(key, entries[key]);
+    });
+  }
+}, sessionStorage);
+```
+
+### API reference
+- [browserContext.storageState([options])](./api/class-browsercontext.mdx#browser-context-storage-state)
+- [browser.newContext([options])](./api/class-browser.mdx#browser-new-context)
+- [page.evaluate(pageFunction[, arg])](./api/class-page.mdx#page-evaluate)
+- [browserContext.addInitScript(script[, arg])](./api/class-browsercontext.mdx#browser-context-add-init-script)
+
+## Multi-factor authentication
+
+Accounts with multi-factor authentication (MFA) cannot be fully automated, and need manual intervention. Persistent authentication can be used to partially automate MFA scenarios.
+
+### Persistent authentication
+
+Note that persistent authentication is not suited for CI environments since it relies on a disk location. User data directories are specific to browser types and cannot be shared across browser types.
+
+User data directories can be used with the [browserType.launchPersistentContext(userDataDir[, options])](./api/class-browsertype.mdx#browser-type-launch-persistent-context) API.
+
+```js
+const { chromium } = require('playwright');
+
+const userDataDir = '/path/to/directory';
+const context = await chromium.launchPersistentContext(userDataDir, { headless: false });
+// Execute login steps manually in the browser window
+```
+
+### Lifecycle
+1. Create a user data directory on disk 2. Launch a persistent context with the user data directory and login the MFA account. 3. Reuse user data directory to run automation scenarios.
+
+### API reference
+- [BrowserContext]
+- [browserType.launchPersistentContext(userDataDir[, options])](./api/class-browsertype.mdx#browser-type-launch-persistent-context)
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Android]: ./api/class-android.mdx "Android"
+[AndroidDevice]: ./api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: ./api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: ./api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: ./api/class-androidwebview.mdx "AndroidWebView"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: ./api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: ./api/class-coverage.mdx "Coverage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[Electron]: ./api/class-electron.mdx "Electron"
+[ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Logger]: ./api/class-logger.mdx "Logger"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./core-concepts.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
