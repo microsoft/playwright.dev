@@ -16,7 +16,6 @@ jobs:
       - uses: actions/checkout@v2
         with:
           repository: 'microsoft/playwright'
-          fetch-depth: 0
           path: playwright
       - uses: actions/setup-node@v2
         with:
@@ -40,16 +39,20 @@ jobs:
             echo "No changes detected, skipping PR"
             exit 0
           fi
-          git push origin $BRANCH_NAME
+          git config --global user.name github-actions
+          git config --global user.email github-actions@github.com
+          git commit -am "feat(roll): roll to ToT Playwright ($(date +"%d-%m-%y"))"
+          git push origin $BRANCH_NAME --force
       - name: Create Pull Request
         uses: actions/github-script@v4
-        if: ${{ steps.prepare-branch.outputs.HAS_CHANGES == '1' }}
+        # if: ${{ steps.prepare-branch.outputs.HAS_CHANGES == '1' }}
         with:
           script: |
-            octokit.rest.pulls.create({
+            console.log(${{ steps.prepare-branch.outputs.HAS_CHANGES }}, typeof ${{ steps.prepare-branch.outputs.HAS_CHANGES == '1' }})
+            await github.pulls.create({
               owner: 'microsoft',
               repo: 'playwright.dev',
               head: 'microsoft:${{ steps.prepare-branch.outputs.BRANCH_NAME }}',
               base: 'master',
-              title: 'feat(roll): roll to ToT Playwright (${{ steps.prepare-branch.outputs.BRANCH_NAME }})
+              title: 'feat(roll): roll to ToT Playwright (${{ steps.prepare-branch.outputs.BRANCH_NAME }})',
             });
