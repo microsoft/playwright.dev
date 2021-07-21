@@ -1,0 +1,159 @@
+---
+id: class-route
+title: "Route"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Whenever a network route is set up with [page.route(url, handler)](./api/class-page.mdx#page-route) or [browserContext.route(url, handler)](./api/class-browsercontext.mdx#browser-context-route), the `Route` object allows to handle the route.
+
+
+- [route.abort([errorCode])](./api/class-route.mdx#route-abort)
+- [route.continue([options])](./api/class-route.mdx#route-continue)
+- [route.fulfill([options])](./api/class-route.mdx#route-fulfill)
+- [route.request()](./api/class-route.mdx#route-request)
+
+## route.abort([errorCode]) {#route-abort}
+- `errorCode`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-abort-param-error-code"/> &#60;[string]&#62; Optional error code. Defaults to `failed`, could be one of the following:<a href="#route-abort-param-error-code" class="list-anchor">#</a>
+  * `'aborted'` - An operation was aborted (due to user action)
+  * `'accessdenied'` - Permission to access a resource, other than the network, was denied
+  * `'addressunreachable'` - The IP address is unreachable. This usually means that there is no route to the specified host or network.
+  * `'blockedbyclient'` - The client chose to block the request.
+  * `'blockedbyresponse'` - The request failed because the response was delivered along with requirements which are not met ('X-Frame-Options' and 'Content-Security-Policy' ancestor checks, for instance).
+  * `'connectionaborted'` - A connection timed out as a result of not receiving an ACK for data sent.
+  * `'connectionclosed'` - A connection was closed (corresponding to a TCP FIN).
+  * `'connectionfailed'` - A connection attempt failed.
+  * `'connectionrefused'` - A connection attempt was refused.
+  * `'connectionreset'` - A connection was reset (corresponding to a TCP RST).
+  * `'internetdisconnected'` - The Internet connection has been lost.
+  * `'namenotresolved'` - The host name could not be resolved.
+  * `'timedout'` - An operation timed out.
+  * `'failed'` - A generic failure occurred.
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-abort-return"/> &#60;[Promise]<[void]>&#62;<a href="#route-abort-return" class="list-anchor">#</a>
+
+Aborts the route's request.
+
+## route.continue([options]) {#route-continue}
+- `options` &#60;[Object]&#62;
+  - `headers`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-headers"/> &#60;[Object]<[string], [string]>&#62; If set changes the request HTTP headers. Header values will be converted to a string.<a href="#route-continue-option-headers" class="list-anchor">#</a>
+  - `method`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-method"/> &#60;[string]&#62; If set changes the request method (e.g. GET or POST)<a href="#route-continue-option-method" class="list-anchor">#</a>
+  - `postData`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-post-data"/> &#60;[string]|[Buffer]&#62; If set changes the post data of request<a href="#route-continue-option-post-data" class="list-anchor">#</a>
+  - `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-url"/> &#60;[string]&#62; If set changes the request URL. New URL must have same protocol as original one.<a href="#route-continue-option-url" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-return"/> &#60;[Promise]<[void]>&#62;<a href="#route-continue-return" class="list-anchor">#</a>
+
+Continues route's request with optional overrides.
+
+```js
+await page.route('**/*', (route, request) => {
+  // Override headers
+  const headers = {
+    ...request.headers(),
+    foo: 'bar', // set "foo" header
+    origin: undefined, // remove "origin" header
+  };
+  route.continue({headers});
+});
+```
+
+## route.fulfill([options]) {#route-fulfill}
+- `options` &#60;[Object]&#62;
+  - `body`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-body"/> &#60;[string]|[Buffer]&#62; Response body.<a href="#route-fulfill-option-body" class="list-anchor">#</a>
+  - `contentType`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-content-type"/> &#60;[string]&#62; If set, equals to setting `Content-Type` response header.<a href="#route-fulfill-option-content-type" class="list-anchor">#</a>
+  - `headers`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-headers"/> &#60;[Object]<[string], [string]>&#62; Response headers. Header values will be converted to a string.<a href="#route-fulfill-option-headers" class="list-anchor">#</a>
+  - `path`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-path"/> &#60;[string]&#62; File path to respond with. The content type will be inferred from file extension. If `path` is a relative path, then it is resolved relative to the current working directory.<a href="#route-fulfill-option-path" class="list-anchor">#</a>
+  - `status`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-status"/> &#60;[number]&#62; Response status code, defaults to `200`.<a href="#route-fulfill-option-status" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-return"/> &#60;[Promise]<[void]>&#62;<a href="#route-fulfill-return" class="list-anchor">#</a>
+
+Fulfills route's request with given response.
+
+An example of fulfilling all requests with 404 responses:
+
+```js
+await page.route('**/*', route => {
+  route.fulfill({
+    status: 404,
+    contentType: 'text/plain',
+    body: 'Not Found!'
+  });
+});
+```
+
+An example of serving static file:
+
+```js
+await page.route('**/xhr_endpoint', route => route.fulfill({ path: 'mock_data.json' }));
+```
+
+## route.request() {#route-request}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-request-return"/> &#60;[Request]&#62;<a href="#route-request-return" class="list-anchor">#</a>
+
+A request to be routed.
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Android]: ./api/class-android.mdx "Android"
+[AndroidDevice]: ./api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: ./api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: ./api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: ./api/class-androidwebview.mdx "AndroidWebView"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: ./api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: ./api/class-coverage.mdx "Coverage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[Electron]: ./api/class-electron.mdx "Electron"
+[ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Logger]: ./api/class-logger.mdx "Logger"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./core-concepts.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
