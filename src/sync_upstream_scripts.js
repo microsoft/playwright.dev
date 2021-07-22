@@ -7,7 +7,9 @@ if (!process.env.SRC_DIR)
 fs.copyFileSync(path.join(process.env.SRC_DIR, "utils", "markdown.js"), path.join(__dirname, 'markdown.js'))
 
 let documentationJsFile = fs.readFileSync(path.join(process.env.SRC_DIR, "utils", "doclint", "documentation.js")).toString()
-
 documentationJsFile = documentationJsFile.replace(/\.\.\/markdown/g, './markdown')
-
 fs.writeFileSync(path.join(__dirname, 'documentation.js'), documentationJsFile)
+
+let apiParserJsFile = fs.readFileSync(path.join(process.env.SRC_DIR, "utils", "doclint", "api_parser.js")).toString()
+apiParserJsFile = apiParserJsFile.replace(/\.\.\/markdown/g, './markdown')
+fs.writeFileSync(path.join(__dirname, 'api_parser.js'), apiParserJsFile)

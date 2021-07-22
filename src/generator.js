@@ -32,6 +32,28 @@ if (!process.env.SRC_DIR)
 const DIR_SRC = path.join(process.env.SRC_DIR, 'docs', 'src');
 const commonSnippets = new Set(['html', 'xml', 'yml', 'yaml', 'json', 'groovy', 'html', 'bash']);
 
+// -------- HACKS BEGIN --------
+/**
+ * @param {string} className
+ * @param {string} lang
+ * @returns {string|undefined}
+ */
+function rewriteClassTitle(className, lang) {
+  if (className === 'Test')
+    return 'Playwright Test';
+  if (lang === 'js' && className === 'Playwright')
+    return 'Playwright Library';
+}
+
+/**
+ * @param {string} text
+ * @returns {string}
+ */
+function rewriteContent(text) {
+  return text.replace(/\.\(call\)/g, '');
+}
+// -------- HACKS END --------
+
 /**
  * @typedef {{
  *   formatMember: function(Documentation.Member): { text: string, args: Documentation.Member[] }[],
@@ -56,10 +78,9 @@ class Generator {
     this.lang = lang;
     this.outDir = outDir;
     /** @type {Set<string>} */
-    this.sourceFiles = new Set();
-    listFiles(DIR_SRC, DIR_SRC, this.sourceFiles);
+    this.generatedFiles = new Set();
     this.formatter = formatter;
-    this.documentation = parseApi(path.join(DIR_SRC, 'api'));
+    this.documentation = parseApi(path.join(DIR_SRC, 'api')).mergeWith(parseApi(path.join(DIR_SRC, 'test-api')));
     this.documentation.filterForLanguage(lang);
     this.documentation.setLinkRenderer(item => {
       const { clazz, member, param, option } = item;
@@ -77,19 +98,34 @@ class Generator {
       const links = fs.readFileSync(path.join(__dirname, '..', 'common', 'links.md')).toString();
       const langLinks = fs.readFileSync(path.join(__dirname, '..', 'common', `links-${lang}.md`)).toString();
       const localLinks = [];
-      for (const clazz of this.documentation.classesArray)
-        localLinks.push(`[${clazz.name}]: ./api/class-${clazz.name.toLowerCase()}.md "${clazz.name}"`);
-        this.generatedLinksSuffix = '\n' + localLinks.join('\n') + '\n' + links + '\n' + langLinks;
+      for (const clazz of this.documentation.classesArray) {
+        const generatedFileName = `./api/class-${clazz.name.toLowerCase()}.md`;
+        localLinks.push(`[${clazz.name}]: ${generatedFileName} "${clazz.name}"`);
+        this.generatedFiles.add(generatedFileName);
+      }
+      this.generatedLinksSuffix = '\n' + localLinks.join('\n') + '\n' + links + '\n' + langLinks;
+    }
+
+    /** @type {Map<string, string>} */
+    const guides = new Map();
+    for (const entry of fs.readdirSync(DIR_SRC, { withFileTypes: true })) {
+      if (entry.isDirectory() || entry.name.startsWith('links'))
+        continue;
+      if (entry.name.includes('-js') || entry.name.includes('-python') || entry.name.includes('-java') || entry.name.includes('-csharp')) {
+        if (!entry.name.includes('-' + this.lang))
+          continue;
+      }
+
+      const outName = entry.name.replace(new RegExp('-' + this.lang), '');
+      guides.set(entry.name, outName);
+      this.generatedFiles.add(`./${outName}`);
     }
 
     for (const clazz of this.documentation.classesArray)
       this.generateClassDoc(clazz);
 
-    for (const name of fs.readdirSync(path.join(DIR_SRC))) {
-      if (name.startsWith('links') || name === 'api')
-        continue;
-      this.generateDoc(name);
-    }
+    for (const [name, outName] of guides)
+      this.generateDoc(name, outName + 'x');
   }
 
   /**
@@ -102,7 +138,7 @@ class Generator {
       type: 'text',
       text: `---
 id: class-${clazz.name.toLowerCase()}
-title: "${clazz.name}"
+title: "${rewriteClassTitle(clazz.name, this.lang) || clazz.name}"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -131,7 +167,7 @@ import TabItem from '@theme/TabItem';
           throw new Error(`Header ${text} needs to have an explicit ID`)
         memberNode.text = `${text} {#${this.heading2ExplicitId.get(member)}}`;
         memberNode.children.push(...args.map(a => this.renderProperty(`\`${this.formatter.formatArgumentName(a.alias)}\``, a, a.spec, 'in')));
-  
+
         // Append type
         if (member.type && (member.type.name !== 'void' || member.kind === 'method')) {
           let name;
@@ -142,7 +178,7 @@ import TabItem from '@theme/TabItem';
           }
           memberNode.children.push(this.renderProperty(name, member, undefined, 'out', member.async));
         }
-  
+
         // Append member doc
         memberNode.children.push(...this.formatComment(member.spec));
         result.push(memberNode);
@@ -157,9 +193,9 @@ import TabItem from '@theme/TabItem';
    * @param {string} text
    */
   mdxLinks(text) {
-    for (const name of this.sourceFiles)
+    for (const name of this.generatedFiles)
       text = text.replace(new RegExp('\\' + name, 'g'), name + 'x');
-    return text;
+    return rewriteContent(text);
   }
 
   /**
@@ -199,11 +235,9 @@ import TabItem from '@theme/TabItem';
 
   /**
    * @param {string} name
+   * @param {string} outName
    */
-  generateDoc(name) {
-    if (name.includes('-js') || name.includes('-python') || name.includes('-java') || name.includes('-csharp'))
-      if (!name.includes('-' + this.lang))
-        return;
+  generateDoc(name, outName) {
     const content = fs.readFileSync(path.join(DIR_SRC, name)).toString();
     let nodes = this.filterForLanguage(md.parse(content));
     this.documentation.renderLinksInText(nodes);
@@ -225,7 +259,6 @@ import TabItem from '@theme/TabItem';
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';`);
-    const outName = name.replace(new RegExp('-' + this.lang), '') + 'x';
     fs.writeFileSync(path.join(this.outDir, outName), this.mdxLinks(output));
   }
 
@@ -463,7 +496,7 @@ function listFiles(dir, base, result) {
 }
 
 /**
- * @param {Documentation.Member} member 
+ * @param {Documentation.Member} member
  * @returns {String}
  */
 function calculateHeadingHash(member) {
@@ -476,7 +509,7 @@ function calculateHeadingHash(member) {
 }
 
 /**
- * @param {Documentation.Member} member 
+ * @param {Documentation.Member} member
  * @param {'in'|'out'} direction
  * @returns {String}
  */

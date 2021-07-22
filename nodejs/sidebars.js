@@ -78,6 +78,7 @@ module.exports = {
       "type": "category",
       "label": "API reference",
       "items": [
+        { "type": "doc", "id": "api/class-test" },
         { "type": "doc", "id": "api/class-playwright" },
         {
           "type": "category",
@@ -105,12 +106,16 @@ module.exports = {
             { "type": "doc", "id": "api/class-response" },
             { "type": "doc", "id": "api/class-route" },
             { "type": "doc", "id": "api/class-selectors" },
+            { "type": "doc", "id": "api/class-testconfig" },
+            { "type": "doc", "id": "api/class-testinfo" },
+            { "type": "doc", "id": "api/class-testproject" },
             { "type": "doc", "id": "api/class-timeouterror" },
             { "type": "doc", "id": "api/class-touchscreen" },
             { "type": "doc", "id": "api/class-tracing" },
             { "type": "doc", "id": "api/class-video" },
             { "type": "doc", "id": "api/class-websocket" },
             { "type": "doc", "id": "api/class-worker" },
+            { "type": "doc", "id": "api/class-workerinfo" },
           ],
           "collapsed": false
         },
