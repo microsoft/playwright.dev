@@ -1,0 +1,525 @@
+---
+id: class-fixtures
+title: "Fixtures"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Playwright Test is based on the concept of the [test fixtures](./test-fixtures.mdx). Test fixtures are used to establish environment for each test, giving the test everything it needs and nothing else.
+
+Playwright Test looks at each test declaration, analyses the set of fixtures the test needs and prepares those fixtures specifically for the test. Values prepared by the fixtures are merged into a single object that is available to the `test`, hooks, annotations and other fixtures as a first parameter.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import { test, expect } from '@playwright/test';
+
+test('basic test', async ({ page }) => {
+  // ...
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+const { test, expect } = require('@playwright/test');
+
+test('basic test', async ({ page }) => {
+  // ...
+});
+```
+
+</TabItem>
+</Tabs>
+
+Given the test above, Playwright Test will set up the `page` fixture before running the test, and tear it down after the test has finished. `page` fixture provides a [Page] object that is available to the test.
+
+Playwright Test comes with builtin fixtures listed below, and you can add your own fixtures as well. Many fixtures are designed as "options" that you can set in your [testConfig.use](./api/class-testconfig.mdx#test-config-use) section.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import { PlaywrightTestConfig } from '@playwright/test';
+const config: PlaywrightTestConfig = {
+  use: {
+    headless: false,
+    viewport: { width: 1280, height: 720 },
+    ignoreHTTPSErrors: true,
+    video: 'on-first-retry',
+  },
+};
+export default config;
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// @ts-check
+
+/** @type {import('@playwright/test').PlaywrightTestConfig} */
+const config = {
+  use: {
+    headless: false,
+    viewport: { width: 1280, height: 720 },
+    ignoreHTTPSErrors: true,
+    video: 'on-first-retry',
+  },
+};
+
+module.exports = config;
+```
+
+</TabItem>
+</Tabs>
+
+Alternatively, with [test.use(fixtures)](./api/class-test.mdx#test-use) you can override some options for a file.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+// example.spec.ts
+import { test, expect } from '@playwright/test';
+
+// Run tests in this file with portrait-like viewport.
+test.use({ viewport: { width: 600, height: 900 } });
+
+test('my portrait test', async ({ page }) => {
+  // ...
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// example.spec.js
+const { test, expect } = require('@playwright/test');
+
+// Run tests in this file with portrait-like viewport.
+test.use({ viewport: { width: 600, height: 900 } });
+
+test('my portrait test', async ({ page }) => {
+  // ...
+});
+```
+
+</TabItem>
+</Tabs>
+
+
+- [fixtures.acceptDownloads](./api/class-fixtures.mdx#fixtures-accept-downloads)
+- [fixtures.baseURL](./api/class-fixtures.mdx#fixtures-base-url)
+- [fixtures.browserName](./api/class-fixtures.mdx#fixtures-browser-name)
+- [fixtures.bypassCSP](./api/class-fixtures.mdx#fixtures-bypass-csp)
+- [fixtures.channel](./api/class-fixtures.mdx#fixtures-channel)
+- [fixtures.colorScheme](./api/class-fixtures.mdx#fixtures-color-scheme)
+- [fixtures.context](./api/class-fixtures.mdx#fixtures-context)
+- [fixtures.contextOptions](./api/class-fixtures.mdx#fixtures-context-options)
+- [fixtures.deviceScaleFactor](./api/class-fixtures.mdx#fixtures-device-scale-factor)
+- [fixtures.extraHTTPHeaders](./api/class-fixtures.mdx#fixtures-extra-http-headers)
+- [fixtures.geolocation](./api/class-fixtures.mdx#fixtures-geolocation)
+- [fixtures.hasTouch](./api/class-fixtures.mdx#fixtures-has-touch)
+- [fixtures.headless](./api/class-fixtures.mdx#fixtures-headless)
+- [fixtures.httpCredentials](./api/class-fixtures.mdx#fixtures-http-credentials)
+- [fixtures.ignoreHTTPSErrors](./api/class-fixtures.mdx#fixtures-ignore-https-errors)
+- [fixtures.isMobile](./api/class-fixtures.mdx#fixtures-is-mobile)
+- [fixtures.javaScriptEnabled](./api/class-fixtures.mdx#fixtures-java-script-enabled)
+- [fixtures.launchOptions](./api/class-fixtures.mdx#fixtures-launch-options)
+- [fixtures.locale](./api/class-fixtures.mdx#fixtures-locale)
+- [fixtures.offline](./api/class-fixtures.mdx#fixtures-offline)
+- [fixtures.page](./api/class-fixtures.mdx#fixtures-page)
+- [fixtures.permissions](./api/class-fixtures.mdx#fixtures-permissions)
+- [fixtures.proxy](./api/class-fixtures.mdx#fixtures-proxy)
+- [fixtures.screenshot](./api/class-fixtures.mdx#fixtures-screenshot)
+- [fixtures.storageState](./api/class-fixtures.mdx#fixtures-storage-state)
+- [fixtures.timezoneId](./api/class-fixtures.mdx#fixtures-timezone-id)
+- [fixtures.trace](./api/class-fixtures.mdx#fixtures-trace)
+- [fixtures.userAgent](./api/class-fixtures.mdx#fixtures-user-agent)
+- [fixtures.video](./api/class-fixtures.mdx#fixtures-video)
+- [fixtures.viewport](./api/class-fixtures.mdx#fixtures-viewport)
+
+## fixtures.acceptDownloads {#fixtures-accept-downloads}
+- type: &#60;[boolean]&#62;
+
+Whether to automatically download all the attachments. Defaults to `false` where all the downloads are canceled.
+
+## fixtures.baseURL {#fixtures-base-url}
+- type: &#60;[string]&#62;
+
+When using [page.goto(url[, options])](./api/class-page.mdx#page-goto), [page.route(url, handler)](./api/class-page.mdx#page-route), [page.waitForURL(url[, options])](./api/class-page.mdx#page-wait-for-url), [page.waitForRequest(urlOrPredicate[, options])](./api/class-page.mdx#page-wait-for-request), or [page.waitForResponse(urlOrPredicate[, options])](./api/class-page.mdx#page-wait-for-response) it takes the base URL in consideration by using the [`URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor for building the corresponding URL. Examples:
+* baseURL: `http://localhost:3000` and navigating to `/bar.html` results in `http://localhost:3000/bar.html`
+* baseURL: `http://localhost:3000/foo/` and navigating to `./bar.html` results in `http://localhost:3000/foo/bar.html`
+
+## fixtures.browserName {#fixtures-browser-name}
+- type: &#60;"chromium"|"firefox"|"webkit"&#62;
+
+Name of the browser that runs tests. Defaults to `'chromium'`. Most of the time you should set `browserName` in your [TestConfig]:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+// playwright.config.ts
+import { PlaywrightTestConfig, devices } from '@playwright/test';
+
+const config: PlaywrightTestConfig = {
+  use: {
+    browserName: 'firefox',
+  },
+};
+export default config;
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// playwright.config.js
+// @ts-check
+
+/** @type {import('@playwright/test').PlaywrightTestConfig} */
+const config = {
+  use: {
+    browserName: 'firefox',
+  },
+};
+
+module.exports = config;
+```
+
+</TabItem>
+</Tabs>
+
+## fixtures.bypassCSP {#fixtures-bypass-csp}
+- type: &#60;[boolean]&#62;
+
+Toggles bypassing page's Content-Security-Policy.
+
+## fixtures.channel {#fixtures-channel}
+- type: &#60;[string]&#62;
+
+Browser distribution channel.  Supported values are "chrome", "chrome-beta", "chrome-dev", "chrome-canary", "msedge", "msedge-beta", "msedge-dev", "msedge-canary". Read more about using [Google Chrome and Microsoft Edge](./browsers.mdx#google-chrome--microsoft-edge).
+
+## fixtures.colorScheme {#fixtures-color-scheme}
+- type: &#60;"light"|"dark"|"no-preference"&#62;
+
+Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [page.emulateMedia([options])](./api/class-page.mdx#page-emulate-media) for more details. Defaults to `'light'`.
+
+## fixtures.context {#fixtures-context}
+- type: &#60;[BrowserContext]&#62;
+
+Isolated [BrowserContext] instance, created for each test. Since contexts are isolated between each other, every test gets a fresh environment, even when multiple tests run in a single [Browser] for maximum efficiency.
+
+Learn how to [configure context](./test-configuration.mdx) through other fixtures and options.
+
+The [fixtures.page](./api/class-fixtures.mdx#fixtures-page) belongs to this context.
+
+## fixtures.contextOptions {#fixtures-context-options}
+- type: &#60;[Object]&#62;
+
+Options used to create the context, as passed to [browser.newContext([options])](./api/class-browser.mdx#browser-new-context). Specific options like [fixtures.viewport](./api/class-fixtures.mdx#fixtures-viewport) take priority over this.
+
+## fixtures.deviceScaleFactor {#fixtures-device-scale-factor}
+- type: &#60;[number]&#62;
+
+Specify device scale factor (can be thought of as dpr). Defaults to `1`.
+
+## fixtures.extraHTTPHeaders {#fixtures-extra-http-headers}
+- type: &#60;[Object]<[string], [string]>&#62;
+
+An object containing additional HTTP headers to be sent with every request. All header values must be strings.
+
+## fixtures.geolocation {#fixtures-geolocation}
+- type: &#60;[Object]&#62;
+  - `latitude` &#60;[number]&#62; Latitude between -90 and 90.
+  - `longitude` &#60;[number]&#62; Longitude between -180 and 180.
+  - `accuracy` &#60;[number]&#62; Non-negative accuracy value. Defaults to `0`.
+
+## fixtures.hasTouch {#fixtures-has-touch}
+- type: &#60;[boolean]&#62;
+
+Specifies if viewport supports touch events. Defaults to false.
+
+## fixtures.headless {#fixtures-headless}
+- type: &#60;[boolean]&#62;
+
+Whether to run browser in headless mode. More details for [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) and [Firefox](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode). Defaults to `true` unless the `devtools` option is `true`.
+
+## fixtures.httpCredentials {#fixtures-http-credentials}
+- type: &#60;[Object]&#62;
+  - `username` &#60;[string]&#62;
+  - `password` &#60;[string]&#62;
+
+Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).
+
+## fixtures.ignoreHTTPSErrors {#fixtures-ignore-https-errors}
+- type: &#60;[boolean]&#62;
+
+Whether to ignore HTTPS errors during navigation. Defaults to `false`.
+
+## fixtures.isMobile {#fixtures-is-mobile}
+- type: &#60;[boolean]&#62;
+
+Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.
+
+## fixtures.javaScriptEnabled {#fixtures-java-script-enabled}
+- type: &#60;[boolean]&#62;
+
+Whether or not to enable JavaScript in the context. Defaults to `true`.
+
+## fixtures.launchOptions {#fixtures-launch-options}
+- type: &#60;[Object]&#62;
+
+Options used to launch the browser, as passed to [browserType.launch([options])](./api/class-browsertype.mdx#browser-type-launch). Specific options [fixtures.headless](./api/class-fixtures.mdx#fixtures-headless) and [fixtures.channel](./api/class-fixtures.mdx#fixtures-channel) take priority over this.
+
+## fixtures.locale {#fixtures-locale}
+- type: &#60;[string]&#62;
+
+Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
+
+## fixtures.offline {#fixtures-offline}
+- type: &#60;[boolean]&#62;
+
+Whether to emulate network being offline. Defaults to `false`.
+
+## fixtures.page {#fixtures-page}
+- type: &#60;[Page]&#62;
+
+Isolated [Page] instance, created for each test. Pages are isolated between tests due to [fixtures.context](./api/class-fixtures.mdx#fixtures-context) isolation.
+
+This is the most common fixture used in a test.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import { test, expect } from '@playwright/test';
+
+test('basic test', async ({ page }) => {
+  await page.goto('/signin');
+  await page.fill('#username', 'User');
+  await page.fill('#password', 'pwd');
+  await page.click('text=Sign in');
+  // ...
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+const { test, expect } = require('@playwright/test');
+
+test('basic test', async ({ page }) => {
+  await page.goto('/signin');
+  await page.fill('#username', 'User');
+  await page.fill('#password', 'pwd');
+  await page.click('text=Sign in');
+  // ...
+});
+```
+
+</TabItem>
+</Tabs>
+
+## fixtures.permissions {#fixtures-permissions}
+- type: &#60;[Array]<[string]>&#62;
+
+A list of permissions to grant to all pages in this context. See [browserContext.grantPermissions(permissions[, options])](./api/class-browsercontext.mdx#browser-context-grant-permissions) for more details.
+
+## fixtures.proxy {#fixtures-proxy}
+- type: &#60;[Object]&#62;
+  - `server` &#60;[string]&#62; Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
+  - `bypass` &#60;[string]&#62; Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
+  - `username` &#60;[string]&#62; Optional username to use if HTTP proxy requires authentication.
+  - `password` &#60;[string]&#62; Optional password to use if HTTP proxy requires authentication.
+
+Network proxy settings.
+
+## fixtures.screenshot {#fixtures-screenshot}
+- type: &#60;"off"|"on"|"only-on-failure"&#62;
+
+Whether to automatically capture a screenshot after each test. Defaults to `'off'`.
+1. `'off'`: Do not capture screenshots.
+1. `'on'`: Capture screenshot after each test.
+1. `'only-on-failure'`: Capture screenshot after each test failure.
+
+Learn more about [automatic screenshots](./test-configuration.mdx#automatic-screenshots).
+
+## fixtures.storageState {#fixtures-storage-state}
+- type: &#60;[string]|[Object]&#62;
+  - `cookies` &#60;[Array]<[Object]>&#62; Optional cookies to set for context
+    - `name` &#60;[string]&#62;
+    - `value` &#60;[string]&#62;
+    - `url` &#60;[string]&#62; Optional either url or domain / path are required
+    - `domain` &#60;[string]&#62; Optional either url or domain / path are required
+    - `path` &#60;[string]&#62; Optional either url or domain / path are required
+    - `expires` &#60;[number]&#62; Optional Unix time in seconds.
+    - `httpOnly` &#60;[boolean]&#62; Optional httpOnly flag
+    - `secure` &#60;[boolean]&#62; Optional secure flag
+    - `sameSite` &#60;"Strict"|"Lax"|"None"&#62; Optional sameSite flag
+  - `origins` &#60;[Array]<[Object]>&#62; Optional localStorage to set for context
+    - `origin` &#60;[string]&#62;
+    - `localStorage` &#60;[Array]<[Object]>&#62;
+      - `name` &#60;[string]&#62;
+      - `value` &#60;[string]&#62;
+
+Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [browserContext.storageState([options])](./api/class-browsercontext.mdx#browser-context-storage-state). Either a path to the file with saved storage, or an object with the following fields:
+
+## fixtures.timezoneId {#fixtures-timezone-id}
+- type: &#60;[string]&#62;
+
+Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.
+
+## fixtures.trace {#fixtures-trace}
+- type: &#60;"off"|"on"|"retain-on-failure"|"on-first-retry"&#62;
+
+Whether to record a trace for each test. Defaults to `'off'`.
+1. `'off'`: Do not record a trace.
+1. `'on'`: Record a trace for each test.
+1. `'retain-on-failure'`: Record a trace for each test, but remove it from successful test runs.
+1. `'on-first-retry'`: Record a trace only when retrying a test for the first time.
+
+Learn more about [recording trace](./test-configuration.mdx#record-test-trace).
+
+## fixtures.userAgent {#fixtures-user-agent}
+- type: &#60;[string]&#62;
+
+Specific user agent to use in this context.
+
+## fixtures.video {#fixtures-video}
+- type: &#60;[Object]|"off"|"on"|"retain-on-failure"|"on-first-retry"&#62;
+  - `mode` &#60;"off"|"on"|"retain-on-failure"|"on-first-retry"&#62; Video recording mode.
+  - `size` &#60;[Object]&#62; Size of the recorded video.
+    - `width` &#60;[number]&#62;
+    - `height` &#60;[number]&#62;
+
+Whether to record video for each test. Defaults to `'off'`.
+1. `'off'`: Do not record video.
+1. `'on'`: Record video for each test.
+1. `'retain-on-failure'`: Record video for each test, but remove all videos from successful test runs.
+1. `'on-first-retry'`: Record video only when retrying a test for the first time.
+
+Learn more about [recording video](./test-configuration.mdx#record-video).
+
+## fixtures.viewport {#fixtures-viewport}
+- type: &#60;[null]|[Object]&#62;
+  - `width` &#60;[number]&#62; page width in pixels.
+  - `height` &#60;[number]&#62; page height in pixels.
+
+Emulates consistent viewport for each page. Defaults to an 1280x720 viewport. `null` disables the default viewport.
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Android]: ./api/class-android.mdx "Android"
+[AndroidDevice]: ./api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: ./api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: ./api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: ./api/class-androidwebview.mdx "AndroidWebView"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: ./api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: ./api/class-coverage.mdx "Coverage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[Electron]: ./api/class-electron.mdx "Electron"
+[ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Logger]: ./api/class-logger.mdx "Logger"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Fixtures]: ./api/class-fixtures.mdx "Fixtures"
+[Test]: ./api/class-test.mdx "Test"
+[TestConfig]: ./api/class-testconfig.mdx "TestConfig"
+[TestInfo]: ./api/class-testinfo.mdx "TestInfo"
+[TestProject]: ./api/class-testproject.mdx "TestProject"
+[WorkerInfo]: ./api/class-workerinfo.mdx "WorkerInfo"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./core-concepts.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
