@@ -28,7 +28,7 @@ if (path) {
   ];
   const pathname = window.location.pathname;
   for (const redirect of redirects) {
-    if (pathname === redirect.from) {
+    if (pathname === redirect.from || pathname === redirect.from + '/') {
       window.location.pathname = redirect.to;
       break;
     }
