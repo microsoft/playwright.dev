@@ -64,6 +64,7 @@ module.exports = {
           "type": "category",
           "label": "Classes",
           "items": [
+            { "type": "doc", "id": "api/class-accessibility" },
             { "type": "doc", "id": "api/class-browser" },
             { "type": "doc", "id": "api/class-browsercontext" },
             { "type": "doc", "id": "api/class-browsertype" },
