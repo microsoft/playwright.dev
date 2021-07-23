@@ -1,63 +1,75 @@
 ---
-id: class-workerinfo
-title: "WorkerInfo"
+id: class-testresult
+title: "TestResult"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-`WorkerInfo` contains information about the worker that is running tests. It is available to [test.beforeAll(hookFunction)](./api/class-test.mdx#test-before-all) and [test.afterAll(hookFunction)](./api/class-test.mdx#test-after-all) hooks and worker-scoped fixtures.
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
-```js
-import { test, expect } from '@playwright/test';
-
-test.beforeAll(async ({ browserName }, workerInfo) => {
-  console.log(`Running ${browserName} in worker #${workerInfo.workerIndex}`);
-});
-```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-const { test, expect } = require('@playwright/test');
-
-test.beforeAll(async ({ browserName }, workerInfo) => {
-  console.log(`Running ${browserName} in worker #${workerInfo.workerIndex}`);
-});
-```
-
-</TabItem>
-</Tabs>
+A result of a single [TestCase] run.
 
 
-- [workerInfo.config](./api/class-workerinfo.mdx#worker-info-config)
-- [workerInfo.project](./api/class-workerinfo.mdx#worker-info-project)
-- [workerInfo.workerIndex](./api/class-workerinfo.mdx#worker-info-worker-index)
+- [testResult.attachments](./api/class-testresult.mdx#test-result-attachments)
+- [testResult.duration](./api/class-testresult.mdx#test-result-duration)
+- [testResult.error](./api/class-testresult.mdx#test-result-error)
+- [testResult.retry](./api/class-testresult.mdx#test-result-retry)
+- [testResult.startTime](./api/class-testresult.mdx#test-result-start-time)
+- [testResult.status](./api/class-testresult.mdx#test-result-status)
+- [testResult.stderr](./api/class-testresult.mdx#test-result-stderr)
+- [testResult.stdout](./api/class-testresult.mdx#test-result-stdout)
+- [testResult.workerIndex](./api/class-testresult.mdx#test-result-worker-index)
 
-## workerInfo.config {#worker-info-config}
-- type: &#60;[TestConfig]&#62;
+## testResult.attachments {#test-result-attachments}
+- type: &#60;[Array]<[Object]>&#62;
+  - `name` &#60;[string]&#62; Attachment name.
+  - `contentType` &#60;[string]&#62; Content type of this attachment to properly present in the report, for example `'application/json'` or `'image/png'`.
+  - `path` &#60;[void]|[string]&#62; Optional path on the filesystem to the attached file.
+  - `body` &#60;[void]|[Buffer]&#62; Optional attachment body used instead of a file.
 
-Processed configuration from the [configuration file](./test-configuration.mdx).
+The list of files or buffers attached during the test execution through [testInfo.attachments](./api/class-testinfo.mdx#test-info-attachments).
 
-## workerInfo.project {#worker-info-project}
-- type: &#60;[TestProject]&#62;
-
-Processed project configuration from the [configuration file](./test-configuration.mdx).
-
-## workerInfo.workerIndex {#worker-info-worker-index}
+## testResult.duration {#test-result-duration}
 - type: &#60;[number]&#62;
 
-The unique index of the worker process that is running the test. Also available as `process.env.TEST_WORKER_INDEX`. Learn more about [parallelism and sharding](./test-parallel.mdx) with Playwright Test.
+Running time in milliseconds.
+
+## testResult.error {#test-result-error}
+- type: &#60;[void]|[TestError]&#62;
+
+An error thrown during the test execution, if any.
+
+## testResult.retry {#test-result-retry}
+- type: &#60;[number]&#62;
+
+When test is retries multiple times, each retry attempt is given a sequential number.
+
+Learn more about [test retries](./test-retries.mdx).
+
+## testResult.startTime {#test-result-start-time}
+- type: &#60;[Date]&#62;
+
+Start time of this particular test run.
+
+## testResult.status {#test-result-status}
+- type: &#60;[void]|"passed"|"failed"|"timedOut"|"skipped"&#62;
+
+The status of this test result. See also [testCase.expectedStatus](./api/class-testcase.mdx#test-case-expected-status).
+
+## testResult.stderr {#test-result-stderr}
+- type: &#60;[Array]<[string]|[Buffer]>&#62;
+
+Anything written to the standard error during the test run.
+
+## testResult.stdout {#test-result-stdout}
+- type: &#60;[Array]<[string]|[Buffer]>&#62;
+
+Anything written to the standard output during the test run.
+
+## testResult.workerIndex {#test-result-worker-index}
+- type: &#60;[number]&#62;
+
+Index of the worker where the test was run.
+
+Learn more about [parallelism and sharding](./test-parallel.mdx) with Playwright Test.
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"

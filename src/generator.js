@@ -80,7 +80,9 @@ class Generator {
     /** @type {Set<string>} */
     this.generatedFiles = new Set();
     this.formatter = formatter;
-    this.documentation = parseApi(path.join(DIR_SRC, 'api')).mergeWith(parseApi(path.join(DIR_SRC, 'test-api'), path.join(DIR_SRC, 'api', 'params.md')));
+    this.documentation = parseApi(path.join(DIR_SRC, 'api'))
+        .mergeWith(parseApi(path.join(DIR_SRC, 'test-api'), path.join(DIR_SRC, 'api', 'params.md')))
+        .mergeWith(parseApi(path.join(DIR_SRC, 'test-reporter-api')));
     this.documentation.filterForLanguage(lang);
     this.documentation.setLinkRenderer(item => {
       const { clazz, member, param, option } = item;
