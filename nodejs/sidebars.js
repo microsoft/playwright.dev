@@ -108,6 +108,7 @@ module.exports = {
             { "type": "doc", "id": "api/class-route" },
             { "type": "doc", "id": "api/class-selectors" },
             { "type": "doc", "id": "api/class-testconfig" },
+            { "type": "doc", "id": "api/class-testerror" },
             { "type": "doc", "id": "api/class-testinfo" },
             { "type": "doc", "id": "api/class-testproject" },
             { "type": "doc", "id": "api/class-timeouterror" },
@@ -117,6 +118,18 @@ module.exports = {
             { "type": "doc", "id": "api/class-websocket" },
             { "type": "doc", "id": "api/class-worker" },
             { "type": "doc", "id": "api/class-workerinfo" },
+          ],
+          "collapsed": false
+        },
+        {
+          "type": "category",
+          "label": "Test Reporter",
+          "items": [
+            { "type": "doc", "id": "api/class-location" },
+            { "type": "doc", "id": "api/class-reporter" },
+            { "type": "doc", "id": "api/class-suite" },
+            { "type": "doc", "id": "api/class-testcase" },
+            { "type": "doc", "id": "api/class-testresult" },
           ],
           "collapsed": false
         },
