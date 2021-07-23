@@ -1,92 +1,68 @@
 ---
-id: class-playwright
-title: "Playwright Library"
+id: class-suite
+title: "Suite"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright module provides a method to launch a browser instance. The following is a typical example of using Playwright to drive automation:
+`Suite` is a group of tests. All tests in Playwright Test form the following hierarchy:
+* Root suite has a child suite for each [TestProject].
+  * Project suite #1. Has a child suite for each test file in the project.
+    * File suite #1
+      * [TestCase] #1
+      * [TestCase] #2
+      * Suite corresponding to a [test.describe(title, callback)](./api/class-test.mdx#test-describe) group
+        * [TestCase] #1 in a group
+        * [TestCase] #2 in a group
+      * < more test cases ... >
+    * File suite #2
+    * < more file suites ... >
+  * Project suite #2
+  * < more project suites ... >
 
-```js
-const { chromium, firefox, webkit } = require('playwright');
-
-(async () => {
-  const browser = await chromium.launch();  // Or 'firefox' or 'webkit'.
-  const page = await browser.newPage();
-  await page.goto('http://example.com');
-  // other actions...
-  await browser.close();
-})();
-```
+Reporter is given a root suite in the [reporter.onBegin(config, suite)](./api/class-reporter.mdx#reporter-on-begin) method.
 
 
-- [playwright.chromium](./api/class-playwright.mdx#playwright-chromium)
-- [playwright.devices](./api/class-playwright.mdx#playwright-devices)
-- [playwright.errors](./api/class-playwright.mdx#playwright-errors)
-- [playwright.firefox](./api/class-playwright.mdx#playwright-firefox)
-- [playwright.selectors](./api/class-playwright.mdx#playwright-selectors)
-- [playwright.webkit](./api/class-playwright.mdx#playwright-webkit)
+- [suite.allTests()](./api/class-suite.mdx#suite-all-tests)
+- [suite.titlePath()](./api/class-suite.mdx#suite-title-path)
+- [suite.location](./api/class-suite.mdx#suite-location)
+- [suite.suites](./api/class-suite.mdx#suite-suites)
+- [suite.tests](./api/class-suite.mdx#suite-tests)
+- [suite.title](./api/class-suite.mdx#suite-title)
 
-## playwright.chromium {#playwright-chromium}
-- type: &#60;[BrowserType]&#62;
+## suite.allTests() {#suite-all-tests}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="suite-all-tests-return"/> &#60;[Array]<[TestCase]>&#62;<a href="#suite-all-tests-return" class="list-anchor">#</a>
 
-This object can be used to launch or connect to Chromium, returning instances of [Browser].
+Returns the list of all test cases in this suite and its descendants, as opposite to [suite.tests](./api/class-suite.mdx#suite-tests).
 
-## playwright.devices {#playwright-devices}
-- type: &#60;[Object]&#62;
+## suite.titlePath() {#suite-title-path}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="suite-title-path-return"/> &#60;[Array]<[string]>&#62;<a href="#suite-title-path-return" class="list-anchor">#</a>
 
-Returns a dictionary of devices to be used with [browser.newContext([options])](./api/class-browser.mdx#browser-new-context) or [browser.newPage([options])](./api/class-browser.mdx#browser-new-page).
+Returns a list of titles from the root down to this suite.
 
-```js
-const { webkit, devices } = require('playwright');
-const iPhone = devices['iPhone 6'];
+## suite.location {#suite-location}
+- type: &#60;[void]|[Location]&#62;
 
-(async () => {
-  const browser = await webkit.launch();
-  const context = await browser.newContext({
-    ...iPhone
-  });
-  const page = await context.newPage();
-  await page.goto('http://example.com');
-  // other actions...
-  await browser.close();
-})();
-```
+Location in the source where the suite is defined. Missing for root and project suites.
 
-## playwright.errors {#playwright-errors}
-- type: &#60;[Object]&#62;
-  - `TimeoutError` &#60;[function]&#62; A class of [TimeoutError].
+## suite.suites {#suite-suites}
+- type: &#60;[Array]<[Suite]>&#62;
 
-Playwright methods might throw errors if they are unable to fulfill a request. For example, [page.waitForSelector(selector[, options])](./api/class-page.mdx#page-wait-for-selector) might fail if the selector doesn't match any nodes during the given timeframe.
+Child suites. See [Suite] for the hierarchy of suites.
 
-For certain types of errors Playwright uses specific error classes. These classes are available via [`playwright.errors`](#playwrighterrors).
+## suite.tests {#suite-tests}
+- type: &#60;[Array]<[TestCase]>&#62;
 
-An example of handling a timeout error:
+Test cases in the suite. Note that only test cases defined directly in this suite are in the list. Any test cases defined in nested [test.describe(title, callback)](./api/class-test.mdx#test-describe) groups are listed in the child [suite.suites](./api/class-suite.mdx#suite-suites).
 
-```js
-try {
-  await page.waitForSelector('.foo');
-} catch (e) {
-  if (e instanceof playwright.errors.TimeoutError) {
-    // Do something if this is a timeout.
-  }
-}
-```
+## suite.title {#suite-title}
+- type: &#60;[string]&#62;
 
-## playwright.firefox {#playwright-firefox}
-- type: &#60;[BrowserType]&#62;
-
-This object can be used to launch or connect to Firefox, returning instances of [Browser].
-
-## playwright.selectors {#playwright-selectors}
-- type: &#60;[Selectors]&#62;
-
-Selectors can be used to install custom selector engines. See [Working with selectors](./selectors.mdx) for more information.
-
-## playwright.webkit {#playwright-webkit}
-- type: &#60;[BrowserType]&#62;
-
-This object can be used to launch or connect to WebKit, returning instances of [Browser].
+Suite title.
+* Empty for root suite.
+* Project name for project suite.
+* File path for file suite.
+* Title passed to [test.describe(title, callback)](./api/class-test.mdx#test-describe) for a group suite.
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"
@@ -124,6 +100,18 @@ This object can be used to launch or connect to WebKit, returning instances of [
 [Video]: ./api/class-video.mdx "Video"
 [WebSocket]: ./api/class-websocket.mdx "WebSocket"
 [Worker]: ./api/class-worker.mdx "Worker"
+[Fixtures]: ./api/class-fixtures.mdx "Fixtures"
+[Test]: ./api/class-test.mdx "Test"
+[TestConfig]: ./api/class-testconfig.mdx "TestConfig"
+[TestError]: ./api/class-testerror.mdx "TestError"
+[TestInfo]: ./api/class-testinfo.mdx "TestInfo"
+[TestProject]: ./api/class-testproject.mdx "TestProject"
+[WorkerInfo]: ./api/class-workerinfo.mdx "WorkerInfo"
+[Location]: ./api/class-location.mdx "Location"
+[Reporter]: ./api/class-reporter.mdx "Reporter"
+[Suite]: ./api/class-suite.mdx "Suite"
+[TestCase]: ./api/class-testcase.mdx "TestCase"
+[TestResult]: ./api/class-testresult.mdx "TestResult"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: ./core-concepts.mdx#evaluation-argument "EvaluationArgument"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
