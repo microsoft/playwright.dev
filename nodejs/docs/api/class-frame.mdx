@@ -34,10 +34,10 @@ const { firefox } = require('playwright');  // Or 'chromium' or 'webkit'.
 ```
 
 
-- [frame.$(selector)](./api/class-frame.mdx#frame-query-selector)
+- [frame.$(selector[, options])](./api/class-frame.mdx#frame-query-selector)
 - [frame.$$(selector)](./api/class-frame.mdx#frame-query-selector-all)
 - [frame.$$eval(selector, pageFunction[, arg])](./api/class-frame.mdx#frame-eval-on-selector-all)
-- [frame.$eval(selector, pageFunction[, arg])](./api/class-frame.mdx#frame-eval-on-selector)
+- [frame.$eval(selector, pageFunction[, arg, options])](./api/class-frame.mdx#frame-eval-on-selector)
 - [frame.addScriptTag([options])](./api/class-frame.mdx#frame-add-script-tag)
 - [frame.addStyleTag([options])](./api/class-frame.mdx#frame-add-style-tag)
 - [frame.check(selector[, options])](./api/class-frame.mdx#frame-check)
@@ -65,6 +65,7 @@ const { firefox } = require('playwright');  // Or 'chromium' or 'webkit'.
 - [frame.isEnabled(selector[, options])](./api/class-frame.mdx#frame-is-enabled)
 - [frame.isHidden(selector[, options])](./api/class-frame.mdx#frame-is-hidden)
 - [frame.isVisible(selector[, options])](./api/class-frame.mdx#frame-is-visible)
+- [frame.locator(selector)](./api/class-frame.mdx#frame-locator)
 - [frame.name()](./api/class-frame.mdx#frame-name)
 - [frame.page()](./api/class-frame.mdx#frame-page)
 - [frame.parentFrame()](./api/class-frame.mdx#frame-parent-frame)
@@ -85,8 +86,10 @@ const { firefox } = require('playwright');  // Or 'chromium' or 'webkit'.
 - [frame.waitForTimeout(timeout)](./api/class-frame.mdx#frame-wait-for-timeout)
 - [frame.waitForURL(url[, options])](./api/class-frame.mdx#frame-wait-for-url)
 
-## frame.$(selector) {#frame-query-selector}
+## frame.$(selector[, options]) {#frame-query-selector}
 - `selector`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-query-selector-option-selector"/> &#60;[string]&#62; A selector to query for. See [working with selectors](./selectors.mdx) for more details.<a href="#frame-query-selector-option-selector" class="list-anchor">#</a>
+- `options` &#60;[Object]&#62;
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-query-selector-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-query-selector-option-strict" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-query-selector-return"/> &#60;[Promise]<[null]|[ElementHandle]>&#62;<a href="#frame-query-selector-return" class="list-anchor">#</a>
 
 Returns the ElementHandle pointing to the frame element.
@@ -101,17 +104,19 @@ Returns the ElementHandles pointing to the frame elements.
 
 The method finds all elements matching the specified selector within the frame. See [Working with selectors](./selectors.mdx) for more details. If no elements match the selector, returns empty array.
 
-## frame.$eval(selector, pageFunction[, arg]) {#frame-eval-on-selector}
+## frame.$eval(selector, pageFunction[, arg, options]) {#frame-eval-on-selector}
 - `selector`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-eval-on-selector-option-selector"/> &#60;[string]&#62; A selector to query for. See [working with selectors](./selectors.mdx) for more details.<a href="#frame-eval-on-selector-option-selector" class="list-anchor">#</a>
 - `pageFunction`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-eval-on-selector-option-expression"/> &#60;[function]\([Element]\)&#62; Function to be evaluated in the page context.<a href="#frame-eval-on-selector-option-expression" class="list-anchor">#</a>
 - `arg`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-eval-on-selector-option-arg"/> &#60;[EvaluationArgument]&#62; Optional argument to pass to `pageFunction`.<a href="#frame-eval-on-selector-option-arg" class="list-anchor">#</a>
+- `options` &#60;[Object]&#62;
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-eval-on-selector-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-eval-on-selector-option-strict" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-eval-on-selector-return"/> &#60;[Promise]<[Serializable]>&#62;<a href="#frame-eval-on-selector-return" class="list-anchor">#</a>
 
 Returns the return value of `pageFunction`.
 
 The method finds an element matching the specified selector within the frame and passes it as a first argument to `pageFunction`. See [Working with selectors](./selectors.mdx) for more details. If no elements match the selector, the method throws an error.
 
-If `pageFunction` returns a [Promise], then [frame.$eval(selector, pageFunction[, arg])](./api/class-frame.mdx#frame-eval-on-selector) would wait for the promise to resolve and return its value.
+If `pageFunction` returns a [Promise], then [frame.$eval(selector, pageFunction[, arg, options])](./api/class-frame.mdx#frame-eval-on-selector) would wait for the promise to resolve and return its value.
 
 Examples:
 
@@ -170,6 +175,7 @@ Adds a `<link rel="stylesheet">` tag into the page with the desired url or a `<s
   - `position`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-check-option-position"/> &#60;[Object]&#62; A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.<a href="#frame-check-option-position" class="list-anchor">#</a>
     - `x` &#60;[number]&#62;
     - `y` &#60;[number]&#62;
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-check-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-check-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-check-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-check-option-timeout" class="list-anchor">#</a>
   - `trial`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-check-option-trial"/> &#60;[boolean]&#62; When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.<a href="#frame-check-option-trial" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-check-return"/> &#60;[Promise]<[void]>&#62;<a href="#frame-check-return" class="list-anchor">#</a>
@@ -200,6 +206,7 @@ When all steps combined have not finished during the specified `timeout`, this m
   - `position`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-click-option-position"/> &#60;[Object]&#62; A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.<a href="#frame-click-option-position" class="list-anchor">#</a>
     - `x` &#60;[number]&#62;
     - `y` &#60;[number]&#62;
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-click-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-click-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-click-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-click-option-timeout" class="list-anchor">#</a>
   - `trial`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-click-option-trial"/> &#60;[boolean]&#62; When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.<a href="#frame-click-option-trial" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-click-return"/> &#60;[Promise]<[void]>&#62;<a href="#frame-click-return" class="list-anchor">#</a>
@@ -229,6 +236,7 @@ Gets the full HTML contents of the frame, including the doctype.
   - `position`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-dblclick-option-position"/> &#60;[Object]&#62; A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.<a href="#frame-dblclick-option-position" class="list-anchor">#</a>
     - `x` &#60;[number]&#62;
     - `y` &#60;[number]&#62;
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-dblclick-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-dblclick-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-dblclick-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-dblclick-option-timeout" class="list-anchor">#</a>
   - `trial`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-dblclick-option-trial"/> &#60;[boolean]&#62; When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.<a href="#frame-dblclick-option-trial" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-dblclick-return"/> &#60;[Promise]<[void]>&#62;<a href="#frame-dblclick-return" class="list-anchor">#</a>
@@ -251,6 +259,7 @@ When all steps combined have not finished during the specified `timeout`, this m
 - `type`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-dispatch-event-option-type"/> &#60;[string]&#62; DOM event type: `"click"`, `"dragstart"`, etc.<a href="#frame-dispatch-event-option-type" class="list-anchor">#</a>
 - `eventInit`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-dispatch-event-option-event-init"/> &#60;[EvaluationArgument]&#62; Optional event-specific initialization properties.<a href="#frame-dispatch-event-option-event-init" class="list-anchor">#</a>
 - `options` &#60;[Object]&#62;
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-dispatch-event-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-dispatch-event-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-dispatch-event-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-dispatch-event-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-dispatch-event-return"/> &#60;[Promise]<[void]>&#62;<a href="#frame-dispatch-event-return" class="list-anchor">#</a>
 
@@ -285,6 +294,7 @@ await frame.dispatchEvent('#source', 'dragstart', { dataTransfer });
 - `options` &#60;[Object]&#62;
   - `force`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-drag-and-drop-option-force"/> &#60;[boolean]&#62; Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.<a href="#frame-drag-and-drop-option-force" class="list-anchor">#</a>
   - `noWaitAfter`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-drag-and-drop-option-no-wait-after"/> &#60;[boolean]&#62; Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.<a href="#frame-drag-and-drop-option-no-wait-after" class="list-anchor">#</a>
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-drag-and-drop-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-drag-and-drop-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-drag-and-drop-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-drag-and-drop-option-timeout" class="list-anchor">#</a>
   - `trial`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-drag-and-drop-option-trial"/> &#60;[boolean]&#62; When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.<a href="#frame-drag-and-drop-option-trial" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-drag-and-drop-return"/> &#60;[Promise]<[void]>&#62;<a href="#frame-drag-and-drop-return" class="list-anchor">#</a>
@@ -370,6 +380,7 @@ To send fine-grained keyboard events, use [frame.type(selector, text[, options])
 ## frame.focus(selector[, options]) {#frame-focus}
 - `selector`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-focus-option-selector"/> &#60;[string]&#62; A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.<a href="#frame-focus-option-selector" class="list-anchor">#</a>
 - `options` &#60;[Object]&#62;
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-focus-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-focus-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-focus-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-focus-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-focus-return"/> &#60;[Promise]<[void]>&#62;<a href="#frame-focus-return" class="list-anchor">#</a>
 
@@ -394,6 +405,7 @@ console.log(frame === contentFrame);  // -> true
 - `selector`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-attribute-option-selector"/> &#60;[string]&#62; A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.<a href="#frame-get-attribute-option-selector" class="list-anchor">#</a>
 - `name`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-attribute-option-name"/> &#60;[string]&#62; Attribute name to get the value for.<a href="#frame-get-attribute-option-name" class="list-anchor">#</a>
 - `options` &#60;[Object]&#62;
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-attribute-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-get-attribute-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-attribute-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-get-attribute-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-attribute-return"/> &#60;[Promise]<[null]|[string]>&#62;<a href="#frame-get-attribute-return" class="list-anchor">#</a>
 
@@ -437,6 +449,7 @@ Headless mode doesn't support navigation to a PDF document. See the [upstream is
   - `position`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-hover-option-position"/> &#60;[Object]&#62; A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.<a href="#frame-hover-option-position" class="list-anchor">#</a>
     - `x` &#60;[number]&#62;
     - `y` &#60;[number]&#62;
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-hover-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-hover-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-hover-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-hover-option-timeout" class="list-anchor">#</a>
   - `trial`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-hover-option-trial"/> &#60;[boolean]&#62; When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.<a href="#frame-hover-option-trial" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-hover-return"/> &#60;[Promise]<[void]>&#62;<a href="#frame-hover-return" class="list-anchor">#</a>
@@ -453,6 +466,7 @@ When all steps combined have not finished during the specified `timeout`, this m
 ## frame.innerHTML(selector[, options]) {#frame-inner-html}
 - `selector`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-inner-html-option-selector"/> &#60;[string]&#62; A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.<a href="#frame-inner-html-option-selector" class="list-anchor">#</a>
 - `options` &#60;[Object]&#62;
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-inner-html-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-inner-html-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-inner-html-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-inner-html-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-inner-html-return"/> &#60;[Promise]<[string]>&#62;<a href="#frame-inner-html-return" class="list-anchor">#</a>
 
@@ -461,6 +475,7 @@ Returns `element.innerHTML`.
 ## frame.innerText(selector[, options]) {#frame-inner-text}
 - `selector`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-inner-text-option-selector"/> &#60;[string]&#62; A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.<a href="#frame-inner-text-option-selector" class="list-anchor">#</a>
 - `options` &#60;[Object]&#62;
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-inner-text-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-inner-text-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-inner-text-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-inner-text-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-inner-text-return"/> &#60;[Promise]<[string]>&#62;<a href="#frame-inner-text-return" class="list-anchor">#</a>
 
@@ -469,6 +484,7 @@ Returns `element.innerText`.
 ## frame.inputValue(selector[, options]) {#frame-input-value}
 - `selector`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-input-value-option-selector"/> &#60;[string]&#62; A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.<a href="#frame-input-value-option-selector" class="list-anchor">#</a>
 - `options` &#60;[Object]&#62;
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-input-value-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-input-value-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-input-value-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-input-value-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-input-value-return"/> &#60;[Promise]<[string]>&#62;<a href="#frame-input-value-return" class="list-anchor">#</a>
 
@@ -477,6 +493,7 @@ Returns `input.value` for the selected `<input>` or `<textarea>` element. Throws
 ## frame.isChecked(selector[, options]) {#frame-is-checked}
 - `selector`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-checked-option-selector"/> &#60;[string]&#62; A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.<a href="#frame-is-checked-option-selector" class="list-anchor">#</a>
 - `options` &#60;[Object]&#62;
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-checked-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-is-checked-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-checked-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-is-checked-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-checked-return"/> &#60;[Promise]<[boolean]>&#62;<a href="#frame-is-checked-return" class="list-anchor">#</a>
 
@@ -490,6 +507,7 @@ Returns `true` if the frame has been detached, or `false` otherwise.
 ## frame.isDisabled(selector[, options]) {#frame-is-disabled}
 - `selector`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-disabled-option-selector"/> &#60;[string]&#62; A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.<a href="#frame-is-disabled-option-selector" class="list-anchor">#</a>
 - `options` &#60;[Object]&#62;
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-disabled-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-is-disabled-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-disabled-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-is-disabled-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-disabled-return"/> &#60;[Promise]<[boolean]>&#62;<a href="#frame-is-disabled-return" class="list-anchor">#</a>
 
@@ -498,6 +516,7 @@ Returns whether the element is disabled, the opposite of [enabled](./actionabili
 ## frame.isEditable(selector[, options]) {#frame-is-editable}
 - `selector`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-editable-option-selector"/> &#60;[string]&#62; A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.<a href="#frame-is-editable-option-selector" class="list-anchor">#</a>
 - `options` &#60;[Object]&#62;
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-editable-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-is-editable-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-editable-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-is-editable-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-editable-return"/> &#60;[Promise]<[boolean]>&#62;<a href="#frame-is-editable-return" class="list-anchor">#</a>
 
@@ -506,6 +525,7 @@ Returns whether the element is [editable](./actionability.mdx#editable).
 ## frame.isEnabled(selector[, options]) {#frame-is-enabled}
 - `selector`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-enabled-option-selector"/> &#60;[string]&#62; A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.<a href="#frame-is-enabled-option-selector" class="list-anchor">#</a>
 - `options` &#60;[Object]&#62;
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-enabled-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-is-enabled-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-enabled-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-is-enabled-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-enabled-return"/> &#60;[Promise]<[boolean]>&#62;<a href="#frame-is-enabled-return" class="list-anchor">#</a>
 
@@ -514,6 +534,7 @@ Returns whether the element is [enabled](./actionability.mdx#enabled).
 ## frame.isHidden(selector[, options]) {#frame-is-hidden}
 - `selector`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-hidden-option-selector"/> &#60;[string]&#62; A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.<a href="#frame-is-hidden-option-selector" class="list-anchor">#</a>
 - `options` &#60;[Object]&#62;
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-hidden-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-is-hidden-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-hidden-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-is-hidden-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-hidden-return"/> &#60;[Promise]<[boolean]>&#62;<a href="#frame-is-hidden-return" class="list-anchor">#</a>
 
@@ -522,10 +543,19 @@ Returns whether the element is hidden, the opposite of [visible](./actionability
 ## frame.isVisible(selector[, options]) {#frame-is-visible}
 - `selector`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-visible-option-selector"/> &#60;[string]&#62; A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.<a href="#frame-is-visible-option-selector" class="list-anchor">#</a>
 - `options` &#60;[Object]&#62;
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-visible-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-is-visible-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-visible-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-is-visible-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-visible-return"/> &#60;[Promise]<[boolean]>&#62;<a href="#frame-is-visible-return" class="list-anchor">#</a>
 
 Returns whether the element is [visible](./actionability.mdx#visible). `selector` that does not match any elements is considered not visible.
+
+## frame.locator(selector) {#frame-locator}
+- `selector`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-locator-option-selector"/> &#60;[string]&#62; A selector to use when resolving DOM element. See [working with selectors](./selectors.mdx) for more details.<a href="#frame-locator-option-selector" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-locator-return"/> &#60;[Locator]&#62;<a href="#frame-locator-return" class="list-anchor">#</a>
+
+The method returns an element locator that can be used to perform actions in the frame. Locator is resolved to the element immediately before performing an action, so a series of actions on the same locator can in fact be performed on different DOM elements. That would happen if the DOM structure between those actions has changed.
+
+Note that locator always implies visibility, so it will always be locating visible elements.
 
 ## frame.name() {#frame-name}
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-name-return"/> &#60;[string]&#62;<a href="#frame-name-return" class="list-anchor">#</a>
@@ -554,6 +584,7 @@ Parent frame, if any. Detached frames and main frames return `null`.
 - `options` &#60;[Object]&#62;
   - `delay`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-press-option-delay"/> &#60;[number]&#62; Time to wait between `keydown` and `keyup` in milliseconds. Defaults to 0.<a href="#frame-press-option-delay" class="list-anchor">#</a>
   - `noWaitAfter`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-press-option-no-wait-after"/> &#60;[boolean]&#62; Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.<a href="#frame-press-option-no-wait-after" class="list-anchor">#</a>
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-press-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-press-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-press-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-press-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-press-return"/> &#60;[Promise]<[void]>&#62;<a href="#frame-press-return" class="list-anchor">#</a>
 
@@ -578,6 +609,7 @@ Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported a
 - `options` &#60;[Object]&#62;
   - `force`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-select-option-option-force"/> &#60;[boolean]&#62; Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.<a href="#frame-select-option-option-force" class="list-anchor">#</a>
   - `noWaitAfter`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-select-option-option-no-wait-after"/> &#60;[boolean]&#62; Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.<a href="#frame-select-option-option-no-wait-after" class="list-anchor">#</a>
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-select-option-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-select-option-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-select-option-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-select-option-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-select-option-return"/> &#60;[Promise]<[Array]<[string]>>&#62;<a href="#frame-select-option-return" class="list-anchor">#</a>
 
@@ -618,6 +650,7 @@ frame.selectOption('select#colors', 'red', 'green', 'blue');
   - `buffer` &#60;[Buffer]&#62; File content
 - `options` &#60;[Object]&#62;
   - `noWaitAfter`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-input-files-option-no-wait-after"/> &#60;[boolean]&#62; Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.<a href="#frame-set-input-files-option-no-wait-after" class="list-anchor">#</a>
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-input-files-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-set-input-files-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-input-files-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-set-input-files-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-input-files-return"/> &#60;[Promise]<[void]>&#62;<a href="#frame-set-input-files-return" class="list-anchor">#</a>
 
@@ -634,6 +667,7 @@ Sets the value of the file input to these file paths or files. If some of the `f
   - `position`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-tap-option-position"/> &#60;[Object]&#62; A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.<a href="#frame-tap-option-position" class="list-anchor">#</a>
     - `x` &#60;[number]&#62;
     - `y` &#60;[number]&#62;
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-tap-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-tap-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-tap-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-tap-option-timeout" class="list-anchor">#</a>
   - `trial`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-tap-option-trial"/> &#60;[boolean]&#62; When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.<a href="#frame-tap-option-trial" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-tap-return"/> &#60;[Promise]<[void]>&#62;<a href="#frame-tap-return" class="list-anchor">#</a>
@@ -654,6 +688,7 @@ When all steps combined have not finished during the specified `timeout`, this m
 ## frame.textContent(selector[, options]) {#frame-text-content}
 - `selector`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-text-content-option-selector"/> &#60;[string]&#62; A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.<a href="#frame-text-content-option-selector" class="list-anchor">#</a>
 - `options` &#60;[Object]&#62;
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-text-content-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-text-content-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-text-content-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-text-content-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-text-content-return"/> &#60;[Promise]<[null]|[string]>&#62;<a href="#frame-text-content-return" class="list-anchor">#</a>
 
@@ -670,6 +705,7 @@ Returns the page title.
 - `options` &#60;[Object]&#62;
   - `delay`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-type-option-delay"/> &#60;[number]&#62; Time to wait between key presses in milliseconds. Defaults to 0.<a href="#frame-type-option-delay" class="list-anchor">#</a>
   - `noWaitAfter`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-type-option-no-wait-after"/> &#60;[boolean]&#62; Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.<a href="#frame-type-option-no-wait-after" class="list-anchor">#</a>
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-type-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-type-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-type-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-type-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-type-return"/> &#60;[Promise]<[void]>&#62;<a href="#frame-type-return" class="list-anchor">#</a>
 
@@ -690,6 +726,7 @@ await frame.type('#mytextarea', 'World', {delay: 100}); // Types slower, like a 
   - `position`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-uncheck-option-position"/> &#60;[Object]&#62; A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.<a href="#frame-uncheck-option-position" class="list-anchor">#</a>
     - `x` &#60;[number]&#62;
     - `y` &#60;[number]&#62;
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-uncheck-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-uncheck-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-uncheck-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-uncheck-option-timeout" class="list-anchor">#</a>
   - `trial`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-uncheck-option-trial"/> &#60;[boolean]&#62; When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.<a href="#frame-uncheck-option-trial" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-uncheck-return"/> &#60;[Promise]<[void]>&#62;<a href="#frame-uncheck-return" class="list-anchor">#</a>
@@ -793,6 +830,7 @@ Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/Hist
     * `'detached'` - wait for element to not be present in DOM.
     * `'visible'` - wait for element to have non-empty bounding box and no `visibility:hidden`. Note that element without any content or with `display:none` has an empty bounding box and is not considered visible.
     * `'hidden'` - wait for element to be either detached from DOM, or have an empty bounding box or `visibility:hidden`. This is opposite to the `'visible'` option.
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-selector-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-wait-for-selector-option-strict" class="list-anchor">#</a>
   - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-selector-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-wait-for-selector-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-selector-return"/> &#60;[Promise]<[null]|[ElementHandle]>&#62;<a href="#frame-wait-for-selector-return" class="list-anchor">#</a>
 
@@ -865,6 +903,7 @@ await frame.waitForURL('**/target.html');
 [Frame]: ./api/class-frame.mdx "Frame"
 [JSHandle]: ./api/class-jshandle.mdx "JSHandle"
 [Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Locator]: ./api/class-locator.mdx "Locator"
 [Logger]: ./api/class-logger.mdx "Logger"
 [Mouse]: ./api/class-mouse.mdx "Mouse"
 [Page]: ./api/class-page.mdx "Page"
