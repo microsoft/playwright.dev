@@ -100,6 +100,7 @@ module.exports = {
             { "type": "doc", "id": "api/class-frame" },
             { "type": "doc", "id": "api/class-jshandle" },
             { "type": "doc", "id": "api/class-keyboard" },
+            { "type": "doc", "id": "api/class-locator" },
             { "type": "doc", "id": "api/class-logger" },
             { "type": "doc", "id": "api/class-mouse" },
             { "type": "doc", "id": "api/class-page" },

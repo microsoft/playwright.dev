@@ -113,10 +113,12 @@ class CSharpFormatter {
           case 'ElementHandle.selectOption.values': return '`SelectOption`';
           case 'Frame.selectOption.values': return '`SelectOption`';
           case 'Page.selectOption.values': return '`SelectOption`';
+          case 'Locator.selectOption.values': return '`SelectOption`';
           case 'ElementHandle.setInputFiles.files': return '`FilePayload`';
           case 'FileChooser.setFiles.files': return '`FilePayload`';
           case 'Frame.setInputFiles.files': return '`FilePayload`';
           case 'Page.setInputFiles.files': return '`FilePayload`';
+          case 'Locator.setInputFiles.files': return '`FilePayload`';
         }
         if (!type.templates)
           return `${toTitleCase(member.alias)}${optionalSuffix}`;
