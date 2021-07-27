@@ -113,12 +113,13 @@ class Generator {
     for (const entry of fs.readdirSync(DIR_SRC, { withFileTypes: true })) {
       if (entry.isDirectory() || entry.name.startsWith('links'))
         continue;
-      if (entry.name.includes('-js') || entry.name.includes('-python') || entry.name.includes('-java') || entry.name.includes('-csharp')) {
+      const supportedLanguages = ['js', 'python', 'java', 'csharp'];
+      if (supportedLanguages.some(l => entry.name.includes(`-${l}`))) {
         if (!entry.name.includes('-' + this.lang))
           continue;
       }
 
-      const outName = entry.name.replace(new RegExp('-' + this.lang), '');
+      const outName = entry.name.replace(new RegExp(`(${supportedLanguages.map(l => '-' + l).join('|')})`, 'g'), '');
       guides.set(entry.name, outName);
       this.generatedFiles.add(`./${outName}`);
     }
@@ -477,24 +478,6 @@ function highlighterName(lang) {
   if (lang === 'python')
     return 'py';
   return lang;
-}
-
-/**
- * @param {string} dir
- * @param {string} base
- * @param {Set<string>} result
- */
-function listFiles(dir, base, result) {
-  for (let name of fs.readdirSync(dir)) {
-    const f = path.join(dir, name);
-    if (fs.lstatSync(f).isDirectory()) {
-      listFiles(f, base, result);
-    } else {
-      name = name.replace(/(-js\.|-python\.|-java\.|-sharp\.)/, '.');
-      if (name.endsWith('.md'))
-        result.add('./' + path.relative(base, path.join(dir, name)));
-    }
-  }
 }
 
 /**
