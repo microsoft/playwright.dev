@@ -4,6 +4,9 @@ import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import {useLocation} from '@docusaurus/router';
 import {isSamePath} from '@docusaurus/theme-common';
+import IconExternalLink from '@theme/IconExternalLink';
+import isInternalUrl from '@docusaurus/isInternalUrl';
+const dropdownLinkActiveClass = 'dropdown__link--active';
 
 function NavLink({
   activeBasePath,
@@ -23,6 +26,8 @@ function NavLink({
   const normalizedHref = useBaseUrl(href, {
     forcePrependBaseUrl: true,
   });
+  const isExternalLink = label && href && !isInternalUrl(href);
+  const isDropdownLink = activeClassName === dropdownLinkActiveClass;
 
   // Start Playwright adjustment
   const location = useLocation();
@@ -62,7 +67,19 @@ function NavLink({
               : null),
           })}
       {...props}>
-      {label}
+      {isExternalLink ? (
+        <span>
+          {label}
+          <IconExternalLink
+            {...(isDropdownLink && {
+              width: 12,
+              height: 12,
+            })}
+          />
+        </span>
+      ) : (
+        label
+      )}
     </Link>
   );
 }
@@ -136,7 +153,7 @@ function NavItemDesktop({items, position, className, ...props}) {
                   }
                 }
               }}
-              activeClassName="dropdown__link--active"
+              activeClassName={dropdownLinkActiveClass}
               className={navLinkClassNames(childItemClassName, true)}
               {...childItemProps}
             />

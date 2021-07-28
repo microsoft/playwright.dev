@@ -2,7 +2,7 @@
 
 set -e
 
-COMMIT_HASH="61c4b742c160b13b721eb400a8d531f131aaa2bd"
+COMMIT_HASH="5c51edc1d46b2739236cd16b67e3f6e2ae7bd0cb"
 
 cd third_party
 
