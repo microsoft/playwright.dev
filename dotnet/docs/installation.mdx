@@ -5,13 +5,19 @@ title: "Installation"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-This is a browser installation guide for Playwright Library. If you are using Playwright Test, please refer to [installing browsers](./test-install.mdx) test guide.
-
 - [Managing browser binaries](#managing-browser-binaries)
 - [Install behind a firewall or a proxy](#install-behind-a-firewall-or-a-proxy)
 - [Download from artifact repository](#download-from-artifact-repository)
 - [Skip browser downloads](#skip-browser-downloads)
 - [Stale browser removal](#stale-browser-removal)
+
+### Prerequisites for .NET
+
+All examples require the `Microsoft.Playwright.CLI` to be installed. You only have to do this once:
+
+```bash
+dotnet tool install -g Microsoft.Playwright.CLI
+```
 
 ## Managing browser binaries
 
@@ -19,6 +25,11 @@ Each version of Playwright needs specific versions of browser binaries to operat
 - `%USERPROFILE%\AppData\Local\ms-playwright` on Windows
 - `~/Library/Caches/ms-playwright` on MacOS
 - `~/.cache/ms-playwright` on Linux
+
+```bash
+# In your solution/project folder...
+playwright install
+```
 
 These browsers will take a few hundred megabytes of disk space when installed:
 
@@ -31,7 +42,34 @@ du -hs ~/Library/Caches/ms-playwright/*
 
 You can override default behavior using environment variables. When installing Playwright, ask it to download browsers into a specific location:
 
+```bash
+# Linux/macOS
+PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers 
+playwright install
+
+# Windows with cmd.exe
+set PLAYWRIGHT_BROWSERS_PATH=%USERPROFILE%\pw-browsers
+playwright install
+
+# Windows with PowerShell
+$env:PLAYWRIGHT_BROWSERS_PATH="$env:USERPROFILE\pw-browsers"
+playwright install
+```
+
 When running Playwright scripts, ask it to search for browsers in a shared location.
+
+```bash
+# Linux/macOS
+PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers dotnet test
+
+# Windows with cmd.exe
+set PLAYWRIGHT_BROWSERS_PATH=%USERPROFILE%\pw-browsers
+dotnet test
+
+# Windows with PowerShell
+$env:PLAYWRIGHT_BROWSERS_PATH="$env:USERPROFILE\pw-browsers"
+dotnet test
+```
 
 Playwright keeps track of packages that need those browsers and will garbage collect them as you update Playwright to the newer versions.
 
@@ -45,19 +83,63 @@ By default, Playwright downloads browsers from Microsoft CDN.
 
 Sometimes companies maintain an internal proxy that blocks direct access to the public resources. In this case, Playwright can be configured to download browsers via a proxy server.
 
+```bash
+# Linux/macOS
+HTTPS_PROXY=https://192.0.2.1 playwright install
+
+# Windows with cmd.exe
+set HTTPS_PROXY=https://192.0.2.1
+playwright install
+
+# Windows with PowerShell
+$env:HTTPS_PROXY="https://192.0.2.1"
+playwright install
+```
+
 ## Download from artifact repository
 
 By default, Playwright downloads browsers from Microsoft CDN.
 
 Sometimes companies maintain an internal artifact repository to host browser binaries. In this case, Playwright can be configured to download from a custom location using the `PLAYWRIGHT_DOWNLOAD_HOST` env variable.
 
+```bash
+# Linux/macOS
+PLAYWRIGHT_DOWNLOAD_HOST=192.0.2.1 playwright install
+
+# Windows with cmd.exe
+set PLAYWRIGHT_DOWNLOAD_HOST=192.0.2.1
+playwright install
+
+# Windows with PowerShell
+$env:PLAYWRIGHT_DOWNLOAD_HOST="192.0.2.1"
+playwright install
+```
+
 It is also possible to use a per-browser download hosts using `PLAYWRIGHT_CHROMIUM_DOWNLOAD_HOST`, `PLAYWRIGHT_FIREFOX_DOWNLOAD_HOST` and `PLAYWRIGHT_WEBKIT_DOWNLOAD_HOST` env variables that take precedence over `PLAYWRIGHT_DOWNLOAD_HOST`.
+
+```bash
+# Linux/macOS
+PLAYWRIGHT_FIREFOX_DOWNLOAD_HOST=203.0.113.3 PLAYWRIGHT_DOWNLOAD_HOST=192.0.2.1 playwright install
+```
 
 ## Skip browser downloads
 
 In certain cases, it is desired to avoid browser downloads altogether because browser binaries are managed separately.
 
 This can be done by setting `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` variable before installation.
+
+```bash
+# Linux/macOS
+PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 playwright install
+
+# Windows with cmd.exe
+set PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+playwright install
+
+# Windows with PowerShell
+$env:PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+playwright install
+```
 
 ## Stale browser removal
 
@@ -129,3 +211,5 @@ To opt-out from the unused browser removal, you can set the `PLAYWRIGHT_SKIP_BRO
 [all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
 [Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
 [Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
+
+[installation-managing-browser-binaries]: ./installation.mdx#managing-browser-binaries "Installation: Manage browser binaries"

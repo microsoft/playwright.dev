@@ -19,3 +19,5 @@
 [all available image tags]: https://mcr.microsoft.com/v2/playwright/java/tags/list "all available image tags"
 [Docker Hub]: https://hub.docker.com/_/microsoft-playwright-java "Docker Hub"
 [Dockerfile.focal]: https://github.com/microsoft/playwright-java/blob/master/Dockerfile.focal "Dockerfile.focal"
+
+[installation-managing-browser-binaries]: ./installation.md#managing-browser-binaries "Installation: Manage browser binaries"

@@ -22,7 +22,45 @@ Page objects **simplify maintenance**. They capture element selectors in one pla
 
 Page object models wrap over a Playwright [Page].
 
+```csharp
+using System.Threading.Tasks;
+using Microsoft.Playwright;
+
+namespace BigEcommerceApp.Tests.Models
+{
+  public class SearchPage
+  {
+    private readonly IPage _page;
+
+    public SearchPage(IPage page)
+    {
+      _page = page;
+    }
+
+    public async Task Goto()
+    {
+      await _page.GotoAsync("https://bing.com");
+    }
+
+    public async Task Search(string text)
+    {
+      await _page.FillAsync("[aria-label='Enter your search term']", text);
+      await _page.PressAsync("[aria-label='Enter your search term']", "Enter");
+    }
+  }
+}
+```
+
 Page objects can then be used inside a test.
+
+```csharp
+using BigEcommerceApp.Tests.Models;
+
+// in the test
+var page = new SearchPage(await browser.NewPageAsync());
+await page.Goto();
+await page.Search("search query");
+```
 
 ### API reference
 - [Page]
@@ -91,3 +129,5 @@ Page objects can then be used inside a test.
 [all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
 [Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
 [Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
+
+[installation-managing-browser-binaries]: ./installation.mdx#managing-browser-binaries "Installation: Manage browser binaries"
