@@ -20,41 +20,16 @@ ElementHandle represents an in-page DOM element. ElementHandles can be created w
 <TabItem value="sync">
 
 ```py
-from playwright.sync_api import sync_playwright
-
-def run(playwright):
-    chromium = playwright.chromium
-    browser = chromium.launch()
-    page = browser.new_page()
-    page.goto("https://example.com")
-    href_element = page.query_selector("a")
-    href_element.click()
-    # ...
-
-with sync_playwright() as playwright:
-    run(playwright)
+href_element = page.query_selector("a")
+href_element.click()
 ```
 
 </TabItem>
 <TabItem value="async">
 
 ```py
-import asyncio
-from playwright.async_api import async_playwright
-
-async def run(playwright):
-    chromium = playwright.chromium
-    browser = await chromium.launch()
-    page = await browser.new_page()
-    await page.goto("https://example.com")
-    href_element = await page.query_selector("a")
-    await href_element.click()
-    # ...
-
-async def main():
-    async with async_playwright() as playwright:
-        await run(playwright)
-asyncio.run(main())
+href_element = await page.query_selector("a")
+await href_element.click()
 ```
 
 </TabItem>
@@ -63,6 +38,72 @@ asyncio.run(main())
 ElementHandle prevents DOM element from garbage collection unless the handle is disposed with [js_handle.dispose()](./api/class-jshandle.mdx#js-handle-dispose). ElementHandles are auto-disposed when their origin frame gets navigated.
 
 ElementHandle instances can be used as an argument in [page.eval_on_selector(selector, expression, **kwargs)](./api/class-page.mdx#page-eval-on-selector) and [page.evaluate(expression, **kwargs)](./api/class-page.mdx#page-evaluate) methods.
+
+:::note
+In most cases, you would want to use the [Locator] object instead. You should only use [ElementHandle] if you want to retain a handle to a particular DOM Node that you intend to pass into [page.evaluate(expression, **kwargs)](./api/class-page.mdx#page-evaluate) as an argument.
+:::
+
+The difference between the [Locator] and ElementHandle is that the ElementHandle points to a particular element, while [Locator] captures the logic of how to retrieve an element.
+
+In the example below, handle points to a particular DOM element on page. If that element changes text or is used by React to render an entirely different component, handle is still pointing to that very DOM element. This can lead to unexpected behaviors.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+handle = page.query_selector("text=Submit")
+handle.hover()
+handle.click()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+handle = await page.query_selector("text=Submit")
+await handle.hover()
+await handle.click()
+```
+
+</TabItem>
+</Tabs>
+
+With the locator, every time the `element` is used, up-to-date DOM element is located in the page using the selector. So in the snippet below, underlying DOM element is going to be located twice.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+locator = page.locator("text=Submit")
+locator.hover()
+locator.click()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+locator = page.locator("text=Submit")
+await locator.hover()
+await locator.click()
+```
+
+</TabItem>
+</Tabs>
 
 
 - [element_handle.bounding_box()](./api/class-elementhandle.mdx#element-handle-bounding-box)

@@ -55,7 +55,7 @@ test('basic test', async ({ page }) => {
 - [test.fixme([condition, description])](./api/class-test.mdx#test-fixme)
 - [test.only(title, testFunction)](./api/class-test.mdx#test-only)
 - [test.setTimeout(timeout)](./api/class-test.mdx#test-set-timeout)
-- [test.skip([condition, description])](./api/class-test.mdx#test-skip)
+- [test.skip(titleOrCondition, testFunctionOrDescription)](./api/class-test.mdx#test-skip)
 - [test.slow([condition, description])](./api/class-test.mdx#test-slow)
 - [test.use(fixtures)](./api/class-test.mdx#test-use)
 - [test.expect](./api/class-test.mdx#test-expect)
@@ -712,14 +712,14 @@ test.beforeEach(async ({ page }, testInfo) => {
 
 Timeout for the currently running test is available through [testInfo.timeout](./api/class-testinfo.mdx#test-info-timeout).
 
-## test.skip([condition, description]) {#test-skip}
-- `condition`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-skip-option-condition"/> &#60;[void]|[boolean]|[function]\([Fixtures]\):[boolean]&#62; Optional condition - either a boolean value, or a function that takes a fixtures object and returns a boolean. Test or tests are skipped when the condition is `true`.<a href="#test-skip-option-condition" class="list-anchor">#</a>
-- `description`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-skip-option-description"/> &#60;[void]|[string]&#62; Optional description that will be reflected in a test report.<a href="#test-skip-option-description" class="list-anchor">#</a>
+## test.skip(titleOrCondition, testFunctionOrDescription) {#test-skip}
+- `titleOrCondition`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-skip-option-condition"/> &#60;[string]|[void]|[boolean]|[function]\([Fixtures]\):[boolean]&#62; When used with `test.skip('test', () => {})` notation, first argument is a test title. Otherwise it is an optional skip condition - either a boolean value, or a function that takes a fixtures object and returns a boolean. Test or tests are skipped when the condition is `true`.<a href="#test-skip-option-condition" class="list-anchor">#</a>
+- `testFunctionOrDescription`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-skip-option-description"/> &#60;[function]\([Fixtures], [TestInfo]\)|[void]|[string]&#62; When used with `test.skip('test', () => {})` notation, second argument is a test function. Otherwise it is an optional description that will be reflected in a test report.<a href="#test-skip-option-description" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-skip-return"/> &#60;[void]&#62;<a href="#test-skip-return" class="list-anchor">#</a>
 
 Skips a test or a group of tests.
 
-Unconditionally skip a test:
+Unconditionally skip a test, this is similar syntax to [test(title, testFunction)](./api/class-test.mdx#test-call):
 
 <Tabs
   groupId="js-flavor"
@@ -734,8 +734,7 @@ Unconditionally skip a test:
 ```js
 import { test, expect } from '@playwright/test';
 
-test('broken test', async ({ page }) => {
-  test.skip();
+test.skip('broken test', async ({ page }) => {
   // ...
 });
 ```
@@ -746,8 +745,7 @@ test('broken test', async ({ page }) => {
 ```js
 const { test, expect } = require('@playwright/test');
 
-test('broken test', async ({ page }) => {
-  test.skip();
+test.skip('broken test', async ({ page }) => {
   // ...
 });
 ```
@@ -755,7 +753,7 @@ test('broken test', async ({ page }) => {
 </TabItem>
 </Tabs>
 
-Conditionally skip a test with an optional description:
+Conditionally skip a test with an optional description. In this case, call `test.skip()` inside the test function:
 
 <Tabs
   groupId="js-flavor"
