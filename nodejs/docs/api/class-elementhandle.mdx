@@ -10,21 +10,37 @@ import TabItem from '@theme/TabItem';
 ElementHandle represents an in-page DOM element. ElementHandles can be created with the [page.$(selector[, options])](./api/class-page.mdx#page-query-selector) method.
 
 ```js
-const { chromium } = require('playwright');  // Or 'firefox' or 'webkit'.
-
-(async () => {
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
-  await page.goto('https://example.com');
-  const hrefElement = await page.$('a');
-  await hrefElement.click();
-  // ...
-})();
+const hrefElement = await page.$('a');
+await hrefElement.click();
 ```
 
 ElementHandle prevents DOM element from garbage collection unless the handle is disposed with [jsHandle.dispose()](./api/class-jshandle.mdx#js-handle-dispose). ElementHandles are auto-disposed when their origin frame gets navigated.
 
 ElementHandle instances can be used as an argument in [page.$eval(selector, pageFunction[, arg, options])](./api/class-page.mdx#page-eval-on-selector) and [page.evaluate(pageFunction[, arg])](./api/class-page.mdx#page-evaluate) methods.
+
+:::note
+In most cases, you would want to use the [Locator] object instead. You should only use [ElementHandle] if you want to retain a handle to a particular DOM Node that you intend to pass into [page.evaluate(pageFunction[, arg])](./api/class-page.mdx#page-evaluate) as an argument.
+:::
+
+The difference between the [Locator] and ElementHandle is that the ElementHandle points to a particular element, while [Locator] captures the logic of how to retrieve an element.
+
+In the example below, handle points to a particular DOM element on page. If that element changes text or is used by React to render an entirely different component, handle is still pointing to that very DOM element. This can lead to unexpected behaviors.
+
+```js
+const handle = await page.$('text=Submit');
+// ...
+await handle.hover();
+await handle.click();
+```
+
+With the locator, every time the `element` is used, up-to-date DOM element is located in the page using the selector. So in the snippet below, underlying DOM element is going to be located twice.
+
+```js
+const locator = page.locator('text=Submit');
+// ...
+await locator.hover();
+await locator.click();
+```
 
 
 - [elementHandle.$(selector)](./api/class-elementhandle.mdx#element-handle-query-selector)
