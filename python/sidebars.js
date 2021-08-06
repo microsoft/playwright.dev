@@ -6,9 +6,8 @@ module.exports = {
       "items": [
         { "type": "doc", "id": "why-playwright" },
         { "type": "doc", "id": "intro" },
-        { "type": "doc", "id": "core-concepts" },
-        { "type": "doc", "id": "cli" },
         { "type": "doc", "id": "debug" },
+        { "type": "doc", "id": "cli" },
         { "type": "doc", "id": "languages" },
         { "type": "doc", "id": "release-notes" },
         { "type": "doc", "id": "test-runners" }
@@ -24,6 +23,7 @@ module.exports = {
         { "type": "doc", "id": "auth" },
         { "type": "doc", "id": "browsers" },
         { "type": "doc", "id": "chrome-extensions" },
+        { "type": "doc", "id": "core-concepts" },
         { "type": "doc", "id": "dialogs" },
         { "type": "doc", "id": "downloads" },
         { "type": "doc", "id": "selectors" },
@@ -33,7 +33,6 @@ module.exports = {
         { "type": "doc", "id": "handles" },
         { "type": "doc", "id": "input" },
         { "type": "doc", "id": "inspector" },
-        { "type": "doc", "id": "installation" },
         { "type": "doc", "id": "multi-pages" },
         { "type": "doc", "id": "navigations" },
         { "type": "doc", "id": "network" },

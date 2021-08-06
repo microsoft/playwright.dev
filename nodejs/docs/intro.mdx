@@ -5,7 +5,7 @@ title: "Getting Started"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright can either be used as a part of the Playwright Test, or as a [Playwright Library](./library.mdx). If you intend to use Playwright for testing, read on.
+Playwright can either be used as a part of the Playwright Test (this guide), or as a [Playwright Library](./library.mdx).
 
 Playwright Test was created specifically to accommodate the needs of the end-to-end testing. It does everything you would expect from the regular test runner, and more. Playwright test allows to:
 - Run tests across all browsers.
@@ -18,10 +18,11 @@ Playwright Test was created specifically to accommodate the needs of the end-to-
 
 - [Installation](#installation)
 - [First test](#first-test)
-- [Test fixtures](#test-fixtures)
-- [Test and assertion features](#test-and-assertion-features)
-- [Learn the command line](#learn-the-command-line)
-- [Create a configuration file](#create-a-configuration-file)
+- [Writing assertions](#writing-assertions)
+- [Using test fixtures](#using-test-fixtures)
+- [Using test hooks](#using-test-hooks)
+- [Learning the command line](#learning-the-command-line)
+- [Creating a configuration file](#creating-a-configuration-file)
 - [Release notes](./release-notes.mdx)
 
 <br/>
@@ -32,15 +33,11 @@ Playwright has its own test runner for end-to-end tests, we call it Playwright T
 
 ```bash
 npm i -D @playwright/test
-```
-
-Unlike Playwright Library, Playwright Test does not bundle browsers by default, so you need to install them explicitly:
-
-```bash
+# install supported browsers
 npx playwright install
 ```
 
-You can optionally install only selected browsers, see [installing browsers](./test-install.mdx) for more details. Or you can install no browsers at all and use existing [browser channels](./browsers.mdx).
+You can optionally install only selected browsers, see [installing browsers](./browsers.mdx#installing-browsers) for more details. Or you can install no browsers at all and use existing [browser channels](./browsers.mdx).
 
 ## First test
 
@@ -61,8 +58,8 @@ import { test, expect } from '@playwright/test';
 
 test('basic test', async ({ page }) => {
   await page.goto('https://playwright.dev/');
-  const name = await page.innerText('.navbar__title');
-  expect(name).toBe('Playwright');
+  const title = page.locator('.navbar__title');
+  await expect(title).toHaveText('Playwright');
 });
 ```
 
@@ -74,8 +71,8 @@ const { test, expect } = require('@playwright/test');
 
 test('basic test', async ({ page }) => {
   await page.goto('https://playwright.dev/');
-  const name = await page.innerText('.navbar__title');
-  expect(name).toBe('Playwright');
+  const title = page.locator('.navbar__title');
+  await expect(title).toHaveText('Playwright');
 });
 ```
 
@@ -108,7 +105,121 @@ npx playwright test --browser=all
 
 Refer to [configuration](./test-configuration.mdx) section for configuring test runs in different modes with different browsers.
 
-## Test fixtures
+## Writing assertions
+
+Playwright Test uses [expect](https://jestjs.io/docs/expect) library for test assertions. It provides a lot of matchers like `toEqual`, `toContain`, `toMatch`, `toMatchSnapshot` and many more. Playwright also extends this set with the following matchers:
+- `toBeChecked`
+- `toBeDisabled`
+- `toBeEditable`
+- `toBeEmpty`
+- `toBeEnabled`
+- `toBeFocused`
+- `toBeHidden`
+- `toBeSelected`
+- `toBeVisible`
+- `toContainText`
+- `toHaveAttr`
+- `toHaveClass`
+- `toHaveCount`
+- `toHaveCSS`
+- `toHaveData`
+- `toHaveId`
+- `toHaveProp`
+- `toHaveText`
+- `toHaveTitle`
+- `toHaveURL`
+- `toHaveValue`
+- `toMatchSnapshot`
+- Find out more in the [assertions](./assertions.mdx) guide
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+// example.spec.ts
+import { test, expect } from '@playwright/test';
+
+test('my test', async ({ page }) => {
+  await page.goto('https://playwright.dev/');
+
+  // Expect a title "to contain" a substring.
+  await expect(page).toHaveTitle('Playwright');
+
+  // Expect an attribute "to be strictly equal" to the value.
+  await expect(page.locator('text=Get Started').toHaveAttr('href', '/docs/intro');
+
+  // Expect an element "to be visible".
+  await expect(page.locator('text=Learn more')).toBeVisible();
+
+  await page.click('text=Get Started');
+  // Expect some text to be visible on the page.
+  await expect(page.locator('text=System requirements')).toBeVisible();
+
+  // Compare screenshot with a stored reference.
+  expect(await page.screenshot()).toMatchSnapshot('get-started.png');
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// example.spec.js
+const { test, expect } = require('@playwright/test');
+
+test('my test', async ({ page }) => {
+  await page.goto('https://playwright.dev/');
+
+  // Expect a title "to contain" a substring.
+  await expect(page).toHaveTitle('Playwright');
+
+  // Expect an attribute "to be strictly equal" to the value.
+  await expect(page.locator('text=Get Started').toHaveAttr('href', '/docs/intro');
+
+  // Expect an element "to be visible".
+  await expect(page.locator('text=Learn more')).toBeVisible();
+
+  await page.click('text=Get Started');
+  // Expect some text to be visible on the page.
+  await expect(page.locator('text=System requirements')).toBeVisible();
+
+  // Compare screenshot with a stored reference.
+  expect(await page.screenshot()).toMatchSnapshot('get-started.png');
+});
+```
+
+</TabItem>
+</Tabs>
+
+Notice how running this test is saying:
+
+```
+Error: example.spec.ts-snapshots/get-started-chromium-darwin.png is missing in snapshots, writing actual.
+```
+
+That's because there was no golden file for your `get-started.png` snapshot. It is now created and is ready to be added to the repository. The name of the folder with the golden expectations starts with the name of your test file:
+
+```bash
+drwxr-xr-x  5 user  group  160 Jun  4 11:46 .
+drwxr-xr-x  6 user  group  192 Jun  4 11:45 ..
+-rw-r--r--  1 user  group  231 Jun  4 11:16 example.spec.ts
+drwxr-xr-x  3 user  group   96 Jun  4 11:46 example.spec.ts-snapshots
+```
+
+To update your golden files, you can use the `--update-snapshots` parameter.
+
+```bash
+npx playwright test --update-snapshots
+```
+
+## Using test fixtures
 
 You noticed an argument `{ page }` that the test above has access to:
 
@@ -149,125 +260,7 @@ Here is a list of the pre-defined fixtures that you are likely to use most of th
 |browser    |[Browser]        |Browsers are shared across tests to optimize resources. Learn how to [configure browser](./test-configuration.mdx). |
 |browserName|[string]         |The name of the browser currently running the test. Either `chromium`, `firefox` or `webkit`.|
 
-## Test and assertion features
-
-If you are familiar with test runners like Jest, Mocha and Ava, you will find the Playwright Test syntax familiar. These are the basic things you can do with the test:
-
-### Focus a test
-
-You can focus some tests. When there are focused tests, only they run.
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
-```js
-test.only('focus this test', async ({ page }) => {
-  // Run only focused tests in the entire project.
-});
-```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-test.only('focus this test', async ({ page }) => {
-  // Run only focused tests in the entire project.
-});
-```
-
-</TabItem>
-</Tabs>
-
-### Skip a test
-
-Mark a test as skipped.
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
-```js
-test.skip('skip this test', async ({ page }) => {
-  // This test is not run
-});
-```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-test.skip('skip this test', async ({ page }) => {
-  // This test is not run
-});
-```
-
-</TabItem>
-</Tabs>
-
-You can also skip a test when [some condition is met](./test-annotations.mdx#conditionally-skip-a-test).
-
-### Group tests
-
-You can group tests to give them a logical name or to scope before/after hooks to the group.
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
-```js
-import { test, expect } from '@playwright/test';
-
-test.describe('two tests', () => {
-  test('one', async ({ page }) => {
-    // ...
-  });
-
-  test('two', async ({ page }) => {
-    // ...
-  });
-});
-```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-const { test, expect } = require('@playwright/test');
-
-test.describe('two tests', () => {
-  test('one', async ({ page }) => {
-    // ...
-  });
-
-  test('two', async ({ page }) => {
-    // ...
-  });
-});
-```
-
-</TabItem>
-</Tabs>
-
-### Use test hooks
+## Using test hooks
 
 You can use `test.beforeAll` and `test.afterAll` hooks to set up and tear down resources shared between tests. And you can use `test.beforeEach` and `test.afterEach` hooks to set up and tear down resources for each test individually.
 
@@ -293,7 +286,7 @@ test.describe('feature foo', () => {
 
   test('my test', async ({ page }) => {
     // Assertions use the expect API.
-    expect(page.url()).toBe('https://my.start.url/');
+    await expect(page).toHaveURL('https://my.start.url/');
   });
 });
 ```
@@ -313,7 +306,7 @@ test.describe('feature foo', () => {
 
   test('my test', async ({ page }) => {
     // Assertions use the expect API.
-    expect(page.url()).toBe('https://my.start.url/');
+    await expect(page).toHaveURL('https://my.start.url/');
   });
 });
 ```
@@ -321,106 +314,7 @@ test.describe('feature foo', () => {
 </TabItem>
 </Tabs>
 
-### Write assertions
-
-Playwright Test uses [expect](https://jestjs.io/docs/expect) library for test assertions. It provides a lot of matchers like `toEqual`, `toContain`, `toMatch`, `toMatchSnapshot` and many more.
-
-Combine `expect` with various Playwright methods to create expectations for your test:
-- [page.isVisible(selector[, options])](./api/class-page.mdx#page-is-visible)
-- [page.waitForSelector(selector[, options])](./api/class-page.mdx#page-wait-for-selector)
-- [page.textContent(selector[, options])](./api/class-page.mdx#page-text-content)
-- [page.getAttribute(selector, name[, options])](./api/class-page.mdx#page-get-attribute)
-- [page.screenshot([options])](./api/class-page.mdx#page-screenshot)
-- Find out more in the [assertions](./assertions.mdx) guide
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
-```js
-// example.spec.ts
-import { test, expect } from '@playwright/test';
-
-test('my test', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
-
-  // Expect a title "to contain" a substring.
-  expect(await page.title()).toContain('Playwright');
-
-  // Expect an attribute "to be strictly equal" to the value.
-  expect(await page.getAttribute('text=Get Started', 'href')).toBe('/docs/intro');
-
-  // Expect an element "to be visible".
-  expect(await page.isVisible('text=Learn more')).toBeTruthy();
-
-  await page.click('text=Get Started');
-  // Expect some text to be visible on the page.
-  expect(await page.waitForSelector('text=System requirements')).toBeTruthy();
-
-  // Compare screenshot with a stored reference.
-  expect(await page.screenshot()).toMatchSnapshot('get-started.png');
-});
-```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-// example.spec.js
-const { test, expect } = require('@playwright/test');
-
-test('my test', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
-
-  // Expect a title "to contain" a substring.
-  expect(await page.title()).toContain('Playwright');
-
-  // Expect an attribute "to be strictly equal" to the value.
-  expect(await page.getAttribute('text=Get Started', 'href')).toBe('/docs/intro');
-
-  // Expect an element "to be visible".
-  expect(await page.isVisible('text=Learn more')).toBeTruthy();
-
-  await page.click('text=Get Started');
-  // Expect some text to be visible on the page.
-  expect(await page.waitForSelector('text=System requirements')).toBeTruthy();
-
-  // Compare screenshot with a stored reference.
-  expect(await page.screenshot()).toMatchSnapshot('get-started.png');
-});
-```
-
-</TabItem>
-</Tabs>
-
-Notice how running this test is saying:
-
-```
-Error: example.spec.ts-snapshots/get-started-chromium-darwin.png is missing in snapshots, writing actual.
-```
-
-That's because there was no golden file for your `get-started.png` snapshot. It is now created and is ready to be added to the repository. The name of the folder with the golden expectations starts with the name of your test file:
-
-```bash
-drwxr-xr-x  5 user  group  160 Jun  4 11:46 .
-drwxr-xr-x  6 user  group  192 Jun  4 11:45 ..
--rw-r--r--  1 user  group  231 Jun  4 11:16 example.spec.ts
-drwxr-xr-x  3 user  group   96 Jun  4 11:46 example.spec.ts-snapshots
-```
-
-To update your golden files, you can use the `--update-snapshots` parameter.
-
-```bash
-npx playwright test --update-snapshots
-```
-
-## Learn the command line
+## Learning the command line
 
 Here are the most common options available in the [command line](./test-cli.mdx).
 - Run tests in headed browsers
@@ -492,7 +386,7 @@ Here are the most common options available in the [command line](./test-cli.mdx)
   npx playwright test
   ```
 
-## Create a configuration file
+## Creating a configuration file
 
 So far, we've looked at the zero-config operation of Playwright Test. For a real world application, it is likely that you would want to use a config.
 
@@ -704,5 +598,3 @@ If you put your configuration file in a different place, pass it with `--config`
 [all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
 [Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
 [Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
-
-[installation-managing-browser-binaries]: ./library.mdx#managing-browser-binaries "Installation: Managing browser binaries"
