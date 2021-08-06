@@ -7,6 +7,8 @@ import TabItem from '@theme/TabItem';
 
 - [Using reporters](#using-reporters)
 - [Built-in reporters](#built-in-reporters)
+- [Custom reporters](#custom-reporters)
+- [Third party showcase](#third-party-showcase)
 
 ## Using reporters
 
@@ -449,6 +451,131 @@ module.exports = config;
 </TabItem>
 </Tabs>
 
+## Custom reporters
+
+You can create a custom reporter by implementing a class with some of the reporter methods. Learn more about the [Reporter] API.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+// playwright.config.ts
+import { Reporter } from '@playwright/test/reporter';
+
+class MyReporter implements Reporter {
+  onBegin(config, suite) {
+    console.log(`Starting the run with ${suite.allTests().length} tests`);
+  }
+
+  onTestBegin(test) {
+    console.log(`Starting test ${test.title}`);
+  }
+
+  onTestEnd(test, result) {
+    console.log(`Finished test ${test.title}: ${result.status}`);
+  }
+
+  onEnd(result) {
+    console.log(`Finished the run: ${result.status}`);
+  }
+}
+export default MyReporter;
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// my-awesome-reporter.js
+// @ts-check
+
+/** @implements {import('@playwright/test/reporter').Reporter} */
+class MyReporter {
+  onBegin(config, suite) {
+    console.log(`Starting the run with ${suite.allTests().length} tests`);
+  }
+
+  onTestBegin(test) {
+    console.log(`Starting test ${test.title}`);
+  }
+
+  onTestEnd(test, result) {
+    console.log(`Finished test ${test.title}: ${result.status}`);
+  }
+
+  onEnd(result) {
+    console.log(`Finished the run: ${result.status}`);
+  }
+}
+
+module.exports = MyReporter;
+```
+
+</TabItem>
+</Tabs>
+
+Now use this reporter with [testConfig.reporter](./api/class-testconfig.mdx#test-config-reporter).
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+// playwright.config.ts
+import { PlaywrightTestConfig } from '@playwright/test';
+
+const config: PlaywrightTestConfig = {
+  reporter: './my-awesome-reporter.ts',
+};
+export default config;
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// playwright.config.js
+// @ts-check
+
+/** @type {import('@playwright/test').PlaywrightTestConfig} */
+const config = {
+  reporter: './my-awesome-reporter.js',
+};
+
+module.exports = config;
+```
+
+</TabItem>
+</Tabs>
+
+## Third party showcase
+- Allure reporter
+
+  ```bash
+  # Install
+  npm i -D experimental-allure-playwright
+  
+  # Run tests
+  npx playwright test --reporter=line,experimental-allure-playwright
+  
+  # Generate report
+  allure generate ./allure-result --clean && allure open ./allure-report
+  ```
+
+
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"
 [AndroidDevice]: ./api/class-androiddevice.mdx "AndroidDevice"
@@ -531,5 +658,3 @@ module.exports = config;
 [all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
 [Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
 [Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
-
-[installation-managing-browser-binaries]: ./library.mdx#managing-browser-binaries "Installation: Managing browser binaries"

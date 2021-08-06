@@ -137,6 +137,8 @@ function tabLabel(type) {
     return 'TypeScript';
   if (type === 'js')
     return 'JavaScript';
+  if (type === 'library')
+    return 'Library';
 }
 
 function tabWeight(type) {

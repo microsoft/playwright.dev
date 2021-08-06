@@ -19,5 +19,3 @@
 [all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
 [Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
 [Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
-
-[installation-managing-browser-binaries]: ./library.md#managing-browser-binaries "Installation: Managing browser binaries"
