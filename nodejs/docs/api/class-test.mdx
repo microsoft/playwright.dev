@@ -51,6 +51,8 @@ test('basic test', async ({ page }) => {
 - [test.beforeEach(hookFunction)](./api/class-test.mdx#test-before-each)
 - [test.describe(title, callback)](./api/class-test.mdx#test-describe)
 - [test.describe.only(title, callback)](./api/class-test.mdx#test-describe-only)
+- [test.describe.serial(title, callback)](./api/class-test.mdx#test-describe-serial)
+- [test.describe.serial.only(title, callback)](./api/class-test.mdx#test-describe-serial-only)
 - [test.fail([condition, description])](./api/class-test.mdx#test-fail)
 - [test.fixme([condition, description])](./api/class-test.mdx#test-fixme)
 - [test.only(title, testFunction)](./api/class-test.mdx#test-only)
@@ -105,7 +107,7 @@ test('basic test', async ({ page }) => {
 </Tabs>
 
 ## test.afterAll(hookFunction) {#test-after-all}
-- `hookFunction`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-after-all-option-hook-function"/> &#60;[function]\([Fixtures], [WorkerInfo]\)&#62; Hook function that takes one or two arguments: an object with fixtures and optional [WorkerInfo].<a href="#test-after-all-option-hook-function" class="list-anchor">#</a>
+- `hookFunction`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-after-all-option-hook-function"/> &#60;[function]\([Fixtures], [TestInfo]\)&#62; Hook function that takes one or two arguments: an object with fixtures and optional [TestInfo].<a href="#test-after-all-option-hook-function" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-after-all-return"/> &#60;[void]&#62;<a href="#test-after-all-return" class="list-anchor">#</a>
 
 Declares an `afterAll` hook that is executed once after all tests. When called in the scope of a test file, runs after all tests in the file. When called inside a [test.describe(title, callback)](./api/class-test.mdx#test-describe) group, runs after all tests in the group.
@@ -117,7 +119,7 @@ Declares an `afterAll` hook that is executed once after all tests. When called i
 Declares an `afterEach` hook that is executed after each test. When called in the scope of a test file, runs before each test in the file. When called inside a [test.describe(title, callback)](./api/class-test.mdx#test-describe) group, runs before each test in the group.
 
 ## test.beforeAll(hookFunction) {#test-before-all}
-- `hookFunction`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-before-all-option-hook-function"/> &#60;[function]\([Fixtures], [WorkerInfo]\)&#62; Hook function that takes one or two arguments: an object with fixtures and optional [WorkerInfo].<a href="#test-before-all-option-hook-function" class="list-anchor">#</a>
+- `hookFunction`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-before-all-option-hook-function"/> &#60;[function]\([Fixtures], [TestInfo]\)&#62; Hook function that takes one or two arguments: an object with fixtures and optional [TestInfo].<a href="#test-before-all-option-hook-function" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-before-all-return"/> &#60;[void]&#62;<a href="#test-before-all-return" class="list-anchor">#</a>
 
 Declares a `beforeAll` hook that is executed once before all tests. When called in the scope of a test file, runs before all tests in the file. When called inside a [test.describe(title, callback)](./api/class-test.mdx#test-describe) group, runs before all tests in the group.
@@ -312,6 +314,96 @@ test.describe.only('focused group', () => {
 });
 test('not in the focused group', async ({ page }) => {
   // This test will not run
+});
+```
+
+</TabItem>
+</Tabs>
+
+## test.describe.serial(title, callback) {#test-describe-serial}
+- `title`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-serial-option-title"/> &#60;[string]&#62; Group title.<a href="#test-describe-serial-option-title" class="list-anchor">#</a>
+- `callback`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-serial-option-callback"/> &#60;[function]&#62; A callback that is run immediately when calling [test.describe.serial(title, callback)](./api/class-test.mdx#test-describe-serial). Any tests added in this callback will belong to the group.<a href="#test-describe-serial-option-callback" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-serial-return"/> &#60;[void]&#62;<a href="#test-describe-serial-return" class="list-anchor">#</a>
+
+Declares a group of tests that should always be run serially. If one of the tests fails, all subsequent tests are skipped. All tests in a group are retried together.
+
+:::note
+Using serial is not recommended. It is usually better to make your tests isolated, so they can be run independently.
+:::
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+test.describe.serial('group', () => {
+  test('runs first', async ({ page }) => {
+  });
+  test('runs second', async ({ page }) => {
+  });
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+test.describe.serial('group', () => {
+  test('runs first', async ({ page }) => {
+  });
+  test('runs second', async ({ page }) => {
+  });
+});
+```
+
+</TabItem>
+</Tabs>
+
+## test.describe.serial.only(title, callback) {#test-describe-serial-only}
+- `title`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-serial-only-option-title"/> &#60;[string]&#62; Group title.<a href="#test-describe-serial-only-option-title" class="list-anchor">#</a>
+- `callback`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-serial-only-option-callback"/> &#60;[function]&#62; A callback that is run immediately when calling [test.describe.serial.only(title, callback)](./api/class-test.mdx#test-describe-serial-only). Any tests added in this callback will belong to the group.<a href="#test-describe-serial-only-option-callback" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-serial-only-return"/> &#60;[void]&#62;<a href="#test-describe-serial-only-return" class="list-anchor">#</a>
+
+Declares a focused group of tests that should always be run serially. If one of the tests fails, all subsequent tests are skipped. All tests in a group are retried together. If there are some focused tests or suites, all of them will be run but nothing else.
+
+:::note
+Using serial is not recommended. It is usually better to make your tests isolated, so they can be run independently.
+:::
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+test.describe.serial.only('group', () => {
+  test('runs first', async ({ page }) => {
+  });
+  test('runs second', async ({ page }) => {
+  });
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+test.describe.serial.only('group', () => {
+  test('runs first', async ({ page }) => {
+  });
+  test('runs second', async ({ page }) => {
+  });
 });
 ```
 
