@@ -1,0 +1,621 @@
+---
+id: class-browsercontext
+title: "BrowserContext"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+* extends: [EventEmitter]
+
+BrowserContexts provide a way to operate multiple independent browser sessions.
+
+If a page opens another page, e.g. with a `window.open` call, the popup will belong to the parent page's browser context.
+
+Playwright allows creation of "incognito" browser contexts with `browser.newContext()` method. "Incognito" browser contexts don't write any browsing data to disk.
+
+```js
+// Create a new incognito browser context
+const context = await browser.newContext();
+// Create a new page inside context.
+const page = await context.newPage();
+await page.goto('https://example.com');
+// Dispose context once it's no longer needed.
+await context.close();
+```
+
+
+- [browserContext.on('backgroundpage')](./api/class-browsercontext.mdx#browser-context-event-background-page)
+- [browserContext.on('close')](./api/class-browsercontext.mdx#browser-context-event-close)
+- [browserContext.on('page')](./api/class-browsercontext.mdx#browser-context-event-page)
+- [browserContext.on('request')](./api/class-browsercontext.mdx#browser-context-event-request)
+- [browserContext.on('requestfailed')](./api/class-browsercontext.mdx#browser-context-event-request-failed)
+- [browserContext.on('requestfinished')](./api/class-browsercontext.mdx#browser-context-event-request-finished)
+- [browserContext.on('response')](./api/class-browsercontext.mdx#browser-context-event-response)
+- [browserContext.on('serviceworker')](./api/class-browsercontext.mdx#browser-context-event-service-worker)
+- [browserContext.addCookies(cookies)](./api/class-browsercontext.mdx#browser-context-add-cookies)
+- [browserContext.addInitScript(script[, arg])](./api/class-browsercontext.mdx#browser-context-add-init-script)
+- [browserContext.backgroundPages()](./api/class-browsercontext.mdx#browser-context-background-pages)
+- [browserContext.browser()](./api/class-browsercontext.mdx#browser-context-browser)
+- [browserContext.clearCookies()](./api/class-browsercontext.mdx#browser-context-clear-cookies)
+- [browserContext.clearPermissions()](./api/class-browsercontext.mdx#browser-context-clear-permissions)
+- [browserContext.close()](./api/class-browsercontext.mdx#browser-context-close)
+- [browserContext.cookies([urls])](./api/class-browsercontext.mdx#browser-context-cookies)
+- [browserContext.exposeBinding(name, callback[, options])](./api/class-browsercontext.mdx#browser-context-expose-binding)
+- [browserContext.exposeFunction(name, callback)](./api/class-browsercontext.mdx#browser-context-expose-function)
+- [browserContext.grantPermissions(permissions[, options])](./api/class-browsercontext.mdx#browser-context-grant-permissions)
+- [browserContext.newCDPSession(page)](./api/class-browsercontext.mdx#browser-context-new-cdp-session)
+- [browserContext.newPage()](./api/class-browsercontext.mdx#browser-context-new-page)
+- [browserContext.pages()](./api/class-browsercontext.mdx#browser-context-pages)
+- [browserContext.route(url, handler)](./api/class-browsercontext.mdx#browser-context-route)
+- [browserContext.serviceWorkers()](./api/class-browsercontext.mdx#browser-context-service-workers)
+- [browserContext.setDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout)
+- [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout)
+- [browserContext.setExtraHTTPHeaders(headers)](./api/class-browsercontext.mdx#browser-context-set-extra-http-headers)
+- [browserContext.setGeolocation(geolocation)](./api/class-browsercontext.mdx#browser-context-set-geolocation)
+- [browserContext.setHTTPCredentials(httpCredentials)](./api/class-browsercontext.mdx#browser-context-set-http-credentials)
+- [browserContext.setOffline(offline)](./api/class-browsercontext.mdx#browser-context-set-offline)
+- [browserContext.storageState([options])](./api/class-browsercontext.mdx#browser-context-storage-state)
+- [browserContext.unroute(url[, handler])](./api/class-browsercontext.mdx#browser-context-unroute)
+- [browserContext.waitForEvent(event[, optionsOrPredicate, options])](./api/class-browsercontext.mdx#browser-context-wait-for-event)
+- [browserContext.tracing](./api/class-browsercontext.mdx#browser-context-tracing)
+
+## browserContext.on('backgroundpage') {#browser-context-event-background-page}
+- type: &#60;[Page]&#62;
+
+:::note
+Only works with Chromium browser's persistent context.
+:::
+
+Emitted when new background page is created in the context.
+
+```js
+const backgroundPage = await context.waitForEvent('backgroundpage');
+```
+
+## browserContext.on('close') {#browser-context-event-close}
+- type: &#60;[BrowserContext]&#62;
+
+Emitted when Browser context gets closed. This might happen because of one of the following:
+* Browser context is closed.
+* Browser application is closed or crashed.
+* The [browser.close()](./api/class-browser.mdx#browser-close) method was called.
+
+## browserContext.on('page') {#browser-context-event-page}
+- type: &#60;[Page]&#62;
+
+The event is emitted when a new Page is created in the BrowserContext. The page may still be loading. The event will also fire for popup pages. See also [page.on('popup')](./api/class-page.mdx#page-event-popup) to receive events about popups relevant to a specific page.
+
+The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
+
+```js
+const [newPage] = await Promise.all([
+  context.waitForEvent('page'),
+  page.click('a[target=_blank]'),
+]);
+console.log(await newPage.evaluate('location.href'));
+```
+
+:::note
+Use [page.waitForLoadState([state, options])](./api/class-page.mdx#page-wait-for-load-state) to wait until the page gets to a particular state (you should not need it in most cases).
+:::
+
+## browserContext.on('request') {#browser-context-event-request}
+- type: &#60;[Request]&#62;
+
+Emitted when a request is issued from any pages created through this context. The [request] object is read-only. To only listen for requests from a particular page, use [page.on('request')](./api/class-page.mdx#page-event-request).
+
+In order to intercept and mutate requests, see [browserContext.route(url, handler)](./api/class-browsercontext.mdx#browser-context-route) or [page.route(url, handler)](./api/class-page.mdx#page-route).
+
+## browserContext.on('requestfailed') {#browser-context-event-request-failed}
+- type: &#60;[Request]&#62;
+
+Emitted when a request fails, for example by timing out. To only listen for failed requests from a particular page, use [page.on('requestfailed')](./api/class-page.mdx#page-event-request-failed).
+
+:::note
+HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [browserContext.on('requestfinished')](./api/class-browsercontext.mdx#browser-context-event-request-finished) event and not with [browserContext.on('requestfailed')](./api/class-browsercontext.mdx#browser-context-event-request-failed).
+:::
+
+## browserContext.on('requestfinished') {#browser-context-event-request-finished}
+- type: &#60;[Request]&#62;
+
+Emitted when a request finishes successfully after downloading the response body. For a successful response, the sequence of events is `request`, `response` and `requestfinished`. To listen for successful requests from a particular page, use [page.on('requestfinished')](./api/class-page.mdx#page-event-request-finished).
+
+## browserContext.on('response') {#browser-context-event-response}
+- type: &#60;[Response]&#62;
+
+Emitted when [response] status and headers are received for a request. For a successful response, the sequence of events is `request`, `response` and `requestfinished`. To listen for response events from a particular page, use [page.on('response')](./api/class-page.mdx#page-event-response).
+
+## browserContext.on('serviceworker') {#browser-context-event-service-worker}
+- type: &#60;[Worker]&#62;
+
+:::note
+Service workers are only supported on Chromium-based browsers.
+:::
+
+Emitted when new service worker is created in the context.
+
+## browserContext.addCookies(cookies) {#browser-context-add-cookies}
+- `cookies`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-add-cookies-option-cookies"/> &#60;[Array]<[Object]>&#62;<a href="#browser-context-add-cookies-option-cookies" class="list-anchor">#</a>
+  - `name` &#60;[string]&#62;
+  - `value` &#60;[string]&#62;
+  - `url` &#60;[string]&#62; either url or domain / path are required. Optional.
+  - `domain` &#60;[string]&#62; either url or domain / path are required Optional.
+  - `path` &#60;[string]&#62; either url or domain / path are required Optional.
+  - `expires` &#60;[number]&#62; Unix time in seconds. Optional.
+  - `httpOnly` &#60;[boolean]&#62; Optional.
+  - `secure` &#60;[boolean]&#62; Optional.
+  - `sameSite` &#60;"Strict"|"Lax"|"None"&#62; Optional.
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-add-cookies-return"/> &#60;[Promise]<[void]>&#62;<a href="#browser-context-add-cookies-return" class="list-anchor">#</a>
+
+Adds cookies into this browser context. All pages within this context will have these cookies installed. Cookies can be obtained via [browserContext.cookies([urls])](./api/class-browsercontext.mdx#browser-context-cookies).
+
+```js
+await browserContext.addCookies([cookieObject1, cookieObject2]);
+```
+
+## browserContext.addInitScript(script[, arg]) {#browser-context-add-init-script}
+- `script`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-add-init-script-option-script"/> &#60;[function]|[string]|[Object]&#62; Script to be evaluated in all pages in the browser context.<a href="#browser-context-add-init-script-option-script" class="list-anchor">#</a>
+  - `path` &#60;[string]&#62; Path to the JavaScript file. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
+  - `content` &#60;[string]&#62; Raw script content. Optional.
+- `arg`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-add-init-script-option-arg"/> &#60;[Serializable]&#62; Optional argument to pass to `script` (only supported when passing a function).<a href="#browser-context-add-init-script-option-arg" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-add-init-script-return"/> &#60;[Promise]<[void]>&#62;<a href="#browser-context-add-init-script-return" class="list-anchor">#</a>
+
+Adds a script which would be evaluated in one of the following scenarios:
+* Whenever a page is created in the browser context or is navigated.
+* Whenever a child frame is attached or navigated in any page in the browser context. In this case, the script is evaluated in the context of the newly attached frame.
+
+The script is evaluated after the document was created but before any of its scripts were run. This is useful to amend the JavaScript environment, e.g. to seed `Math.random`.
+
+An example of overriding `Math.random` before the page loads:
+
+```js
+// preload.js
+Math.random = () => 42;
+```
+
+```js
+// In your playwright script, assuming the preload.js file is in same directory.
+await browserContext.addInitScript({
+  path: 'preload.js'
+});
+```
+
+:::note
+The order of evaluation of multiple scripts installed via [browserContext.addInitScript(script[, arg])](./api/class-browsercontext.mdx#browser-context-add-init-script) and [page.addInitScript(script[, arg])](./api/class-page.mdx#page-add-init-script) is not defined.
+:::
+
+## browserContext.backgroundPages() {#browser-context-background-pages}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-background-pages-return"/> &#60;[Array]<[Page]>&#62;<a href="#browser-context-background-pages-return" class="list-anchor">#</a>
+
+:::note
+Background pages are only supported on Chromium-based browsers.
+:::
+
+All existing background pages in the context.
+
+## browserContext.browser() {#browser-context-browser}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-browser-return"/> &#60;[null]|[Browser]&#62;<a href="#browser-context-browser-return" class="list-anchor">#</a>
+
+Returns the browser instance of the context. If it was launched as a persistent context null gets returned.
+
+## browserContext.clearCookies() {#browser-context-clear-cookies}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-clear-cookies-return"/> &#60;[Promise]<[void]>&#62;<a href="#browser-context-clear-cookies-return" class="list-anchor">#</a>
+
+Clears context cookies.
+
+## browserContext.clearPermissions() {#browser-context-clear-permissions}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-clear-permissions-return"/> &#60;[Promise]<[void]>&#62;<a href="#browser-context-clear-permissions-return" class="list-anchor">#</a>
+
+Clears all permission overrides for the browser context.
+
+```js
+const context = await browser.newContext();
+await context.grantPermissions(['clipboard-read']);
+// do stuff ..
+context.clearPermissions();
+```
+
+## browserContext.close() {#browser-context-close}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-close-return"/> &#60;[Promise]<[void]>&#62;<a href="#browser-context-close-return" class="list-anchor">#</a>
+
+Closes the browser context. All the pages that belong to the browser context will be closed.
+
+:::note
+The default browser context cannot be closed.
+:::
+
+## browserContext.cookies([urls]) {#browser-context-cookies}
+- `urls`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-cookies-option-urls"/> &#60;[string]|[Array]<[string]>&#62; Optional list of URLs.<a href="#browser-context-cookies-option-urls" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-cookies-return"/> &#60;[Promise]<[Array]<[Object]>>&#62;<a href="#browser-context-cookies-return" class="list-anchor">#</a>
+  - `name` &#60;[string]&#62;
+  - `value` &#60;[string]&#62;
+  - `domain` &#60;[string]&#62;
+  - `path` &#60;[string]&#62;
+  - `expires` &#60;[number]&#62; Unix time in seconds.
+  - `httpOnly` &#60;[boolean]&#62;
+  - `secure` &#60;[boolean]&#62;
+  - `sameSite` &#60;"Strict"|"Lax"|"None"&#62;
+
+If no URLs are specified, this method returns all cookies. If URLs are specified, only cookies that affect those URLs are returned.
+
+## browserContext.exposeBinding(name, callback[, options]) {#browser-context-expose-binding}
+- `name`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-expose-binding-option-name"/> &#60;[string]&#62; Name of the function on the window object.<a href="#browser-context-expose-binding-option-name" class="list-anchor">#</a>
+- `callback`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-expose-binding-option-callback"/> &#60;[function]&#62; Callback function that will be called in the Playwright's context.<a href="#browser-context-expose-binding-option-callback" class="list-anchor">#</a>
+- `options` &#60;[Object]&#62;
+  - `handle`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-expose-binding-option-handle"/> &#60;[boolean]&#62; Whether to pass the argument as a handle, instead of passing by value. When passing a handle, only one argument is supported. When passing by value, multiple arguments are supported.<a href="#browser-context-expose-binding-option-handle" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-expose-binding-return"/> &#60;[Promise]<[void]>&#62;<a href="#browser-context-expose-binding-return" class="list-anchor">#</a>
+
+The method adds a function called `name` on the `window` object of every frame in every page in the context. When called, the function executes `callback` and returns a [Promise] which resolves to the return value of `callback`. If the `callback` returns a [Promise], it will be awaited.
+
+The first argument of the `callback` function contains information about the caller: `{ browserContext: BrowserContext, page: Page, frame: Frame }`.
+
+See [page.exposeBinding(name, callback[, options])](./api/class-page.mdx#page-expose-binding) for page-only version.
+
+An example of exposing page URL to all frames in all pages in the context:
+
+```js
+const { webkit } = require('playwright');  // Or 'chromium' or 'firefox'.
+
+(async () => {
+  const browser = await webkit.launch({ headless: false });
+  const context = await browser.newContext();
+  await context.exposeBinding('pageURL', ({ page }) => page.url());
+  const page = await context.newPage();
+  await page.setContent(`
+    <script>
+      async function onClick() {
+        document.querySelector('div').textContent = await window.pageURL();
+      }
+    </script>
+    <button onclick="onClick()">Click me</button>
+    <div></div>
+  `);
+  await page.click('button');
+})();
+```
+
+An example of passing an element handle:
+
+```js
+await context.exposeBinding('clicked', async (source, element) => {
+  console.log(await element.textContent());
+}, { handle: true });
+await page.setContent(`
+  <script>
+    document.addEventListener('click', event => window.clicked(event.target));
+  </script>
+  <div>Click me</div>
+  <div>Or click me</div>
+`);
+```
+
+## browserContext.exposeFunction(name, callback) {#browser-context-expose-function}
+- `name`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-expose-function-option-name"/> &#60;[string]&#62; Name of the function on the window object.<a href="#browser-context-expose-function-option-name" class="list-anchor">#</a>
+- `callback`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-expose-function-option-callback"/> &#60;[function]&#62; Callback function that will be called in the Playwright's context.<a href="#browser-context-expose-function-option-callback" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-expose-function-return"/> &#60;[Promise]<[void]>&#62;<a href="#browser-context-expose-function-return" class="list-anchor">#</a>
+
+The method adds a function called `name` on the `window` object of every frame in every page in the context. When called, the function executes `callback` and returns a [Promise] which resolves to the return value of `callback`.
+
+If the `callback` returns a [Promise], it will be awaited.
+
+See [page.exposeFunction(name, callback)](./api/class-page.mdx#page-expose-function) for page-only version.
+
+An example of adding a `sha256` function to all pages in the context:
+
+```js
+const { webkit } = require('playwright');  // Or 'chromium' or 'firefox'.
+const crypto = require('crypto');
+
+(async () => {
+  const browser = await webkit.launch({ headless: false });
+  const context = await browser.newContext();
+  await context.exposeFunction('sha256', text => crypto.createHash('sha256').update(text).digest('hex'));
+  const page = await context.newPage();
+  await page.setContent(`
+    <script>
+      async function onClick() {
+        document.querySelector('div').textContent = await window.sha256('PLAYWRIGHT');
+      }
+    </script>
+    <button onclick="onClick()">Click me</button>
+    <div></div>
+  `);
+  await page.click('button');
+})();
+```
+
+## browserContext.grantPermissions(permissions[, options]) {#browser-context-grant-permissions}
+- `permissions`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-grant-permissions-option-permissions"/> &#60;[Array]<[string]>&#62; A permission or an array of permissions to grant. Permissions can be one of the following values:<a href="#browser-context-grant-permissions-option-permissions" class="list-anchor">#</a>
+  * `'geolocation'`
+  * `'midi'`
+  * `'midi-sysex'` (system-exclusive midi)
+  * `'notifications'`
+  * `'push'`
+  * `'camera'`
+  * `'microphone'`
+  * `'background-sync'`
+  * `'ambient-light-sensor'`
+  * `'accelerometer'`
+  * `'gyroscope'`
+  * `'magnetometer'`
+  * `'accessibility-events'`
+  * `'clipboard-read'`
+  * `'clipboard-write'`
+  * `'payment-handler'`
+- `options` &#60;[Object]&#62;
+  - `origin`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-grant-permissions-option-origin"/> &#60;[string]&#62; The [origin] to grant permissions to, e.g. "https://example.com".<a href="#browser-context-grant-permissions-option-origin" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-grant-permissions-return"/> &#60;[Promise]<[void]>&#62;<a href="#browser-context-grant-permissions-return" class="list-anchor">#</a>
+
+Grants specified permissions to the browser context. Only grants corresponding permissions to the given origin if specified.
+
+## browserContext.newCDPSession(page) {#browser-context-new-cdp-session}
+- `page`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-new-cdp-session-option-page"/> &#60;[Page]&#62; Page to create new session for.<a href="#browser-context-new-cdp-session-option-page" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-new-cdp-session-return"/> &#60;[Promise]<[CDPSession]>&#62;<a href="#browser-context-new-cdp-session-return" class="list-anchor">#</a>
+
+:::note
+CDP sessions are only supported on Chromium-based browsers.
+:::
+
+Returns the newly created session.
+
+## browserContext.newPage() {#browser-context-new-page}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-new-page-return"/> &#60;[Promise]<[Page]>&#62;<a href="#browser-context-new-page-return" class="list-anchor">#</a>
+
+Creates a new page in the browser context.
+
+## browserContext.pages() {#browser-context-pages}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-pages-return"/> &#60;[Array]<[Page]>&#62;<a href="#browser-context-pages-return" class="list-anchor">#</a>
+
+Returns all open pages in the context.
+
+## browserContext.route(url, handler) {#browser-context-route}
+- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-option-url"/> &#60;[string]|[RegExp]|[function]\([URL]\):[boolean]&#62; A glob pattern, regex pattern or predicate receiving [URL] to match while routing. When a `baseURL` via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.<a href="#browser-context-route-option-url" class="list-anchor">#</a>
+- `handler`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-option-handler"/> &#60;[function]\([Route], [Request]\)&#62; handler function to route the request.<a href="#browser-context-route-option-handler" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-return"/> &#60;[Promise]<[void]>&#62;<a href="#browser-context-route-return" class="list-anchor">#</a>
+
+Routing provides the capability to modify network requests that are made by any page in the browser context. Once route is enabled, every request matching the url pattern will stall unless it's continued, fulfilled or aborted.
+
+An example of a naive handler that aborts all image requests:
+
+```js
+const context = await browser.newContext();
+await context.route('**/*.{png,jpg,jpeg}', route => route.abort());
+const page = await context.newPage();
+await page.goto('https://example.com');
+await browser.close();
+```
+
+or the same snippet using a regex pattern instead:
+
+```js
+const context = await browser.newContext();
+await context.route(/(\.png$)|(\.jpg$)/, route => route.abort());
+const page = await context.newPage();
+await page.goto('https://example.com');
+await browser.close();
+```
+
+It is possible to examine the request to decide the route action. For example, mocking all requests that contain some post data, and leaving all other requests as is:
+
+```js
+await context.route('/api/**', route => {
+  if (route.request().postData().includes('my-string'))
+    route.fulfill({ body: 'mocked-data' });
+  else
+    route.continue();
+});
+```
+
+Page routes (set up with [page.route(url, handler)](./api/class-page.mdx#page-route)) take precedence over browser context routes when request matches both handlers.
+
+To remove a route with its handler you can use [browserContext.unroute(url[, handler])](./api/class-browsercontext.mdx#browser-context-unroute).
+
+:::note
+Enabling routing disables http cache.
+:::
+
+## browserContext.serviceWorkers() {#browser-context-service-workers}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-service-workers-return"/> &#60;[Array]<[Worker]>&#62;<a href="#browser-context-service-workers-return" class="list-anchor">#</a>
+
+:::note
+Service workers are only supported on Chromium-based browsers.
+:::
+
+All existing service workers in the context.
+
+## browserContext.setDefaultNavigationTimeout(timeout) {#browser-context-set-default-navigation-timeout}
+- `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-set-default-navigation-timeout-option-timeout"/> &#60;[number]&#62; Maximum navigation time in milliseconds<a href="#browser-context-set-default-navigation-timeout-option-timeout" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-set-default-navigation-timeout-return"/> &#60;[void]&#62;<a href="#browser-context-set-default-navigation-timeout-return" class="list-anchor">#</a>
+
+This setting will change the default maximum navigation time for the following methods and related shortcuts:
+* [page.goBack([options])](./api/class-page.mdx#page-go-back)
+* [page.goForward([options])](./api/class-page.mdx#page-go-forward)
+* [page.goto(url[, options])](./api/class-page.mdx#page-goto)
+* [page.reload([options])](./api/class-page.mdx#page-reload)
+* [page.setContent(html[, options])](./api/class-page.mdx#page-set-content)
+* [page.waitForNavigation([options])](./api/class-page.mdx#page-wait-for-navigation)
+
+:::note
+[page.setDefaultNavigationTimeout(timeout)](./api/class-page.mdx#page-set-default-navigation-timeout) and [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) take priority over [browserContext.setDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout).
+:::
+
+## browserContext.setDefaultTimeout(timeout) {#browser-context-set-default-timeout}
+- `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-set-default-timeout-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds<a href="#browser-context-set-default-timeout-option-timeout" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-set-default-timeout-return"/> &#60;[void]&#62;<a href="#browser-context-set-default-timeout-return" class="list-anchor">#</a>
+
+This setting will change the default maximum time for all the methods accepting `timeout` option.
+
+:::note
+[page.setDefaultNavigationTimeout(timeout)](./api/class-page.mdx#page-set-default-navigation-timeout), [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) and [browserContext.setDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout) take priority over [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout).
+:::
+
+## browserContext.setExtraHTTPHeaders(headers) {#browser-context-set-extra-http-headers}
+- `headers`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-set-extra-http-headers-option-headers"/> &#60;[Object]<[string], [string]>&#62; An object containing additional HTTP headers to be sent with every request. All header values must be strings.<a href="#browser-context-set-extra-http-headers-option-headers" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-set-extra-http-headers-return"/> &#60;[Promise]<[void]>&#62;<a href="#browser-context-set-extra-http-headers-return" class="list-anchor">#</a>
+
+The extra HTTP headers will be sent with every request initiated by any page in the context. These headers are merged with page-specific extra HTTP headers set with [page.setExtraHTTPHeaders(headers)](./api/class-page.mdx#page-set-extra-http-headers). If page overrides a particular header, page-specific header value will be used instead of the browser context header value.
+
+:::note
+[browserContext.setExtraHTTPHeaders(headers)](./api/class-browsercontext.mdx#browser-context-set-extra-http-headers) does not guarantee the order of headers in the outgoing requests.
+:::
+
+## browserContext.setGeolocation(geolocation) {#browser-context-set-geolocation}
+- `geolocation`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-set-geolocation-option-geolocation"/> &#60;[null]|[Object]&#62;<a href="#browser-context-set-geolocation-option-geolocation" class="list-anchor">#</a>
+  - `latitude` &#60;[number]&#62; Latitude between -90 and 90.
+  - `longitude` &#60;[number]&#62; Longitude between -180 and 180.
+  - `accuracy` &#60;[number]&#62; Non-negative accuracy value. Defaults to `0`.
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-set-geolocation-return"/> &#60;[Promise]<[void]>&#62;<a href="#browser-context-set-geolocation-return" class="list-anchor">#</a>
+
+Sets the context's geolocation. Passing `null` or `undefined` emulates position unavailable.
+
+```js
+await browserContext.setGeolocation({latitude: 59.95, longitude: 30.31667});
+```
+
+:::note
+Consider using [browserContext.grantPermissions(permissions[, options])](./api/class-browsercontext.mdx#browser-context-grant-permissions) to grant permissions for the browser context pages to read its geolocation.
+:::
+
+## browserContext.setHTTPCredentials(httpCredentials) {#browser-context-set-http-credentials}
+- `httpCredentials`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-set-http-credentials-option-http-credentials"/> &#60;[null]|[Object]&#62;<a href="#browser-context-set-http-credentials-option-http-credentials" class="list-anchor">#</a>
+  - `username` &#60;[string]&#62;
+  - `password` &#60;[string]&#62;
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-set-http-credentials-return"/> &#60;[Promise]<[void]>&#62;<a href="#browser-context-set-http-credentials-return" class="list-anchor">#</a>
+
+**DEPRECATED** Browsers may cache credentials after successful authentication. Create a new browser context instead.
+
+## browserContext.setOffline(offline) {#browser-context-set-offline}
+- `offline`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-set-offline-option-offline"/> &#60;[boolean]&#62; Whether to emulate network being offline for the browser context.<a href="#browser-context-set-offline-option-offline" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-set-offline-return"/> &#60;[Promise]<[void]>&#62;<a href="#browser-context-set-offline-return" class="list-anchor">#</a>
+
+## browserContext.storageState([options]) {#browser-context-storage-state}
+- `options` &#60;[Object]&#62;
+  - `path`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-storage-state-option-path"/> &#60;[string]&#62; The file path to save the storage state to. If `path` is a relative path, then it is resolved relative to current working directory. If no path is provided, storage state is still returned, but won't be saved to the disk.<a href="#browser-context-storage-state-option-path" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-storage-state-return"/> &#60;[Promise]<[Object]>&#62;<a href="#browser-context-storage-state-return" class="list-anchor">#</a>
+  - `cookies` &#60;[Array]<[Object]>&#62;
+    - `name` &#60;[string]&#62;
+    - `value` &#60;[string]&#62;
+    - `domain` &#60;[string]&#62;
+    - `path` &#60;[string]&#62;
+    - `expires` &#60;[number]&#62; Unix time in seconds.
+    - `httpOnly` &#60;[boolean]&#62;
+    - `secure` &#60;[boolean]&#62;
+    - `sameSite` &#60;"Strict"|"Lax"|"None"&#62;
+  - `origins` &#60;[Array]<[Object]>&#62;
+    - `origin` &#60;[string]&#62;
+    - `localStorage` &#60;[Array]<[Object]>&#62;
+      - `name` &#60;[string]&#62;
+      - `value` &#60;[string]&#62;
+
+Returns storage state for this browser context, contains current cookies and local storage snapshot.
+
+## browserContext.unroute(url[, handler]) {#browser-context-unroute}
+- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-unroute-option-url"/> &#60;[string]|[RegExp]|[function]\([URL]\):[boolean]&#62; A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with [browserContext.route(url, handler)](./api/class-browsercontext.mdx#browser-context-route).<a href="#browser-context-unroute-option-url" class="list-anchor">#</a>
+- `handler`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-unroute-option-handler"/> &#60;[function]\([Route], [Request]\)&#62; Optional handler function used to register a routing with [browserContext.route(url, handler)](./api/class-browsercontext.mdx#browser-context-route).<a href="#browser-context-unroute-option-handler" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-unroute-return"/> &#60;[Promise]<[void]>&#62;<a href="#browser-context-unroute-return" class="list-anchor">#</a>
+
+Removes a route created with [browserContext.route(url, handler)](./api/class-browsercontext.mdx#browser-context-route). When `handler` is not specified, removes all routes for the `url`.
+
+## browserContext.waitForEvent(event[, optionsOrPredicate, options]) {#browser-context-wait-for-event}
+- `event`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-wait-for-event-option-event"/> &#60;[string]&#62; Event name, same one would pass into `browserContext.on(event)`.<a href="#browser-context-wait-for-event-option-event" class="list-anchor">#</a>
+- `optionsOrPredicate`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-wait-for-event-option-options-or-predicate"/> &#60;[function]|[Object]&#62; Either a predicate that receives an event or an options object. Optional.<a href="#browser-context-wait-for-event-option-options-or-predicate" class="list-anchor">#</a>
+  - `predicate` &#60;[function]&#62; receives the event data and resolves to truthy value when the waiting should resolve.
+  - `timeout` &#60;[number]&#62; maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout).
+- `options` &#60;[Object]&#62;
+  - `predicate`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-wait-for-event-option-predicate"/> &#60;[function]&#62; Receives the event data and resolves to truthy value when the waiting should resolve.<a href="#browser-context-wait-for-event-option-predicate" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-wait-for-event-return"/> &#60;[Promise]<[Object]>&#62;<a href="#browser-context-wait-for-event-return" class="list-anchor">#</a>
+
+Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the context closes before the event is fired. Returns the event data value.
+
+```js
+const [page, _] = await Promise.all([
+  context.waitForEvent('page'),
+  page.click('button')
+]);
+```
+
+## browserContext.tracing {#browser-context-tracing}
+- type: &#60;[Tracing]&#62;
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Android]: ./api/class-android.mdx "Android"
+[AndroidDevice]: ./api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: ./api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: ./api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: ./api/class-androidwebview.mdx "AndroidWebView"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: ./api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: ./api/class-coverage.mdx "Coverage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[Electron]: ./api/class-electron.mdx "Electron"
+[ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Locator]: ./api/class-locator.mdx "Locator"
+[Logger]: ./api/class-logger.mdx "Logger"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Fixtures]: ./api/class-fixtures.mdx "Fixtures"
+[Test]: ./api/class-test.mdx "Test"
+[TestConfig]: ./api/class-testconfig.mdx "TestConfig"
+[TestError]: ./api/class-testerror.mdx "TestError"
+[TestInfo]: ./api/class-testinfo.mdx "TestInfo"
+[TestProject]: ./api/class-testproject.mdx "TestProject"
+[WorkerInfo]: ./api/class-workerinfo.mdx "WorkerInfo"
+[Location]: ./api/class-location.mdx "Location"
+[Reporter]: ./api/class-reporter.mdx "Reporter"
+[Suite]: ./api/class-suite.mdx "Suite"
+[TestCase]: ./api/class-testcase.mdx "TestCase"
+[TestResult]: ./api/class-testresult.mdx "TestResult"
+[TestStep]: ./api/class-teststep.mdx "TestStep"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./core-concepts.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"

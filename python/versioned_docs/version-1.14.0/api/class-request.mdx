@@ -1,0 +1,277 @@
+---
+id: class-request
+title: "Request"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Whenever the page sends a request for a network resource the following sequence of events are emitted by [Page]:
+* [page.on("request")](./api/class-page.mdx#page-event-request) emitted when the request is issued by the page.
+* [page.on("response")](./api/class-page.mdx#page-event-response) emitted when/if the response status and headers are received for the request.
+* [page.on("requestfinished")](./api/class-page.mdx#page-event-request-finished) emitted when the response body is downloaded and the request is complete.
+
+If request fails at some point, then instead of `'requestfinished'` event (and possibly instead of 'response' event), the  [page.on("requestfailed")](./api/class-page.mdx#page-event-request-failed) event is emitted.
+
+:::note
+HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with `'requestfinished'` event.
+:::
+
+If request gets a 'redirect' response, the request is successfully finished with the 'requestfinished' event, and a new request is  issued to a redirected url.
+
+
+- [request.failure](./api/class-request.mdx#request-failure)
+- [request.frame](./api/class-request.mdx#request-frame)
+- [request.headers](./api/class-request.mdx#request-headers)
+- [request.is_navigation_request()](./api/class-request.mdx#request-is-navigation-request)
+- [request.method](./api/class-request.mdx#request-method)
+- [request.post_data](./api/class-request.mdx#request-post-data)
+- [request.post_data_buffer](./api/class-request.mdx#request-post-data-buffer)
+- [request.post_data_json](./api/class-request.mdx#request-post-data-json)
+- [request.redirected_from](./api/class-request.mdx#request-redirected-from)
+- [request.redirected_to](./api/class-request.mdx#request-redirected-to)
+- [request.resource_type](./api/class-request.mdx#request-resource-type)
+- [request.response()](./api/class-request.mdx#request-response)
+- [request.timing](./api/class-request.mdx#request-timing)
+- [request.url](./api/class-request.mdx#request-url)
+
+## request.failure {#request-failure}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-failure-return"/> &#60;[NoneType]|[str]&#62;<a href="#request-failure-return" class="list-anchor">#</a>
+
+The method returns `null` unless this request has failed, as reported by `requestfailed` event.
+
+Example of logging of all the failed requests:
+
+```py
+page.on("requestfailed", lambda request: print(request.url + " " + request.failure))
+```
+
+## request.frame {#request-frame}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-frame-return"/> &#60;[Frame]&#62;<a href="#request-frame-return" class="list-anchor">#</a>
+
+Returns the [Frame] that initiated this request.
+
+## request.headers {#request-headers}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-headers-return"/> &#60;[Dict]\[[str], [str]\]&#62;<a href="#request-headers-return" class="list-anchor">#</a>
+
+An object with HTTP headers associated with the request. All header names are lower-case.
+
+## request.is_navigation_request() {#request-is-navigation-request}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-is-navigation-request-return"/> &#60;[bool]&#62;<a href="#request-is-navigation-request-return" class="list-anchor">#</a>
+
+Whether this request is driving frame's navigation.
+
+## request.method {#request-method}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-method-return"/> &#60;[str]&#62;<a href="#request-method-return" class="list-anchor">#</a>
+
+Request's method (GET, POST, etc.)
+
+## request.post_data {#request-post-data}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-post-data-return"/> &#60;[NoneType]|[str]&#62;<a href="#request-post-data-return" class="list-anchor">#</a>
+
+Request's post body, if any.
+
+## request.post_data_buffer {#request-post-data-buffer}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-post-data-buffer-return"/> &#60;[NoneType]|[bytes]&#62;<a href="#request-post-data-buffer-return" class="list-anchor">#</a>
+
+Request's post body in a binary form, if any.
+
+## request.post_data_json {#request-post-data-json}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-post-data-json-return"/> &#60;[NoneType]|[Any]&#62;<a href="#request-post-data-json-return" class="list-anchor">#</a>
+
+Returns parsed request's body for `form-urlencoded` and JSON as a fallback if any.
+
+When the response is `application/x-www-form-urlencoded` then a key/value object of the values will be returned. Otherwise it will be parsed as JSON.
+
+## request.redirected_from {#request-redirected-from}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-redirected-from-return"/> &#60;[NoneType]|[Request]&#62;<a href="#request-redirected-from-return" class="list-anchor">#</a>
+
+Request that was redirected by the server to this one, if any.
+
+When the server responds with a redirect, Playwright creates a new [Request] object. The two requests are connected by `redirectedFrom()` and `redirectedTo()` methods. When multiple server redirects has happened, it is possible to construct the whole redirect chain by repeatedly calling `redirectedFrom()`.
+
+For example, if the website `http://example.com` redirects to `https://example.com`:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+response = page.goto("http://example.com")
+print(response.request.redirected_from.url) # "http://example.com"
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+response = await page.goto("http://example.com")
+print(response.request.redirected_from.url) # "http://example.com"
+```
+
+</TabItem>
+</Tabs>
+
+If the website `https://google.com` has no redirects:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+response = page.goto("https://google.com")
+print(response.request.redirected_from) # None
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+response = await page.goto("https://google.com")
+print(response.request.redirected_from) # None
+```
+
+</TabItem>
+</Tabs>
+
+## request.redirected_to {#request-redirected-to}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-redirected-to-return"/> &#60;[NoneType]|[Request]&#62;<a href="#request-redirected-to-return" class="list-anchor">#</a>
+
+New request issued by the browser if the server responded with redirect.
+
+This method is the opposite of [request.redirected_from](./api/class-request.mdx#request-redirected-from):
+
+```py
+assert request.redirected_from.redirected_to == request
+```
+
+## request.resource_type {#request-resource-type}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-resource-type-return"/> &#60;[str]&#62;<a href="#request-resource-type-return" class="list-anchor">#</a>
+
+Contains the request's resource type as it was perceived by the rendering engine. ResourceType will be one of the following: `document`, `stylesheet`, `image`, `media`, `font`, `script`, `texttrack`, `xhr`, `fetch`, `eventsource`, `websocket`, `manifest`, `other`.
+
+## request.response() {#request-response}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-response-return"/> &#60;[NoneType]|[Response]&#62;<a href="#request-response-return" class="list-anchor">#</a>
+
+Returns the matching [Response] object, or `null` if the response was not received due to error.
+
+## request.timing {#request-timing}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-timing-return"/> &#60;[Dict]&#62;<a href="#request-timing-return" class="list-anchor">#</a>
+  - `startTime` &#60;[float]&#62; Request start time in milliseconds elapsed since January 1, 1970 00:00:00 UTC
+  - `domainLookupStart` &#60;[float]&#62; Time immediately before the browser starts the domain name lookup for the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `domainLookupEnd` &#60;[float]&#62; Time immediately after the browser starts the domain name lookup for the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `connectStart` &#60;[float]&#62; Time immediately before the user agent starts establishing the connection to the server to retrieve the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `secureConnectionStart` &#60;[float]&#62; Time immediately before the browser starts the handshake process to secure the current connection. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `connectEnd` &#60;[float]&#62; Time immediately before the user agent starts establishing the connection to the server to retrieve the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `requestStart` &#60;[float]&#62; Time immediately before the browser starts requesting the resource from the server, cache, or local resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `responseStart` &#60;[float]&#62; Time immediately after the browser starts requesting the resource from the server, cache, or local resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `responseEnd` &#60;[float]&#62; Time immediately after the browser receives the last byte of the resource or immediately before the transport connection is closed, whichever comes first. The value is given in milliseconds relative to `startTime`, -1 if not available.
+
+Returns resource timing information for given request. Most of the timing values become available upon the response, `responseEnd` becomes available when request finishes. Find more information at [Resource Timing API](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceResourceTiming).
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+with page.expect_event("requestfinished") as request_info:
+    page.goto("http://example.com")
+request = request_info.value
+print(request.timing)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+async with page.expect_event("requestfinished") as request_info:
+    await page.goto("http://example.com")
+request = await request_info.value
+print(request.timing)
+```
+
+</TabItem>
+</Tabs>
+
+## request.url {#request-url}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-url-return"/> &#60;[str]&#62;<a href="#request-url-return" class="list-anchor">#</a>
+
+URL of the request.
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[Error]: ./api/class-error.mdx "Error"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Locator]: ./api/class-locator.mdx "Locator"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./core-concepts.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
+[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[bytes]: https://docs.python.org/3/library/stdtypes.html#bytes "bytes"
+[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
+[Exception]: https://docs.python.org/3/library/exceptions.html#Exception "Exception"
+[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
+[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
+[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
+[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
+[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
+[URL]: https://en.wikipedia.org/wiki/URL "URL"
+[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
+[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
+[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
