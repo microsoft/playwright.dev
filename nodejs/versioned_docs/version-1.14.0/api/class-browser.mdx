@@ -1,0 +1,348 @@
+---
+id: class-browser
+title: "Browser"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+* extends: [EventEmitter]
+
+A Browser is created via [browserType.launch([options])](./api/class-browsertype.mdx#browser-type-launch). An example of using a [Browser] to create a [Page]:
+
+```js
+const { firefox } = require('playwright');  // Or 'chromium' or 'webkit'.
+
+(async () => {
+  const browser = await firefox.launch();
+  const page = await browser.newPage();
+  await page.goto('https://example.com');
+  await browser.close();
+})();
+```
+
+
+- [browser.on('disconnected')](./api/class-browser.mdx#browser-event-disconnected)
+- [browser.close()](./api/class-browser.mdx#browser-close)
+- [browser.contexts()](./api/class-browser.mdx#browser-contexts)
+- [browser.isConnected()](./api/class-browser.mdx#browser-is-connected)
+- [browser.newBrowserCDPSession()](./api/class-browser.mdx#browser-new-browser-cdp-session)
+- [browser.newContext([options])](./api/class-browser.mdx#browser-new-context)
+- [browser.newPage([options])](./api/class-browser.mdx#browser-new-page)
+- [browser.startTracing([page, options])](./api/class-browser.mdx#browser-start-tracing)
+- [browser.stopTracing()](./api/class-browser.mdx#browser-stop-tracing)
+- [browser.version()](./api/class-browser.mdx#browser-version)
+
+## browser.on('disconnected') {#browser-event-disconnected}
+- type: &#60;[Browser]&#62;
+
+Emitted when Browser gets disconnected from the browser application. This might happen because of one of the following:
+* Browser application is closed or crashed.
+* The [browser.close()](./api/class-browser.mdx#browser-close) method was called.
+
+## browser.close() {#browser-close}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-close-return"/> &#60;[Promise]<[void]>&#62;<a href="#browser-close-return" class="list-anchor">#</a>
+
+In case this browser is obtained using [browserType.launch([options])](./api/class-browsertype.mdx#browser-type-launch), closes the browser and all of its pages (if any were opened).
+
+In case this browser is connected to, clears all created contexts belonging to this browser and disconnects from the browser server.
+
+The [Browser] object itself is considered to be disposed and cannot be used anymore.
+
+## browser.contexts() {#browser-contexts}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-contexts-return"/> &#60;[Array]<[BrowserContext]>&#62;<a href="#browser-contexts-return" class="list-anchor">#</a>
+
+Returns an array of all open browser contexts. In a newly created browser, this will return zero browser contexts.
+
+```js
+const browser = await pw.webkit.launch();
+console.log(browser.contexts().length); // prints `0`
+
+const context = await browser.newContext();
+console.log(browser.contexts().length); // prints `1`
+```
+
+## browser.isConnected() {#browser-is-connected}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-is-connected-return"/> &#60;[boolean]&#62;<a href="#browser-is-connected-return" class="list-anchor">#</a>
+
+Indicates that the browser is connected.
+
+## browser.newBrowserCDPSession() {#browser-new-browser-cdp-session}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-browser-cdp-session-return"/> &#60;[Promise]<[CDPSession]>&#62;<a href="#browser-new-browser-cdp-session-return" class="list-anchor">#</a>
+
+:::note
+CDP Sessions are only supported on Chromium-based browsers.
+:::
+
+Returns the newly created browser session.
+
+## browser.newContext([options]) {#browser-new-context}
+- `options` &#60;[Object]&#62;
+  - `acceptDownloads`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-accept-downloads"/> &#60;[boolean]&#62; Whether to automatically download all the attachments. Defaults to `false` where all the downloads are canceled.<a href="#browser-new-context-option-accept-downloads" class="list-anchor">#</a>
+  - `baseURL`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-base-url"/> &#60;[string]&#62; When using [page.goto(url[, options])](./api/class-page.mdx#page-goto), [page.route(url, handler)](./api/class-page.mdx#page-route), [page.waitForURL(url[, options])](./api/class-page.mdx#page-wait-for-url), [page.waitForRequest(urlOrPredicate[, options])](./api/class-page.mdx#page-wait-for-request), or [page.waitForResponse(urlOrPredicate[, options])](./api/class-page.mdx#page-wait-for-response) it takes the base URL in consideration by using the [`URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor for building the corresponding URL. Examples:<a href="#browser-new-context-option-base-url" class="list-anchor">#</a>
+    * baseURL: `http://localhost:3000` and navigating to `/bar.html` results in `http://localhost:3000/bar.html`
+    * baseURL: `http://localhost:3000/foo/` and navigating to `./bar.html` results in `http://localhost:3000/foo/bar.html`
+  - `bypassCSP`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-bypass-csp"/> &#60;[boolean]&#62; Toggles bypassing page's Content-Security-Policy.<a href="#browser-new-context-option-bypass-csp" class="list-anchor">#</a>
+  - `colorScheme`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-color-scheme"/> &#60;"light"|"dark"|"no-preference"&#62; Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [page.emulateMedia([options])](./api/class-page.mdx#page-emulate-media) for more details. Defaults to `'light'`.<a href="#browser-new-context-option-color-scheme" class="list-anchor">#</a>
+  - `deviceScaleFactor`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-device-scale-factor"/> &#60;[number]&#62; Specify device scale factor (can be thought of as dpr). Defaults to `1`.<a href="#browser-new-context-option-device-scale-factor" class="list-anchor">#</a>
+  - `extraHTTPHeaders`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-extra-http-headers"/> &#60;[Object]<[string], [string]>&#62; An object containing additional HTTP headers to be sent with every request. All header values must be strings.<a href="#browser-new-context-option-extra-http-headers" class="list-anchor">#</a>
+  - `geolocation`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-geolocation"/> &#60;[Object]&#62;<a href="#browser-new-context-option-geolocation" class="list-anchor">#</a>
+    - `latitude` &#60;[number]&#62; Latitude between -90 and 90.
+    - `longitude` &#60;[number]&#62; Longitude between -180 and 180.
+    - `accuracy` &#60;[number]&#62; Non-negative accuracy value. Defaults to `0`.
+  - `hasTouch`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-has-touch"/> &#60;[boolean]&#62; Specifies if viewport supports touch events. Defaults to false.<a href="#browser-new-context-option-has-touch" class="list-anchor">#</a>
+  - `httpCredentials`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-http-credentials"/> &#60;[Object]&#62; Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).<a href="#browser-new-context-option-http-credentials" class="list-anchor">#</a>
+    - `username` &#60;[string]&#62;
+    - `password` &#60;[string]&#62;
+  - `ignoreHTTPSErrors`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-ignore-https-errors"/> &#60;[boolean]&#62; Whether to ignore HTTPS errors during navigation. Defaults to `false`.<a href="#browser-new-context-option-ignore-https-errors" class="list-anchor">#</a>
+  - `isMobile`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-is-mobile"/> &#60;[boolean]&#62; Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.<a href="#browser-new-context-option-is-mobile" class="list-anchor">#</a>
+  - `javaScriptEnabled`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-java-script-enabled"/> &#60;[boolean]&#62; Whether or not to enable JavaScript in the context. Defaults to `true`.<a href="#browser-new-context-option-java-script-enabled" class="list-anchor">#</a>
+  - `locale`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-locale"/> &#60;[string]&#62; Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.<a href="#browser-new-context-option-locale" class="list-anchor">#</a>
+  - `logger`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-logger"/> &#60;[Logger]&#62; Logger sink for Playwright logging.<a href="#browser-new-context-option-logger" class="list-anchor">#</a>
+  - `offline`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-offline"/> &#60;[boolean]&#62; Whether to emulate network being offline. Defaults to `false`.<a href="#browser-new-context-option-offline" class="list-anchor">#</a>
+  - `permissions`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-permissions"/> &#60;[Array]<[string]>&#62; A list of permissions to grant to all pages in this context. See [browserContext.grantPermissions(permissions[, options])](./api/class-browsercontext.mdx#browser-context-grant-permissions) for more details.<a href="#browser-new-context-option-permissions" class="list-anchor">#</a>
+  - `proxy`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-proxy"/> &#60;[Object]&#62; Network proxy settings to use with this context.<a href="#browser-new-context-option-proxy" class="list-anchor">#</a>
+    - `server` &#60;[string]&#62; Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
+    - `bypass` &#60;[string]&#62; Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
+    - `username` &#60;[string]&#62; Optional username to use if HTTP proxy requires authentication.
+    - `password` &#60;[string]&#62; Optional password to use if HTTP proxy requires authentication.
+  - `recordHar`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-record-har"/> &#60;[Object]&#62; Enables [HAR](http://www.softwareishard.com/blog/har-12-spec) recording for all pages into `recordHar.path` file. If not specified, the HAR is not recorded. Make sure to await [browserContext.close()](./api/class-browsercontext.mdx#browser-context-close) for the HAR to be saved.<a href="#browser-new-context-option-record-har" class="list-anchor">#</a>
+    - `omitContent` &#60;[boolean]&#62; Optional setting to control whether to omit request content from the HAR. Defaults to `false`.
+    - `path` &#60;[string]&#62; Path on the filesystem to write the HAR file to.
+  - `recordVideo`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-record-video"/> &#60;[Object]&#62; Enables video recording for all pages into `recordVideo.dir` directory. If not specified videos are not recorded. Make sure to await [browserContext.close()](./api/class-browsercontext.mdx#browser-context-close) for videos to be saved.<a href="#browser-new-context-option-record-video" class="list-anchor">#</a>
+    - `dir` &#60;[string]&#62; Path to the directory to put videos into.
+    - `size` &#60;[Object]&#62; Optional dimensions of the recorded videos. If not specified the size will be equal to `viewport` scaled down to fit into 800x800. If `viewport` is not configured explicitly the video size defaults to 800x450. Actual picture of each page will be scaled down if necessary to fit the specified size.
+      - `width` &#60;[number]&#62; Video frame width.
+      - `height` &#60;[number]&#62; Video frame height.
+  - `reducedMotion`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-reduced-motion"/> &#60;"reduce"|"no-preference"&#62; Emulates `'prefers-reduced-motion'` media feature, supported values are `'reduce'`, `'no-preference'`. See [page.emulateMedia([options])](./api/class-page.mdx#page-emulate-media) for more details. Defaults to `'no-preference'`.<a href="#browser-new-context-option-reduced-motion" class="list-anchor">#</a>
+  - `screen`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-screen"/> &#60;[Object]&#62; Emulates consistent window screen size available inside web page via `window.screen`. Is only used when the `viewport` is set.<a href="#browser-new-context-option-screen" class="list-anchor">#</a>
+    - `width` &#60;[number]&#62; page width in pixels.
+    - `height` &#60;[number]&#62; page height in pixels.
+  - `storageState`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-storage-state"/> &#60;[string]|[Object]&#62; Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [browserContext.storageState([options])](./api/class-browsercontext.mdx#browser-context-storage-state). Either a path to the file with saved storage, or an object with the following fields:<a href="#browser-new-context-option-storage-state" class="list-anchor">#</a>
+    - `cookies` &#60;[Array]<[Object]>&#62; Optional cookies to set for context
+      - `name` &#60;[string]&#62;
+      - `value` &#60;[string]&#62;
+      - `url` &#60;[string]&#62; Optional either url or domain / path are required
+      - `domain` &#60;[string]&#62; Optional either url or domain / path are required
+      - `path` &#60;[string]&#62; Optional either url or domain / path are required
+      - `expires` &#60;[number]&#62; Optional Unix time in seconds.
+      - `httpOnly` &#60;[boolean]&#62; Optional httpOnly flag
+      - `secure` &#60;[boolean]&#62; Optional secure flag
+      - `sameSite` &#60;"Strict"|"Lax"|"None"&#62; Optional sameSite flag
+    - `origins` &#60;[Array]<[Object]>&#62; Optional localStorage to set for context
+      - `origin` &#60;[string]&#62;
+      - `localStorage` &#60;[Array]<[Object]>&#62;
+        - `name` &#60;[string]&#62;
+        - `value` &#60;[string]&#62;
+  - `timezoneId`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-timezone-id"/> &#60;[string]&#62; Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.<a href="#browser-new-context-option-timezone-id" class="list-anchor">#</a>
+  - `userAgent`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-user-agent"/> &#60;[string]&#62; Specific user agent to use in this context.<a href="#browser-new-context-option-user-agent" class="list-anchor">#</a>
+  - `videoSize`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-video-size"/> &#60;[Object]&#62; **DEPRECATED** Use `recordVideo` instead.<a href="#browser-new-context-option-video-size" class="list-anchor">#</a>
+    - `width` &#60;[number]&#62; Video frame width.
+    - `height` &#60;[number]&#62; Video frame height.
+  - `videosPath`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-videos-path"/> &#60;[string]&#62; **DEPRECATED** Use `recordVideo` instead.<a href="#browser-new-context-option-videos-path" class="list-anchor">#</a>
+  - `viewport`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-viewport"/> &#60;[null]|[Object]&#62; Emulates consistent viewport for each page. Defaults to an 1280x720 viewport. `null` disables the default viewport.<a href="#browser-new-context-option-viewport" class="list-anchor">#</a>
+    - `width` &#60;[number]&#62; page width in pixels.
+    - `height` &#60;[number]&#62; page height in pixels.
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-return"/> &#60;[Promise]<[BrowserContext]>&#62;<a href="#browser-new-context-return" class="list-anchor">#</a>
+
+Creates a new browser context. It won't share cookies/cache with other browser contexts.
+
+```js
+(async () => {
+  const browser = await playwright.firefox.launch();  // Or 'chromium' or 'webkit'.
+  // Create a new incognito browser context.
+  const context = await browser.newContext();
+  // Create a new page in a pristine context.
+  const page = await context.newPage();
+  await page.goto('https://example.com');
+})();
+```
+
+## browser.newPage([options]) {#browser-new-page}
+- `options` &#60;[Object]&#62;
+  - `acceptDownloads`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-accept-downloads"/> &#60;[boolean]&#62; Whether to automatically download all the attachments. Defaults to `false` where all the downloads are canceled.<a href="#browser-new-page-option-accept-downloads" class="list-anchor">#</a>
+  - `baseURL`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-base-url"/> &#60;[string]&#62; When using [page.goto(url[, options])](./api/class-page.mdx#page-goto), [page.route(url, handler)](./api/class-page.mdx#page-route), [page.waitForURL(url[, options])](./api/class-page.mdx#page-wait-for-url), [page.waitForRequest(urlOrPredicate[, options])](./api/class-page.mdx#page-wait-for-request), or [page.waitForResponse(urlOrPredicate[, options])](./api/class-page.mdx#page-wait-for-response) it takes the base URL in consideration by using the [`URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor for building the corresponding URL. Examples:<a href="#browser-new-page-option-base-url" class="list-anchor">#</a>
+    * baseURL: `http://localhost:3000` and navigating to `/bar.html` results in `http://localhost:3000/bar.html`
+    * baseURL: `http://localhost:3000/foo/` and navigating to `./bar.html` results in `http://localhost:3000/foo/bar.html`
+  - `bypassCSP`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-bypass-csp"/> &#60;[boolean]&#62; Toggles bypassing page's Content-Security-Policy.<a href="#browser-new-page-option-bypass-csp" class="list-anchor">#</a>
+  - `colorScheme`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-color-scheme"/> &#60;"light"|"dark"|"no-preference"&#62; Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [page.emulateMedia([options])](./api/class-page.mdx#page-emulate-media) for more details. Defaults to `'light'`.<a href="#browser-new-page-option-color-scheme" class="list-anchor">#</a>
+  - `deviceScaleFactor`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-device-scale-factor"/> &#60;[number]&#62; Specify device scale factor (can be thought of as dpr). Defaults to `1`.<a href="#browser-new-page-option-device-scale-factor" class="list-anchor">#</a>
+  - `extraHTTPHeaders`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-extra-http-headers"/> &#60;[Object]<[string], [string]>&#62; An object containing additional HTTP headers to be sent with every request. All header values must be strings.<a href="#browser-new-page-option-extra-http-headers" class="list-anchor">#</a>
+  - `geolocation`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-geolocation"/> &#60;[Object]&#62;<a href="#browser-new-page-option-geolocation" class="list-anchor">#</a>
+    - `latitude` &#60;[number]&#62; Latitude between -90 and 90.
+    - `longitude` &#60;[number]&#62; Longitude between -180 and 180.
+    - `accuracy` &#60;[number]&#62; Non-negative accuracy value. Defaults to `0`.
+  - `hasTouch`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-has-touch"/> &#60;[boolean]&#62; Specifies if viewport supports touch events. Defaults to false.<a href="#browser-new-page-option-has-touch" class="list-anchor">#</a>
+  - `httpCredentials`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-http-credentials"/> &#60;[Object]&#62; Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).<a href="#browser-new-page-option-http-credentials" class="list-anchor">#</a>
+    - `username` &#60;[string]&#62;
+    - `password` &#60;[string]&#62;
+  - `ignoreHTTPSErrors`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-ignore-https-errors"/> &#60;[boolean]&#62; Whether to ignore HTTPS errors during navigation. Defaults to `false`.<a href="#browser-new-page-option-ignore-https-errors" class="list-anchor">#</a>
+  - `isMobile`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-is-mobile"/> &#60;[boolean]&#62; Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.<a href="#browser-new-page-option-is-mobile" class="list-anchor">#</a>
+  - `javaScriptEnabled`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-java-script-enabled"/> &#60;[boolean]&#62; Whether or not to enable JavaScript in the context. Defaults to `true`.<a href="#browser-new-page-option-java-script-enabled" class="list-anchor">#</a>
+  - `locale`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-locale"/> &#60;[string]&#62; Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.<a href="#browser-new-page-option-locale" class="list-anchor">#</a>
+  - `logger`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-logger"/> &#60;[Logger]&#62; Logger sink for Playwright logging.<a href="#browser-new-page-option-logger" class="list-anchor">#</a>
+  - `offline`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-offline"/> &#60;[boolean]&#62; Whether to emulate network being offline. Defaults to `false`.<a href="#browser-new-page-option-offline" class="list-anchor">#</a>
+  - `permissions`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-permissions"/> &#60;[Array]<[string]>&#62; A list of permissions to grant to all pages in this context. See [browserContext.grantPermissions(permissions[, options])](./api/class-browsercontext.mdx#browser-context-grant-permissions) for more details.<a href="#browser-new-page-option-permissions" class="list-anchor">#</a>
+  - `proxy`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-proxy"/> &#60;[Object]&#62; Network proxy settings to use with this context.<a href="#browser-new-page-option-proxy" class="list-anchor">#</a>
+    - `server` &#60;[string]&#62; Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
+    - `bypass` &#60;[string]&#62; Optional coma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
+    - `username` &#60;[string]&#62; Optional username to use if HTTP proxy requires authentication.
+    - `password` &#60;[string]&#62; Optional password to use if HTTP proxy requires authentication.
+  - `recordHar`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-record-har"/> &#60;[Object]&#62; Enables [HAR](http://www.softwareishard.com/blog/har-12-spec) recording for all pages into `recordHar.path` file. If not specified, the HAR is not recorded. Make sure to await [browserContext.close()](./api/class-browsercontext.mdx#browser-context-close) for the HAR to be saved.<a href="#browser-new-page-option-record-har" class="list-anchor">#</a>
+    - `omitContent` &#60;[boolean]&#62; Optional setting to control whether to omit request content from the HAR. Defaults to `false`.
+    - `path` &#60;[string]&#62; Path on the filesystem to write the HAR file to.
+  - `recordVideo`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-record-video"/> &#60;[Object]&#62; Enables video recording for all pages into `recordVideo.dir` directory. If not specified videos are not recorded. Make sure to await [browserContext.close()](./api/class-browsercontext.mdx#browser-context-close) for videos to be saved.<a href="#browser-new-page-option-record-video" class="list-anchor">#</a>
+    - `dir` &#60;[string]&#62; Path to the directory to put videos into.
+    - `size` &#60;[Object]&#62; Optional dimensions of the recorded videos. If not specified the size will be equal to `viewport` scaled down to fit into 800x800. If `viewport` is not configured explicitly the video size defaults to 800x450. Actual picture of each page will be scaled down if necessary to fit the specified size.
+      - `width` &#60;[number]&#62; Video frame width.
+      - `height` &#60;[number]&#62; Video frame height.
+  - `reducedMotion`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-reduced-motion"/> &#60;"reduce"|"no-preference"&#62; Emulates `'prefers-reduced-motion'` media feature, supported values are `'reduce'`, `'no-preference'`. See [page.emulateMedia([options])](./api/class-page.mdx#page-emulate-media) for more details. Defaults to `'no-preference'`.<a href="#browser-new-page-option-reduced-motion" class="list-anchor">#</a>
+  - `screen`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-screen"/> &#60;[Object]&#62; Emulates consistent window screen size available inside web page via `window.screen`. Is only used when the `viewport` is set.<a href="#browser-new-page-option-screen" class="list-anchor">#</a>
+    - `width` &#60;[number]&#62; page width in pixels.
+    - `height` &#60;[number]&#62; page height in pixels.
+  - `storageState`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-storage-state"/> &#60;[string]|[Object]&#62; Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [browserContext.storageState([options])](./api/class-browsercontext.mdx#browser-context-storage-state). Either a path to the file with saved storage, or an object with the following fields:<a href="#browser-new-page-option-storage-state" class="list-anchor">#</a>
+    - `cookies` &#60;[Array]<[Object]>&#62; Optional cookies to set for context
+      - `name` &#60;[string]&#62;
+      - `value` &#60;[string]&#62;
+      - `url` &#60;[string]&#62; Optional either url or domain / path are required
+      - `domain` &#60;[string]&#62; Optional either url or domain / path are required
+      - `path` &#60;[string]&#62; Optional either url or domain / path are required
+      - `expires` &#60;[number]&#62; Optional Unix time in seconds.
+      - `httpOnly` &#60;[boolean]&#62; Optional httpOnly flag
+      - `secure` &#60;[boolean]&#62; Optional secure flag
+      - `sameSite` &#60;"Strict"|"Lax"|"None"&#62; Optional sameSite flag
+    - `origins` &#60;[Array]<[Object]>&#62; Optional localStorage to set for context
+      - `origin` &#60;[string]&#62;
+      - `localStorage` &#60;[Array]<[Object]>&#62;
+        - `name` &#60;[string]&#62;
+        - `value` &#60;[string]&#62;
+  - `timezoneId`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-timezone-id"/> &#60;[string]&#62; Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.<a href="#browser-new-page-option-timezone-id" class="list-anchor">#</a>
+  - `userAgent`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-user-agent"/> &#60;[string]&#62; Specific user agent to use in this context.<a href="#browser-new-page-option-user-agent" class="list-anchor">#</a>
+  - `videoSize`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-video-size"/> &#60;[Object]&#62; **DEPRECATED** Use `recordVideo` instead.<a href="#browser-new-page-option-video-size" class="list-anchor">#</a>
+    - `width` &#60;[number]&#62; Video frame width.
+    - `height` &#60;[number]&#62; Video frame height.
+  - `videosPath`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-videos-path"/> &#60;[string]&#62; **DEPRECATED** Use `recordVideo` instead.<a href="#browser-new-page-option-videos-path" class="list-anchor">#</a>
+  - `viewport`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-viewport"/> &#60;[null]|[Object]&#62; Emulates consistent viewport for each page. Defaults to an 1280x720 viewport. `null` disables the default viewport.<a href="#browser-new-page-option-viewport" class="list-anchor">#</a>
+    - `width` &#60;[number]&#62; page width in pixels.
+    - `height` &#60;[number]&#62; page height in pixels.
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-return"/> &#60;[Promise]<[Page]>&#62;<a href="#browser-new-page-return" class="list-anchor">#</a>
+
+Creates a new page in a new browser context. Closing this page will close the context as well.
+
+This is a convenience API that should only be used for the single-page scenarios and short snippets. Production code and testing frameworks should explicitly create [browser.newContext([options])](./api/class-browser.mdx#browser-new-context) followed by the [browserContext.newPage()](./api/class-browsercontext.mdx#browser-context-new-page) to control their exact life times.
+
+## browser.startTracing([page, options]) {#browser-start-tracing}
+- `page`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-start-tracing-option-page"/> &#60;[Page]&#62; Optional, if specified, tracing includes screenshots of the given page.<a href="#browser-start-tracing-option-page" class="list-anchor">#</a>
+- `options` &#60;[Object]&#62;
+  - `categories`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-start-tracing-option-categories"/> &#60;[Array]<[string]>&#62; specify custom categories to use instead of default.<a href="#browser-start-tracing-option-categories" class="list-anchor">#</a>
+  - `path`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-start-tracing-option-path"/> &#60;[string]&#62; A path to write the trace file to.<a href="#browser-start-tracing-option-path" class="list-anchor">#</a>
+  - `screenshots`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-start-tracing-option-screenshots"/> &#60;[boolean]&#62; captures screenshots in the trace.<a href="#browser-start-tracing-option-screenshots" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-start-tracing-return"/> &#60;[Promise]<[void]>&#62;<a href="#browser-start-tracing-return" class="list-anchor">#</a>
+
+:::note
+This API controls [Chromium Tracing](https://www.chromium.org/developers/how-tos/trace-event-profiling-tool) which is a low-level chromium-specific debugging tool. API to control [Playwright Tracing](../trace-viewer) could be found [here](./class-tracing).
+:::
+
+You can use [browser.startTracing([page, options])](./api/class-browser.mdx#browser-start-tracing) and [browser.stopTracing()](./api/class-browser.mdx#browser-stop-tracing) to create a trace file that can be opened in Chrome DevTools performance panel.
+
+```js
+await browser.startTracing(page, {path: 'trace.json'});
+await page.goto('https://www.google.com');
+await browser.stopTracing();
+```
+
+## browser.stopTracing() {#browser-stop-tracing}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-stop-tracing-return"/> &#60;[Promise]<[Buffer]>&#62;<a href="#browser-stop-tracing-return" class="list-anchor">#</a>
+
+:::note
+This API controls [Chromium Tracing](https://www.chromium.org/developers/how-tos/trace-event-profiling-tool) which is a low-level chromium-specific debugging tool. API to control [Playwright Tracing](../trace-viewer) could be found [here](./class-tracing).
+:::
+
+Returns the buffer with trace data.
+
+## browser.version() {#browser-version}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-version-return"/> &#60;[string]&#62;<a href="#browser-version-return" class="list-anchor">#</a>
+
+Returns the browser version.
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Android]: ./api/class-android.mdx "Android"
+[AndroidDevice]: ./api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: ./api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: ./api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: ./api/class-androidwebview.mdx "AndroidWebView"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: ./api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: ./api/class-coverage.mdx "Coverage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[Electron]: ./api/class-electron.mdx "Electron"
+[ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Locator]: ./api/class-locator.mdx "Locator"
+[Logger]: ./api/class-logger.mdx "Logger"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Fixtures]: ./api/class-fixtures.mdx "Fixtures"
+[Test]: ./api/class-test.mdx "Test"
+[TestConfig]: ./api/class-testconfig.mdx "TestConfig"
+[TestError]: ./api/class-testerror.mdx "TestError"
+[TestInfo]: ./api/class-testinfo.mdx "TestInfo"
+[TestProject]: ./api/class-testproject.mdx "TestProject"
+[WorkerInfo]: ./api/class-workerinfo.mdx "WorkerInfo"
+[Location]: ./api/class-location.mdx "Location"
+[Reporter]: ./api/class-reporter.mdx "Reporter"
+[Suite]: ./api/class-suite.mdx "Suite"
+[TestCase]: ./api/class-testcase.mdx "TestCase"
+[TestResult]: ./api/class-testresult.mdx "TestResult"
+[TestStep]: ./api/class-teststep.mdx "TestStep"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./core-concepts.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
