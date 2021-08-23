@@ -6,8 +6,8 @@ module.exports = {
       "items": [
         { "type": "doc", "id": "why-playwright" },
         { "type": "doc", "id": "intro" },
-        { "type": "doc", "id": "debug" },
         { "type": "doc", "id": "cli" },
+        { "type": "doc", "id": "debug" },
         { "type": "doc", "id": "languages" },
         { "type": "doc", "id": "release-notes" }
       ],
@@ -19,13 +19,13 @@ module.exports = {
       "items": [
         { "type": "doc", "id": "test-annotations" },
         { "type": "doc", "id": "test-assertions" },
+        { "type": "doc", "id": "test-cli" },
         { "type": "doc", "id": "test-configuration" },
         { "type": "doc", "id": "test-pom" },
         { "type": "doc", "id": "test-parallel" },
         { "type": "doc", "id": "test-reporters" },
         { "type": "doc", "id": "test-retries" },
         { "type": "doc", "id": "test-snapshots" },
-        { "type": "doc", "id": "test-cli" },
         { "type": "doc", "id": "test-advanced" },
         { "type": "doc", "id": "test-fixtures" },
       ],
