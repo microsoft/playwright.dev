@@ -9,6 +9,55 @@ import TabItem from '@theme/TabItem';
 
 TimeoutError is emitted whenever certain operations are terminated due to timeout, e.g. [page.wait_for_selector(selector, **kwargs)](./api/class-page.mdx#page-wait-for-selector) or [browser_type.launch(**kwargs)](./api/class-browsertype.mdx#browser-type-launch).
 
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
+
+with sync_playwright() as p:
+    browser = p.chromium.launch()
+    page = browser.new_page()
+    try:
+      page.click("text=Example", timeout=100)
+    except PlaywrightTimeoutError:
+      print("Timeout!")
+    browser.close()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+import asyncio
+from playwright.async_api import async_playwright, TimeoutError as PlaywrightTimeoutError
+
+async def run(playwright):
+    browser = await playwright.chromium.launch()
+    page = await browser.new_page()
+    try:
+      await page.click("text=Example", timeout=100)
+    except PlaywrightTimeoutError:
+      print("Timeout!")
+    await browser.close()
+
+async def main():
+    async with async_playwright() as playwright:
+        await run(playwright)
+
+asyncio.run(main())
+```
+
+</TabItem>
+</Tabs>
+
 
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
