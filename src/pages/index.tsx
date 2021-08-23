@@ -37,33 +37,6 @@ const features = [
   },
 ];
 
-const videoRows = [
-  {
-    title: "Get started instantly",
-    description:
-      "Install Playwright and browsers with a single command – on local and CI environments. Then use the API to launch browsers, create pages, and automate page interactions.",
-    videoUrl: "img/gifs/intro.mp4",
-  },
-  {
-    title: "Reliably automate with auto-waits",
-    description:
-      "Actions, like clicks, auto-wait for UI elements to ensure your scripts are reliable to execute. Wait for precise events for more control and say goodbye to timeouts.",
-    videoUrl: "img/gifs/auto-wait.mp4",
-  },
-  {
-    title: "Intercept network activity",
-    description:
-      "Playwright can intercept network activity to modify or mock network requests during test scenarios.",
-    videoUrl: "img/gifs/network.mp4",
-  },
-  {
-    title: "Run multi-page emulation scenarios",
-    description:
-      "A single browser instance in Playwright can create multiple isolated browser contexts. Each browser context can run multi-page emulation scenarios.",
-    videoUrl: "img/gifs/contexts.mp4",
-  },
-];
-
 type FeatureProps = {
   imageUrl?: string
   title: string
@@ -224,10 +197,6 @@ const Home: React.FC = () => {
             </div>
           </div>
         </section>
-
-        {videoRows.map((row, idx) => (
-          <FeatureRow {...row} key={idx} isImageLeft={idx % 2 === 1} />
-        ))}
       </main>
     </Layout>
   );
