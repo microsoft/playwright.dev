@@ -28,6 +28,7 @@ module.exports = {
         { "type": "doc", "id": "test-snapshots" },
         { "type": "doc", "id": "test-advanced" },
         { "type": "doc", "id": "test-fixtures" },
+        { "type": "doc", "id": "test-typescript" },
       ],
       "collapsed": true
     },
