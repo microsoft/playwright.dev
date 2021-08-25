@@ -74,7 +74,7 @@ await context.close()
 - [browser_context.new_cdp_session(page)](./api/class-browsercontext.mdx#browser-context-new-cdp-session)
 - [browser_context.new_page()](./api/class-browsercontext.mdx#browser-context-new-page)
 - [browser_context.pages](./api/class-browsercontext.mdx#browser-context-pages)
-- [browser_context.route(url, handler)](./api/class-browsercontext.mdx#browser-context-route)
+- [browser_context.route(url, handler, **kwargs)](./api/class-browsercontext.mdx#browser-context-route)
 - [browser_context.service_workers](./api/class-browsercontext.mdx#browser-context-service-workers)
 - [browser_context.set_default_navigation_timeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout)
 - [browser_context.set_default_timeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout)
@@ -173,7 +173,7 @@ Use [page.wait_for_load_state(**kwargs)](./api/class-page.mdx#page-wait-for-load
 
 Emitted when a request is issued from any pages created through this context. The [request] object is read-only. To only listen for requests from a particular page, use [page.on("request")](./api/class-page.mdx#page-event-request).
 
-In order to intercept and mutate requests, see [browser_context.route(url, handler)](./api/class-browsercontext.mdx#browser-context-route) or [page.route(url, handler)](./api/class-page.mdx#page-route).
+In order to intercept and mutate requests, see [browser_context.route(url, handler, **kwargs)](./api/class-browsercontext.mdx#browser-context-route) or [page.route(url, handler, **kwargs)](./api/class-page.mdx#page-route).
 
 ## browser_context.on("requestfailed") {#browser-context-event-request-failed}
 - type: &#60;[Request]&#62;
@@ -674,15 +674,16 @@ Creates a new page in the browser context.
 
 Returns all open pages in the context.
 
-## browser_context.route(url, handler) {#browser-context-route}
+## browser_context.route(url, handler, **kwargs) {#browser-context-route}
 - `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-option-url"/> &#60;[str]|[Pattern]|[Callable]\[[URL]\]:[bool]&#62; A glob pattern, regex pattern or predicate receiving [URL] to match while routing. When a `base_url` via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.<a href="#browser-context-route-option-url" class="list-anchor">#</a>
 - `handler`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-option-handler"/> &#60;[Callable]\[[Route], [Request]\]&#62; handler function to route the request.<a href="#browser-context-route-option-handler" class="list-anchor">#</a>
+- `times`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-option-times"/> &#60;[int]&#62; How often a route should be used. By default it will be used every time.<a href="#browser-context-route-option-times" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-return"/> &#60;[NoneType]&#62;<a href="#browser-context-route-return" class="list-anchor">#</a>
 
 Routing provides the capability to modify network requests that are made by any page in the browser context. Once route is enabled, every request matching the url pattern will stall unless it's continued, fulfilled or aborted.
 
 :::note
-[page.route(url, handler)](./api/class-page.mdx#page-route) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception. Via `await context.addInitScript(() => delete window.navigator.serviceWorker);`
+[page.route(url, handler, **kwargs)](./api/class-page.mdx#page-route) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception. Via `await context.addInitScript(() => delete window.navigator.serviceWorker);`
 :::
 
 An example of a naive handler that aborts all image requests:
@@ -792,7 +793,7 @@ await context.route("/api/**", handle_route)
 </TabItem>
 </Tabs>
 
-Page routes (set up with [page.route(url, handler)](./api/class-page.mdx#page-route)) take precedence over browser context routes when request matches both handlers.
+Page routes (set up with [page.route(url, handler, **kwargs)](./api/class-page.mdx#page-route)) take precedence over browser context routes when request matches both handlers.
 
 To remove a route with its handler you can use [browser_context.unroute(url, **kwargs)](./api/class-browsercontext.mdx#browser-context-unroute).
 
@@ -907,11 +908,11 @@ Consider using [browser_context.grant_permissions(permissions, **kwargs)](./api/
 Returns storage state for this browser context, contains current cookies and local storage snapshot.
 
 ## browser_context.unroute(url, **kwargs) {#browser-context-unroute}
-- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-unroute-option-url"/> &#60;[str]|[Pattern]|[Callable]\[[URL]\]:[bool]&#62; A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with [browser_context.route(url, handler)](./api/class-browsercontext.mdx#browser-context-route).<a href="#browser-context-unroute-option-url" class="list-anchor">#</a>
-- `handler`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-unroute-option-handler"/> &#60;[Callable]\[[Route], [Request]\]&#62; Optional handler function used to register a routing with [browser_context.route(url, handler)](./api/class-browsercontext.mdx#browser-context-route).<a href="#browser-context-unroute-option-handler" class="list-anchor">#</a>
+- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-unroute-option-url"/> &#60;[str]|[Pattern]|[Callable]\[[URL]\]:[bool]&#62; A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with [browser_context.route(url, handler, **kwargs)](./api/class-browsercontext.mdx#browser-context-route).<a href="#browser-context-unroute-option-url" class="list-anchor">#</a>
+- `handler`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-unroute-option-handler"/> &#60;[Callable]\[[Route], [Request]\]&#62; Optional handler function used to register a routing with [browser_context.route(url, handler, **kwargs)](./api/class-browsercontext.mdx#browser-context-route).<a href="#browser-context-unroute-option-handler" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-unroute-return"/> &#60;[NoneType]&#62;<a href="#browser-context-unroute-return" class="list-anchor">#</a>
 
-Removes a route created with [browser_context.route(url, handler)](./api/class-browsercontext.mdx#browser-context-route). When `handler` is not specified, removes all routes for the `url`.
+Removes a route created with [browser_context.route(url, handler, **kwargs)](./api/class-browsercontext.mdx#browser-context-route). When `handler` is not specified, removes all routes for the `url`.
 
 ## browser_context.wait_for_event(event, **kwargs) {#browser-context-wait-for-event-2}
 - `event`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-wait-for-event-2-option-event"/> &#60;[str]&#62; Event name, same one typically passed into `*.on(event)`.<a href="#browser-context-wait-for-event-2-option-event" class="list-anchor">#</a>

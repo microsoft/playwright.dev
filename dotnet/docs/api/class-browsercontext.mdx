@@ -44,7 +44,7 @@ await context.CloseAsync();
 - [BrowserContext.GrantPermissionsAsync(permissions, options)](./api/class-browsercontext.mdx#browser-context-grant-permissions)
 - [BrowserContext.NewPageAsync()](./api/class-browsercontext.mdx#browser-context-new-page)
 - [BrowserContext.Pages](./api/class-browsercontext.mdx#browser-context-pages)
-- [BrowserContext.RouteAsync(url, handler)](./api/class-browsercontext.mdx#browser-context-route)
+- [BrowserContext.RouteAsync(url, handler, options)](./api/class-browsercontext.mdx#browser-context-route)
 - [BrowserContext.RunAndWaitForPageAsync(action, options)](./api/class-browsercontext.mdx#browser-context-wait-for-page)
 - [BrowserContext.SetDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout)
 - [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout)
@@ -88,7 +88,7 @@ Use [Page.WaitForLoadStateAsync(state, options)](./api/class-page.mdx#page-wait-
 
 Emitted when a request is issued from any pages created through this context. The [request] object is read-only. To only listen for requests from a particular page, use [event Page.Request](./api/class-page.mdx#page-event-request).
 
-In order to intercept and mutate requests, see [BrowserContext.RouteAsync(url, handler)](./api/class-browsercontext.mdx#browser-context-route) or [Page.RouteAsync(url, handler)](./api/class-page.mdx#page-route).
+In order to intercept and mutate requests, see [BrowserContext.RouteAsync(url, handler, options)](./api/class-browsercontext.mdx#browser-context-route) or [Page.RouteAsync(url, handler, options)](./api/class-page.mdx#page-route).
 
 ## event BrowserContext.RequestFailed {#browser-context-event-request-failed}
 - type: &#60;[Request]&#62;
@@ -345,15 +345,17 @@ Creates a new page in the browser context.
 
 Returns all open pages in the context.
 
-## BrowserContext.RouteAsync(url, handler) {#browser-context-route}
+## BrowserContext.RouteAsync(url, handler, options) {#browser-context-route}
 - `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-option-url"/> &#60;[string]|[Regex]|[Func]<[string], bool>&#62; A glob pattern, regex pattern or predicate receiving [URL] to match while routing. When a `baseURL` via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.<a href="#browser-context-route-option-url" class="list-anchor">#</a>
 - `handler`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-option-handler"/> &#60;[Action]<[Route]>&#62; handler function to route the request.<a href="#browser-context-route-option-handler" class="list-anchor">#</a>
+- `options` &#60;`BrowserContextRouteOptions?`&#62;
+  - `Times`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-option-times"/> &#60;[int]?&#62; How often a route should be used. By default it will be used every time.<a href="#browser-context-route-option-times" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-return"/> &#60;[void]&#62;<a href="#browser-context-route-return" class="list-anchor">#</a>
 
 Routing provides the capability to modify network requests that are made by any page in the browser context. Once route is enabled, every request matching the url pattern will stall unless it's continued, fulfilled or aborted.
 
 :::note
-[Page.RouteAsync(url, handler)](./api/class-page.mdx#page-route) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception. Via `await context.addInitScript(() => delete window.navigator.serviceWorker);`
+[Page.RouteAsync(url, handler, options)](./api/class-page.mdx#page-route) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception. Via `await context.addInitScript(() => delete window.navigator.serviceWorker);`
 :::
 
 An example of a naive handler that aborts all image requests:
@@ -388,7 +390,7 @@ await page.RouteAsync("/api/**", async r =>
 });
 ```
 
-Page routes (set up with [Page.RouteAsync(url, handler)](./api/class-page.mdx#page-route)) take precedence over browser context routes when request matches both handlers.
+Page routes (set up with [Page.RouteAsync(url, handler, options)](./api/class-page.mdx#page-route)) take precedence over browser context routes when request matches both handlers.
 
 To remove a route with its handler you can use [BrowserContext.UnrouteAsync(url, handler)](./api/class-browsercontext.mdx#browser-context-unroute).
 
@@ -480,11 +482,11 @@ Consider using [BrowserContext.GrantPermissionsAsync(permissions, options)](./ap
 Returns storage state for this browser context, contains current cookies and local storage snapshot.
 
 ## BrowserContext.UnrouteAsync(url, handler) {#browser-context-unroute}
-- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-unroute-option-url"/> &#60;[string]|[Regex]|[Func]<[string], bool>&#62; A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with [BrowserContext.RouteAsync(url, handler)](./api/class-browsercontext.mdx#browser-context-route).<a href="#browser-context-unroute-option-url" class="list-anchor">#</a>
-- `handler`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-unroute-option-handler"/> &#60;[Action]<[Route]?>&#62; Optional handler function used to register a routing with [BrowserContext.RouteAsync(url, handler)](./api/class-browsercontext.mdx#browser-context-route).<a href="#browser-context-unroute-option-handler" class="list-anchor">#</a>
+- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-unroute-option-url"/> &#60;[string]|[Regex]|[Func]<[string], bool>&#62; A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with [BrowserContext.RouteAsync(url, handler, options)](./api/class-browsercontext.mdx#browser-context-route).<a href="#browser-context-unroute-option-url" class="list-anchor">#</a>
+- `handler`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-unroute-option-handler"/> &#60;[Action]<[Route]?>&#62; Optional handler function used to register a routing with [BrowserContext.RouteAsync(url, handler, options)](./api/class-browsercontext.mdx#browser-context-route).<a href="#browser-context-unroute-option-handler" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-unroute-return"/> &#60;[void]&#62;<a href="#browser-context-unroute-return" class="list-anchor">#</a>
 
-Removes a route created with [BrowserContext.RouteAsync(url, handler)](./api/class-browsercontext.mdx#browser-context-route). When `handler` is not specified, removes all routes for the `url`.
+Removes a route created with [BrowserContext.RouteAsync(url, handler, options)](./api/class-browsercontext.mdx#browser-context-route). When `handler` is not specified, removes all routes for the `url`.
 
 ## BrowserContext.Tracing {#browser-context-tracing}
 - type: &#60;[Tracing]&#62;
