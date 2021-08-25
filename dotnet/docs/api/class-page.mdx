@@ -116,7 +116,7 @@ page.Load -= PageLoadHandler;
 - [Page.QuerySelectorAllAsync(selector)](./api/class-page.mdx#page-query-selector-all)
 - [Page.QuerySelectorAsync(selector, options)](./api/class-page.mdx#page-query-selector)
 - [Page.ReloadAsync(options)](./api/class-page.mdx#page-reload)
-- [Page.RouteAsync(url, handler)](./api/class-page.mdx#page-route)
+- [Page.RouteAsync(url, handler, options)](./api/class-page.mdx#page-route)
 - [Page.RunAndWaitForConsoleMessageAsync(action, options)](./api/class-page.mdx#page-wait-for-console-message)
 - [Page.RunAndWaitForDownloadAsync(action, options)](./api/class-page.mdx#page-wait-for-download)
 - [Page.RunAndWaitForFileChooserAsync(action, options)](./api/class-page.mdx#page-wait-for-file-chooser)
@@ -289,7 +289,7 @@ Use [Page.WaitForLoadStateAsync(state, options)](./api/class-page.mdx#page-wait-
 ## event Page.Request {#page-event-request}
 - type: &#60;[Request]&#62;
 
-Emitted when a page issues a request. The [request] object is read-only. In order to intercept and mutate requests, see [Page.RouteAsync(url, handler)](./api/class-page.mdx#page-route) or [BrowserContext.RouteAsync(url, handler)](./api/class-browsercontext.mdx#browser-context-route).
+Emitted when a page issues a request. The [request] object is read-only. In order to intercept and mutate requests, see [Page.RouteAsync(url, handler, options)](./api/class-page.mdx#page-route) or [BrowserContext.RouteAsync(url, handler, options)](./api/class-browsercontext.mdx#browser-context-route).
 
 ## event Page.RequestFailed {#page-event-request-failed}
 - type: &#60;[Request]&#62;
@@ -1192,9 +1192,11 @@ Shortcut for main frame's [Frame.QuerySelectorAllAsync(selector)](./api/class-fr
 
 Returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect.
 
-## Page.RouteAsync(url, handler) {#page-route}
+## Page.RouteAsync(url, handler, options) {#page-route}
 - `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-option-url"/> &#60;[string]|[Regex]|[Func]<[string], bool>&#62; A glob pattern, regex pattern or predicate receiving [URL] to match while routing. When a `baseURL` via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.<a href="#page-route-option-url" class="list-anchor">#</a>
 - `handler`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-option-handler"/> &#60;[Action]<[Route]>&#62; handler function to route the request.<a href="#page-route-option-handler" class="list-anchor">#</a>
+- `options` &#60;`PageRouteOptions?`&#62;
+  - `Times`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-option-times"/> &#60;[int]?&#62; How often a route should be used. By default it will be used every time.<a href="#page-route-option-times" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-return"/> &#60;[void]&#62;<a href="#page-route-return" class="list-anchor">#</a>
 
 Routing provides the capability to modify network requests that are made by a page.
@@ -1206,7 +1208,7 @@ The handler will only be called for the first url if the response is a redirect.
 :::
 
 :::note
-[Page.RouteAsync(url, handler)](./api/class-page.mdx#page-route) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception. Via `await context.addInitScript(() => delete window.navigator.serviceWorker);`
+[Page.RouteAsync(url, handler, options)](./api/class-page.mdx#page-route) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception. Via `await context.addInitScript(() => delete window.navigator.serviceWorker);`
 :::
 
 An example of a naive handler that aborts all image requests:
@@ -1237,7 +1239,7 @@ await page.RouteAsync("/api/**", async r =>
 });
 ```
 
-Page routes take precedence over browser context routes (set up with [BrowserContext.RouteAsync(url, handler)](./api/class-browsercontext.mdx#browser-context-route)) when request matches both handlers.
+Page routes take precedence over browser context routes (set up with [BrowserContext.RouteAsync(url, handler, options)](./api/class-browsercontext.mdx#browser-context-route)) when request matches both handlers.
 
 To remove a route with its handler you can use [Page.UnrouteAsync(url, handler)](./api/class-page.mdx#page-unroute).
 
@@ -1717,7 +1719,7 @@ Shortcut for main frame's [Frame.UncheckAsync(selector, options)](./api/class-fr
 - `handler`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-unroute-option-handler"/> &#60;[Action]<[Route]?>&#62; Optional handler function to route the request.<a href="#page-unroute-option-handler" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-unroute-return"/> &#60;[void]&#62;<a href="#page-unroute-return" class="list-anchor">#</a>
 
-Removes a route created with [Page.RouteAsync(url, handler)](./api/class-page.mdx#page-route). When `handler` is not specified, removes all routes for the `url`.
+Removes a route created with [Page.RouteAsync(url, handler, options)](./api/class-page.mdx#page-route). When `handler` is not specified, removes all routes for the `url`.
 
 ## Page.Url {#page-url}
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-url-return"/> &#60;[string]&#62;<a href="#page-url-return" class="list-anchor">#</a>

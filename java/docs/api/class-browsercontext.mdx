@@ -40,7 +40,7 @@ context.close();
 - [BrowserContext.grantPermissions(permissions[, options])](./api/class-browsercontext.mdx#browser-context-grant-permissions)
 - [BrowserContext.newPage()](./api/class-browsercontext.mdx#browser-context-new-page)
 - [BrowserContext.pages()](./api/class-browsercontext.mdx#browser-context-pages)
-- [BrowserContext.route(url, handler)](./api/class-browsercontext.mdx#browser-context-route)
+- [BrowserContext.route(url, handler[, options])](./api/class-browsercontext.mdx#browser-context-route)
 - [BrowserContext.setDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout)
 - [BrowserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout)
 - [BrowserContext.setExtraHTTPHeaders(headers)](./api/class-browsercontext.mdx#browser-context-set-extra-http-headers)
@@ -82,7 +82,7 @@ Use [Page.waitForLoadState([state, options])](./api/class-page.mdx#page-wait-for
 
 Emitted when a request is issued from any pages created through this context. The [request] object is read-only. To only listen for requests from a particular page, use [Page.onRequest(handler)](./api/class-page.mdx#page-event-request).
 
-In order to intercept and mutate requests, see [BrowserContext.route(url, handler)](./api/class-browsercontext.mdx#browser-context-route) or [Page.route(url, handler)](./api/class-page.mdx#page-route).
+In order to intercept and mutate requests, see [BrowserContext.route(url, handler[, options])](./api/class-browsercontext.mdx#browser-context-route) or [Page.route(url, handler[, options])](./api/class-page.mdx#page-route).
 
 ## BrowserContext.onRequestFailed(handler) {#browser-context-event-request-failed}
 - type: &#60;[Request]&#62;
@@ -333,15 +333,17 @@ Creates a new page in the browser context.
 
 Returns all open pages in the context.
 
-## BrowserContext.route(url, handler) {#browser-context-route}
+## BrowserContext.route(url, handler[, options]) {#browser-context-route}
 - `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-option-url"/> &#60;[String]|[Pattern]|[Predicate]<[String]>&#62; A glob pattern, regex pattern or predicate receiving [URL] to match while routing. When a `baseURL` via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.<a href="#browser-context-route-option-url" class="list-anchor">#</a>
 - `handler`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-option-handler"/> &#60;[Consumer]<[Route]>&#62; handler function to route the request.<a href="#browser-context-route-option-handler" class="list-anchor">#</a>
+- `options` &#60;`BrowserContext.RouteOptions`&#62;
+  - `setTimes`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-option-times"/> &#60;[int]&#62; How often a route should be used. By default it will be used every time.<a href="#browser-context-route-option-times" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-return"/> &#60;[void]&#62;<a href="#browser-context-route-return" class="list-anchor">#</a>
 
 Routing provides the capability to modify network requests that are made by any page in the browser context. Once route is enabled, every request matching the url pattern will stall unless it's continued, fulfilled or aborted.
 
 :::note
-[Page.route(url, handler)](./api/class-page.mdx#page-route) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception. Via `await context.addInitScript(() => delete window.navigator.serviceWorker);`
+[Page.route(url, handler[, options])](./api/class-page.mdx#page-route) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception. Via `await context.addInitScript(() => delete window.navigator.serviceWorker);`
 :::
 
 An example of a naive handler that aborts all image requests:
@@ -375,7 +377,7 @@ context.route("/api/**", route -> {
 });
 ```
 
-Page routes (set up with [Page.route(url, handler)](./api/class-page.mdx#page-route)) take precedence over browser context routes when request matches both handlers.
+Page routes (set up with [Page.route(url, handler[, options])](./api/class-page.mdx#page-route)) take precedence over browser context routes when request matches both handlers.
 
 To remove a route with its handler you can use [BrowserContext.unroute(url[, handler])](./api/class-browsercontext.mdx#browser-context-unroute).
 
@@ -448,11 +450,11 @@ Consider using [BrowserContext.grantPermissions(permissions[, options])](./api/c
 Returns storage state for this browser context, contains current cookies and local storage snapshot.
 
 ## BrowserContext.unroute(url[, handler]) {#browser-context-unroute}
-- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-unroute-option-url"/> &#60;[String]|[Pattern]|[Predicate]<[String]>&#62; A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with [BrowserContext.route(url, handler)](./api/class-browsercontext.mdx#browser-context-route).<a href="#browser-context-unroute-option-url" class="list-anchor">#</a>
-- `handler`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-unroute-option-handler"/> &#60;[Consumer]<[Route]>&#62; Optional handler function used to register a routing with [BrowserContext.route(url, handler)](./api/class-browsercontext.mdx#browser-context-route).<a href="#browser-context-unroute-option-handler" class="list-anchor">#</a>
+- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-unroute-option-url"/> &#60;[String]|[Pattern]|[Predicate]<[String]>&#62; A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with [BrowserContext.route(url, handler[, options])](./api/class-browsercontext.mdx#browser-context-route).<a href="#browser-context-unroute-option-url" class="list-anchor">#</a>
+- `handler`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-unroute-option-handler"/> &#60;[Consumer]<[Route]>&#62; Optional handler function used to register a routing with [BrowserContext.route(url, handler[, options])](./api/class-browsercontext.mdx#browser-context-route).<a href="#browser-context-unroute-option-handler" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-unroute-return"/> &#60;[void]&#62;<a href="#browser-context-unroute-return" class="list-anchor">#</a>
 
-Removes a route created with [BrowserContext.route(url, handler)](./api/class-browsercontext.mdx#browser-context-route). When `handler` is not specified, removes all routes for the `url`.
+Removes a route created with [BrowserContext.route(url, handler[, options])](./api/class-browsercontext.mdx#browser-context-route). When `handler` is not specified, removes all routes for the `url`.
 
 ## BrowserContext.waitForPage([options], callback) {#browser-context-wait-for-page}
 - `options` &#60;`BrowserContext.WaitForPageOptions`&#62;
