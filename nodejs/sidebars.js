@@ -139,6 +139,7 @@ module.exports = {
             { "type": "doc", "id": "api/class-suite" },
             { "type": "doc", "id": "api/class-testcase" },
             { "type": "doc", "id": "api/class-testresult" },
+            { "type": "doc", "id": "api/class-teststep" },
           ],
           "collapsed": false
         },
