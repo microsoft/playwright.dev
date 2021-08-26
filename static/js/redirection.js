@@ -14,7 +14,7 @@ const version = param("version");
 if (path) {
   // TODO: use versions
   // http://localhost:3000/#version=master&path=docs%2Femulation.md&q=geolocation
-  window.location.href = `${param("path").replace(".md", "")}#${param("q")}`;
+  window.location.pathname = `${param("path").replace(".md", "")}#${param("q")}`;
 } else {
   const redirects = [
     // ------------------- nodejs ---------------------
