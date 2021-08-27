@@ -84,5 +84,5 @@ function urlMatchesPrefix(url: string, prefix: string) {
 }
 
 function isStableVersion(url: string) {
-  return url.indexOf('next') === -1 && !url.match(/([0-9]+)\.([0-9]+)\.([0-9]+)/);
+  return url.indexOf('next') === -1 && !url.match(/([0-9]+)\.([0-9]+)/);
 }
