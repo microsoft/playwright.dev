@@ -79,6 +79,7 @@ class FrameExamples
 - [Frame.QuerySelectorAsync(selector, options)](./api/class-frame.mdx#frame-query-selector)
 - [Frame.RunAndWaitForNavigationAsync(action, options)](./api/class-frame.mdx#frame-wait-for-navigation)
 - [Frame.SelectOptionAsync(selector, values, options)](./api/class-frame.mdx#frame-select-option)
+- [Frame.SetCheckedAsync(selector, checked, options)](./api/class-frame.mdx#frame-set-checked)
 - [Frame.SetContentAsync(html, options)](./api/class-frame.mdx#frame-set-content)
 - [Frame.SetInputFilesAsync(selector, files, options)](./api/class-frame.mdx#frame-set-input-files)
 - [Frame.TapAsync(selector, options)](./api/class-frame.mdx#frame-tap)
@@ -691,6 +692,32 @@ await frame.SelectOptionAsync("select#colors", new[] { new SelectOptionValue() {
 // multiple selection
 await frame.SelectOptionAsync("select#colors", new[] { "red", "green", "blue" });
 ```
+
+## Frame.SetCheckedAsync(selector, checked, options) {#frame-set-checked}
+- `selector`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-checked-option-selector"/> &#60;[string]&#62; A selector to search for an element. If there are multiple elements satisfying the selector, the first will be used. See [working with selectors](./selectors.mdx) for more details.<a href="#frame-set-checked-option-selector" class="list-anchor">#</a>
+- `checked`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-checked-option-checked"/> &#60;[boolean]&#62; Whether to check or uncheck the checkbox.<a href="#frame-set-checked-option-checked" class="list-anchor">#</a>
+- `options` &#60;`FrameSetCheckedOptions?`&#62;
+  - `Force`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-checked-option-force"/> &#60;[boolean]?&#62; Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.<a href="#frame-set-checked-option-force" class="list-anchor">#</a>
+  - `NoWaitAfter`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-checked-option-no-wait-after"/> &#60;[boolean]?&#62; Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.<a href="#frame-set-checked-option-no-wait-after" class="list-anchor">#</a>
+  - `Position`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-checked-option-position"/> &#60;Position?&#62; A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.<a href="#frame-set-checked-option-position" class="list-anchor">#</a>
+    - `X` &#60;[double]&#62;
+    - `Y` &#60;[double]&#62;
+  - `Strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-checked-option-strict"/> &#60;[boolean]?&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#frame-set-checked-option-strict" class="list-anchor">#</a>
+  - `Timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-checked-option-timeout"/> &#60;[double]?&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#frame-set-checked-option-timeout" class="list-anchor">#</a>
+  - `Trial`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-checked-option-trial"/> &#60;[boolean]?&#62; When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.<a href="#frame-set-checked-option-trial" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-checked-return"/> &#60;[void]&#62;<a href="#frame-set-checked-return" class="list-anchor">#</a>
+
+This method checks or unchecks an element matching `selector` by performing the following steps:
+1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
+1. Ensure that matched element is a checkbox or a radio input. If not, this method throws.
+1. If the element already has the right checked state, this method returns immediately.
+1. Wait for [actionability](./actionability.mdx) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
+1. Scroll the element into view if needed.
+1. Use [Page.Mouse](./api/class-page.mdx#page-mouse) to click in the center of the element.
+1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+1. Ensure that the element is now checked or unchecked. If not, this method throws.
+
+When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
 
 ## Frame.SetContentAsync(html, options) {#frame-set-content}
 - `html`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-content-option-html"/> &#60;[string]&#62; HTML markup to assign to the page.<a href="#frame-set-content-option-html" class="list-anchor">#</a>

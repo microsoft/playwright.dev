@@ -57,7 +57,10 @@ test('basic test', async ({ page }) => {
 - [test.fixme([condition, description])](./api/class-test.mdx#test-fixme)
 - [test.only(title, testFunction)](./api/class-test.mdx#test-only)
 - [test.setTimeout(timeout)](./api/class-test.mdx#test-set-timeout)
-- [test.skip(titleOrCondition, testFunctionOrDescription)](./api/class-test.mdx#test-skip)
+- [test.skip(title, testFunction)](./api/class-test.mdx#test-skip-1)
+- [test.skip()](./api/class-test.mdx#test-skip-2)
+- [test.skip(condition, description)](./api/class-test.mdx#test-skip-3)
+- [test.skip(callback, description)](./api/class-test.mdx#test-skip-4)
 - [test.slow([condition, description])](./api/class-test.mdx#test-slow)
 - [test.step(title, body)](./api/class-test.mdx#test-step)
 - [test.use(fixtures)](./api/class-test.mdx#test-use)
@@ -805,14 +808,12 @@ test.beforeEach(async ({ page }, testInfo) => {
 
 Timeout for the currently running test is available through [testInfo.timeout](./api/class-testinfo.mdx#test-info-timeout).
 
-## test.skip(titleOrCondition, testFunctionOrDescription) {#test-skip}
-- `titleOrCondition`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-skip-option-condition"/> &#60;[string]|[void]|[boolean]|[function]\([Fixtures]\):[boolean]&#62; When used with `test.skip('test', () => {})` notation, first argument is a test title. Otherwise it is an optional skip condition - either a boolean value, or a function that takes a fixtures object and returns a boolean. Test or tests are skipped when the condition is `true`.<a href="#test-skip-option-condition" class="list-anchor">#</a>
-- `testFunctionOrDescription`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-skip-option-description"/> &#60;[function]\([Fixtures], [TestInfo]\)|[void]|[string]&#62; When used with `test.skip('test', () => {})` notation, second argument is a test function. Otherwise it is an optional description that will be reflected in a test report.<a href="#test-skip-option-description" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-skip-return"/> &#60;[void]&#62;<a href="#test-skip-return" class="list-anchor">#</a>
+## test.skip(title, testFunction) {#test-skip-1}
+- `title`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-skip-1-option-title"/> &#60;[string]&#62; Test title.<a href="#test-skip-1-option-title" class="list-anchor">#</a>
+- `testFunction`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-skip-1-option-test-function"/> &#60;[function]\([Fixtures], [TestInfo]\)&#62; Test function that takes one or two arguments: an object with fixtures and optional [TestInfo].<a href="#test-skip-1-option-test-function" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-skip-1-return"/> &#60;[void]&#62;<a href="#test-skip-1-return" class="list-anchor">#</a>
 
-Skips a test or a group of tests.
-
-Unconditionally skip a test, this is similar syntax to [test(title, testFunction)](./api/class-test.mdx#test-call):
+Declares a skipped test, similarly to [test(title, testFunction)](./api/class-test.mdx#test-call). Skipped test is never run.
 
 <Tabs
   groupId="js-flavor"
@@ -846,7 +847,95 @@ test.skip('broken test', async ({ page }) => {
 </TabItem>
 </Tabs>
 
-Conditionally skip a test with an optional description. In this case, call `test.skip()` inside the test function:
+## test.skip() {#test-skip-2}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-skip-2-return"/> &#60;[void]&#62;<a href="#test-skip-2-return" class="list-anchor">#</a>
+
+Unconditionally skip a test. Test is immediately aborted when you call [test.skip()](./api/class-test.mdx#test-skip-2).
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import { test, expect } from '@playwright/test';
+
+test('skipped test', async ({ page }) => {
+  test.skip();
+  // ...
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+const { test, expect } = require('@playwright/test');
+
+test('skipped test', async ({ page }) => {
+  test.skip();
+  // ...
+});
+```
+
+</TabItem>
+</Tabs>
+
+Unconditionally skip all tests in a file or [test.describe(title, callback)](./api/class-test.mdx#test-describe) group:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import { test, expect } from '@playwright/test';
+
+test.skip();
+
+test('skipped test 1', async ({ page }) => {
+  // ...
+});
+test('skipped test 2', async ({ page }) => {
+  // ...
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+const { test, expect } = require('@playwright/test');
+
+test.skip();
+
+test('skipped test 1', async ({ page }) => {
+  // ...
+});
+test('skipped test 2', async ({ page }) => {
+  // ...
+});
+```
+
+</TabItem>
+</Tabs>
+
+## test.skip(condition, description) {#test-skip-3}
+- `condition`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-skip-3-option-condition"/> &#60;[boolean]&#62; A skip condition. Test or tests are skipped when the condition is `true`.<a href="#test-skip-3-option-condition" class="list-anchor">#</a>
+- `description`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-skip-3-option-description"/> &#60;[void]|[string]&#62; An optional description that will be reflected in a test report.<a href="#test-skip-3-option-description" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-skip-3-return"/> &#60;[void]&#62;<a href="#test-skip-3-return" class="list-anchor">#</a>
+
+Conditionally skip a test with an optional description.
 
 <Tabs
   groupId="js-flavor"
@@ -882,7 +971,48 @@ test('skip in WebKit', async ({ page, browserName }) => {
 </TabItem>
 </Tabs>
 
-Conditionally skip all tests in a file or [test.describe(title, callback)](./api/class-test.mdx#test-describe) group:
+Skip from [test.beforeEach(hookFunction)](./api/class-test.mdx#test-before-each) hook:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import { test, expect } from '@playwright/test';
+
+test.beforeEach(async ({ page }) => {
+  test.skip(process.env.APP_VERSION === 'v1', 'There are no settings in v1');
+  await page.goto('/settings');
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+const { test, expect } = require('@playwright/test');
+
+test.beforeEach(async ({ page }) => {
+  test.skip(process.env.APP_VERSION === 'v1', 'There are no settings in v1');
+  await page.goto('/settings');
+});
+```
+
+</TabItem>
+</Tabs>
+
+## test.skip(callback, description) {#test-skip-4}
+- `callback`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-skip-4-option-condition"/> &#60;[function]\([Fixtures]\):[boolean]&#62; A function that returns whether to skip, based on test fixtures. Test or tests are skipped when the return value is `true`.<a href="#test-skip-4-option-condition" class="list-anchor">#</a>
+- `description`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-skip-4-option-description"/> &#60;[void]|[string]&#62; An optional description that will be reflected in a test report.<a href="#test-skip-4-option-description" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-skip-4-return"/> &#60;[void]&#62;<a href="#test-skip-4-return" class="list-anchor">#</a>
+
+Conditionally skips all tests in a file or [test.describe(title, callback)](./api/class-test.mdx#test-describe) group.
 
 <Tabs
   groupId="js-flavor"
@@ -920,42 +1050,6 @@ test('skip in WebKit 1', async ({ page }) => {
 });
 test('skip in WebKit 2', async ({ page }) => {
   // ...
-});
-```
-
-</TabItem>
-</Tabs>
-
-Skip from a hook:
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
-```js
-import { test, expect } from '@playwright/test';
-
-test.beforeEach(async ({ page }) => {
-  test.skip(process.env.APP_VERSION === 'v1', 'There are no settings in v1');
-  await page.goto('/settings');
-});
-```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-const { test, expect } = require('@playwright/test');
-
-test.beforeEach(async ({ page }) => {
-  test.skip(process.env.APP_VERSION === 'v1', 'There are no settings in v1');
-  await page.goto('/settings');
 });
 ```
 

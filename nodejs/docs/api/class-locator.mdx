@@ -80,6 +80,7 @@ await page.locator('button').first().click();
 - [locator.scrollIntoViewIfNeeded([options])](./api/class-locator.mdx#locator-scroll-into-view-if-needed)
 - [locator.selectOption(values[, options])](./api/class-locator.mdx#locator-select-option)
 - [locator.selectText([options])](./api/class-locator.mdx#locator-select-text)
+- [locator.setChecked(checked[, options])](./api/class-locator.mdx#locator-set-checked)
 - [locator.setInputFiles(files[, options])](./api/class-locator.mdx#locator-set-input-files)
 - [locator.tap([options])](./api/class-locator.mdx#locator-tap)
 - [locator.textContent([options])](./api/class-locator.mdx#locator-text-content)
@@ -510,6 +511,30 @@ element.selectOption(['red', 'green', 'blue']);
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-select-text-return"/> &#60;[Promise]<[void]>&#62;<a href="#locator-select-text-return" class="list-anchor">#</a>
 
 This method waits for [actionability](./actionability.mdx) checks, then focuses the element and selects all its text content.
+
+## locator.setChecked(checked[, options]) {#locator-set-checked}
+- `checked`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-set-checked-option-checked"/> &#60;[boolean]&#62; Whether to check or uncheck the checkbox.<a href="#locator-set-checked-option-checked" class="list-anchor">#</a>
+- `options` &#60;[Object]&#62;
+  - `force`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-set-checked-option-force"/> &#60;[boolean]&#62; Whether to bypass the [actionability](./actionability.mdx) checks. Defaults to `false`.<a href="#locator-set-checked-option-force" class="list-anchor">#</a>
+  - `noWaitAfter`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-set-checked-option-no-wait-after"/> &#60;[boolean]&#62; Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.<a href="#locator-set-checked-option-no-wait-after" class="list-anchor">#</a>
+  - `position`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-set-checked-option-position"/> &#60;[Object]&#62; A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.<a href="#locator-set-checked-option-position" class="list-anchor">#</a>
+    - `x` &#60;[number]&#62;
+    - `y` &#60;[number]&#62;
+  - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-set-checked-option-strict"/> &#60;[boolean]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#locator-set-checked-option-strict" class="list-anchor">#</a>
+  - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-set-checked-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#locator-set-checked-option-timeout" class="list-anchor">#</a>
+  - `trial`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-set-checked-option-trial"/> &#60;[boolean]&#62; When set, this method only performs the [actionability](./actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.<a href="#locator-set-checked-option-trial" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-set-checked-return"/> &#60;[Promise]<[void]>&#62;<a href="#locator-set-checked-return" class="list-anchor">#</a>
+
+This method checks or unchecks an element by performing the following steps:
+1. Ensure that matched element is a checkbox or a radio input. If not, this method throws.
+1. If the element already has the right checked state, this method returns immediately.
+1. Wait for [actionability](./actionability.mdx) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
+1. Scroll the element into view if needed.
+1. Use [page.mouse](./api/class-page.mdx#page-mouse) to click in the center of the element.
+1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+1. Ensure that the element is now checked or unchecked. If not, this method throws.
+
+When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
 
 ## locator.setInputFiles(files[, options]) {#locator-set-input-files}
 - `files`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-set-input-files-option-files"/> &#60;[string]|[Array]<[string]>|[Object]|[Array]<[Object]>&#62;<a href="#locator-set-input-files-option-files" class="list-anchor">#</a>
