@@ -388,16 +388,21 @@ import TabItem from '@theme/TabItem';`);
    * @param {'in'|'out'} direction
    * @param {Documentation.Member} member
    */
-  renderType(type, direction, member) {
+   renderType(type, direction, member) {
     if (type.union) {
       if (this.lang === 'java' && type.union.some(v => v.name.startsWith('"'))) {
         const values = type.union.map(l => l.name.substring(1, l.name.length - 1).replace('-', '_').toLocaleUpperCase());
         return `\`enum ${type.name} { ${values.join(', ')} }\``;
       }
       let union = type.union;
-      if (this.lang === 'csharp' && type.union.length && type.union[0].name === 'null') {
-        union = type.union.slice(1);
-        member.required = false;
+      if (this.lang === 'csharp') {
+        if (type.union.length && type.union[0].name === 'null') {
+          union = type.union.slice(1);
+          member.required = false;
+        }
+        if(type.union.some(v => v.name.startsWith('"'))) {
+          return `\`enum ${type.name} { ${union.map(l => toTitleCase(l.name.replace(/"/g, ''))).join(', ')} }${member.required ? '' : '?'}\``;
+        }
       }
       return union.map(l => this.renderType(l, direction, member)).join('|');
     }
