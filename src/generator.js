@@ -81,8 +81,8 @@ class Generator {
     this.generatedFiles = new Set();
     this.formatter = formatter;
     this.documentation = parseApi(path.join(DIR_SRC, 'api'))
-        .mergeWith(parseApi(path.join(DIR_SRC, 'test-api'), path.join(DIR_SRC, 'api', 'params.md')))
-        .mergeWith(parseApi(path.join(DIR_SRC, 'test-reporter-api')));
+      .mergeWith(parseApi(path.join(DIR_SRC, 'test-api'), path.join(DIR_SRC, 'api', 'params.md')))
+      .mergeWith(parseApi(path.join(DIR_SRC, 'test-reporter-api')));
     this.documentation.filterForLanguage(lang);
     this.documentation.setLinkRenderer(item => {
       const { clazz, member, param, option } = item;
@@ -395,9 +395,19 @@ import TabItem from '@theme/TabItem';`);
         return `\`enum ${type.name} { ${values.join(', ')} }\``;
       }
       let union = type.union;
-      if (this.lang === 'csharp' && type.union.length && type.union[0].name === 'null') {
-        union = type.union.slice(1);
-        member.required = false;
+      if (this.lang === 'csharp') {
+        if (type.union.length && type.union[0].name === 'null') {
+          union = type.union.slice(1);
+          member.required = false;
+        }
+        if (type.union.some(v => v.name.startsWith('"'))) {
+          // strip out the quotes
+          const sanitizeLiteral = (literal) => {
+            // toTitleCase(l.name.replace(/[\"-]/g, ''))
+            return literal.split('-').map(l => toTitleCase(l.replace(/[\"]/g, ''))).join('');
+          }
+          return `\`enum ${type.name} { ${union.map(l => sanitizeLiteral(l.name)).join(', ')} }${member.required ? '' : '?'}\``;
+        }
       }
       return union.map(l => this.renderType(l, direction, member)).join('|');
     }
