@@ -5,9 +5,9 @@ title: "Tracing"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-API for collecting and saving Playwright traces. Playwright traces can be opened using the Playwright CLI after Playwright script runs.
+API for collecting and saving Playwright traces. Playwright traces can be opened in [Trace Viewer](./trace-viewer.mdx) after Playwright script runs.
 
-Start with specifying the folder traces will be stored in:
+Start recording a trace before performing actions. At the end, stop tracing and save it to a file.
 
 <Tabs
   groupId="python-flavor"
@@ -23,6 +23,7 @@ Start with specifying the folder traces will be stored in:
 browser = chromium.launch()
 context = browser.new_context()
 context.tracing.start(screenshots=True, snapshots=True)
+page = context.new_page()
 page.goto("https://playwright.dev")
 context.tracing.stop(path = "trace.zip")
 ```
@@ -34,6 +35,7 @@ context.tracing.stop(path = "trace.zip")
 browser = await chromium.launch()
 context = await browser.new_context()
 await context.tracing.start(screenshots=True, snapshots=True)
+page = await context.new_page()
 await page.goto("https://playwright.dev")
 await context.tracing.stop(path = "trace.zip")
 ```
@@ -43,7 +45,9 @@ await context.tracing.stop(path = "trace.zip")
 
 
 - [tracing.start(**kwargs)](./api/class-tracing.mdx#tracing-start)
+- [tracing.start_chunk()](./api/class-tracing.mdx#tracing-start-chunk)
 - [tracing.stop(**kwargs)](./api/class-tracing.mdx#tracing-stop)
+- [tracing.stop_chunk(**kwargs)](./api/class-tracing.mdx#tracing-stop-chunk)
 
 ## tracing.start(**kwargs) {#tracing-start}
 - `name`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="tracing-start-option-name"/> &#60;[str]&#62; If specified, the trace is going to be saved into the file with the given name inside the `traces_dir` folder specified in [browser_type.launch(**kwargs)](./api/class-browsertype.mdx#browser-type-launch).<a href="#tracing-start-option-name" class="list-anchor">#</a>
@@ -65,8 +69,8 @@ Start tracing.
 
 ```py
 context.tracing.start(name="trace", screenshots=True, snapshots=True)
+page = context.new_page()
 page.goto("https://playwright.dev")
-context.tracing.stop()
 context.tracing.stop(path = "trace.zip")
 ```
 
@@ -75,19 +79,78 @@ context.tracing.stop(path = "trace.zip")
 
 ```py
 await context.tracing.start(name="trace", screenshots=True, snapshots=True)
+page = await context.new_page()
 await page.goto("https://playwright.dev")
-await context.tracing.stop()
 await context.tracing.stop(path = "trace.zip")
 ```
 
 </TabItem>
 </Tabs>
 
+## tracing.start_chunk() {#tracing-start-chunk}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="tracing-start-chunk-return"/> &#60;[NoneType]&#62;<a href="#tracing-start-chunk-return" class="list-anchor">#</a>
+
+Start a new trace chunk. If you'd like to record multiple traces on the same [BrowserContext], use [tracing.start(**kwargs)](./api/class-tracing.mdx#tracing-start) once, and then create multiple trace chunks with [tracing.start_chunk()](./api/class-tracing.mdx#tracing-start-chunk) and [tracing.stop_chunk(**kwargs)](./api/class-tracing.mdx#tracing-stop-chunk).
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+context.tracing.start(name="trace", screenshots=True, snapshots=True)
+page = context.new_page()
+page.goto("https://playwright.dev")
+
+context.tracing.start_chunk()
+page.click("text=Get Started")
+# Everything between start_chunk and stop_chunk will be recorded in the trace.
+context.tracing.stop_chunk(path = "trace1.zip")
+
+context.tracing.start_chunk()
+page.goto("http://example.com")
+# Save a second trace file with different actions.
+context.tracing.stop_chunk(path = "trace2.zip")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await context.tracing.start(name="trace", screenshots=True, snapshots=True)
+page = await context.new_page()
+await page.goto("https://playwright.dev")
+
+await context.tracing.start_chunk()
+await page.click("text=Get Started")
+# Everything between start_chunk and stop_chunk will be recorded in the trace.
+await context.tracing.stop_chunk(path = "trace1.zip")
+
+await context.tracing.start_chunk()
+await page.goto("http://example.com")
+# Save a second trace file with different actions.
+await context.tracing.stop_chunk(path = "trace2.zip")
+```
+
+</TabItem>
+</Tabs>
+
 ## tracing.stop(**kwargs) {#tracing-stop}
-- `path`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="tracing-stop-option-path"/> &#60;[Union]\[[str], [pathlib.Path]\]&#62; Export trace into the file with the given name.<a href="#tracing-stop-option-path" class="list-anchor">#</a>
+- `path`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="tracing-stop-option-path"/> &#60;[Union]\[[str], [pathlib.Path]\]&#62; Export trace into the file with the given path.<a href="#tracing-stop-option-path" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="tracing-stop-return"/> &#60;[NoneType]&#62;<a href="#tracing-stop-return" class="list-anchor">#</a>
 
 Stop tracing.
+
+## tracing.stop_chunk(**kwargs) {#tracing-stop-chunk}
+- `path`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="tracing-stop-chunk-option-path"/> &#60;[Union]\[[str], [pathlib.Path]\]&#62; Export trace collected since the last [tracing.start_chunk()](./api/class-tracing.mdx#tracing-start-chunk) call into the file with the given path.<a href="#tracing-stop-chunk-option-path" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="tracing-stop-chunk-return"/> &#60;[NoneType]&#62;<a href="#tracing-stop-chunk-return" class="list-anchor">#</a>
+
+Stop the trace chunk. See [tracing.start_chunk()](./api/class-tracing.mdx#tracing-start-chunk) for more details about multiple trace chunks.
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Browser]: ./api/class-browser.mdx "Browser"
@@ -101,6 +164,7 @@ Stop tracing.
 [Error]: ./api/class-error.mdx "Error"
 [FileChooser]: ./api/class-filechooser.mdx "FileChooser"
 [Frame]: ./api/class-frame.mdx "Frame"
+[Headers]: ./api/class-headers.mdx "Headers"
 [JSHandle]: ./api/class-jshandle.mdx "JSHandle"
 [Keyboard]: ./api/class-keyboard.mdx "Keyboard"
 [Locator]: ./api/class-locator.mdx "Locator"

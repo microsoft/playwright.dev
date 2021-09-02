@@ -5,9 +5,9 @@ title: "Tracing"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-API for collecting and saving Playwright traces. Playwright traces can be opened using the Playwright CLI after Playwright script runs.
+API for collecting and saving Playwright traces. Playwright traces can be opened in [Trace Viewer](./trace-viewer.mdx) after Playwright script runs.
 
-Start with specifying the folder traces will be stored in:
+Start recording a trace before performing actions. At the end, stop tracing and save it to a file.
 
 ```csharp
 await using var browser = playwright.Chromium.LaunchAsync();
@@ -27,7 +27,9 @@ await context.Tracing.StopAsync(new TracingStopOptions
 
 
 - [Tracing.StartAsync(options)](./api/class-tracing.mdx#tracing-start)
+- [Tracing.StartChunkAsync()](./api/class-tracing.mdx#tracing-start-chunk)
 - [Tracing.StopAsync(options)](./api/class-tracing.mdx#tracing-stop)
+- [Tracing.StopChunkAsync(options)](./api/class-tracing.mdx#tracing-stop-chunk)
 
 ## Tracing.StartAsync(options) {#tracing-start}
 - `options` &#60;`TracingStartOptions?`&#62;
@@ -54,12 +56,52 @@ await context.Tracing.StopAsync(new TracingStopOptions
 });
 ```
 
+## Tracing.StartChunkAsync() {#tracing-start-chunk}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="tracing-start-chunk-return"/> &#60;[void]&#62;<a href="#tracing-start-chunk-return" class="list-anchor">#</a>
+
+Start a new trace chunk. If you'd like to record multiple traces on the same [BrowserContext], use [Tracing.StartAsync(options)](./api/class-tracing.mdx#tracing-start) once, and then create multiple trace chunks with [Tracing.StartChunkAsync()](./api/class-tracing.mdx#tracing-start-chunk) and [Tracing.StopChunkAsync(options)](./api/class-tracing.mdx#tracing-stop-chunk).
+
+```csharp
+await using var browser = playwright.Chromium.LaunchAsync();
+await using var context = await browser.NewContextAsync();
+await context.Tracing.StartAsync(new TracingStartOptions
+{
+  Screenshots: true,
+  Snapshots: true
+});
+var page = context.NewPageAsync();
+await page.GotoAsync("https://playwright.dev");
+
+await context.Tracing.StartChunkAsync();
+await page.ClickAsync("text=Get Started");
+// Everything between StartChunkAsync and StopChunkAsync will be recorded in the trace.
+await context.Tracing.StopChunkAsync(new TracingStopChunkOptions
+{
+  Path: "trace1.zip"
+});
+
+await context.Tracing.StartChunkAsync();
+await page.GotoAsync("http://example.com");
+// Save a second trace file with different actions.
+await context.Tracing.StopChunkAsync(new TracingStopChunkOptions
+{
+  Path: "trace2.zip"
+});
+```
+
 ## Tracing.StopAsync(options) {#tracing-stop}
 - `options` &#60;`TracingStopOptions?`&#62;
-  - `Path`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="tracing-stop-option-path"/> &#60;[string]?&#62; Export trace into the file with the given name.<a href="#tracing-stop-option-path" class="list-anchor">#</a>
+  - `Path`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="tracing-stop-option-path"/> &#60;[string]?&#62; Export trace into the file with the given path.<a href="#tracing-stop-option-path" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="tracing-stop-return"/> &#60;[void]&#62;<a href="#tracing-stop-return" class="list-anchor">#</a>
 
 Stop tracing.
+
+## Tracing.StopChunkAsync(options) {#tracing-stop-chunk}
+- `options` &#60;`TracingStopChunkOptions?`&#62;
+  - `Path`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="tracing-stop-chunk-option-path"/> &#60;[string]?&#62; Export trace collected since the last [Tracing.StartChunkAsync()](./api/class-tracing.mdx#tracing-start-chunk) call into the file with the given path.<a href="#tracing-stop-chunk-option-path" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="tracing-stop-chunk-return"/> &#60;[void]&#62;<a href="#tracing-stop-chunk-return" class="list-anchor">#</a>
+
+Stop the trace chunk. See [Tracing.StartChunkAsync()](./api/class-tracing.mdx#tracing-start-chunk) for more details about multiple trace chunks.
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Browser]: ./api/class-browser.mdx "Browser"
@@ -71,6 +113,7 @@ Stop tracing.
 [ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: ./api/class-filechooser.mdx "FileChooser"
 [Frame]: ./api/class-frame.mdx "Frame"
+[Headers]: ./api/class-headers.mdx "Headers"
 [JSHandle]: ./api/class-jshandle.mdx "JSHandle"
 [Keyboard]: ./api/class-keyboard.mdx "Keyboard"
 [Locator]: ./api/class-locator.mdx "Locator"
