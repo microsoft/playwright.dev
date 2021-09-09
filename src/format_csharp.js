@@ -122,13 +122,14 @@ class CSharpFormatter {
         }
         if (!type.templates)
           return `${toTitleCase(member.alias)}${optionalSuffix}`;
-        return `[Map]${optionalSuffix}`;
+        return `[IDictionary]${optionalSuffix}`;
       }
       case 'path': return `[string]${optionalSuffix}`;
       case 'RegExp': return `[Regex]${optionalSuffix}`;
       case 'string': return `[string]${optionalSuffix}`;
+      case 'boolean': return `[bool]${optionalSuffix}`;
       // Escape '[' and ']' so that they don't break markdown links like [byte[]](link)
-      case 'Buffer': return `[byte&#91;&#93;]${optionalSuffix}`;
+      case 'Buffer': return `[byte]&#91;&#93;${optionalSuffix}`;
       case 'Readable': return `[Stream]${optionalSuffix}`;
       case 'Serializable': return `[object]${optionalSuffix}`;
       case 'URL': return `[string]${optionalSuffix}`;
