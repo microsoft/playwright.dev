@@ -64,6 +64,14 @@ module.exports = {
     },
     {
       "type": "category",
+      "label": "Migrations",
+      "items": [
+        { "type": "doc", "id": "protractor-js" },
+      ],
+      "collapsed": true
+    },
+    {
+      "type": "category",
       "label": "Integrations",
       "items": [
         { "type": "doc", "id": "library" },
