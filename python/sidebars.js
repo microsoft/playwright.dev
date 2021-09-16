@@ -74,7 +74,6 @@ module.exports = {
             { "type": "doc", "id": "api/class-download" },
             { "type": "doc", "id": "api/class-elementhandle" },
             { "type": "doc", "id": "api/class-error" },
-            { "type": "doc", "id": "api/class-fetchresponse" },
             { "type": "doc", "id": "api/class-filechooser" },
             { "type": "doc", "id": "api/class-frame" },
             { "type": "doc", "id": "api/class-jshandle" },
