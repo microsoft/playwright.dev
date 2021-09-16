@@ -75,7 +75,7 @@ module.exports = MyReporter;
 </TabItem>
 </Tabs>
 
-Now use this reporter with [testConfig.reporter](./api/class-testconfig.mdx#test-config-reporter).
+Now use this reporter with [testConfig.reporter](./api/class-testconfig.mdx#test-config-reporter). Learn more about [using reporters](./test-reporters.mdx).
 
 <Tabs
   groupId="js-flavor"
@@ -115,7 +115,14 @@ module.exports = config;
 </TabItem>
 </Tabs>
 
-Learn more about [reporters](./test-reporters.mdx).
+Here is a typical order of reporter calls:
+* [reporter.onBegin(config, suite)](./api/class-reporter.mdx#reporter-on-begin) is called once with a root suite that contains all other suites and tests. Learn more about [suites hierarchy][Suite].
+* [reporter.onTestBegin(test, result)](./api/class-reporter.mdx#reporter-on-test-begin) is called for each test run. It is given a [TestCase] that is executed, and a [TestResult] that is almost empty. Test result will be populated while the test runs (for example, with steps and stdio) and will get final `status` once the test finishes.
+* [reporter.onStepBegin(test, result, step)](./api/class-reporter.mdx#reporter-on-step-begin) and [reporter.onStepEnd(test, result, step)](./api/class-reporter.mdx#reporter-on-step-end) are called for each executed step inside the test. When steps are executed, test run has not finished yet.
+* [reporter.onTestEnd(test, result)](./api/class-reporter.mdx#reporter-on-test-end) is called when test run has finished. By this time, [TestResult] is complete and you can use [testResult.status](./api/class-testresult.mdx#test-result-status), [testResult.error](./api/class-testresult.mdx#test-result-error) and more.
+* [reporter.onEnd(result)](./api/class-reporter.mdx#reporter-on-end) is called once after all tests that should run had finished.
+
+Additionally, [reporter.onStdOut(chunk, test, result)](./api/class-reporter.mdx#reporter-on-std-out) and [reporter.onStdErr(chunk, test, result)](./api/class-reporter.mdx#reporter-on-std-err) are called when standard output is produced in the worker process, possibly during a test execution, and [reporter.onError(error)](./api/class-reporter.mdx#reporter-on-error) is called when something went wrong outside of the test execution.
 
 
 - [reporter.onBegin(config, suite)](./api/class-reporter.mdx#reporter-on-begin)
@@ -212,6 +219,7 @@ Called after a test has been finished in the worker process.
 [Electron]: ./api/class-electron.mdx "Electron"
 [ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FetchRequest]: ./api/class-fetchrequest.mdx "FetchRequest"
 [FetchResponse]: ./api/class-fetchresponse.mdx "FetchResponse"
 [FileChooser]: ./api/class-filechooser.mdx "FileChooser"
 [Frame]: ./api/class-frame.mdx "Frame"

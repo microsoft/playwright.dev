@@ -119,6 +119,9 @@ class CSharpFormatter {
           case 'Frame.setInputFiles.files': return '`FilePayload`';
           case 'Page.setInputFiles.files': return '`FilePayload`';
           case 'Locator.setInputFiles.files': return '`FilePayload`';
+          case 'Request.headersArray': return '`HttpHeader`';
+          case 'Response.headersArray': return '`HttpHeader`';
+          case 'FetchResponse.headersArray': return '`HttpHeader`';
         }
         if (!type.templates)
           return `${toTitleCase(member.alias)}${optionalSuffix}`;
