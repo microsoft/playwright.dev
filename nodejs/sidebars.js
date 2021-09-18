@@ -134,6 +134,7 @@ module.exports = {
             { "type": "doc", "id": "api/class-testconfig" },
             { "type": "doc", "id": "api/class-testerror" },
             { "type": "doc", "id": "api/class-testinfo" },
+            { "type": "doc", "id": "api/class-testoptions" },
             { "type": "doc", "id": "api/class-testproject" },
             { "type": "doc", "id": "api/class-timeouterror" },
           ],
