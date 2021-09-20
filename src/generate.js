@@ -23,6 +23,7 @@ const { PythonFormatter } = require('./format_python');
 const { JavaFormatter } = require('./format_java');
 const { CSharpFormatter } = require('./format_csharp');
 
+new Generator('js', path.join(__dirname, '..', 'test', 'docs'), new JavaScriptFormatter());
 new Generator('js', path.join(__dirname, '..', 'nodejs', 'docs'), new JavaScriptFormatter());
 new Generator('python', path.join(__dirname, '..', 'python', 'docs'), new PythonFormatter());
 new Generator('java', path.join(__dirname, '..', 'java', 'docs'), new JavaFormatter());

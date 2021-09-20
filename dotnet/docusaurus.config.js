@@ -82,12 +82,12 @@ module.exports = {
           position: 'left',
           items: [
             {
-              label: '.NET',
-              'data-language-prefix': '/dotnet/',
+              label: '@playwright/test',
+              'data-language-prefix': '/',
             },
             {
               label: 'Node.js',
-              'data-language-prefix': '/',
+              'data-language-prefix': '/nodejs/',
             },
             {
               label: 'Python',
@@ -96,6 +96,10 @@ module.exports = {
             {
               label: 'Java',
               'data-language-prefix': '/java/',
+            },
+            {
+              label: '.NET',
+              'data-language-prefix': '/dotnet/',
             },
           ],
         },

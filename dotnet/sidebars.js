@@ -41,7 +41,7 @@ module.exports = {
         { "type": "doc", "id": "verification" },
         { "type": "doc", "id": "videos" },
       ],
-      "collapsed": true
+      "collapsed": false
     },
     {
       "type": "category",

@@ -15,25 +15,6 @@ module.exports = {
     },
     {
       "type": "category",
-      "label": "Playwright Test",
-      "items": [
-        { "type": "doc", "id": "test-annotations" },
-        { "type": "doc", "id": "test-assertions" },
-        { "type": "doc", "id": "test-cli" },
-        { "type": "doc", "id": "test-configuration" },
-        { "type": "doc", "id": "test-pom" },
-        { "type": "doc", "id": "test-parallel" },
-        { "type": "doc", "id": "test-reporters" },
-        { "type": "doc", "id": "test-retries" },
-        { "type": "doc", "id": "test-snapshots" },
-        { "type": "doc", "id": "test-advanced" },
-        { "type": "doc", "id": "test-fixtures" },
-        { "type": "doc", "id": "test-typescript" },
-      ],
-      "collapsed": true
-    },
-    {
-      "type": "category",
       "label": "Guides",
       "items": [
         { "type": "doc", "id": "actionability" },
@@ -60,11 +41,11 @@ module.exports = {
         { "type": "doc", "id": "verification" },
         { "type": "doc", "id": "videos" },
       ],
-      "collapsed": true
+      "collapsed": false
     },
     {
       "type": "category",
-      "label": "Migrations",
+      "label": "Migration",
       "items": [
         { "type": "doc", "id": "protractor" },
       ],

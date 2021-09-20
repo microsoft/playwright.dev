@@ -49,7 +49,7 @@ window.addEventListener("load", () => {
   }
 })
 
-const languagesInSubfolders = ['java', 'dotnet', 'python'];
+const languagesInSubfolders = ['java', 'dotnet', 'python', 'nodejs'];
 
 window.addEventListener("load", () => {
   if ("serviceWorker" in navigator) {

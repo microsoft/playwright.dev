@@ -24,23 +24,23 @@ if (isProd) {
 }
 
 module.exports = {
-  title: "Playwright",
+  title: "Playwright Library",
   tagline: "Fast and reliable end-to-end testing for modern web apps",
   // Repo config for GitHub Pages
   url: "https://playwright.dev",
-  baseUrl: "/",
+  baseUrl: "/nodejs/",
   organizationName: "microsoft",
   projectName: "playwright.dev",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "throw",
-  scripts: ["/js/redirection.js"],
+  scripts: ["/nodejs/js/redirection.js"],
   favicon: "img/playwright-logo.svg",
   themeConfig: {
     colorMode: {
       defaultMode: "dark",
     },
     navbar: {
-      title: "Playwright",
+      title: "Playwright Library",
       logo: {
         alt: "Playwright logo",
         src: "img/playwright-logo.svg",
@@ -78,8 +78,12 @@ module.exports = {
           position: 'left',
           items: [
             {
-              label: 'Node.js',
+              label: '@playwright/test',
               'data-language-prefix': '/',
+            },
+            {
+              label: 'Node.js',
+              'data-language-prefix': '/nodejs/',
             },
             {
               label: 'Python',

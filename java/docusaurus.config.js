@@ -82,16 +82,20 @@ module.exports = {
           position: 'left',
           items: [
             {
-              label: 'Java',
-              'data-language-prefix': '/java/',
+              label: '@playwright/test',
+              'data-language-prefix': '/',
             },
             {
               label: 'Node.js',
-              'data-language-prefix': '/',
+              'data-language-prefix': '/nodejs/',
             },
             {
               label: 'Python',
               'data-language-prefix': '/python/',
+            },
+            {
+              label: 'Java',
+              'data-language-prefix': '/java/',
             },
             {
               label: '.NET',
