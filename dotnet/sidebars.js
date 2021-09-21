@@ -4,13 +4,11 @@ module.exports = {
       "type": "category",
       "label": "Introduction",
       "items": [
-        { "type": "doc", "id": "why-playwright" },
         { "type": "doc", "id": "intro" },
         { "type": "doc", "id": "inspector" },
         { "type": "doc", "id": "trace-viewer" },
         { "type": "doc", "id": "codegen" },
         { "type": "doc", "id": "debug" },
-        { "type": "doc", "id": "languages" },
         { "type": "doc", "id": "release-notes" },
         { "type": "doc", "id": "test-runners" }
       ],
@@ -53,6 +51,7 @@ module.exports = {
       ],
       "collapsed": true
     },
+    { "type": "doc", "id": "languages" },
   ],
   "api": [
     {
