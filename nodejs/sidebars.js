@@ -6,7 +6,9 @@ module.exports = {
       "items": [
         { "type": "doc", "id": "why-playwright" },
         { "type": "doc", "id": "intro" },
-        { "type": "doc", "id": "cli" },
+        { "type": "doc", "id": "inspector" },
+        { "type": "doc", "id": "trace-viewer" },
+        { "type": "doc", "id": "codegen" },
         { "type": "doc", "id": "debug" },
         { "type": "doc", "id": "languages" },
         { "type": "doc", "id": "release-notes" }
@@ -19,6 +21,7 @@ module.exports = {
       "items": [
         { "type": "doc", "id": "test-annotations" },
         { "type": "doc", "id": "test-assertions" },
+        { "type": "doc", "id": "test-auth" },
         { "type": "doc", "id": "test-cli" },
         { "type": "doc", "id": "test-configuration" },
         { "type": "doc", "id": "test-pom" },
@@ -34,13 +37,15 @@ module.exports = {
     },
     {
       "type": "category",
-      "label": "Guides",
+      "label": "Playwright Library",
       "items": [
+        { "type": "doc", "id": "library" },
         { "type": "doc", "id": "actionability" },
         { "type": "doc", "id": "assertions" },
         { "type": "doc", "id": "auth" },
         { "type": "doc", "id": "browsers" },
         { "type": "doc", "id": "chrome-extensions" },
+        { "type": "doc", "id": "cli" },
         { "type": "doc", "id": "core-concepts" },
         { "type": "doc", "id": "dialogs" },
         { "type": "doc", "id": "downloads" },
@@ -50,13 +55,11 @@ module.exports = {
         { "type": "doc", "id": "extensibility" },
         { "type": "doc", "id": "handles" },
         { "type": "doc", "id": "input" },
-        { "type": "doc", "id": "inspector" },
         { "type": "doc", "id": "multi-pages" },
         { "type": "doc", "id": "navigations" },
         { "type": "doc", "id": "network" },
         { "type": "doc", "id": "pom" },
         { "type": "doc", "id": "screenshots" },
-        { "type": "doc", "id": "trace-viewer" },
         { "type": "doc", "id": "verification" },
         { "type": "doc", "id": "videos" },
       ],
@@ -64,7 +67,7 @@ module.exports = {
     },
     {
       "type": "category",
-      "label": "Migrations",
+      "label": "Migration",
       "items": [
         { "type": "doc", "id": "protractor" },
       ],
@@ -74,7 +77,6 @@ module.exports = {
       "type": "category",
       "label": "Integrations",
       "items": [
-        { "type": "doc", "id": "library" },
         { "type": "doc", "id": "docker" },
         { "type": "doc", "id": "ci" },
         { "type": "doc", "id": "test-runners" },
