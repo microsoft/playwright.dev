@@ -105,6 +105,7 @@ module.exports = {
             { "type": "doc", "id": "api/class-dialog" },
             { "type": "doc", "id": "api/class-download" },
             { "type": "doc", "id": "api/class-elementhandle" },
+            { "type": "doc", "id": "api/class-fetchrequest" },
             { "type": "doc", "id": "api/class-fetchresponse" },
             { "type": "doc", "id": "api/class-filechooser" },
             { "type": "doc", "id": "api/class-frame" },
