@@ -87,6 +87,7 @@ page.locator("button").count();
 - [Locator.textContent([options])](./api/class-locator.mdx#locator-text-content)
 - [Locator.type(text[, options])](./api/class-locator.mdx#locator-type)
 - [Locator.uncheck([options])](./api/class-locator.mdx#locator-uncheck)
+- [Locator.waitFor([options])](./api/class-locator.mdx#locator-wait-for)
 
 ## Locator.allInnerTexts() {#locator-all-inner-texts}
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-all-inner-texts-return"/> &#60;[List]<[String]>&#62;<a href="#locator-all-inner-texts-return" class="list-anchor">#</a>
@@ -630,6 +631,26 @@ This method checks the element by performing the following steps:
 If the element is detached from the DOM at any moment during the action, this method throws.
 
 When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
+
+## Locator.waitFor([options]) {#locator-wait-for}
+- `options` &#60;`Locator.WaitForOptions`&#62;
+  - `setState`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-wait-for-option-state"/> &#60;`enum WaitForSelectorState { ATTACHED, DETACHED, VISIBLE, HIDDEN }`&#62; Defaults to `'visible'`. Can be either:<a href="#locator-wait-for-option-state" class="list-anchor">#</a>
+    * `'attached'` - wait for element to be present in DOM.
+    * `'detached'` - wait for element to not be present in DOM.
+    * `'visible'` - wait for element to have non-empty bounding box and no `visibility:hidden`. Note that element without any content or with `display:none` has an empty bounding box and is not considered visible.
+    * `'hidden'` - wait for element to be either detached from DOM, or have an empty bounding box or `visibility:hidden`. This is opposite to the `'visible'` option.
+  - `setTimeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-wait-for-option-timeout"/> &#60;[double]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.setDefaultTimeout(timeout)](./api/class-page.mdx#page-set-default-timeout) methods.<a href="#locator-wait-for-option-timeout" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-wait-for-return"/> &#60;[void]&#62;<a href="#locator-wait-for-return" class="list-anchor">#</a>
+
+Returns when element specified by locator satisfies the `state` option.
+
+If target element already satisfies the condition, the method returns immediately. Otherwise, waits for up to `timeout` milliseconds until the condition is met.
+
+```java
+Locator orderSent = page.locator("#order-sent");
+orderSent.waitFor();
+```
+
 
 [Browser]: ./api/class-browser.mdx "Browser"
 [BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
