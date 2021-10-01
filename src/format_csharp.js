@@ -99,7 +99,7 @@ class CSharpFormatter {
           case 'Page.waitForEvent.predicate': return '[Func]<T, [bool]>';
           case 'Page.waitForEvent2.predicate': return '[Func]<T, [bool]>';
         }
-        throw new Error(`Unknwon C# type for "${fullName(member)}": "${text}"`);
+        throw new Error(`Unknown C# type for "${fullName(member)}": "${text}"`);
       };
       case 'null': return '[null]';
       case 'Object': {
@@ -141,7 +141,7 @@ class CSharpFormatter {
   }
 
   preprocessComment(spec) {
-    return spec;
+    return spec.filter(n => !n.text || !n.text.startsWith('extends: [EventEmitter]'));
   }
 }
 

@@ -175,7 +175,7 @@ import TabItem from '@theme/TabItem';
         if (member.type && (member.type.name !== 'void' || member.kind === 'method')) {
           let name;
           switch (member.kind) {
-            case 'event': name = 'type:'; break;
+            case 'event': name = this.lang === 'csharp' ? 'EventArgs type:' :'type:'; break;
             case 'property': name = this.lang === 'java' ? 'returns:' : 'type:'; break;
             case 'method': name = 'returns:'; break;
           }
