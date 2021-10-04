@@ -41,7 +41,7 @@ module.exports = {
     },
     prism: {
       theme: require('prism-react-renderer/themes/dracula'),
-      additionalLanguages: ['csharp'],
+      additionalLanguages: ['csharp', 'bash', 'batch', 'powershell'],
     },
     navbar: {
       title: "Playwright for .NET",
