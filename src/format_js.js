@@ -19,6 +19,7 @@
 const md = require('./markdown');
 const Documentation = require('./documentation');
 const { toTitleCase, renderJSSignature } = require('./generator');
+const { generateTabGroup } = require('./format_utils');
 /** @typedef {import('./generator').GeneratorFormatter} GeneratorFormatter */
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
 
@@ -26,6 +27,9 @@ const { toTitleCase, renderJSSignature } = require('./generator');
  * @implements {GeneratorFormatter}
  */
 class JavaScriptFormatter {
+  constructor() {
+    this.lang = 'js';
+  }
   formatMember(member) {
     let text;
     let args = [];
@@ -78,74 +82,9 @@ class JavaScriptFormatter {
    * @returns {MarkdownNode[]}
    */
   preprocessComment(spec) {
-    /** @type {MarkdownNode[]} */
-    const newSpec = [];
-    for (let i = 0; i < spec.length; ++i) {
-      const tabs = [];
-      let match = spec[i].codeLang && spec[i].codeLang.match(/^js ([\w+-_]+)=([\w+-_]+)/);
-      while (match) {
-        spec[i].codeLang = 'js';
-        tabs.push({ groupId: match[1], value: match[2], spec: spec[i] });
-        ++i;
-        if (i >= spec.length)
-          break;
-        match = spec[i].codeLang && spec[i].codeLang.match(/^js ([\w+-_]+)=([\w+-_]+)/);
-      }
-      if (tabs.length) {
-        if (tabs.length === 1)
-          throw new Error('Bad js tab group: ' + md.render(spec));
-        tabs.sort((t1, t2) => tabWeight(t2.value) - tabWeight(t1.value));
-
-        // Validate group consistency.
-        const groupId = tabs[0].groupId;
-        const values = new Set();
-        for (const tab of tabs) {
-          if (tab.groupId !== groupId)
-            throw new Error('Mixed group ids: ' + md.render(spec));
-          if (values.has(tab.value))
-            throw new Error('Dupe tabs: ' + md.render(spec));
-          values.add(tab.value);
-        }
-
-        const tokens = [];
-        tokens.push(`<Tabs
-  groupId="${groupId}"
-  defaultValue="${tabs[0].value}"
-  values={[`);
-        tokens.push(...tabs.map((t, i) => `    {label: '${tabLabel(t.value)}', value: '${t.value}'}${ i === tabs.length - 1 ? '' : ','}`))
-        tokens.push(`  ]
-}>`);
-        tokens.push(...tabs.map(t => `<TabItem value="${t.value}">
-${md.render([t.spec])}
-</TabItem>`));
-        tokens.push(`</Tabs>`);
-
-        newSpec.push({
-          type: 'text',
-          text: tokens.join('\n')
-        });
-      }
-      if (i < spec.length)
-        newSpec.push(spec[i]);
-    }
-    return newSpec;
+   const newSpec = generateTabGroup(spec, this.lang, 'js');
+   return generateTabGroup(newSpec, this.lang, 'bash')
   }
-}
-
-function tabLabel(type) {
-  if (type === 'ts')
-    return 'TypeScript';
-  if (type === 'js')
-    return 'JavaScript';
-  if (type === 'library')
-    return 'Library';
-}
-
-function tabWeight(type) {
-  if (type === 'ts')
-    return 2;
-  if (type === 'js')
-    return 1;
 }
 
 module.exports = { JavaScriptFormatter };

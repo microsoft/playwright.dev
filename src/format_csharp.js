@@ -17,6 +17,7 @@
 //@ts-check
 
 const Documentation = require('./documentation');
+const { generateTabGroup } = require('./format_utils');
 const { toTitleCase } = require('./generator');
 /** @typedef {import('./generator').GeneratorFormatter} GeneratorFormatter */
 
@@ -24,6 +25,9 @@ const { toTitleCase } = require('./generator');
  * @implements {GeneratorFormatter}
  */
 class CSharpFormatter {
+  constructor() {
+    this.lang = 'csharp';
+  }
   /**
    * @param {Documentation.Member} member 
    */
@@ -141,7 +145,7 @@ class CSharpFormatter {
   }
 
   preprocessComment(spec) {
-    return spec;
+    return generateTabGroup(spec, this.lang, 'bash');
   }
 }
 

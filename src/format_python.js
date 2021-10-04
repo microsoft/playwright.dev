@@ -19,6 +19,7 @@
 const md = require('./markdown');
 const Documentation = require('./documentation');
 const { toSnakeCase } = require('./generator');
+const { generateTabGroup } = require('./format_utils');
 /** @typedef {import('./generator').GeneratorFormatter} GeneratorFormatter */
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
 
@@ -26,6 +27,9 @@ const { toSnakeCase } = require('./generator');
  * @implements {GeneratorFormatter}
  */
 class PythonFormatter {
+  constructor() {
+    this.lang = 'python';
+  }
   formatMember(member) {
     let text;
     const args = [];
@@ -126,7 +130,7 @@ ${md.render([spec[i]])}
         newSpec.push(spec[i]);
       }
     }
-    return newSpec;
+    return generateTabGroup(newSpec, this.lang, 'bash');
   }
 }
 
