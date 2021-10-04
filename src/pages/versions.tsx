@@ -33,7 +33,7 @@ const Version: React.FC = () => {
                     <Link to={stableVersion.path + '/api/class-playwright'}>Documentation</Link>
                   </td>
                   <td>
-                    <a href={`${repoUrl}/releases/tag/v${stableVersion.name}`}>
+                    <a href={`${repoUrl}/releases/tag/v${stableVersion.name}.0`}>
                       Release Notes
                     </a>
                   </td>
@@ -73,7 +73,7 @@ const Version: React.FC = () => {
                       <Link to={version.path + '/api/class-playwright'}>Documentation</Link>
                     </td>
                     <td>
-                      <a href={`${repoUrl}/releases/tag/v${version.name}`}>
+                      <a href={`${repoUrl}/releases/tag/v${version.name}.0`}>
                         Release Notes
                       </a>
                     </td>
