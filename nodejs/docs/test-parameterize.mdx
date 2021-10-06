@@ -1,77 +1,198 @@
 ---
-id: class-fetchresponse
-title: "FetchResponse"
+id: test-parameterize
+title: "Parameterize tests"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-[FetchResponse] class represents responses received from [fetchRequest.fetch(urlOrRequest[, options])](./api/class-fetchrequest.mdx#fetch-request-fetch).
+You can either parameterize tests on a test level or on a project level.
 
+- [Parametrized Tests](#parametrized-tests)
+- [Parametrized Projects](#parametrized-projects)
 
-- [fetchResponse.body()](./api/class-fetchresponse.mdx#fetch-response-body)
-- [fetchResponse.dispose()](./api/class-fetchresponse.mdx#fetch-response-dispose)
-- [fetchResponse.headers()](./api/class-fetchresponse.mdx#fetch-response-headers)
-- [fetchResponse.headersArray()](./api/class-fetchresponse.mdx#fetch-response-headers-array)
-- [fetchResponse.json()](./api/class-fetchresponse.mdx#fetch-response-json)
-- [fetchResponse.ok()](./api/class-fetchresponse.mdx#fetch-response-ok)
-- [fetchResponse.status()](./api/class-fetchresponse.mdx#fetch-response-status)
-- [fetchResponse.statusText()](./api/class-fetchresponse.mdx#fetch-response-status-text)
-- [fetchResponse.text()](./api/class-fetchresponse.mdx#fetch-response-text)
-- [fetchResponse.url()](./api/class-fetchresponse.mdx#fetch-response-url)
+## Parametrized Tests
 
-## fetchResponse.body() {#fetch-response-body}
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="fetch-response-body-return"/> &#60;[Promise]<[Buffer]>&#62;<a href="#fetch-response-body-return" class="list-anchor">#</a>
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
 
-Returns the buffer with response body.
+```ts
+// example.spec.ts
+const people = ['Alice', 'Bob'];
+for (const name in people) {
+  test(`testing with ${name}`, async () => {
+    // ...
+  });
+  // You can also do it with test.describe() or with multiple tests as long the test name is unique.
+}
+```
 
-## fetchResponse.dispose() {#fetch-response-dispose}
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="fetch-response-dispose-return"/> &#60;[Promise]<[void]>&#62;<a href="#fetch-response-dispose-return" class="list-anchor">#</a>
+</TabItem>
+<TabItem value="js">
 
-Disposes the body of this response. If not called then the body will stay in memory until the context closes.
+```js
+// example.spec.js
+const people = ['Alice', 'Bob'];
+for (const name in people) {
+  test(`testing with ${name}`, async () => {
+    // ...
+  });
+  // You can also do it with test.describe() or with multiple tests as long the test name is unique.
+}
+```
 
-## fetchResponse.headers() {#fetch-response-headers}
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="fetch-response-headers-return"/> &#60;[Object]<[string], [string]>&#62;<a href="#fetch-response-headers-return" class="list-anchor">#</a>
+</TabItem>
+</Tabs>
 
-An object with all the response HTTP headers associated with this response.
+## Parametrized Projects
 
-## fetchResponse.headersArray() {#fetch-response-headers-array}
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="fetch-response-headers-array-return"/> &#60;[Array]<[Object]>&#62;<a href="#fetch-response-headers-array-return" class="list-anchor">#</a>
-  - `name` &#60;[string]&#62; Name of the header.
-  - `value` &#60;[string]&#62; Value of the header.
+Playwright Test supports running multiple test projects at the same time. In the following example, we'll run two projects with different parameters. A parameter itself is represented as a [`fixture`](./api/class-fixtures), where the value gets set from the config. The first project runs with the value `Alice` and the second with the value `Bob`.
 
-An array with all the request HTTP headers associated with this response. Header names are not lower-cased. Headers with multiple entries, such as `Set-Cookie`, appear in the array multiple times.
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
 
-## fetchResponse.json() {#fetch-response-json}
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="fetch-response-json-return"/> &#60;[Promise]<[Serializable]>&#62;<a href="#fetch-response-json-return" class="list-anchor">#</a>
+```ts
+// my-test.ts
+import { test as base } from '@playwright/test';
 
-Returns the JSON representation of response body.
+export type TestOptions = {
+  person: string;
+};
 
-This method will throw if the response body is not parsable via `JSON.parse`.
+export const test = base.extend<TestOptions>({
+  // Default value for the person.
+  person: 'not-set',
+});
+```
 
-## fetchResponse.ok() {#fetch-response-ok}
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="fetch-response-ok-return"/> &#60;[boolean]&#62;<a href="#fetch-response-ok-return" class="list-anchor">#</a>
+</TabItem>
+<TabItem value="js">
 
-Contains a boolean stating whether the response was successful (status in the range 200-299) or not.
+```js
+// my-test.js
+const base = require('@playwright/test');
 
-## fetchResponse.status() {#fetch-response-status}
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="fetch-response-status-return"/> &#60;[number]&#62;<a href="#fetch-response-status-return" class="list-anchor">#</a>
+exports.test = base.test.extend({
+  // Default value for person.
+  person: 'not-set',
+});
+```
 
-Contains the status code of the response (e.g., 200 for a success).
+</TabItem>
+</Tabs>
 
-## fetchResponse.statusText() {#fetch-response-status-text}
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="fetch-response-status-text-return"/> &#60;[string]&#62;<a href="#fetch-response-status-text-return" class="list-anchor">#</a>
+We can use our fixtures in the test.
 
-Contains the status text of the response (e.g. usually an "OK" for a success).
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
 
-## fetchResponse.text() {#fetch-response-text}
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="fetch-response-text-return"/> &#60;[Promise]<[string]>&#62;<a href="#fetch-response-text-return" class="list-anchor">#</a>
+```ts
+// example.spec.ts
+import { test } from './my-test';
 
-Returns the text representation of response body.
+test('test 1', async ({ page, person }) => {
+  await page.goto(`/index.html`);
+  await expect(page.locator('#node')).toContainText(person);
+  // ...
+});
+```
 
-## fetchResponse.url() {#fetch-response-url}
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="fetch-response-url-return"/> &#60;[string]&#62;<a href="#fetch-response-url-return" class="list-anchor">#</a>
+</TabItem>
+<TabItem value="js">
 
-Contains the URL of the response.
+```js
+// example.spec.js
+const { test } = require('./my-test');
+
+test('test 1', async ({ page, person }) => {
+  await page.goto(`/index.html`);
+  await expect(page.locator('#node')).toContainText(person);
+  // ...
+});
+```
+
+</TabItem>
+</Tabs>
+
+Now, we can run test in multiple configurations by using projects.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+// playwright.config.ts
+import { PlaywrightTestConfig } from '@playwright/test';
+import { TestOptions } from './my-test';
+
+const config: PlaywrightTestConfig<TestOptions> = {
+  timeout: 20000,
+  projects: [
+    {
+      name: 'alice',
+      use: { person: 'Alice' },
+    },
+    {
+      name: 'Bob',
+      use: { person: 'Bob' },
+    },
+  ]
+};
+export default config;
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// playwright.config.js
+// @ts-check
+
+/** @type {import('@playwright/test').PlaywrightTestConfig<{ version: string }>} */
+const config = {
+  projects: [
+    {
+      name: 'Alice',
+      use: { person: 'Alice' },
+    },
+    {
+      name: 'Bob',
+      use: { person: 'Bob' },
+    },
+  ]
+};
+
+module.exports = config;
+```
+
+</TabItem>
+</Tabs>
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"
@@ -79,6 +200,9 @@ Contains the URL of the response.
 [AndroidInput]: ./api/class-androidinput.mdx "AndroidInput"
 [AndroidSocket]: ./api/class-androidsocket.mdx "AndroidSocket"
 [AndroidWebView]: ./api/class-androidwebview.mdx "AndroidWebView"
+[ApiRequest]: ./api/class-apirequest.mdx "ApiRequest"
+[ApiRequestContext]: ./api/class-apirequestcontext.mdx "ApiRequestContext"
+[ApiResponse]: ./api/class-apiresponse.mdx "ApiResponse"
 [Browser]: ./api/class-browser.mdx "Browser"
 [BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
 [BrowserServer]: ./api/class-browserserver.mdx "BrowserServer"
@@ -91,8 +215,6 @@ Contains the URL of the response.
 [Electron]: ./api/class-electron.mdx "Electron"
 [ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
-[FetchRequest]: ./api/class-fetchrequest.mdx "FetchRequest"
-[FetchResponse]: ./api/class-fetchresponse.mdx "FetchResponse"
 [FileChooser]: ./api/class-filechooser.mdx "FileChooser"
 [Frame]: ./api/class-frame.mdx "Frame"
 [JSHandle]: ./api/class-jshandle.mdx "JSHandle"
