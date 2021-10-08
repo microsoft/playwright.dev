@@ -1,0 +1,285 @@
+---
+id: auth
+title: "API testing"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Playwright can be used to get access to the [REST](https://en.wikipedia.org/wiki/Representational_state_transfer) API of your application.
+
+Sometimes you may want to send requests to the server directly from Node.js without loading a page and running js code in it. A few example where it may come in handy:
+- Test your server API.
+- Prepare server side state before visting the web application in a test.
+- Validate server side post-conditions after running some actions in the browser All of that could be achived via [ApiRequestContext] methods.
+
+- [Writing API Test](#writing-api-test)
+- [Preparing server state via API calls](#preparing-server-state-via-api-calls)
+- [Checking server state after running user actions](#checking-server-state-after-running-user-actions)
+- [Reuse authentication state](#reuse-authentication-state)
+
+## Writing API Test
+
+The Playwright [ApiRequestContext] can send all kinds of HTTP(S) requests over network.
+
+The following example demonstrates how to use Plawright to test programmatic creation of issues via [GitHub API](https://docs.github.com/en/rest). The test suite will do the following:
+- create a new repo before all tests
+- create a few issues and validate the server state
+- after all tests finish delete the repo
+
+Creating and deleting a repo:
+
+```js
+const { request } = require('@playwright/test');
+...
+const context = await request.newContext();
+await context.post('https://api.github.com/user/repos', {
+  headers: {
+    'Accept': 'application/vnd.github.v3+json',
+    // Add GitHub personal access token.
+    'Authorization': `token ${process.env.API_TOKEN}`,
+  },
+  data: {
+    name: 'test-repo-1'
+  }
+});
+const response = await request.delete(`https://api.github.com/repos/${user}/test-repo-1`{
+  headers: {
+    'Accept': 'application/vnd.github.v3+json',
+    // Add GitHub personal access token.
+    'Authorization': `token ${process.env.API_TOKEN}`,
+  }
+});
+```
+
+Playwright Test comes with a built in request fixture that can be used to simplify the code. Also since the authorizaztion token is going to be reused between tests it makes sense to configure it once for all tests:
+
+```js
+test.use({
+  baseURL: 'https://api.github.com',
+  extraHTTPHeaders: {
+    'Accept': 'application/vnd.github.v3+json',
+    // Add authorization token to all requests.
+    'Authorization': 'token ' + token,
+  }
+});
+
+const repo = 'test-repo-1';
+
+// The request object will use the context parameters above.
+test.beforeAll(async ({ request }) => {
+  // Create new repository
+  const response = await request.post('/user/repos', {
+    data: {
+      name: repo
+    }
+  });
+  expect(response.ok()).toBeTruthy();
+});
+
+test.afterAll(async ({ request }) => {
+  // Delete the repository
+  const response = await request.delete(`/repos/${user}/${repo}`);
+  expect(response.ok()).toBeTruthy();
+});
+```
+
+Now we can add a couple tests that would create new issues in the repository:
+
+```js
+test('should create bug report', async ({ request }) => {
+  const newIssue = await request.post(`/repos/${user}/${repo}/issues`, {
+    data: {
+      title: '[Bug] report 1',
+      body: 'Bug description',
+    }
+  });
+  expect(newIssue.ok()).toBeTruthy();
+
+  const issues = await request.get(`/repos/${user}/${repo}/issues`);
+  expect(issues.ok()).toBeTruthy();
+  expect(await issues.json()).toContainEqual(expect.objectContaining({
+    title: '[Bug] report 1',
+    body: 'Bug description'
+  }));
+});
+
+test('should create feature request', async ({ request }) => {
+  const newIssue = await request.post(`/repos/${user}/${repo}/issues`, {
+    data: {
+      title: '[Feature] request 1',
+      body: 'Feature description',
+    }
+  });
+  expect(newIssue.ok()).toBeTruthy();
+
+  const issues = await request.get(`/repos/${user}/${repo}/issues`);
+  expect(issues.ok()).toBeTruthy();
+  expect(await issues.json()).toContainEqual(expect.objectContaining({
+    title: '[Feature] request 1',
+    body: 'Feature description'
+  }));
+});
+```
+
+## Preparing server state via API calls
+
+The following test creates a new issue via API and then navigates to the list of all issues in the project to check that it appears at the top of the list.
+
+```js
+test('last created issue should be first in the list', async ({ page, request }) => {
+  const newIssue = await request.post(`/repos/${user}/${repo}/issues`, {
+    data: {
+      title: '[Feature] request 1',
+    }
+  });
+  expect(newIssue.ok()).toBeTruthy();
+
+  await page.goto(`https://github.com/${user}/${repo}/issues`);
+  const text = await page.locator(`a[data-hovercard-type='issue']`).first().textContent()
+  expect('[Feature] request 1');
+});
+```
+
+## Checking server state after running user actions
+
+The following test creates a new issue via user interface in the browser and then uses checks if it was created by means of the server API:
+
+```js
+test('last created issue should be on server', async ({ page, request }) => {
+  await page.goto(`https://github.com/${user}/${repo}/issues`);
+  await page.click('text=New Issue');
+  await page.fill('[aria-label="Title"]', 'Bug report 1');
+  await page.fill('[aria-label="Comment body"]', 'Bug description');
+  await page.click('text=Submit new issue');
+  const issueId = page.url().substr(page.url().lastIndexOf('/'));
+
+  const newIssue = await request.get(`https://api.github.com/repos/${user}/${repo}/issues/${issueId}`);
+  expect(newIssue.ok()).toBeTruthy();
+  expect(newIssue).toEqual(expect.objectContaining({
+    title: 'Bug report 1'
+  }));
+});
+```
+
+### API reference
+- [playwright.request](./api/class-playwright.mdx#playwright-request)
+- [browserContext.request](./api/class-browsercontext.mdx#browser-context-request)
+- [page.request](./api/class-page.mdx#page-request)
+- [apiRequest.newContext([options])](./api/class-apirequest.mdx#api-request-new-context)
+- [apiRequestContext.delete(url[, options])](./api/class-apirequestcontext.mdx#api-request-context-delete)
+- [apiRequestContext.fetch(urlOrRequest[, options])](./api/class-apirequestcontext.mdx#api-request-context-fetch)
+- [apiRequestContext.get(url[, options])](./api/class-apirequestcontext.mdx#api-request-context-get)
+- [apiRequestContext.post(url[, options])](./api/class-apirequestcontext.mdx#api-request-context-post)
+
+## Reuse authentication state
+
+Web apps use cookie-based or token-based authentication, where authenticated state is stored as [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) Playwright provides [apiRequestContext.storageState([options])](./api/class-apirequestcontext.mdx#api-request-context-storage-state) method that can be used to retrieve storage state from authenticated contexts and then create new contexts with prepopulated state.
+
+Storage state is interchangable between [BrowserContext] and [ApiRequestContext]. You can use it e.g. to log in via API calls and then create a new context with retrived cookies. The following code snippet retrieves state from an authenticated [ApiRequestContext] and creates a new [BrowserContext] with that state.
+
+```js
+const requestContext = await request.newContext({
+  httpCredentials: {
+    username: 'user',
+    password: 'passwd'
+  }
+});
+await requestContext.get(`https://api.example.com/login`);
+// Save storage state into the file.
+await requestContext.storageState({ path: 'state.json' });
+
+// Create a new context with the saved storage state.
+const context = await browser.newContext({ storageState: 'state.json' });
+```
+
+### API reference
+- [browser.newContext([options])](./api/class-browser.mdx#browser-new-context)
+- [apiRequestContext.storageState([options])](./api/class-apirequestcontext.mdx#api-request-context-storage-state)
+- [apiRequest.newContext([options])](./api/class-apirequest.mdx#api-request-new-context)
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Android]: ./api/class-android.mdx "Android"
+[AndroidDevice]: ./api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: ./api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: ./api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: ./api/class-androidwebview.mdx "AndroidWebView"
+[ApiRequest]: ./api/class-apirequest.mdx "ApiRequest"
+[ApiRequestContext]: ./api/class-apirequestcontext.mdx "ApiRequestContext"
+[ApiResponse]: ./api/class-apiresponse.mdx "ApiResponse"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: ./api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: ./api/class-coverage.mdx "Coverage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[Electron]: ./api/class-electron.mdx "Electron"
+[ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Locator]: ./api/class-locator.mdx "Locator"
+[Logger]: ./api/class-logger.mdx "Logger"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Fixtures]: ./api/class-fixtures.mdx "Fixtures"
+[Test]: ./api/class-test.mdx "Test"
+[TestConfig]: ./api/class-testconfig.mdx "TestConfig"
+[TestError]: ./api/class-testerror.mdx "TestError"
+[TestInfo]: ./api/class-testinfo.mdx "TestInfo"
+[TestOptions]: ./api/class-testoptions.mdx "TestOptions"
+[TestProject]: ./api/class-testproject.mdx "TestProject"
+[WorkerInfo]: ./api/class-workerinfo.mdx "WorkerInfo"
+[Location]: ./api/class-location.mdx "Location"
+[Reporter]: ./api/class-reporter.mdx "Reporter"
+[Suite]: ./api/class-suite.mdx "Suite"
+[TestCase]: ./api/class-testcase.mdx "TestCase"
+[TestResult]: ./api/class-testresult.mdx "TestResult"
+[TestStep]: ./api/class-teststep.mdx "TestStep"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./core-concepts.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
