@@ -11,3 +11,5 @@ tags: [conference]
 <div className="embed-youtube">
     <iframe src="https://www.youtube-nocookie.com/embed/PXTspGn1im0" frameBorder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" width="750" height="563" allowFullScreen></iframe>
 </div>
+
+See [here](https://docs.google.com/presentation/d/1L8Acw2xGWS-FIWu0L5NWMCOUUVJy7KGw08Z2P9sfrfo/edit?usp=sharing) for the slides.
