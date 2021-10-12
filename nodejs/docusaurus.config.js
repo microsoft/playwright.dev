@@ -141,6 +141,14 @@ module.exports = {
               label: "GitHub",
               href: "https://github.com/microsoft/playwright",
             },
+            {
+              label: "YouTube",
+              href: "https://www.youtube.com/channel/UC46Zj8pDH5tDosqm1gd7WTg",
+            },
+            {
+              label: "Conference videos",
+              href: "/blog/",
+            },
           ],
         },
       ],
