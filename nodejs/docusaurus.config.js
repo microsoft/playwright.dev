@@ -13,7 +13,7 @@ let plugins = [
     {
       showReadingTime: true,
       editUrl:
-        "https://github.com/microsoft/playwright.dev/edit/master/v2/blog/",
+        "https://github.com/microsoft/playwright.dev/edit/master/",
     },
   ],
   require.resolve("@docusaurus/plugin-content-pages"),
