@@ -13,7 +13,7 @@ let plugins = [
     {
       showReadingTime: true,
       editUrl:
-        "https://github.com/microsoft/playwright.dev/edit/master/v2/blog/",
+        "https://github.com/microsoft/playwright.dev/edit/master/",
     },
   ],
   require.resolve("@docusaurus/plugin-content-pages"),
@@ -140,6 +140,14 @@ module.exports = {
             {
               label: "GitHub",
               href: "https://github.com/microsoft/playwright-java",
+            },
+            {
+              label: "YouTube",
+              href: "https://www.youtube.com/channel/UC46Zj8pDH5tDosqm1gd7WTg",
+            },
+            {
+              label: "Conference videos",
+              href: "/blog/",
             },
           ],
         },
