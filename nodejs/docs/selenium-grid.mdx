@@ -1,44 +1,28 @@
 ---
-id: test-typescript
-title: "Advanced: TypeScript"
+id: selenium-grid
+title: "Selenium Grid"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-## Manually compile tests with TypeScript
+Playwright can connect to [Selenium Grid Hub](https://www.selenium.dev/documentation/grid/) to launch **Chrome** browser, instead of running browser on the local machine. To enable this mode, set `SELENIUM_REMOTE_URL` environment variable pointing to your Selenium Grid Hub.
 
-Playwright Test supports TypeScript out of the box. We automatically transform TypeScript code to javascript to run it.
+```bash
+# Playwright Test
+SELENIUM_REMOTE_URL=http://internal.grid:4444/wd/hub npx playwright test
 
-However if you find that the TypeScript code is not being transpiled correctly, you can perform your own TypeScript compilation before sending the tests to Playwright.
-
-First I add a `tsconfig.json` file inside my tests directory.
-
-```json
-{
-    "compilerOptions": {
-        "target": "ESNext",
-        "module": "commonjs",
-        "moduleResolution": "Node",
-        "sourceMap": true,
-        "outDir": "../tests-out",
-    }
-}
+# Playwright Library
+SELENIUM_REMOTE_URL=http://internal.grid:4444/wd/hub node script.js
 ```
 
-In my `package.json`, I have two scripts:
+You don't have to change your code, just use [browserType.launch([options])](./api/class-browsertype.mdx#browser-type-launch) as usual.
 
-```json
-{
-  "scripts": {
-    "pretest": "tsc --incremental -p tests/tsconfig.json",
-    "test": "playwright test -c tests-out"
-  }
-}
-```
+When using Selenium Grid Hub, you can [skip browser downloads](./browsers.mdx#skip-browser-downloads).
 
-The `pretest` script runs typescript on the tests. `test` will run the tests that have been generated to the `tests-out` directory. The `-c` argument configures the test runner to look for tests inside the `tests-out` directory.
+:::note
+Internally, Playwright connects to the browser using [Chrome DevTools Protocol](https://chromedevtools.github.io/devtools-protocol/) websocket. This requires Selenium Grid nodes to be directly accessible from the machine that runs Playwright.
+:::
 
-Then `npm run test` will build the tests and run them.
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"
