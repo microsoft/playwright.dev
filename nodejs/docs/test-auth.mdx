@@ -220,6 +220,66 @@ test('test', async ({ page }) => {
 If you can log in once and commit the `storageState.json` into the repository, you won't need the global setup at all, just specify the `storageState.json` in Playwright Config as above and it'll be picked up.
 :::
 
+### Sign in via API request
+
+If your web application supports signing in via API, you can use [APIRequestContext] to simplify sign in flow. Global setup script from the example above would change like this:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+// global-setup.ts
+import { request } from '@playwright/test';
+
+async function globalSetup() {
+  const requestContext = await request.newContext();
+  await requestContext.post('https://github.com/login', {
+    form: {
+      'user': 'user',
+      'password': 'password'
+    }
+  });
+  // Save signed-in state to 'storageState.json'.
+  await requestContext.storageState({ path: 'storageState.json' });
+  await requestContext.dispose();
+}
+
+export default globalSetup;
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// global-setup.js
+const { request } = require('@playwright/test');
+
+module.exports = async () => {
+  const requestContext = await request.newContext();
+  await requestContext.post('https://github.com/login', {
+    form: {
+      'user': 'user',
+      'password': 'password'
+    }
+  });
+  // Save signed-in state to 'storageState.json'.
+  await requestContext.storageState({ path: 'storageState.json' });
+  await requestContext.dispose();
+}
+
+export default globalSetup;
+```
+
+</TabItem>
+</Tabs>
+
 ## Multiple signed in roles
 
 Sometimes you have more than one signed-in user in your end to end tests. You can achieve that via logging in for these users multiple times in globalSetup and saving that state into different files.
@@ -425,8 +485,8 @@ You can also use `storageState` property when you are creating the [browser.newP
 [AndroidInput]: ./api/class-androidinput.mdx "AndroidInput"
 [AndroidSocket]: ./api/class-androidsocket.mdx "AndroidSocket"
 [AndroidWebView]: ./api/class-androidwebview.mdx "AndroidWebView"
-[ApiRequest]: ./api/class-apirequest.mdx "ApiRequest"
-[ApiRequestContext]: ./api/class-apirequestcontext.mdx "ApiRequestContext"
+[APIRequest]: ./api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: ./api/class-apirequestcontext.mdx "APIRequestContext"
 [ApiResponse]: ./api/class-apiresponse.mdx "ApiResponse"
 [Browser]: ./api/class-browser.mdx "Browser"
 [BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
