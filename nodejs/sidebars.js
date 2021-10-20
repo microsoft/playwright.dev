@@ -24,9 +24,9 @@ module.exports = {
         { "type": "doc", "id": "test-configuration" },
         { "type": "doc", "id": "test-pom" },
         { "type": "doc", "id": "test-parallel" },
+        { "type": "doc", "id": "test-parameterize" },
         { "type": "doc", "id": "test-reporters" },
         { "type": "doc", "id": "test-retries" },
-        { "type": "doc", "id": "test-parameterize" },
         { "type": "doc", "id": "test-snapshots" },
         { "type": "doc", "id": "test-advanced" },
         { "type": "doc", "id": "test-fixtures" },
@@ -79,6 +79,7 @@ module.exports = {
       "items": [
         { "type": "doc", "id": "docker" },
         { "type": "doc", "id": "ci" },
+        { "type": "doc", "id": "selenium-grid" },
         { "type": "doc", "id": "test-runners" },
       ],
       "collapsed": true
