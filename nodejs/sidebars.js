@@ -19,6 +19,7 @@ module.exports = {
       "items": [
         { "type": "doc", "id": "test-annotations" },
         { "type": "doc", "id": "test-assertions" },
+        { "type": "doc", "id": "test-api-testing" },
         { "type": "doc", "id": "test-auth" },
         { "type": "doc", "id": "test-cli" },
         { "type": "doc", "id": "test-configuration" },
@@ -39,7 +40,6 @@ module.exports = {
       "label": "Playwright Library",
       "items": [
         { "type": "doc", "id": "library" },
-        { "type": "doc", "id": "api-testing" },
         { "type": "doc", "id": "assertions" },
         { "type": "doc", "id": "auth" },
         { "type": "doc", "id": "actionability" },
