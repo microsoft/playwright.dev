@@ -1,0 +1,469 @@
+---
+id: navigations
+title: "Navigations"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Playwright can navigate to URLs and handle navigations caused by page interactions. This guide covers common scenarios to wait for page navigations and loading to complete.
+
+- [Navigation lifecycle](#navigation-lifecycle)
+- [Scenarios initiated by browser UI](#scenarios-initiated-by-browser-ui)
+- [Scenarios initiated by page interaction](#scenarios-initiated-by-page-interaction)
+- [Advanced patterns](#advanced-patterns)
+
+## Navigation lifecycle
+
+Playwright splits the process of showing a new document in a page into **navigation** and **loading**.
+
+**Navigations** can be initiated by changing the page URL or by interacting with the page (e.g., clicking a link). Navigation ends when response headers have been parsed and session history is updated. The navigation intent may be canceled, for example, on hitting an unresolved DNS address or transformed into a file download. Only after the navigation succeeds, page starts **loading** the document.
+
+**Loading** covers getting the remaining response body over the network, parsing, executing the scripts and firing load events:
+- [page.url](./api/class-page.mdx#page-url) is set to the new url
+- document content is loaded over network and parsed
+- [page.on("domcontentloaded")](./api/class-page.mdx#page-event-dom-content-loaded) event is fired
+- page executes some scripts and loads resources like stylesheets and images
+- [page.on("load")](./api/class-page.mdx#page-event-load) event is fired
+- page executes dynamically loaded scripts
+- `networkidle` is fired when no new network requests are made for 500 ms
+
+## Scenarios initiated by browser UI
+
+Navigations can be initiated by changing the URL bar, reloading the page or going back or forward in session history.
+
+### Auto-wait
+
+Navigating to a URL auto-waits for the page to fire the `load` event. If the page does a client-side redirect before `load`, [page.goto(url, **kwargs)](./api/class-page.mdx#page-goto) will auto-wait for the redirected page to fire the `load` event.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Navigate the page
+page.goto("https://example.com")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Navigate the page
+await page.goto("https://example.com")
+```
+
+</TabItem>
+</Tabs>
+
+### Custom wait
+
+Override the default behavior to wait until a specific event, like `networkidle`.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Navigate and wait until network is idle
+page.goto("https://example.com", wait_until="networkidle")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Navigate and wait until network is idle
+await page.goto("https://example.com", wait_until="networkidle")
+```
+
+</TabItem>
+</Tabs>
+
+### Wait for element
+
+In lazy-loaded pages, it can be useful to wait until an element is visible with [page.wait_for_selector(selector, **kwargs)](./api/class-page.mdx#page-wait-for-selector). Alternatively, page interactions like [page.click(selector, **kwargs)](./api/class-page.mdx#page-click) auto-wait for elements.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Navigate and wait for element
+page.goto("https://example.com")
+page.wait_for_selector("text=example domain")
+
+# Navigate and click element
+# Click will auto-wait for the element
+page.goto("https://example.com")
+page.click("text=example domain")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Navigate and wait for element
+await page.goto("https://example.com")
+await page.wait_for_selector("text=example domain")
+
+# Navigate and click element
+# Click will auto-wait for the element
+await page.goto("https://example.com")
+await page.click("text=example domain")
+```
+
+</TabItem>
+</Tabs>
+
+### API reference
+- [page.goto(url, **kwargs)](./api/class-page.mdx#page-goto)
+- [page.reload(**kwargs)](./api/class-page.mdx#page-reload)
+- [page.go_back(**kwargs)](./api/class-page.mdx#page-go-back)
+- [page.go_forward(**kwargs)](./api/class-page.mdx#page-go-forward)
+
+## Scenarios initiated by page interaction
+
+In the scenarios below, [page.click(selector, **kwargs)](./api/class-page.mdx#page-click) initiates a navigation and then waits for the navigation to complete.
+
+### Auto-wait
+
+By default, [page.click(selector, **kwargs)](./api/class-page.mdx#page-click) will wait for the navigation step to complete. This can be combined with a page interaction on the navigated page which would auto-wait for an element.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Click will auto-wait for navigation to complete
+page.click("text=Login")
+
+# Fill will auto-wait for element on navigated page
+page.fill("#username", "John Doe")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Click will auto-wait for navigation to complete
+await page.click("text=Login")
+
+# Fill will auto-wait for element on navigated page
+await page.fill("#username", "John Doe")
+```
+
+</TabItem>
+</Tabs>
+
+### Custom wait
+
+`page.click` can be combined with [page.wait_for_load_state(**kwargs)](./api/class-page.mdx#page-wait-for-load-state) to wait for a loading event.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.click("button"); # Click triggers navigation
+page.wait_for_load_state("networkidle"); # This waits for the "networkidle"
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.click("button"); # Click triggers navigation
+await page.wait_for_load_state("networkidle"); # This waits for the "networkidle"
+```
+
+</TabItem>
+</Tabs>
+
+### Wait for element
+
+In lazy-loaded pages, it can be useful to wait until an element is visible with [page.wait_for_selector(selector, **kwargs)](./api/class-page.mdx#page-wait-for-selector). Alternatively, page interactions like [page.click(selector, **kwargs)](./api/class-page.mdx#page-click) auto-wait for elements.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Click triggers navigation
+page.click("text=Login")
+# Click will auto-wait for the element
+page.wait_for_selector("#username", "John Doe")
+
+# Click triggers navigation
+page.click("text=Login")
+# Fill will auto-wait for element
+page.fill("#username", "John Doe")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Click will auto-wait for the element and trigger navigation
+await page.click("text=Login")
+# Wait for the element
+await page.wait_for_selector("#username")
+
+# Click triggers navigation
+await page.click("text=Login")
+# Fill will auto-wait for element
+await page.fill("#username", "John Doe")
+```
+
+</TabItem>
+</Tabs>
+
+### Asynchronous navigation
+
+Clicking an element could trigger asynchronous processing before initiating the navigation. In these cases, it is recommended to explicitly call [page.expect_navigation(**kwargs)](./api/class-page.mdx#page-wait-for-navigation). For example:
+* Navigation is triggered from a `setTimeout`
+* Page waits for network requests before navigation
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Waits for the next navigation. Using Python context manager
+# prevents a race condition between clicking and waiting for a navigation.
+with page.expect_navigation():
+    # Triggers a navigation after a timeout
+    page.click("a")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Waits for the next navigation. Using Python context manager
+# prevents a race condition between clicking and waiting for a navigation.
+async with page.expect_navigation():
+    # Triggers a navigation after a timeout
+    await page.click("div.delayed-navigation")
+```
+
+</TabItem>
+</Tabs>
+
+### Multiple navigations
+
+Clicking an element could trigger multiple navigations. In these cases, it is recommended to explicitly [page.expect_navigation(**kwargs)](./api/class-page.mdx#page-wait-for-navigation) to a specific url. For example:
+* Client-side redirects issued after the `load` event
+* Multiple pushes to history state
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Using Python context manager prevents a race condition
+# between clicking and waiting for a navigation.
+with page.expect_navigation(url="**/login"):
+    # Triggers a navigation with a script redirect
+    page.click("a")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Using Python context manager prevents a race condition
+# between clicking and waiting for a navigation.
+async with page.expect_navigation(url="**/login"):
+    # Triggers a navigation with a script redirect
+    await page.click("a")
+```
+
+</TabItem>
+</Tabs>
+
+### Loading a popup
+
+When popup is opened, explicitly calling [page.wait_for_load_state(**kwargs)](./api/class-page.mdx#page-wait-for-load-state) ensures that popup is loaded to the desired state.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+with page.expect_popup() as popup_info:
+    page.click('a[target="_blank"]') # Opens popup
+popup = popup_info.value
+popup.wait_for_load_state("load")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+async with page.expect_popup() as popup_info:
+    await page.click('a[target="_blank"]') # Opens popup
+popup = await popup_info.value
+await popup.wait_for_load_state("load")
+```
+
+</TabItem>
+</Tabs>
+
+### API reference
+- [page.click(selector, **kwargs)](./api/class-page.mdx#page-click)
+- [page.wait_for_load_state(**kwargs)](./api/class-page.mdx#page-wait-for-load-state)
+- [page.wait_for_selector(selector, **kwargs)](./api/class-page.mdx#page-wait-for-selector)
+- [page.expect_navigation(**kwargs)](./api/class-page.mdx#page-wait-for-navigation)
+- [page.wait_for_function(expression, **kwargs)](./api/class-page.mdx#page-wait-for-function)
+
+## Advanced patterns
+
+For pages that have complicated loading patterns, [page.wait_for_function(expression, **kwargs)](./api/class-page.mdx#page-wait-for-function) is a powerful and extensible approach to define a custom wait criteria.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.goto("http://example.com")
+page.wait_for_function("() => window.amILoadedYet()")
+# Ready to take a screenshot, according to the page itself.
+page.screenshot()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.goto("http://example.com")
+await page.wait_for_function("() => window.amILoadedYet()")
+# Ready to take a screenshot, according to the page itself.
+await page.screenshot()
+```
+
+</TabItem>
+</Tabs>
+
+### API reference
+- [page.wait_for_function(expression, **kwargs)](./api/class-page.mdx#page-wait-for-function)
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[Error]: ./api/class-error.mdx "Error"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Locator]: ./api/class-locator.mdx "Locator"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./core-concepts.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
+[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[bytes]: https://docs.python.org/3/library/stdtypes.html#bytes "bytes"
+[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
+[Exception]: https://docs.python.org/3/library/exceptions.html#Exception "Exception"
+[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
+[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
+[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
+[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
+[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
+[URL]: https://en.wikipedia.org/wiki/URL "URL"
+[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
+[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
+[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
