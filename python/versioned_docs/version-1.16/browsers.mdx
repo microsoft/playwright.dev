@@ -1,0 +1,431 @@
+---
+id: browsers
+title: "Browsers"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Each version of Playwright needs specific versions of browser binaries to operate. Depending on the language you use, Playwright will either download these browsers at package install time for you, or you will need to use [Playwright CLI](./cli.mdx) to install these browsers.
+
+With every release, Playwright updates the versions of the browsers it supports, so that the latest Playwright would support the latest browsers at any moment. It means that every time you update playwright, you might need to re-run the `install` CLI command.
+
+- [Chromium](#chromium)
+- [Firefox](#firefox)
+- [WebKit](#webkit)
+- [Google Chrome & Microsoft Edge](#google-chrome--microsoft-edge)
+- [Installing browsers](#installing-browsers)
+- [Managing browser binaries](#managing-browser-binaries)
+- [Install behind a firewall or a proxy](#install-behind-a-firewall-or-a-proxy)
+- [Download from artifact repository](#download-from-artifact-repository)
+- [Skip browser downloads](#skip-browser-downloads)
+- [Download single browser binary](#download-single-browser-binary)
+- [Stale browser removal](#stale-browser-removal)
+
+## Chromium
+
+For Google Chrome, Microsoft Edge and other Chromium-based browsers, by default, Playwright uses open source Chromium builds. Since Chromium project is ahead of the branded browsers, when the world is on Google Chrome N, Playwright already supports Chromium N+1 that will be released in Google Chrome and Microsoft Edge in a few weeks.
+
+There is also a way to opt into using Google Chrome's or Microsoft Edge's branded builds for testing. For details on when to opt into stable channels, refer to the [Google Chrome & Microsoft Edge](#google-chrome--microsoft-edge) section below.
+
+## Firefox
+
+Playwright's Firefox version matches the recent [Firefox Stable](https://www.mozilla.org/en-US/firefox/new/) build.
+
+## WebKit
+
+Playwright's WebKit version matches the recent WebKit trunk build, before it is used in Apple Safari and other WebKit-based browsers. This gives a lot of lead time to react on the potential browser update issues.
+
+## Google Chrome & Microsoft Edge
+
+While Playwright can download and use the recent Chromium build, it can operate against the stock Google Chrome and Microsoft Edge browsers available on the machine. In particular, current Playwright version will support Stable and Beta channels of these browsers. Here is how you can opt into using the stock browser:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Can be "msedge", "chrome-beta", "msedge-beta", "msedge-dev", etc.
+browser = playwright.chromium.launch(channel="chrome")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Can be "msedge", "chrome-beta", "msedge-beta", "msedge-dev", etc.
+browser = await playwright.chromium.launch(channel="chrome")
+```
+
+</TabItem>
+</Tabs>
+
+### When to use Google Chrome & Microsoft Edge and when not to?
+
+**Defaults**
+
+Using default Playwright configuration with the latest Chromium is a good idea most of the time. Since Playwright is ahead of Stable channels for the browsers, it gives peace of mind that the upcoming Google Chrome or Microsoft Edge releases won't break your site. You catch breakage early and have a lot of time to fix it before the official Chrome update.
+
+**Regression testing**
+
+Having said that, testing policies often require regression testing to be performed against the current publicly available browsers. In this case, you can opt into one of the stable channels, `"chrome"` or `"msedge"`.
+
+**Media codecs**
+
+Another reason for testing using official binaries is to test functionality related to media codecs. Chromium does not have all the codecs that Google Chrome or Microsoft Edge are bundling due to various licensing considerations and agreements. If your site relies on this kind of codecs (which is rarely the case), you also want to use official channel.
+
+**Enterprise policy**
+
+Google Chrome and Microsoft Edge respect enterprise policies, which include limitations to the capabilities, network proxy, mandatory extensions that stand in the way of testing. So if you are a part of the organization that uses such policies, it is the easiest to use bundled Chromium for your local testing, you can still opt into stable channels on the bots that are typically free of such restrictions.
+
+## Installing browsers
+
+## Managing browser binaries
+
+Playwright downloads Chromium, WebKit and Firefox browsers into the OS-specific cache folders:
+- `%USERPROFILE%\AppData\Local\ms-playwright` on Windows
+- `~/Library/Caches/ms-playwright` on MacOS
+- `~/.cache/ms-playwright` on Linux
+
+These browsers will take a few hundred megabytes of disk space when installed:
+
+```bash
+du -hs ~/Library/Caches/ms-playwright/*
+281M  chromium-XXXXXX
+187M  firefox-XXXX
+180M  webkit-XXXX
+```
+
+You can override default behavior using environment variables. When installing Playwright, ask it to download browsers into a specific location:
+
+<Tabs
+  groupId="bash-flavor"
+  defaultValue="bash"
+  values={[
+    {label: 'Bash', value: 'bash'},
+    {label: 'PowerShell', value: 'powershell'},
+    {label: 'Batch', value: 'batch'}
+  ]
+}>
+<TabItem value="bash">
+
+```bash
+pip install playwright
+PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers python -m playwright install
+```
+
+</TabItem>
+<TabItem value="powershell">
+
+```powershell
+$env:PLAYWRIGHT_BROWSERS_PATH="$env:USERPROFILE\pw-browsers"
+pip install playwright
+playwright install
+```
+
+</TabItem>
+<TabItem value="batch">
+
+```batch
+set PLAYWRIGHT_BROWSERS_PATH=%USERPROFILE%\pw-browsers
+pip install playwright
+playwright install
+```
+
+</TabItem>
+</Tabs>
+
+When running Playwright scripts, ask it to search for browsers in a shared location.
+
+<Tabs
+  groupId="bash-flavor"
+  defaultValue="bash"
+  values={[
+    {label: 'Bash', value: 'bash'},
+    {label: 'PowerShell', value: 'powershell'},
+    {label: 'Batch', value: 'batch'}
+  ]
+}>
+<TabItem value="bash">
+
+```bash
+# Linux/macOS
+PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers python playwright_script.py
+```
+
+</TabItem>
+<TabItem value="powershell">
+
+```powershell
+
+$env:PLAYWRIGHT_BROWSERS_PATH="$env:USERPROFILE\pw-browsers"
+python playwright_script.py
+```
+
+</TabItem>
+<TabItem value="batch">
+
+```batch
+set PLAYWRIGHT_BROWSERS_PATH=%USERPROFILE%\pw-browsers
+python playwright_script.py
+```
+
+</TabItem>
+</Tabs>
+
+Playwright keeps track of packages that need those browsers and will garbage collect them as you update Playwright to the newer versions.
+
+:::note
+Developers can opt-in in this mode via exporting `PLAYWRIGHT_BROWSERS_PATH=$HOME/pw-browsers` in their `.bashrc`.
+:::
+
+## Install behind a firewall or a proxy
+
+By default, Playwright downloads browsers from Microsoft CDN.
+
+Sometimes companies maintain an internal proxy that blocks direct access to the public resources. In this case, Playwright can be configured to download browsers via a proxy server.
+
+<Tabs
+  groupId="bash-flavor"
+  defaultValue="bash"
+  values={[
+    {label: 'Bash', value: 'bash'},
+    {label: 'PowerShell', value: 'powershell'},
+    {label: 'Batch', value: 'batch'}
+  ]
+}>
+<TabItem value="bash">
+
+```bash
+pip install playwright
+HTTPS_PROXY=https://192.0.2.1 playwright install
+```
+
+</TabItem>
+<TabItem value="powershell">
+
+```powershell
+$env:HTTPS_PROXY="https://192.0.2.1"
+pip install playwright
+playwright install
+```
+
+</TabItem>
+<TabItem value="batch">
+
+```batch
+set HTTPS_PROXY=https://192.0.2.1
+pip install playwright
+playwright install
+```
+
+</TabItem>
+</Tabs>
+
+## Download from artifact repository
+
+By default, Playwright downloads browsers from Microsoft CDN.
+
+Sometimes companies maintain an internal artifact repository to host browser binaries. In this case, Playwright can be configured to download from a custom location using the `PLAYWRIGHT_DOWNLOAD_HOST` env variable.
+
+<Tabs
+  groupId="bash-flavor"
+  defaultValue="bash"
+  values={[
+    {label: 'Bash', value: 'bash'},
+    {label: 'PowerShell', value: 'powershell'},
+    {label: 'Batch', value: 'batch'}
+  ]
+}>
+<TabItem value="bash">
+
+```bash
+pip install playwright
+PLAYWRIGHT_DOWNLOAD_HOST=192.0.2.1 playwright install
+```
+
+</TabItem>
+<TabItem value="powershell">
+
+```powershell
+$env:PLAYWRIGHT_DOWNLOAD_HOST="192.0.2.1"
+pip install playwright
+playwright install
+```
+
+</TabItem>
+<TabItem value="batch">
+
+```batch
+set PLAYWRIGHT_DOWNLOAD_HOST=192.0.2.1
+pip install playwright
+playwright install
+```
+
+</TabItem>
+</Tabs>
+
+It is also possible to use a per-browser download hosts using `PLAYWRIGHT_CHROMIUM_DOWNLOAD_HOST`, `PLAYWRIGHT_FIREFOX_DOWNLOAD_HOST` and `PLAYWRIGHT_WEBKIT_DOWNLOAD_HOST` env variables that take precedence over `PLAYWRIGHT_DOWNLOAD_HOST`.
+
+<Tabs
+  groupId="bash-flavor"
+  defaultValue="bash"
+  values={[
+    {label: 'Bash', value: 'bash'},
+    {label: 'PowerShell', value: 'powershell'},
+    {label: 'Batch', value: 'batch'}
+  ]
+}>
+<TabItem value="bash">
+
+```bash
+pip install playwright
+PLAYWRIGHT_FIREFOX_DOWNLOAD_HOST=203.0.113.3 PLAYWRIGHT_DOWNLOAD_HOST=192.0.2.1 playwright install
+```
+
+</TabItem>
+<TabItem value="powershell">
+
+```powershell
+$env:PLAYWRIGHT_FIREFOX_DOWNLOAD_HOST="203.0.113.3"
+$env:PLAYWRIGHT_DOWNLOAD_HOST="192.0.2.1"
+pip install playwright
+playwright install
+```
+
+</TabItem>
+<TabItem value="batch">
+
+```batch
+set PLAYWRIGHT_FIREFOX_DOWNLOAD_HOST=203.0.113.3
+set PLAYWRIGHT_DOWNLOAD_HOST=192.0.2.1
+pip install playwright
+playwright install
+```
+
+</TabItem>
+</Tabs>
+
+## Skip browser downloads
+
+In certain cases, it is desired to avoid browser downloads altogether because browser binaries are managed separately.
+
+This can be done by setting `PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD` variable before installation.
+
+<Tabs
+  groupId="bash-flavor"
+  defaultValue="bash"
+  values={[
+    {label: 'Bash', value: 'bash'},
+    {label: 'PowerShell', value: 'powershell'},
+    {label: 'Batch', value: 'batch'}
+  ]
+}>
+<TabItem value="bash">
+
+```bash
+pip install playwright
+PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 python -m playwright install
+```
+
+</TabItem>
+<TabItem value="powershell">
+
+```powershell
+$env:PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+pip install playwright
+playwright install
+```
+
+</TabItem>
+<TabItem value="batch">
+
+```batch
+set PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+pip install playwright
+playwright install
+```
+
+</TabItem>
+</Tabs>
+
+## Download single browser binary
+
+Playwright downloads Chromium, Firefox and WebKit browsers by default. To install a specific browser, pass it as an argument during installation.
+
+```bash
+pip install playwright
+playwright install firefox
+```
+
+## Stale browser removal
+
+Playwright keeps track of the clients that use its browsers. When there are no more clients that require particular version of the browser, that version is deleted from the system. That way you can safely use Playwright instances of different versions and at the same time, you don't waste disk space for the browsers that are no longer in use.
+
+To opt-out from the unused browser removal, you can set the `PLAYWRIGHT_SKIP_BROWSER_GC=1` environment variable.
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[Error]: ./api/class-error.mdx "Error"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Locator]: ./api/class-locator.mdx "Locator"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./core-concepts.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
+[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[bytes]: https://docs.python.org/3/library/stdtypes.html#bytes "bytes"
+[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
+[Exception]: https://docs.python.org/3/library/exceptions.html#Exception "Exception"
+[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
+[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
+[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
+[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
+[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
+[URL]: https://en.wikipedia.org/wiki/URL "URL"
+[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
+[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
+[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
