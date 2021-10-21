@@ -18,8 +18,8 @@ module.exports = {
       "label": "Playwright Test",
       "items": [
         { "type": "doc", "id": "test-annotations" },
-        { "type": "doc", "id": "test-assertions" },
         { "type": "doc", "id": "test-api-testing" },
+        { "type": "doc", "id": "test-assertions" },
         { "type": "doc", "id": "test-auth" },
         { "type": "doc", "id": "test-cli" },
         { "type": "doc", "id": "test-configuration" },
