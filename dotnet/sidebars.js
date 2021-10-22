@@ -48,7 +48,6 @@ module.exports = {
       "items": [
         { "type": "doc", "id": "docker" },
         { "type": "doc", "id": "ci" },
-        { "type": "doc", "id": "selenium-grid" },
       ],
       "collapsed": true
     },
