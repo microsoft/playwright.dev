@@ -5,10 +5,10 @@ module.exports = {
       "label": "Introduction",
       "items": [
         { "type": "doc", "id": "intro" },
+        { "type": "doc", "id": "trace-viewer" },
+        { "type": "doc", "id": "codegen" },
         { "type": "doc", "id": "debug" },
-        { "type": "doc", "id": "cli" },
-        { "type": "doc", "id": "release-notes" },
-        { "type": "doc", "id": "test-runners" }
+        { "type": "doc", "id": "release-notes" }
       ],
       "collapsed": false
     },
@@ -20,6 +20,7 @@ module.exports = {
         { "type": "doc", "id": "assertions" },
         { "type": "doc", "id": "auth" },
         { "type": "doc", "id": "browsers" },
+        { "type": "doc", "id": "cli" },
         { "type": "doc", "id": "core-concepts" },
         { "type": "doc", "id": "dialogs" },
         { "type": "doc", "id": "downloads" },
@@ -36,7 +37,7 @@ module.exports = {
         { "type": "doc", "id": "network" },
         { "type": "doc", "id": "pom" },
         { "type": "doc", "id": "screenshots" },
-        { "type": "doc", "id": "trace-viewer" },
+        { "type": "doc", "id": "test-runners" },
         { "type": "doc", "id": "verification" },
         { "type": "doc", "id": "videos" },
       ],
