@@ -347,18 +347,22 @@ import TabItem from '@theme/TabItem';`);
       comment = spec[0].text;
     const type = member.type;
     const properties = type.deepProperties();
-    let children;
-    if (properties && properties.length)
-      children = properties.map(p => {
+    /** @type {MarkdownNode[]} */
+    let children = [];
+    if (properties && properties.length) {
+      children.push(...properties.map(p => {
         let alias = p.alias;
         if (this.lang === 'java' && member.kind === 'property' && direction === 'in')
           alias = `set${toTitleCase(alias)}`;
         if (this.lang === 'csharp' && member.kind === 'property' && direction === 'in')
           alias = toTitleCase(alias);
         return this.renderProperty(`\`${alias}\``, p, p.spec, direction, false)
-      });
-    else if (spec && spec.length > 1)
-      children = spec.slice(1).map(s => md.clone(s));
+      }));
+      if (spec && spec.length > 1)
+        children.push({ type: 'text', text: '<br />' });
+    }
+    if (spec && spec.length > 1)
+      children.push(...spec.slice(1).map(s => md.clone(s)));
 
     let typeText = this.renderType(type, direction, member);
     if (async)
