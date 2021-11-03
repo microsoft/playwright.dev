@@ -84,22 +84,18 @@ module.exports = {
             {
               label: 'Python',
               'data-language-prefix': '/python/',
-              href: '#',
             },
             {
               label: 'Node.js',
               'data-language-prefix': '/',
-              href: '#',
             },
             {
               label: 'Java',
               'data-language-prefix': '/java/',
-              href: '#',
             },
             {
               label: '.NET',
               'data-language-prefix': '/dotnet/',
-              href: '#',
             },
           ],
         },
