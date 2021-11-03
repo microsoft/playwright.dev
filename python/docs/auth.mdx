@@ -140,14 +140,14 @@ os.environ["SESSION_STORAGE"] = session_storage
 
 # Set session storage in a new context
 session_storage = os.environ["SESSION_STORAGE"]
-context.add_init_script("""storage => {
-  if (window.location.hostname == 'example.com') {
-    entries = JSON.parse(storage)
-    Object.keys(entries).forEach(key => {
-      window.sessionStorage.setItem(key, entries[key])
-    })
+context.add_init_script("""(storage => {
+  if (window.location.hostname === 'example.com') {
+    const entries = JSON.parse(storage)
+    for (const [key, value] of Object.entries(entries)) {
+      window.sessionStorage.setItem(key, key)
+    }
   }
-}""", session_storage)
+})('""" + session_storage + "')")
 ```
 
 </TabItem>
@@ -161,14 +161,14 @@ os.environ["SESSION_STORAGE"] = session_storage
 
 # Set session storage in a new context
 session_storage = os.environ["SESSION_STORAGE"]
-await context.add_init_script("""storage => {
-  if (window.location.hostname == 'example.com') {
-    entries = JSON.parse(storage)
-    Object.keys(entries).forEach(key => {
-      window.sessionStorage.setItem(key, entries[key])
-    })
+await context.add_init_script("""(storage => {
+  if (window.location.hostname === 'example.com') {
+    const entries = JSON.parse(storage)
+    for (const [key, value] of Object.entries(entries)) {
+      window.sessionStorage.setItem(key, key)
+    }
   }
-}""", session_storage)
+})('""" + session_storage + "')")
 ```
 
 </TabItem>
