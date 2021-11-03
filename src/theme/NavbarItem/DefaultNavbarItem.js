@@ -1,27 +1,26 @@
-import React, {useState, useRef, useEffect} from 'react';
+import React from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import useBaseUrl from '@docusaurus/useBaseUrl';
 import {useLocation} from '@docusaurus/router';
-import {isSamePath} from '@docusaurus/theme-common';
 import IconExternalLink from '@theme/IconExternalLink';
 import isInternalUrl from '@docusaurus/isInternalUrl';
+const { getInfimaActiveClassName } = require('@docusaurus/theme-classic/lib/theme/NavbarItem');
 const dropdownLinkActiveClass = 'dropdown__link--active';
-
-function NavLink({
+export function NavLink({
   activeBasePath,
   activeBaseRegex,
   to,
   href,
   label,
-  activeClassName = 'navbar__link--active',
+  activeClassName = '',
   prependBaseUrlToHref,
   'data-language-prefix': languagePrefix,
   ...props
 }) {
   // TODO all this seems hacky
   // {to: 'version'} should probably be forbidden, in favor of {to: '/version'}
-  let toUrl = useBaseUrl(to);
+  const toUrl = useBaseUrl(to);
   const activeBaseUrl = useBaseUrl(activeBasePath);
   const normalizedHref = useBaseUrl(href, {
     forcePrependBaseUrl: true,
@@ -55,7 +54,9 @@ function NavLink({
           }
         : {
             isNavLink: true,
-            activeClassName,
+            activeClassName: !props.className?.includes(activeClassName)
+              ? activeClassName
+              : '',
             to: toUrl,
             ...(activeBasePath || activeBaseRegex
               ? {
@@ -84,158 +85,55 @@ function NavLink({
   );
 }
 
-function NavItemDesktop({items, position, className, ...props}) {
-  const dropdownRef = useRef(null);
-  const dropdownMenuRef = useRef(null);
-  const [showDropdown, setShowDropdown] = useState(false);
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (!dropdownRef.current || dropdownRef.current.contains(event.target)) {
-        return;
-      }
-
-      setShowDropdown(false);
-    };
-
-    document.addEventListener('mousedown', handleClickOutside);
-    document.addEventListener('touchstart', handleClickOutside);
-    return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
-      document.removeEventListener('touchstart', handleClickOutside);
-    };
-  }, [dropdownRef]);
-
-  const navLinkClassNames = (extraClassName, isDropdownItem = false) =>
-    clsx(
-      {
-        'navbar__item navbar__link': !isDropdownItem,
-        dropdown__link: isDropdownItem,
-      },
-      extraClassName,
-    );
-
-  if (!items) {
-    return <NavLink className={navLinkClassNames(className)} {...props} />;
-  }
-
-  return (
-    <div
-      ref={dropdownRef}
-      className={clsx('navbar__item', 'dropdown', 'dropdown--hoverable', {
-        'dropdown--left': position === 'left',
-        'dropdown--right': position === 'right',
-        'dropdown--show': showDropdown,
-      })}>
-      <NavLink
-        className={navLinkClassNames(className)}
-        {...props}
-        onClick={props.to ? undefined : (e) => e.preventDefault()}
-        onKeyDown={(e) => {
-          if (e.key === 'Enter') {
-            e.preventDefault();
-            setShowDropdown(!showDropdown);
-          }
-        }}>
-        {props.children ?? props.label}
-      </NavLink>
-      <ul ref={dropdownMenuRef} className="dropdown__menu">
-        {items.map(({className: childItemClassName, ...childItemProps}, i) => (
-          <li key={i}>
-            <NavLink
-              onKeyDown={(e) => {
-                if (i === items.length - 1 && e.key === 'Tab') {
-                  e.preventDefault();
-                  setShowDropdown(false);
-                  const nextNavbarItem = dropdownRef.current.nextElementSibling;
-
-                  if (nextNavbarItem) {
-                    nextNavbarItem.focus();
-                  }
-                }
-              }}
-              activeClassName={dropdownLinkActiveClass}
-              className={navLinkClassNames(childItemClassName, true)}
-              {...childItemProps}
-            />
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-function NavItemMobile({
-  items,
+function DefaultNavbarItemDesktop({
   className,
-  position: _position,
-  // Need to destructure position from props so that it doesn't get passed on.
+  isDropdownItem = false,
   ...props
 }) {
-  const menuListRef = useRef(null);
-  const {pathname} = useLocation();
-  const [collapsed, setCollapsed] = useState(
-    () => !items?.some((item) => isSamePath(item.to, pathname)) ?? true,
+  const element = (
+    <NavLink
+      className={clsx(
+        isDropdownItem ? 'dropdown__link' : 'navbar__item navbar__link',
+        className,
+      )}
+      {...props}
+    />
   );
 
-  const navLinkClassNames = (extraClassName, isSubList = false) =>
-    clsx(
-      'menu__link',
-      {
-        'menu__link--sublist': isSubList,
-      },
-      extraClassName,
-    );
-
-  if (!items) {
-    return (
-      <li className="menu__list-item">
-        <NavLink className={navLinkClassNames(className)} {...props} />
-      </li>
-    );
+  if (isDropdownItem) {
+    return <li>{element}</li>;
   }
 
-  const menuListHeight = menuListRef.current?.scrollHeight
-    ? `${menuListRef.current?.scrollHeight}px`
-    : undefined;
+  return element;
+}
+
+function DefaultNavbarItemMobile({
+  className,
+  isDropdownItem: _isDropdownItem,
+  ...props
+}) {
   return (
-    <li
-      className={clsx('menu__list-item', {
-        'menu__list-item--collapsed': collapsed,
-      })}>
-      <NavLink
-        role="button"
-        className={navLinkClassNames(className, true)}
-        {...props}
-        onClick={(e) => {
-          e.preventDefault();
-          setCollapsed((state) => !state);
-        }}>
-        {props.children ?? props.label}
-      </NavLink>
-      <ul
-        className="menu__list"
-        ref={menuListRef}
-        style={{
-          height: !collapsed ? menuListHeight : undefined,
-        }}>
-        {items.map(({className: childItemClassName, ...childItemProps}, i) => (
-          <li className="menu__list-item" key={i}>
-            <NavLink
-              activeClassName="menu__link--active"
-              className={navLinkClassNames(childItemClassName)}
-              {...childItemProps}
-              onClick={props.onClick}
-            />
-          </li>
-        ))}
-      </ul>
+    <li className="menu__list-item">
+      <NavLink className={clsx('menu__link', className)} {...props} />
     </li>
   );
 }
 
-function DefaultNavbarItem({mobile = false, ...props}) {
-  const Comp = mobile ? NavItemMobile : NavItemDesktop;
-  return <Comp {...props} />;
+function DefaultNavbarItem({
+  mobile = false,
+  position: _position,
+  // Need to destructure position from props so that it doesn't get passed on.
+  ...props
+}) {
+  const Comp = mobile ? DefaultNavbarItemMobile : DefaultNavbarItemDesktop;
+  return (
+    <Comp
+      {...props}
+      activeClassName={
+        props.activeClassName ?? getInfimaActiveClassName(mobile)
+      }
+    />
+  );
 }
 
 export default DefaultNavbarItem;
