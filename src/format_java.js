@@ -74,23 +74,19 @@ class JavaFormatter {
    */
   formatArrayType(type, direction, member) {
     const text = type.name;
-    if ('Array' !== text)
+    if ('Array' !== text || direction !== 'in')
       return null;
     const method = member.enclosingMethod;
     if (!method)
       return null;
-    const methodName = member.enclosingMethod.alias;
-    // const path = `${method.clazz.name}.${member.enclosingMethod.alias}.${member.name}`;
-    if (methodName === 'selectOption' ||
-        methodName === 'setInputFiles' ||
-        methodName === 'setFiles' ||
-        methodName === 'containsText' ||
-        methodName === 'hasClass' ||
-        methodName === 'hasText') {
-      const elementType = this.renderType(type.templates[0], direction, member);
-      return `${elementType}&#91;&#93;`;
-    }
-    return null;
+    if (!member.type.union)
+      return null;
+    // If there are more than Array arguments format them as arrays
+    // (List overloads don't work because of type erasure in java).
+    if (member.type.union.filter(e => e.name === 'Array').length < 2)
+      return null;
+    const elementType = this.renderType(type.templates[0], direction, member);
+    return `${elementType}&#91;&#93;`;
   }
 
   /**
