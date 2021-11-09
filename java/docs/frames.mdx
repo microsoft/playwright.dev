@@ -1,117 +1,44 @@
 ---
-id: multi-pages
-title: "Multi-page scenarios"
+id: frames
+title: "Pages and frames"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright can automate scenarios that span multiple browser contexts or multiple tabs in a browser window.
+- [Frames](#frames)
+- [Frame objects](#frame-objects)
 
-- [Multiple contexts](#multiple-contexts)
-- [Multiple pages](#multiple-pages)
-- [Handling new pages](#handling-new-pages)
-- [Handling popups](#handling-popups)
+## Frames
 
-## Multiple contexts
+A [Page] can have one or more [Frame] objects attached to it. Each page has a main frame and page-level interactions (like `click`) are assumed to operate in the main frame.
 
-[Browser contexts](./core-concepts.mdx#browser-contexts) are isolated environments on a single browser instance. Playwright can create multiple browser contexts within a single scenario. This is useful when you want to test for multi-user functionality, like chat.
+A page can have additional frames attached with the `iframe` HTML tag. These frames can be accessed for interactions inside the frame.
 
 ```java
-import com.microsoft.playwright.*;
-
-public class Example {
-  public static void main(String[] args) {
-    try (Playwright playwright = Playwright.create()) {
-      BrowserType chromium = playwright.chromium();
-      // Create a Chromium browser instance
-      Browser browser = chromium.launch();
-      // Create two isolated browser contexts
-      BrowserContext userContext = browser.newContext();
-      BrowserContext adminContext = browser.newContext();
-      // Create pages and interact with contexts independently
-    }
-  }
-}
+// Locate element inside frame
+Locator username = page.frameLocator(".frame-class").locator("#username-input");
+username.fill("John");
 ```
 
-### API reference
-- [BrowserContext]
-- [Browser.newContext([options])](./api/class-browser.mdx#browser-new-context)
-- [BrowserContext.addCookies(cookies)](./api/class-browsercontext.mdx#browser-context-add-cookies)
+## Frame objects
 
-## Multiple pages
-
-Each browser context can host multiple pages (tabs).
-* Each page behaves like a focused, active page. Bringing the page to front is not required.
-* Pages inside a context respect context-level emulation, like viewport sizes, custom network routes or browser locale.
+One can access frame objects using the [Page.frame(name)](./api/class-page.mdx#page-frame) API:
 
 ```java
-// Create two pages
-Page pageOne = context.newPage();
-Page pageTwo = context.newPage();
+// Get frame using the frame"s name attribute
+Frame frame = page.frame("frame-login");
 
-// Get pages of a browser context
-List<Page> allPages = context.pages();
+// Get frame using frame"s URL
+Frame frame = page.frameByUrl(Pattern.compile(".*domain.*"));
+
+// Get frame using any other selector
+ElementHandle frameElementHandle = page.querySelector(".frame-class");
+Frame frame = frameElementHandle.contentFrame();
+
+// Interact with the frame
+frame.fill("#username-input", "John");
 ```
 
-### API reference
-- [Page]
-- [BrowserContext.newPage()](./api/class-browsercontext.mdx#browser-context-new-page)
-- [BrowserContext.pages()](./api/class-browsercontext.mdx#browser-context-pages)
-
-## Handling new pages
-
-The `page` event on browser contexts can be used to get new pages that are created in the context. This can be used to handle new pages opened by `target="_blank"` links.
-
-```java
-// Get page after a specific action (e.g. clicking a link)
-Page newPage = context.waitForPage(() -> {
-  page.click("a[target='_blank']"); // Opens a new tab
-});
-newPage.waitForLoadState();
-System.out.println(newPage.title());
-```
-
-If the action that triggers the new page is unknown, the following pattern can be used.
-
-```java
-// Get all new pages (including popups) in the context
-context.onPage(page -> {
-  page.waitForLoadState();
-  System.out.println(page.title());
-});
-```
-
-### API reference
-- [BrowserContext.onPage(handler)](./api/class-browsercontext.mdx#browser-context-event-page)
-
-## Handling popups
-
-If the page opens a pop-up (e.g. pages opened by `target="_blank"` links), you can get a reference to it by listening to the `popup` event on the page.
-
-This event is emitted in addition to the `browserContext.on('page')` event, but only for popups relevant to this page.
-
-```java
-// Get popup after a specific action (e.g., click)
-Page popup = page.waitForPopup(() -> {
-  page.click("#open");
-});
-popup.waitForLoadState();
-System.out.println(popup.title());
-```
-
-If the action that triggers the popup is unknown, the following pattern can be used.
-
-```java
-// Get all popups when they open
-page.onPopup(popup -> {
-  popup.waitForLoadState();
-  System.out.println(popup.title());
-});
-```
-
-### API reference
-- [Page.onPopup(handler)](./api/class-page.mdx#page-event-popup)
 
 [Browser]: ./api/class-browser.mdx "Browser"
 [BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
@@ -122,6 +49,7 @@ page.onPopup(popup -> {
 [ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: ./api/class-filechooser.mdx "FileChooser"
 [Frame]: ./api/class-frame.mdx "Frame"
+[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
 [JSHandle]: ./api/class-jshandle.mdx "JSHandle"
 [Keyboard]: ./api/class-keyboard.mdx "Keyboard"
 [Locator]: ./api/class-locator.mdx "Locator"
@@ -144,7 +72,7 @@ page.onPopup(popup -> {
 [WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"
 [Worker]: ./api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[EvaluationArgument]: ./core-concepts.mdx#evaluation-argument "EvaluationArgument"
+[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"

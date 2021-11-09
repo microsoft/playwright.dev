@@ -1,225 +1,9 @@
 ---
-id: core-concepts
-title: "Core concepts"
+id: evaluating
+title: "Evaluating JavaScript"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-
-Playwright provides a set of APIs to automate Chromium, Firefox and WebKit browsers. By using the Playwright API, you can write scripts to create new browser pages, navigate to URLs and then interact with elements on a page.
-
-Along with a test runner Playwright can be used to automate user interactions to validate and test web applications. The Playwright API enables this through the following primitives.
-
-- [Browser](#browser)
-- [Browser contexts](#browser-contexts)
-- [Pages and frames](#pages-and-frames)
-- [Selectors](#selectors)
-- [Auto-waiting](#auto-waiting)
-- [Execution contexts: Playwright and Browser](#execution-contexts-playwright-and-browser)
-- [Evaluation Argument](#evaluation-argument)
-
-<br/>
-
-## Browser
-
-A [Browser] refers to an instance of Chromium, Firefox or WebKit. Playwright scripts generally start with launching a browser instance and end with closing the browser. Browser instances can be launched in headless (without a GUI) or headed mode.
-
-```js
-const { chromium } = require('playwright');  // Or 'firefox' or 'webkit'.
-
-const browser = await chromium.launch({ headless: false });
-await browser.close();
-```
-
-Launching a browser instance can be expensive, and Playwright is designed to maximize what a single instance can do through multiple browser contexts.
-
-### API reference
-- [Browser]
-
-<br/>
-
-## Browser contexts
-
-A [BrowserContext] is an isolated incognito-alike session within a browser instance. Browser contexts are fast and cheap to create. We recommend running each test scenario in its own new Browser context, so that the browser state is isolated between the tests.
-
-```js
-const browser = await chromium.launch();
-const context = await browser.newContext();
-const page = await context.newPage();
-```
-
-Browser contexts can also be used to emulate multi-page scenarios involving mobile devices, permissions, locale and color scheme.
-
-```js
-const { devices } = require('playwright');
-const iPhone = devices['iPhone 11 Pro'];
-
-const context = await browser.newContext({
-  ...iPhone,
-  permissions: ['geolocation'],
-  geolocation: { latitude: 52.52, longitude: 13.39},
-  colorScheme: 'dark',
-  locale: 'de-DE'
-});
-const page = await context.newPage();
-```
-
-### API reference
-- [BrowserContext]
-- [browser.newContext([options])](./api/class-browser.mdx#browser-new-context)
-- [browserContext.newPage()](./api/class-browsercontext.mdx#browser-context-new-page)
-
-<br/>
-
-## Pages and frames
-
-A Browser context can have multiple pages. A [Page] refers to a single tab or a popup window within a browser context. It should be used to navigate to URLs and interact with the page content.
-
-```js
-// Create a page.
-const page = await context.newPage();
-
-// Navigate explicitly, similar to entering a URL in the browser.
-await page.goto('http://example.com');
-// Fill an input.
-await page.fill('#search', 'query');
-
-// Navigate implicitly by clicking a link.
-await page.click('#submit');
-// Expect a new url.
-console.log(page.url());
-
-// Page can navigate from the script - this will be picked up by Playwright.
-window.location.href = 'https://example.com';
-```
-
-> Read more on [page navigation and loading](./navigations.mdx).
-
-A page can have one or more [Frame] objects attached to it. Each page has a main frame and page-level interactions (like `click`) are assumed to operate in the main frame.
-
-A page can have additional frames attached with the `iframe` HTML tag. These frames can be accessed for interactions inside the frame.
-
-```js
-// Get frame using the frame's name attribute
-const frame = page.frame('frame-login');
-
-// Get frame using frame's URL
-const frame = page.frame({ url: /.*domain.*/ });
-
-// Get frame using any other selector
-const frameElementHandle = await page.$('.frame-class');
-const frame = await frameElementHandle.contentFrame();
-
-// Interact with the frame
-await frame.fill('#username-input', 'John');
-```
-
-### API reference
-- [Page]
-- [Frame]
-- [page.frame(frameSelector)](./api/class-page.mdx#page-frame)
-
-<br/>
-
-## Selectors
-
-Playwright can search for elements using CSS selectors, XPath selectors, HTML attributes like `id`, `data-test-id` and even text content.
-
-You can explicitly specify the selector engine you are using or let Playwright detect it.
-
-All selector engines except for XPath pierce shadow DOM by default. If you want to enforce regular DOM selection, you can use the `*:light` versions of the selectors. You don't typically need to though.
-
-Learn more about selectors and selector engines [here](./selectors.mdx).
-
-Some examples below:
-
-```js
-// Using data-test-id= selector engine
-await page.click('data-test-id=foo');
-```
-
-```js
-// CSS and XPath selector engines are automatically detected
-await page.click('div');
-await page.click('//html/body/div');
-```
-
-```js
-// Find node by text substring
-await page.click('text=Hello w');
-```
-
-```js
-// Explicit CSS and XPath notation
-await page.click('css=div');
-await page.click('xpath=//html/body/div');
-```
-
-```js
-// Only search light DOM, outside WebComponent shadow DOM:
-await page.click('css:light=div');
-```
-
-Selectors using the same or different engines can be combined using the `>>` separator. For example,
-
-```js
-// Click an element with text 'Sign Up' inside of a #free-month-promo.
-await page.click('#free-month-promo >> text=Sign Up');
-```
-
-```js
-// Capture textContent of a section that contains an element with text 'Selectors'.
-const sectionText = await page.$eval('*css=section >> text=Selectors', e => e.textContent);
-```
-
-<br/>
-
-## Auto-waiting
-
-Actions like [page.click(selector[, options])](./api/class-page.mdx#page-click) and [page.fill(selector, value[, options])](./api/class-page.mdx#page-fill) auto-wait for the element to be visible and [actionable](./actionability.mdx). For example, click will:
-- wait for an element with the given selector to appear in the DOM
-- wait for it to become visible: have non-empty bounding box and no `visibility:hidden`
-- wait for it to stop moving: for example, wait until css transition finishes
-- scroll the element into view
-- wait for it to receive pointer events at the action point: for example, wait until element becomes non-obscured by other elements
-- retry if the element is detached during any of the above checks
-
-```js
-// Playwright waits for #search element to be in the DOM
-await page.fill('#search', 'query');
-```
-
-```js
-// Playwright waits for element to stop animating
-// and accept clicks.
-await page.click('#search');
-```
-
-You can explicitly wait for an element to appear in the DOM or to become visible:
-
-```js
-// Wait for #search to appear in the DOM.
-await page.waitForSelector('#search', { state: 'attached' });
-// Wait for #promo to become visible, for example with `visibility:visible`.
-await page.waitForSelector('#promo');
-```
-
-... or to become hidden or detached
-
-```js
-// Wait for #details to become hidden, for example with `display:none`.
-await page.waitForSelector('#details', { state: 'hidden' });
-// Wait for #promo to be removed from the DOM.
-await page.waitForSelector('#promo', { state: 'detached' });
-```
-
-### API reference
-- [page.click(selector[, options])](./api/class-page.mdx#page-click)
-- [page.fill(selector, value[, options])](./api/class-page.mdx#page-fill)
-- [page.waitForSelector(selector[, options])](./api/class-page.mdx#page-wait-for-selector)
-
-<br/>
-
-## Execution contexts: Playwright and Browser
 
 Playwright scripts run in your Playwright environment. Your page scripts run in the browser page environment. Those environments don't intersect, they are running in different virtual machines in different processes and even potentially on different computers.
 
@@ -305,12 +89,6 @@ const result = await page.evaluate(() => {
 });
 ```
 
-### API reference
-- [page.evaluate(pageFunction[, arg])](./api/class-page.mdx#page-evaluate)
-- [frame.evaluate(pageFunction[, arg])](./api/class-frame.mdx#frame-evaluate)
-- [EvaluationArgument]
-
-<br/>
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"
@@ -335,6 +113,7 @@ const result = await page.evaluate(() => {
 [ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: ./api/class-filechooser.mdx "FileChooser"
 [Frame]: ./api/class-frame.mdx "Frame"
+[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
 [JSHandle]: ./api/class-jshandle.mdx "JSHandle"
 [Keyboard]: ./api/class-keyboard.mdx "Keyboard"
 [Locator]: ./api/class-locator.mdx "Locator"
@@ -367,7 +146,7 @@ const result = await page.evaluate(() => {
 [TestResult]: ./api/class-testresult.mdx "TestResult"
 [TestStep]: ./api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[EvaluationArgument]: ./core-concepts.mdx#evaluation-argument "EvaluationArgument"
+[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
