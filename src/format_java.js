@@ -68,6 +68,32 @@ class JavaFormatter {
   }
 
   /**
+   * @param {Documentation.Type} type
+   * @param {string} direction
+   * @param {Documentation.Member} member
+   */
+  formatArrayType(type, direction, member) {
+    const text = type.name;
+    if ('Array' !== text)
+      return null;
+    const method = member.enclosingMethod;
+    if (!method)
+      return null;
+    const methodName = member.enclosingMethod.alias;
+    // const path = `${method.clazz.name}.${member.enclosingMethod.alias}.${member.name}`;
+    if (methodName === 'selectOption' ||
+        methodName === 'setInputFiles' ||
+        methodName === 'setFiles' ||
+        methodName === 'containsText' ||
+        methodName === 'hasClass' ||
+        methodName === 'hasText') {
+      const elementType = this.renderType(type.templates[0], direction, member);
+      return `${elementType}&#91;&#93;`;
+    }
+    return null;
+  }
+
+  /**
    * @param {Documentation.Type} type 
    * @param {string} direction
    * @param {Documentation.Member} member
