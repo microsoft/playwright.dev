@@ -1,20 +1,18 @@
 ---
-id: multi-pages
-title: "Multi-page scenarios"
+id: pages
+title: "Pages"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright can automate scenarios that span multiple browser contexts or multiple tabs in a browser window.
-
-- [Multiple contexts](#multiple-contexts)
+- [Pages](#pages)
 - [Multiple pages](#multiple-pages)
 - [Handling new pages](#handling-new-pages)
 - [Handling popups](#handling-popups)
 
-## Multiple contexts
+## Pages
 
-[Browser contexts](./core-concepts.mdx#browser-contexts) are isolated environments on a single browser instance. Playwright can create multiple browser contexts within a single scenario. This is useful when you want to test for multi-user functionality, like chat.
+Each [BrowserContext] can have multiple pages. A [Page] refers to a single tab or a popup window within a browser context. It should be used to navigate to URLs and interact with the page content.
 
 <Tabs
   groupId="python-flavor"
@@ -27,54 +25,38 @@ Playwright can automate scenarios that span multiple browser contexts or multipl
 <TabItem value="sync">
 
 ```py
-from playwright.sync_api import sync_playwright
+page = context.new_page()
 
-def run(playwright):
-    # create a chromium browser instance
-    chromium = playwright.chromium
-    browser = chromium.launch()
+# Navigate explicitly, similar to entering a URL in the browser.
+page.goto('http://example.com')
+# Fill an input.
+page.locator('#search').fill('query')
 
-    # create two isolated browser contexts
-    user_context = browser.new_context()
-    admin_context = browser.new_context()
-
-    # create pages and interact with contexts independently
-
-with sync_playwright() as playwright:
-    run(playwright)
+# Navigate implicitly by clicking a link.
+page.locator('#submit').click()
+# Expect a new url.
+print(page.url)
 ```
 
 </TabItem>
 <TabItem value="async">
 
 ```py
-import asyncio
-from playwright.async_api import async_playwright
+page = await context.new_page()
 
-async def run(playwright):
-    # create a chromium browser instance
-    chromium = playwright.chromium
-    browser = await chromium.launch()
+# Navigate explicitly, similar to entering a URL in the browser.
+await page.goto('http://example.com')
+# Fill an input.
+await page.locator('#search').fill('query')
 
-    # create two isolated browser contexts
-    user_context = await browser.new_context()
-    admin_context = await browser.new_context()
-
-    # create pages and interact with contexts independently
-
-async def main():
-    async with async_playwright() as playwright:
-        await run(playwright)
-asyncio.run(main())
+# Navigate implicitly by clicking a link.
+await page.locator('#submit').click()
+# Expect a new url.
+print(page.url)
 ```
 
 </TabItem>
 </Tabs>
-
-### API reference
-- [BrowserContext]
-- [browser.new_context(**kwargs)](./api/class-browser.mdx#browser-new-context)
-- [browser_context.add_cookies(cookies)](./api/class-browsercontext.mdx#browser-context-add-cookies)
 
 ## Multiple pages
 
@@ -115,11 +97,6 @@ all_pages = context.pages()
 
 </TabItem>
 </Tabs>
-
-### API reference
-- [Page]
-- [browser_context.new_page()](./api/class-browsercontext.mdx#browser-context-new-page)
-- [browser_context.pages](./api/class-browsercontext.mdx#browser-context-pages)
 
 ## Handling new pages
 
@@ -196,9 +173,6 @@ context.on("page", handle_page)
 
 </TabItem>
 </Tabs>
-
-### API reference
-- [browser_context.on("page")](./api/class-browsercontext.mdx#browser-context-event-page)
 
 ## Handling popups
 
@@ -278,9 +252,6 @@ page.on("popup", handle_popup)
 </TabItem>
 </Tabs>
 
-### API reference
-- [page.on("popup")](./api/class-page.mdx#page-event-popup)
-
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Browser]: ./api/class-browser.mdx "Browser"
 [BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
@@ -293,6 +264,7 @@ page.on("popup", handle_popup)
 [Error]: ./api/class-error.mdx "Error"
 [FileChooser]: ./api/class-filechooser.mdx "FileChooser"
 [Frame]: ./api/class-frame.mdx "Frame"
+[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
 [JSHandle]: ./api/class-jshandle.mdx "JSHandle"
 [Keyboard]: ./api/class-keyboard.mdx "Keyboard"
 [Locator]: ./api/class-locator.mdx "Locator"
@@ -310,7 +282,7 @@ page.on("popup", handle_popup)
 [WebSocket]: ./api/class-websocket.mdx "WebSocket"
 [Worker]: ./api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[EvaluationArgument]: ./core-concepts.mdx#evaluation-argument "EvaluationArgument"
+[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"

@@ -1,119 +1,85 @@
 ---
-id: multi-pages
-title: "Multi-page scenarios"
+id: evaluating
+title: "Evaluating JavaScript"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright can automate scenarios that span multiple browser contexts or multiple tabs in a browser window.
+Playwright scripts run in your Playwright environment. Your page scripts run in the browser page environment. Those environments don't intersect, they are running in different virtual machines in different processes and even potentially on different computers.
 
-- [Multiple contexts](#multiple-contexts)
-- [Multiple pages](#multiple-pages)
-- [Handling new pages](#handling-new-pages)
-- [Handling popups](#handling-popups)
-
-## Multiple contexts
-
-[Browser contexts](./core-concepts.mdx#browser-contexts) are isolated environments on a single browser instance. Playwright can create multiple browser contexts within a single scenario. This is useful when you want to test for multi-user functionality, like chat.
+The [Page.EvaluateAsync(expression, arg)](./api/class-page.mdx#page-evaluate) API can run a JavaScript function in the context of the web page and bring results back to the Playwright environment. Browser globals like `window` and `document` can be used in `evaluate`.
 
 ```csharp
-using Microsoft.Playwright;
-using System.Threading.Tasks;
-
-class Program
-{
-    public static async Task Main()
-    {
-        using var playwright = await Playwright.CreateAsync();
-        // Create a Chromium browser instance
-        await using var browser = await playwright.Chromium.LaunchAsync();
-        await using var userContext = await browser.NewContextAsync();
-        await using var adminContext = await browser.NewContextAsync();
-        // Create pages and interact with contexts independently.
-    }
-}
+var href = await page.EvaluateAsync<string>("document.location.href");
 ```
 
-### API reference
-- [BrowserContext]
-- [Browser.NewContextAsync(options)](./api/class-browser.mdx#browser-new-context)
-- [BrowserContext.AddCookiesAsync(cookies)](./api/class-browsercontext.mdx#browser-context-add-cookies)
-
-## Multiple pages
-
-Each browser context can host multiple pages (tabs).
-* Each page behaves like a focused, active page. Bringing the page to front is not required.
-* Pages inside a context respect context-level emulation, like viewport sizes, custom network routes or browser locale.
+If the result is a Promise or if the function is asynchronous evaluate will automatically wait until it's resolved:
 
 ```csharp
-// Create two pages
-var pageOne = await context.NewPageAsync();
-var pageTwo = await context.NewPageAsync();
-
-// Get pages of a browser context
-var allPages = context.Pages;
+int status = await page.EvaluateAsync<int>(@"async () => {
+  const response = await fetch(location.href);
+  return response.status;
+}");
 ```
 
-### API reference
-- [Page]
-- [BrowserContext.NewPageAsync()](./api/class-browsercontext.mdx#browser-context-new-page)
-- [BrowserContext.Pages](./api/class-browsercontext.mdx#browser-context-pages)
+## Evaluation Argument
 
-## Handling new pages
-
-The `page` event on browser contexts can be used to get new pages that are created in the context. This can be used to handle new pages opened by `target="_blank"` links.
+Playwright evaluation methods like [Page.EvaluateAsync(expression, arg)](./api/class-page.mdx#page-evaluate) take a single optional argument. This argument can be a mix of [Serializable] values and [JSHandle] or [ElementHandle] instances. Handles are automatically converted to the value they represent.
 
 ```csharp
-// Get page after a specific action (e.g. clicking a link)
-var newPage = await context.RunAndWaitForPageAsync(async () =>
-{
-    await page.ClickAsync("a[target='_blank']");
-});
-await newPage.WaitForLoadStateAsync();
-Console.WriteLine(await newPage.TitleAsync());
+// A primitive value.
+await page.EvaluateAsync<int>("num => num", 42);
+
+// An array.
+await page.EvaluateAsync<int[]>("array => array.length", new[] { 1, 2, 3 });
+
+// An object.
+await page.EvaluateAsync<object>("object => object.foo", new { foo = "bar" });
+
+// A single handle.
+var button = await page.QuerySelectorAsync("button");
+await page.EvaluateAsync<IJSHandle>("button => button.textContent", button);
+
+// Alternative notation using elementHandle.EvaluateAsync.
+await button.EvaluateAsync<string>("(button, from) => button.textContent.substring(from)", 5);
+
+// Object with multiple handles.
+var button1 = await page.QuerySelectorAsync(".button1");
+var button2 = await page.QuerySelectorAsync(".button2");
+await page.EvaluateAsync("o => o.button1.textContent + o.button2.textContent", new { button1, button2 });
+
+// Object destructuring works. Note that property names must match
+// between the destructured object and the argument.
+// Also note the required parenthesis.
+await page.EvaluateAsync("({ button1, button2 }) => button1.textContent + button2.textContent", new { button1, button2 });
+
+// Array works as well. Arbitrary names can be used for destructuring.
+// Note the required parenthesis.
+await page.EvaluateAsync("([b1, b2]) => b1.textContent + b2.textContent", new[] { button1, button2 });
+
+// Any non-cyclic mix of serializables and handles works.
+await page.EvaluateAsync("x => x.button1.textContent + x.list[0].textContent + String(x.foo)", new { button1, list = new[] { button2 }, foo = null as object });
 ```
 
-If the action that triggers the new page is unknown, the following pattern can be used.
+Right:
 
 ```csharp
-// Get all new pages (including popups) in the context
-context.Page += async  (_, page) => {
-    await page.WaitForLoadStateAsync();
-    Console.WriteLine(await page.TitleAsync());
-};
+var data = new { text = "some data", value = 1};
+// Pass data as a parameter
+var result = await page.EvaluateAsync("data => { window.myApp.use(data); }", data);
 ```
 
-### API reference
-- [event BrowserContext.Page](./api/class-browsercontext.mdx#browser-context-event-page)
-
-## Handling popups
-
-If the page opens a pop-up (e.g. pages opened by `target="_blank"` links), you can get a reference to it by listening to the `popup` event on the page.
-
-This event is emitted in addition to the `browserContext.on('page')` event, but only for popups relevant to this page.
+Wrong:
 
 ```csharp
-// Get popup after a specific action (e.g., click)
-var newPage = await page.RunAndWaitForPopupAsync(async () =>
-{
-    await page.ClickAsync("#open");
-});
-await newPage.WaitForLoadStateAsync();
-Console.WriteLine(await newPage.TitleAsync());
+var data = new { text = "some data", value = 1};
+// Pass data as a parameter
+var result = await page.EvaluateAsync(@"data => {
+  // There is no |data| in the web page.
+  window.myApp.use(data); 
+}");
 ```
 
-If the action that triggers the popup is unknown, the following pattern can be used.
-
-```csharp
-// Get all popups when they open
-page.Popup += async  (_, popup) => {
-    await popup.WaitForLoadStateAsync();
-    Console.WriteLine(await page.TitleAsync());
-};
-```
-
-### API reference
-- [event Page.Popup](./api/class-page.mdx#page-event-popup)
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Browser]: ./api/class-browser.mdx "Browser"
@@ -125,6 +91,7 @@ page.Popup += async  (_, popup) => {
 [ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: ./api/class-filechooser.mdx "FileChooser"
 [Frame]: ./api/class-frame.mdx "Frame"
+[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
 [JSHandle]: ./api/class-jshandle.mdx "JSHandle"
 [Keyboard]: ./api/class-keyboard.mdx "Keyboard"
 [Locator]: ./api/class-locator.mdx "Locator"
@@ -143,7 +110,7 @@ page.Popup += async  (_, popup) => {
 [WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"
 [Worker]: ./api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[EvaluationArgument]: ./core-concepts.mdx#evaluation-argument "EvaluationArgument"
+[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
 [origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
