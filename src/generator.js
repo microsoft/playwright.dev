@@ -61,6 +61,7 @@ function rewriteContent(text) {
  *   formatTemplate: function(string): string,
  *   formatFunction: function(string, string, Documentation.Type): string,
  *   formatPromise: function(string): string,
+ *   formatArrayType?: function(Documentation.Type, string, Documentation.Member): string?,
  *   preprocessComment: function(MarkdownNode[]): MarkdownNode[]
  *   renderType: function(Documentation.Type, string, Documentation.Member): string,
  * }} GeneratorFormatter
@@ -415,6 +416,9 @@ import TabItem from '@theme/TabItem';`);
       }
       return union.map(l => this.renderType(l, direction, member)).join('|');
     }
+    const result = this.formatter.formatArrayType?.(type, direction, member);
+    if (result)
+      return result;
     if (type.templates)
       return `${this.renderTypeName(type, direction, member)}${this.formatter.formatTemplate(type.templates.map(l => {
         return this.renderType(l, direction, /** @type {Documentation.Member} */({ ...member, required: true }));
