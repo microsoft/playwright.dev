@@ -267,6 +267,10 @@ await frame.DispatchEventAsync("#source", "dragstart", new { dataTransfer });
 
 Returns the return value of `expression`.
 
+:::caution
+This method does not wait for the element to pass actionability checks and therefore can lead to the flaky tests. Use [Locator.EvaluateAsync(expression, arg, options)](./api/class-locator.mdx#locator-evaluate), other [Locator] helper methods or web-first assertions instead.
+:::
+
 The method finds an element matching the specified selector within the frame and passes it as a first argument to `expression`. See [Working with selectors](./selectors.mdx) for more details. If no elements match the selector, the method throws an error.
 
 If `expression` returns a [Promise], then [Frame.EvalOnSelectorAsync(selector, expression, arg, options)](./api/class-frame.mdx#frame-eval-on-selector) would wait for the promise to resolve and return its value.
@@ -286,6 +290,10 @@ var html = await frame.EvalOnSelectorAsync(".main-container", "(e, suffix) => e.
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-eval-on-selector-all-return"/> &#60;[object]&#62;<a href="#frame-eval-on-selector-all-return" class="list-anchor">#</a>
 
 Returns the return value of `expression`.
+
+:::note
+In most cases, [Locator.EvaluateAllAsync(expression, arg)](./api/class-locator.mdx#locator-evaluate-all), other [Locator] helper methods and web-first assertions do a better job.
+:::
 
 The method finds all elements matching the specified selector within the frame and passes an array of matched elements as a first argument to `expression`. See [Working with selectors](./selectors.mdx) for more details.
 
@@ -322,7 +330,7 @@ Console.WriteLine(await frame.EvaluateAsync<int>("1 + 2")); // prints "3"
 [ElementHandle] instances can be passed as an argument to the [Frame.EvaluateAsync(expression, arg)](./api/class-frame.mdx#frame-evaluate):
 
 ```csharp
-var bodyHandle = await frame.QuerySelectorAsync("body");
+var bodyHandle = await frame.EvaluateAsync("document.body");
 var html = await frame.EvaluateAsync<string>("([body, suffix]) => body.innerHTML + suffix", new object [] { bodyHandle, "hello" });
 await bodyHandle.DisposeAsync();
 ```
@@ -615,6 +623,10 @@ Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported a
 
 Returns the ElementHandle pointing to the frame element.
 
+:::caution
+The use of [ElementHandle] is discouraged, use [Locator] objects and web-first assertions instead.
+:::
+
 The method finds an element matching the specified selector within the frame. See [Working with selectors](./selectors.mdx) for more details. If no elements match the selector, returns `null`.
 
 ## Frame.QuerySelectorAllAsync(selector) {#frame-query-selector-all}
@@ -622,6 +634,10 @@ The method finds an element matching the specified selector within the frame. Se
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-query-selector-all-return"/> &#60;[IEnumerable]<[ElementHandle]>&#62;<a href="#frame-query-selector-all-return" class="list-anchor">#</a>
 
 Returns the ElementHandles pointing to the frame elements.
+
+:::caution
+The use of [ElementHandle] is discouraged, use [Locator] objects instead.
+:::
 
 The method finds all elements matching the specified selector within the frame. See [Working with selectors](./selectors.mdx) for more details. If no elements match the selector, returns empty array.
 
@@ -916,6 +932,10 @@ await frame.WaitForLoadStateAsync(); // Defaults to LoadState.Load
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-selector-return"/> &#60;[ElementHandle]?&#62;<a href="#frame-wait-for-selector-return" class="list-anchor">#</a>
 
 Returns when element specified by selector satisfies `state` option. Returns `null` if waiting for `hidden` or `detached`.
+
+:::note
+Playwright automatically waits for element to be ready before performing an action. Using [Locator] objects and web-first assertions make the code wait-for-selector-free.
+:::
 
 Wait for the `selector` to satisfy `state` option (either appear/disappear from dom, or become visible/hidden). If at the moment of calling the method `selector` already satisfies the condition, the method will return immediately. If the selector doesn't satisfy the condition for the `timeout` milliseconds, the function will throw.
 
