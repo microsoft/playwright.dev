@@ -333,6 +333,10 @@ await frame.dispatch_event("#source", "dragstart", { "dataTransfer": data_transf
 
 Returns the return value of `expression`.
 
+:::caution
+This method does not wait for the element to pass actionability checks and therefore can lead to the flaky tests. Use [locator.evaluate(expression, **kwargs)](./api/class-locator.mdx#locator-evaluate), other [Locator] helper methods or web-first assertions instead.
+:::
+
 The method finds an element matching the specified selector within the frame and passes it as a first argument to `expression`. See [Working with selectors](./selectors.mdx) for more details. If no elements match the selector, the method throws an error.
 
 If `expression` returns a [Promise], then [frame.eval_on_selector(selector, expression, **kwargs)](./api/class-frame.mdx#frame-eval-on-selector) would wait for the promise to resolve and return its value.
@@ -374,6 +378,10 @@ html = await frame.eval_on_selector(".main-container", "(e, suffix) => e.outerHT
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-eval-on-selector-all-return"/> &#60;[Serializable]&#62;<a href="#frame-eval-on-selector-all-return" class="list-anchor">#</a>
 
 Returns the return value of `expression`.
+
+:::note
+In most cases, [locator.evaluate_all(expression, **kwargs)](./api/class-locator.mdx#locator-evaluate-all), other [Locator] helper methods and web-first assertions do a better job.
+:::
 
 The method finds all elements matching the specified selector within the frame and passes an array of matched elements as a first argument to `expression`. See [Working with selectors](./selectors.mdx) for more details.
 
@@ -485,7 +493,7 @@ print(await frame.evaluate(f"1 + {x}")) # prints "11"
 <TabItem value="sync">
 
 ```py
-body_handle = frame.query_selector("body")
+body_handle = frame.evaluate("document.body")
 html = frame.evaluate("([body, suffix]) => body.innerHTML + suffix", [body_handle, "hello"])
 body_handle.dispose()
 ```
@@ -494,7 +502,7 @@ body_handle.dispose()
 <TabItem value="async">
 
 ```py
-body_handle = await frame.query_selector("body")
+body_handle = await frame.evaluate("document.body")
 html = await frame.evaluate("([body, suffix]) => body.innerHTML + suffix", [body_handle, "hello"])
 await body_handle.dispose()
 ```
@@ -927,6 +935,10 @@ Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported a
 
 Returns the ElementHandle pointing to the frame element.
 
+:::caution
+The use of [ElementHandle] is discouraged, use [Locator] objects and web-first assertions instead.
+:::
+
 The method finds an element matching the specified selector within the frame. See [Working with selectors](./selectors.mdx) for more details. If no elements match the selector, returns `null`.
 
 ## frame.query_selector_all(selector) {#frame-query-selector-all}
@@ -934,6 +946,10 @@ The method finds an element matching the specified selector within the frame. Se
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-query-selector-all-return"/> &#60;[List]\[[ElementHandle]\]&#62;<a href="#frame-query-selector-all-return" class="list-anchor">#</a>
 
 Returns the ElementHandles pointing to the frame elements.
+
+:::caution
+The use of [ElementHandle] is discouraged, use [Locator] objects instead.
+:::
 
 The method finds all elements matching the specified selector within the frame. See [Working with selectors](./selectors.mdx) for more details. If no elements match the selector, returns empty array.
 
@@ -1285,6 +1301,10 @@ await frame.wait_for_load_state() # the promise resolves after "load" event.
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-selector-return"/> &#60;[NoneType]|[ElementHandle]&#62;<a href="#frame-wait-for-selector-return" class="list-anchor">#</a>
 
 Returns when element specified by selector satisfies `state` option. Returns `null` if waiting for `hidden` or `detached`.
+
+:::note
+Playwright automatically waits for element to be ready before performing an action. Using [Locator] objects and web-first assertions make the code wait-for-selector-free.
+:::
 
 Wait for the `selector` to satisfy `state` option (either appear/disappear from dom, or become visible/hidden). If at the moment of calling the method `selector` already satisfies the condition, the method will return immediately. If the selector doesn't satisfy the condition for the `timeout` milliseconds, the function will throw.
 

@@ -794,6 +794,10 @@ await page.evaluate("matchMedia('(prefers-color-scheme: no-preference)').matches
 - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-eval-on-selector-option-strict"/> &#60;[bool]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#page-eval-on-selector-option-strict" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-eval-on-selector-return"/> &#60;[Serializable]&#62;<a href="#page-eval-on-selector-return" class="list-anchor">#</a>
 
+:::caution
+This method does not wait for the element to pass actionability checks and therefore can lead to the flaky tests. Use [locator.evaluate(expression, **kwargs)](./api/class-locator.mdx#locator-evaluate), other [Locator] helper methods or web-first assertions instead.
+:::
+
 The method finds an element matching the specified selector within the page and passes it as a first argument to `expression`. If no elements match the selector, the method throws an error. Returns the value of `expression`.
 
 If `expression` returns a [Promise], then [page.eval_on_selector(selector, expression, **kwargs)](./api/class-page.mdx#page-eval-on-selector) would wait for the promise to resolve and return its value.
@@ -835,6 +839,10 @@ Shortcut for main frame's [frame.eval_on_selector(selector, expression, **kwargs
 - `expression`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-eval-on-selector-all-option-expression"/> &#60;[str]&#62; JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.<a href="#page-eval-on-selector-all-option-expression" class="list-anchor">#</a>
 - `arg`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-eval-on-selector-all-option-arg"/> &#60;[EvaluationArgument]&#62; Optional argument to pass to `expression`.<a href="#page-eval-on-selector-all-option-arg" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-eval-on-selector-all-return"/> &#60;[Serializable]&#62;<a href="#page-eval-on-selector-all-return" class="list-anchor">#</a>
+
+:::note
+In most cases, [locator.evaluate_all(expression, **kwargs)](./api/class-locator.mdx#locator-evaluate-all), other [Locator] helper methods and web-first assertions do a better job.
+:::
 
 The method finds all elements matching the specified selector within the page and passes an array of matched elements as a first argument to `expression`. Returns the result of `expression` invocation.
 
@@ -948,7 +956,7 @@ print(await page.evaluate(f"1 + {x}")) # prints "11"
 <TabItem value="sync">
 
 ```py
-body_handle = page.query_selector("body")
+body_handle = page.evaluate("document.body")
 html = page.evaluate("([body, suffix]) => body.innerHTML + suffix", [body_handle, "hello"])
 body_handle.dispose()
 ```
@@ -957,7 +965,7 @@ body_handle.dispose()
 <TabItem value="async">
 
 ```py
-body_handle = await page.query_selector("body")
+body_handle = await page.evaluate("document.body")
 html = await page.evaluate("([body, suffix]) => body.innerHTML + suffix", [body_handle, "hello"])
 await body_handle.dispose()
 ```
@@ -1954,13 +1962,21 @@ await browser.close()
 - `strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-query-selector-option-strict"/> &#60;[bool]&#62; When true, the call requires selector to resolve to a single element. If given selector resolves to more then one element, the call throws an exception.<a href="#page-query-selector-option-strict" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-query-selector-return"/> &#60;[NoneType]|[ElementHandle]&#62;<a href="#page-query-selector-return" class="list-anchor">#</a>
 
-The method finds an element matching the specified selector within the page. If no elements match the selector, the return value resolves to `null`. To wait for an element on the page, use [page.wait_for_selector(selector, **kwargs)](./api/class-page.mdx#page-wait-for-selector).
+:::caution
+The use of [ElementHandle] is discouraged, use [Locator] objects and web-first assertions instead.
+:::
+
+The method finds an element matching the specified selector within the page. If no elements match the selector, the return value resolves to `null`. To wait for an element on the page, use [locator.wait_for(**kwargs)](./api/class-locator.mdx#locator-wait-for).
 
 Shortcut for main frame's [frame.query_selector(selector, **kwargs)](./api/class-frame.mdx#frame-query-selector).
 
 ## page.query_selector_all(selector) {#page-query-selector-all}
 - `selector`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-query-selector-all-option-selector"/> &#60;[str]&#62; A selector to query for. See [working with selectors](./selectors.mdx) for more details.<a href="#page-query-selector-all-option-selector" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-query-selector-all-return"/> &#60;[List]\[[ElementHandle]\]&#62;<a href="#page-query-selector-all-return" class="list-anchor">#</a>
+
+:::caution
+The use of [ElementHandle] is discouraged, use [Locator] objects and web-first assertions instead.
+:::
 
 The method finds all elements matching the specified selector within the page. If no elements match the selector, the return value resolves to `[]`.
 
@@ -2619,6 +2635,10 @@ Shortcut for main frame's [frame.wait_for_load_state(**kwargs)](./api/class-fram
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-selector-return"/> &#60;[NoneType]|[ElementHandle]&#62;<a href="#page-wait-for-selector-return" class="list-anchor">#</a>
 
 Returns when element specified by selector satisfies `state` option. Returns `null` if waiting for `hidden` or `detached`.
+
+:::note
+Playwright automatically waits for element to be ready before performing an action. Using [Locator] objects and web-first assertions make the code wait-for-selector-free.
+:::
 
 Wait for the `selector` to satisfy `state` option (either appear/disappear from dom, or become visible/hidden). If at the moment of calling the method `selector` already satisfies the condition, the method will return immediately. If the selector doesn't satisfy the condition for the `timeout` milliseconds, the function will throw.
 
