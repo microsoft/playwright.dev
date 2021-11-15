@@ -96,6 +96,10 @@ const { firefox } = require('playwright');  // Or 'chromium' or 'webkit'.
 
 Returns the ElementHandle pointing to the frame element.
 
+:::caution
+The use of [ElementHandle] is discouraged, use [Locator] objects and web-first assertions instead.
+:::
+
 The method finds an element matching the specified selector within the frame. See [Working with selectors](./selectors.mdx) for more details. If no elements match the selector, returns `null`.
 
 ## frame.$$(selector) {#frame-query-selector-all}
@@ -103,6 +107,10 @@ The method finds an element matching the specified selector within the frame. Se
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-query-selector-all-return"/> &#60;[Promise]<[Array]<[ElementHandle]>>&#62;<a href="#frame-query-selector-all-return" class="list-anchor">#</a>
 
 Returns the ElementHandles pointing to the frame elements.
+
+:::caution
+The use of [ElementHandle] is discouraged, use [Locator] objects instead.
+:::
 
 The method finds all elements matching the specified selector within the frame. See [Working with selectors](./selectors.mdx) for more details. If no elements match the selector, returns empty array.
 
@@ -115,6 +123,10 @@ The method finds all elements matching the specified selector within the frame. 
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-eval-on-selector-return"/> &#60;[Promise]<[Serializable]>&#62;<a href="#frame-eval-on-selector-return" class="list-anchor">#</a>
 
 Returns the return value of `pageFunction`.
+
+:::caution
+This method does not wait for the element to pass actionability checks and therefore can lead to the flaky tests. Use [locator.evaluate(pageFunction[, arg, options])](./api/class-locator.mdx#locator-evaluate), other [Locator] helper methods or web-first assertions instead.
+:::
 
 The method finds an element matching the specified selector within the frame and passes it as a first argument to `pageFunction`. See [Working with selectors](./selectors.mdx) for more details. If no elements match the selector, the method throws an error.
 
@@ -135,6 +147,10 @@ const html = await frame.$eval('.main-container', (e, suffix) => e.outerHTML + s
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-eval-on-selector-all-return"/> &#60;[Promise]<[Serializable]>&#62;<a href="#frame-eval-on-selector-all-return" class="list-anchor">#</a>
 
 Returns the return value of `pageFunction`.
+
+:::note
+In most cases, [locator.evaluateAll(pageFunction[, arg])](./api/class-locator.mdx#locator-evaluate-all), other [Locator] helper methods and web-first assertions do a better job.
+:::
 
 The method finds all elements matching the specified selector within the frame and passes an array of matched elements as a first argument to `pageFunction`. See [Working with selectors](./selectors.mdx) for more details.
 
@@ -334,7 +350,7 @@ console.log(await frame.evaluate('1 + 2')); // prints "3"
 [ElementHandle] instances can be passed as an argument to the [frame.evaluate(pageFunction[, arg])](./api/class-frame.mdx#frame-evaluate):
 
 ```js
-const bodyHandle = await frame.$('body');
+const bodyHandle = await frame.evaluate('document.body');
 const html = await frame.evaluate(([body, suffix]) => body.innerHTML + suffix, [bodyHandle, 'hello']);
 await bodyHandle.dispose();
 ```
@@ -882,6 +898,10 @@ Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/Hist
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-selector-return"/> &#60;[Promise]<[null]|[ElementHandle]>&#62;<a href="#frame-wait-for-selector-return" class="list-anchor">#</a>
 
 Returns when element specified by selector satisfies `state` option. Returns `null` if waiting for `hidden` or `detached`.
+
+:::note
+Playwright automatically waits for element to be ready before performing an action. Using [Locator] objects and web-first assertions make the code wait-for-selector-free.
+:::
 
 Wait for the `selector` to satisfy `state` option (either appear/disappear from dom, or become visible/hidden). If at the moment of calling the method `selector` already satisfies the condition, the method will return immediately. If the selector doesn't satisfy the condition for the `timeout` milliseconds, the function will throw.
 
