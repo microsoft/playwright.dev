@@ -664,7 +664,9 @@ await page.text_content("article:has(div.promo)")
 
 ## Selecting elements matching one of the conditions
 
-The `:is()` pseudo-class is an [experimental CSS pseudo-class](https://developer.mozilla.org/en-US/docs/Web/CSS/:is). It is a function that takes a selector list as its argument, and selects any element that can be selected by one of the selectors in that list. This is useful for writing large selectors in a more compact form.
+### CSS selector list
+
+Comma separated list of CSS selectors will match all elements that can be selected by one of the selectors in that list.
 
 <Tabs
   groupId="python-flavor"
@@ -678,7 +680,7 @@ The `:is()` pseudo-class is an [experimental CSS pseudo-class](https://developer
 
 ```py
 # Clicks a <button> that has either a "Log in" or "Sign in" text.
-page.click(':is(button:has-text("Log in"), button:has-text("Sign in"))')
+page.click('button:has-text("Log in"), button:has-text("Sign in")')
 ```
 
 </TabItem>
@@ -686,7 +688,39 @@ page.click(':is(button:has-text("Log in"), button:has-text("Sign in"))')
 
 ```py
 # Clicks a <button> that has either a "Log in" or "Sign in" text.
-await page.click(':is(button:has-text("Log in"), button:has-text("Sign in"))')
+await page.click('button:has-text("Log in"), button:has-text("Sign in")')
+```
+
+</TabItem>
+</Tabs>
+
+The `:is()` pseudo-class is an [experimental CSS pseudo-class](https://developer.mozilla.org/en-US/docs/Web/CSS/:is) that may be useful for specifying a list of extra conditions on an element.
+
+### XPath union
+
+Pipe operator (`|`) can be used to specify multiple selectors in XPath. It will match all elements that can be selected by one of the selectors in that list.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Waits for either confirmation dialog or load spinner.
+page.click("//span[contains(@class, 'spinner__loading')]|//div[@id='confirmation']")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Waits for either confirmation dialog or load spinner.
+await page.click("//span[contains(@class, 'spinner__loading')]|//div[@id='confirmation']")
 ```
 
 </TabItem>
