@@ -37,7 +37,7 @@ class JavaFormatter {
     if (member.kind === 'event')
       text = `${toTitleCase(member.clazz.varName)}.on${toTitleCase(member.alias)}(handler)`;
 
-    if (member.kind === 'method' ) {
+    if (member.kind === 'method') {
       args = member.argsArray;
       const signature = renderJSSignature(args);
       text = `${toTitleCase(member.clazz.varName)}.${member.alias}(${signature})`;
@@ -50,7 +50,7 @@ class JavaFormatter {
   }
 
   formatTemplate(text) {
-    return`<${text}>`;
+    return `<${text}>`;
   }
 
   formatFunction(args, ret, type) {
@@ -129,6 +129,7 @@ class JavaFormatter {
           case 'Locator.setInputFiles.files': return '`FilePayload`';
           case 'Request.headersArray': return '`HttpHeader`';
           case 'Response.headersArray': return '`HttpHeader`';
+          case 'ApiResponse.headersArray': return '`HttpHeader`';
           case 'FetchResponse.headersArray': return '`HttpHeader`';
         }
         if (!type.templates)
