@@ -32,15 +32,15 @@ class JavaFormatter {
     let text;
     let args = [];
     if (member.kind === 'property')
-      text = `${toTitleCase(member.clazz.varName)}.${member.alias}()`;
+      text = `${member.clazz.name}.${member.alias}()`;
 
     if (member.kind === 'event')
-      text = `${toTitleCase(member.clazz.varName)}.on${toTitleCase(member.alias)}(handler)`;
+      text = `${member.clazz.name}.on${toTitleCase(member.alias)}(handler)`;
 
     if (member.kind === 'method') {
       args = member.argsArray;
       const signature = renderJSSignature(args);
-      text = `${toTitleCase(member.clazz.varName)}.${member.alias}(${signature})`;
+      text = `${member.clazz.name}.${member.alias}(${signature})`;
     }
     return [{ text, args }];
   }
