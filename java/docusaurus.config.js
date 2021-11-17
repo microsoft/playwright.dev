@@ -169,7 +169,7 @@ module.exports = {
       {
         hashed: true,
         language: ["en", "zh"],
-        searchResultLimits: 10,
+        searchResultLimits: 8,
       },
     ],
   ],
