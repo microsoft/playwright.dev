@@ -1,86 +1,43 @@
 ---
-id: chrome-extensions
-title: "Chrome Extensions"
+id: class-playwrightassertions
+title: "PlaywrightAssertions"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-:::note
-Extensions only work in Chrome / Chromium in non-headless mode.
-:::
+The [PlaywrightAssertions] class provides convenience methods for creating assertions that will wait until the expected condition is met.
 
-The following is code for getting a handle to the [background page](https://developer.chrome.com/extensions/background_pages) of an extension whose source is located in `./my-extension`:
+Consider the following example:
 
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
+Playwright will be re-testing the node with the selector `.status` until fetched Node has the `"Submitted"` text. It will be re-fetching the node and checking it over and over, until the condition is met or until the timeout is reached. You can pass this timeout as an option.
 
-```py
-from playwright.sync_api import sync_playwright
+By default, the timeout for assertions is set to 5 seconds.
 
-path_to_extension = "./my-extension"
-user_data_dir = "/tmp/test-user-data-dir"
+To use Playwright assertions add the following dependency into the `pom.xml` of your Maven project:
 
-
-def run(playwright):
-    context = playwright.chromium.launch_persistent_context(
-        user_data_dir,
-        headless=False,
-        args=[
-            f"--disable-extensions-except={path_to_extension}",
-            f"--load-extension={path_to_extension}",
-        ],
-    )
-    background_page = context.background_pages[0]
-    # Test the background page as you would any other page.
-    context.close()
-
-
-with sync_playwright() as playwright:
-    run(playwright)
+```xml
+<dependency>
+  <groupId>com.microsoft.playwright</groupId>
+  <artifactId>assertions</artifactId>
+  <version>1.17.0</version>
+</dependency>
 ```
 
-</TabItem>
-<TabItem value="async">
 
-```py
-import asyncio
-from playwright.async_api import async_playwright
+- [playwright_assertions.expect(locator)](./api/class-playwrightassertions.mdx#playwright-assertions-assert-that-locator)
+- [playwright_assertions.expect(page)](./api/class-playwrightassertions.mdx#playwright-assertions-assert-that-page)
 
-path_to_extension = "./my-extension"
-user_data_dir = "/tmp/test-user-data-dir"
+## playwright_assertions.expect(locator) {#playwright-assertions-assert-that-locator}
+- `locator`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="playwright-assertions-assert-that-locator-option-locator"/> &#60;[Locator]&#62; [Locator] object to use for assertions.<a href="#playwright-assertions-assert-that-locator-option-locator" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="playwright-assertions-assert-that-locator-return"/> &#60;[LocatorAssertions]&#62;<a href="#playwright-assertions-assert-that-locator-return" class="list-anchor">#</a>
 
+Creates a [LocatorAssertions] object for the given [Locator].
 
-async def run(playwright):
-    context = await playwright.chromium.launch_persistent_context(
-        user_data_dir,
-        headless=False,
-        args=[
-            f"--disable-extensions-except={path_to_extension}",
-            f"--load-extension={path_to_extension}",
-        ],
-    )
-    background_page = context.background_pages[0]
-    # Test the background page as you would any other page.
-    await context.close()
+## playwright_assertions.expect(page) {#playwright-assertions-assert-that-page}
+- `page`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="playwright-assertions-assert-that-page-option-page"/> &#60;[Page]&#62; [Page] object to use for assertions.<a href="#playwright-assertions-assert-that-page-option-page" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="playwright-assertions-assert-that-page-return"/> &#60;[PageAssertions]&#62;<a href="#playwright-assertions-assert-that-page-return" class="list-anchor">#</a>
 
-
-async def main():
-    async with async_playwright() as playwright:
-        await run(playwright)
-
-
-asyncio.run(main())
-```
-
-</TabItem>
-</Tabs>
+Creates a [PageAssertions] object for the given [Page].
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [APIRequest]: ./api/class-apirequest.mdx "APIRequest"
