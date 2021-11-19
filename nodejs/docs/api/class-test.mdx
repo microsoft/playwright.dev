@@ -55,6 +55,7 @@ test('basic test', async ({ page }) => {
 - [test.describe.parallel.only(title, callback)](./api/class-test.mdx#test-describe-parallel-only)
 - [test.describe.serial(title, callback)](./api/class-test.mdx#test-describe-serial)
 - [test.describe.serial.only(title, callback)](./api/class-test.mdx#test-describe-serial-only)
+- [test.extend(fixtures)](./api/class-test.mdx#test-extend)
 - [test.fail([condition, description])](./api/class-test.mdx#test-fail)
 - [test.fixme([condition, description])](./api/class-test.mdx#test-fixme)
 - [test.only(title, testFunction)](./api/class-test.mdx#test-only)
@@ -516,6 +517,176 @@ test.describe.serial.only('group', () => {
 
 </TabItem>
 </Tabs>
+
+## test.extend(fixtures) {#test-extend}
+- `fixtures`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-extend-option-fixtures"/> &#60;[Object]&#62; An object containing fixtures and/or options. Learn more about [fixtures format](./test-fixtures.mdx).<a href="#test-extend-option-fixtures" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-extend-return"/> &#60;[Test]&#62;<a href="#test-extend-return" class="list-anchor">#</a>
+
+Extends the `test` object by defining fixtures and/or options that can be used in the tests.
+
+First define a fixture and/or an option.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+import { test as base } from '@playwright/test';
+import { TodoPage } from './todo-page';
+
+export type Options = { defaultItem: string };
+
+// Extend basic test by providing a "defaultItem" option and a "todoPage" fixture.
+export const test = base.extend<Options & { todoPage: TodoPage }>({
+  // Define an option and provide a default value.
+  // We can later override it in the config.
+  defaultItem: ['Do stuff', { option: true }],
+
+  // Define a fixture. Note that it can use built-in fixture "page"
+  // and a new option "defaultItem".
+  todoPage: async ({ page, defaultItem }, use) => {
+    const todoPage = new TodoPage(page);
+    await todoPage.goto();
+    await todoPage.addToDo(defaultItem);
+    await use(todoPage);
+    await todoPage.removeAll();
+  },
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// my-test.js
+const base = require('@playwright/test');
+const { TodoPage } = require('./todo-page');
+
+// Extend basic test by providing a "defaultItem" option and a "todoPage" fixture.
+exports.test = base.test.extend({
+  // Define an option and provide a default value.
+  // We can later override it in the config.
+  defaultItem: ['Do stuff', { option: true }],
+
+  // Define a fixture. Note that it can use built-in fixture "page"
+  // and a new option "defaultItem".
+  todoPage: async ({ page, defaultItem }, use) => {
+    const todoPage = new TodoPage(page);
+    await todoPage.goto();
+    await todoPage.addToDo(defaultItem);
+    await use(todoPage);
+    await todoPage.removeAll();
+  },
+});
+```
+
+</TabItem>
+</Tabs>
+
+Then use the fixture in the test.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+// example.spec.ts
+import { test } from './my-test';
+
+test('test 1', async ({ todoPage }) => {
+  await todoPage.addToDo('my todo');
+  // ...
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// example.spec.js
+const { test } = require('./my-test');
+
+test('test 1', async ({ todoPage }) => {
+  await todoPage.addToDo('my todo');
+  // ...
+});
+```
+
+</TabItem>
+</Tabs>
+
+Configure the option in config file.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+// playwright.config.ts
+import { PlaywrightTestConfig } from '@playwright/test';
+import { Options } from './my-test';
+
+const config: PlaywrightTestConfig<Options> = {
+  projects: [
+    {
+      name: 'shopping',
+      use: { defaultItem: 'Buy milk' },
+    },
+    {
+      name: 'wellbeing',
+      use: { defaultItem: 'Exercise!' },
+    },
+  ]
+};
+export default config;
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// playwright.config.js
+// @ts-check
+
+/** @type {import('@playwright/test').PlaywrightTestConfig<{ defaultItem: string }>} */
+const config = {
+  projects: [
+    {
+      name: 'shopping',
+      use: { defaultItem: 'Buy milk' },
+    },
+    {
+      name: 'wellbeing',
+      use: { defaultItem: 'Exercise!' },
+    },
+  ]
+};
+
+module.exports = config;
+```
+
+</TabItem>
+</Tabs>
+
+Learn more about [fixtures](./test-fixtures.mdx) and [parametrizing tests](./test-parameterize.mdx).
 
 ## test.fail([condition, description]) {#test-fail}
 - `condition`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-fail-option-condition"/> &#60;[void]|[boolean]|[function]\([Fixtures]\):[boolean]&#62; Optional condition - either a boolean value, or a function that takes a fixtures object and returns a boolean. Test or tests are marked as "should fail" when the condition is `true`.<a href="#test-fail-option-condition" class="list-anchor">#</a>
