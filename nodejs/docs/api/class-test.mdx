@@ -55,8 +55,12 @@ test('basic test', async ({ page }) => {
 - [test.describe.parallel.only(title, callback)](./api/class-test.mdx#test-describe-parallel-only)
 - [test.describe.serial(title, callback)](./api/class-test.mdx#test-describe-serial)
 - [test.describe.serial.only(title, callback)](./api/class-test.mdx#test-describe-serial-only)
+- [test.extend(fixtures)](./api/class-test.mdx#test-extend)
 - [test.fail([condition, description])](./api/class-test.mdx#test-fail)
-- [test.fixme([condition, description])](./api/class-test.mdx#test-fixme)
+- [test.fixme(title, testFunction)](./api/class-test.mdx#test-fixme-1)
+- [test.fixme()](./api/class-test.mdx#test-fixme-2)
+- [test.fixme(condition, description)](./api/class-test.mdx#test-fixme-3)
+- [test.fixme(callback, description)](./api/class-test.mdx#test-fixme-4)
 - [test.only(title, testFunction)](./api/class-test.mdx#test-only)
 - [test.setTimeout(timeout)](./api/class-test.mdx#test-set-timeout)
 - [test.skip(title, testFunction)](./api/class-test.mdx#test-skip-1)
@@ -115,7 +119,9 @@ test('basic test', async ({ page }) => {
 - `hookFunction`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-after-all-option-hook-function"/> &#60;[function]\([Fixtures], [TestInfo]\)&#62; Hook function that takes one or two arguments: an object with worker fixtures and optional [TestInfo].<a href="#test-after-all-option-hook-function" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-after-all-return"/> &#60;[void]&#62;<a href="#test-after-all-return" class="list-anchor">#</a>
 
-Declares an `afterAll` hook that is executed once after all tests. When called in the scope of a test file, runs after all tests in the file. When called inside a [test.describe(title, callback)](./api/class-test.mdx#test-describe) group, runs after all tests in the group.
+Declares an `afterAll` hook that is executed once per worker after all tests. When called in the scope of a test file, runs after all tests in the file. When called inside a [test.describe(title, callback)](./api/class-test.mdx#test-describe) group, runs after all tests in the group.
+
+Note that worker process is restarted on test failures, and `afterAll` hook runs again in the new worker. Learn more about [workers and failures](./test-retries.mdx).
 
 ## test.afterEach(hookFunction) {#test-after-each}
 - `hookFunction`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-after-each-option-hook-function"/> &#60;[function]\([Fixtures], [TestInfo]\)&#62; Hook function that takes one or two arguments: an object with fixtures and optional [TestInfo].<a href="#test-after-each-option-hook-function" class="list-anchor">#</a>
@@ -177,7 +183,7 @@ test('my test', async ({ page }) => {
 - `hookFunction`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-before-all-option-hook-function"/> &#60;[function]\([Fixtures], [TestInfo]\)&#62; Hook function that takes one or two arguments: an object with worker fixtures and optional [TestInfo].<a href="#test-before-all-option-hook-function" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-before-all-return"/> &#60;[void]&#62;<a href="#test-before-all-return" class="list-anchor">#</a>
 
-Declares a `beforeAll` hook that is executed once before all tests. When called in the scope of a test file, runs before all tests in the file. When called inside a [test.describe(title, callback)](./api/class-test.mdx#test-describe) group, runs before all tests in the group.
+Declares a `beforeAll` hook that is executed once per worker process before all tests. When called in the scope of a test file, runs before all tests in the file. When called inside a [test.describe(title, callback)](./api/class-test.mdx#test-describe) group, runs before all tests in the group.
 
 <Tabs
   groupId="js-flavor"
@@ -228,6 +234,8 @@ test('my test', async ({ page }) => {
 
 </TabItem>
 </Tabs>
+
+Note that worker process is restarted on test failures, and `beforeAll` hook runs again in the new worker. Learn more about [workers and failures](./test-retries.mdx).
 
 You can use [test.afterAll(hookFunction)](./api/class-test.mdx#test-after-all) to teardown any resources set up in `beforeAll`.
 
@@ -517,6 +525,176 @@ test.describe.serial.only('group', () => {
 </TabItem>
 </Tabs>
 
+## test.extend(fixtures) {#test-extend}
+- `fixtures`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-extend-option-fixtures"/> &#60;[Object]&#62; An object containing fixtures and/or options. Learn more about [fixtures format](./test-fixtures.mdx).<a href="#test-extend-option-fixtures" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-extend-return"/> &#60;[Test]&#62;<a href="#test-extend-return" class="list-anchor">#</a>
+
+Extends the `test` object by defining fixtures and/or options that can be used in the tests.
+
+First define a fixture and/or an option.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+import { test as base } from '@playwright/test';
+import { TodoPage } from './todo-page';
+
+export type Options = { defaultItem: string };
+
+// Extend basic test by providing a "defaultItem" option and a "todoPage" fixture.
+export const test = base.extend<Options & { todoPage: TodoPage }>({
+  // Define an option and provide a default value.
+  // We can later override it in the config.
+  defaultItem: ['Do stuff', { option: true }],
+
+  // Define a fixture. Note that it can use built-in fixture "page"
+  // and a new option "defaultItem".
+  todoPage: async ({ page, defaultItem }, use) => {
+    const todoPage = new TodoPage(page);
+    await todoPage.goto();
+    await todoPage.addToDo(defaultItem);
+    await use(todoPage);
+    await todoPage.removeAll();
+  },
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// my-test.js
+const base = require('@playwright/test');
+const { TodoPage } = require('./todo-page');
+
+// Extend basic test by providing a "defaultItem" option and a "todoPage" fixture.
+exports.test = base.test.extend({
+  // Define an option and provide a default value.
+  // We can later override it in the config.
+  defaultItem: ['Do stuff', { option: true }],
+
+  // Define a fixture. Note that it can use built-in fixture "page"
+  // and a new option "defaultItem".
+  todoPage: async ({ page, defaultItem }, use) => {
+    const todoPage = new TodoPage(page);
+    await todoPage.goto();
+    await todoPage.addToDo(defaultItem);
+    await use(todoPage);
+    await todoPage.removeAll();
+  },
+});
+```
+
+</TabItem>
+</Tabs>
+
+Then use the fixture in the test.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+// example.spec.ts
+import { test } from './my-test';
+
+test('test 1', async ({ todoPage }) => {
+  await todoPage.addToDo('my todo');
+  // ...
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// example.spec.js
+const { test } = require('./my-test');
+
+test('test 1', async ({ todoPage }) => {
+  await todoPage.addToDo('my todo');
+  // ...
+});
+```
+
+</TabItem>
+</Tabs>
+
+Configure the option in config file.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+// playwright.config.ts
+import { PlaywrightTestConfig } from '@playwright/test';
+import { Options } from './my-test';
+
+const config: PlaywrightTestConfig<Options> = {
+  projects: [
+    {
+      name: 'shopping',
+      use: { defaultItem: 'Buy milk' },
+    },
+    {
+      name: 'wellbeing',
+      use: { defaultItem: 'Exercise!' },
+    },
+  ]
+};
+export default config;
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// playwright.config.js
+// @ts-check
+
+/** @type {import('@playwright/test').PlaywrightTestConfig<{ defaultItem: string }>} */
+const config = {
+  projects: [
+    {
+      name: 'shopping',
+      use: { defaultItem: 'Buy milk' },
+    },
+    {
+      name: 'wellbeing',
+      use: { defaultItem: 'Exercise!' },
+    },
+  ]
+};
+
+module.exports = config;
+```
+
+</TabItem>
+</Tabs>
+
+Learn more about [fixtures](./test-fixtures.mdx) and [parametrizing tests](./test-parameterize.mdx).
+
 ## test.fail([condition, description]) {#test-fail}
 - `condition`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-fail-option-condition"/> &#60;[void]|[boolean]|[function]\([Fixtures]\):[boolean]&#62; Optional condition - either a boolean value, or a function that takes a fixtures object and returns a boolean. Test or tests are marked as "should fail" when the condition is `true`.<a href="#test-fail-option-condition" class="list-anchor">#</a>
 - `description`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-fail-option-description"/> &#60;[void]|[string]&#62; Optional description that will be reflected in a test report.<a href="#test-fail-option-description" class="list-anchor">#</a>
@@ -640,14 +818,12 @@ test('fail in WebKit 2', async ({ page }) => {
 </TabItem>
 </Tabs>
 
-## test.fixme([condition, description]) {#test-fixme}
-- `condition`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-fixme-option-condition"/> &#60;[void]|[boolean]|[function]\([Fixtures]\):[boolean]&#62; Optional condition - either a boolean value, or a function that takes a fixtures object and returns a boolean. Test or tests are marked as "fixme" when the condition is `true`.<a href="#test-fixme-option-condition" class="list-anchor">#</a>
-- `description`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-fixme-option-description"/> &#60;[void]|[string]&#62; Optional description that will be reflected in a test report.<a href="#test-fixme-option-description" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-fixme-return"/> &#60;[void]&#62;<a href="#test-fixme-return" class="list-anchor">#</a>
+## test.fixme(title, testFunction) {#test-fixme-1}
+- `title`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-fixme-1-option-title"/> &#60;[string]&#62; Test title.<a href="#test-fixme-1-option-title" class="list-anchor">#</a>
+- `testFunction`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-fixme-1-option-test-function"/> &#60;[function]\([Fixtures], [TestInfo]\)&#62; Test function that takes one or two arguments: an object with fixtures and optional [TestInfo].<a href="#test-fixme-1-option-test-function" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-fixme-1-return"/> &#60;[void]&#62;<a href="#test-fixme-1-return" class="list-anchor">#</a>
 
-Marks a test or a group of tests as "fixme". These tests will not be run, but the intention is to fix them.
-
-Unconditional fixme:
+Declares a test to be fixed, similarly to [test(title, testFunction)](./api/class-test.mdx#test-call). This test will not be run.
 
 <Tabs
   groupId="js-flavor"
@@ -662,8 +838,7 @@ Unconditional fixme:
 ```ts
 import { test, expect } from '@playwright/test';
 
-test('not yet ready', async ({ page }) => {
-  test.fixme();
+test.fixme('test to be fixed', async ({ page }) => {
   // ...
 });
 ```
@@ -674,8 +849,7 @@ test('not yet ready', async ({ page }) => {
 ```js
 const { test, expect } = require('@playwright/test');
 
-test('not yet ready', async ({ page }) => {
-  test.fixme();
+test.fixme('test to be fixed', async ({ page }) => {
   // ...
 });
 ```
@@ -683,7 +857,10 @@ test('not yet ready', async ({ page }) => {
 </TabItem>
 </Tabs>
 
-Conditional fixme a test with an optional description:
+## test.fixme() {#test-fixme-2}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-fixme-2-return"/> &#60;[void]&#62;<a href="#test-fixme-2-return" class="list-anchor">#</a>
+
+Mark a test as "fixme", with the intention to fix it. Test is immediately aborted when you call [test.fixme()](./api/class-test.mdx#test-fixme-2).
 
 <Tabs
   groupId="js-flavor"
@@ -698,8 +875,8 @@ Conditional fixme a test with an optional description:
 ```ts
 import { test, expect } from '@playwright/test';
 
-test('fixme in WebKit', async ({ page, browserName }) => {
-  test.fixme(browserName === 'webkit', 'This feature is not implemented for Mac yet');
+test('test to be fixed', async ({ page }) => {
+  test.fixme();
   // ...
 });
 ```
@@ -710,8 +887,8 @@ test('fixme in WebKit', async ({ page, browserName }) => {
 ```js
 const { test, expect } = require('@playwright/test');
 
-test('fixme in WebKit', async ({ page, browserName }) => {
-  test.fixme(browserName === 'webkit', 'This feature is not implemented for Mac yet');
+test('test to be fixed', async ({ page }) => {
+  test.fixme();
   // ...
 });
 ```
@@ -719,7 +896,97 @@ test('fixme in WebKit', async ({ page, browserName }) => {
 </TabItem>
 </Tabs>
 
-Conditional fixme for all tests in a file or [test.describe(title, callback)](./api/class-test.mdx#test-describe) group:
+Mark all tests in a file or [test.describe(title, callback)](./api/class-test.mdx#test-describe) group as "fixme".
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+import { test, expect } from '@playwright/test';
+
+test.fixme();
+
+test('test to be fixed 1', async ({ page }) => {
+  // ...
+});
+test('test to be fixed 2', async ({ page }) => {
+  // ...
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+const { test, expect } = require('@playwright/test');
+
+test.fixme();
+
+test('test to be fixed 1', async ({ page }) => {
+  // ...
+});
+test('test to be fixed 2', async ({ page }) => {
+  // ...
+});
+```
+
+</TabItem>
+</Tabs>
+
+## test.fixme(condition, description) {#test-fixme-3}
+- `condition`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-fixme-3-option-condition"/> &#60;[boolean]&#62; Test or tests are marked as "fixme" when the condition is `true`.<a href="#test-fixme-3-option-condition" class="list-anchor">#</a>
+- `description`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-fixme-3-option-description"/> &#60;[void]|[string]&#62; An optional description that will be reflected in a test report.<a href="#test-fixme-3-option-description" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-fixme-3-return"/> &#60;[void]&#62;<a href="#test-fixme-3-return" class="list-anchor">#</a>
+
+Conditionally mark a test as "fixme" with an optional description.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+import { test, expect } from '@playwright/test';
+
+test('broken in WebKit', async ({ page, browserName }) => {
+  test.fixme(browserName === 'webkit', 'This feature is not implemented on Mac yet');
+  // ...
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+const { test, expect } = require('@playwright/test');
+
+test('broken in WebKit', async ({ page, browserName }) => {
+  test.fixme(browserName === 'webkit', 'This feature is not implemented on Mac yet');
+  // ...
+});
+```
+
+</TabItem>
+</Tabs>
+
+## test.fixme(callback, description) {#test-fixme-4}
+- `callback`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-fixme-4-option-condition"/> &#60;[function]\([Fixtures]\):[boolean]&#62; A function that returns whether to mark as "fixme", based on test fixtures. Test or tests are marked as "fixme" when the return value is `true`.<a href="#test-fixme-4-option-condition" class="list-anchor">#</a>
+- `description`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-fixme-4-option-description"/> &#60;[void]|[string]&#62; An optional description that will be reflected in a test report.<a href="#test-fixme-4-option-description" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-fixme-4-return"/> &#60;[void]&#62;<a href="#test-fixme-4-return" class="list-anchor">#</a>
+
+Conditionally mark all tests in a file or [test.describe(title, callback)](./api/class-test.mdx#test-describe) group as "fixme".
 
 <Tabs
   groupId="js-flavor"
@@ -736,10 +1003,10 @@ import { test, expect } from '@playwright/test';
 
 test.fixme(({ browserName }) => browserName === 'webkit');
 
-test('fixme in WebKit 1', async ({ page }) => {
+test('broken in WebKit 1', async ({ page }) => {
   // ...
 });
-test('fixme in WebKit 2', async ({ page }) => {
+test('broken in WebKit 2', async ({ page }) => {
   // ...
 });
 ```
@@ -752,47 +1019,11 @@ const { test, expect } = require('@playwright/test');
 
 test.fixme(({ browserName }) => browserName === 'webkit');
 
-test('fixme in WebKit 1', async ({ page }) => {
+test('broken in WebKit 1', async ({ page }) => {
   // ...
 });
-test('fixme in WebKit 2', async ({ page }) => {
+test('broken in WebKit 2', async ({ page }) => {
   // ...
-});
-```
-
-</TabItem>
-</Tabs>
-
-`fixme` from a hook:
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
-```ts
-import { test, expect } from '@playwright/test';
-
-test.beforeEach(async ({ page }) => {
-  test.fixme(process.env.APP_VERSION === 'v2', 'No settings in v2 yet');
-  await page.goto('/settings');
-});
-```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-const { test, expect } = require('@playwright/test');
-
-test.beforeEach(async ({ page }) => {
-  test.fixme(process.env.APP_VERSION === 'v2', 'No settings in v2 yet');
-  await page.goto('/settings');
 });
 ```
 
@@ -838,7 +1069,7 @@ test.only('focus this test', async ({ page }) => {
 - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-set-timeout-option-timeout"/> &#60;[number]&#62; Timeout in milliseconds.<a href="#test-set-timeout-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-set-timeout-return"/> &#60;[void]&#62;<a href="#test-set-timeout-return" class="list-anchor">#</a>
 
-Changes the timeout for the test.
+Changes the timeout for the test. Learn more about [various timeouts](./test-timeouts.mdx).
 
 <Tabs
   groupId="js-flavor"
