@@ -16,6 +16,9 @@ module.exports = {
       "type": "category",
       "label": "Guides",
       "items": [
+        { "type": "doc", "id": "api/class-apirequest" },
+        { "type": "doc", "id": "api/class-apirequestcontext" },
+        { "type": "doc", "id": "api/class-apiresponse" },
         { "type": "doc", "id": "actionability" },
         { "type": "doc", "id": "assertions" },
         { "type": "doc", "id": "auth" },
