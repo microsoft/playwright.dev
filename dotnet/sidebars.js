@@ -74,7 +74,6 @@ module.exports = {
             { "type": "doc", "id": "api/class-elementhandle" },
             { "type": "doc", "id": "api/class-filechooser" },
             { "type": "doc", "id": "api/class-frame" },
-            { "type": "doc", "id": "api/class-framelocator" },
             { "type": "doc", "id": "api/class-jshandle" },
             { "type": "doc", "id": "api/class-keyboard" },
             { "type": "doc", "id": "api/class-locator" },
