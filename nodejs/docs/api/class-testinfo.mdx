@@ -366,6 +366,56 @@ Specifies a unique repeat index when running in "repeat each" mode. This mode is
 
 Specifies the retry number when the test is retried after a failure. The first test run has [testInfo.retry](./api/class-testinfo.mdx#test-info-retry) equal to zero, the first retry has it equal to one, and so on. Learn more about [retries](./test-retries.mdx#retries).
 
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+import { test, expect } from '@playwright/test';
+
+test.beforeEach(async ({}, testInfo) => {
+  // You can access testInfo.retry in any hook or fixture.
+  if (testInfo.retry > 0)
+    console.log(`Retrying!`);
+});
+
+test('my test', async ({ page }, testInfo) => {
+  // Here we clear some server-side state when retrying.
+  if (testInfo.retry)
+    await cleanSomeCachesOnTheServer();
+  // ...
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+const { test, expect } = require('@playwright/test');
+
+test.beforeEach(async ({}, testInfo) => {
+  // You can access testInfo.retry in any hook or fixture.
+  if (testInfo.retry > 0)
+    console.log(`Retrying!`);
+});
+
+test('my test', async ({ page }, testInfo) => {
+  // Here we clear some server-side state when retrying.
+  if (testInfo.retry)
+    await cleanSomeCachesOnTheServer();
+  // ...
+});
+```
+
+</TabItem>
+</Tabs>
+
 ## testInfo.snapshotDir {#test-info-snapshot-dir}
 - type: &#60;[string]&#62;
 
