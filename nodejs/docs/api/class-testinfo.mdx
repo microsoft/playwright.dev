@@ -42,6 +42,8 @@ test('basic test', async ({ page }, testInfo) => {
 </Tabs>
 
 
+- [testInfo.attach(path[, options])](./api/class-testinfo.mdx#test-info-attach-1)
+- [testInfo.attach(body, name[, options])](./api/class-testinfo.mdx#test-info-attach-2)
 - [testInfo.fail([condition, description])](./api/class-testinfo.mdx#test-info-fail)
 - [testInfo.fixme([condition, description])](./api/class-testinfo.mdx#test-info-fixme)
 - [testInfo.outputPath(pathSegments)](./api/class-testinfo.mdx#test-info-output-path)
@@ -73,6 +75,118 @@ test('basic test', async ({ page }, testInfo) => {
 - [testInfo.title](./api/class-testinfo.mdx#test-info-title)
 - [testInfo.titlePath](./api/class-testinfo.mdx#test-info-title-path)
 - [testInfo.workerIndex](./api/class-testinfo.mdx#test-info-worker-index)
+
+## testInfo.attach(path[, options]) {#test-info-attach-1}
+- `path`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-info-attach-1-option-path"/> &#60;[string]&#62;<a href="#test-info-attach-1-option-path" class="list-anchor">#</a>
+- `options` &#60;[Object]&#62;
+  - `contentType`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-info-attach-1-option-content-type"/> &#60;[void]|[string]&#62;<a href="#test-info-attach-1-option-content-type" class="list-anchor">#</a>
+  - `name`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-info-attach-1-option-name"/> &#60;[void]|[string]&#62;<a href="#test-info-attach-1-option-name" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-info-attach-1-return"/> &#60;[void]&#62;<a href="#test-info-attach-1-return" class="list-anchor">#</a>
+
+Attach a file from disk to the current test. Some reporters show test attachments. The `name` and `contentType` will be inferred by default from the `path`, but you can optionally override either of these.
+
+For example, you can attach a screenshot to the test:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+import { test, expect } from '@playwright/test';
+
+test('basic test', async ({ page }, testInfo) => {
+  await page.goto('https://playwright.dev');
+
+  // Capture a screenshot and attach it.
+  const path = testInfo.outputPath('screenshot.png');
+  await page.screenshot({ path });
+  await testInfo.attach(path);
+  // Optionally override the name.
+  await testInfo.attach(path, { name: 'example.png' });
+  // Optionally override the contentType.
+  await testInfo.attach(path, { name: 'example.custom-file', contentType: 'x-custom-content-type' });
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+const { test, expect } = require('@playwright/test');
+
+test('basic test', async ({ page }, testInfo) => {
+  await page.goto('https://playwright.dev');
+
+  // Capture a screenshot and attach it.
+  const path = testInfo.outputPath('screenshot.png');
+  await page.screenshot({ path });
+  await testInfo.attach(path);
+  // Optionally override the name.
+  await testInfo.attach(path, { name: 'example.png' });
+  // Optionally override the contentType.
+  await testInfo.attach(path, { name: 'example.custom-file', contentType: 'x-custom-content-type' });
+});
+```
+
+</TabItem>
+</Tabs>
+
+Or you can attach files returned by your APIs:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+import { test, expect } from '@playwright/test';
+
+test('basic test', async ({}, testInfo) => {
+  const { download } = require('./my-custom-helpers');
+  const tmpPath = await download('a');
+  await testInfo.attach(tmpPath, { name: 'example.json' });
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+const { test, expect } = require('@playwright/test');
+
+test('basic test', async ({}, testInfo) => {
+  const { download } = require('./my-custom-helpers');
+  const tmpPath = await download('a');
+  await testInfo.attach(tmpPath, { name: 'example.json' });
+});
+```
+
+</TabItem>
+</Tabs>
+
+:::note
+[testInfo.attach(path[, options])](./api/class-testinfo.mdx#test-info-attach-1) automatically takes care of copying attachments to a location that is accessible to reporters, even if you were to delete the attachment after awaiting the attach call.
+:::
+
+## testInfo.attach(body, name[, options]) {#test-info-attach-2}
+- `body`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-info-attach-2-option-body"/> &#60;[string]|[Buffer]&#62;<a href="#test-info-attach-2-option-body" class="list-anchor">#</a>
+- `name`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-info-attach-2-option-name"/> &#60;[string]&#62;<a href="#test-info-attach-2-option-name" class="list-anchor">#</a>
+- `options` &#60;[Object]&#62;
+  - `contentType`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-info-attach-2-option-content-type"/> &#60;[void]|[string]&#62;<a href="#test-info-attach-2-option-content-type" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-info-attach-2-return"/> &#60;[void]&#62;<a href="#test-info-attach-2-return" class="list-anchor">#</a>
+
+Attach data to the current test, either a `string` or a `Buffer`. Some reporters show test attachments.
 
 ## testInfo.fail([condition, description]) {#test-info-fail}
 - `condition`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-info-fail-option-condition"/> &#60;[void]|[boolean]&#62; Optional condition - the test is marked as "should fail" when the condition is `true`.<a href="#test-info-fail-option-condition" class="list-anchor">#</a>
@@ -214,49 +328,9 @@ Learn more about [test annotations](./test-annotations.mdx).
   - `path` &#60;[void]|[string]&#62; Optional path on the filesystem to the attached file.
   - `body` &#60;[void]|[Buffer]&#62; Optional attachment body used instead of a file.
 
-The list of files or buffers attached to the current test. Some reporters show test attachments. For example, you can attach a screenshot to the test.
+The list of files or buffers attached to the current test. Some reporters show test attachments.
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
-```ts
-import { test, expect } from '@playwright/test';
-
-test('basic test', async ({ page }, testInfo) => {
-  await page.goto('https://playwright.dev');
-
-  // Capture a screenshot and attach it.
-  const path = testInfo.outputPath('screenshot.png');
-  await page.screenshot({ path });
-  testInfo.attachments.push({ name: 'screenshot', path, contentType: 'image/png' });
-});
-```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-const { test, expect } = require('@playwright/test');
-
-test('basic test', async ({ page }, testInfo) => {
-  await page.goto('https://playwright.dev');
-
-  // Capture a screenshot and attach it.
-  const path = testInfo.outputPath('screenshot.png');
-  await page.screenshot({ path });
-  testInfo.attachments.push({ name: 'screenshot', path, contentType: 'image/png' });
-});
-```
-
-</TabItem>
-</Tabs>
+To safely add a file from disk as an attachment, please use [testInfo.attach(path[, options])](./api/class-testinfo.mdx#test-info-attach-1) instead of directly pushing onto this array. For inline attachments, use [testInfo.attach(path[, options])](./api/class-testinfo.mdx#test-info-attach-1).
 
 ## testInfo.column {#test-info-column}
 - type: &#60;[number]&#62;
