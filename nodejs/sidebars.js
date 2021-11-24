@@ -30,7 +30,6 @@ module.exports = {
         { "type": "doc", "id": "test-retries" },
         { "type": "doc", "id": "test-timeouts" },
         { "type": "doc", "id": "test-snapshots" },
-        { "type": "doc", "id": "test-timeouts" },
         { "type": "doc", "id": "test-advanced" },
         { "type": "doc", "id": "test-fixtures" },
         { "type": "doc", "id": "test-typescript" },
