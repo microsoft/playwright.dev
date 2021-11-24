@@ -1,58 +1,42 @@
 ---
-id: class-worker
-title: "Worker"
+id: class-pageassertions
+title: "PageAssertions"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-The Worker class represents a [WebWorker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API). `worker` event is emitted on the page object to signal a worker creation. `close` event is emitted on the worker object when the worker is gone.
+The [PageAssertions] class provides assertion methods that can be used to make assertions about the [Page] state in the tests. A new instance of [LocatorAssertions] is created by calling [playwrightAssertions.expect(page)](./api/class-playwrightassertions.mdx#playwright-assertions-expect-page):
+
+
+- [pageAssertions.not()](./api/class-pageassertions.mdx#page-assertions-not)
+- [pageAssertions.toHaveTitle(titleOrRegExp)](./api/class-pageassertions.mdx#page-assertions-to-have-title)
+- [pageAssertions.toHaveURL(urlOrRegExp)](./api/class-pageassertions.mdx#page-assertions-to-have-url)
+
+## pageAssertions.not() {#page-assertions-not}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-not-return"/> &#60;[PageAssertions]&#62;<a href="#page-assertions-not-return" class="list-anchor">#</a>
+
+Makes the assertion check for the opposite condition. For example, this code tests that the page URL doesn't contain `"error"`:
+
+## pageAssertions.toHaveTitle(titleOrRegExp) {#page-assertions-to-have-title}
+- `titleOrRegExp`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-title-option-title-or-reg-exp"/> &#60;[string]|[RegExp]&#62; Expected title or RegExp.<a href="#page-assertions-to-have-title-option-title-or-reg-exp" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-title-return"/> &#60;[void]&#62;<a href="#page-assertions-to-have-title-return" class="list-anchor">#</a>
+
+Ensures the page has the given title.
 
 ```js
-page.on('worker', worker => {
-  console.log('Worker created: ' + worker.url());
-  worker.on('close', worker => console.log('Worker destroyed: ' + worker.url()));
-});
-
-console.log('Current workers:');
-for (const worker of page.workers())
-  console.log('  ' + worker.url());
+await expect(page).toHaveTitle(/.*checkout/);
 ```
 
+## pageAssertions.toHaveURL(urlOrRegExp) {#page-assertions-to-have-url}
+- `urlOrRegExp`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-url-option-url-or-reg-exp"/> &#60;[string]|[RegExp]&#62; Expected substring or RegExp.<a href="#page-assertions-to-have-url-option-url-or-reg-exp" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-url-return"/> &#60;[void]&#62;<a href="#page-assertions-to-have-url-return" class="list-anchor">#</a>
 
-- [worker.on('close')](./api/class-worker.mdx#worker-event-close)
-- [worker.evaluate(pageFunction[, arg])](./api/class-worker.mdx#worker-evaluate)
-- [worker.evaluateHandle(pageFunction[, arg])](./api/class-worker.mdx#worker-evaluate-handle)
-- [worker.url()](./api/class-worker.mdx#worker-url)
+Ensures the page is navigated to the given URL.
 
-## worker.on('close') {#worker-event-close}
-- type: &#60;[Worker]&#62;
+```js
+await expect(page).toHaveURL(/.*checkout/);
+```
 
-Emitted when this dedicated [WebWorker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) is terminated.
-
-## worker.evaluate(pageFunction[, arg]) {#worker-evaluate}
-- `pageFunction`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="worker-evaluate-option-expression"/> &#60;[function]|[string]&#62; Function to be evaluated in the worker context.<a href="#worker-evaluate-option-expression" class="list-anchor">#</a>
-- `arg`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="worker-evaluate-option-arg"/> &#60;[EvaluationArgument]&#62; Optional argument to pass to `pageFunction`.<a href="#worker-evaluate-option-arg" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="worker-evaluate-return"/> &#60;[Promise]<[Serializable]>&#62;<a href="#worker-evaluate-return" class="list-anchor">#</a>
-
-Returns the return value of `pageFunction`.
-
-If the function passed to the [worker.evaluate(pageFunction[, arg])](./api/class-worker.mdx#worker-evaluate) returns a [Promise], then [worker.evaluate(pageFunction[, arg])](./api/class-worker.mdx#worker-evaluate) would wait for the promise to resolve and return its value.
-
-If the function passed to the [worker.evaluate(pageFunction[, arg])](./api/class-worker.mdx#worker-evaluate) returns a non-[Serializable] value, then [worker.evaluate(pageFunction[, arg])](./api/class-worker.mdx#worker-evaluate) returns `undefined`. Playwright also supports transferring some additional values that are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`.
-
-## worker.evaluateHandle(pageFunction[, arg]) {#worker-evaluate-handle}
-- `pageFunction`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="worker-evaluate-handle-option-expression"/> &#60;[function]|[string]&#62; Function to be evaluated in the worker context.<a href="#worker-evaluate-handle-option-expression" class="list-anchor">#</a>
-- `arg`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="worker-evaluate-handle-option-arg"/> &#60;[EvaluationArgument]&#62; Optional argument to pass to `pageFunction`.<a href="#worker-evaluate-handle-option-arg" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="worker-evaluate-handle-return"/> &#60;[Promise]<[JSHandle]>&#62;<a href="#worker-evaluate-handle-return" class="list-anchor">#</a>
-
-Returns the return value of `pageFunction` as a [JSHandle].
-
-The only difference between [worker.evaluate(pageFunction[, arg])](./api/class-worker.mdx#worker-evaluate) and [worker.evaluateHandle(pageFunction[, arg])](./api/class-worker.mdx#worker-evaluate-handle) is that [worker.evaluateHandle(pageFunction[, arg])](./api/class-worker.mdx#worker-evaluate-handle) returns [JSHandle].
-
-If the function passed to the [worker.evaluateHandle(pageFunction[, arg])](./api/class-worker.mdx#worker-evaluate-handle) returns a [Promise], then [worker.evaluateHandle(pageFunction[, arg])](./api/class-worker.mdx#worker-evaluate-handle) would wait for the promise to resolve and return its value.
-
-## worker.url() {#worker-url}
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="worker-url-return"/> &#60;[string]&#62;<a href="#worker-url-return" class="list-anchor">#</a>
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"
