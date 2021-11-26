@@ -2,6 +2,34 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.20.0](https://www.github.com/easyops-cn/docusaurus-search-local/compare/v0.19.1...v0.20.0) (2021-11-12)
+
+
+### Features
+
+* remove nodejieba from peerDependencies ([e76bb64](https://www.github.com/easyops-cn/docusaurus-search-local/commit/e76bb6490b749cab6b17607349ab04f226d8eee4))
+
+### [0.19.1](https://www.github.com/easyops-cn/docusaurus-search-local/compare/v0.19.0...v0.19.1) (2021-08-03)
+
+
+### Bug Fixes
+
+* fix docsRouteBasePath or blogRouteBasePath set to "/" ([a1b1df6](https://www.github.com/easyops-cn/docusaurus-search-local/commit/a1b1df6d59ab309ca68c18494ac72f8aa6a1b370))
+* fix search page ignore ([9841cc8](https://www.github.com/easyops-cn/docusaurus-search-local/commit/9841cc8b910d5a1b2ea9fe896ec5acdde0b2faf0))
+* refine get site config ([e215a1a](https://www.github.com/easyops-cn/docusaurus-search-local/commit/e215a1a5ceef1751233996e5a48c57fa9ca25d1e))
+
+## [0.19.0](https://www.github.com/easyops-cn/docusaurus-search-local/compare/v0.18.1...v0.19.0) (2021-08-03)
+
+
+### Features
+
+* depends on docusaurus 2.0.0-beta.4 ([69ea575](https://www.github.com/easyops-cn/docusaurus-search-local/commit/69ea5757d6b4ef6158033d1cf766abc65d5e76d4))
+
+
+### Bug Fixes
+
+* handle trailingSlash config ([16aa10f](https://www.github.com/easyops-cn/docusaurus-search-local/commit/16aa10f8117f1ceb5de4e1df3f18fe89c8b0c4ba)), closes [#100](https://www.github.com/easyops-cn/docusaurus-search-local/issues/100)
+
 ### [0.18.1](https://www.github.com/easyops-cn/docusaurus-search-local/compare/v0.18.0...v0.18.1) (2021-06-05)
 
 
