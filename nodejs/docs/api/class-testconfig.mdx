@@ -79,6 +79,7 @@ module.exports = config;
 - [testConfig.timeout](./api/class-testconfig.mdx#test-config-timeout)
 - [testConfig.updateSnapshots](./api/class-testconfig.mdx#test-config-update-snapshots)
 - [testConfig.use](./api/class-testconfig.mdx#test-config-use)
+- [testConfig.webServer](./api/class-testconfig.mdx#test-config-web-server)
 - [testConfig.workers](./api/class-testconfig.mdx#test-config-workers)
 
 ## testConfig.expect {#test-config-expect}
@@ -835,6 +836,112 @@ const config = {
 };
 
 module.exports = config;
+```
+
+</TabItem>
+</Tabs>
+
+## testConfig.webServer {#test-config-web-server}
+- type: &#60;[Object]&#62;
+  - `command` &#60;[string]&#62; Command which gets executed
+  - `port` &#60;[number]&#62; Port to wait on for the web server
+  - `timeout` &#60;[number]&#62; Maximum duration to wait on until the web server is ready
+  - `reuseExistingServer` &#60;[boolean]&#62; If true, reuse the existing server if it is already running, otherwise it will fail
+  - `cwd` &#60;[boolean]&#62; Working directory to run the command in
+  - `env` &#60;[Object]<[string], [string]>&#62; Environment variables to set for the command
+
+Launch a development web server during the tests.
+
+The server will wait for it to be available on `127.0.0.1` or `::1` before running the tests. For continuous integration, you may want to use the `reuseExistingServer: !process.env.CI` option which does not use an existing server on the CI.
+
+The port gets then passed over to Playwright as a `baseURL` when creating the context [browser.newContext([options])](./api/class-browser.mdx#browser-new-context). For example `8080` ends up in `baseURL` to be `http://localhost:8080`. If you want to use `https://` you need to manually specify the `baseURL` inside `use`.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+// playwright.config.ts
+import { PlaywrightTestConfig } from '@playwright/test';
+const config: PlaywrightTestConfig = {
+  webServer: {
+    command: 'npm run start',
+    port: 3000,
+    timeout: 120 * 1000,
+    reuseExistingServer: !process.env.CI,
+  },
+};
+export default config;
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// playwright.config.js
+// @ts-check
+/** @type {import('@playwright/test').PlaywrightTestConfig} */
+const config = {
+  webServer: {
+    command: 'npm run start',
+    port: 3000,
+    timeout: 120 * 1000,
+    reuseExistingServer: !process.env.CI,
+  },
+};
+module.exports = config;
+```
+
+</TabItem>
+</Tabs>
+
+Now you can use a relative path when navigating the page, or use `baseURL` fixture:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+// test.spec.ts
+import { test } from '@playwright/test';
+test('test', async ({ page, baseURL }) => {
+  // baseURL is taken directly from your web server,
+  // e.g. http://localhost:3000
+  await page.goto(baseURL + '/bar');
+  // Alternatively, just use relative path, because baseURL is already
+  // set for the default context and page.
+  // For example, this will result in http://localhost:3000/foo
+  await page.goto('/foo');
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// test.spec.js
+const { test } = require('@playwright/test');
+test('test', async ({ page, baseURL }) => {
+  // baseURL is taken directly from your web server,
+  // e.g. http://localhost:3000
+  await page.goto(baseURL + '/bar');
+  // Alternatively, just use relative path, because baseURL is already
+  // set for the default context and page.
+  // For example, this will result in http://localhost:3000/foo
+  await page.goto('/foo');
+});
 ```
 
 </TabItem>
