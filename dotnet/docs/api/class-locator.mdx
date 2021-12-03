@@ -45,6 +45,27 @@ await page.Locator("button").First.ClickAsync();
 await page.Locator("button").CountAsync();
 ```
 
+**Lists**
+
+You can also use locators to work with the element lists.
+
+```csharp
+// Locate elements, this locator points to a list.
+var rows = page.Locator("table tr");
+
+// Pattern 1: use locator methods to calculate text on the whole list.
+var texts = await rows.AllTextContentsAsync();
+
+// Pattern 2: do something with each element in the list:
+var count = await rows.CountAsync()
+for (let i = 0; i < count; ++i)
+  Console.WriteLine(await rows.Nth(i).TextContentAsync());
+
+// Pattern 3: resolve locator to elements on page and map them to their text content
+// Note: the code inside evaluateAll runs in page, you can call any DOM apis there
+var texts = await rows.EvaluateAllAsync("list => list.map(element => element.textContent)");
+```
+
 
 - [Locator.AllInnerTextsAsync()](./api/class-locator.mdx#locator-all-inner-texts)
 - [Locator.AllTextContentsAsync()](./api/class-locator.mdx#locator-all-text-contents)
