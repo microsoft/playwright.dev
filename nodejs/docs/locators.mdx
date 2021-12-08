@@ -1,48 +1,88 @@
 ---
-id: downloads
-title: "Downloads"
+id: locators
+title: "Locators"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-:::note
-For uploading files, see the [uploading files](./input.mdx#upload-files) section.
-:::
-
-For every attachment downloaded by the page, [page.on('download')](./api/class-page.mdx#page-event-download) event is emitted. All these attachments are going to be downloaded into a temporary folder. You can obtain the download url, file system path and payload stream using the [Download] object from the event.
-
-You can specify where to persist downloaded files using the `downloadsPath` option in [browserType.launch([options])](./api/class-browsertype.mdx#browser-type-launch).
-
-:::note
-Downloaded files are deleted when the browser context that produced them is closed.
-:::
-
-Here is the simplest way to handle the file download:
+[Locator]s are the central piece of Playwright's auto-waiting and retry-ability. In a nutshell, locators represent a way to find element(s) on the page at any moment. Locator can be created with the [page.locator(selector)](./api/class-page.mdx#page-locator) method.
 
 ```js
-const [ download ] = await Promise.all([
-  // Start waiting for the download
-  page.waitForEvent('download'),
-  // Perform the action that initiates download
-  page.click('button#delayed-download')
-]);
-// Wait for the download process to complete
-const path = await download.path();
+const locator = page.locator('text=Submit');
+await locator.click();
 ```
 
-#### Variations
-
-If you have no idea what initiates the download, you can still handle the event:
+Every time locator is used for some action, up-to-date DOM element is located in the page. So in the snippet below, underlying DOM element is going to be located twice, prior to every action. This means that if the DOM changes in between the calls due to re-render, the new element corresponding to the locator will be used.
 
 ```js
-page.on('download', download => download.path().then(console.log));
+const locator = page.locator('text=Submit');
+// ...
+await locator.hover();
+await locator.click();
 ```
 
-Note that handling the event forks the control flow and makes script harder to follow. Your scenario might end while you are downloading a file since your main control flow is not awaiting for this operation to resolve.
+## Strictness
 
-### API reference
-- [Download]
-- [page.on('download')](./api/class-page.mdx#page-event-download)
+Locators are strict. This means that all operations on locators that imply some target DOM element will throw if more than one element matches given selector.
+
+```js
+// Throws if there are several buttons in DOM:
+await page.locator('button').click();
+
+// Works because we explicitly tell locator to pick the first element:
+await page.locator('button').first().click();
+
+// Works because count knows what to do with multiple matches:
+await page.locator('button').count();
+```
+
+## Lists
+
+You can also use locators to work with the element lists.
+
+```js
+// Locate elements, this locator points to a list.
+const rows = page.locator('table tr');
+
+// Pattern 1: use locator methods to calculate text on the whole list.
+const texts = await rows.allTextContents();
+
+// Pattern 2: do something with each element in the list.
+const count = await rows.count()
+for (let i = 0; i < count; ++i)
+  console.log(await rows.nth(i).textContent());
+
+// Pattern 3: resolve locator to elements on page and map them to their text content.
+// Note: the code inside evaluateAll runs in page, you can call any DOM apis there.
+const texts = await rows.evaluateAll(list => list.map(element => element.textContent));
+```
+
+## Locator vs ElementHandle
+
+:::caution
+We only recommend using [ElementHandle] in the rare cases when you need to perform extensive DOM traversal on a static page. For all user actions and assertions use locator instead.
+:::
+
+The difference between the [Locator] and [ElementHandle] is that the latter points to a particular element, while Locator captures the logic of how to retrieve that element.
+
+In the example below, handle points to a particular DOM element on page. If that element changes text or is used by React to render an entirely different component, handle is still pointing to that very stale DOM element. This can lead to unexpected behaviors.
+
+```js
+const handle = await page.$('text=Submit');
+// ...
+await handle.hover();
+await handle.click();
+```
+
+With the locator, every time the locator is used, up-to-date DOM element is located in the page using the selector. So in the snippet below, underlying DOM element is going to be located twice.
+
+```js
+const locator = page.locator('text=Submit');
+// ...
+await locator.hover();
+await locator.click();
+```
+
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"
