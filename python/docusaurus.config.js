@@ -182,4 +182,5 @@ module.exports = {
     repositoryName: "playwright-python",
     languageName: 'Python',
   },
+  trailingSlash: false,
 };

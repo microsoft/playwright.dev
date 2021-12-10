@@ -182,4 +182,5 @@ module.exports = {
     repositoryName: "playwright",
     languageName: 'Node.js',
   },
+  trailingSlash: false,
 };
