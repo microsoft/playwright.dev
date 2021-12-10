@@ -182,4 +182,5 @@ module.exports = {
     repositoryName: "playwright-java",
     languageName: 'Java',
   },
+  trailingSlash: false,
 };

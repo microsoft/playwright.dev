@@ -182,4 +182,5 @@ module.exports = {
     repositoryName: "playwright-dotnet",
     languageName: '.NET',
   },
+  trailingSlash: false,
 };
