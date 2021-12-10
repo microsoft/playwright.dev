@@ -5,10 +5,12 @@ module.exports = {
       "label": "Introduction",
       "items": [
         { "type": "doc", "id": "intro" },
+        { "type": "doc", "id": "inspector" },
         { "type": "doc", "id": "trace-viewer" },
         { "type": "doc", "id": "codegen" },
         { "type": "doc", "id": "debug" },
-        { "type": "doc", "id": "release-notes" }
+        { "type": "doc", "id": "release-notes" },
+        { "type": "doc", "id": "test-runners" }
       ],
       "collapsed": false
     },
@@ -42,7 +44,7 @@ module.exports = {
         { "type": "doc", "id": "verification" },
         { "type": "doc", "id": "videos" },
       ],
-      "collapsed": true
+      "collapsed": false
     },
     {
       "type": "category",
@@ -51,7 +53,6 @@ module.exports = {
         { "type": "doc", "id": "docker" },
         { "type": "doc", "id": "ci" },
         { "type": "doc", "id": "selenium-grid" },
-        { "type": "doc", "id": "test-runners" },
       ],
       "collapsed": true
     },

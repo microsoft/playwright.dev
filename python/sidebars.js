@@ -5,8 +5,10 @@ module.exports = {
       "label": "Introduction",
       "items": [
         { "type": "doc", "id": "intro" },
+        { "type": "doc", "id": "inspector" },
+        { "type": "doc", "id": "trace-viewer" },
+        { "type": "doc", "id": "codegen" },
         { "type": "doc", "id": "debug" },
-        { "type": "doc", "id": "cli" },
         { "type": "doc", "id": "release-notes" },
         { "type": "doc", "id": "test-runners" }
       ],
@@ -22,6 +24,7 @@ module.exports = {
         { "type": "doc", "id": "browsers" },
         { "type": "doc", "id": "browser-contexts" },
         { "type": "doc", "id": "chrome-extensions" },
+        { "type": "doc", "id": "cli" },
         { "type": "doc", "id": "dialogs" },
         { "type": "doc", "id": "downloads" },
         { "type": "doc", "id": "emulation" },
@@ -41,7 +44,7 @@ module.exports = {
         { "type": "doc", "id": "verification" },
         { "type": "doc", "id": "videos" },
       ],
-      "collapsed": true
+      "collapsed": false
     },
     {
       "type": "category",
