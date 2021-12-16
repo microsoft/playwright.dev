@@ -1,38 +1,42 @@
 ---
-id: frames
-title: "Frames"
+id: class-apiresponseassertions
+title: "APIResponseAssertions"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-- [Frames](#frames)
-- [Frame objects](#frame-objects)
-
-## Frames
-
-A [Page] can have one or more [Frame] objects attached to it. Each page has a main frame and page-level interactions (like `click`) are assumed to operate in the main frame.
-
-A page can have additional frames attached with the `iframe` HTML tag. These frames can be accessed for interactions inside the frame.
+The [APIResponseAssertions] class provides assertion methods that can be used to make assertions about the [APIResponse] in the tests. A new instance of [APIResponseAssertions] is created by calling [playwrightAssertions.expect(response)](./api/class-playwrightassertions.mdx#playwright-assertions-expect-api-response):
 
 ```js
-// Locate element inside frame
-const username = await page.frameLocator('.frame-class').locator('#username-input');
-await username.fill('John');
+import { test, expect } from '@playwright/test';
+
+test('navigates to login', async ({ page }) => {
+  // ...
+  const response = await page.request.get('https://playwright.dev');
+  expect(response).toBeOK();
+});
 ```
 
-## Frame objects
 
-One can access frame objects using the [page.frame(frameSelector)](./api/class-page.mdx#page-frame) API:
+- [apiResponseAssertions.not()](./api/class-apiresponseassertions.mdx#api-response-assertions-not)
+- [apiResponseAssertions.toBeOK()](./api/class-apiresponseassertions.mdx#api-response-assertions-to-be-ok)
+
+## apiResponseAssertions.not() {#api-response-assertions-not}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-response-assertions-not-return"/> &#60;[APIResponseAssertions]&#62;<a href="#api-response-assertions-not-return" class="list-anchor">#</a>
+
+Makes the assertion check for the opposite condition. For example, this code tests that the response status is not successfull:
 
 ```js
-// Get frame using the frame's name attribute
-const frame = page.frame('frame-login');
+expect(response).not.toBeOK();
+```
 
-// Get frame using frame's URL
-const frame = page.frame({ url: /.*domain.*/ });
+## apiResponseAssertions.toBeOK() {#api-response-assertions-to-be-ok}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-response-assertions-to-be-ok-return"/> &#60;[void]&#62;<a href="#api-response-assertions-to-be-ok-return" class="list-anchor">#</a>
 
-// Interact with the frame
-await frame.fill('#username-input', 'John');
+Ensures the response status code is within [200..299) range.
+
+```js
+expect(response).toBeOK();
 ```
 
 
