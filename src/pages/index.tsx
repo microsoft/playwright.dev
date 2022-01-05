@@ -217,6 +217,7 @@ const logos = [
     imageUrl: "img/logos/accessibilityinsights.png",
     href: "https://accessibilityinsights.io/",
   },
+  { imageUrl: "img/logos/RancherDesktop.png", href: "https://rancherdesktop.io/" },
 ];
 
 const Home: React.FC = () => {
