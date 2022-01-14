@@ -1,0 +1,572 @@
+---
+id: test-auth
+title: "Authentication"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Tests written with Playwright execute in isolated clean-slate environments called [browser contexts](./browser-contexts.mdx). Each test gets a brand new page created in a brand new context. This isolation model improves reproducibility and prevents cascading test failures.
+
+Below are the typical strategies for implementing the signed-in scenarios.
+
+- [Sign in with beforeEach](#sign-in-with-beforeeach)
+- [Reuse signed in state](#reuse-signed-in-state)
+- [Multiple signed in roles](#multiple-signed-in-roles)
+- [Reuse the signed in page in multiple tests](#reuse-the-signed-in-page-in-multiple-tests)
+
+## Sign in with beforeEach
+
+This is the simplest way where each test signs in inside the `beforeEach` hook. It also is the least efficient one in case the log in process has high latencies.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+import { test } from '@playwright/test';
+
+test.beforeEach(async ({ page }) => {
+  // Runs before each test and signs in each page.
+  await page.goto('https://github.com/login');
+  await page.click('text=Login');
+  await page.fill('input[name="login"]', 'username');
+  await page.fill('input[name="password"]', 'password');
+  await page.click('text=Submit');
+});
+
+test('first', async ({ page }) => {
+  // page is signed in.
+});
+
+test('second', async ({ page }) => {
+  // page is signed in.
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+const { test } = require('@playwright/test');
+
+test.beforeEach(async ({ page }) => {
+  // Runs before each test and signs in each page.
+  await page.goto('https://github.com/login');
+  await page.click('text=Login');
+  await page.fill('input[name="login"]', 'username');
+  await page.fill('input[name="password"]', 'password');
+  await page.click('text=Submit');
+});
+
+test('first', async ({ page }) => {
+  // page is signed in.
+});
+
+test('second', async ({ page }) => {
+  // page is signed in.
+});
+```
+
+</TabItem>
+</Tabs>
+
+Redoing login for every test can slow down test execution. To mitigate that, reuse existing authentication state instead.
+
+## Reuse signed in state
+
+Playwright provides a way to reuse the signed-in state in the tests. That way you can log in only once and then skip the log in step for all of the tests.
+
+Create a new global setup script:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+// global-setup.ts
+import { chromium, FullConfig } from '@playwright/test';
+
+async function globalSetup(config: FullConfig) {
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+  await page.goto('https://github.com/login');
+  await page.fill('input[name="user"]', 'user');
+  await page.fill('input[name="password"]', 'password');
+  await page.click('text=Sign in');
+  // Save signed-in state to 'storageState.json'.
+  await page.context().storageState({ path: 'storageState.json' });
+  await browser.close();
+}
+
+export default globalSetup;
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// global-setup.js
+const { chromium } = require('@playwright/test');
+
+module.exports = async config => {
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+  await page.goto('https://github.com/login');
+  await page.fill('input[name="user"]', 'user');
+  await page.fill('input[name="password"]', 'password');
+  await page.click('text=Sign in');
+  // Save signed-in state to 'storageState.json'.
+  await page.context().storageState({ path: 'storageState.json' });
+  await browser.close();
+};
+```
+
+</TabItem>
+</Tabs>
+
+Register global setup script in the Playwright configuration file:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+// playwright.config.ts
+import { PlaywrightTestConfig } from '@playwright/test';
+
+const config: PlaywrightTestConfig = {
+  globalSetup: require.resolve('./global-setup'),
+  use: {
+    // Tell all tests to load signed-in state from 'storageState.json'.
+    storageState: 'storageState.json'
+  }
+};
+export default config;
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// playwright.config.js
+// @ts-check
+/** @type {import('@playwright/test').PlaywrightTestConfig} */
+const config = {
+  globalSetup: require.resolve('./global-setup'),
+  use: {
+    // Tell all tests to load signed-in state from 'storageState.json'.
+    storageState: 'storageState.json'
+  }
+};
+module.exports = config;
+```
+
+</TabItem>
+</Tabs>
+
+Tests start already authenticated because we specify `storageState` that was populated by global setup.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+import { test } from '@playwright/test';
+
+test('test', async ({ page }) => {
+  // page is signed in.
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+const { test } = require('@playwright/test');
+
+test('test', async ({ page }) => {
+  // page is signed in.
+});
+```
+
+</TabItem>
+</Tabs>
+
+:::note
+If you can log in once and commit the `storageState.json` into the repository, you won't need the global setup at all, just specify the `storageState.json` in Playwright Config as above and it'll be picked up.
+:::
+
+### Sign in via API request
+
+If your web application supports signing in via API, you can use [APIRequestContext] to simplify sign in flow. Global setup script from the example above would change like this:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+// global-setup.ts
+import { request } from '@playwright/test';
+
+async function globalSetup() {
+  const requestContext = await request.newContext();
+  await requestContext.post('https://github.com/login', {
+    form: {
+      'user': 'user',
+      'password': 'password'
+    }
+  });
+  // Save signed-in state to 'storageState.json'.
+  await requestContext.storageState({ path: 'storageState.json' });
+  await requestContext.dispose();
+}
+
+export default globalSetup;
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// global-setup.js
+const { request } = require('@playwright/test');
+
+module.exports = async () => {
+  const requestContext = await request.newContext();
+  await requestContext.post('https://github.com/login', {
+    form: {
+      'user': 'user',
+      'password': 'password'
+    }
+  });
+  // Save signed-in state to 'storageState.json'.
+  await requestContext.storageState({ path: 'storageState.json' });
+  await requestContext.dispose();
+}
+
+export default globalSetup;
+```
+
+</TabItem>
+</Tabs>
+
+## Multiple signed in roles
+
+Sometimes you have more than one signed-in user in your end to end tests. You can achieve that via logging in for these users multiple times in globalSetup and saving that state into different files.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+// global-setup.ts
+import { chromium, FullConfig } from '@playwright/test';
+
+async function globalSetup(config: FullConfig) {
+  const browser = await chromium.launch();
+  const adminPage = await browser.newPage();
+  // ... log in
+  await adminPage.context().storageState({ path: 'adminStorageState.json' });
+
+  const userPage = await browser.newPage();
+  // ... log in
+  await userPage.context().storageState({ path: 'userStorageState.json' });
+  await browser.close();
+}
+
+export default globalSetup;
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// global-setup.js
+const { chromium } = require('@playwright/test');
+
+module.exports = async config => {
+  const browser = await chromium.launch();
+  const adminPage = await browser.newPage();
+  // ... log in
+  await adminPage.context().storageState({ path: 'adminStorageState.json' });
+
+  const userPage = await browser.newPage();
+  // ... log in
+  await userPage.context().storageState({ path: 'userStorageState.json' });
+  await browser.close();
+};
+```
+
+</TabItem>
+</Tabs>
+
+After that you can specify the user to use for each test file or each test group:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+import { test } from '@playwright/test';
+
+test.use({ storageState: 'adminStorageState.json' });
+
+test('admin test', async ({ page }) => {
+  // page is signed in as admin.
+});
+
+test.describe(() => {
+  test.use({ storageState: 'userStorageState.json' });
+
+  test('user test', async ({ page }) => {
+    // page is signed in as a user.
+  });
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+const { test } = require('@playwright/test');
+
+test.use({ storageState: 'adminStorageState.json' });
+
+test('admin test', async ({ page }) => {
+  // page is signed in as amin.
+});
+
+test.describe(() => {
+  test.use({ storageState: 'userStorageState.json' });
+
+  test('user test', async ({ page }) => {
+    // page is signed in as a user.
+  });
+});
+```
+
+</TabItem>
+</Tabs>
+
+## Reuse the signed in page in multiple tests
+
+Although discouraged, sometimes it is necessary to sacrifice the isolation and run a number of tests in the same page. In that case, you can log into that page once in `beforeAll` and then use that same page in all the tests. Note that you need to run these tests serially using `test.describe.serial` in order to achieve that:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+// example.spec.ts
+
+import { test, Page } from '@playwright/test';
+
+test.describe.serial('use the same page', () => {
+  let page: Page;
+
+  test.beforeAll(async ({ browser }) => {
+    // Create page once and sign in.
+    page = await browser.newPage();
+    await page.goto('https://github.com/login');
+    await page.fill('input[name="user"]', 'user');
+    await page.fill('input[name="password"]', 'password');
+    await page.click('text=Sign in');
+  });
+
+  test.afterAll(async () => {
+    await page.close();
+  });
+
+  test('first test', async () => {
+    // page is signed in.
+  });
+
+  test('second test', async () => {
+    // page is signed in.
+  });
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// example.spec.js
+// @ts-check
+
+const { test } = require('@playwright/test');
+
+test.describe.serial('use the same page', () => {
+  /** @type {import('@playwright/test').Page} */
+  let page;
+
+  test.beforeAll(async ({ browser }) => {
+    // Create page yourself and sign in.
+    page = await browser.newPage();
+    await page.goto('https://github.com/login');
+    await page.fill('input[name="user"]', 'user');
+    await page.fill('input[name="password"]', 'password');
+    await page.click('text=Sign in');
+  });
+
+  test.afterAll(async () => {
+    await page.close();
+  });
+
+  test('first test', async () => {
+    // page is signed in.
+  });
+
+  test('second test', async () => {
+    // page is signed in.
+  });
+});
+```
+
+</TabItem>
+</Tabs>
+
+:::note
+You can also use `storageState` property when you are creating the [browser.newPage([options])](./api/class-browser.mdx#browser-new-page) in order to pass it an existing logged in state.
+:::
+
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Android]: ./api/class-android.mdx "Android"
+[AndroidDevice]: ./api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: ./api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: ./api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: ./api/class-androidwebview.mdx "AndroidWebView"
+[APIRequest]: ./api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: ./api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: ./api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: ./api/class-apiresponseassertions.mdx "APIResponseAssertions"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: ./api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: ./api/class-coverage.mdx "Coverage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[Electron]: ./api/class-electron.mdx "Electron"
+[ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Locator]: ./api/class-locator.mdx "Locator"
+[LocatorAssertions]: ./api/class-locatorassertions.mdx "LocatorAssertions"
+[Logger]: ./api/class-logger.mdx "Logger"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[PageAssertions]: ./api/class-pageassertions.mdx "PageAssertions"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: ./api/class-playwrightassertions.mdx "PlaywrightAssertions"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Fixtures]: ./api/class-fixtures.mdx "Fixtures"
+[Test]: ./api/class-test.mdx "Test"
+[TestConfig]: ./api/class-testconfig.mdx "TestConfig"
+[TestError]: ./api/class-testerror.mdx "TestError"
+[TestInfo]: ./api/class-testinfo.mdx "TestInfo"
+[TestOptions]: ./api/class-testoptions.mdx "TestOptions"
+[TestProject]: ./api/class-testproject.mdx "TestProject"
+[WorkerInfo]: ./api/class-workerinfo.mdx "WorkerInfo"
+[Location]: ./api/class-location.mdx "Location"
+[Reporter]: ./api/class-reporter.mdx "Reporter"
+[Suite]: ./api/class-suite.mdx "Suite"
+[TestCase]: ./api/class-testcase.mdx "TestCase"
+[TestResult]: ./api/class-testresult.mdx "TestResult"
+[TestStep]: ./api/class-teststep.mdx "TestStep"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
