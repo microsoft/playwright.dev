@@ -5,6 +5,7 @@ title: "Release notes"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
+- [Version 1.18](#version-118)
 - [Version 1.17](#version-117)
 - [Version 1.16](#version-116)
 - [Version 1.15](#version-115)
@@ -16,6 +17,132 @@ import TabItem from '@theme/TabItem';
 - [Version 1.9](#version-19)
 - [Version 1.8](#version-18)
 - [Version 1.7](#version-17)
+
+## Version 1.18
+
+### API Testing
+
+Playwright for Python 1.18 introduces new [API Testing](./api/class-apirequestcontext) that lets you send requests to the server directly from Python! Now you can:
+- test your server API
+- prepare server side state before visiting the web application in a test
+- validate server side post-conditions after running some actions in the browser
+
+To do a request on behalf of Playwright's Page, use **new [page.request](./api/class-page.mdx#page-request) API**:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Do a GET request on behalf of page
+res = page.request.get("http://example.com/foo.json")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Do a GET request on behalf of page
+res = await page.request.get("http://example.com/foo.json")
+```
+
+</TabItem>
+</Tabs>
+
+Read more in [our documentation](./api/class-apirequestcontext).
+
+### Web-First Assertions
+
+Playwright for Python 1.18 introduces [Web-First Assertions](./api/class-playwrightassertions).
+
+Consider the following example:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+from playwright.sync_api import Page, expect
+
+def test_status_becomes_submitted(page: Page) -> None:
+    # ..
+    page.click("#submit-button")
+    expect(page.locator(".status")).to_have_text("Submitted")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+from playwright.async_api import Page, expect
+
+async def test_status_becomes_submitted(page: Page) -> None:
+    # ..
+    await page.click("#submit-button")
+    await expect(page.locator(".status")).to_have_text("Submitted")
+```
+
+</TabItem>
+</Tabs>
+
+Playwright will be re-testing the node with the selector `.status` until fetched Node has the `"Submitted"` text. It will be re-fetching the node and checking it over and over, until the condition is met or until the timeout is reached. You can pass this timeout as an option.
+
+Read more in [our documentation](./api/class-playwrightassertions).
+
+### Locator Improvements
+- [locator.drag_to(target, **kwargs)](./api/class-locator.mdx#locator-drag-to)
+- Each locator can now be optionally filtered by the text it contains:
+
+  <Tabs
+    groupId="python-flavor"
+    defaultValue="sync"
+    values={[
+      {label: 'Sync', value: 'sync'},
+      {label: 'Async', value: 'async'}
+    ]
+  }>
+  <TabItem value="sync">
+  
+  ```py
+  page.locator("li", has_text="my item")).locator("button").click()
+  ```
+  
+  </TabItem>
+  <TabItem value="async">
+  
+  ```py
+  await page.locator("li", has_text="my item")).locator("button").click()
+  ```
+  
+  </TabItem>
+  </Tabs>
+
+  Read more in [locator documentation](./api/class-locator#locator-locator-option-has-text)
+
+### New APIs & changes
+- [`accept_downloads`](./api/class-browser#browser-new-context-option-accept-downloads) option now defaults to `True`.
+- [`sources`](./api/class-tracing#tracing-start-option-sources) option to embed sources into traces.
+
+### Browser Versions
+- Chromium 99.0.4812.0
+- Mozilla Firefox 95.0
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+- Google Chrome 97
+- Microsoft Edge 97
 
 ## Version 1.17
 
