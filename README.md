@@ -18,6 +18,14 @@ The project uses a fork of the [docusaurus-search-local](https://github.com/easy
 SRC_DIR=~/code/playwright npm run roll
 ```
 
+### Remove old release
+
+```sh
+rm -rf */versioned_docs/version-1.14
+# Remove the version from the following JSON files:
+ls */versions.json
+```
+
 ### Run dev server
 
 ```sh
