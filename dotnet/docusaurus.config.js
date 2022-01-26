@@ -17,7 +17,7 @@ let plugins = [
     },
   ],
   require.resolve("@docusaurus/plugin-content-pages"),
-  require.resolve("./plugins/docusaurus-pixel-integration/lib/index.js"),
+  require.resolve("./plugins/playwright-analytics-integration/lib/index.js"),
 ];
 
 if (isProd) {
