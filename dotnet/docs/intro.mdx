@@ -8,6 +8,8 @@ import TabItem from '@theme/TabItem';
 - [First project](#first-project)
 - [First test](#first-test)
 - [Record scripts](#record-scripts)
+- [Install browsers via API](#install-browsers-via-api)
+- [Bundle drivers for different platforms](#bundle-drivers-for-different-platforms)
 - [System requirements](#system-requirements)
 - [Release notes](./release-notes.mdx)
 
@@ -59,10 +61,10 @@ dotnet run
 By default, Playwright runs the browsers in headless mode. To see the browser UI, pass the `Headless = false` flag while launching the browser. You can also use `slowMo` to slow down execution. Learn more in the debugging tools [section](./debug.mdx).
 
 ```csharp
-await playwright.Firefox.LaunchAsync(new BrowserTypeLaunchOptions 
-{ 
-    Headless = false, 
-    SlowMo = 50, 
+await playwright.Firefox.LaunchAsync(new BrowserTypeLaunchOptions
+{
+    Headless = false,
+    SlowMo = 50,
 });
 ```
 
@@ -126,6 +128,36 @@ dotnet test -- NUnit.NumberOfTestWorkers=5
 
 ```bash
 pwsh bin\Debug\netX\playwright.ps1 codegen
+```
+
+## Install browsers via API
+
+It's possible to run [Command line tools](./cli.mdx) commands via the .NET API:
+
+```csharp
+var exitCode = Microsoft.Playwright.Program.Main(new[] {"install"});
+if (exitCode != 0)
+{
+    throw new Exception($"Playwright exited with code {exitCode}");
+}
+```
+
+## Bundle drivers for different platforms
+
+Playwright by default does bundle only the driver for the .NET publish target runtime. If you want to bundle for additional platforms, you can override this behavior by using either `all`, `none` or `linux`, `win`, `osx` in your project file.
+
+```xml
+<PropertyGroup>
+  <PlaywrightPlatform>all</PlaywrightPlatform>
+</PropertyGroup>
+```
+
+or:
+
+```xml
+<PropertyGroup>
+  <PlaywrightPlatform>osx;linux</PlaywrightPlatform>
+</PropertyGroup>
 ```
 
 ## System requirements
