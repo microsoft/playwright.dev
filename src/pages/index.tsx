@@ -11,10 +11,10 @@ const features = [
     title: "Any browser \u2022 Any platform \u2022 One API",
     description: <>
       <p>
-        <b>Cross-browser.</b> Playwright supports all modern rendering engines, including Chromium, WebKit and Firefox.
+        <b>Cross-browser.</b> Playwright supports all modern rendering engines including Chromium, WebKit, and Firefox.
       </p>
       <p>
-        <b>Cross-platform.</b> Test on Windows, Linux and macOS, locally or on CI, headless or headed.
+        <b>Cross-platform.</b> Test on Windows, Linux, and macOS, locally or on CI, headless or headed.
       </p>
       <p>
         <b>Cross-language.</b> Use the Playwright API in <a
@@ -25,7 +25,7 @@ const features = [
         href="https://playwright.dev/java/docs/intro">Java</a>.
       </p>
       <p>
-        <b>Test Mobile Web.</b> Native mobile emulation of Google Chrome for Android and Mobile Safari. Same rendering engine works on your Desktop and in the Cloud.
+        <b>Test Mobile Web.</b> Native mobile emulation of Google Chrome for Android and Mobile Safari. The same rendering engine works on your Desktop and in the Cloud.
       </p>
     </>,
   },
@@ -39,8 +39,8 @@ const features = [
       <>
         <p>
           <b>Auto-wait.</b> Playwright waits for elements to be actionable prior to performing
-          actions. It also has rich set of introspection events. The combination of the two
-          eliminate the need for artificial timeouts - primary cause of flaky tests.
+          actions. It also has a rich set of introspection events. The combination of the two
+          eliminates the need for artificial timeouts - the primary cause of flaky tests.
         </p>
         <p>
           <b>Web-first assertions.</b> Playwright assertions are created specifically for the
@@ -109,7 +109,7 @@ const features = [
         </p>
         <p>
           <b>Trace Viewer.</b> Capture all the information to investigate the test failure. Playwright trace
-          contains test execution screencast, live DOM snapshots, action explorer, test source and many more.
+          contains test execution screencast, live DOM snapshots, action explorer, test source, and many more.
         </p>
       </>
     ),
