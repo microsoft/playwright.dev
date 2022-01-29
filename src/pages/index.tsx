@@ -18,8 +18,8 @@ const features = [
       </p>
       <p>
         <b>Cross-language.</b> Use the Playwright API in <a
-        href="https://playwright.dev">TypeScript</a>, <a
-        href="https://playwright.dev">JavaScript</a>, <a
+        href="https://playwright.dev/docs/intro">TypeScript</a>, <a
+        href="https://playwright.dev/docs/intro">JavaScript</a>, <a
         href="https://playwright.dev/python/docs/intro">Python</a>, <a
         href="https://playwright.dev/dotnet/docs/intro">.NET</a>, <a
         href="https://playwright.dev/java/docs/intro">Java</a>.
