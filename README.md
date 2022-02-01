@@ -21,9 +21,7 @@ SRC_DIR=~/code/playwright npm run roll
 ### Remove old release
 
 ```sh
-rm -rf */versioned_docs/version-1.14
-# Remove the version from the following JSON files:
-ls */versions.json
+node src/remove_version.js 1.16
 ```
 
 ### Run dev server

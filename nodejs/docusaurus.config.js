@@ -17,6 +17,7 @@ let plugins = [
     },
   ],
   require.resolve("@docusaurus/plugin-content-pages"),
+  require.resolve("./plugins/playwright-analytics-integration/lib/index.js"),
 ];
 
 if (isProd) {
