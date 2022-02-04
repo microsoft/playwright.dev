@@ -206,12 +206,12 @@ Consider the following snippet that uses `test.describe.serial`:
 ```ts
 import { test } from '@playwright/test';
 
-test.describe.serial('suite', () => {
-  test.beforeAll(async () => { /* ... */ });
-  test('first good', async ({ page }) => { /* ... */ });
-  test('second flaky', async ({ page }) => { /* ... */ });
-  test('third good', async ({ page }) => { /* ... */ });
-});
+test.describe.configure({ mode: 'serial' });
+
+test.beforeAll(async () => { /* ... */ });
+test('first good', async ({ page }) => { /* ... */ });
+test('second flaky', async ({ page }) => { /* ... */ });
+test('third good', async ({ page }) => { /* ... */ });
 ```
 
 </TabItem>
@@ -220,12 +220,12 @@ test.describe.serial('suite', () => {
 ```js
 const { test } = require('@playwright/test');
 
-test.describe.serial('suite', () => {
-  test.beforeAll(async () => { /* ... */ });
-  test('first good', async ({ page }) => { /* ... */ });
-  test('second flaky', async ({ page }) => { /* ... */ });
-  test('third good', async ({ page }) => { /* ... */ });
-});
+test.describe.configure({ mode: 'serial' });
+
+test.beforeAll(async () => { /* ... */ });
+test('first good', async ({ page }) => { /* ... */ });
+test('second flaky', async ({ page }) => { /* ... */ });
+test('third good', async ({ page }) => { /* ... */ });
 ```
 
 </TabItem>
@@ -273,24 +273,24 @@ Playwright Test creates an isolated [Page] object for each test. However, if you
 
 import { test, Page } from '@playwright/test';
 
-test.describe.serial('use the same page', () => {
-  let page: Page;
+test.describe.configure({ mode: 'serial' });
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage();
-  });
+let page: Page;
 
-  test.afterAll(async () => {
-    await page.close();
-  });
+test.beforeAll(async ({ browser }) => {
+  page = await browser.newPage();
+});
 
-  test('runs first', async () => {
-    await page.goto('https://playwright.dev/');
-  });
+test.afterAll(async () => {
+  await page.close();
+});
 
-  test('runs second', async () => {
-    await page.click('text=Get Started');
-  });
+test('runs first', async () => {
+  await page.goto('https://playwright.dev/');
+});
+
+test('runs second', async () => {
+  await page.click('text=Get Started');
 });
 ```
 
@@ -303,25 +303,25 @@ test.describe.serial('use the same page', () => {
 
 const { test } = require('@playwright/test');
 
-test.describe.serial('use the same page', () => {
-  /** @type {import('@playwright/test').Page} */
-  let page;
+test.describe.configure({ mode: 'serial' });
 
-  test.beforeAll(async ({ browser }) => {
-    page = await browser.newPage();
-  });
+/** @type {import('@playwright/test').Page} */
+let page;
 
-  test.afterAll(async () => {
-    await page.close();
-  });
+test.beforeAll(async ({ browser }) => {
+  page = await browser.newPage();
+});
 
-  test('runs first', async () => {
-    await page.goto('https://playwright.dev/');
-  });
+test.afterAll(async () => {
+  await page.close();
+});
 
-  test('runs second', async () => {
-    await page.click('text=Get Started');
-  });
+test('runs first', async () => {
+  await page.goto('https://playwright.dev/');
+});
+
+test('runs second', async () => {
+  await page.click('text=Get Started');
 });
 ```
 
