@@ -50,6 +50,7 @@ test('basic test', async ({ page }) => {
 - [test.beforeAll(hookFunction)](./api/class-test.mdx#test-before-all)
 - [test.beforeEach(hookFunction)](./api/class-test.mdx#test-before-each)
 - [test.describe(title, callback)](./api/class-test.mdx#test-describe)
+- [test.describe.configure([options])](./api/class-test.mdx#test-describe-configure)
 - [test.describe.only(title, callback)](./api/class-test.mdx#test-describe-only)
 - [test.describe.parallel(title, callback)](./api/class-test.mdx#test-describe-parallel)
 - [test.describe.parallel.only(title, callback)](./api/class-test.mdx#test-describe-parallel-only)
@@ -341,6 +342,79 @@ test.describe('two tests', () => {
 </TabItem>
 </Tabs>
 
+## test.describe.configure([options]) {#test-describe-configure}
+- `options` &#60;[Object]&#62;
+  - `mode`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-configure-option-mode"/> &#60;"parallel"|"serial"&#62;<a href="#test-describe-configure-option-mode" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-configure-return"/> &#60;[void]&#62;<a href="#test-describe-configure-return" class="list-anchor">#</a>
+
+Set execution mode of execution for the enclosing scope. Can be executed either on the top level or inside a describe. Configuration applies to the entire scope, regardless of whether it run before or after the test declaration.
+
+Learn more about the execution modes [here](./test-parallel.mdx).
+
+Running tests in parallel:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+// Run all the tests in the file concurrently using parallel workers.
+test.describe.configure({ mode: 'parallel' });
+test('runs in parallel 1', async ({ page }) => {});
+test('runs in parallel 2', async ({ page }) => {});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// Run all the tests in the file concurrently using parallel workers.
+test.describe.configure({ mode: 'parallel' });
+test('runs in parallel 1', async ({ page }) => {});
+test('runs in parallel 2', async ({ page }) => {});
+```
+
+</TabItem>
+</Tabs>
+
+Running tests sequentially:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+// Annotate tests as inter-dependent.
+test.describe.configure({ mode: 'serial' });
+test('runs first', async ({ page }) => {});
+test('runs second', async ({ page }) => {});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// Annotate tests as inter-dependent.
+test.describe.configure({ mode: 'serial' });
+test('runs first', async ({ page }) => {});
+test('runs second', async ({ page }) => {});
+```
+
+</TabItem>
+</Tabs>
+
 ## test.describe.only(title, callback) {#test-describe-only}
 - `title`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-only-option-title"/> &#60;[string]&#62; Group title.<a href="#test-describe-only-option-title" class="list-anchor">#</a>
 - `callback`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-only-option-callback"/> &#60;[function]&#62; A callback that is run immediately when calling [test.describe.only(title, callback)](./api/class-test.mdx#test-describe-only). Any tests added in this callback will belong to the group.<a href="#test-describe-only-option-callback" class="list-anchor">#</a>
@@ -393,6 +467,8 @@ test('not in the focused group', async ({ page }) => {
 
 Declares a group of tests that could be run in parallel. By default, tests in a single test file run one after another, but using [test.describe.parallel(title, callback)](./api/class-test.mdx#test-describe-parallel) allows them to run in parallel.
 
+See [test.describe.configure([options])](./api/class-test.mdx#test-describe-configure) for the preferred way of configuring the execution mode.
+
 <Tabs
   groupId="js-flavor"
   defaultValue="ts"
@@ -405,10 +481,8 @@ Declares a group of tests that could be run in parallel. By default, tests in a 
 
 ```ts
 test.describe.parallel('group', () => {
-  test('runs in parallel 1', async ({ page }) => {
-  });
-  test('runs in parallel 2', async ({ page }) => {
-  });
+  test('runs in parallel 1', async ({ page }) => {});
+  test('runs in parallel 2', async ({ page }) => {});
 });
 ```
 
@@ -417,10 +491,8 @@ test.describe.parallel('group', () => {
 
 ```js
 test.describe.parallel('group', () => {
-  test('runs in parallel 1', async ({ page }) => {
-  });
-  test('runs in parallel 2', async ({ page }) => {
-  });
+  test('runs in parallel 1', async ({ page }) => {});
+  test('runs in parallel 2', async ({ page }) => {});
 });
 ```
 
@@ -443,6 +515,8 @@ Declares a focused group of tests that could be run in parallel. This is similar
 
 Declares a group of tests that should always be run serially. If one of the tests fails, all subsequent tests are skipped. All tests in a group are retried together.
 
+See [test.describe.configure([options])](./api/class-test.mdx#test-describe-configure) for the preferred way of configuring the execution mode.
+
 :::note
 Using serial is not recommended. It is usually better to make your tests isolated, so they can be run independently.
 :::
@@ -459,10 +533,8 @@ Using serial is not recommended. It is usually better to make your tests isolate
 
 ```ts
 test.describe.serial('group', () => {
-  test('runs first', async ({ page }) => {
-  });
-  test('runs second', async ({ page }) => {
-  });
+  test('runs first', async ({ page }) => {});
+  test('runs second', async ({ page }) => {});
 });
 ```
 
@@ -471,10 +543,8 @@ test.describe.serial('group', () => {
 
 ```js
 test.describe.serial('group', () => {
-  test('runs first', async ({ page }) => {
-  });
-  test('runs second', async ({ page }) => {
-  });
+  test('runs first', async ({ page }) => {});
+  test('runs second', async ({ page }) => {});
 });
 ```
 
