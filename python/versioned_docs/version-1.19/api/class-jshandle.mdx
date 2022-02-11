@@ -1,0 +1,233 @@
+---
+id: class-jshandle
+title: "JSHandle"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+JSHandle represents an in-page JavaScript object. JSHandles can be created with the [page.evaluate_handle(expression, **kwargs)](./api/class-page.mdx#page-evaluate-handle) method.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+window_handle = page.evaluate_handle("window")
+# ...
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+window_handle = await page.evaluate_handle("window")
+# ...
+```
+
+</TabItem>
+</Tabs>
+
+JSHandle prevents the referenced JavaScript object being garbage collected unless the handle is exposed with [js_handle.dispose()](./api/class-jshandle.mdx#js-handle-dispose). JSHandles are auto-disposed when their origin frame gets navigated or the parent context gets destroyed.
+
+JSHandle instances can be used as an argument in [page.eval_on_selector(selector, expression, **kwargs)](./api/class-page.mdx#page-eval-on-selector), [page.evaluate(expression, **kwargs)](./api/class-page.mdx#page-evaluate) and [page.evaluate_handle(expression, **kwargs)](./api/class-page.mdx#page-evaluate-handle) methods.
+
+
+- [js_handle.as_element()](./api/class-jshandle.mdx#js-handle-as-element)
+- [js_handle.dispose()](./api/class-jshandle.mdx#js-handle-dispose)
+- [js_handle.evaluate(expression, **kwargs)](./api/class-jshandle.mdx#js-handle-evaluate)
+- [js_handle.evaluate_handle(expression, **kwargs)](./api/class-jshandle.mdx#js-handle-evaluate-handle)
+- [js_handle.get_properties()](./api/class-jshandle.mdx#js-handle-get-properties)
+- [js_handle.get_property(property_name)](./api/class-jshandle.mdx#js-handle-get-property)
+- [js_handle.json_value()](./api/class-jshandle.mdx#js-handle-json-value)
+
+## js_handle.as_element() {#js-handle-as-element}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="js-handle-as-element-return"/> &#60;[NoneType]|[ElementHandle]&#62;<a href="#js-handle-as-element-return" class="list-anchor">#</a>
+
+Returns either `null` or the object handle itself, if the object handle is an instance of [ElementHandle].
+
+## js_handle.dispose() {#js-handle-dispose}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="js-handle-dispose-return"/> &#60;[NoneType]&#62;<a href="#js-handle-dispose-return" class="list-anchor">#</a>
+
+The `jsHandle.dispose` method stops referencing the element handle.
+
+## js_handle.evaluate(expression, **kwargs) {#js-handle-evaluate}
+- `expression`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="js-handle-evaluate-option-expression"/> &#60;[str]&#62; JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.<a href="#js-handle-evaluate-option-expression" class="list-anchor">#</a>
+- `arg`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="js-handle-evaluate-option-arg"/> &#60;[EvaluationArgument]&#62; Optional argument to pass to `expression`.<a href="#js-handle-evaluate-option-arg" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="js-handle-evaluate-return"/> &#60;[Serializable]&#62;<a href="#js-handle-evaluate-return" class="list-anchor">#</a>
+
+Returns the return value of `expression`.
+
+This method passes this handle as the first argument to `expression`.
+
+If `expression` returns a [Promise], then `handle.evaluate` would wait for the promise to resolve and return its value.
+
+Examples:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+tweet_handle = page.query_selector(".tweet .retweets")
+assert tweet_handle.evaluate("node => node.innerText") == "10 retweets"
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+tweet_handle = await page.query_selector(".tweet .retweets")
+assert await tweet_handle.evaluate("node => node.innerText") == "10 retweets"
+```
+
+</TabItem>
+</Tabs>
+
+## js_handle.evaluate_handle(expression, **kwargs) {#js-handle-evaluate-handle}
+- `expression`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="js-handle-evaluate-handle-option-expression"/> &#60;[str]&#62; JavaScript expression to be evaluated in the browser context. If it looks like a function declaration, it is interpreted as a function. Otherwise, evaluated as an expression.<a href="#js-handle-evaluate-handle-option-expression" class="list-anchor">#</a>
+- `arg`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="js-handle-evaluate-handle-option-arg"/> &#60;[EvaluationArgument]&#62; Optional argument to pass to `expression`.<a href="#js-handle-evaluate-handle-option-arg" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="js-handle-evaluate-handle-return"/> &#60;[JSHandle]&#62;<a href="#js-handle-evaluate-handle-return" class="list-anchor">#</a>
+
+Returns the return value of `expression` as a [JSHandle].
+
+This method passes this handle as the first argument to `expression`.
+
+The only difference between `jsHandle.evaluate` and `jsHandle.evaluateHandle` is that `jsHandle.evaluateHandle` returns [JSHandle].
+
+If the function passed to the `jsHandle.evaluateHandle` returns a [Promise], then `jsHandle.evaluateHandle` would wait for the promise to resolve and return its value.
+
+See [page.evaluate_handle(expression, **kwargs)](./api/class-page.mdx#page-evaluate-handle) for more details.
+
+## js_handle.get_properties() {#js-handle-get-properties}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="js-handle-get-properties-return"/> &#60;[Map]\[[str], [JSHandle]\]&#62;<a href="#js-handle-get-properties-return" class="list-anchor">#</a>
+
+The method returns a map with **own property names** as keys and JSHandle instances for the property values.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+handle = page.evaluate_handle("{window, document}")
+properties = handle.get_properties()
+window_handle = properties.get("window")
+document_handle = properties.get("document")
+handle.dispose()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+handle = await page.evaluate_handle("{window, document}")
+properties = await handle.get_properties()
+window_handle = properties.get("window")
+document_handle = properties.get("document")
+await handle.dispose()
+```
+
+</TabItem>
+</Tabs>
+
+## js_handle.get_property(property_name) {#js-handle-get-property}
+- `property_name`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="js-handle-get-property-option-property-name"/> &#60;[str]&#62; property to get<a href="#js-handle-get-property-option-property-name" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="js-handle-get-property-return"/> &#60;[JSHandle]&#62;<a href="#js-handle-get-property-return" class="list-anchor">#</a>
+
+Fetches a single property from the referenced object.
+
+## js_handle.json_value() {#js-handle-json-value}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="js-handle-json-value-return"/> &#60;[Serializable]&#62;<a href="#js-handle-json-value-return" class="list-anchor">#</a>
+
+Returns a JSON representation of the object. If the object has a `toJSON` function, it **will not be called**.
+
+:::note
+The method will return an empty JSON object if the referenced object is not stringifiable. It will throw an error if the object has circular references.
+:::
+
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[APIRequest]: ./api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: ./api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: ./api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: ./api/class-apiresponseassertions.mdx "APIResponseAssertions"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[Error]: ./api/class-error.mdx "Error"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Locator]: ./api/class-locator.mdx "Locator"
+[LocatorAssertions]: ./api/class-locatorassertions.mdx "LocatorAssertions"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[PageAssertions]: ./api/class-pageassertions.mdx "PageAssertions"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: ./api/class-playwrightassertions.mdx "PlaywrightAssertions"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
+[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[bytes]: https://docs.python.org/3/library/stdtypes.html#bytes "bytes"
+[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
+[Exception]: https://docs.python.org/3/library/exceptions.html#Exception "Exception"
+[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
+[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
+[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
+[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
+[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
+[URL]: https://en.wikipedia.org/wiki/URL "URL"
+[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
+[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
+[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
