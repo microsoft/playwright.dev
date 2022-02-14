@@ -4,6 +4,7 @@ import Layout from "@theme/Layout";
 import Link from "@docusaurus/Link";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import useBaseUrl from "@docusaurus/useBaseUrl";
+import GitHubStarButton from '../components/GitHubStarButton';
 import styles from "./styles.module.css";
 
 const features = [
@@ -138,21 +139,6 @@ const Feature: React.FC<FeatureProps> = ({ imageUrl, title, description, link })
   );
 }
 
-const GitHubStars: React.FC = () => {
-  const {siteConfig} = useDocusaurusContext();
-  return (
-    <div style={{ height: 30 }}>
-      <iframe
-        className={styles.githubStars}
-        src={`https://ghbtns.com/github-btn.html?user=microsoft&repo=${siteConfig.customFields.repositoryName}&type=star&count=true&size=large`}
-        width={160}
-        height={30}
-        title="GitHub Stars"
-      />
-    </div>
-  );
-}
-
 type FeatureRowProps = {
   title: string
   description: string
@@ -240,7 +226,7 @@ const Home: React.FC = () => {
             >
               Get started
             </Link>
-            <GitHubStars />
+            <GitHubStarButton owner="microsoft" repo={siteConfig.customFields.repositoryName}/>
           </div>
         </div>
       </header>
