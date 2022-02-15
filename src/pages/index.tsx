@@ -232,6 +232,19 @@ const Home: React.FC = () => {
       </header>
       <br></br>
       <main>
+        <br/>
+        <br/>
+        <div className={styles.introductionVideoContainer}>
+          <iframe 
+            width="672"
+            height="378"
+            src="https://www.youtube-nocookie.com/embed/videoseries/?list=PLQ6Buerc008dhme8fC80zmhohqpkA0aXI"
+            title="YouTube video player"
+            frameBorder="0"
+            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+            allowFullScreen
+            ></iframe>
+        </div>
         <br></br>
         <br></br>
         <center>
