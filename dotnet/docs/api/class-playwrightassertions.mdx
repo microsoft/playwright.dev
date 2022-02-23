@@ -1,34 +1,62 @@
 ---
-id: why-playwright
-title: "Why Playwright?"
+id: class-playwrightassertions
+title: "PlaywrightAssertions"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright enables fast, reliable and capable testing and automation across all modern browsers. This guide covers those key differentiators to help you decide on the right tool for your automated tests.
+The [PlaywrightAssertions] class provides convenience methods for creating assertions that will wait until the expected condition is met.
 
-- [Support for all browsers](#support-for-all-browsers)
-- [Fast and reliable execution](#fast-and-reliable-execution)
-- [Powerful automation capabilities](#powerful-automation-capabilities)
-- [Release notes](./release-notes.mdx)
+Consider the following example:
 
-## Support for all browsers
-* **Test on Chromium, Firefox and WebKit**. Playwright has full API coverage for all modern browsers, including Google Chrome and Microsoft Edge (with [Chromium](https://www.chromium.org/)), Apple Safari (with [WebKit](https://webkit.org/)) and Mozilla Firefox.
-* **Cross-platform WebKit testing**. With Playwright, test how your app behaves in Apple Safari with WebKit builds for Windows, Linux and macOS. Test locally and on CI.
-* **Test for mobile**. Use [device emulation](./emulation.mdx) to test your responsive web apps in mobile web browsers.
-* **Headless and headed**. Playwright supports headless (without browser UI) and headed (with browser UI) modes for all browsers and all platforms. Headed is great for debugging, and headless is faster and suited for CI/cloud executions.
+```csharp
+using System.Threading.Tasks;
+using Microsoft.Playwright.NUnit;
+using NUnit.Framework;
 
-## Fast and reliable execution
-* **Auto-wait APIs**. Playwright interactions [auto-wait for elements](./actionability.mdx) to be ready. This improves reliability and simplifies test authoring.
-* **Timeout-free automation**. Playwright receives browser signals, like network requests, page navigations and page load events to eliminate the need for sleep timeouts that cause flakiness.
-* **Fast isolation with browser contexts**. Reuse a single browser instance for multiple isolated execution environments with [browser contexts](./browser-contexts.mdx).
-* **Resilient element selectors**. Playwright can rely on user-facing strings, like text content and accessibility labels to [select elements](./selectors.mdx). These strings are more resilient than selectors tightly-coupled to the DOM structure.
+using static Microsoft.Playwright.Assertions;
 
-## Powerful automation capabilities
-* **Multiple domains, pages and frames**. Playwright is an out-of-process automation driver that is not limited by the scope of in-page JavaScript execution and can automate scenarios with [multiple pages](./pages.mdx).
-* **Powerful network control**. Playwright introduces context-wide [network interception](./network.mdx) to stub and mock network requests.
-* **Modern web features**. Playwright supports web components through [shadow-piercing selectors](./selectors.mdx), [geolocation, permissions](./emulation.mdx), web workers and other modern web APIs.
-* **Capabilities to cover all scenarios**. Support for [file downloads](./downloads.mdx) and [uploads](./input.mdx), out-of-process iframes, native [input events](./input.mdx), and even [dark mode](./emulation.mdx).
+namespace Playwright.TestingHarnessTest.NUnit
+{
+    public class ExampleTests : PageTest
+    {
+        [Test]
+        public async Task StatusBecomesSubmitted()
+        {
+            await Expect(Page.Locator(".status")).ToHaveTextAsync("Submitted");
+        }
+    }
+}
+```
+
+Playwright will be re-testing the node with the selector `.status` until fetched Node has the `"Submitted"` text. It will be re-fetching the node and checking it over and over, until the condition is met or until the timeout is reached. You can pass this timeout as an option.
+
+By default, the timeout for assertions is set to 5 seconds.
+
+
+- [PlaywrightAssertions.Expect(locator)](./api/class-playwrightassertions.mdx#playwright-assertions-expect-locator)
+- [PlaywrightAssertions.Expect(page)](./api/class-playwrightassertions.mdx#playwright-assertions-expect-page)
+
+## PlaywrightAssertions.Expect(locator) {#playwright-assertions-expect-locator}
+- `locator`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="playwright-assertions-expect-locator-option-locator"/> &#60;[Locator]&#62; [Locator] object to use for assertions.<a href="#playwright-assertions-expect-locator-option-locator" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="playwright-assertions-expect-locator-return"/> &#60;[LocatorAssertions]&#62;<a href="#playwright-assertions-expect-locator-return" class="list-anchor">#</a>
+
+Creates a [LocatorAssertions] object for the given [Locator].
+
+```csharp
+await Expect(locator).ToBeVisibleAsync();
+```
+
+## PlaywrightAssertions.Expect(page) {#playwright-assertions-expect-page}
+- `page`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="playwright-assertions-expect-page-option-page"/> &#60;[Page]&#62; [Page] object to use for assertions.<a href="#playwright-assertions-expect-page-option-page" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="playwright-assertions-expect-page-return"/> &#60;[PageAssertions]&#62;<a href="#playwright-assertions-expect-page-return" class="list-anchor">#</a>
+
+Creates a [PageAssertions] object for the given [Page].
+
+```csharp
+await Expect(page).ToHaveTitleAsync("News");
+```
+
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Browser]: ./api/class-browser.mdx "Browser"
