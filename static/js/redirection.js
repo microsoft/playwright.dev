@@ -26,13 +26,13 @@ if (path) {
     { from: '/docs/next/assertions', to: '/next/docs/test-assertions' },
     // ------------------- python ---------------------
     { from: '/python/docs/assertions', to: '/python/docs/api/class-playwrightassertions' },
-    { from: '/python/docs/next/assertions', to: '/python/next/docs/api/class-playwrightassertions' },
+    { from: '/python/next/docs/assertions', to: '/python/next/docs/api/class-playwrightassertions' },
     // ------------------- dotnet ---------------------
     { from: '/dotnet/docs/assertions', to: '/dotnet/docs/api/class-playwrightassertions' },
-    { from: '/dotnet/docs/next/assertions', to: '/dotnet/next/docs/api/class-playwrightassertions' },
+    { from: '/dotnet/next/docs/assertions', to: '/dotnet/next/docs/api/class-playwrightassertions' },
     // ------------------- java -----------------------
     { from: '/java/docs/assertions', to: '/java/docs/api/class-playwrightassertions' },
-    { from: '/java/docs/next/assertions', to: '/java/docs/next/api/class-playwrightassertions' },
+    { from: '/java/next/docs/assertions', to: '/java/next/docs/api/class-playwrightassertions' },
   ];
   const pathname = window.location.pathname;
   for (const redirect of redirects) {
