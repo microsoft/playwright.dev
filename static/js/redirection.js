@@ -22,9 +22,17 @@ if (path) {
     { from: '/docs/installation', to: '/docs/library' },
     { from: '/docs/next/test-intro', to: '/docs/next/intro' },
     { from: '/docs/next/installation', to: '/docs/next/library' },
+    { from: '/docs/assertions', to: '/docs/test-assertions' },
+    { from: '/docs/next/assertions', to: '/next/docs/test-assertions' },
     // ------------------- python ---------------------
+    { from: '/python/docs/assertions', to: '/python/docs/api/class-playwrightassertions' },
+    { from: '/python/next/docs/assertions', to: '/python/next/docs/api/class-playwrightassertions' },
     // ------------------- dotnet ---------------------
+    { from: '/dotnet/docs/assertions', to: '/dotnet/docs/api/class-playwrightassertions' },
+    { from: '/dotnet/next/docs/assertions', to: '/dotnet/next/docs/api/class-playwrightassertions' },
     // ------------------- java -----------------------
+    { from: '/java/docs/assertions', to: '/java/docs/api/class-playwrightassertions' },
+    { from: '/java/next/docs/assertions', to: '/java/next/docs/api/class-playwrightassertions' },
   ];
   const pathname = window.location.pathname;
   for (const redirect of redirects) {

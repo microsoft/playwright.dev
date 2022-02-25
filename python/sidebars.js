@@ -20,7 +20,6 @@ module.exports = {
       "items": [
         { "type": "doc", "id": "actionability" },
         { "type": "doc", "id": "api-testing" },
-        { "type": "doc", "id": "assertions" },
         { "type": "doc", "id": "auth" },
         { "type": "doc", "id": "browsers" },
         { "type": "doc", "id": "browser-contexts" },
