@@ -5,9 +5,128 @@ title: "Verification"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
+:::note
+Playwright has [Web-First Assertions](./api/class-playwrightassertions) which automatically retry until the expected condition is met. This helps to reduce flakiness and readability of tests.
+:::
+
+- [Text content](#text-content)
+- [Inner text](#inner-text)
+- [Attribute value](#attribute-value)
+- [Checkbox state](#checkbox-state)
+- [Text content](#text-content)
+- [Inner HTML](#inner-html)
+- [Visibility](#visibility)
+- [Enabled state](#enabled-state)
+- [Custom assertions](#custom-assertions)
 - [Console logs](#console-logs)
 - [Page errors](#page-errors)
 - [Page events](#page-events)
+
+## Text content
+
+```csharp
+var content = await page.Locator("nav:first-child").TextContentAsync();
+Assert.AreEqual("home", content);
+```
+
+### API reference
+- [Page.TextContentAsync(selector, options)](./api/class-page.mdx#page-text-content)
+- [ElementHandle.TextContentAsync()](./api/class-elementhandle.mdx#element-handle-text-content)
+
+## Inner text
+
+```csharp
+var content = await page.Locator(".selected").InnerTextAsync();
+Assert.AreEqual("value", content);
+```
+
+### API reference
+- [Page.InnerTextAsync(selector, options)](./api/class-page.mdx#page-inner-text)
+- [ElementHandle.InnerTextAsync()](./api/class-elementhandle.mdx#element-handle-inner-text)
+
+## Attribute value
+
+```csharp
+var value = await page.Locator("input").GetAttributeAsync("alt");
+Assert.AreEqual("Text", value);
+```
+
+## Checkbox state
+
+```csharp
+var checked = await page.Locator("input").IsCheckedAsync();
+Assert.True(checked);
+```
+
+### API reference
+- [Page.IsCheckedAsync(selector, options)](./api/class-page.mdx#page-is-checked)
+- [ElementHandle.IsCheckedAsync()](./api/class-elementhandle.mdx#element-handle-is-checked)
+
+## Text content
+
+```csharp
+var content = await page.locator("nav:first-child").TextContentAsync();
+Assert.AreEqual("home", content);
+```
+
+### API reference
+- [Page.EvalOnSelectorAsync(selector, expression, arg, options)](./api/class-page.mdx#page-eval-on-selector)
+- [JsHandle.EvaluateAsync(expression, arg)](./api/class-jshandle.mdx#js-handle-evaluate)
+
+## Inner HTML
+
+```csharp
+var html = await page.Locator("div.result").InnerHTMLAsync();
+Assert.AreEqual("<p>Result</p>", html);
+```
+
+### API reference
+- [Page.InnerHTMLAsync(selector, options)](./api/class-page.mdx#page-inner-html)
+- [ElementHandle.InnerHTMLAsync()](./api/class-elementhandle.mdx#element-handle-inner-html)
+
+## Visibility
+
+```csharp
+var visibility = await page.Locator("input").IsVisibleAsync();
+Assert.True(visibility);
+```
+
+### API reference
+- [Page.IsVisibleAsync(selector, options)](./api/class-page.mdx#page-is-visible)
+- [ElementHandle.IsVisibleAsync()](./api/class-elementhandle.mdx#element-handle-is-visible)
+
+## Enabled state
+
+```csharp
+var enabled = await page.Locator("input").IsEnabledAsync();
+Assert.True(enabled);
+```
+
+### API reference
+- [Page.IsEnabledAsync(selector, options)](./api/class-page.mdx#page-is-enabled)
+- [ElementHandle.IsEnabledAsync()](./api/class-elementhandle.mdx#element-handle-is-enabled)
+
+## Custom assertions
+
+With Playwright, you can also write custom JavaScript to run in the context of the browser. This is useful in situations where you want to assert for values that are not covered by the convenience APIs above.
+
+```csharp
+// Assert local storage value
+var userId = await page.EvaluateAsync<string>("() => window.localStorage.getItem('userId')");
+Assert.NotNull(userId);
+
+// Assert value for input element
+var value = await page.Locator("#search").InputValueAsync();
+Assert.AreEqual("query", value);
+
+// Assert computed style
+var fontSize = await page.Locator("div").EvalOnSelectorAsync<string>("el => window.getComputedStyle(el).fontSize");
+Assert.AreEqual("16px", fontSize);
+
+// Assert list length
+var length = await page.Locator("li.selected").CountAsync();
+Assert.AreEqual(3, length);
+```
 
 ## Console logs
 
