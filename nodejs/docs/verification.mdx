@@ -5,9 +5,128 @@ title: "Verification"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
+:::note
+Playwright has [Web-First Assertions](./api/class-playwrightassertions) which automatically retry until the expected condition is met. This helps to reduce flakiness and readability of tests.
+:::
+
+- [Text content](#text-content)
+- [Inner text](#inner-text)
+- [Attribute value](#attribute-value)
+- [Checkbox state](#checkbox-state)
+- [Text content](#text-content)
+- [Inner HTML](#inner-html)
+- [Visibility](#visibility)
+- [Enabled state](#enabled-state)
+- [Custom assertions](#custom-assertions)
 - [Console logs](#console-logs)
 - [Page errors](#page-errors)
 - [Page events](#page-events)
+
+## Text content
+
+```js
+const content = await page.locator('nav:first-child').textContent();
+expect(content).toBe('home');
+```
+
+### API reference
+- [page.textContent(selector[, options])](./api/class-page.mdx#page-text-content)
+- [elementHandle.textContent()](./api/class-elementhandle.mdx#element-handle-text-content)
+
+## Inner text
+
+```js
+const text = await page.locator('.selected').innerText();
+expect(text).toBe('value');
+```
+
+### API reference
+- [page.innerText(selector[, options])](./api/class-page.mdx#page-inner-text)
+- [elementHandle.innerText()](./api/class-elementhandle.mdx#element-handle-inner-text)
+
+## Attribute value
+
+```js
+const alt = await page.locator('input').getAttribute('alt');
+expect(alt).toBe('Text');
+```
+
+## Checkbox state
+
+```js
+const checked = await page.locator('input').isChecked();
+expect(checked).toBeTruthy();
+```
+
+### API reference
+- [page.isChecked(selector[, options])](./api/class-page.mdx#page-is-checked)
+- [elementHandle.isChecked()](./api/class-elementhandle.mdx#element-handle-is-checked)
+
+## Text content
+
+```js
+const content = await page.locator('nav:first-child').textContent();
+expect(content).toBe('home');
+```
+
+### API reference
+- [page.$eval(selector, pageFunction[, arg, options])](./api/class-page.mdx#page-eval-on-selector)
+- [jsHandle.evaluate(pageFunction[, arg])](./api/class-jshandle.mdx#js-handle-evaluate)
+
+## Inner HTML
+
+```js
+const html = await page.locator('div.result').innerHTML();
+expect(html).toBe('<p>Result</p>');
+```
+
+### API reference
+- [page.innerHTML(selector[, options])](./api/class-page.mdx#page-inner-html)
+- [elementHandle.innerHTML()](./api/class-elementhandle.mdx#element-handle-inner-html)
+
+## Visibility
+
+```js
+const visible = await page.locator('input').isVisible();
+expect(visible).toBeTruthy();
+```
+
+### API reference
+- [page.isVisible(selector[, options])](./api/class-page.mdx#page-is-visible)
+- [elementHandle.isVisible()](./api/class-elementhandle.mdx#element-handle-is-visible)
+
+## Enabled state
+
+```js
+const enabled = await page.locator('input').isEnabled();
+expect(enabled).toBeTruthy();
+```
+
+### API reference
+- [page.isEnabled(selector[, options])](./api/class-page.mdx#page-is-enabled)
+- [elementHandle.isEnabled()](./api/class-elementhandle.mdx#element-handle-is-enabled)
+
+## Custom assertions
+
+With Playwright, you can also write custom JavaScript to run in the context of the browser. This is useful in situations where you want to assert for values that are not covered by the convenience APIs above.
+
+```js
+// Assert local storage value
+const userId = page.evaluate(() => window.localStorage.getItem('userId'));
+expect(userId).toBeTruthy();
+
+// Assert value for input element
+const value = await page.locator('#search').inputValue();
+expect(value === 'query').toBeTruthy();
+
+// Assert computed style
+const fontSize = await page.locator('div').evaluate(el => window.getComputedStyle(el).fontSize);
+expect(fontSize === '16px').toBeTruthy();
+
+// Assert list length
+const length = await page.locator('li.selected').count();
+expect(length === 3).toBeTruthy();
+```
 
 ## Console logs
 
