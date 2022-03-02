@@ -33,8 +33,18 @@ class JavaScriptFormatter {
   formatMember(member) {
     let text;
     let args = [];
+
+    let prefix = `${member.clazz.varName}.`;
+    if (member.clazz.varName === ('playwrightAssertions')) {
+      prefix = '';
+    } else if (member.clazz.varName.includes('Assertions')) {
+      const varName = member.clazz.varName.substring(0, member.clazz.varName.length -'Assertions'.length);
+      // Generate `expect(locator).` instead of `locatorAssertions.`
+      prefix = `expect(${varName}).`;
+    }
+
     if (member.kind === 'property')
-      text = `${member.clazz.varName}.${member.alias}`;
+      text = `${prefix}${member.alias}`;
 
     if (member.kind === 'event')
       text = `${member.clazz.varName}.on('${member.alias.toLowerCase()}')`;
@@ -42,7 +52,7 @@ class JavaScriptFormatter {
     if (member.kind === 'method') {
       args = member.argsArray;
       const signature = renderJSSignature(args);
-      text = `${member.clazz.varName}.${member.alias}(${signature})`;
+      text = `${prefix}${member.alias}(${signature})`;
     }
     return [{ text, args }];
   }
@@ -64,7 +74,7 @@ class JavaScriptFormatter {
   }
 
   /**
-   * @param {Documentation.Type} type 
+   * @param {Documentation.Type} type
    */
   renderType(type) {
     const text = type.name;
