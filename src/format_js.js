@@ -35,7 +35,7 @@ class JavaScriptFormatter {
     let args = [];
 
     let prefix = `${member.clazz.varName}.`;
-    if (member.clazz.varName === ('playwrightAssertions')) {
+    if (member.clazz.varName === 'playwrightAssertions') {
       prefix = '';
     } else if (member.clazz.varName.includes('Assertions')) {
       const varName = member.clazz.varName.substring(0, member.clazz.varName.length -'Assertions'.length);
