@@ -47,7 +47,7 @@ class JavaScriptFormatter {
       text = `${prefix}${member.alias}`;
 
     if (member.kind === 'event')
-      text = `${member.clazz.varName}.on('${member.alias.toLowerCase()}')`;
+      text = `${prefix}on('${member.alias.toLowerCase()}')`;
 
     if (member.kind === 'method') {
       args = member.argsArray;

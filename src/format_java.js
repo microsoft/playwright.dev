@@ -31,16 +31,26 @@ class JavaFormatter {
   formatMember(member) {
     let text;
     let args = [];
+
+    let prefix = `${member.clazz.name}.`;
+    if (member.clazz.varName === 'playwrightAssertions') {
+      prefix = '';
+    } else if (member.clazz.varName.includes('Assertions')) {
+      const varName = member.clazz.varName.substring(0, member.clazz.varName.length -'Assertions'.length);
+      // Generate `expect(locator).` instead of `locatorAssertions.`
+      prefix = `assertThat(${varName}).`;
+    }
+
     if (member.kind === 'property')
-      text = `${member.clazz.name}.${member.alias}()`;
+      text = `${prefix}${member.alias}()`;
 
     if (member.kind === 'event')
-      text = `${member.clazz.name}.on${toTitleCase(member.alias)}(handler)`;
+      text = `${prefix}on${toTitleCase(member.alias)}(handler)`;
 
     if (member.kind === 'method') {
       args = member.argsArray;
       const signature = renderJSSignature(args);
-      text = `${member.clazz.name}.${member.alias}(${signature})`;
+      text = `${prefix}${member.alias}(${signature})`;
     }
     return [{ text, args }];
   }
