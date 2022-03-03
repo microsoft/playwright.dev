@@ -33,11 +33,21 @@ class PythonFormatter {
   formatMember(member) {
     let text;
     const args = [];
+
+    let prefix = `${toSnakeCase(member.clazz.varName)}.`;
+    if (member.clazz.varName === 'playwrightAssertions') {
+      prefix = '';
+    } else if (member.clazz.varName.includes('Assertions')) {
+      const varName = member.clazz.varName.substring(0, member.clazz.varName.length -'Assertions'.length);
+      // Generate `expect(locator).` instead of `locatorAssertions.`
+      prefix = `expect(${toSnakeCase(varName)}).`;
+    }
+
     if (member.kind === 'property')
-      text = `${toSnakeCase(member.clazz.varName)}.${toSnakeCase(member.alias)}`;
+      text = `${prefix}${toSnakeCase(member.alias)}`;
 
     if (member.kind === 'event')
-      text = `${toSnakeCase(member.clazz.varName)}.on("${member.alias.toLowerCase()}")`;
+      text = `${prefix}on("${member.alias.toLowerCase()}")`;
 
     if (member.kind === 'method') {
       for (const arg of member.argsArray)
@@ -46,7 +56,7 @@ class PythonFormatter {
       let isGetter = !signature && !member.async && !!member.type;
       if (member.name.startsWith('is') || member.name.startsWith('as'))
         isGetter = false;
-      text = `${toSnakeCase(member.clazz.varName)}.${toSnakeCase(member.alias)}`;
+      text = `${prefix}${toSnakeCase(member.alias)}`;
       if (!isGetter)
         text += `(${signature})`;
     }

@@ -34,10 +34,20 @@ class CSharpFormatter {
   formatMember(member) {
     let text;
     let args = [];
+
+    let prefix = `${toTitleCase(member.clazz.varName)}.`;
+    if (member.clazz.varName === 'playwrightAssertions') {
+      prefix = '';
+    } else if (member.clazz.varName.includes('Assertions')) {
+      const varName = member.clazz.varName.substring(0, member.clazz.varName.length -'Assertions'.length);
+      // Generate `expect(locator).` instead of `locatorAssertions.`
+      prefix = `Expect(${toTitleCase(varName)}).`;
+    }
+
     if (member.kind === 'property')
-      text = `${toTitleCase(member.clazz.varName)}.${toTitleCase(member.alias)}`;
+      text = `${prefix}${toTitleCase(member.alias)}`;
     if (member.kind === 'event')
-      text = `event ${toTitleCase(member.clazz.varName)}.${toTitleCase(member.alias)}`;
+      text = `event ${prefix}${toTitleCase(member.alias)}`;
     if (member.kind === 'method' ) {
       args = member.argsArray.slice();
       const signature = renderSharpSignature(args);
@@ -45,7 +55,7 @@ class CSharpFormatter {
       let isGetter = !signature && !member.async && !!member.type;
       if (member.name.startsWith('as'))
         isGetter = false;
-      text = `${toTitleCase(member.clazz.varName)}.${toAsyncTitleCase(member.async, member.alias)}`;
+      text = `${prefix}${toAsyncTitleCase(member.async, member.alias)}`;
       if (!isGetter)
         text += `(${signature})`;
       if (member.alias.startsWith('RunAnd'))
