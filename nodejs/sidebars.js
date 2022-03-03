@@ -129,6 +129,7 @@ module.exports = {
             { "type": "doc", "id": "api/class-request" },
             { "type": "doc", "id": "api/class-response" },
             { "type": "doc", "id": "api/class-route" },
+            { "type": "doc", "id": "api/class-screenshotassertions" },
             { "type": "doc", "id": "api/class-selectors" },
             { "type": "doc", "id": "api/class-touchscreen" },
             { "type": "doc", "id": "api/class-tracing" },
