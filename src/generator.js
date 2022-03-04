@@ -41,6 +41,8 @@ const commonSnippets = new Set(['txt', 'html', 'xml', 'yml', 'yaml', 'json', 'gr
 function rewriteClassTitle(className, lang) {
   if (className === 'Test')
     return 'Playwright Test';
+  if (className === 'PlaywrightAssertions')
+    return 'Assertions';
   if (lang === 'js' && className === 'Playwright')
     return 'Playwright Library';
 }
@@ -102,7 +104,7 @@ class Generator {
       const langLinks = fs.readFileSync(path.join(__dirname, '..', 'common', `links-${lang}.md`)).toString();
       const localLinks = [];
       for (const clazz of this.documentation.classesArray) {
-        const generatedFileName = `./api/class-${clazz.name.toLowerCase()}.md`;
+        const generatedFileName = apiClassLink(clazz);
         localLinks.push(`[${clazz.name}]: ${generatedFileName} "${clazz.name}"`);
         this.generatedFiles.add(generatedFileName);
       }
@@ -162,7 +164,30 @@ import TabItem from '@theme/TabItem';
       const superClass = this.documentation.classes.get(clazz.extends);
       result.push(...this.generateClassToc(superClass));
     }
-    for (const member of clazz.membersArray) {
+    const mergedMembersArray = [...clazz.membersArray];
+    if (clazz.name === 'PlaywrightAssertions') {
+      // Merge these classes docs into PlaywrightAssertions in this exact order.
+      const assertionClassNames = ['PageAssertions', 'LocatorAssertions', 'APIResponseAssertions'];
+      if (this.lang === 'js')
+        assertionClassNames.push('ScreenshotAssertions');
+      for (const name of assertionClassNames) {
+        const relatedClass = this.documentation.classes.get(name);
+        result.push(...this.generateClassToc(relatedClass));
+        mergedMembersArray.push(...relatedClass.membersArray);
+      }
+    } else if (clazz.name.endsWith('Assertions')) {
+      // Those files are merged into PlaywrightAssertions
+      return;
+    }
+    result.push(...this._formatClassMembers(mergedMembersArray));
+    fs.mkdirSync(path.join(this.outDir, 'api'), { recursive: true });
+    const output = [md.render(result), this.generatedLinksSuffix].join('\n');
+    fs.writeFileSync(path.join(this.outDir, 'api', `class-${clazz.name.toLowerCase()}.mdx`), this.mdxLinks(output));
+  }
+
+  _formatClassMembers(mergedMembersArray) {
+    const result = [];
+    for (const member of mergedMembersArray) {
       // Iterate members
       for (const { text, args } of this.formatter.formatMember(member)) {
         /** @type {MarkdownNode} */
@@ -188,9 +213,7 @@ import TabItem from '@theme/TabItem';
         result.push(memberNode);
       }
     }
-    fs.mkdirSync(path.join(this.outDir, 'api'), { recursive: true });
-    const output = [md.render(result), this.generatedLinksSuffix].join('\n');
-    fs.writeFileSync(path.join(this.outDir, 'api', `class-${clazz.name.toLowerCase()}.mdx`), this.mdxLinks(output));
+    return result;
   }
 
   /**
@@ -237,6 +260,13 @@ import TabItem from '@theme/TabItem';
     return spec;
   }
 
+  _assertionClassNames() {
+    const assertionClassNames = ['PageAssertions', 'LocatorAssertions', 'APIResponseAssertions'];
+    if (this.lang === 'js')
+      assertionClassNames.push('ScreenshotAssertions');
+    return assertionClassNames;
+  }
+
   /**
    * @param {string} name
    * @param {string} outName
@@ -245,11 +275,23 @@ import TabItem from '@theme/TabItem';
     const content = fs.readFileSync(path.join(DIR_SRC, name)).toString();
     let nodes = this.filterForLanguage(md.parse(content));
     this.documentation.renderLinksInText(nodes);
-    for (const node of nodes) {
+    const tocIndex = nodes.findIndex(node => node.text === '<!-- TOC -->' || node.text === '<!-- TOC3 -->');
+    if (tocIndex !== -1) {
+      const node = nodes[tocIndex];
       if (node.text === '<!-- TOC -->')
         node.text = md.generateToc(nodes);
       if (node.text === '<!-- TOC3 -->')
         node.text = md.generateToc(nodes, true);
+      if (name.toLowerCase().includes('assertion')) {
+        const assertionClassNames = ['PageAssertions', 'LocatorAssertions', 'APIResponseAssertions'];
+        const extraToc = [];
+        for (const name of assertionClassNames) {
+          const relatedClass = this.documentation.classes.get(name);
+          extraToc.push(...this.generateClassToc(relatedClass));
+          nodes.push(...this._formatClassMembers(relatedClass.membersArray));
+        }
+        nodes.splice(tocIndex + 1, 0, ...extraToc);
+      }
     }
     nodes = this.formatComment(nodes);
     md.visitAll(nodes, node => {
@@ -305,7 +347,7 @@ import TabItem from '@theme/TabItem';`);
    * @return {string[]}
    */
   createMemberLink(member) {
-    const file = `./api/class-${member.clazz.name.toLowerCase()}.md`;
+    const file = apiClassLink(member.clazz);
     const hash = calculateHeadingHash(member)
     this.heading2ExplicitId.set(member, hash)
     return this.formatter.formatMember(member).map(f => this.createLink(file, f.text, hash));
@@ -496,6 +538,15 @@ function highlighterName(lang) {
   if (lang === 'python')
     return 'py';
   return lang;
+}
+
+/**
+ * @param {Documentation.Class} clazz
+ * @returns {string}
+ */
+function apiClassLink(clazz) {
+  const linkName = clazz.name.endsWith('Assertions') ? 'playwrightassertions' : clazz.name.toLowerCase();
+  return `./api/class-${linkName}.md`;
 }
 
 /**
