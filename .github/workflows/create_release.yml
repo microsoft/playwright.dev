@@ -7,6 +7,7 @@ on:
         required: true
 jobs:
   build:
+    name: Create/Update release
     runs-on: ubuntu-20.04
     steps:
       - name: Validate input version number
@@ -28,6 +29,8 @@ jobs:
       - run: npm i -g npm@8
       - name: Install dependencies
         run: npm ci
+      - name: Delete optionally previous version
+        run: node src/remove_version.js ${{ github.event.inputs.version }}
       - name: Roll
         run: npm run roll
         env:
