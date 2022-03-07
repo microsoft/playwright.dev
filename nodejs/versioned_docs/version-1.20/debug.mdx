@@ -1,0 +1,262 @@
+---
+id: debug
+title: "Debugging tools"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Playwright scripts work with existing debugging tools, like Node.js debuggers and browser developer tools. Playwright also introduces new debugging features for browser automation.
+
+- [Playwright Inspector](#playwright-inspector)
+- [Playwright Trace Viewer](#playwright-trace-viewer)
+- [Run in headed mode](#run-in-headed-mode)
+- [Browser Developer Tools](#browser-developer-tools)
+- [Run in Debug Mode](#run-in-debug-mode)
+- [Selectors in Developer Tools Console](#selectors-in-developer-tools-console)
+- [Visual Studio Code debugger (Node.js)](#visual-studio-code-debugger-nodejs)
+- [Verbose API logs](#verbose-api-logs)
+
+## Playwright Inspector
+
+[Playwright Inspector](./inspector.mdx) is a GUI tool that helps authoring and debugging Playwright scripts. That's our default recommended tool for scripts troubleshooting.
+
+<img width="712" alt="Playwright Inspector" src="https://user-images.githubusercontent.com/883973/108614092-8c478a80-73ac-11eb-9597-67dfce110e00.png"></img>
+
+## Playwright Trace Viewer
+
+[Playwright Trace Viewer](./trace-viewer.mdx) is a GUI tool that helps troubleshooting test runs in a post-mortem manner.
+
+<img width="1212" alt="Playwright Trace Viewer" src="https://user-images.githubusercontent.com/883973/120585896-6a1bca80-c3e7-11eb-951a-bd84002480f5.png"></img>
+
+## Run in headed mode
+
+Playwright runs browsers in headless mode by default. To change this behavior, use `headless: false` as a launch option. You can also use the `slowMo` option to slow down execution and follow along while debugging.
+
+```js
+await chromium.launch({ headless: false, slowMo: 100 }); // or firefox, webkit
+```
+
+## Browser Developer Tools
+
+You can use browser developer tools in Chromium, Firefox and WebKit while running a Playwright script in headed mode. Developer tools help to:
+* Inspect the DOM tree and **find element selectors**
+* **See console logs** during execution (or learn how to [read logs via API](./verification.mdx#console-logs))
+* Check **network activity** and other developer tools features
+
+<a href="https://user-images.githubusercontent.com/284612/77234134-5f21a500-6b69-11ea-92ec-1c146e1333ec.png"><img src="https://user-images.githubusercontent.com/284612/77234134-5f21a500-6b69-11ea-92ec-1c146e1333ec.png" width="500" alt="Chromium Developer Tools"></img></a>
+
+Using a [page.pause()](./api/class-page.mdx#page-pause) method is an easy way to pause the Playwright script execution and inspect the page in Developer tools. It will also open [Playwright Inspector](./inspector.mdx) to help with debugging.
+
+**For Chromium**: you can also open developer tools through a launch option.
+
+```js
+await chromium.launch({ devtools: true });
+```
+
+:::note
+**For WebKit**: launching WebKit Inspector during the execution will   prevent the Playwright script from executing any further.
+:::
+
+## Run in Debug Mode
+
+Set the `PWDEBUG` environment variable to run your scripts in debug mode. Using `PWDEBUG=1` will open [Playwright Inspector](./inspector.mdx).
+
+Using `PWDEBUG=console` will configure the browser for debugging in Developer tools console:
+* **Runs headed**: Browsers always launch in headed mode
+* **Disables timeout**: Sets default timeout to 0 (= no timeout)
+* **Console helper**: Configures a `playwright` object in the browser to generate and highlight [Playwright selectors](./selectors.mdx). This can be used to verify text or composite selectors.
+
+<Tabs
+  groupId="bash-flavor"
+  defaultValue="bash"
+  values={[
+    {label: 'Bash', value: 'bash'},
+    {label: 'PowerShell', value: 'powershell'},
+    {label: 'Batch', value: 'batch'}
+  ]
+}>
+<TabItem value="bash">
+
+```bash
+PWDEBUG=console npm run test
+```
+
+</TabItem>
+<TabItem value="powershell">
+
+```powershell
+$env:PWDEBUG="console"
+npm run test
+```
+
+</TabItem>
+<TabItem value="batch">
+
+```batch
+set PWDEBUG=console
+npm run test
+```
+
+</TabItem>
+</Tabs>
+
+## Selectors in Developer Tools Console
+
+When running in Debug Mode with `PWDEBUG=console`, a `playwright` object is available in Developer tools console.
+1. Run with `PWDEBUG=console`
+1. Setup a breakpoint to pause the execution
+1. Open the console panel in browser developer tools
+1. Use the `playwright` API
+   * `playwright.$(selector)`: Highlight the first occurrence of the selector. This reflects how `page.$` would see the page.
+   * `playwright.$$(selector)`: Highlight all occurrences of the selector. This reflects how `page.$$` would see the page.
+   * `playwright.inspect(selector)`: Inspect the selector in the Elements panel.
+   * `playwright.locator(selector)`: Highlight the first occurrence of the locator.
+   * `playwright.clear()`: Clear existing highlights.
+   * `playwright.selector(element)`: Generate a selector that points to the element.
+
+<a href="https://user-images.githubusercontent.com/284612/86857345-299abc00-c073-11ea-9e31-02923a9f0d4b.png"><img src="https://user-images.githubusercontent.com/284612/86857345-299abc00-c073-11ea-9e31-02923a9f0d4b.png" width="500" alt="Highlight selectors"></img></a>
+
+## Visual Studio Code debugger (Node.js)
+
+The VS Code debugger can be used to pause and resume execution of Playwright scripts with breakpoints. The debugger can be configured in two ways.
+
+### Use launch config
+
+Setup [`launch.json` configuration](https://code.visualstudio.com/docs/nodejs/nodejs-debugging) for your Node.js project. Once configured launch the scripts with F5 and use breakpoints.
+
+### Use the JavaScript Debug Terminal
+1. Open [JavaScript Debug Terminal](https://code.visualstudio.com/docs/nodejs/nodejs-debugging#_javascript-debug-terminal)
+1. Set a breakpoint in VS Code
+   * Use the `debugger` keyword or set a breakpoint in the VS Code UI
+1. Run your Node.js script from the terminal
+
+## Verbose API logs
+
+Playwright supports verbose logging with the `DEBUG` environment variable.
+
+<Tabs
+  groupId="bash-flavor"
+  defaultValue="bash"
+  values={[
+    {label: 'Bash', value: 'bash'},
+    {label: 'PowerShell', value: 'powershell'},
+    {label: 'Batch', value: 'batch'}
+  ]
+}>
+<TabItem value="bash">
+
+```bash
+DEBUG=pw:api npm run test
+```
+
+</TabItem>
+<TabItem value="powershell">
+
+```powershell
+$env:DEBUG="pw:api"
+npm run test
+```
+
+</TabItem>
+<TabItem value="batch">
+
+```batch
+set DEBUG=pw:api
+npm run test
+```
+
+</TabItem>
+</Tabs>
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Android]: ./api/class-android.mdx "Android"
+[AndroidDevice]: ./api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: ./api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: ./api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: ./api/class-androidwebview.mdx "AndroidWebView"
+[APIRequest]: ./api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: ./api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: ./api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: ./api/class-apiresponseassertions.mdx "APIResponseAssertions"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: ./api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: ./api/class-coverage.mdx "Coverage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[Electron]: ./api/class-electron.mdx "Electron"
+[ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Locator]: ./api/class-locator.mdx "Locator"
+[LocatorAssertions]: ./api/class-locatorassertions.mdx "LocatorAssertions"
+[Logger]: ./api/class-logger.mdx "Logger"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[PageAssertions]: ./api/class-pageassertions.mdx "PageAssertions"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: ./api/class-playwrightassertions.mdx "PlaywrightAssertions"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[ScreenshotAssertions]: ./api/class-screenshotassertions.mdx "ScreenshotAssertions"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Fixtures]: ./api/class-fixtures.mdx "Fixtures"
+[Test]: ./api/class-test.mdx "Test"
+[TestConfig]: ./api/class-testconfig.mdx "TestConfig"
+[TestError]: ./api/class-testerror.mdx "TestError"
+[TestInfo]: ./api/class-testinfo.mdx "TestInfo"
+[TestOptions]: ./api/class-testoptions.mdx "TestOptions"
+[TestProject]: ./api/class-testproject.mdx "TestProject"
+[WorkerInfo]: ./api/class-workerinfo.mdx "WorkerInfo"
+[Location]: ./api/class-location.mdx "Location"
+[Reporter]: ./api/class-reporter.mdx "Reporter"
+[Suite]: ./api/class-suite.mdx "Suite"
+[TestCase]: ./api/class-testcase.mdx "TestCase"
+[TestResult]: ./api/class-testresult.mdx "TestResult"
+[TestStep]: ./api/class-teststep.mdx "TestStep"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"

@@ -1,0 +1,224 @@
+---
+id: class-electronapplication
+title: "ElectronApplication"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Electron application representation. You can use [electron.launch([options])](./api/class-electron.mdx#electron-launch) to obtain the application instance. This instance you can control main electron process as well as work with Electron windows:
+
+```js
+const { _electron: electron } = require('playwright');
+
+(async () => {
+  // Launch Electron app.
+  const electronApp = await electron.launch({ args: ['main.js'] });
+
+  // Evaluation expression in the Electron context.
+  const appPath = await electronApp.evaluate(async ({ app }) => {
+    // This runs in the main Electron process, parameter here is always
+    // the result of the require('electron') in the main app script.
+    return app.getAppPath();
+  });
+  console.log(appPath);
+
+  // Get the first window that the app opens, wait if necessary.
+  const window = await electronApp.firstWindow();
+  // Print the title.
+  console.log(await window.title());
+  // Capture a screenshot.
+  await window.screenshot({ path: 'intro.png' });
+  // Direct Electron console to Node terminal.
+  window.on('console', console.log);
+  // Click button.
+  await window.click('text=Click me');
+  // Exit app.
+  await electronApp.close();
+})();
+```
+
+
+- [electronApplication.on('close')](./api/class-electronapplication.mdx#electron-application-event-close)
+- [electronApplication.on('window')](./api/class-electronapplication.mdx#electron-application-event-window)
+- [electronApplication.browserWindow(page)](./api/class-electronapplication.mdx#electron-application-browser-window)
+- [electronApplication.close()](./api/class-electronapplication.mdx#electron-application-close)
+- [electronApplication.context()](./api/class-electronapplication.mdx#electron-application-context)
+- [electronApplication.evaluate(pageFunction[, arg])](./api/class-electronapplication.mdx#electron-application-evaluate)
+- [electronApplication.evaluateHandle(pageFunction, arg)](./api/class-electronapplication.mdx#electron-application-evaluate-handle)
+- [electronApplication.firstWindow()](./api/class-electronapplication.mdx#electron-application-first-window)
+- [electronApplication.waitForEvent(event[, optionsOrPredicate])](./api/class-electronapplication.mdx#electron-application-wait-for-event)
+- [electronApplication.windows()](./api/class-electronapplication.mdx#electron-application-windows)
+
+## electronApplication.on('close') {#electron-application-event-close}
+
+This event is issued when the application closes.
+
+## electronApplication.on('window') {#electron-application-event-window}
+- type: &#60;[Page]&#62;
+
+This event is issued for every window that is created **and loaded** in Electron. It contains a [Page] that can be used for Playwright automation.
+
+## electronApplication.browserWindow(page) {#electron-application-browser-window}
+- `page`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="electron-application-browser-window-option-page"/> &#60;[Page]&#62; Page to retrieve the window for.<a href="#electron-application-browser-window-option-page" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="electron-application-browser-window-return"/> &#60;[Promise]<[JSHandle]>&#62;<a href="#electron-application-browser-window-return" class="list-anchor">#</a>
+
+Returns the BrowserWindow object that corresponds to the given Playwright page.
+
+## electronApplication.close() {#electron-application-close}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="electron-application-close-return"/> &#60;[Promise]<[void]>&#62;<a href="#electron-application-close-return" class="list-anchor">#</a>
+
+Closes Electron application.
+
+## electronApplication.context() {#electron-application-context}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="electron-application-context-return"/> &#60;[BrowserContext]&#62;<a href="#electron-application-context-return" class="list-anchor">#</a>
+
+This method returns browser context that can be used for setting up context-wide routing, etc.
+
+## electronApplication.evaluate(pageFunction[, arg]) {#electron-application-evaluate}
+- `pageFunction`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="electron-application-evaluate-option-expression"/> &#60;[function]|[Electron]&#62; Function to be evaluated in the worker context.<a href="#electron-application-evaluate-option-expression" class="list-anchor">#</a>
+- `arg`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="electron-application-evaluate-option-arg"/> &#60;[EvaluationArgument]&#62; Optional argument to pass to `pageFunction`.<a href="#electron-application-evaluate-option-arg" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="electron-application-evaluate-return"/> &#60;[Promise]<[Serializable]>&#62;<a href="#electron-application-evaluate-return" class="list-anchor">#</a>
+
+Returns the return value of `pageFunction`.
+
+If the function passed to the [electronApplication.evaluate(pageFunction[, arg])](./api/class-electronapplication.mdx#electron-application-evaluate) returns a [Promise], then [electronApplication.evaluate(pageFunction[, arg])](./api/class-electronapplication.mdx#electron-application-evaluate) would wait for the promise to resolve and return its value.
+
+If the function passed to the [electronApplication.evaluate(pageFunction[, arg])](./api/class-electronapplication.mdx#electron-application-evaluate) returns a non-[Serializable] value, then [electronApplication.evaluate(pageFunction[, arg])](./api/class-electronapplication.mdx#electron-application-evaluate) returns `undefined`. Playwright also supports transferring some additional values that are not serializable by `JSON`: `-0`, `NaN`, `Infinity`, `-Infinity`.
+
+## electronApplication.evaluateHandle(pageFunction, arg) {#electron-application-evaluate-handle}
+- `pageFunction`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="electron-application-evaluate-handle-option-expression"/> &#60;[function]|[Electron]&#62; Function to be evaluated in the worker context.<a href="#electron-application-evaluate-handle-option-expression" class="list-anchor">#</a>
+- `arg`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="electron-application-evaluate-handle-option-arg"/> &#60;[EvaluationArgument]&#62;<a href="#electron-application-evaluate-handle-option-arg" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="electron-application-evaluate-handle-return"/> &#60;[Promise]<[JSHandle]>&#62;<a href="#electron-application-evaluate-handle-return" class="list-anchor">#</a>
+
+Returns the return value of `pageFunction` as a [JSHandle].
+
+The only difference between [electronApplication.evaluate(pageFunction[, arg])](./api/class-electronapplication.mdx#electron-application-evaluate) and [electronApplication.evaluateHandle(pageFunction, arg)](./api/class-electronapplication.mdx#electron-application-evaluate-handle) is that [electronApplication.evaluateHandle(pageFunction, arg)](./api/class-electronapplication.mdx#electron-application-evaluate-handle) returns [JSHandle].
+
+If the function passed to the [electronApplication.evaluateHandle(pageFunction, arg)](./api/class-electronapplication.mdx#electron-application-evaluate-handle) returns a [Promise], then [electronApplication.evaluateHandle(pageFunction, arg)](./api/class-electronapplication.mdx#electron-application-evaluate-handle) would wait for the promise to resolve and return its value.
+
+## electronApplication.firstWindow() {#electron-application-first-window}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="electron-application-first-window-return"/> &#60;[Promise]<[Page]>&#62;<a href="#electron-application-first-window-return" class="list-anchor">#</a>
+
+Convenience method that waits for the first application window to be opened. Typically your script will start with:
+
+```js
+  const electronApp = await electron.launch({
+    args: ['main.js']
+  });
+  const window = await electronApp.firstWindow();
+  // ...
+```
+
+## electronApplication.waitForEvent(event[, optionsOrPredicate]) {#electron-application-wait-for-event}
+- `event`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="electron-application-wait-for-event-option-event"/> &#60;[string]&#62; Event name, same one typically passed into `*.on(event)`.<a href="#electron-application-wait-for-event-option-event" class="list-anchor">#</a>
+- `optionsOrPredicate`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="electron-application-wait-for-event-option-options-or-predicate"/> &#60;[function]|[Object]&#62; Either a predicate that receives an event or an options object. Optional.<a href="#electron-application-wait-for-event-option-options-or-predicate" class="list-anchor">#</a>
+  - `predicate` &#60;[function]&#62; receives the event data and resolves to truthy value when the waiting should resolve.
+  - `timeout` &#60;[number]&#62; maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout).
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="electron-application-wait-for-event-return"/> &#60;[Promise]<[Object]>&#62;<a href="#electron-application-wait-for-event-return" class="list-anchor">#</a>
+
+Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the application is closed before the event is fired. Returns the event data value.
+
+```js
+const [window] = await Promise.all([
+  electronApp.waitForEvent('window'),
+  mainWindow.click('button')
+]);
+```
+
+## electronApplication.windows() {#electron-application-windows}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="electron-application-windows-return"/> &#60;[Array]<[Page]>&#62;<a href="#electron-application-windows-return" class="list-anchor">#</a>
+
+Convenience method that returns all the opened windows.
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Android]: ./api/class-android.mdx "Android"
+[AndroidDevice]: ./api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: ./api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: ./api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: ./api/class-androidwebview.mdx "AndroidWebView"
+[APIRequest]: ./api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: ./api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: ./api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: ./api/class-apiresponseassertions.mdx "APIResponseAssertions"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: ./api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: ./api/class-coverage.mdx "Coverage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[Electron]: ./api/class-electron.mdx "Electron"
+[ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Locator]: ./api/class-locator.mdx "Locator"
+[LocatorAssertions]: ./api/class-locatorassertions.mdx "LocatorAssertions"
+[Logger]: ./api/class-logger.mdx "Logger"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[PageAssertions]: ./api/class-pageassertions.mdx "PageAssertions"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: ./api/class-playwrightassertions.mdx "PlaywrightAssertions"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[ScreenshotAssertions]: ./api/class-screenshotassertions.mdx "ScreenshotAssertions"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Fixtures]: ./api/class-fixtures.mdx "Fixtures"
+[Test]: ./api/class-test.mdx "Test"
+[TestConfig]: ./api/class-testconfig.mdx "TestConfig"
+[TestError]: ./api/class-testerror.mdx "TestError"
+[TestInfo]: ./api/class-testinfo.mdx "TestInfo"
+[TestOptions]: ./api/class-testoptions.mdx "TestOptions"
+[TestProject]: ./api/class-testproject.mdx "TestProject"
+[WorkerInfo]: ./api/class-workerinfo.mdx "WorkerInfo"
+[Location]: ./api/class-location.mdx "Location"
+[Reporter]: ./api/class-reporter.mdx "Reporter"
+[Suite]: ./api/class-suite.mdx "Suite"
+[TestCase]: ./api/class-testcase.mdx "TestCase"
+[TestResult]: ./api/class-testresult.mdx "TestResult"
+[TestStep]: ./api/class-teststep.mdx "TestStep"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
