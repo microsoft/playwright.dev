@@ -39,7 +39,6 @@ module.exports = {
         { "type": "doc", "id": "pom" },
         { "type": "doc", "id": "screenshots" },
         { "type": "doc", "id": "selectors" },
-        { "type": "doc", "id": "verification" },
         { "type": "doc", "id": "videos" },
       ],
       "collapsed": false
@@ -66,6 +65,7 @@ module.exports = {
           "type": "category",
           "label": "Classes",
           "items": [
+            { "type": "doc", "id": "test-assertions" },
             { "type": "doc", "id": "api/class-browser" },
             { "type": "doc", "id": "api/class-browsercontext" },
             { "type": "doc", "id": "api/class-browsertype" },
@@ -79,11 +79,8 @@ module.exports = {
             { "type": "doc", "id": "api/class-jshandle" },
             { "type": "doc", "id": "api/class-keyboard" },
             { "type": "doc", "id": "api/class-locator" },
-            { "type": "doc", "id": "api/class-locatorassertions" },
             { "type": "doc", "id": "api/class-mouse" },
             { "type": "doc", "id": "api/class-page" },
-            { "type": "doc", "id": "api/class-pageassertions" },
-            { "type": "doc", "id": "api/class-playwrightassertions" },
             { "type": "doc", "id": "api/class-request" },
             { "type": "doc", "id": "api/class-response" },
             { "type": "doc", "id": "api/class-route" },
