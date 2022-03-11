@@ -184,4 +184,14 @@ module.exports = {
     languageName: 'Node.js',
   },
   trailingSlash: false,
+  webpack: {
+    jsLoader: (isServer) => ({
+      loader: require.resolve('esbuild-loader'),
+      options: {
+        loader: 'tsx',
+        format: isServer ? 'cjs' : undefined,
+        target: isServer ? 'node12' : 'es2017',
+      },
+    }),
+  }
 };
