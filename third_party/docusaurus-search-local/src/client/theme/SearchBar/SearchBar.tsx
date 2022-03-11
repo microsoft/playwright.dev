@@ -77,6 +77,7 @@ export default function SearchBar({
       {
         hint: false,
         autoselect: true,
+        openOnFocus: true,
         cssClasses: {
           root: styles.searchBar,
           noPrefix: true,
@@ -123,23 +124,29 @@ export default function SearchBar({
           },
         },
       ]
-    ).on("autocomplete:selected", function (
-      event: any,
-      { document: { u, h }, tokens }: SearchResult
-    ) {
-      let url = u;
-      if (Mark && tokens.length > 0) {
-        const params = new URLSearchParams();
-        for (const token of tokens) {
-          params.append(SEARCH_PARAM_HIGHLIGHT, token);
+    )
+      .on("autocomplete:selected", function (
+        event: any,
+        { document: { u, h }, tokens }: SearchResult
+      ) {
+        searchBarRef.current?.blur();
+
+        let url = u;
+        if (Mark && tokens.length > 0) {
+          const params = new URLSearchParams();
+          for (const token of tokens) {
+            params.append(SEARCH_PARAM_HIGHLIGHT, token);
+          }
+          url += `?${params.toString()}`;
         }
-        url += `?${params.toString()}`;
-      }
-      if (h) {
-        url += h;
-      }
-      history.push(url);
-    });
+        if (h) {
+          url += h;
+        }
+        history.push(url);
+      })
+      .on("autocomplete:closed", () => {
+        searchBarRef.current?.blur();
+      });
 
     indexState.current = "done";
     setLoading(false);
@@ -201,6 +208,29 @@ export default function SearchBar({
     []
   );
 
+  // Implement hint icons for the search shortcuts on mac and the rest operating systems.
+  const isMac = ExecutionEnvironment.canUseDOM
+    ? /mac/i.test(
+        (navigator as any).userAgentData?.platform ?? navigator.platform
+      )
+    : false;
+
+  useEffect(() => {
+    // Add shortcuts command/ctrl + K
+    function handleShortcut(event: KeyboardEvent): void {
+      if ((isMac ? event.metaKey : event.ctrlKey) && event.code === "KeyK") {
+        event.preventDefault();
+        searchBarRef.current?.focus();
+        onInputFocus();
+      }
+    }
+
+    document.addEventListener("keydown", handleShortcut);
+    return () => {
+      document.removeEventListener("keydown", handleShortcut);
+    };
+  }, [isMac, onInputFocus]);
+
   return (
     <div
       className={clsx("navbar__search", styles.searchBarContainer, {
@@ -218,6 +248,10 @@ export default function SearchBar({
         ref={searchBarRef}
       />
       <LoadingRing className={styles.searchBarLoadingRing} />
+      <div className={styles.searchHintContainer}>
+        <kbd className={styles.searchHint}>{isMac ? "⌘" : "ctrl"}</kbd>
+        <kbd className={styles.searchHint}>K</kbd>
+      </div>
     </div>
   );
 }
