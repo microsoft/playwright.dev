@@ -11,7 +11,8 @@ on:
 
 jobs:
   build_and_deploy_job:
-    if: (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) && (github.event_name == 'push' || (github.event_name == 'pull_request' && github.event.action != 'closed'))
+    # If pushed to the main branch or a Pull Request to the main repo gets opened
+    if: (github.event_name == 'push' && github.repository == 'microsoft/playwright.dev' && contains(github.ref, 'main')) || (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.action != 'closed'))
     runs-on: ubuntu-latest
     name: Build and Deploy Job
     steps:
@@ -34,7 +35,8 @@ jobs:
           ###### End of Repository/Build Configurations ######
 
   close_pull_request_job:
-    if: (github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository) && github.event_name == 'pull_request' && github.event.action == 'closed'
+    # Only when Pull Requests gets closed which are no forks 
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository && github.event.action == 'closed'
     runs-on: ubuntu-latest
     name: Close Pull Request Job
     steps:
