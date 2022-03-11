@@ -2,7 +2,10 @@ import React from 'react';
 import Link from '@docusaurus/Link';
 import Layout from '@theme/Layout';
 
-import { useVersions, useLatestVersion } from '@theme/hooks/useDocs';
+import {
+  useVersions,
+  useLatestVersion,
+} from '@docusaurus/plugin-content-docs/client';
 
 const Version: React.FC = () => {
   const versions = useVersions();

@@ -6,7 +6,7 @@ type StarButtonProps = {
     repo: string
 }
 
-const STARS = '34k+';
+const STARS = '35k+';
 
 const StarButton: React.FC<StarButtonProps> = ({owner, repo}) => {
     return (

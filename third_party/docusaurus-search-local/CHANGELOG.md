@@ -2,6 +2,55 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [0.23.0](https://www.github.com/easyops-cn/docusaurus-search-local/compare/v0.22.0...v0.23.0) (2022-03-10)
+
+
+### Features
+
+* replace nodejieba with @node-rs/jieba ([f3f7594](https://www.github.com/easyops-cn/docusaurus-search-local/commit/f3f7594d0a97075a4aefa19e15f2d1f961bbb824))
+
+## [0.22.0](https://www.github.com/easyops-cn/docusaurus-search-local/compare/v0.21.4...v0.22.0) (2022-02-28)
+
+
+### Features
+
+* improve focus for search bar ([e4ede16](https://www.github.com/easyops-cn/docusaurus-search-local/commit/e4ede1650883e326bcbc7ff17c5ed3d37b279d17))
+
+### [0.21.4](https://www.github.com/easyops-cn/docusaurus-search-local/compare/v0.21.3...v0.21.4) (2021-12-15)
+
+
+### Bug Fixes
+
+* set max-width for dropdown on small screen ([cec8c39](https://www.github.com/easyops-cn/docusaurus-search-local/commit/cec8c3924beacd900d880fd66edaf52dbdbdd952)), closes [#135](https://www.github.com/easyops-cn/docusaurus-search-local/issues/135)
+
+### [0.21.3](https://www.github.com/easyops-cn/docusaurus-search-local/compare/v0.21.2...v0.21.3) (2021-12-14)
+
+
+### Bug Fixes
+
+* use keydown instead of keypress ([d871f0b](https://www.github.com/easyops-cn/docusaurus-search-local/commit/d871f0bbb1e1c6fe191341f7166b89b6aeb11bf2)), closes [#132](https://www.github.com/easyops-cn/docusaurus-search-local/issues/132)
+
+### [0.21.2](https://www.github.com/easyops-cn/docusaurus-search-local/compare/v0.21.1...v0.21.2) (2021-12-13)
+
+
+### Bug Fixes
+
+* refine styles with dark navbar ([e3c9eef](https://www.github.com/easyops-cn/docusaurus-search-local/commit/e3c9eef41ffd9d51bb57b05fd199f7dc32541e79)), closes [#128](https://www.github.com/easyops-cn/docusaurus-search-local/issues/128)
+
+### [0.21.1](https://www.github.com/easyops-cn/docusaurus-search-local/compare/v0.21.0...v0.21.1) (2021-12-07)
+
+
+### Bug Fixes
+
+* fix input box style of search page in dark mode ([f233bce](https://www.github.com/easyops-cn/docusaurus-search-local/commit/f233bcedb4d79cba9b8d21f700ca79f2297f0ec9)), closes [#125](https://www.github.com/easyops-cn/docusaurus-search-local/issues/125)
+
+## [0.21.0](https://www.github.com/easyops-cn/docusaurus-search-local/compare/v0.20.0...v0.21.0) (2021-12-04)
+
+
+### Features
+
+* add shortcut (cmd/ctrl + K) support ([f12403f](https://www.github.com/easyops-cn/docusaurus-search-local/commit/f12403fc6bc48b489d8ef170aecad2262f3a4ebc))
+
 ## [0.20.0](https://www.github.com/easyops-cn/docusaurus-search-local/compare/v0.19.1...v0.20.0) (2021-11-12)
 
 
