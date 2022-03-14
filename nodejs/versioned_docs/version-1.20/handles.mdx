@@ -1,0 +1,180 @@
+---
+id: handles
+title: "Handles"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Playwright can create handles to the page DOM elements or any other objects inside the page. These handles live in the Playwright process, whereas the actual objects live in the browser. There are two types of handles:
+- [JSHandle] to reference any JavaScript objects in the page
+- [ElementHandle] to reference DOM elements in the page, it has extra methods that allow performing actions on the elements and asserting their properties.
+
+Since any DOM element in the page is also a JavaScript object, any [ElementHandle] is a [JSHandle] as well.
+
+Handles are used to perform operations on those actual objects in the page. You can evaluate on a handle, get handle properties, pass handle as an evaluation parameter, serialize page object into JSON etc. See the [JSHandle] class API for these and methods.
+
+### API reference
+- [JSHandle]
+- [ElementHandle]
+
+Here is the easiest way to obtain a [JSHandle].
+
+```js
+const jsHandle = await page.evaluateHandle('window');
+//  Use jsHandle for evaluations.
+```
+
+## Element Handles
+
+:::caution Discouraged
+The use of [ElementHandle] is discouraged, use [Locator] objects and web-first assertions instead.
+:::
+
+When [ElementHandle] is required, it is recommended to fetch it with the [page.waitForSelector(selector[, options])](./api/class-page.mdx#page-wait-for-selector) or [frame.waitForSelector(selector[, options])](./api/class-frame.mdx#frame-wait-for-selector) methods. These APIs wait for the element to be attached and visible.
+
+```js
+// Get the element handle
+const elementHandle = page.waitForSelector('#box');
+
+// Assert bounding box for the element
+const boundingBox = await elementHandle.boundingBox();
+expect(boundingBox.width).toBe(100);
+
+// Assert attribute for the element
+const classNames = await elementHandle.getAttribute('class');
+expect(classNames.includes('highlighted')).toBeTruthy();
+```
+
+## Handles as parameters
+
+Handles can be passed into the [page.evaluate(pageFunction[, arg])](./api/class-page.mdx#page-evaluate) and similar methods. The following snippet creates a new array in the page, initializes it with data and returns a handle to this array into Playwright. It then uses the handle in subsequent evaluations:
+
+```js
+// Create new array in page.
+const myArrayHandle = await page.evaluateHandle(() => {
+  window.myArray = [1];
+  return myArray;
+});
+
+// Get the length of the array.
+const length = await page.evaluate(a => a.length, myArrayHandle);
+
+// Add one more element to the array using the handle
+await page.evaluate(arg => arg.myArray.push(arg.newElement), {
+  myArray: myArrayHandle,
+  newElement: 2
+});
+
+// Release the object when it's no longer needed.
+await myArrayHandle.dispose();
+```
+
+## Handle Lifecycle
+
+Handles can be acquired using the page methods such as [page.evaluateHandle(pageFunction[, arg])](./api/class-page.mdx#page-evaluate-handle), [page.$(selector[, options])](./api/class-page.mdx#page-query-selector) or [page.$$(selector)](./api/class-page.mdx#page-query-selector-all) or their frame counterparts [frame.evaluateHandle(pageFunction[, arg])](./api/class-frame.mdx#frame-evaluate-handle), [frame.$(selector[, options])](./api/class-frame.mdx#frame-query-selector) or [frame.$$(selector)](./api/class-frame.mdx#frame-query-selector-all). Once created, handles will retain object from [garbage collection](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_Management) unless page navigates or the handle is manually disposed via the [jsHandle.dispose()](./api/class-jshandle.mdx#js-handle-dispose) method.
+
+### API reference
+- [JSHandle]
+- [ElementHandle]
+- [elementHandle.boundingBox()](./api/class-elementhandle.mdx#element-handle-bounding-box)
+- [elementHandle.getAttribute(name)](./api/class-elementhandle.mdx#element-handle-get-attribute)
+- [elementHandle.innerText()](./api/class-elementhandle.mdx#element-handle-inner-text)
+- [elementHandle.innerHTML()](./api/class-elementhandle.mdx#element-handle-inner-html)
+- [elementHandle.textContent()](./api/class-elementhandle.mdx#element-handle-text-content)
+- [jsHandle.evaluate(pageFunction[, arg])](./api/class-jshandle.mdx#js-handle-evaluate)
+- [page.evaluateHandle(pageFunction[, arg])](./api/class-page.mdx#page-evaluate-handle)
+- [page.$(selector[, options])](./api/class-page.mdx#page-query-selector)
+- [page.$$(selector)](./api/class-page.mdx#page-query-selector-all)
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Android]: ./api/class-android.mdx "Android"
+[AndroidDevice]: ./api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: ./api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: ./api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: ./api/class-androidwebview.mdx "AndroidWebView"
+[APIRequest]: ./api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: ./api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: ./api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: ./test-assertions.mdx "APIResponseAssertions"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: ./api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: ./api/class-coverage.mdx "Coverage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[Electron]: ./api/class-electron.mdx "Electron"
+[ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Locator]: ./api/class-locator.mdx "Locator"
+[LocatorAssertions]: ./test-assertions.mdx "LocatorAssertions"
+[Logger]: ./api/class-logger.mdx "Logger"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[PageAssertions]: ./test-assertions.mdx "PageAssertions"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: ./test-assertions.mdx "PlaywrightAssertions"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[ScreenshotAssertions]: ./test-assertions.mdx "ScreenshotAssertions"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Fixtures]: ./api/class-fixtures.mdx "Fixtures"
+[Test]: ./api/class-test.mdx "Test"
+[TestConfig]: ./api/class-testconfig.mdx "TestConfig"
+[TestError]: ./api/class-testerror.mdx "TestError"
+[TestInfo]: ./api/class-testinfo.mdx "TestInfo"
+[TestOptions]: ./api/class-testoptions.mdx "TestOptions"
+[TestProject]: ./api/class-testproject.mdx "TestProject"
+[WorkerInfo]: ./api/class-workerinfo.mdx "WorkerInfo"
+[Location]: ./api/class-location.mdx "Location"
+[Reporter]: ./api/class-reporter.mdx "Reporter"
+[Suite]: ./api/class-suite.mdx "Suite"
+[TestCase]: ./api/class-testcase.mdx "TestCase"
+[TestResult]: ./api/class-testresult.mdx "TestResult"
+[TestStep]: ./api/class-teststep.mdx "TestStep"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
