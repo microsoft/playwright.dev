@@ -5,7 +5,27 @@ title: "ConsoleMessage"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-[ConsoleMessage] objects are dispatched by page via the [event Page.Console](./api/class-page.mdx#page-event-console) event.
+[ConsoleMessage] objects are dispatched by page via the [event Page.Console](./api/class-page.mdx#page-event-console) event. For each console messages logged in the page there will be corresponding event in the Playwright context.
+
+```csharp
+// Listen for all System.out.printlns
+page.Console += (_, msg) => Console.WriteLine(msg.Text);
+
+// Listen for all console events and handle errors
+page.Console += (_, msg) =>
+{
+    if ("error".Equals(msg.Type))
+        Console.WriteLine("Error text: " + msg.Text);
+};
+
+// Get the next System.out.println
+var waitForMessageTask = page.WaitForConsoleMessageAsync();
+await page.EvaluateAsync("console.log('hello', 42, { foo: 'bar' });");
+var message = await waitForMessageTask;
+// Deconstruct console.log arguments
+await message.Args.ElementAt(0).JsonValueAsync<string>(); // hello
+await message.Args.ElementAt(1).JsonValueAsync<int>(); // 42
+```
 
 
 - [ConsoleMessage.Args](./api/class-consolemessage.mdx#console-message-args)

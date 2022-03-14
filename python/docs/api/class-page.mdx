@@ -289,6 +289,10 @@ except Error as e:
 
 Emitted when a JavaScript dialog appears, such as `alert`, `prompt`, `confirm` or `beforeunload`. Listener **must** either [dialog.accept(**kwargs)](./api/class-dialog.mdx#dialog-accept) or [dialog.dismiss()](./api/class-dialog.mdx#dialog-dismiss) the dialog - otherwise the page will [freeze](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#never_blocking) waiting for the dialog, and actions like click will never finish.
 
+```py
+page.on("dialog", lambda dialog: dialog.accept())
+```
+
 :::note
 When no [page.on("dialog")](./api/class-page.mdx#page-event-dialog) listeners are present, all dialogs are automatically dismissed.
 :::
@@ -336,6 +340,38 @@ Emitted when the JavaScript [`load`](https://developer.mozilla.org/en-US/docs/We
 - type: &#60;[Error]&#62;
 
 Emitted when an uncaught exception happens within the page.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Log all uncaught errors to the terminal
+page.on("pageerror", lambda exc: print(f"uncaught exception: {exc}"))
+
+# Navigate to a page with an exception.
+page.goto("data:text/html,<script>throw new Error('test')</script>")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Log all uncaught errors to the terminal
+page.on("pageerror", lambda exc: print(f"uncaught exception: {exc}"))
+
+# Navigate to a page with an exception.
+await page.goto("data:text/html,<script>throw new Error('test')</script>")
+```
+
+</TabItem>
+</Tabs>
 
 ## page.on("popup") {#page-event-popup}
 - type: &#60;[Page]&#62;
@@ -387,6 +423,10 @@ Emitted when a page issues a request. The [request] object is read-only. In orde
 - type: &#60;[Request]&#62;
 
 Emitted when a request fails, for example by timing out.
+
+```py
+page.on("requestfailed", lambda request: print(request.url + " " + request.failure.error_text))
+```
 
 :::note
 HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [page.on("requestfinished")](./api/class-page.mdx#page-event-request-finished) event and not with [page.on("requestfailed")](./api/class-page.mdx#page-event-request-failed). A request will only be considered failed when the client cannot get an HTTP response from the server, e.g. due to network error net::ERR_FAILED.
