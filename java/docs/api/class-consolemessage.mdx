@@ -5,7 +5,28 @@ title: "ConsoleMessage"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-[ConsoleMessage] objects are dispatched by page via the [Page.onConsoleMessage(handler)](./api/class-page.mdx#page-event-console) event.
+[ConsoleMessage] objects are dispatched by page via the [Page.onConsoleMessage(handler)](./api/class-page.mdx#page-event-console) event. For each console messages logged in the page there will be corresponding event in the Playwright context.
+
+```java
+// Listen for all System.out.printlns
+page.onConsoleMessage(msg -> System.out.println(msg.text()));
+
+// Listen for all console events and handle errors
+page.onConsoleMessage(msg -> {
+  if ("error".equals(msg.type()))
+    System.out.println("Error text: " + msg.text());
+});
+
+// Get the next System.out.println
+ConsoleMessage msg = page.waitForConsoleMessage(() -> {
+  // Issue console.log inside the page
+  page.evaluate("console.log('hello', 42, { foo: 'bar' });");
+});
+
+// Deconstruct console.log arguments
+msg.args().get(0).jsonValue() // hello
+msg.args().get(1).jsonValue() // 42
+```
 
 
 - [ConsoleMessage.args()](./api/class-consolemessage.mdx#console-message-args)

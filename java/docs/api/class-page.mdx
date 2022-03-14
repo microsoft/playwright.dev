@@ -202,6 +202,12 @@ try {
 
 Emitted when a JavaScript dialog appears, such as `alert`, `prompt`, `confirm` or `beforeunload`. Listener **must** either [Dialog.accept([promptText])](./api/class-dialog.mdx#dialog-accept) or [Dialog.dismiss()](./api/class-dialog.mdx#dialog-dismiss) the dialog - otherwise the page will [freeze](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#never_blocking) waiting for the dialog, and actions like click will never finish.
 
+```java
+page.onDialog(dialog -> {
+  dialog.accept();
+});
+```
+
 :::note
 When no [Page.onDialog(handler)](./api/class-page.mdx#page-event-dialog) listeners are present, all dialogs are automatically dismissed.
 :::
@@ -252,6 +258,16 @@ Emitted when the JavaScript [`load`](https://developer.mozilla.org/en-US/docs/We
 
 Emitted when an uncaught exception happens within the page.
 
+```java
+// Log all uncaught errors to the terminal
+page.onPageError(exception -> {
+  System.out.println("Uncaught exception: " + exception);
+});
+
+// Navigate to a page with an exception.
+page.navigate("data:text/html,<script>throw new Error('Test')</script>");
+```
+
 ## Page.onPopup(handler) {#page-event-popup}
 - type: &#60;[Page]&#62;
 
@@ -279,6 +295,12 @@ Emitted when a page issues a request. The [request] object is read-only. In orde
 - type: &#60;[Request]&#62;
 
 Emitted when a request fails, for example by timing out.
+
+```java
+page.onRequestFailed(request -> {
+  System.out.println(request.url() + " " + request.failure());
+});
+```
 
 :::note
 HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [Page.onRequestFinished(handler)](./api/class-page.mdx#page-event-request-finished) event and not with [Page.onRequestFailed(handler)](./api/class-page.mdx#page-event-request-failed). A request will only be considered failed when the client cannot get an HTTP response from the server, e.g. due to network error net::ERR_FAILED.
