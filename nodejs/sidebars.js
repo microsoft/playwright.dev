@@ -63,7 +63,6 @@ module.exports = {
         { "type": "doc", "id": "pom" },
         { "type": "doc", "id": "screenshots" },
         { "type": "doc", "id": "selectors" },
-        { "type": "doc", "id": "verification" },
         { "type": "doc", "id": "videos" },
       ],
       "collapsed": false
