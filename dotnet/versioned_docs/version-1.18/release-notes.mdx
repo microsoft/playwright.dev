@@ -1,67 +1,303 @@
 ---
-id: release-notes
-title: "Release notes"
+  id: release-notes
+  title: "Release notes"
 ---
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
 
-- [Version 1.18](#version-118)
-- [Version 1.17](#version-117)
-- [Ubuntu ARM64 support + more](#ubuntu-arm64-support--more)
-- [Version 1.16](#version-116)
-- [Version 1.15](#version-115)
-- [Version 1.14](#version-114)
-- [Version 1.13](#version-113)
-- [Version 1.12](#version-112)
+## [N/A](https://github.com/microsoft/playwright-dotnet/releases/tag/)
 
-## Version 1.18
+### Web-First Assertions
 
-### Locator Improvements
-- [Locator.DragToAsync(target, options)](./api/class-locator.mdx#locator-drag-to)
-- Each locator can now be optionally filtered by the text it contains:
 
-  ```csharp
-  await Page.Locator("li", new () { HasTextString = "My Item" })
-            .Locator("button").click();
-  ```
+Playwright for .NET 1.20 introduces [Web-First Assertions](https://playwright.dev/dotnet/docs/test-assertions).
 
-  Read more in [locator documentation](./api/class-locator#locator-locator-option-has-text)
+Consider the following example:
 
-### New APIs & changes
-- [`AcceptDownloads`](./api/class-browser#browser-new-context-option-accept-downloads) option now defaults to `true`.
-- [`Sources`](./api/class-tracing#tracing-start-option-sources) option to embed sources into traces.
+```csharp
+using System.Threading.Tasks;
+using Microsoft.Playwright.NUnit;
+using NUnit.Framework;
+
+namespace Playwright.TestingHarnessTest.NUnit
+{
+    public class ExampleTests : PageTest
+    {
+        [Test]
+        public async Task StatusBecomesSubmitted()
+        {
+            await Expect(Page.Locator(".status")).ToHaveTextAsync("Submitted");
+        }
+    }
+}
+```
+
+Playwright will be re-testing the node with the selector `.status` until
+fetched Node has the `"Submitted"` text. It will be re-fetching the node and
+checking it over and over, until the condition is met or until the timeout is
+reached. You can pass this timeout as an option.
+
+Read more in [our documentation](https://playwright.dev/dotnet/docs/next/test-assertions).
+
+### Other Updates
+
+
+- New options for methods [`page.screenshot()`](https://playwright.dev/dotnet/docs/api/class-page#page-screenshot), [`locator.screenshot()`](https://playwright.dev/dotnet/docs/api/class-locator#locator-screenshot) and [`elementHandle.screenshot()`](https://playwright.dev/dotnet/docs/api/class-elementhandle#element-handle-screenshot):
+  * Option `ScreenshotAnimations.Disabled` rewinds all CSS animations and transitions to a consistent state
+  * Option `mask: Locator[]` masks given elements, overlaying them with pink `#FF00FF` boxes.
+- [`Locator.highlight()`](https://playwright.dev/dotnet/docs/api/class-locator#locator-highlight) visually reveals element(s) for easier debugging.
+
+### Announcements
+
+
+- v1.20 is the last release to receive WebKit update for macOS 10.15 Catalina. Please update MacOS to keep using latest & greatest WebKit!
 
 ### Browser Versions
+
+
+- Chromium 101.0.4921.0
+- Mozilla Firefox 97.0.1
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 99
+- Microsoft Edge 99
+
+
+
+## [v1.19.1](https://github.com/microsoft/playwright-dotnet/releases/tag/v1.19.1)
+
+### Highlights
+
+
+This patch includes the following bug fixes:
+
+https://github.com/microsoft/playwright-dotnet/pull/2023 - [BUG] chore: don't include PlaywrightCopyItems in pack
+https://github.com/microsoft/playwright/issues/12075 - [Question] After update to 1.19 firefox fails to run
+https://github.com/microsoft/playwright/issues/12106 - [BUG] Error: EBUSY: resource busy or locked when using volumes in docker-compose with playwright 1.19.0 and mcr.microsoft.com/playwright:v1.15.0-focal
+
+### Browser Versions
+
+
+- Chromium 100.0.4863.0
+- Mozilla Firefox 96.0.1
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 98
+- Microsoft Edge 98
+
+
+
+## [v1.19.0](https://github.com/microsoft/playwright-dotnet/releases/tag/v1.19.0)
+
+### Version 1.19
+
+
+### Locator Updates
+
+
+#### Locator now supports a `has` option that makes sure it contains another locator inside:
+
+
+  ```csharp
+  await Page.Locator("article", new () { Has = Page.Locator(".highlight") }).ClickAsync();
+  ```
+
+  The snippet above will select article that has highlight in it and will press the button in it.
+  Read more in [locator documentation](https://playwright.dev/dotnet/docs/api/class-locator#locator-locator-option-has)
+
+### Other Updates
+
+
+- New [`method: Locator.page`](https://playwright.dev/dotnet/docs/api/class-locator#locator-page)
+- [`method: Page.screenshot`](https://playwright.dev/dotnet/docs/api/class-page#page-screenshot) and [`method: Locator.screenshot`](https://playwright.dev/dotnet/docs/api/class-locator#locator-screenshot) now automatically hides blinking caret
+- Playwright Codegen now generates locators and frame locators
+
+### Browser Versions
+
+
+- Chromium 100.0.4863.0
+- Mozilla Firefox 96.0.1
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 98
+- Microsoft Edge 98
+
+
+
+
+## [v1.18.1](https://github.com/microsoft/playwright-dotnet/releases/tag/v1.18.1)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright-dotnet/issues/1964 - [BUG] Save trace without a path was not possible
+
+### Browser Versions
+
+
 - Chromium 99.0.4812.0
 - Mozilla Firefox 95.0
 - WebKit 15.4
 
 This version was also tested against the following stable channels:
+
 - Google Chrome 97
 - Microsoft Edge 97
 
-## Version 1.17
+
+
+## [v1.18.0](https://github.com/microsoft/playwright-dotnet/releases/tag/v1.18.0)
+
+### Locator Improvements
+
+
+- [`Locator.DragToAsync`](https://playwright.dev/dotnet/docs/next/api/class-locator#locator-drag-to)
+- Each locator can now be optionally filtered by the text it contains:
+    ```csharp
+    await Page.Locator("li", new () { HasTextString = "My Item" })
+              .Locator("button").click();
+    ```
+    Read more in [locator documentation](https://playwright.dev/dotnet/docs/api/class-locator#locator-locator-option-has-text)
+
+
+### New APIs & changes
+
+
+- [`BrowserType.ConnectOverCDPAsync`](https://playwright.dev/dotnet/docs/api/class-browsertype#browser-type-connect) connect to a Chromium browser via Chromium DevTools Protocol (CDP)
+- [`BrowserType.ConnectAsync`](https://playwright.dev/dotnet/docs/api/class-browsertype#browser-type-connect) connect to a Playwright server instance
+- [`AcceptDownloads`](https://playwright.dev/dotnet/docs/api/class-browser#browser-new-context-option-accept-downloads) option now defaults to `true`.
+- [`Sources`](https://playwright.dev/dotnet/docs/api/class-tracing#tracing-start-option-sources) option to embed sources into traces.
+
+### Browser Versions
+
+
+- Chromium 99.0.4812.0
+- Mozilla Firefox 95.0
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 97
+- Microsoft Edge 97
+
+
+
+
+## [v1.17.3](https://github.com/microsoft/playwright-dotnet/releases/tag/v1.17.3)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright-dotnet/issues/1668 - [BUG] Microsoft.Playwright.CLI was not working under .NET 6
+https://github.com/microsoft/playwright-dotnet/issues/1841 - [BUG] HAR file didn't get saved on the disk
+https://github.com/microsoft/playwright-dotnet/issues/1749 - [BUG]: Driver process lead to leaking zombie processes
+
+
+### Browser Versions
+
+
+- Chromium 98.0.4695.0
+- Mozilla Firefox 94.0.1
+- WebKit 15.4
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 96
+- Microsoft Edge 96
+
+
+
+
+## [v1.17.2](https://github.com/microsoft/playwright-dotnet/releases/tag/v1.17.2)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/10638 - [BUG] Locator.click -> subtree intercepts pointer events since version 1.17.0
+https://github.com/microsoft/playwright/issues/10632 - [BUG] Playwright 1.17.0 -> After clicking the element - I get an error that click action was failed
+https://github.com/microsoft/playwright/issues/10627 - [REGRESSION]: Can no longer click Material UI select box
+https://github.com/microsoft/playwright/issues/10620 - [BUG] trailing zero width whitespace fails toHaveText
+
+
+### Browser Versions
+
+
+- Chromium 98.0.4695.0
+- Mozilla Firefox 94.0.1
+- WebKit 15.4
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 96
+- Microsoft Edge 96
+
+
+
+
+## [v1.17.1](https://github.com/microsoft/playwright-dotnet/releases/tag/v1.17.1)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/10127 - [BUG] Add Trace Viewer error handling (file not found, not parsable)
+https://github.com/microsoft/playwright/issues/10436 - [Bug]: Add hints on how to open trace from HTML report when opened locally
+https://github.com/microsoft/playwright/pull/10492 - [Bug]: Fix broken Firefox User-Agent on 'Desktop Firefox' devices
+
+### Browser Versions
+
+
+- Chromium 98.0.4695.0
+- Mozilla Firefox 94.0.1
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 96
+- Microsoft Edge 96
+
+
+
+
+## [v1.17.0](https://github.com/microsoft/playwright-dotnet/releases/tag/v1.17.0)
+
+### Playwright v1.17.0
+
 
 ### Frame Locators
 
-Playwright 1.17 introduces [frame locators](./api/class-framelocator) - a locator to the iframe on the page. Frame locators capture the logic sufficient to retrieve the `iframe` and then locate elements in that iframe. Frame locators are strict by default, will wait for `iframe` to appear and can be used in Web-First assertions.
+
+Playwright 1.17 introduces [frame locators] - a locator to the iframe on the page. Frame locators capture the logic sufficient to retrieve the `iframe` and then locate elements in that iframe. Frame locators are strict by default, will wait for `iframe` to appear and can be used in Web-First assertions.
 
 ![Graphics](https://user-images.githubusercontent.com/746130/142082759-2170db38-370d-43ec-8d41-5f9941f57d83.png)
 
-Frame locators can be created with either [Page.FrameLocator(selector)](./api/class-page.mdx#page-frame-locator) or [Locator.FrameLocator(selector)](./api/class-locator.mdx#locator-frame-locator) method.
+Frame locators can be created with either [`page.FrameLocator(selector)`] or [`locator.FrameLocator(selector)`] method.
 
 ```csharp
-var locator = page.FrameLocator("#my-frame").Locator("text=Submit");
+var locator = page.FrameLocator("#my-iframe").Locator("text=Submit");
 await locator.ClickAsync();
 ```
 
-Read more at [our documentation](./api/class-framelocator).
+Read more at [our documentation](https://playwright.dev/dotnet/docs/api/class-framelocator).
 
 ### Trace Viewer Update
+
 
 Playwright Trace Viewer is now **available online** at https://trace.playwright.dev! Just drag-and-drop your `trace.zip` file to inspect its contents.
 
 > **NOTE**: trace files are not uploaded anywhere; [trace.playwright.dev](https://trace.playwright.dev) is a [progressive web application](https://web.dev/progressive-web-apps/) that processes traces locally.
+
 - Playwright Test traces now include sources by default (these could be turned off with tracing option)
 - Trace Viewer now shows test name
 - New trace metadata tab with browser details
@@ -69,63 +305,210 @@ Playwright Trace Viewer is now **available online** at https://trace.playwright.
 
 ![image](https://user-images.githubusercontent.com/746130/141877831-29e37cd1-e574-4bd9-aab5-b13a463bb4ae.png)
 
-### HTML Report Update
-- HTML report now supports dynamic filtering
-- Report is now a **single static HTML file** that could be sent by e-mail or as a slack attachment.
+### Ubuntu ARM64 support + more
 
-![image](https://user-images.githubusercontent.com/746130/141877402-e486643d-72c7-4db3-8844-ed2072c5d676.png)
 
-## Ubuntu ARM64 support + more
 - Playwright now supports **Ubuntu 20.04 ARM64**. You can now run Playwright tests inside Docker on Apple M1 and on Raspberry Pi.
-- You can now use Playwright to install stable version of Edge on Linux:
 
-  ```bash
-  npx playwright install msedge
-  ```
 
 ### New APIs
-- Tracing now supports a [`'title'`](./api/class-tracing#tracing-start-option-title) option
-- Page navigations support a new [`'commit'`](./api/class-page#page-goto) waiting option
 
-## Version 1.16
+
+- Tracing now supports a [`'title'`](https://playwright.dev/dotnet/docs/api/class-tracing#tracing-start-option-title) option
+- Page navigations support a new [`'commit'`](https://playwright.dev/dotnet/docs/api/class-page#page-goto) waiting option
+
+### Browser Versions
+
+
+- Chromium 98.0.4695.0
+- Mozilla Firefox 94.0.1
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 96
+- Microsoft Edge 96
+
+---
+
+[frame locators]: https://playwright.dev/dotnet/docs/api/class-framelocator
+[`page.FrameLocator(selector)`]: https://playwright.dev/dotnet/docs/api/class-page#page-frame-locator
+[`locator.FrameLocator(selector)`]: https://playwright.dev/dotnet/docs/api/class-locator#locator-frame-locator
+
+
+
+## [v1.16.1](https://github.com/microsoft/playwright-dotnet/releases/tag/v1.16.1)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/9692 - [BUG] HTML report shows locator._withElement for locator.evaluate
+https://github.com/microsoft/playwright/issues/7818 - [Bug]: dedup snapshot CSS images
+
+### Browser Versions
+
+
+- Chromium 97.0.4666.0
+- Mozilla Firefox 93.0
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 94
+- Microsoft Edge 94
+
+---
+
+(1.16.2-1635322350000)
+
+
+
+## [v1.16.0](https://github.com/microsoft/playwright-dotnet/releases/tag/v1.16.0)
 
 ### 🎭 Playwright Library
 
-#### Locator.WaitForAsync
 
-Wait for a locator to resolve to a single element with a given state. Defaults to the `state: 'visible'`.
+### Locator.waitForAsync
+
+
+Wait for a locator to resolve to a single element with a given state.
+Defaults to the `state: 'visible'`.
 
 ```csharp
 var orderSent = page.Locator("#order-sent");
 orderSent.WaitForAsync();
 ```
 
-Read more about [Locator.WaitForAsync(options)](./api/class-locator.mdx#locator-wait-for).
+Read more about [`Locator.WaitForAsync()`].
 
 ### 🎭 Playwright Trace Viewer
+
+
 - run trace viewer with `npx playwright show-trace` and drop trace files to the trace viewer PWA
 - better visual attribution of action targets
 
-Read more about [Trace Viewer](./trace-viewer).
+Read more about [Trace Viewer].
 
 ### Browser Versions
+
+
 - Chromium 97.0.4666.0
 - Mozilla Firefox 93.0
 - WebKit 15.4
 
 This version of Playwright was also tested against the following stable channels:
+
 - Google Chrome 94
 - Microsoft Edge 94
 
-## Version 1.15
+---
+
+(1.16.0-1634781227000)
+
+[Trace Viewer]: https://playwright.dev/dotnet/docs/next/trace-viewer
+[`Locator.WaitForAsync()`]: https://playwright.dev/dotnet/docs/next/api/class-locator#locator-wait-for
+
+
+
+
+## [v1.15.4](https://github.com/microsoft/playwright-dotnet/releases/tag/v1.15.4)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/9261 - [BUG] npm init playwright fails on path spaces
+https://github.com/microsoft/playwright/issues/9298 - [Question]: Should new Headers methods work in RouteAsync ?
+
+### Browser Versions
+
+
+- Chromium 96.0.4641.0
+- Mozilla Firefox 92.0
+- WebKit 15.0
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 93
+- Microsoft Edge 93
+
+---
+
+(driver version:  `1.15.2-1633455481000`)
+
+
+
+
+## [v1.15.2](https://github.com/microsoft/playwright-dotnet/releases/tag/v1.15.2)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/9065 - [BUG] browser(webkit): disable COOP support
+https://github.com/microsoft/playwright/issues/9092 - [BUG] browser(webkit): fix text padding
+
+### Browser Versions
+
+
+- Chromium 96.0.4641.0
+- Mozilla Firefox 92.0
+- WebKit 15.0
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 93
+- Microsoft Edge 93
+
+---
+
+(driver version:  `1.15.0-1633020276000`)
+
+
+
+
+## [v1.15.1](https://github.com/microsoft/playwright-dotnet/releases/tag/v1.15.1)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/pull/8955 - [BUG] fix(inspector): stop on all snapshottable actions
+https://github.com/microsoft/playwright/pull/8999 - [BUG] fix: do not dedup header values
+https://github.com/microsoft/playwright/pull/9038 - [BUG] fix: restore support for slowmo connect option
+
+### Browser Versions
+
+
+- Chromium 96.0.4641.0
+- Mozilla Firefox 92.0
+- WebKit 15.0
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 93
+- Microsoft Edge 93
+
+
+
+
+## [v1.15.0](https://github.com/microsoft/playwright-dotnet/releases/tag/v1.15.0)
 
 ### 🖱️ Mouse Wheel
+
 
 By using [`Page.Mouse.WheelAsync`](https://playwright.dev/dotnet/docs/next/api/class-mouse#mouse-wheel) you are now able to scroll vertically or horizontally.
 
 ### 📜 New Headers API
 
+
 Previously it was not possible to get multiple header values of a response. This is now possible and additional helper functions are available:
+
 - [Request.AllHeadersAsync()](https://playwright.dev/dotnet/docs/next/api/class-request#request-all-headers)
 - [Request.HeadersArrayAsync()](https://playwright.dev/dotnet/docs/next/api/class-request#request-headers-array)
 - [Request.HeaderValueAsync(name: string)](https://playwright.dev/dotnet/docs/next/api/class-request#request-header-value)
@@ -136,179 +519,598 @@ Previously it was not possible to get multiple header values of a response. This
 
 ### 🌈 Forced-Colors emulation
 
+
 Its now possible to emulate the `forced-colors` CSS media feature by passing it in the [context options](https://playwright.dev/dotnet/docs/next/api/class-browser#browser-new-context-option-forced-colors) or calling [Page.EmulateMediaAsync()](https://playwright.dev/dotnet/docs/next/api/class-page#page-emulate-media).
 
 ### New APIs
+
+
 - [Page.RouteAsync()](https://playwright.dev/dotnet/docs/next/api/class-page#page-route) accepts new `times` option to specify how many times this route should be matched.
 - [Page.SetCheckedAsync(selector: string, checked: Boolean)](https://playwright.dev/dotnet/docs/next/api/class-page#page-set-checked) and [Locator.SetCheckedAsync(selector: string, checked: Boolean)](https://playwright.dev/dotnet/docs/next/api/class-locator#locator-set-checked) was introduced to set the checked state of a checkbox.
 - [Request.SizesAsync()](https://playwright.dev/dotnet/docs/next/api/class-request#request-sizes) Returns resource size information for given http request.
 - [Tracing.StartChunkAsync()](https://playwright.dev/dotnet/docs/next/api/class-tracing#tracing-start-chunk) - Start a new trace chunk.
 - [Tracing.StopChunkAsync()](https://playwright.dev/dotnet/docs/next/api/class-tracing#tracing-stop-chunk) - Stops a new trace chunk.
 
-### Important ⚠
-* ⬆ .NET Core Apps 2.1 are **no longer** supported for our CLI tooling. As of August 31st, 2021, .NET Core 2.1 is no [longer supported](https://devblogs.microsoft.com/dotnet/net-core-2-1-will-reach-end-of-support-on-august-21-2021/) and will not receive any security updates. We've decided to move the CLI forward and require .NET Core 3.1 as a minimum. 
-
 ### Browser Versions
+
+
 - Chromium 96.0.4641.0
 - Mozilla Firefox 92.0
 - WebKit 15.0
 
-## Version 1.14
+### Important ⚠
 
-#### ⚡️ New "strict" mode
+* ⬆ .NET Core Apps 2.1 are **no longer** supported for our CLI tooling. As of August 31st, 2021, .NET Core 2.1 is no [longer supported](https://devblogs.microsoft.com/dotnet/net-core-2-1-will-reach-end-of-support-on-august-21-2021/) and will not receive any security updates. We've decided to move the CLI forward and require .NET Core 3.1 as a minimum. 
 
-Selector ambiguity is a common problem in automation testing. **"strict" mode** ensures that your selector points to a single element and throws otherwise.
+This version of Playwright was also tested against the following stable channels:
 
-Set `setStrict(true)` in your action calls to opt in.
+- Google Chrome 93
+- Microsoft Edge 93
 
-```csharp
+### Important ⚠
+
+* ⬆ .NET Core Apps 2.1 are **no longer** supported for our CLI tooling. As of August 31st, 2021, .NET Core 2.1 is no [longer supported](https://devblogs.microsoft.com/dotnet/net-core-2-1-will-reach-end-of-support-on-august-21-2021/) and will not receive any security updates. We've decided to move the CLI forward and require .NET Core 3.1 as a minimum. 
+
+
+
+
+## [v1.14.1](https://github.com/microsoft/playwright-dotnet/releases/tag/v1.14.1)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+microsoft/playwright#8287 - [BUG] webkit crashes intermittently: "file data stream has an unexpected number of bytes"
+microsoft/playwright#8281 - [BUG] HTML report crashes if diff snapshot does not exists
+microsoft/playwright#8230 - Using React Selectors with multiple React trees 
+microsoft/playwright#8366 - [BUG] Mark timeout in isVisible as deprecated and noop
+
+### Browser Versions
+
+
+- Chromium 94.0.4595.0
+- Mozilla Firefox 91.0
+- WebKit 15.0
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 92
+- Microsoft Edge 92
+
+
+
+## [v1.14.0](https://github.com/microsoft/playwright-dotnet/releases/tag/v1.14.0)
+
+### ⚡️ New "strict" mode
+
+
+Selector ambiguity is a common problem in automation testing. **"strict" mode**
+ensures that your selector points to a single element and throws otherwise.
+
+Pass `Strict = true` into your action calls to opt in.
+
+```C#
 // This will throw if you have more than one button!
-await page.ClickAsync("button", new Page.ClickOptions().setStrict(true));
+await page.ClickAsync("button", new () { Strict = true } );
 ```
 
-#### 📍 New [**Locators API**](./api/class-locator)
+### 📍 New [**Locators API**](https://playwright.dev/dotnet/docs/api/class-locator)
+
 
 Locator represents a view to the element(s) on the page. It captures the logic sufficient to retrieve the element at any given moment.
 
-The difference between the [Locator](./api/class-locator) and [ElementHandle](./api/class-elementhandle) is that the latter points to a particular element, while [Locator](./api/class-locator) captures the logic of how to retrieve that element.
+The difference between the [Locator](https://playwright.dev/dotnet/docs/api/class-locator) and [ElementHandle](https://playwright.dev/dotnet/docs/api/class-elementhandle) is that the latter points to a particular element, while [Locator](https://playwright.dev/dotnet/docs/api/class-locator) captures the logic of how to retrieve that element.
 
 Also, locators are **"strict" by default**!
 
-```csharp
+```C#
 var locator = page.Locator("button");
 await locator.ClickAsync();
 ```
 
-Learn more in the [documentation](./api/class-locator).
+Learn more in the [documentation](https://playwright.dev/dotnet/docs/api/class-locator).
 
-#### 🧩 Experimental [**React**](./selectors#react-selectors) and [**Vue**](./selectors#vue-selectors) selector engines
+### 🧩 Experimental [**React**](https://playwright.dev/dotnet/docs/selectors#react-selectors) and [**Vue**](https://playwright.dev/dotnet/docs/selectors#vue-selectors) selector engines
+
 
 React and Vue selectors allow selecting elements by its component name and/or property values. The syntax is very similar to [attribute selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) and supports all attribute selector operators.
 
-```csharp
+```C#
 await page.ClickAsync("_react=SubmitButton[enabled=true]");
 await page.ClickAsync("_vue=submit-button[enabled=true]");
 ```
 
-Learn more in the [react selectors documentation](./selectors#react-selectors) and the [vue selectors documentation](./selectors#vue-selectors).
+Learn more in the [react selectors documentation](https://playwright.dev/dotnet/docs/selectors#react-selectors) and the [vue selectors documentation](https://playwright.dev/dotnet/docs/selectors#vue-selectors).
 
-#### ✨ New [**`nth`**](./selectors#n-th-element-selector) and [**`visible`**](./selectors#selecting-visible-elements) selector engines
-- [`nth`](./selectors#n-th-element-selector) selector engine is equivalent to the `:nth-match` pseudo class, but could be combined with other selector engines.
-- [`visible`](./selectors#selecting-visible-elements) selector engine is equivalent to the `:visible` pseudo class, but could be combined with other selector engines.
+### ✨ New [**`nth`**](https://playwright.dev/dotnet/docs/selectors#n-th-element-selector) and [**`visible`**](https://playwright.dev/dotnet/docs/selectors#selecting-visible-elements) selector engines
 
-```csharp
+
+- [`nth`](https://playwright.dev/dotnet/docs/selectors#n-th-element-selector) selector engine is equivalent to the `:nth-match` pseudo class, but could be combined with other selector engines.
+- [`visible`](https://playwright.dev/dotnet/docs/selectors#selecting-visible-elements) selector engine is equivalent to the `:visible` pseudo class, but could be combined with other selector engines.
+
+```C#
 // select the first button among all buttons
 await button.ClickAsync("button >> nth=0");
-// or if you are using locators, you can use First, Nth() and Last
+// or if you are using locators, you can use first(), nth() and last()
 await page.Locator("button").First.ClickAsync();
 
 // click a visible button
 await button.ClickAsync("button >> visible=true");
 ```
 
+### .NET Specific Features
+
+
+* 🧪 `SkipAttribute` We now have a `NUnit` attribute that can be used to skip various combinations of browser and/or platforms.
+
+
 ### Browser Versions
+
+
 - Chromium 94.0.4595.0
 - Mozilla Firefox 91.0
 - WebKit 15.0
 
-## Version 1.13
+This version of Playwright was also tested against the following stable channels:
 
-#### Playwright
-- **🖖 Programmatic drag-and-drop support** via the [Page.DragAndDropAsync(source, target, options)](./api/class-page.mdx#page-drag-and-drop) API.
-- **🔎 Enhanced HAR** with body sizes for requests and responses. Use via `recordHar` option in [Browser.NewContextAsync(options)](./api/class-browser.mdx#browser-new-context).
+- Google Chrome 92
+- Microsoft Edge 92
 
-#### Tools
+
+
+## [v1.13.0](https://github.com/microsoft/playwright-dotnet/releases/tag/v1.13.0)
+
+### Playwright
+
+
+- **🖖 Programmatic drag-and-drop support** via the [`Page.DragAndDropAsync()`] API.
+- **🔎 Enhanced HAR** with body sizes for requests and responses. Use via `RecordHarPath` option in [`Browser.NewContextAsync()`].
+- **🔒 Assembly Signing** for .NET assemblies is no longer done using `PublicSign` but using a full signing key, making it easier to use in projects requiring full-trust
+
+### Tools
+
+
 - Playwright Trace Viewer now shows parameters, returned values and `console.log()` calls.
 
-#### New and Overhauled Guides
-- [Intro](./intro.mdx)
-- [Authentication](./auth.mdx)
+### New and Overhauled Guides
 
-#### Browser Versions
+
+- [Intro](https://playwright.dev/dotnet/docs/next/intro/)
+
+### Browser Versions
+
+
 - Chromium 93.0.4576.0
 - Mozilla Firefox 90.0
 - WebKit 14.2
 
-#### New Playwright APIs
-- new `baseURL` option in [Browser.NewContextAsync(options)](./api/class-browser.mdx#browser-new-context) and [Browser.NewPageAsync(options)](./api/class-browser.mdx#browser-new-page)
-- [Response.SecurityDetailsAsync()](./api/class-response.mdx#response-security-details) and [Response.ServerAddrAsync()](./api/class-response.mdx#response-server-addr)
-- [Page.DragAndDropAsync(source, target, options)](./api/class-page.mdx#page-drag-and-drop) and [Frame.DragAndDropAsync(source, target, options)](./api/class-frame.mdx#frame-drag-and-drop)
-- [Download.CancelAsync()](./api/class-download.mdx#download-cancel)
-- [Page.InputValueAsync(selector, options)](./api/class-page.mdx#page-input-value), [Frame.InputValueAsync(selector, options)](./api/class-frame.mdx#frame-input-value) and [ElementHandle.InputValueAsync(options)](./api/class-elementhandle.mdx#element-handle-input-value)
-- new `force` option in [Page.FillAsync(selector, value, options)](./api/class-page.mdx#page-fill), [Frame.FillAsync(selector, value, options)](./api/class-frame.mdx#frame-fill), and [ElementHandle.FillAsync(value, options)](./api/class-elementhandle.mdx#element-handle-fill)
-- new `force` option in [Page.SelectOptionAsync(selector, values, options)](./api/class-page.mdx#page-select-option), [Frame.SelectOptionAsync(selector, values, options)](./api/class-frame.mdx#frame-select-option), and [ElementHandle.SelectOptionAsync(values, options)](./api/class-elementhandle.mdx#element-handle-select-option)
+### New Playwright APIs
 
-## Version 1.12
 
-#### Highlights
-- Playwright for .NET v1.12 is now stable!
-- Ships with the [codegen](./cli.mdx#generate-code) and [trace viewer](./trace-viewer.mdx) tools out-of-the-box
+- new `BaseURL` option in [`Browser.NewContextAsync()`] and [`Browser.NewPageAsync()`]
+- [`Response.SecurityDetailsAsync()`] and [`Response.ServerAddrAsync()`]
+- [`Page.DragAndDropAsync()`] and [`Frame.DragAndDropAsync()`]
+- [`Download.CancelAsync()`]
+- [`Page.InputValueAsync()`], [`Frame.InputValueAsync()`] and [`ElementHandle.InputValueAsync()`]
+- new `Force` option in [`Page.FillAsync()`], [`Frame.FillAsync()`], and [`ElementHandle.FillAsync()`]
+- new `Force` option in [`Page.SelectOptionAsync()`], [`Frame.SelectOptionAsync()`], and [`ElementHandle.SelectOptionAsync()`]
 
-#### Browser Versions
+[`Download.CancelAsync()`]: https://playwright.dev/dotnet/docs/next/api/class-download#download-cancel
+
+[`Page.FillAsync()`]: https://playwright.dev/dotnet/docs/next/api/class-page#page-fill
+[`Frame.FillAsync()`]: https://playwright.dev/dotnet/docs/next/api/class-frame#frame-fill
+[`ElementHandle.FillAsync()`]: https://playwright.dev/dotnet/docs/next/api/class-elementhandle#element-handle-fill
+
+[`Page.InputValueAsync()`]: https://playwright.dev/dotnet/docs/next/api/class-page#page-input-value
+[`Frame.InputValueAsync()`]: https://playwright.dev/dotnet/docs/next/api/class-frame#frame-input-value
+[`ElementHandle.InputValueAsync()`]: https://playwright.dev/dotnet/docs/next/api/class-elementhandle#element-handle-input-value
+
+[`Page.SelectOptionAsync()`]: https://playwright.dev/dotnet/docs/next/api/class-page#page-select-option
+[`Frame.SelectOptionAsync()`]: https://playwright.dev/dotnet/docs/next/api/class-frame#frame-select-option
+[`ElementHandle.SelectOptionAsync()`]: https://playwright.dev/dotnet/docs/next/api/class-elementhandle#element-handle-select-option
+
+[`Page.DragAndDropAsync()`]: https://playwright.dev/dotnet/docs/next/api/class-page#page-drag-and-drop
+[`Frame.DragAndDropAsync()`]: https://playwright.dev/dotnet/docs/next/api/class-frame#frame-drag-and-drop
+
+[`Response.SecurityDetailsAsync()`]: https://playwright.dev/dotnet/docs/next/api/class-response#response-security-details
+[`Response.ServerAddrAsync()`]: https://playwright.dev/dotnet/docs/next/api/class-response#response-server-addr
+
+[`Browser.NewContextAsync()`]: https://playwright.dev/dotnet/docs/next/api/class-browser#browser-new-context
+[`Browser.NewPageAsync()`]: https://playwright.dev/dotnet/docs/next/api/class-browser#browser-new-page
+
+
+
+
+## [v1.12.2](https://github.com/microsoft/playwright-dotnet/releases/tag/v1.12.2)
+
+### Highlights
+
+
+This patch release includes bugfixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/7015 - [BUG] Firefox: strange undefined toJSON property on JS objects
+https://github.com/microsoft/playwright/issues/7048 - [BUG] Dialogs cannot be dismissed if tracing is on in Chromium or Webkit
+https://github.com/microsoft/playwright/issues/7058 - [BUG] Getting no video frame error for mobile chrome
+
+### Browser Versions
+
+
 - Chromium 93.0.4530.0
 - Mozilla Firefox 89.0
 - WebKit 14.2
 
 This version of Playwright was also tested against the following stable channels:
+
 - Google Chrome 91
 - Microsoft Edge 91
 
-[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
-[Browser]: ./api/class-browser.mdx "Browser"
-[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
-[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
-[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
-[Dialog]: ./api/class-dialog.mdx "Dialog"
-[Download]: ./api/class-download.mdx "Download"
-[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
-[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
-[Frame]: ./api/class-frame.mdx "Frame"
-[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
-[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
-[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
-[Locator]: ./api/class-locator.mdx "Locator"
-[Mouse]: ./api/class-mouse.mdx "Mouse"
-[Page]: ./api/class-page.mdx "Page"
-[Playwright]: ./api/class-playwright.mdx "Playwright"
-[Request]: ./api/class-request.mdx "Request"
-[Response]: ./api/class-response.mdx "Response"
-[Route]: ./api/class-route.mdx "Route"
-[Selectors]: ./api/class-selectors.mdx "Selectors"
-[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
-[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
-[Tracing]: ./api/class-tracing.mdx "Tracing"
-[Video]: ./api/class-video.mdx "Video"
-[WebSocket]: ./api/class-websocket.mdx "WebSocket"
-[WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"
-[Worker]: ./api/class-worker.mdx "Worker"
-[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
-[bool]: https://docs.microsoft.com/en-us/dotnet/api/system.boolean "bool"
-[double]: https://docs.microsoft.com/en-us/dotnet/api/system.double "double"
-[byte]: https://docs.microsoft.com/en-us/dotnet/api/system.byte "byte"
-[int]: https://docs.microsoft.com/en-us/dotnet/api/system.int32 "int"
-[void]: https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/void "void"
-[string]: https://docs.microsoft.com/en-us/dotnet/api/system.string "string"
-[URL]: https://nodejs.org/api/url.html "URL"
-[Regex]: https://docs.microsoft.com/en-us/dotnet/api/system.text.regularexpressions.regex "Regex"
 
-[Action]: https://docs.microsoft.com/en-us/dotnet/api/system.action-1 "Action"
-[Func]: https://docs.microsoft.com/en-us/dotnet/api/system.func-2 "Func"
-[IEnumerable]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.ienumerable "IEnumerable"
-[IDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.idictionary "IDictionary"
-[Task]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-5.0 "Task"
-[IReadOnlyDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlydictionary-2 "IReadOnlyDictionary"
-[JsonElement]: https://docs.microsoft.com/en-us/dotnet/api/system.text.json.jsonelement "JsonElement"
+## [v1.12.1](https://github.com/microsoft/playwright-dotnet/releases/tag/v1.12.1)
 
-[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
-[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
-[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
+### Highlights
+
+
+- Playwright for .NET v1.12 is now stable! 
+- The NuGet package has been renamed and is now available as [Microsoft.Playwright](https://www.nuget.org/packages/Microsoft.Playwright/).
+- Ships with the [codegen](https://playwright.dev/dotnet/docs/cli#generate-code) and [trace viewer](https://playwright.dev/dotnet/docs/trace-viewer) tools out-of-the-box
+
+### Browser Versions
+
+
+- Chromium 93.0.4530.0
+- Mozilla Firefox 89.0
+- WebKit 14.2
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 91
+- Microsoft Edge 91
+
+### Breaking Changes
+
+This release is a major release for the .NET port. We've completely redone the API surface in order to ensure parity with the rest of the supported languages. Unfortunately, this meant we had to introduce some breaking changes. The following list points out the key ones:
+
+* **Installation** of the browsers no longer happens automatically. Follow the steps in [Getting started](https://playwright.dev/dotnet/docs/intro#first-project).
+ * Optional arguments have been replaced with an `options` class. Method calls should look closer to `.LaunchAsync(new() { Headless = false });`
+ * All `decimal` arguments are now `float`.
+ * `IAccessibility` now returns a `JSONElement`
+ * The use of `System.Drawing.Point` was dropped in favour of using our own, generated `Position`
+ * `timeout` and `delay` arguments are now `float`.
+ * The usage of the `Rect` class was replaced by `ElementHandleBoundingBoxResult`.
+ * `WaitForState` was renamed to `WaitForSelectorState`.
+ * `SelectOption` was renamed to `SelectOptionValue`.
+ * `EventArg`s were removed in favor of the class the `EventArg` was wrapping. For instance `Page.Close` is now an `EventHandler<IPage>` and `Page.Download` is now an `EventHandler<IDownload>`.
+ * `Modifier` was renamed to `KeyboardModifier`. 
+ * `LifecycleEvent` was renamed to `LoadState`. 
+ * Arrays are now exposed as `ReadOnlyCollection`.
+
+### Other Breaking Changes
+
+
+### IBrowserContext
+
+### Events
+
+New event: `EventHandler<IRequest> Request`
+New event: `EventHandler<IRequest> RequestFailed`
+New event: `EventHandler<IRequest> RequestFinished`
+New event: `EventHandler<IResponse> Response`
+
+### Properties
+
+* `DefaultTimeout` has been replaced with `SetDefaultTimeout`
+* `DefaultNavigationTimeout` has been replaced with `SetDefaultNavigationTimeout`
+
+### Methods
+
+* `GetCookiesAsync` has been replaced with `CookiesAsync`
+* `GetStorageStateAsync` has been replaced with `StorageStateAsync`
+* `SetHttpCredentialsAsync` has been removed.
+* `WaitForEventAsync` has been replaced with `WaitForPageAsync` and `RunAndWaitForPageAsync`.
+
+
+### IElementHandle
+
+### Methods
+
+* `GetBoundingBoxAsync` has been replaced with `BoundingBoxAsync`
+* `GetContentFrameAsync` has been replaced with `ContentFrameAsync`
+* `GetInnerHtmlAsync` has been replaced with `InnerHTMLAsync`
+* `GetInnerTextAsync` has been replaced with `InnerTextAsync`
+* `GetOwnerFrameAsync` has been replaced with `OwnerFrameAsync`
+* `GetTextContentAsync` has been replaced with `TextContentAsync`
+
+### IFrame
+
+### Methods
+
+* `GetContentAsync`  has been replaced with `ContentAsync`
+* `GetFrameElementAsync`  has been replaced with `FrameElementAsync`
+* `GetInnerHtmlAsync`  has been replaced with `InnerHTMLAsync`
+* `GetInnerTextAsync`  has been replaced with `InnerTextAsync`
+* `GetTextContentAsync`  has been replaced with `TextContentAsync`
+* `GetTitleAsync`  has been replaced with `TitleAsync`
+* `GoToAsync`  has been replaced with `GotoAsync`
+
+### IJSHandle
+
+### Methods
+
+* `GetJsonValueAsync` has been replaced with `JsonValueAsync`
+
+### IPage
+
+### Events
+
+
+### Properties
+
+* `DefaultTimeout` has been removed.
+* `DefaultNavigationTimeout` has been removed.
+* `Coverage` has been removed.
+
+### Methods
+
+* `GetContentAsync` has been replaced with `ContentAsync`
+* `GetFrame` has been replaced with `Frame`
+* `GetInnerHtmlAsync` has been replaced with `InnerHTMLAsync`
+* `GetInnerTextAsync` has been replaced with `InnerTextAsync`
+* `GetOpenerAsync` has been replaced with `OpenerAsync`
+* `GetPdfAsync` has been replaced with `PdfAsync`
+* `GetTextContentAsync` has been replaced with `TextContentAsync`
+* `GetTitleAsync` has been replaced with TitleAsync``
+* `GoToAsync` has been replaced with `GotoAsync`
+* `WaitForEventAsync` has been replaced with more specific `WaitFor*` overloads
+
+
+### IRequest
+
+### Methods
+
+* `GetPostDataJson` has been replaced with `PostDataJSON`
+* `GetResponseAsync` has been replaced with `ResponseAsync`
+
+### IResponse
+
+### Methods
+
+* `GetBodyAsync` has been replaced with `BodyAsync`
+* `GetJsonAsync` has been replaced with `JsonAsync`
+* `GetTextAsync` has been replaced with `TextAsync`
+
+### IVideo
+
+### Methods
+
+* `GetPathAsync` has been replaced with `PathAsync`
+
+### IWebSocket
+
+### Methods
+
+* `WaitForEventAsync` has been removed.
+
+### Removed Types
+
+* `ICoverage` has been removed.
+* `IConnectionTransport` has been removed.
+* `ICDPSession` has been removed.
+* `IChromiumBrowser` has been removed.
+* `IChromiumBrowserContext` has been removed.
+* `IChromiumBrowserType` has been removed.
+
+
+
+## [v0.192.0](https://github.com/microsoft/playwright-dotnet/releases/tag/v0.192.0)
+
+### Changes
+
+* Introduces additional tests for `postData` and encoding support
+* Driver updated to [1.9.2](https://github.com/microsoft/playwright/releases/tag/v1.9.2).
+
+
+
+## [v0.191.2](https://github.com/microsoft/playwright-dotnet/releases/tag/v0.191.2)
+
+Fix drivers deploy on Linux
+
+
+
+## [v0.191.1](https://github.com/microsoft/playwright-dotnet/releases/tag/v0.191.1)
+
+Fix nuget package
+
+
+
+## [v0.191.0](https://github.com/microsoft/playwright-dotnet/releases/tag/v0.191.0)
+
+### Driver Update
+
+Driver updated to [v.1.9.1](https://github.com/microsoft/playwright/releases/tag/v1.9.1), (see also [v.1.9.0](https://github.com/microsoft/playwright/releases/tag/v1.9.0)). These are the outstanding changes:
+
+ * New `has-text` pseudo-class for CSS selectors. `:has-text("example")` matches any element containing "example" somewhere inside a child or a descendant element. There are [more examples](https://playwright.dev/docs/selectors#text-selector) available.
+ * Introduces `Page.PauseAsync()`, which is *not yet* supported in PlaywrightSharp. 
+ * Page dialogs are now auto-dismissed during execution, unless a listener for dialog event is configured. [Learn more](https://playwright.dev/docs/dialogs) about this.
+
+### Changelog
+
+
+ * The driver deployment was changed to support the new driver structure. We [moved](https://github.com/microsoft/playwright-sharp/pull/1175) from [architecture-specific folder](https://docs.microsoft.com/en-us/nuget/create-packages/supporting-multiple-target-frameworks#architecture-specific-folders) to build targets. 
+ * [Fix](https://github.com/microsoft/playwright-sharp/commit/53eca715767827c156d82decba59deed039bfae1) Mobile Geolocation snippet.
+ * [Don't fail](https://github.com/microsoft/playwright-sharp/commit/f01af994e35809d7cb72bccb0eb9d8bfc1ecb77f) on possible invalid script.
+* Our primary branch is [now called](https://github.com/microsoft/playwright-sharp/commit/19dd36c40e0bbcd7ded300133aa1449b96d25de9) `main`
+
+
+
+## [v0.180.0](https://github.com/microsoft/playwright-dotnet/releases/tag/v0.180.0)
+
+### Driver Update
+
+Driver updated to [v.1.8.0](https://github.com/microsoft/playwright/releases/tag/v1.8.0). These are the outstanding changes:
+
+* [Selecting elements based on layout](https://playwright.dev/docs/selectors/#selecting-elements-based-on-layout) with `:left-of()`, `:right-of()`, `:above()` and `:below()`
+* `SelectOptionAsync` now waits for the options to be present
+
+### New APIs
+
+
+ * `ElementHandle.IsCheckedAsync()`
+ * `ElementHandle.IsDisabledAsync()`
+ * `ElementHandle.IsEditableAsync()`
+ * `ElementHandle.IsEnabledAsync()`
+ * `ElementHandle.IsHiddenAsync()`
+ * `ElementHandle.IsVisibleAsync()`
+ * `Page.IsCheckedAsync(selector, timeout)`
+ * `Page.IsDisabledAsync(selector, timeout)`
+ * `Page.IsEditableAsync(selector, timeout)`
+ * `Page.IsEnabledAsync(selector, timeout)`
+ * `Page.IsHiddenAsync(selector, timeout)`
+ * `Page.IsVisibleAsync(selector, timeout)`
+ * New enum item `Editable` in `ElementHandle.WaitForElementStateAsync.`
+
+### Breaking Changes
+
+
+We are still tweaking the API so we can offer the same experience across all bindings. These are the changes we had to make in this release:
+
+ * `ExtraHttpHeaders` properties were renamed to `ExtraHTTPHeaders`.
+ * `SetExtraHttpHeadersAsync` method was renamed to `SetExtraHTTPHeadersAsync`.
+ * `firefoxUserPrefs` was removed from launch persistent options.
+
+### Changelog
+
+
+ * https://github.com/microsoft/playwright-sharp/commit/1f29b0943efca3471dc96a69c6bd376b34a6e45f fix ignore all default arguments.
+ * https://github.com/microsoft/playwright-sharp/commit/ae6b879dfde5fa78eb0989afff236975f2f2c879 fix ignoreDefaultArgs serialization.
+
+
+
+## [v0.170.2](https://github.com/microsoft/playwright-dotnet/releases/tag/v0.170.2)
+
+### Changelog
+
+* https://github.com/microsoft/playwright-sharp/commit/5dfec1ef0e67acc6c83a5f43e1ff0f844238b819 Fixed builds on Windows projects using packages.config
+ * https://github.com/microsoft/playwright-sharp/commit/88a62f3853eed2f1cf1e35d501c5c5c23707ab08 Fixed Env property serialization.
+
+
+
+## [v0.170.1](https://github.com/microsoft/playwright-dotnet/releases/tag/v0.170.1)
+
+Fix deployed assembly references
+
+
+
+## [v0.170.0](https://github.com/microsoft/playwright-dotnet/releases/tag/v0.170.0)
+
+### Driver update
+
+Driver updated to v.0.170.0. See playwright changelog [v1.7.0](https://github.com/microsoft/playwright/releases/tag/v1.7.0).
+
+### New APIs
+
+ * New method `BrowserContext.GetStorageStateAsync()` to get current state for later reuse.
+ * New options where added to `Browser.NewContextAsync` and `Browser.NewPageAsync`.
+    * proxy: *Network proxy settings to use with this context*.
+    * storageState: *Populates context with given storage state*.
+    * storageStatePath: *Loads a storage state from a JSON file*.
+
+### Possible breaking changes
+
+ * https://github.com/microsoft/playwright-sharp/commit/a388277f82a1398348179000f737c983c03ff8cd If you use `AddScriptTagAsync` with named arguments the `content` argument was renamed to `script`.
+ * https://github.com/microsoft/playwright-sharp/commit/a388277f82a1398348179000f737c983c03ff8cd If you use `AddStyleTagAsync` with named arguments the `content` argument was renamed to `style`.
+
+### Changelog
+
+ * https://github.com/microsoft/playwright-sharp/commit/4487deef6e7b72e06c9e5453e5a439efccbef385 Fixed Response.Ok. It should return true if the HttpStatusCode is between 200 and 299.
+ *  https://github.com/microsoft/playwright-sharp/commit/857d9190851b914b8a26d4eef469d12de17ebf34 Improved error message if browsers are missing.
+ * https://github.com/microsoft/playwright-sharp/commit/e45ef9944ff9805c7735b2bc9242a7180e638fea Added close reason in transport exceptions.
+ * https://github.com/microsoft/playwright-sharp/commit/5b0ad490548016bf2d7e4da8efec5a8600236ff6 Improved driver deploy on Xamarin.Mac apps.
+ * https://github.com/microsoft/playwright-sharp/commit/c8425a99f2f772ee193b09e569d8bf687b515403 Improved driver deploy on Mono.
+ * https://github.com/microsoft/playwright-sharp/commit/3d04eaa08d92ad0741054de092d88b0fc6f74344 Fixed WebSocketEventArgs.WebSocket visibility.
+ * https://github.com/microsoft/playwright-sharp/commit/8fa18ee42be72e074e55d031bfb55323f0f4b663 Fixed ChromiumBrowserType overloads.
+
+
+
+
+
+## [v0.162.1](https://github.com/microsoft/playwright-dotnet/releases/tag/v0.162.1)
+
+### Changelog
+
+
+Add copy targets for Xamarin.Mac
+
+
+
+## [v0.162.0](https://github.com/microsoft/playwright-dotnet/releases/tag/v0.162.0)
+
+### Major Changes
+
+Driver updated to v.0.162.1. See playwright changelog: [v1.6.0](https://github.com/microsoft/playwright/releases/tag/v1.6.0), [v1.6.1](https://github.com/microsoft/playwright/releases/tag/v1.6.1) and [v1.6.2](https://github.com/microsoft/playwright/releases/tag/v1.6.2).
+
+### Driver and browser install refactor.
+
+
+### Playwright Driver
+
+
+Playwright drivers will be copied to the `bin` folder at build time. Nuget will rely on the [RuntimeIdentifier](https://docs.microsoft.com/en-us/dotnet/core/project-sdk/msbuild-props?WT.mc_id=DT-MVP-5003814#runtimeidentifier) to copy a platform-specific driver, or on the [runtime used on dotnet publish](https://docs.microsoft.com/en-us/dotnet/core/tools/dotnet-publish?WT.mc_id=DT-MVP-5003814).
+If the [RuntimeIdentifier](https://docs.microsoft.com/en-us/dotnet/core/project-sdk/msbuild-props?WT.mc_id=DT-MVP-5003814#runtimeidentifier) is not set, all runtimes will be copied inside a runtimes folder. Then, the platform-specific driver will be picked at run-time.
+
+### Browsers
+
+
+The way browsers are installed will vary depending on the use case scenario. 
+
+#### Playwright in test projects
+
+
+If you use Playwright in test projects, all required browsers will be installed at build time.
+
+#### Using Playwright in Docker
+
+
+If you use the [official Docker images](https://hub.docker.com/_/microsoft-playwright), all the required browsers will be installed in that image. 
+The minor version of the package will tell you which docker image tag to use. For instance, PlaywrightSharp 0.162.0 will work with the tag **v1.6.2**.
+
+#### Using Playwright in a Remote Server.
+
+
+If you run Playwright in a remote server. For instance, as part of a web application, you will need to run `.\bin\playwright-cli.exe install` in Windows or `./bin/playwright-cli install` in OSX/Linux as part of your deploy script. 
+
+### New APIs
+
+ * https://github.com/microsoft/playwright-sharp/commit/46790395f597958532991a47d5171dca6ba4250a `BrowserContextOptions` was implemented to receive a DeviceDescription in the constructor.
+ * https://github.com/microsoft/playwright-sharp/commit/e6aee6c3e35b86e89aba8261d846b991f6d2b5a0 New Request.Timing.
+ * https://github.com/microsoft/playwright-sharp/commit/c5a86d6b610c39ccfb34179ff78c6f1fffede7c8 New `recordVideo` argument in BrowserContext creation.
+ * https://github.com/microsoft/playwright-sharp/commit/c5a86d6b610c39ccfb34179ff78c6f1fffede7c8 New `recordHAR` argument in BrowserContext creation.
+ * https://github.com/microsoft/playwright-sharp/commit/93cb3f4d1626fd4a9d0a5de64e56ce4b6273cded Use Page.Websocket event and the new WebSocket class to inspect WebSocket connections. 
+ * https://github.com/microsoft/playwright-sharp/commit/c9ab521e0983cdbe3abe72cde4febcc24c10813f Introduce TapAsync.
+
+```cs
+await using var context = await _browser.NewContextAsync(new BrowserContextOptions(Playwright.Devices["iPhone 6"])
+{
+    TimezoneId = "America/Jamaica",
+    Locale = "fr-CH",
+    UserAgent = "UA",
+});
+```
+
+### Breaking Changes
+
+
+ * https://github.com/microsoft/playwright-sharp/commit/c1809ae9f066113a938ef75f993e70057c7c1124 `WaitForEvent` methods were renamed to `WaitForEventAsync`.
+ * https://github.com/microsoft/playwright-sharp/commit/ee860a8c28770ec0ee194b98107ab00c81cd421b Request.GetPostDataJsonAsync was renamed to Request.GetPostDataJson.
+
+### Changelog
+
+
+ * https://github.com/microsoft/playwright-sharp/commit/b32e6e09a1eca37030c8f2ab30402cdd0a6918bc Made ResourceType more flexible.
+ * https://github.com/microsoft/playwright-sharp/commit/07727acae19cf446266b3fb8f4632c125e8878ca Fix actionability spelling.
+ * https://github.com/microsoft/playwright-sharp/commit/3182d5f12249d69dea6764ae94d435ae5b81af85 Remove InstallAsync from docs.
+
+
+
+

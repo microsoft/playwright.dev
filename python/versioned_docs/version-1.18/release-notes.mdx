@@ -1,79 +1,181 @@
 ---
-id: release-notes
-title: "Release notes"
+  id: release-notes
+  title: "Release notes"
 ---
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
 
-- [Version 1.18](#version-118)
-- [Version 1.17](#version-117)
-- [Version 1.16](#version-116)
-- [Version 1.15](#version-115)
-- [Version 1.14](#version-114)
-- [Version 1.13](#version-113)
-- [Version 1.12](#version-112)
-- [Version 1.11](#version-111)
-- [Version 1.10](#version-110)
-- [Version 1.9](#version-19)
-- [Version 1.8](#version-18)
-- [Version 1.7](#version-17)
+## [v1.20](https://github.com/microsoft/playwright-python/releases/tag/v1.20)
 
-## Version 1.18
+### Highlights
+
+
+- New options for methods [`page.screenshot()`](https://playwright.dev/python/docs/api/class-page#page-screenshot), [`locator.screenshot()`](https://playwright.dev/python/docs/api/class-locator#locator-screenshot) and [`elementHandle.screenshot()`](https://playwright.dev/python/docs/api/class-elementhandle#element-handle-screenshot):
+  * Option `animations: "disabled"` rewinds all CSS animations and transitions to a consistent state
+  * Option `mask: Locator[]` masks given elements, overlaying them with pink `#FF00FF` boxes.
+- [Trace Viewer](./trace-viewer) now shows [API testing requests](https://playwright.dev/python/docs/api/class-apirequestcontext).
+- [`locator.highlight()`](https://playwright.dev/python/docs/api/class-locator#locator-highlight) visually reveals element(s) for easier debugging.
+
+### Announcements
+
+
+- We now ship a designated Python docker image `mcr.microsoft.com/playwright/python`. Please switch over to it if you use
+  Python. This is the last release that includes Python inside our javascript `mcr.microsoft.com/playwright` docker image.
+- v1.20 is the last release to receive WebKit update for macOS 10.15 Catalina. Please update MacOS to keep using latest & greatest WebKit!
+
+### Browser Versions
+
+
+- Chromium 101.0.4921.0
+- Mozilla Firefox 97.0.1
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 99
+- Microsoft Edge 99
+
+
+
+## [v1.19.1](https://github.com/microsoft/playwright-python/releases/tag/v1.19.1)
+
+### Highlights
+
+
+This patch includes the following bug fixes:
+
+https://github.com/microsoft/playwright-python/pull/1167 - [BUG] Task exception was never retrieved when continue_ race with page closed event
+https://github.com/microsoft/playwright/issues/12106 - [BUG] Error: EBUSY: resource busy or locked when using volumes in docker-compose with playwright 1.19.0 and mcr.microsoft.com/playwright:v1.15.0-focal
+https://github.com/microsoft/playwright/issues/12075 - [Question] After update to 1.19 firefox fails to run
+
+### Browser Versions
+
+
+- Chromium 100.0.4863.0
+- Mozilla Firefox 96.0.1
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 98
+- Microsoft Edge 98
+
+
+
+## [v1.19.0](https://github.com/microsoft/playwright-python/releases/tag/v1.19.0)
+
+### Version 1.19
+
+
+### Locator Updates
+
+
+#### Locator now supports a `has` option that makes sure it contains another locator inside:
+
+
+  ```python
+  page.locator("article", has=page.locator(".highlight")).click()
+  ```
+
+  The snippet above will select article that has highlight in it and will press the button in it.
+  Read more in [locator documentation](https://playwright.dev/python/docs/api/class-locator#locator-locator-option-has)
+
+### Other Updates
+
+
+- New [`method: Locator.page`](https://playwright.dev/python/docs/api/class-locator#locator-page)
+- [`method: Page.screenshot`](https://playwright.dev/python/docs/api/class-page#page-screenshot) and [`method: Locator.screenshot`](https://playwright.dev/python/docs/api/class-locator#locator-screenshot) now automatically hides blinking caret
+- Playwright Codegen now generates locators and frame locators
+
+### Browser Versions
+
+
+- Chromium 100.0.4863.0
+- Mozilla Firefox 96.0.1
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 98
+- Microsoft Edge 98
+
+
+
+
+## [v1.18.2](https://github.com/microsoft/playwright-python/releases/tag/v1.18.2)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright-python/pull/1117 - [BUG] Fixing a pyee DeprecationWarning
+
+### Browser Versions
+
+
+- Chromium 99.0.4812.0
+- Mozilla Firefox 95.0
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 97
+- Microsoft Edge 97
+
+
+
+## [v1.18.1](https://github.com/microsoft/playwright-python/releases/tag/v1.18.1)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/11447 - [BUG] window.orientation on WebKit is different to what Safari gives you
+
+### Browser Versions
+
+
+- Chromium 99.0.4812.0
+- Mozilla Firefox 95.0
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 97
+- Microsoft Edge 97
+
+
+
+## [v1.18.0](https://github.com/microsoft/playwright-python/releases/tag/v1.18.0)
 
 ### API Testing
 
-Playwright for Python 1.18 introduces new [API Testing](./api/class-apirequestcontext) that lets you send requests to the server directly from Python! Now you can:
+
+Playwright for Python 1.18 introduces new [API Testing](https://playwright.dev/python/docs/api/class-apirequestcontext) that lets you send requests to the server directly from Python!
+Now you can:
+
 - test your server API
 - prepare server side state before visiting the web application in a test
 - validate server side post-conditions after running some actions in the browser
 
-To do a request on behalf of Playwright's Page, use **new [page.request](./api/class-page.mdx#page-request) API**:
+To do a request on behalf of Playwright's Page, use **new [`page.request`](https://playwright.dev/python/docs/next/api/class-page#page-request) API**:
 
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
+```python
+### Do a GET request on behalf of page
 
-```py
-# Do a GET request on behalf of page
 res = page.request.get("http://example.com/foo.json")
 ```
 
-</TabItem>
-<TabItem value="async">
-
-```py
-# Do a GET request on behalf of page
-res = await page.request.get("http://example.com/foo.json")
-```
-
-</TabItem>
-</Tabs>
-
-Read more in [our documentation](./api/class-apirequestcontext).
+Read more in [our documentation](https://playwright.dev/python/docs/api/class-apirequestcontext).
 
 ### Web-First Assertions
 
-Playwright for Python 1.18 introduces [Web-First Assertions](./api/class-playwrightassertions).
+
+Playwright for Python 1.18 introduces [Web-First Assertions](https://playwright.dev/python/docs/api/class-playwrightassertions).
 
 Consider the following example:
 
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
+```python
 from playwright.sync_api import Page, expect
 
 def test_status_becomes_submitted(page: Page) -> None:
@@ -82,90 +184,128 @@ def test_status_becomes_submitted(page: Page) -> None:
     expect(page.locator(".status")).to_have_text("Submitted")
 ```
 
-</TabItem>
-<TabItem value="async">
+Playwright will be re-testing the node with the selector `.status` until
+fetched Node has the `"Submitted"` text. It will be re-fetching the node and
+checking it over and over, until the condition is met or until the timeout is
+reached. You can pass this timeout as an option.
 
-```py
-from playwright.async_api import Page, expect
-
-async def test_status_becomes_submitted(page: Page) -> None:
-    # ..
-    await page.click("#submit-button")
-    await expect(page.locator(".status")).to_have_text("Submitted")
-```
-
-</TabItem>
-</Tabs>
-
-Playwright will be re-testing the node with the selector `.status` until fetched Node has the `"Submitted"` text. It will be re-fetching the node and checking it over and over, until the condition is met or until the timeout is reached. You can pass this timeout as an option.
-
-Read more in [our documentation](./api/class-playwrightassertions).
+Read more in [our documentation](https://playwright.dev/python/docs/api/class-playwrightassertions).
 
 ### Locator Improvements
-- [locator.drag_to(target, **kwargs)](./api/class-locator.mdx#locator-drag-to)
+
+
+- [`locator.drag_to()`](https://playwright.dev/python/docs/api/class-locator#locator-drag-to)
 - Each locator can now be optionally filtered by the text it contains:
+    ```python
+    page.locator("li", has_text="my item").locator("button").click()
+    ```
 
-  <Tabs
-    groupId="python-flavor"
-    defaultValue="sync"
-    values={[
-      {label: 'Sync', value: 'sync'},
-      {label: 'Async', value: 'async'}
-    ]
-  }>
-  <TabItem value="sync">
-  
-  ```py
-  page.locator("li", has_text="my item")).locator("button").click()
-  ```
-  
-  </TabItem>
-  <TabItem value="async">
-  
-  ```py
-  await page.locator("li", has_text="my item")).locator("button").click()
-  ```
-  
-  </TabItem>
-  </Tabs>
+    Read more in [locator documentation](https://playwright.dev/python/docs/api/class-locator#locator-locator-option-has-text)
 
-  Read more in [locator documentation](./api/class-locator#locator-locator-option-has-text)
 
 ### New APIs & changes
-- [`accept_downloads`](./api/class-browser#browser-new-context-option-accept-downloads) option now defaults to `True`.
-- [`sources`](./api/class-tracing#tracing-start-option-sources) option to embed sources into traces.
+
+
+- [`accept_downloads`](https://playwright.dev/python/docs/api/class-browser#browser-new-context-option-accept-downloads) option now defaults to `True`.
+- [`sources`](https://playwright.dev/python/docs/api/class-tracing#tracing-start-option-sources) option to embed sources into traces.
 
 ### Browser Versions
+
+
 - Chromium 99.0.4812.0
 - Mozilla Firefox 95.0
 - WebKit 15.4
 
 This version was also tested against the following stable channels:
+
 - Google Chrome 97
 - Microsoft Edge 97
 
-## Version 1.17
+
+
+## [v1.17.2](https://github.com/microsoft/playwright-python/releases/tag/v1.17.2)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/10638 - [BUG] Locator.click -> subtree intercepts pointer events since version 1.17.0
+https://github.com/microsoft/playwright/issues/10632 - [BUG] Playwright 1.17.0 -> After clicking the element - I get an error that click action was failed
+https://github.com/microsoft/playwright/issues/10627 - [REGRESSION]: Can no longer click Material UI select box
+https://github.com/microsoft/playwright/issues/10620 - [BUG] trailing zero width whitespace fails toHaveText
+
+
+### Browser Versions
+
+
+- Chromium 98.0.4695.0
+- Mozilla Firefox 94.0.1
+- WebKit 15.4
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 96
+- Microsoft Edge 96
+
+
+
+
+## [v1.17.1](https://github.com/microsoft/playwright-python/releases/tag/v1.17.1)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/10127 - [BUG] Add Trace Viewer error handling (file not found, not parsable)
+https://github.com/microsoft/playwright/issues/10436 - [Bug]: Add hints on how to open trace from HTML report when opened locally
+https://github.com/microsoft/playwright/pull/10492 - [Bug]: Fix broken Firefox User-Agent on 'Desktop Firefox' devices
+
+
+### Browser Versions
+
+
+- Chromium 98.0.4695.0
+- Mozilla Firefox 94.0.1
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 96
+- Microsoft Edge 96
+
+
+
+
+## [v1.17.0](https://github.com/microsoft/playwright-python/releases/tag/v1.17.0)
+
+### Playwright v1.17.0
+
 
 ### Frame Locators
 
-Playwright 1.17 introduces [frame locators](./api/class-framelocator) - a locator to the iframe on the page. Frame locators capture the logic sufficient to retrieve the `iframe` and then locate elements in that iframe. Frame locators are strict by default, will wait for `iframe` to appear and can be used in Web-First assertions.
+
+Playwright 1.17 introduces [frame locators] - a locator to the iframe on the page. Frame locators capture the logic sufficient to retrieve the `iframe` and then locate elements in that iframe. Frame locators are strict by default, will wait for `iframe` to appear and can be used in Web-First assertions.
 
 ![Graphics](https://user-images.githubusercontent.com/746130/142082759-2170db38-370d-43ec-8d41-5f9941f57d83.png)
 
-Frame locators can be created with either [page.frame_locator(selector)](./api/class-page.mdx#page-frame-locator) or [locator.frame_locator(selector)](./api/class-locator.mdx#locator-frame-locator) method.
+Frame locators can be created with either [`page.frame_locator(selector)`] or [`locator.frame_locator(selector)`] method.
 
 ```py
 locator = page.frame_locator("my-frame").locator("text=Submit")
 locator.click()
 ```
 
-Read more at [our documentation](./api/class-framelocator).
+Read more at [our documentation](https://playwright.dev/python/docs/api/class-framelocator).
 
 ### Trace Viewer Update
+
 
 Playwright Trace Viewer is now **available online** at https://trace.playwright.dev! Just drag-and-drop your `trace.zip` file to inspect its contents.
 
 > **NOTE**: trace files are not uploaded anywhere; [trace.playwright.dev](https://trace.playwright.dev) is a [progressive web application](https://web.dev/progressive-web-apps/) that processes traces locally.
+
 - Playwright Test traces now include sources by default (these could be turned off with tracing option)
 - Trace Viewer now shows test name
 - New trace metadata tab with browser details
@@ -173,71 +313,212 @@ Playwright Trace Viewer is now **available online** at https://trace.playwright.
 
 ![image](https://user-images.githubusercontent.com/746130/141877831-29e37cd1-e574-4bd9-aab5-b13a463bb4ae.png)
 
-### HTML Report Update
-- HTML report now supports dynamic filtering
-- Report is now a **single static HTML file** that could be sent by e-mail or as a slack attachment.
-
-![image](https://user-images.githubusercontent.com/746130/141877402-e486643d-72c7-4db3-8844-ed2072c5d676.png)
-
 ### Ubuntu ARM64 support + more
-- Playwright now supports **Ubuntu 20.04 ARM64**. You can now run Playwright tests inside Docker on Apple M1 and on Raspberry Pi.
-- You can now use Playwright to install stable version of Edge on Linux:
 
-  ```bash
-  npx playwright install msedge
-  ```
+
+- Playwright now supports **Ubuntu 20.04 ARM64**. You can now run Playwright tests inside Docker on Apple M1 and on Raspberry Pi.
+
 
 ### New APIs
-- Tracing now supports a [`'title'`](./api/class-tracing#tracing-start-option-title) option
-- Page navigations support a new [`'commit'`](./api/class-page#page-goto) waiting option
 
-## Version 1.16
+
+- Tracing now supports a [`'title'`](https://playwright.dev/python/docs/api/class-tracing#tracing-start-option-title) option
+- Page navigations support a new [`'commit'`](https://playwright.dev/python/docs/api/class-page#page-goto) waiting option
+
+### Browser Versions
+
+
+- Chromium 98.0.4695.0
+- Mozilla Firefox 94.0.1
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 96
+- Microsoft Edge 96
+
+
+---
+
+[frame locators]: https://playwright.dev/python/docs/api/class-framelocator
+[`page.frame_locator(selector)`]: https://playwright.dev/python/docs/api/class-page#page-frame-locator
+[`locator.frame_locator(selector)`]: https://playwright.dev/python/docs/api/class-locator#locator-frame-locator
+
+
+
+## [v1.16.1](https://github.com/microsoft/playwright-python/releases/tag/v1.16.1)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/9692 - [BUG] HTML report shows locator._withElement for locator.evaluate
+https://github.com/microsoft/playwright/issues/7818 - [Bug]: dedup snapshot CSS images
+
+### Browser Versions
+
+
+- Chromium 97.0.4666.0
+- Mozilla Firefox 93.0
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 94
+- Microsoft Edge 94
+
+---
+
+(1.16.2-1635322350000)
+
+
+
+## [v1.16.0](https://github.com/microsoft/playwright-python/releases/tag/v1.16.0)
 
 ### 🎭 Playwright Library
 
-#### `locator.wait_for`
 
-Wait for a locator to resolve to a single element with a given state. Defaults to the `state: 'visible'`.
+### Locator.waitFor
 
-Comes especially handy when working with lists:
 
-```py
+Wait for a locator to resolve to a single element with a given state.
+Defaults to the `state: 'visible'`.
+
+```python
 order_sent = page.locator("#order-sent")
 order_sent.wait_for()
 ```
 
-Read more about [locator.wait_for(**kwargs)](./api/class-locator.mdx#locator-wait-for).
-
-### Docker support for Arm64
-
-Playwright Docker image is now published for Arm64 so it can be used on Apple Silicon.
-
-Read more about [Docker integration](./docker).
+Read more about [`locator.wait_for()`].
 
 ### 🎭 Playwright Trace Viewer
+
+
 - run trace viewer with `npx playwright show-trace` and drop trace files to the trace viewer PWA
 - better visual attribution of action targets
 
-Read more about [Trace Viewer](./trace-viewer).
+Read more about [Trace Viewer].
 
 ### Browser Versions
+
+
 - Chromium 97.0.4666.0
 - Mozilla Firefox 93.0
 - WebKit 15.4
 
 This version of Playwright was also tested against the following stable channels:
+
 - Google Chrome 94
 - Microsoft Edge 94
 
-## Version 1.15
+---
+
+(1.16.0-1634781227000)
+
+[Trace Viewer]: https://playwright.dev/python/docs/next/trace-viewer
+[Docker integration]: https://playwright.dev/python/docs/next/docker
+[`locator.wait_for()`]: https://playwright.dev/python/docs/next/api/class-locator#locator-wait-for
+
+
+
+
+## [v1.15.3](https://github.com/microsoft/playwright-python/releases/tag/v1.15.3)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/9261 - [BUG] npm init playwright fails on path spaces
+https://github.com/microsoft/playwright/issues/9298 - [Question]: Should new Headers methods work in RouteAsync ?
+
+### Browser Versions
+
+
+- Chromium 96.0.4641.0
+- Mozilla Firefox 92.0
+- WebKit 15.0
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 93
+- Microsoft Edge 93
+
+---
+
+(driver version:  `1.15.2-1633455481000`)
+
+
+
+
+## [v1.15.2](https://github.com/microsoft/playwright-python/releases/tag/v1.15.2)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/9065 - [BUG] browser(webkit): disable COOP support
+https://github.com/microsoft/playwright/issues/9092 - [BUG] browser(webkit): fix text padding
+
+### Browser Versions
+
+
+- Chromium 96.0.4641.0
+- Mozilla Firefox 92.0
+- WebKit 15.0
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 93
+- Microsoft Edge 93
+
+---
+
+(driver version:  `1.15.0-1633020276000`)
+
+
+
+
+## [v1.15.1](https://github.com/microsoft/playwright-python/releases/tag/v1.15.1)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/pull/8955 - [BUG] fix(inspector): stop on all snapshottable actions
+https://github.com/microsoft/playwright/pull/8999 - [BUG] fix: do not dedup header values
+https://github.com/microsoft/playwright/pull/9038 - [BUG] fix: restore support for slowmo connect option
+
+### Browser Versions
+
+
+- Chromium 96.0.4641.0
+- Mozilla Firefox 92.0
+- WebKit 15.0
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 93
+- Microsoft Edge 93
+
+
+
+
+## [v1.15.0](https://github.com/microsoft/playwright-python/releases/tag/v1.15.0)
 
 ### 🖱️ Mouse Wheel
+
 
 By using [`Page.mouse.wheel`](https://playwright.dev/python/docs/api/class-mouse#mouse-wheel) you are now able to scroll vertically or horizontally.
 
 ### 📜 New Headers API
 
+
 Previously it was not possible to get multiple header values of a response. This is now  possible and additional helper functions are available:
+
 - [Request.all_headers()](https://playwright.dev/python/docs/api/class-request#request-all-headers)
 - [Request.headers_array()](https://playwright.dev/python/docs/api/class-request#request-headers-array)
 - [Request.header_value(name: str)](https://playwright.dev/python/docs/api/class-request#request-header-value)
@@ -248,9 +529,12 @@ Previously it was not possible to get multiple header values of a response. This
 
 ### 🌈 Forced-Colors emulation
 
+
 Its now possible to emulate the `forced-colors` CSS media feature by passing it in the [context options](https://playwright.dev/python/docs/api/class-browser#browser-new-context-option-forced-colors) or calling [Page.emulate_media()](https://playwright.dev/python/docs/api/class-page#page-emulate-media).
 
 ### New APIs
+
+
 - [Page.route()](https://playwright.dev/python/docs/api/class-page#page-route) accepts new `times` option to specify how many times this route should be matched.
 - [Page.set_checked(selector: str, checked: bool)](https://playwright.dev/python/docs/api/class-page#page-set-checked) and [Locator.set_checked(selector: str, checked: bool)](https://playwright.dev/python/docs/api/class-locator#locator-set-checked) was introduced to set the checked state of a checkbox.
 - [Request.sizes()](https://playwright.dev/python/docs/api/class-request#request-sizes) Returns resource size information for given http request.
@@ -258,148 +542,370 @@ Its now possible to emulate the `forced-colors` CSS media feature by passing it 
 - [BrowserContext.tracing.stop_chunk()](https://playwright.dev/python/docs/api/class-tracing#tracing-stop-chunk) - Stops a new trace chunk.
 
 ### Browser Versions
+
+
 - Chromium 96.0.4641.0
 - Mozilla Firefox 92.0
 - WebKit 15.0
 
-## Version 1.14
+This version of Playwright was also tested against the following stable channels:
 
-#### ⚡️ New "strict" mode
+- Google Chrome 93
+- Microsoft Edge 93
 
-Selector ambiguity is a common problem in automation testing. **"strict" mode** ensures that your selector points to a single element and throws otherwise.
 
-Pass `strict=true` into your action calls to opt in.
 
-```py
-# This will throw if you have more than one button!
-page.click("button", strict=true)
-```
 
-#### 📍 New [**Locators API**](./api/class-locator)
+## [v1.14.1](https://github.com/microsoft/playwright-python/releases/tag/v1.14.1)
 
-Locator represents a view to the element(s) on the page. It captures the logic sufficient to retrieve the element at any given moment.
+### Highlights
 
-The difference between the [Locator](./api/class-locator) and [ElementHandle](./api/class-elementhandle) is that the latter points to a particular element, while [Locator](./api/class-locator) captures the logic of how to retrieve that element.
 
-Also, locators are **"strict" by default**!
+This patch includes bug fixes for the following issues:
 
-```py
-locator = page.locator("button")
-locator.click()
-```
-
-Learn more in the [documentation](./api/class-locator).
-
-#### 🧩 Experimental [**React**](./selectors#react-selectors) and [**Vue**](./selectors#vue-selectors) selector engines
-
-React and Vue selectors allow selecting elements by its component name and/or property values. The syntax is very similar to [attribute selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) and supports all attribute selector operators.
-
-```py
-page.click("_react=SubmitButton[enabled=true]");
-page.click("_vue=submit-button[enabled=true]");
-```
-
-Learn more in the [react selectors documentation](./selectors#react-selectors) and the [vue selectors documentation](./selectors#vue-selectors).
-
-#### ✨ New [**`nth`**](./selectors#n-th-element-selector) and [**`visible`**](./selectors#selecting-visible-elements) selector engines
-- [`nth`](./selectors#n-th-element-selector) selector engine is equivalent to the `:nth-match` pseudo class, but could be combined with other selector engines.
-- [`visible`](./selectors#selecting-visible-elements) selector engine is equivalent to the `:visible` pseudo class, but could be combined with other selector engines.
-
-```py
-# select the first button among all buttons
-button.click("button >> nth=0")
-# or if you are using locators, you can use first, nth() and last
-page.locator("button").first.click()
-
-# click a visible button
-button.click("button >> visible=true")
-```
+microsoft/playwright#8287 - [BUG] webkit crashes intermittently: "file data stream has an unexpected number of bytes"
+microsoft/playwright#8281 - [BUG] HTML report crashes if diff snapshot does not exists
+microsoft/playwright#8230 - Using React Selectors with multiple React trees 
+microsoft/playwright#8366 - [BUG] Mark timeout in isVisible as deprecated and noop
 
 ### Browser Versions
+
+
 - Chromium 94.0.4595.0
 - Mozilla Firefox 91.0
 - WebKit 15.0
 
-## Version 1.13
+This version of Playwright was also tested against the following stable channels:
 
-#### Playwright
-- **🖖 Programmatic drag-and-drop support** via the [page.drag_and_drop(source, target, **kwargs)](./api/class-page.mdx#page-drag-and-drop) API.
-- **🔎 Enhanced HAR** with body sizes for requests and responses. Use via `recordHar` option in [browser.new_context(**kwargs)](./api/class-browser.mdx#browser-new-context).
+- Google Chrome 92
+- Microsoft Edge 92
 
-#### Tools
-- Playwright Trace Viewer now shows parameters, returned values and `console.log()` calls.
 
-#### New and Overhauled Guides
-- [Intro](./intro.mdx)
-- [Authentication](./auth.mdx)
-- [Chome Extensions](./chrome-extensions.mdx)
 
-#### Browser Versions
+## [v1.14.0](https://github.com/microsoft/playwright-python/releases/tag/v1.14.0)
+
+### ⚡️ New "strict" mode
+
+
+Selector ambiguity is a common problem in automation testing. **"strict" mode**
+ensures that your selector points to a single element and throws otherwise.
+
+Pass `strict = true` into your action calls to opt in.
+
+```py
+### This will throw if you have more than one button!
+
+page.click('button', strict=true)
+```
+
+### 📍 New [**Locators API**](https://playwright.dev/python/docs/api/class-locator)
+
+
+Locator represents a view to the element(s) on the page. It captures the logic sufficient to retrieve the element at any given moment.
+
+The difference between the [Locator](https://playwright.dev/python/docs/api/class-locator) and [ElementHandle](https://playwright.dev/python/docs/api/class-elementhandle) is that the latter points to a particular element, while [Locator](https://playwright.dev/python/docs/api/class-locator) captures the logic of how to retrieve that element.
+
+Also, locators are **"strict" by default**!
+
+```py
+locator = page.locator('button')
+locator.click()
+```
+
+Learn more in the [documentation](https://playwright.dev/python/docs/api/class-locator).
+
+### 🧩 Experimental [**React**](https://playwright.dev/python/docs/selectors#react-selectors) and [**Vue**](https://playwright.dev/python/docs/selectors#vue-selectors) selector engines
+
+
+React and Vue selectors allow selecting elements by its component name and/or property values. The syntax is very similar to [attribute selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) and supports all attribute selector operators.
+
+```py
+page.click('_react=SubmitButton[enabled=true]')
+page.click('_vue=submit-button[enabled=true]')
+```
+
+Learn more in the [react selectors documentation](https://playwright.dev/python/docs/selectors#react-selectors) and the [vue selectors documentation](https://playwright.dev/python/docs/selectors#vue-selectors).
+
+### ✨ New [**`nth`**](https://playwright.dev/python/docs/selectors#n-th-element-selector) and [**`visible`**](https://playwright.dev/python/docs/selectors#selecting-visible-elements) selector engines
+
+
+- [`nth`](https://playwright.dev/python/docs/selectors#n-th-element-selector) selector engine is equivalent to the `:nth-match` pseudo class, but could be combined with other selector engines.
+- [`visible`](https://playwright.dev/python/docs/selectors#selecting-visible-elements) selector engine is equivalent to the `:visible` pseudo class, but could be combined with other selector engines.
+
+```py
+### select the first button among all buttons
+
+button.click('button >> nth=0')
+### or if you are using locators, you can use first(), nth() and last()
+
+page.locator('button').first().click()
+
+### click a visible button
+
+button.click('button >> visible=true')
+```
+
+### Browser Versions
+
+
+- Chromium 94.0.4595.0
+- Mozilla Firefox 91.0
+- WebKit 15.0
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 92
+- Microsoft Edge 92
+
+
+
+## [v1.13.1](https://github.com/microsoft/playwright-python/releases/tag/v1.13.1)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+[823](https://github.com/microsoft/playwright-python/issue/823)
+[820](https://github.com/microsoft/playwright-python/issue/820)
+[812](https://github.com/microsoft/playwright-python/issue/812)
+
+### Browser Versions
+
+
 - Chromium 93.0.4576.0
 - Mozilla Firefox 90.0
 - WebKit 14.2
 
-#### New Playwright APIs
-- new `baseURL` option in [browser.new_context(**kwargs)](./api/class-browser.mdx#browser-new-context) and [browser.new_page(**kwargs)](./api/class-browser.mdx#browser-new-page)
-- [response.security_details()](./api/class-response.mdx#response-security-details) and [response.server_addr()](./api/class-response.mdx#response-server-addr)
-- [page.drag_and_drop(source, target, **kwargs)](./api/class-page.mdx#page-drag-and-drop) and [frame.drag_and_drop(source, target, **kwargs)](./api/class-frame.mdx#frame-drag-and-drop)
-- [download.cancel()](./api/class-download.mdx#download-cancel)
-- [page.input_value(selector, **kwargs)](./api/class-page.mdx#page-input-value), [frame.input_value(selector, **kwargs)](./api/class-frame.mdx#frame-input-value) and [element_handle.input_value(**kwargs)](./api/class-elementhandle.mdx#element-handle-input-value)
-- new `force` option in [page.fill(selector, value, **kwargs)](./api/class-page.mdx#page-fill), [frame.fill(selector, value, **kwargs)](./api/class-frame.mdx#frame-fill), and [element_handle.fill(value, **kwargs)](./api/class-elementhandle.mdx#element-handle-fill)
-- new `force` option in [page.select_option(selector, **kwargs)](./api/class-page.mdx#page-select-option), [frame.select_option(selector, **kwargs)](./api/class-frame.mdx#frame-select-option), and [element_handle.select_option(**kwargs)](./api/class-elementhandle.mdx#element-handle-select-option)
 
-## Version 1.12
 
-#### 🧟‍♂️ Introducing Playwright Trace Viewer
 
-[Playwright Trace Viewer](./trace-viewer.mdx) is a new GUI tool that helps exploring recorded Playwright traces after the script ran. Playwright traces let you examine:
-- page DOM before and after each Playwright action
-- page rendering before and after each Playwright action
-- browser network during script execution
+## [v1.13.0](https://github.com/microsoft/playwright-python/releases/tag/v1.13.0)
 
-Traces are recorded using the new [browser_context.tracing](./api/class-browsercontext.mdx#browser-context-tracing) API:
+### Playwright
 
-```py
-browser = chromium.launch()
-context = browser.new_context()
 
-# Start tracing before creating / navigating a page.
-context.tracing.start(screenshots=True, snapshots=True)
+- **🖖 Programmatic drag-and-drop support** via the [`page.drag_and_drop()`] API.
+- **🔎 Enhanced HAR** with body sizes for requests and responses. Use via `record_har_path` option in [`browser.new_context()`].
 
-page.goto("https://playwright.dev")
+### Tools
 
-# Stop tracing and export it into a zip archive.
-context.tracing.stop(path = "trace.zip")
-```
 
-Traces are examined later with the Playwright CLI:
+- Playwright Trace Viewer now shows parameters, returned values and `console.log()` calls.
+- Playwright Inspector can generate Playwright Test tests.
 
-That will open the following GUI:
+### New and Overhauled Guides
 
-![image](https://user-images.githubusercontent.com/746130/121109654-d66c4480-c7c0-11eb-8d4d-eb70d2b03811.png)
 
-👉 Read more in [trace viewer documentation](./trace-viewer.mdx).
+- [Intro](https://playwright.dev/python/docs/next/intro/)
+- [Authentication](https://playwright.dev/docs/next/auth)
+- [Chome Extensions](https://playwright.dev/docs/next/chrome-extensions)
+- [Playwright Test Configuration](https://playwright.dev/docs/next/test-configuration)
+- [Playwright Test Annotations](https://playwright.dev/docs/next/test-annotations)
+- [Playwright Test Fixtures](https://playwright.dev/docs/next/test-fixtures)
 
-#### Browser Versions
+### Browser Versions
+
+
+- Chromium 93.0.4576.0
+- Mozilla Firefox 90.0
+- WebKit 14.2
+
+### New Playwright APIs
+
+
+- new `baseURL` option in [`browser.new_context()`] and [`browser.new_page()`]
+- [`response.security_details()`] and [`response.server_addr()`]
+- [`page.drag_and_drop()`] and [`frame.drag_and_drop()`]
+- [`download.cancel()`]
+- [`page.input_value()`], [`frame.input_value()`] and [`element_handle.input_value()`]
+- new `force` option in [`page.fill()`], [`frame.fill()`], and [`element_handle.fill()`]
+- new `force` option in [`page.select_option()`], [`frame.select_option()`], and [`element_handle.select_option()`]
+
+[`download.cancel()`]: https://playwright.dev/python/docs/next/api/class-download#download-cancel
+
+[`page.fill()`]: https://playwright.dev/python/docs/next/api/class-page#page-fill
+[`frame.fill()`]: https://playwright.dev/python/docs/next/api/class-frame#frame-fill
+[`element_handle.fill()`]: https://playwright.dev/python/docs/next/api/class-elementhandle#element-handle-fill
+
+[`page.input_value()`]: https://playwright.dev/python/docs/next/api/class-page#page-input-value
+[`frame.input_value()`]: https://playwright.dev/python/docs/next/api/class-frame#frame-input-value
+[`element_handle.input_value()`]: https://playwright.dev/python/docs/next/api/class-elementhandle#element-handle-input-value
+
+[`page.select_option()`]: https://playwright.dev/python/docs/next/api/class-page#page-select-option
+[`frame.select_option()`]: https://playwright.dev/python/docs/next/api/class-frame#frame-select-option
+[`element_handle.select_option()`]: https://playwright.dev/python/docs/next/api/class-elementhandle#element-handle-select-option
+
+[`page.drag_and_drop()`]: https://playwright.dev/python/docs/next/api/class-page#page-drag-and-drop
+[`frame.drag_and_drop()`]: https://playwright.dev/python/docs/next/api/class-frame#frame-drag-and-drop
+
+[`response.security_details()`]: https://playwright.dev/python/docs/next/api/class-response#response-security-details
+[`response.server_addr()`]: https://playwright.dev/python/docs/next/api/class-response#response-server-addr
+
+[`browser.new_context()`]: https://playwright.dev/python/docs/next/api/class-browser#browser-new-context
+[`browser.new_page()`]: https://playwright.dev/python/docs/next/api/class-browser#browser-new-page
+
+
+
+
+## [v1.12.1](https://github.com/microsoft/playwright-python/releases/tag/v1.12.1)
+
+### Highlights
+
+
+This patch release includes bugfixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/7015 - [BUG] Firefox: strange undefined toJSON property on JS objects
+https://github.com/microsoft/playwright/issues/7048 - [BUG] Dialogs cannot be dismissed if tracing is on in Chromium or Webkit
+https://github.com/microsoft/playwright/issues/7058 - [BUG] Getting no video frame error for mobile chrome
+
+### Browser Versions
+
+
 - Chromium 93.0.4530.0
 - Mozilla Firefox 89.0
 - WebKit 14.2
 
 This version of Playwright was also tested against the following stable channels:
+
 - Google Chrome 91
 - Microsoft Edge 91
 
-#### New APIs
-- `reducedMotion` option in [page.emulate_media(**kwargs)](./api/class-page.mdx#page-emulate-media), [browser_type.launch_persistent_context(user_data_dir, **kwargs)](./api/class-browsertype.mdx#browser-type-launch-persistent-context), [browser.new_context(**kwargs)](./api/class-browser.mdx#browser-new-context) and [browser.new_page(**kwargs)](./api/class-browser.mdx#browser-new-page)
-- [browser_context.on("request")](./api/class-browsercontext.mdx#browser-context-event-request)
-- [browser_context.on("requestfailed")](./api/class-browsercontext.mdx#browser-context-event-request-failed)
-- [browser_context.on("requestfinished")](./api/class-browsercontext.mdx#browser-context-event-request-finished)
-- [browser_context.on("response")](./api/class-browsercontext.mdx#browser-context-event-response)
-- `tracesDir` option in [browser_type.launch(**kwargs)](./api/class-browsertype.mdx#browser-type-launch) and [browser_type.launch_persistent_context(user_data_dir, **kwargs)](./api/class-browsertype.mdx#browser-type-launch-persistent-context)
-- new [browser_context.tracing](./api/class-browsercontext.mdx#browser-context-tracing) API namespace
-- new [download.page](./api/class-download.mdx#download-page) method
 
-## Version 1.11
+
+## [v1.12.0](https://github.com/microsoft/playwright-python/releases/tag/v1.12.0)
+
+### 🧟‍♂️ Introducing Playwright Trace & TraceViewer
+
+
+[Playwright Trace Viewer](https://playwright.dev/python/docs/next/trace-viewer) is a new GUI tool that helps exploring recorded Playwright traces after the script ran. Playwright traces let you examine:
+- page DOM before and after each Playwright action
+- page rendering before and after each Playwright action
+- browse network during script execution
+
+Traces are recorded using the new [`browser_context.tracing`] API:
+
+```python
+browser = chromium.launch()
+context = browser.new_context()
+
+### Start tracing before creating / navigating a page.
+
+context.tracing.start(screenshots=True, snapshots=True)
+
+page.goto("https://playwright.dev")
+
+### Stop tracing and export it into a zip archive.
+
+context.tracing.stop(path = "trace.zip")
+```
+
+Traces are examined later with the Playwright CLI:
+
+
+```sh
+playwright show-trace trace.zip
+```
+
+That will open the following GUI:
+
+![image](https://user-images.githubusercontent.com/746130/121109654-d66c4480-c7c0-11eb-8d4d-eb70d2b03811.png)
+
+👉 Read more in [trace viewer documentation](https://playwright.dev/python/docs/next/trace-viewer).
+
+---
+
+### Browser Versions
+
+
+- Chromium 93.0.4530.0
+- Mozilla Firefox 89.0
+- WebKit 14.2
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 91
+- Microsoft Edge 91
+
+### New APIs
+
+
+- `reduced_motion` option in [`page.emulate_media()`], [`browser_type.launch_persistent_context()`], [`browser.new_context()`] and [`browser.new_page()`]
+- [`browser_context.on("request")`]
+- [`browser_context.on("requestfailed")`]
+- [`browser_context.on("requestfinished")`]
+- [`browser_context.on("response")`]
+- `traces_dir` option in [`browser_type.launch()`] and [`browser_type.launch_persistent_context()`]
+- new [`browser_context.tracing`] API namespace
+- new [`download.page`] getter
+
+
+[`page.emulate_media()`]: https://playwright.dev/python/docs/next/api/class-page#page-emulate-media
+[`browser_type.launch_persistent_context()`]: https://playwright.dev/python/docs/next/api/class-browsertype#browser-type-launch-persistent-context
+[`browser_context.tracing`]: https://playwright.dev/python/docs/next/api/class-browsercontext#browser-context-tracing
+[`download.page`]: https://playwright.dev/python/docs/next/api/class-download#download-page
+[`browser_type.launch()`]: https://playwright.dev/python/docs/next/api/class-browsertype
+[`browser.new_context()`]: https://playwright.dev/python/docs/next/api/class-browser#browser-new-context
+[`browser.new_page()`]: https://playwright.dev/python/docs/next/api/class-browser#browser-new-page
+[`browser_context.on("request")`]: https://playwright.dev/python/docs/next/api/class-browsercontext#browser-context-event-request
+[`browser_context.on("requestfailed")`]: https://playwright.dev/python/docs/next/api/class-browsercontext#browser-context-event-request-failed
+[`browser_context.on("requestfinished")`]: https://playwright.dev/python/docs/next/api/class-browsercontext#browser-context-event-request-finished
+[`browser_context.on("response")`]: https://playwright.dev/python/docs/next/api/class-browsercontext#browser-context-event-response
+
+
+
+
+## [v1.11.2](https://github.com/microsoft/playwright-python/releases/tag/v1.11.2)
+
+### Highlights
+
+
+This patch includes bug fixes across all languages for the following issues:
+- https://github.com/microsoft/playwright-python/issues/679 - can't get browser's context pages after connect_over_cdp
+- https://github.com/microsoft/playwright-java/issues/432 - [Bug] Videos are not complete when an exception is thrown
+
+### Browser Versions
+
+
+- Chromium 92.0.4498.0
+- Mozilla Firefox 89.0b6
+- WebKit 14.2
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 90
+- Microsoft Edge 90
+
+
+
+
+## [v1.11.1](https://github.com/microsoft/playwright-python/releases/tag/v1.11.1)
+
+### Highlights
+
+
+🐧 Deploy [v1.11](https://github.com/microsoft/playwright-python/releases/tag/v1.11.0) on PIP for Ubuntu users
+🐍 Release Playwright-Python on Anaconda: https://anaconda.org/Microsoft/playwright
+
+### Browser Versions
+
+
+- Chromium 92.0.4498.0
+- Mozilla Firefox 89.0b6
+- WebKit 14.2
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 90
+- Microsoft Edge 90
+
+
+
+
+## [v1.11.0](https://github.com/microsoft/playwright-python/releases/tag/v1.11.0)
+
+### Highlights
+
 
 🎥  New video: [Playwright: A New Test Automation Framework for the Modern Web](https://youtu.be/_Jla6DyuEu4) ([slides](https://docs.google.com/presentation/d/1xFhZIJrdHkVe2CuMKOrni92HoG2SWslo0DhJJQMR1DI/edit?usp=sharing))
 - We talked about Playwright
@@ -407,169 +913,225 @@ This version of Playwright was also tested against the following stable channels
 - Did live demos with new features ✨
 - **Special thanks** to [applitools](http://applitools.com/) for hosting the event and inviting us!
 
-#### Browser Versions
+⚙️  Chrome DevTools Protocol support with [`browser_type.connect_over_cdp()`].
+
+### Browser Versions
+
+
 - Chromium 92.0.4498.0
 - Mozilla Firefox 89.0b6
 - WebKit 14.2
 
-#### New APIs
-- support for **async predicates** across the API in methods such as [page.expect_request(url_or_predicate, **kwargs)](./api/class-page.mdx#page-wait-for-request) and others
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 90
+- Microsoft Edge 90
+
+### New APIs
+
+
+
 - new **emulation devices**: Galaxy S8, Galaxy S9+, Galaxy Tab S4, Pixel 3, Pixel 4
 - new methods:
-  * [page.wait_for_url(url, **kwargs)](./api/class-page.mdx#page-wait-for-url) to await navigations to URL
-  * [video.delete()](./api/class-video.mdx#video-delete) and [video.save_as(path)](./api/class-video.mdx#video-save-as) to manage screen recording
+    * [`browser_type.connect_over_cdp()`] to connect using Chrome DevTools protocol
+    * [`browser_type.connect()`] to connect to a Playwright server
+    * [`page.wait_for_url()`] to ensure navigations to URL
+    * [`video.delete()`] and [`video.save_as()`] to manage screen recording
 - new options:
-  * `screen` option in the [browser.new_context(**kwargs)](./api/class-browser.mdx#browser-new-context) method to emulate `window.screen` dimensions
-  * `position` option in [page.check(selector, **kwargs)](./api/class-page.mdx#page-check) and [page.uncheck(selector, **kwargs)](./api/class-page.mdx#page-uncheck) methods
-  * `trial` option to dry-run actions in [page.check(selector, **kwargs)](./api/class-page.mdx#page-check), [page.uncheck(selector, **kwargs)](./api/class-page.mdx#page-uncheck), [page.click(selector, **kwargs)](./api/class-page.mdx#page-click), [page.dblclick(selector, **kwargs)](./api/class-page.mdx#page-dblclick), [page.hover(selector, **kwargs)](./api/class-page.mdx#page-hover) and [page.tap(selector, **kwargs)](./api/class-page.mdx#page-tap)
+    * `screen` option in the [`browser.new_context()`] method to emulate `window.screen` dimensions
+    * `position` option in [`page.check()`] and [`page.uncheck()`] methods
+    * `trial` option to dry-run actions in [`page.check()`], [`page.uncheck()`], [`page.click()`], [`page.dblclick()`], [`page.hover()`] and [`page.tap()`]
+    * `headers` option in [`browser_type.connect()`]
 
-## Version 1.10
-- [Playwright for Java v1.10](https://github.com/microsoft/playwright-java) is **now stable**!
-- Run Playwright against **Google Chrome** and **Microsoft Edge** stable channels with the [new channels API](./browsers).
+
+[`browser.new_context()`]: https://playwright.dev/python/docs/next/api/class-browser#browsernew_contextkwargs
+[`page.wait_for_url()`]: https://playwright.dev/python/docs/next/api/class-page#pagewait_for_urlurl-kwargs
+[`video.delete()`]: https://playwright.dev/python/docs/next/api/class-video#videodelete
+[`video.save_as()`]: https://playwright.dev/python/docs/next/api/class-video#videosave_aspath
+[`page.click()`]: https://playwright.dev/python/docs/next/api/class-page#pageclickselector-kwargs
+[`page.check()`]: https://playwright.dev/python/docs/next/api/class-page#pagecheckselector-kwargs
+[`page.uncheck()`]: https://playwright.dev/python/docs/next/api/class-page#pageuncheckselector-kwargs
+[`page.dblclick()`]: https://playwright.dev/python/docs/next/api/class-page#pagedblclickselector-kwargs
+[`page.hover()`]: https://playwright.dev/python/docs/next/api/class-page#pagehoverselector-kwargs
+[`browser_type.connect()`]: https://playwright.dev/python/docs/next/api/class-browsertype#browser_typeconnectws_endpoint-kwargs
+[`page.tap()`]: https://playwright.dev/python/docs/next/api/class-page#pagetapselector-kwargs
+[`browser_type.connect()`]: https://playwright.dev/python/docs/next/api/class-browsertype#browser_typeconnectws_endpoint-kwargs
+[`browser_type.connect_over_cdp()`]: https://playwright.dev/python/docs/next/api/class-browsertype#browser_typeconnect_over_cdpendpoint_url-kwargs
+
+
+
+## [v1.10.0](https://github.com/microsoft/playwright-python/releases/tag/v1.10.0)
+
+### Highlights
+
+
+- Run Playwright against **Google Chrome** and **Microsoft Edge** stable channels with the [new channels API](https://playwright.dev/python/docs/browsers).
 - Chromium screenshots are **fast** on Mac & Windows.
 
-#### Bundled Browser Versions
+### Bundled Browser Versions
+
+
 - Chromium 90.0.4430.0
 - Mozilla Firefox 87.0b10
 - WebKit 14.2
 
 This version of Playwright was also tested against the following stable channels:
+
 - Google Chrome 89
 - Microsoft Edge 89
 
-#### New APIs
-- [`browserType.launch()`](./api/class-browsertype#browsertypelaunchoptions) now accepts the new `'channel'` option. Read more in [our documentation](./browsers).
+### New APIs
 
-## Version 1.9
-- [Playwright Inspector](./inspector.mdx) is a **new GUI tool** to author and debug your tests.
-  - **Line-by-line debugging** of your Playwright scripts, with play, pause and step-through.
-  - Author new scripts by **recording user actions**.
-  - **Generate element selectors** for your script by hovering over elements.
-  - Set the `PWDEBUG=1` environment variable to launch the Inspector
-- **Pause script execution** with [page.pause()](./api/class-page.mdx#page-pause) in headed mode. Pausing the page launches [Playwright Inspector](./inspector.mdx) for debugging.
-- **New has-text pseudo-class** for CSS selectors. `:has-text("example")` matches any element containing `"example"` somewhere inside, possibly in a child or a descendant element. See [more examples](./selectors.mdx#text-selector).
-- **Page dialogs are now auto-dismissed** during execution, unless a listener for `dialog` event is configured. [Learn more](./dialogs.mdx) about this.
-- [Playwright for Python](https://github.com/microsoft/playwright-python) is **now stable** with an idiomatic snake case API and pre-built [Docker image](./docker.mdx) to run tests in CI/CD.
 
-#### Browser Versions
+- [`browserType.launch()`](https://playwright.dev/python/docs/next/api/class-browsertype#browser_typelaunchkwargs) now accepts the new `'channel'` option. Read more in [our documentation](https://playwright.dev/python/docs/browsers).
+
+
+
+
+## [v1.9.2](https://github.com/microsoft/playwright-python/releases/tag/v1.9.2)
+
+### Highlights
+
+
+Text selector and `click()` fixes.
+
+### Browser Versions
+
+
 - Chromium 90.0.4421.0
 - Mozilla Firefox 86.0b10
 - WebKit 14.1
 
-#### New APIs
-- [page.pause()](./api/class-page.mdx#page-pause).
+<details>
+  <summary><b>Issues Closed (4)</b></summary>
 
-## Version 1.8
-- [Selecting elements based on layout](./selectors.mdx#selecting-elements-based-on-layout) with `:left-of()`, `:right-of()`, `:above()` and `:below()`.
-- Playwright now includes [command line interface](./cli.mdx), former playwright-cli.
+[538](https://github.com/microsoft/playwright-python/issue/538)
+[534](https://github.com/microsoft/playwright-python/issue/534)
 
-  ```bash
-  playwright --help
+https://github.com/microsoft/playwright/issues/5634 - [REGRESSION]: Test selector changed behavior 
+https://github.com/microsoft/playwright/issues/5674 - [REGRESSION]: Label is not visible anymore
+
+</details>
+
+
+
+## [v1.9.1](https://github.com/microsoft/playwright-python/releases/tag/v1.9.1)
+
+### Highlights
+
+
+Text selector fixes.
+
+### Browser Versions
+
+
+- Chromium 90.0.4421.0
+- Mozilla Firefox 86.0b10
+- WebKit 14.1
+
+
+
+
+
+## [v1.9.0](https://github.com/microsoft/playwright-python/releases/tag/v1.9.0)
+
+### Highlights
+
+
+- [Playwright for Python](https://github.com/microsoft/playwright-python) is **now stable** with an idiomatic snake case API and pre-built [Docker image](https://playwright.dev/docs/docker) to run tests in CI/CD.
+
+- [Playwright Inspector](https://playwright.dev/docs/inspector) is a **new GUI tool** to author and debug your tests.
+  - **Line-by-line debugging** of your Playwright scripts, with play, pause and step-through.
+  - Author new scripts by **recording user actions**.
+  - **Generate element selectors** for your script by hovering over elements.
+  - Set the `PWDEBUG=1` environment variable to launch the Inspector
+
+- **Pause script execution** with [`page.pause()`](https://playwright.dev/docs/api/class-page#pagepause) in headed mode. Pausing the page launches [Playwright Inspector](https://playwright.dev/docs/inspector) for debugging.
+
+- **New has-text pseudo-class** for CSS selectors. `:has-text("example")` matches any element containing `"example"` somewhere inside, possibly in a child or a descendant element. See [more examples](https://playwright.dev/docs/selectors#text-selector).
+
+- **Page dialogs are now auto-dismissed** during execution, unless a listener for `dialog` event is configured. [Learn more](https://playwright.dev/docs/dialogs) about this.
+
+
+### Browser Versions
+
+
+- Chromium 90.0.4421.0
+- Mozilla Firefox 86.0b10
+- WebKit 14.1
+
+### New APIs
+
+
+- [`page.pause`](https://playwright.dev/docs/next/api/class-page#pagepause)
+
+
+
+
+## [v1.8.0a1](https://github.com/microsoft/playwright-python/releases/tag/v1.8.0a1)
+
+### Highlights
+
+- Playwright goes semver. We are jumping from `0.170.*` to `1.8.0a1` to become semver compliant. This is a breaking change, but once we drop the Alpha bit, it'll be in stone for years!
+- [Documentation site](https://playwright.dev/python/docs/intro) is now all about Python! It has guides, sample snippets, API docs
+- You can now [select elements based on layout](https://playwright.dev/python/docs/selectors#selecting-elements-based-on-layout) with `:left-of()`, `:right-of()`, `:above()` and `:below()`
+- New methods to [assert element state](https://playwright.dev/python/docs/actionability#assertions) like `page.is_editable('selector')` were added.
+
+### Migration from the pre-release versions
+
+
+The API has changed since the last 0.170.0 version:
+- Snake case notation for methods and arguments:
+
+  ```py
+  # old
+  browser.newPage()
+  ```
+  ```py
+  # new
+  browser.new_page()
   ```
 
-- [page.select_option(selector, **kwargs)](./api/class-page.mdx#page-select-option) now waits for the options to be present.
-- New methods to [assert element state](./actionability#assertions) like [page.is_editable(selector, **kwargs)](./api/class-page.mdx#page-is-editable).
+- Import has changed to include sync vs async mode explicitly:
+  ```py
+  # old
+  from playwright import sync_playwright
+  ```
+  ```py
+  # new
+  from playwright.sync_api import sync_playwright
+  ```
 
-#### New APIs
-- [element_handle.is_checked()](./api/class-elementhandle.mdx#element-handle-is-checked).
-- [element_handle.is_disabled()](./api/class-elementhandle.mdx#element-handle-is-disabled).
-- [element_handle.is_editable()](./api/class-elementhandle.mdx#element-handle-is-editable).
-- [element_handle.is_enabled()](./api/class-elementhandle.mdx#element-handle-is-enabled).
-- [element_handle.is_hidden()](./api/class-elementhandle.mdx#element-handle-is-hidden).
-- [element_handle.is_visible()](./api/class-elementhandle.mdx#element-handle-is-visible).
-- [page.is_checked(selector, **kwargs)](./api/class-page.mdx#page-is-checked).
-- [page.is_disabled(selector, **kwargs)](./api/class-page.mdx#page-is-disabled).
-- [page.is_editable(selector, **kwargs)](./api/class-page.mdx#page-is-editable).
-- [page.is_enabled(selector, **kwargs)](./api/class-page.mdx#page-is-enabled).
-- [page.is_hidden(selector, **kwargs)](./api/class-page.mdx#page-is-hidden).
-- [page.is_visible(selector, **kwargs)](./api/class-page.mdx#page-is-visible).
-- New option `'editable'` in [element_handle.wait_for_element_state(state, **kwargs)](./api/class-elementhandle.mdx#element-handle-wait-for-element-state).
+### Browser Versions
 
-#### Browser Versions
+
 - Chromium 90.0.4392.0
 - Mozilla Firefox 85.0b5
 - WebKit 14.1
 
-## Version 1.7
-- **New Java SDK**: [Playwright for Java](https://github.com/microsoft/playwright-java) is now on par with [JavaScript](https://github.com/microsoft/playwright), [Python](https://github.com/microsoft/playwright-python) and [.NET bindings](https://github.com/microsoft/playwright-dotnet).
-- **Browser storage API**: New convenience APIs to save and load browser storage state (cookies, local storage) to simplify automation scenarios with authentication.
-- **New CSS selectors**: We heard your feedback for more flexible selectors and have revamped the selectors implementation. Playwright 1.7 introduces [new CSS extensions](./selectors.mdx) and there's more coming soon.
-- **New website**: The docs website at [playwright.dev](https://playwright.dev/) has been updated and is now built with [Docusaurus](https://v2.docusaurus.io/).
-- **Support for Apple Silicon**: Playwright browser binaries for WebKit and Chromium are now built for Apple Silicon.
+### New APIs
 
-#### New APIs
-- [browser_context.storage_state(**kwargs)](./api/class-browsercontext.mdx#browser-context-storage-state) to get current state for later reuse.
-- `storageState` option in [browser.new_context(**kwargs)](./api/class-browser.mdx#browser-new-context) and [browser.new_page(**kwargs)](./api/class-browser.mdx#browser-new-page) to setup browser context state.
 
-#### Browser Versions
-- Chromium 89.0.4344.0
-- Mozilla Firefox 84.0b9
-- WebKit 14.1
+- [`element_handle.is_checked()`](https://playwright.dev/python/docs/api/class-elementhandle#element_handleis_checked)
+- [`element_handle.is_disabled()`](https://playwright.dev/python/docs/api/class-elementhandle#element_handleis_disabled)
+- [`element_handle.is_editable()`](https://playwright.dev/python/docs/api/class-elementhandle#element_handleis_editable)
+- [`element_handle.is_enabled()`](https://playwright.dev/python/docs/api/class-elementhandle#element_handleis_enabled)
+- [`element_handle.is_hidden()`](https://playwright.dev/python/docs/api/class-elementhandle#element_handleis_hidden)
+- [`element_handle.is_visible()`](https://playwright.dev/python/docs/api/class-elementhandle#element_handleis_visible)
+- [`page.is_checked(selector)`](https://playwright.dev/python/docs/api/class-page#pageis_checkedselector-options)
+- [`page.is_disabled(selector)`](https://playwright.dev/python/docs/api/class-page#pageis_checkedselector-options)
+- [`page.is_editable(selector)`](https://playwright.dev/python/docs/api/class-page#pageis_checkedselector-options)
+- [`page.is_enabled(selector)`](https://playwright.dev/python/docs/api/class-page#pageis_checkedselector-options)
+- [`page.is_hidden(selector)`](https://playwright.dev/python/docs/api/class-page#pageis_checkedselector-options)
+- [`page.is_visible(selector)`](https://playwright.dev/python/docs/api/class-page#pageis_checkedselector-options)
+- New option `'editable'` in [`elementHandle.wait_for_element_state()`](https://playwright.dev/python/docs/api/class-elementhandle#element_handlewait_for_element_statestate-options)
 
-[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
-[APIRequest]: ./api/class-apirequest.mdx "APIRequest"
-[APIRequestContext]: ./api/class-apirequestcontext.mdx "APIRequestContext"
-[APIResponse]: ./api/class-apiresponse.mdx "APIResponse"
-[Browser]: ./api/class-browser.mdx "Browser"
-[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
-[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
-[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
-[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
-[Dialog]: ./api/class-dialog.mdx "Dialog"
-[Download]: ./api/class-download.mdx "Download"
-[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
-[Error]: ./api/class-error.mdx "Error"
-[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
-[Frame]: ./api/class-frame.mdx "Frame"
-[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
-[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
-[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
-[Locator]: ./api/class-locator.mdx "Locator"
-[LocatorAssertions]: ./api/class-locatorassertions.mdx "LocatorAssertions"
-[Mouse]: ./api/class-mouse.mdx "Mouse"
-[Page]: ./api/class-page.mdx "Page"
-[PageAssertions]: ./api/class-pageassertions.mdx "PageAssertions"
-[Playwright]: ./api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: ./api/class-playwrightassertions.mdx "PlaywrightAssertions"
-[Request]: ./api/class-request.mdx "Request"
-[Response]: ./api/class-response.mdx "Response"
-[Route]: ./api/class-route.mdx "Route"
-[Selectors]: ./api/class-selectors.mdx "Selectors"
-[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
-[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
-[Tracing]: ./api/class-tracing.mdx "Tracing"
-[Video]: ./api/class-video.mdx "Video"
-[WebSocket]: ./api/class-websocket.mdx "WebSocket"
-[Worker]: ./api/class-worker.mdx "Worker"
-[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
-[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
-[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
-[bytes]: https://docs.python.org/3/library/stdtypes.html#bytes "bytes"
-[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
-[EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
-[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
-[Exception]: https://docs.python.org/3/library/exceptions.html#Exception "Exception"
-[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
-[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
-[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
-[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
-[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
-[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
-[URL]: https://en.wikipedia.org/wiki/URL "URL"
-[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
-[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
-[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"
 
-[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
-[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
-[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
+
+## [v0.171.1](https://github.com/microsoft/playwright-python/releases/tag/v0.171.1)
+
+* chore(stderr): fix handling without stderr fileno (#402)
+
+
+

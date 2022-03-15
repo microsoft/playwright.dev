@@ -1,68 +1,105 @@
 ---
-id: release-notes
-title: "Release notes"
+  id: release-notes
+  title: "Release notes"
 ---
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
 
-- [Version 1.19](#version-119)
-- [Version 1.18](#version-118)
-- [Version 1.17](#version-117)
-- [Version 1.16](#version-116)
-- [Version 1.15](#version-115)
-- [Version 1.14](#version-114)
-- [Version 1.13](#version-113)
-- [Version 1.12](#version-112)
-- [Version 1.11](#version-111)
-- [Version 1.10](#version-110)
-- [Version 1.9](#version-19)
-- [Version 1.8](#version-18)
-- [Version 1.7](#version-17)
-
-## Version 1.19
+## [N/A](https://github.com/microsoft/playwright-java/releases/tag/)
 
 ### Highlights
-- Locator now supports a `has` option that makes sure it contains another locator inside:
+
+
+- New options for methods [`page.screenshot()`](https://playwright.dev/java/docs/api/class-page#page-screenshot), [`locator.screenshot()`](https://playwright.dev/java/docs/api/class-locator#locator-screenshot) and [`elementHandle.screenshot()`](https://playwright.dev/java/docs/api/class-elementhandle#element-handle-screenshot):
+  * Option `ScreenshotAnimations.DISABLED` rewinds all CSS animations and transitions to a consistent state
+  * Option `mask: List<Locator>` masks given elements, overlaying them with pink `#FF00FF` boxes.
+- [Trace Viewer](https://playwright.dev/docs/trace-viewer) now shows [API testing requests](https://playwright.dev/java/docs/api-testing).
+- [`Locator.highlight()`](https://playwright.dev/java/docs/api/class-locator#locator-highlight) visually reveals element(s) for easier debugging.
+
+### Announcements
+
+
+- v1.20 is the last release to receive WebKit update for macOS 10.15 Catalina. Please update macOS to keep using latest & greatest WebKit!
+
+### Browser Versions
+
+
+- Chromium 101.0.4921.0
+- Mozilla Firefox 97.0.1
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 99
+- Microsoft Edge 99
+
+
+
+
+## [v1.19.0](https://github.com/microsoft/playwright-java/releases/tag/v1.19.0)
+
+### Version 1.19
+
+
+### Locator Updates
+
+
+#### Locator now supports a `has` option that makes sure it contains another locator inside:
+
 
   ```java
   page.locator("article", new Page.LocatorOptions().setHas(page.locator(".highlight"))).click();
   ```
 
-  Read more in [locator documentation](./api/class-locator#locator-locator-option-has)
-- New [Locator.page()](./api/class-locator.mdx#locator-page)
-- [Page.screenshot([options])](./api/class-page.mdx#page-screenshot) and [Locator.screenshot([options])](./api/class-locator.mdx#locator-screenshot) now automatically hide blinking caret
+  The snippet above will select article that has highlight in it and will press the button in it.
+  Read more in [locator documentation](https://playwright.dev/java/docs/api/class-locator#locator-locator-option-has)
+
+### Other Updates
+
+
+- New [`method: Locator.page`](https://playwright.dev/java/docs/api/class-locator#locator-page)
+- [`method: Page.screenshot`](https://playwright.dev/java/docs/api/class-page#page-screenshot) and [`method: Locator.screenshot`](https://playwright.dev/java/docs/api/class-locator#locator-screenshot) now automatically hides blinking caret
 - Playwright Codegen now generates locators and frame locators
 
 ### Browser Versions
+
+
 - Chromium 100.0.4863.0
 - Mozilla Firefox 96.0.1
 - WebKit 15.4
 
 This version was also tested against the following stable channels:
+
 - Google Chrome 98
 - Microsoft Edge 98
 
-## Version 1.18
+
+
+
+## [v1.18.0](https://github.com/microsoft/playwright-java/releases/tag/v1.18.0)
 
 ### API Testing
 
-Playwright for Java 1.18 introduces new [API Testing](./api/class-apirequestcontext) that lets you send requests to the server directly from Java! Now you can:
+
+Playwright for Java 1.18 introduces new [API Testing](https://playwright.dev/java/docs/api/class-apirequestcontext) that lets you send requests to the server directly from Java!
+
+Now you can:
+
 - test your server API
 - prepare server side state before visiting the web application in a test
 - validate server side post-conditions after running some actions in the browser
 
-To do a request on behalf of Playwright's Page, use **new [Page.request()](./api/class-page.mdx#page-request) API**:
+To do a request on behalf of Playwright's Page, use **new [`page.request()`](https://playwright.dev/java/docs/next/api/class-page#page-request) API**:
 
 ```java
 // Do a GET request on behalf of page
 APIResponse res = page.request().get("http://example.com/foo.json");
 ```
 
-Read more about it in our [API testing guide](./api-testing).
+Read more about it in our [API testing guide](https://playwright.dev/java/docs/test-api-testing).
 
 ### Web-First Assertions
 
-Playwright for Java 1.18 introduces [Web-First Assertions](./test-assertions).
+
+Playwright for Java 1.18 introduces [Web-First Assertions](https://playwright.dev/java/docs/api/class-playwrightassertions).
 
 Consider the following example:
 
@@ -81,125 +118,319 @@ public class TestExample {
 }
 ```
 
-Playwright will be re-testing the node with the selector `.status` until fetched Node has the `"Submitted"` text. It will be re-fetching the node and checking it over and over, until the condition is met or until the timeout is reached. You can pass this timeout as an option.
+Playwright will be re-testing the node with the selector `.status` until
+fetched Node has the `"Submitted"` text. It will be re-fetching the node and
+checking it over and over, until the condition is met or until the timeout is
+reached. You can pass this timeout as an option.
 
-Read more in [our documentation](./test-assertions).
+Read more in [our documentation](https://playwright.dev/java/docs/api/class-playwrightassertions).
 
 ### Locator Improvements
-- [Locator.dragTo(target[, options])](./api/class-locator.mdx#locator-drag-to)
+
+
+- [`Locator.dragTo()`](https://playwright.dev/java/docs/next/api/class-locator#locator-drag-to)
 - Each locator can now be optionally filtered by the text it contains:
-
-  ```java
-  page.locator("li", new Page.LocatorOptions().setHasText("my item"))
-      .locator("button").click();
-  ```
-
-  Read more in [locator documentation](./api/class-locator#locator-locator-option-has-text)
+    ```java
+    page.locator("li", new Page.LocatorOptions().setHasText("my item"))
+        .locator("button").click();
+    ```
+    Read more in [locator documentation](https://playwright.dev/java/docs/api/class-locator#locator-locator-option-has-text)
 
 ### Tracing Improvements
 
-[Tracing](./api/class-tracing.mdx) now can embed Java sources to recorded traces, using new [`setSources`](./api/class-tracing#tracing-start-option-sources) option.
+
+[Tracing](https://playwright.dev/java/docs/api/class-tracing.md) now can embed Java sources to recorded
+traces, using new [`setSources`](https://playwright.dev/java/docs/api/class-tracing#tracing-start-option-sources) option.
 
 ![tracing-java-sources](https://user-images.githubusercontent.com/746130/150180856-40a7df71-370c-4597-8665-40c77a5e06ad.png)
 
 ### New APIs & changes
-- [`acceptDownloads`](./api/class-browser#browser-new-context-option-accept-downloads) option now defaults to `true`.
+
+
+- [`acceptDownloads`](https://playwright.dev/java/docs/api/class-browser#browser-new-context-option-accept-downloads) option now defaults to `true`.
 
 ### Browser Versions
+
+
 - Chromium 99.0.4812.0
 - Mozilla Firefox 95.0
 - WebKit 15.4
 
 This version was also tested against the following stable channels:
+
 - Google Chrome 97
 - Microsoft Edge 97
 
-## Version 1.17
+
+
+## [v1.17.2](https://github.com/microsoft/playwright-java/releases/tag/v1.17.2)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/10638 - [BUG] Locator.click -> subtree intercepts pointer events since version 1.17.0
+https://github.com/microsoft/playwright/issues/10632 - [BUG] Playwright 1.17.0 -> After clicking the element - I get an error that click action was failed
+https://github.com/microsoft/playwright/issues/10627 - [REGRESSION]: Can no longer click Material UI select box
+https://github.com/microsoft/playwright/issues/10620 - [BUG] trailing zero width whitespace fails toHaveText
+
+
+### Browser Versions
+
+
+- Chromium 98.0.4695.0
+- Mozilla Firefox 94.0.1
+- WebKit 15.4
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 96
+- Microsoft Edge 96
+
+
+
+
+## [v1.17.1](https://github.com/microsoft/playwright-java/releases/tag/v1.17.1)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/10127 - [BUG] Add Trace Viewer error handling (file not found, not parsable)
+https://github.com/microsoft/playwright/issues/10436 - [Bug]: Add hints on how to open trace from HTML report when opened locally
+https://github.com/microsoft/playwright/pull/10492 - [Bug]: Fix broken Firefox User-Agent on 'Desktop Firefox' devices
+
+
+### Browser Versions
+
+
+- Chromium 98.0.4695.0
+- Mozilla Firefox 94.0.1
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 96
+- Microsoft Edge 96
+
+
+
+
+## [v1.17.0](https://github.com/microsoft/playwright-java/releases/tag/v1.17.0)
+
+### Playwright v1.17.0
+
 
 ### Frame Locators
 
-Playwright 1.17 introduces [frame locators](./api/class-framelocator) - a locator to the iframe on the page. Frame locators capture the logic sufficient to retrieve the `iframe` and then locate elements in that iframe. Frame locators are strict by default, will wait for `iframe` to appear and can be used in Web-First assertions.
+
+Playwright 1.17 introduces [frame locators] - a locator to the iframe on the page. Frame locators capture the logic sufficient to retrieve the `iframe` and then locate elements in that iframe. Frame locators are strict by default, will wait for `iframe` to appear and can be used in Web-First assertions.
 
 ![Graphics](https://user-images.githubusercontent.com/746130/142082759-2170db38-370d-43ec-8d41-5f9941f57d83.png)
 
-Frame locators can be created with either [Page.frameLocator(selector)](./api/class-page.mdx#page-frame-locator) or [Locator.frameLocator(selector)](./api/class-locator.mdx#locator-frame-locator) method.
+Frame locators can be created with either [`page.FrameLocator(selector)`] or [`locator.FrameLocator(selector)`] method.
 
 ```java
 Locator locator = page.frameLocator("#my-frame").locator("text=Submit");
 locator.click();
 ```
 
-Read more at [our documentation](./api/class-framelocator).
+Read more at [our documentation](https://playwright.dev/java/docs/api/class-framelocator).
 
 ### Trace Viewer Update
+
 
 Playwright Trace Viewer is now **available online** at https://trace.playwright.dev! Just drag-and-drop your `trace.zip` file to inspect its contents.
 
 > **NOTE**: trace files are not uploaded anywhere; [trace.playwright.dev](https://trace.playwright.dev) is a [progressive web application](https://web.dev/progressive-web-apps/) that processes traces locally.
-- Playwright Test traces now include sources by default (these could be turned off with tracing option)
+
 - Trace Viewer now shows test name
 - New trace metadata tab with browser details
 - Snapshots now have URL bar
 
 ![image](https://user-images.githubusercontent.com/746130/141877831-29e37cd1-e574-4bd9-aab5-b13a463bb4ae.png)
 
-### HTML Report Update
-- HTML report now supports dynamic filtering
-- Report is now a **single static HTML file** that could be sent by e-mail or as a slack attachment.
-
-![image](https://user-images.githubusercontent.com/746130/141877402-e486643d-72c7-4db3-8844-ed2072c5d676.png)
-
 ### Ubuntu ARM64 support + more
-- Playwright now supports **Ubuntu 20.04 ARM64**. You can now run Playwright tests inside Docker on Apple M1 and on Raspberry Pi.
-- You can now use Playwright to install stable version of Edge on Linux:
 
-  ```bash
-  mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install msedge"
-  ```
+
+- Playwright now supports **Ubuntu 20.04 ARM64**. You can now run Playwright tests inside Docker on Apple M1 and on Raspberry Pi.
+
 
 ### New APIs
-- Tracing now supports a [`'title'`](./api/class-tracing#tracing-start-option-title) option
-- Page navigations support a new [`'commit'`](./api/class-page#page-goto) waiting option
 
-## Version 1.16
+
+- Tracing now supports a [`'title'`](https://playwright.dev/java/docs/api/class-tracing#tracing-start-option-title) option
+- Page navigations support a new [`'commit'`](https://playwright.dev/java/docs/api/class-page#page-goto) waiting option
+
+### Browser Versions
+
+
+- Chromium 98.0.4695.0
+- Mozilla Firefox 94.0.1
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 96
+- Microsoft Edge 96
+
+---
+
+[frame locators]: https://playwright.dev/java/docs/api/class-framelocator
+[`page.FrameLocator(selector)`]: https://playwright.dev/java/docs/api/class-page#page-frame-locator
+[`locator.FrameLocator(selector)`]: https://playwright.dev/java/docs/api/class-locator#locator-frame-locator
+
+
+
+## [v1.16.1](https://github.com/microsoft/playwright-java/releases/tag/v1.16.1)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/9692 - [BUG] HTML report shows locator._withElement for locator.evaluate
+https://github.com/microsoft/playwright/issues/7818 - [Bug]: dedup snapshot CSS images
+
+### Browser Versions
+
+
+- Chromium 97.0.4666.0
+- Mozilla Firefox 93.0
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 94
+- Microsoft Edge 94
+
+---
+
+(1.16.2-1635322350000)
+
+
+
+## [v1.16.0](https://github.com/microsoft/playwright-java/releases/tag/v1.16.0)
 
 ### 🎭 Playwright Library
 
-#### Locator.waitFor
 
-Wait for a locator to resolve to a single element with a given state. Defaults to the `state: 'visible'`.
+### Locator.waitFor
+
+
+Wait for a locator to resolve to a single element with a given state.
+Defaults to the `state: 'visible'`.
 
 ```java
 Locator orderSent = page.locator("#order-sent");
 orderSent.waitFor();
 ```
 
-Read more about [Locator.waitFor([options])](./api/class-locator.mdx#locator-wait-for).
+Read more about [`Locator.waitFor()`].
 
 ### 🎭 Playwright Trace Viewer
-- run trace viewer with `mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="show-trace"` and drop trace files to the trace viewer PWA
+
+
+- run trace viewer with `npx playwright show-trace` and drop trace files to the trace viewer PWA
 - better visual attribution of action targets
 
-Read more about [Trace Viewer](./trace-viewer).
+Read more about [Trace Viewer].
 
 ### Browser Versions
+
+
 - Chromium 97.0.4666.0
 - Mozilla Firefox 93.0
 - WebKit 15.4
 
 This version of Playwright was also tested against the following stable channels:
+
 - Google Chrome 94
 - Microsoft Edge 94
 
-## Version 1.15
+---
+
+(1.16.0-1634781227000)
+
+[Trace Viewer]: https://playwright.dev/java/docs/next/trace-viewer
+[Docker integration]: https://playwright.dev/java/docs/next/docker
+[`Locator.waitFor()`]: https://playwright.dev/java/docs/next/api/class-locator#locator-wait-for
+
+
+
+
+## [v1.15.2](https://github.com/microsoft/playwright-java/releases/tag/v1.15.2)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/9261 - [BUG] npm init playwright fails on path spaces
+https://github.com/microsoft/playwright/issues/9298 - [Question]: Should new Headers methods work in RouteAsync ?
+
+### Browser Versions
+
+
+- Chromium 96.0.4641.0
+- Mozilla Firefox 92.0
+- WebKit 15.0
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 93
+- Microsoft Edge 93
+
+---
+
+(driver version:  `1.15.2-1633455481000`)
+
+
+
+
+## [v1.15.1](https://github.com/microsoft/playwright-java/releases/tag/v1.15.1)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/pull/8955 - [BUG] fix(inspector): stop on all snapshottable actions
+https://github.com/microsoft/playwright/pull/8999 - [BUG] fix: do not dedup header values
+https://github.com/microsoft/playwright/pull/9038 - [BUG] fix: restore support for slowmo connect option
+
+### Browser Versions
+
+
+- Chromium 96.0.4641.0
+- Mozilla Firefox 92.0
+- WebKit 15.0
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 93
+- Microsoft Edge 93
+
+
+
+
+## [v1.15.0](https://github.com/microsoft/playwright-java/releases/tag/v1.15.0)
+
+### Version 1.15
+
 
 ### 🖱️ Mouse Wheel
+
 
 By using [`Mouse.wheel`](https://playwright.dev/java/docs/api/class-mouse#mouse-wheel) you are now able to scroll vertically or horizontally.
 
 ### 📜 New Headers API
 
+
 Previously it was not possible to get multiple header values of a response. This is now possible and additional helper functions are available:
+
 - [Request.allHeaders()](https://playwright.dev/java/docs/api/class-request#request-all-headers)
 - [Request.headersArray()](https://playwright.dev/java/docs/api/class-request#request-headers-array)
 - [Request.headerValue(name: string)](https://playwright.dev/java/docs/api/class-request#request-header-value)
@@ -210,9 +441,12 @@ Previously it was not possible to get multiple header values of a response. This
 
 ### 🌈 Forced-Colors emulation
 
+
 Its now possible to emulate the `forced-colors` CSS media feature by passing it in the [context options](https://playwright.dev/java/docs/api/class-browser#browser-new-context-option-color-scheme) or calling [Page.emulateMedia()](https://playwright.dev/java/docs/api/class-page#page-emulate-media).
 
 ### New APIs
+
+
 - [Page.route()](https://playwright.dev/java/docs/api/class-page#page-route) accepts new `times` option to specify how many times this route should be matched.
 - [Page.setChecked(selector: string, checked: boolean)](https://playwright.dev/java/docs/api/class-page#page-set-checked) and [Locator.setChecked(selector: string, checked: boolean)](https://playwright.dev/java/docs/api/class-locator#locator-set-checked) was introduced to set the checked state of a checkbox.
 - [Request.sizes()](https://playwright.dev/java/docs/api/class-request#request-sizes) Returns resource size information for given http request.
@@ -220,28 +454,67 @@ Its now possible to emulate the `forced-colors` CSS media feature by passing it 
 - [Tracing.stopChunk()](https://playwright.dev/java/docs/api/class-tracing#tracing-stop-chunk) - Stops a new trace chunk.
 
 ### Browser Versions
+
+
 - Chromium 96.0.4641.0
 - Mozilla Firefox 92.0
 - WebKit 15.0
 
-## Version 1.14
+This version of Playwright was also tested against the following stable channels:
 
-#### ⚡️ New "strict" mode
+- Google Chrome 93
+- Microsoft Edge 93
 
-Selector ambiguity is a common problem in automation testing. **"strict" mode** ensures that your selector points to a single element and throws otherwise.
 
-Set `setStrict(true)` in your action calls to opt in.
+
+
+## [v1.14.1](https://github.com/microsoft/playwright-java/releases/tag/v1.14.1)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+microsoft/playwright#8287 - [BUG] webkit crashes intermittently: "file data stream has an unexpected number of bytes"
+microsoft/playwright#8281 - [BUG] HTML report crashes if diff snapshot does not exists
+microsoft/playwright#8230 - Using React Selectors with multiple React trees 
+microsoft/playwright#8366 - [BUG] Mark timeout in isVisible as deprecated and noop
+
+### Browser Versions
+
+
+- Chromium 94.0.4595.0
+- Mozilla Firefox 91.0
+- WebKit 15.0
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 92
+- Microsoft Edge 92
+
+
+
+## [v1.14.0](https://github.com/microsoft/playwright-java/releases/tag/v1.14.0)
+
+### ⚡️ New "strict" mode
+
+
+Selector ambiguity is a common problem in automation testing. **"strict" mode**
+ensures that your selector points to a single element and throws otherwise.
+
+Use `setStrict(true)` in your action calls to opt in.
 
 ```java
 // This will throw if you have more than one button!
 page.click("button", new Page.ClickOptions().setStrict(true));
 ```
 
-#### 📍 New [**Locators API**](./api/class-locator)
+### 📍 New [**Locators API**](https://playwright.dev/java/docs/api/class-locator)
+
 
 Locator represents a view to the element(s) on the page. It captures the logic sufficient to retrieve the element at any given moment.
 
-The difference between the [Locator](./api/class-locator) and [ElementHandle](./api/class-elementhandle) is that the latter points to a particular element, while [Locator](./api/class-locator) captures the logic of how to retrieve that element.
+The difference between the [Locator](https://playwright.dev/java/docs/api/class-locator) and [ElementHandle](https://playwright.dev/java/docs/api/class-elementhandle) is that the latter points to a particular element, while [Locator](https://playwright.dev/java/docs/api/class-locator) captures the logic of how to retrieve that element.
 
 Also, locators are **"strict" by default**!
 
@@ -250,9 +523,10 @@ Locator locator = page.locator("button");
 locator.click();
 ```
 
-Learn more in the [documentation](./api/class-locator).
+Learn more in the [documentation](https://playwright.dev/java/docs/api/class-locator).
 
-#### 🧩 Experimental [**React**](./selectors#react-selectors) and [**Vue**](./selectors#vue-selectors) selector engines
+### 🧩 Experimental [**React**](https://playwright.dev/java/docs/selectors#react-selectors) and [**Vue**](https://playwright.dev/java/docs/selectors#vue-selectors) selector engines
+
 
 React and Vue selectors allow selecting elements by its component name and/or property values. The syntax is very similar to [attribute selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) and supports all attribute selector operators.
 
@@ -261,68 +535,147 @@ page.click("_react=SubmitButton[enabled=true]");
 page.click("_vue=submit-button[enabled=true]");
 ```
 
-Learn more in the [react selectors documentation](./selectors#react-selectors) and the [vue selectors documentation](./selectors#vue-selectors).
+Learn more in the [react selectors documentation](https://playwright.dev/java/docs/selectors#react-selectors) and the [vue selectors documentation](https://playwright.dev/java/docs/selectors#vue-selectors).
 
-#### ✨ New [**`nth`**](./selectors#n-th-element-selector) and [**`visible`**](./selectors#selecting-visible-elements) selector engines
-- [`nth`](./selectors#n-th-element-selector) selector engine is equivalent to the `:nth-match` pseudo class, but could be combined with other selector engines.
-- [`visible`](./selectors#selecting-visible-elements) selector engine is equivalent to the `:visible` pseudo class, but could be combined with other selector engines.
+### ✨ New [**`nth`**](https://playwright.dev/java/docs/selectors#n-th-element-selector) and [**`visible`**](https://playwright.dev/java/docs/selectors#selecting-visible-elements) selector engines
+
+
+- [`nth`](https://playwright.dev/java/docs/selectors#n-th-element-selector) selector engine is equivalent to the `:nth-match` pseudo class, but could be combined with other selector engines.
+- [`visible`](https://playwright.dev/java/docs/selectors#selecting-visible-elements) selector engine is equivalent to the `:visible` pseudo class, but could be combined with other selector engines.
 
 ```java
 // select the first button among all buttons
 button.click("button >> nth=0");
 // or if you are using locators, you can use first(), nth() and last()
 page.locator("button").first().click();
-
 // click a visible button
 button.click("button >> visible=true");
 ```
 
 ### Browser Versions
+
+
 - Chromium 94.0.4595.0
 - Mozilla Firefox 91.0
 - WebKit 15.0
 
-## Version 1.13
+This version of Playwright was also tested against the following stable channels:
 
-#### Playwright
-- **🖖 Programmatic drag-and-drop support** via the [Page.dragAndDrop(source, target[, options])](./api/class-page.mdx#page-drag-and-drop) API.
-- **🔎 Enhanced HAR** with body sizes for requests and responses. Use via `recordHar` option in [Browser.newContext([options])](./api/class-browser.mdx#browser-new-context).
+- Google Chrome 92
+- Microsoft Edge 92
 
-#### Tools
+
+
+
+
+
+## [v1.13.0](https://github.com/microsoft/playwright-java/releases/tag/v1.13.0)
+
+### Playwright
+
+
+- **🖖 Programmatic drag-and-drop support** via the [`Page.dragAndDrop()`] API.
+- **🔎 Enhanced HAR** with body sizes for requests and responses. Use via `setRecordHarPath` option in [`Browser.newContext()`].
+
+### Tools
+
+
 - Playwright Trace Viewer now shows parameters, returned values and `console.log()` calls.
 
-#### New and Overhauled Guides
-- [Intro](./intro.mdx)
-- [Authentication](./auth.mdx)
+### New and Overhauled Guides
 
-#### Browser Versions
+
+- [Intro](https://playwright.dev/docs/next/intro/)
+- [Authentication](https://playwright.dev/docs/next/auth)
+- [Chome Extensions](https://playwright.dev/docs/next/chrome-extensions)
+- [Playwright Test Configuration](https://playwright.dev/docs/next/test-configuration)
+- [Playwright Test Annotations](https://playwright.dev/docs/next/test-annotations)
+- [Playwright Test Fixtures](https://playwright.dev/docs/next/test-fixtures)
+
+### Browser Versions
+
+
 - Chromium 93.0.4576.0
 - Mozilla Firefox 90.0
 - WebKit 14.2
 
-#### New Playwright APIs
-- new `baseURL` option in [Browser.newContext([options])](./api/class-browser.mdx#browser-new-context) and [Browser.newPage([options])](./api/class-browser.mdx#browser-new-page)
-- [Response.securityDetails()](./api/class-response.mdx#response-security-details) and [Response.serverAddr()](./api/class-response.mdx#response-server-addr)
-- [Page.dragAndDrop(source, target[, options])](./api/class-page.mdx#page-drag-and-drop) and [Frame.dragAndDrop(source, target[, options])](./api/class-frame.mdx#frame-drag-and-drop)
-- [Download.cancel()](./api/class-download.mdx#download-cancel)
-- [Page.inputValue(selector[, options])](./api/class-page.mdx#page-input-value), [Frame.inputValue(selector[, options])](./api/class-frame.mdx#frame-input-value) and [ElementHandle.inputValue([options])](./api/class-elementhandle.mdx#element-handle-input-value)
-- new `force` option in [Page.fill(selector, value[, options])](./api/class-page.mdx#page-fill), [Frame.fill(selector, value[, options])](./api/class-frame.mdx#frame-fill), and [ElementHandle.fill(value[, options])](./api/class-elementhandle.mdx#element-handle-fill)
-- new `force` option in [Page.selectOption(selector, values[, options])](./api/class-page.mdx#page-select-option), [Frame.selectOption(selector, values[, options])](./api/class-frame.mdx#frame-select-option), and [ElementHandle.selectOption(values[, options])](./api/class-elementhandle.mdx#element-handle-select-option)
+### New Playwright APIs
 
-## Version 1.12
 
-#### 🧟‍♂️ Introducing Playwright Trace Viewer
+- new `baseURL` option in [`Browser.newContext()`] and [`Browser.newPage()`]
+- [`Response.securityDetails()`] and [`Response.serverAddr()`]
+- [`Page.dragAndDrop()`] and [`Frame.dragAndDrop()`]
+- [`Download.cancel()`]
+- [`Page.inputValue()`], [`Frame.inputValue()`] and [`ElementHandle.inputValue()`]
+- new `force` option in [`Page.fill()`], [`Frame.fill()`], and [`ElementHandle.fill()`]
+- new `force` option in [`Page.selectOption()`], [`Frame.selectOption()`], and [`ElementHandle.selectOption()`]
 
-[Playwright Trace Viewer](./trace-viewer.mdx) is a new GUI tool that helps exploring recorded Playwright traces after the script ran. Playwright traces let you examine:
+[`Download.cancel()`]: https://playwright.dev/java/docs/next/api/class-download#download-cancel
+
+[`Page.fill()`]: https://playwright.dev/java/docs/next/api/class-page#page-fill
+[`Frame.fill()`]: https://playwright.dev/java/docs/next/api/class-frame#frame-fill
+[`ElementHandle.fill()`]: https://playwright.dev/java/docs/next/api/class-elementhandle#element-handle-fill
+
+[`Page.inputValue()`]: https://playwright.dev/java/docs/next/api/class-page#page-input-value
+[`Frame.inputValue()`]: https://playwright.dev/java/docs/next/api/class-frame#frame-input-value
+[`ElementHandle.inputValue()`]: https://playwright.dev/java/docs/next/api/class-elementhandle#element-handle-input-value
+
+[`Page.selectOption()`]: https://playwright.dev/java/docs/next/api/class-page#page-select-option
+[`Frame.selectOption()`]: https://playwright.dev/java/docs/next/api/class-frame#frame-select-option
+[`ElementHandle.selectOption()`]: https://playwright.dev/java/docs/next/api/class-elementhandle#element-handle-select-option
+
+[`Page.dragAndDrop()`]: https://playwright.dev/java/docs/next/api/class-page#page-drag-and-drop
+[`Frame.dragAndDrop()`]: https://playwright.dev/java/docs/next/api/class-frame#frame-drag-and-drop
+
+[`Response.securityDetails()`]: https://playwright.dev/java/docs/next/api/class-response#response-security-details
+[`Response.serverAddr()`]: https://playwright.dev/java/docs/next/api/class-response#response-server-addr
+
+[`Browser.newContext()`]: https://playwright.dev/java/docs/next/api/class-browser#browser-new-context
+[`Browser.newPage()`]: https://playwright.dev/java/docs/next/api/class-browser#browser-new-page
+
+
+
+
+## [v1.12.1](https://github.com/microsoft/playwright-java/releases/tag/v1.12.1)
+
+### Highlights
+
+
+This patch release includes bugfixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/7015 - [BUG] Firefox: strange undefined toJSON property on JS objects
+https://github.com/microsoft/playwright/issues/7048 - [BUG] Dialogs cannot be dismissed if tracing is on in Chromium or Webkit
+https://github.com/microsoft/playwright/issues/7058 - [BUG] Getting no video frame error for mobile chrome
+
+### Browser Versions
+
+
+- Chromium 93.0.4530.0
+- Mozilla Firefox 89.0
+- WebKit 14.2
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 91
+- Microsoft Edge 91
+
+
+
+## [v1.12.0](https://github.com/microsoft/playwright-java/releases/tag/v1.12.0)
+
+### 🧟‍♂️ Introducing Playwright Trace & TraceViewer
+
+
+[Playwright Trace Viewer](https://playwright.dev/java/docs/next/trace-viewer) is a new GUI tool that helps exploring recorded Playwright traces after the script ran. Playwright traces let you examine:
 - page DOM before and after each Playwright action
 - page rendering before and after each Playwright action
 - browser network during script execution
 
-Traces are recorded using the new [BrowserContext.tracing()](./api/class-browsercontext.mdx#browser-context-tracing) API:
+Traces are recorded using the new [`BrowserContext.tracing()`] API:
 
 ```java
 Browser browser = chromium.launch();
-BrowserContext context = browser.newContext();
+BrowserContext context = Browser.newContext();
 
 // Start tracing before creating / navigating a page.
 context.tracing.start(new Tracing.StartOptions()
@@ -339,32 +692,86 @@ context.tracing.stop(new Tracing.StopOptions()
 
 Traces are examined later with the Playwright CLI:
 
+
+```sh
+mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="show-trace trace.zip"
+```
+
 That will open the following GUI:
 
 ![image](https://user-images.githubusercontent.com/746130/121109654-d66c4480-c7c0-11eb-8d4d-eb70d2b03811.png)
 
-👉 Read more in [trace viewer documentation](./trace-viewer.mdx).
+👉 Read more in [trace viewer documentation](https://playwright.dev/java/docs/next/trace-viewer).
 
-#### Browser Versions
+---
+
+### Browser Versions
+
+
 - Chromium 93.0.4530.0
 - Mozilla Firefox 89.0
 - WebKit 14.2
 
 This version of Playwright was also tested against the following stable channels:
+
 - Google Chrome 91
 - Microsoft Edge 91
 
-#### New APIs
-- `reducedMotion` option in [Page.emulateMedia([options])](./api/class-page.mdx#page-emulate-media), [BrowserType.launchPersistentContext(userDataDir[, options])](./api/class-browsertype.mdx#browser-type-launch-persistent-context), [Browser.newContext([options])](./api/class-browser.mdx#browser-new-context) and [Browser.newPage([options])](./api/class-browser.mdx#browser-new-page)
-- [BrowserContext.onRequest(handler)](./api/class-browsercontext.mdx#browser-context-event-request)
-- [BrowserContext.onRequestFailed(handler)](./api/class-browsercontext.mdx#browser-context-event-request-failed)
-- [BrowserContext.onRequestFinished(handler)](./api/class-browsercontext.mdx#browser-context-event-request-finished)
-- [BrowserContext.onResponse(handler)](./api/class-browsercontext.mdx#browser-context-event-response)
-- `tracesDir` option in [BrowserType.launch([options])](./api/class-browsertype.mdx#browser-type-launch) and [BrowserType.launchPersistentContext(userDataDir[, options])](./api/class-browsertype.mdx#browser-type-launch-persistent-context)
-- new [BrowserContext.tracing()](./api/class-browsercontext.mdx#browser-context-tracing) API namespace
-- new [Download.page()](./api/class-download.mdx#download-page) method
+### New APIs
 
-## Version 1.11
+
+- `reducedMotion` option in [`Page.emulateMedia()`], [`BrowserType.launchPersistentContext()`], [`Browser.newContext()`] and [`Browser.newPage()`]
+- [`BrowserContext.onRequest()`]
+- [`BrowserContext.onRequestFailed()`]
+- [`BrowserContext.onRequestFinished()`]
+- [`BrowserContext.onResponse()`]
+- `tracesDir` option in [`BrowserType.launch()`] and [`BrowserType.launchPersistentContext()`]
+- new [`BrowserContext.tracing()`] API namespace
+- new [`Download.page()`] method
+
+[`Page.emulateMedia()`]: https://playwright.dev/java/docs/next/api/class-page#page-emulate-media
+[`BrowserType.launchPersistentContext()`]: https://playwright.dev/java/docs/next/api/class-browsertype#browser-type-launch-persistent-context
+[`BrowserContext.tracing()`]: https://playwright.dev/java/docs/next/api/class-browsercontext#browser-context-tracing
+[`Download.page()`]: https://playwright.dev/java/docs/next/api/class-download#download-page
+[`BrowserType.launch()`]: https://playwright.dev/java/docs/next/api/class-browsertype#browser-type-launch
+[`Browser.newContext()`]: https://playwright.dev/java/docs/next/api/class-browser#browser-new-context
+[`Browser.newPage()`]: https://playwright.dev/java/docs/next/api/class-browser#browser-new-page
+[`BrowserContext.onRequest()`]: https://playwright.dev/java/docs/next/api/class-browsercontext#browser-context-event-request
+[`BrowserContext.onRequestFailed()`]: https://playwright.dev/java/docs/next/api/class-browsercontext#browser-context-event-request-failed
+[`BrowserContext.onRequestFinished()`]: https://playwright.dev/java/docs/next/api/class-browsercontext#browser-context-event-request-finished
+[`BrowserContext.onResponse()`]: https://playwright.dev/java/docs/next/api/class-browsercontext#browser-context-event-response
+
+
+
+
+## [v1.11.1](https://github.com/microsoft/playwright-java/releases/tag/v1.11.1)
+
+### Highlights
+
+
+This patch includes bug fixes across all languages for the following issues:
+- https://github.com/microsoft/playwright-python/issues/679 - can't get browser's context pages after connect_over_cdp
+- https://github.com/microsoft/playwright-java/issues/432 - [Bug] Videos are not complete when an exception is thrown
+
+### Browser Versions
+
+
+- Chromium 92.0.4498.0
+- Mozilla Firefox 89.0b6
+- WebKit 14.2
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 90
+- Microsoft Edge 90
+
+
+
+
+## [v1.11.0](https://github.com/microsoft/playwright-java/releases/tag/v1.11.0)
+
+### Highlights
+
 
 🎥  New video: [Playwright: A New Test Automation Framework for the Modern Web](https://youtu.be/_Jla6DyuEu4) ([slides](https://docs.google.com/presentation/d/1xFhZIJrdHkVe2CuMKOrni92HoG2SWslo0DhJJQMR1DI/edit?usp=sharing))
 - We talked about Playwright
@@ -372,166 +779,249 @@ This version of Playwright was also tested against the following stable channels
 - Did live demos with new features ✨
 - **Special thanks** to [applitools](http://applitools.com/) for hosting the event and inviting us!
 
-#### Browser Versions
+⚙️  Chrome DevTools Protocol support with [`BrowserType.connectOverCDP()`].
+
+### Browser Versions
+
+
 - Chromium 92.0.4498.0
 - Mozilla Firefox 89.0b6
 - WebKit 14.2
 
-#### New APIs
-- support for **async predicates** across the API in methods such as [Page.waitForRequest(urlOrPredicate[, options], callback)](./api/class-page.mdx#page-wait-for-request) and others
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 90
+- Microsoft Edge 90
+
+### New APIs
+
+
+
 - new **emulation devices**: Galaxy S8, Galaxy S9+, Galaxy Tab S4, Pixel 3, Pixel 4
 - new methods:
-  * [Page.waitForURL(url[, options])](./api/class-page.mdx#page-wait-for-url) to await navigations to URL
-  * [Video.delete()](./api/class-video.mdx#video-delete) and [Video.saveAs(path)](./api/class-video.mdx#video-save-as) to manage screen recording
+    * [`BrowserType.connectOverCDP()`] to connect using Chrome DevTools protocol
+    * [`BrowserType.connect()`] to connect to a Playwright server
+    * [`Page.waitForURL()`] to ensure navigations to URL
+    * [`Video.delete()`] and [`Video.saveAs()`] to manage screen recording
 - new options:
-  * `screen` option in the [Browser.newContext([options])](./api/class-browser.mdx#browser-new-context) method to emulate `window.screen` dimensions
-  * `position` option in [Page.check(selector[, options])](./api/class-page.mdx#page-check) and [Page.uncheck(selector[, options])](./api/class-page.mdx#page-uncheck) methods
-  * `trial` option to dry-run actions in [Page.check(selector[, options])](./api/class-page.mdx#page-check), [Page.uncheck(selector[, options])](./api/class-page.mdx#page-uncheck), [Page.click(selector[, options])](./api/class-page.mdx#page-click), [Page.dblclick(selector[, options])](./api/class-page.mdx#page-dblclick), [Page.hover(selector[, options])](./api/class-page.mdx#page-hover) and [Page.tap(selector[, options])](./api/class-page.mdx#page-tap)
+    * `screen` option in the [`Browser.newContext()`] method to emulate `window.screen` dimensions
+    * `position` option in [`Page.check()`] and [`Page.uncheck()`] methods
+    * `trial` option to dry-run actions in [`Page.check()`], [`Page.uncheck()`], [`Page.click()`], [`Page.dblclick()`], [`Page.hover()`] and [`Page.tap()`]
+    * `headers` option in [`BrowserType.connect()`]
 
-## Version 1.10
+
+[`Browser.newContext()`]: https://playwright.dev/java/docs/next/api/class-browser#browsernewcontextoptions
+[`BrowserType.connect()`]: https://playwright.dev/java/docs/next/api/class-browsertype#browsertypeconnectwsendpoint-options
+[`BrowserType.connectOverCDP()`]: https://playwright.dev/java/docs/next/api/class-browsertype#browsertypeconnectovercdpendpointurl-options
+[`Page.click()`]: https://playwright.dev/java/docs/next/api/class-page#pageclickselector-options
+[`Page.check()`]: https://playwright.dev/java/docs/next/api/class-page#pagecheckselector-options
+[`Page.hover()`]: https://playwright.dev/java/docs/next/api/class-page#pagehoverselector-options
+[`Page.dblclick()`]: https://playwright.dev/java/docs/next/api/class-page#pagedblclickselector-options
+[`Page.tap()`]: https://playwright.dev/java/docs/next/api/class-page#pagetapselector-options
+[`Page.waitForURL()`]: https://playwright.dev/java/docs/next/api/class-page#pagewaitforurlurl-options
+[`Page.uncheck()`]: https://playwright.dev/java/docs/next/api/class-page#pageuncheckselector-options
+[`Video.delete()`]: https://playwright.dev/java/docs/next/api/class-video#videodelete
+[`Video.saveAs()`]: https://playwright.dev/java/docs/next/api/class-video#videosaveaspath
+
+
+
+
+## [v1.10.0](https://github.com/microsoft/playwright-java/releases/tag/v1.10.0)
+
+### Highlights
+
+
 - [Playwright for Java v1.10](https://github.com/microsoft/playwright-java) is **now stable**!
-- Run Playwright against **Google Chrome** and **Microsoft Edge** stable channels with the [new channels API](./browsers).
+- Run Playwright against **Google Chrome** and **Microsoft Edge** stable channels with the [new channels API](https://playwright.dev/java/docs/browsers).
 - Chromium screenshots are **fast** on Mac & Windows.
 
-#### Bundled Browser Versions
+### Bundled Browser Versions
+
+
 - Chromium 90.0.4430.0
 - Mozilla Firefox 87.0b10
 - WebKit 14.2
 
 This version of Playwright was also tested against the following stable channels:
+
 - Google Chrome 89
 - Microsoft Edge 89
 
-#### New APIs
-- [`browserType.launch()`](./api/class-browsertype#browsertypelaunchoptions) now accepts the new `'channel'` option. Read more in [our documentation](./browsers).
+### New APIs
 
-## Version 1.9
-- [Playwright Inspector](./inspector.mdx) is a **new GUI tool** to author and debug your tests.
-  - **Line-by-line debugging** of your Playwright scripts, with play, pause and step-through.
-  - Author new scripts by **recording user actions**.
-  - **Generate element selectors** for your script by hovering over elements.
-  - Set the `PWDEBUG=1` environment variable to launch the Inspector
-- **Pause script execution** with [Page.pause()](./api/class-page.mdx#page-pause) in headed mode. Pausing the page launches [Playwright Inspector](./inspector.mdx) for debugging.
-- **New has-text pseudo-class** for CSS selectors. `:has-text("example")` matches any element containing `"example"` somewhere inside, possibly in a child or a descendant element. See [more examples](./selectors.mdx#text-selector).
-- **Page dialogs are now auto-dismissed** during execution, unless a listener for `dialog` event is configured. [Learn more](./dialogs.mdx) about this.
-- [Playwright for Python](https://github.com/microsoft/playwright-python) is **now stable** with an idiomatic snake case API and pre-built [Docker image](./docker.mdx) to run tests in CI/CD.
 
-#### Browser Versions
+- [`BrowserType.launch()`](https://playwright.dev/java/docs/api/class-browsertype#browsertypelaunchoptions) now accepts the new `'channel'` option. Read more in [our documentation](https://playwright.dev/java/docs/browsers).
+
+
+
+
+## [v1.9.1-alpha-0](https://github.com/microsoft/playwright-java/releases/tag/v1.9.1-alpha-0)
+
+### Highlights
+
+
+* This release is based on Playwright v1.9.2
+* Text selector and `click()` fixes.
+
+### Browser Versions
+
+
 - Chromium 90.0.4421.0
 - Mozilla Firefox 86.0b10
 - WebKit 14.1
 
-#### New APIs
-- [Page.pause()](./api/class-page.mdx#page-pause).
+<details>
+  <summary><b>Issues Closed (2)</b></summary>
 
-## Version 1.8
-- [Selecting elements based on layout](./selectors.mdx#selecting-elements-based-on-layout) with `:left-of()`, `:right-of()`, `:above()` and `:below()`.
-- Playwright now includes [command line interface](./cli.mdx), former playwright-cli.
-- [Page.selectOption(selector, values[, options])](./api/class-page.mdx#page-select-option) now waits for the options to be present.
-- New methods to [assert element state](./actionability#assertions) like [Page.isEditable(selector[, options])](./api/class-page.mdx#page-is-editable).
+https://github.com/microsoft/playwright/issues/5634 - [REGRESSION]: Test selector changed behavior 
+https://github.com/microsoft/playwright/issues/5674 - [REGRESSION]: Label is not visible anymore
 
-#### New APIs
-- [ElementHandle.isChecked()](./api/class-elementhandle.mdx#element-handle-is-checked).
-- [ElementHandle.isDisabled()](./api/class-elementhandle.mdx#element-handle-is-disabled).
-- [ElementHandle.isEditable()](./api/class-elementhandle.mdx#element-handle-is-editable).
-- [ElementHandle.isEnabled()](./api/class-elementhandle.mdx#element-handle-is-enabled).
-- [ElementHandle.isHidden()](./api/class-elementhandle.mdx#element-handle-is-hidden).
-- [ElementHandle.isVisible()](./api/class-elementhandle.mdx#element-handle-is-visible).
-- [Page.isChecked(selector[, options])](./api/class-page.mdx#page-is-checked).
-- [Page.isDisabled(selector[, options])](./api/class-page.mdx#page-is-disabled).
-- [Page.isEditable(selector[, options])](./api/class-page.mdx#page-is-editable).
-- [Page.isEnabled(selector[, options])](./api/class-page.mdx#page-is-enabled).
-- [Page.isHidden(selector[, options])](./api/class-page.mdx#page-is-hidden).
-- [Page.isVisible(selector[, options])](./api/class-page.mdx#page-is-visible).
-- New option `'editable'` in [ElementHandle.waitForElementState(state[, options])](./api/class-elementhandle.mdx#element-handle-wait-for-element-state).
+</details>
 
-#### Browser Versions
+
+
+
+## [v1.9.0-alpha-0](https://github.com/microsoft/playwright-java/releases/tag/v1.9.0-alpha-0)
+
+### Highlights
+
+- Playwright goes semver. We are jumping from `0.180.*` to `1.9.0-alapha-0` to become semver compliant. This is a breaking change, but once we drop the Alpha bit, it'll be in stone for years!
+- [Documentation site](https://playwright.dev/java/docs/intro) is now all about Java! It has guides, sample snippets, API docs.
+- [Playwright Inspector](https://playwright.dev/docs/inspector) is a **new GUI tool** to author and debug your tests.
+  - **Line-by-line debugging** of your Playwright scripts, with play, pause and step-through. Set `PLAYWRIGHT_JAVA_SRC=<src dir>` to let debugger know location of your java sources.
+  - Author new scripts by **recording user actions**.
+  - **Generate element selectors** for your script by hovering over elements.
+  - Set the `PWDEBUG=1` environment variable to launch the Inspector
+
+- **Pause script execution** with [`page.pause()`](https://playwright.dev/docs/api/class-page#pagepause) in headed mode. Pausing the page launches [Playwright Inspector](https://playwright.dev/docs/inspector) for debugging.
+
+- **New has-text pseudo-class** for CSS selectors. `:has-text("example")` matches any element containing `"example"` somewhere inside, possibly in a child or a descendant element. See [more examples](https://playwright.dev/docs/selectors#text-selector).
+
+- **Page dialogs are now auto-dismissed** during execution, unless a listener for `dialog` event is configured. [Learn more](https://playwright.dev/docs/dialogs) about this.
+
+### Browser Versions
+
+
+- Chromium 90.0.4421.0
+- Mozilla Firefox 86.0b10
+- WebKit 14.1
+
+### New APIs
+
+
+- [`page.pause`](https://playwright.dev/docs/next/api/class-page#pagepause)
+
+
+
+
+
+## [v0.181.0](https://github.com/microsoft/playwright-java/releases/tag/v0.181.0)
+
+### Highlights
+
+
+* Includes driver [v1.8.1](https://github.com/microsoft/playwright/releases/tag/v1.8.1)
+* `page.reload()` and `page.isVisible()` fixes.
+
+
+
+
+
+## [v0.180.0](https://github.com/microsoft/playwright-java/releases/tag/v0.180.0)
+
+### Highlights
+
+
+- [Selecting elements based on layout](https://playwright.dev/docs/selectors#selecting-elements-based-on-layout) with `:left-of()`, `:right-of()`, `:above()` and `:below()`
+- Playwright now includes [command line interface](https://playwright.dev/docs/cli), former playwright-cli. Give it a try with ```npx playwright --help```
+- [Documentation site](https://playwright.dev/docs/intro) now has a lot more content, and a dedicated [python section](https://playwright.dev/python/docs/intro)
+- [`selectOption(selector, values[, options])`](https://playwright.dev/docs/api/class-page/#pageselectoptionselector-values-options) now waits for the options to be present
+- New methods to [assert element state](https://playwright.dev/docs/actionability#assertions) like `page.isEditable('selector')`
+
+### API changes since the last 0.171.0 version:
+
+
+* Deferred interface has been removed, use `waitFor*` methods instead:
+
+```java
+// Before
+Deferred<Request> event = page.waitForRequest();
+page.click("a");
+Request request = event.get();
+```
+```java
+// After
+Request request = page.waitForRequest(() -> page.click("a"));
+
+```
+
+* Listener interface is gone, use corresponding `on*/off*` methods with typed parameter:
+
+```java
+// Before
+page.addListener(Page.EventType.REQUESTFAILED, event -> {
+  Request request = (Request) event.data();
+  System.out.println(request.url());
+});
+```
+```java
+// After
+page.onRequestFailed(request -> {
+  System.out.println(request.url());
+});
+
+```
+
+
+### Browser Versions
+
+
 - Chromium 90.0.4392.0
 - Mozilla Firefox 85.0b5
 - WebKit 14.1
 
-## Version 1.7
-- **New Java SDK**: [Playwright for Java](https://github.com/microsoft/playwright-java) is now on par with [JavaScript](https://github.com/microsoft/playwright), [Python](https://github.com/microsoft/playwright-python) and [.NET bindings](https://github.com/microsoft/playwright-dotnet).
-- **Browser storage API**: New convenience APIs to save and load browser storage state (cookies, local storage) to simplify automation scenarios with authentication.
-- **New CSS selectors**: We heard your feedback for more flexible selectors and have revamped the selectors implementation. Playwright 1.7 introduces [new CSS extensions](./selectors.mdx) and there's more coming soon.
-- **New website**: The docs website at [playwright.dev](https://playwright.dev/) has been updated and is now built with [Docusaurus](https://v2.docusaurus.io/).
-- **Support for Apple Silicon**: Playwright browser binaries for WebKit and Chromium are now built for Apple Silicon.
+### New APIs
 
-#### New APIs
-- [BrowserContext.storageState([options])](./api/class-browsercontext.mdx#browser-context-storage-state) to get current state for later reuse.
-- `storageState` option in [Browser.newContext([options])](./api/class-browser.mdx#browser-new-context) and [Browser.newPage([options])](./api/class-browser.mdx#browser-new-page) to setup browser context state.
 
-#### Browser Versions
-- Chromium 89.0.4344.0
-- Mozilla Firefox 84.0b9
-- WebKit 14.1
+- [`elementHandle.isChecked()`](https://playwright.dev/docs/api/class-elementhandle#elementhandleischecked)
+- [`elementHandle.isDisabled()`](https://playwright.dev/docs/api/class-elementhandle#elementhandleisdisabled)
+- [`elementHandle.isEditable()`](https://playwright.dev/docs/api/class-elementhandle#elementhandleiseditable)
+- [`elementHandle.isEnabled()`](https://playwright.dev/docs/api/class-elementhandle#elementhandleisenabled)
+- [`elementHandle.isHidden()`](https://playwright.dev/docs/api/class-elementhandle#elementhandleishidden)
+- [`elementHandle.isVisible()`](https://playwright.dev/docs/api/class-elementhandle#elementhandleisvisible)
+- [`page.isChecked(selector[, options])`](https://playwright.dev/docs/api/class-page#pageischeckedselector-options)
+- [`page.isDisabled(selector[, options])`](https://playwright.dev/docs/api/class-page#pageisdisabledselector-options)
+- [`page.isEditable(selector[, options])`](https://playwright.dev/docs/api/class-page#pageiseditableselector-options)
+- [`page.isEnabled(selector[, options])`](https://playwright.dev/docs/api/class-page#pageisenabledselector-options)
+- [`page.isHidden(selector[, options])`](https://playwright.dev/docs/api/class-page#pageishiddenselector-options)
+- [`page.isVisible(selector[, options])`](https://playwright.dev/docs/api/class-page#pageisvisibleselector-options)
+- New option `'editable'` in [`elementHandle.waitForElementState(state[, options])`](https://playwright.dev/docs/api/class-elementhandle#elementhandlewaitforelementstatestate-options)
 
-[APIRequest]: ./api/class-apirequest.mdx "APIRequest"
-[APIRequestContext]: ./api/class-apirequestcontext.mdx "APIRequestContext"
-[APIResponse]: ./api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: ./test-assertions.mdx "APIResponseAssertions"
-[Browser]: ./api/class-browser.mdx "Browser"
-[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
-[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
-[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
-[Dialog]: ./api/class-dialog.mdx "Dialog"
-[Download]: ./api/class-download.mdx "Download"
-[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
-[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
-[FormData]: ./api/class-formdata.mdx "FormData"
-[Frame]: ./api/class-frame.mdx "Frame"
-[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
-[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
-[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
-[Locator]: ./api/class-locator.mdx "Locator"
-[LocatorAssertions]: ./test-assertions.mdx "LocatorAssertions"
-[Mouse]: ./api/class-mouse.mdx "Mouse"
-[Page]: ./api/class-page.mdx "Page"
-[PageAssertions]: ./test-assertions.mdx "PageAssertions"
-[Playwright]: ./api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: ./test-assertions.mdx "PlaywrightAssertions"
-[PlaywrightException]: ./api/class-playwrightexception.mdx "PlaywrightException"
-[Request]: ./api/class-request.mdx "Request"
-[RequestOptions]: ./api/class-requestoptions.mdx "RequestOptions"
-[Response]: ./api/class-response.mdx "Response"
-[Route]: ./api/class-route.mdx "Route"
-[Selectors]: ./api/class-selectors.mdx "Selectors"
-[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
-[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
-[Tracing]: ./api/class-tracing.mdx "Tracing"
-[Video]: ./api/class-video.mdx "Video"
-[WebSocket]: ./api/class-websocket.mdx "WebSocket"
-[WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"
-[Worker]: ./api/class-worker.mdx "Worker"
-[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
-[boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
-[byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
-[Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
-[double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
-[InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
-[int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
-[List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"
-[Map]: https://docs.oracle.com/javase/8/docs/api/java/util/Map.html "Map"
-[null]: https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.7 "null"
-[Object]: https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html "Object"
-[Path]: https://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html "Path"
-[Pattern]: https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html "Pattern"
-[Predicate]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Predicate.html "Predicate"
-[void]: https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html "void"
-[Runnable]: https://docs.oracle.com/javase/8/docs/api/java/lang/Runnable.html "Runnable"
-[RuntimeException]: https://docs.oracle.com/javase/8/docs/api/java/lang/RuntimeException.html "RuntimeException"
-[String]: https://docs.oracle.com/javase/8/docs/api/java/lang/String.html "String"
 
-[all available image tags]: https://mcr.microsoft.com/v2/playwright/java/tags/list "all available image tags"
-[Docker Hub]: https://hub.docker.com/_/microsoft-playwright-java "Docker Hub"
-[Dockerfile.focal]: https://github.com/microsoft/playwright-java/blob/master/Dockerfile.focal "Dockerfile.focal"
+
+## [v0.171.0](https://github.com/microsoft/playwright-java/releases/tag/v0.171.0)
+
+
+
+
+
+## [v0.170.3](https://github.com/microsoft/playwright-java/releases/tag/v0.170.3)
+
+* playwright module now includes driver
+* easier creation of browser context emulating a device
+
+
+
+## [v0.170.2](https://github.com/microsoft/playwright-java/releases/tag/v0.170.2)
+
+
+
+
+
+## [v0.170.0](https://github.com/microsoft/playwright-java/releases/tag/v0.170.0)
+
+
+
+
+

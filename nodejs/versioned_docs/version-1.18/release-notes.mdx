@@ -1,59 +1,321 @@
 ---
-id: release-notes
-title: "Release notes"
+  id: release-notes
+  title: "Release notes"
 ---
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
 
-- [Version 1.18](#version-118)
-- [Version 1.17](#version-117)
-- [Version 1.16](#version-116)
-- [Version 1.15](#version-115)
-- [Version 1.14](#version-114)
-- [Version 1.13](#version-113)
-- [Version 1.12](#version-112)
-- [Version 1.11](#version-111)
-- [Version 1.10](#version-110)
-- [Version 1.9](#version-19)
-- [Version 1.8](#version-18)
-- [Version 1.7](#version-17)
+## [v1.20.0](https://github.com/microsoft/playwright/releases/tag/v1.20.0)
 
-## Version 1.18
+### Highlights
+
+
+- New options for methods [`page.screenshot()`](https://playwright.dev/docs/api/class-page#page-screenshot), [`locator.screenshot()`](https://playwright.dev/docs/api/class-locator#locator-screenshot) and [`elementHandle.screenshot()`](https://playwright.dev/docs/api/class-elementhandle#element-handle-screenshot):
+  * Option `animations: "disabled"` rewinds all CSS animations and transitions to a consistent state.
+  * Option `mask: Locator[]` masks given elements, overlaying them with pink `#FF00FF` boxes.
+- [`expect().toMatchSnapshot()`](https://playwright.dev/docs/test-assertions#screenshot-assertions-to-match-snapshot) now supports anonymous snapshots: when snapshot name is missing, Playwright Test will generate one
+  automatically:
+
+  ```js
+  expect('Web is Awesome <3').toMatchSnapshot();
+  ```
+- New `maxDiffPixels` and `maxDiffPixelRatio` options for fine-grained screenshot comparison using [`expect().toMatchSnapshot()`](https://playwright.dev/docs/test-assertions#screenshot-assertions-to-match-snapshot):
+
+  ```js
+  expect(await page.screenshot()).toMatchSnapshot({
+    maxDiffPixels: 27, // allow no more than 27 different pixels.
+  });
+  ```
+
+  It is most convenient to specify `maxDiffPixels` or `maxDiffPixelRatio` once in [`TestConfig.expect`](https://playwright.dev/docs/api/class-testconfig#test-config-expect).
+- Playwright Test now adds [`TestConfig.fullyParallel`](https://playwright.dev/docs/api/class-testconfig#test-config-fully-parallel) mode. By default, Playwright Test parallelizes between files. In fully parallel mode, tests inside a single file are also run in parallel. You can also use `--fully-parallel` command line flag.
+
+  ```ts
+  // playwright.config.ts
+  export default {
+    fullyParallel: true,
+  };
+  ```
+
+- [`TestProject.grep`](https://playwright.dev/docs/api/class-testproject#test-project-grep) and [`TestProject.grepInvert`](https://playwright.dev/docs/api/class-testproject#test-project-grep-invert) are now configurable per project. For example, you can now
+  configure smoke tests project using `grep`:
+  ```ts
+  // playwright.config.ts
+  export default {
+    projects: [
+      {
+        name: 'smoke tests',
+        grep: '@smoke',
+      },
+    ],
+  };
+  ```
+- [Trace Viewer](https://playwright.dev/docs/trace-viewer) now shows [API testing requests](https://playwright.dev/docs/test-api-testing).
+- [`locator.highlight()`](https://playwright.dev/docs/api/class-locator#locator-highlight) visually reveals element(s) for easier debugging.
+
+### Announcements
+
+
+- We now ship a designated Python docker image `mcr.microsoft.com/playwright/python`. Please switch over to it if you use Python. This is the last release that includes Python inside our javascript `mcr.microsoft.com/playwright` docker image.
+- v1.20 is the last release to receive WebKit update for macOS 10.15 Catalina. Please update MacOS to keep using latest & greatest WebKit!
+
+### Browser Versions
+
+
+- Chromium 101.0.4921.0
+- Mozilla Firefox 97.0.1
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 99
+- Microsoft Edge 99
+
+
+
+## [v1.19.2](https://github.com/microsoft/playwright/releases/tag/v1.19.2)
+
+### Highlights
+
+
+This patch includes the following bug fixes:
+
+https://github.com/microsoft/playwright/issues/12091 - [BUG] playwright 1.19.0 generates more than 1 trace file per test
+https://github.com/microsoft/playwright/issues/12106 - [BUG] Error: EBUSY: resource busy or locked when using volumes in docker-compose with playwright 1.19.0 and mcr.microsoft.com/playwright:v1.15.0-focal
+
+### Browser Versions
+
+
+- Chromium 100.0.4863.0
+- Mozilla Firefox 96.0.1
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 98
+- Microsoft Edge 98
+
+
+
+## [v1.19.1](https://github.com/microsoft/playwright/releases/tag/v1.19.1)
+
+### Highlights
+
+
+This patch includes the following bug fixes:
+
+https://github.com/microsoft/playwright/issues/12075 - [Question] After update to 1.19 firefox fails to run
+https://github.com/microsoft/playwright/issues/12090 - [BUG] did something change on APIRequest/Response APIs ?
+
+### Browser Versions
+
+
+- Chromium 100.0.4863.0
+- Mozilla Firefox 96.0.1
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 98
+- Microsoft Edge 98
+
+
+
+## [v1.19.0](https://github.com/microsoft/playwright/releases/tag/v1.19.0)
+
+### Version 1.19
+
+
+### Playwright Test Updates
+
+
+#### Soft assertions
+
+Playwright Test v1.19 now supports **soft assertions**. Failed soft assertions **do not** terminate test execution, but mark the test as failed. Read more in [our documentation](https://playwright.dev/docs/test-assertions#soft-assertions).
+
+  ```js
+  // Make a few checks that will not stop the test when failed...
+  await expect.soft(page.locator('#status')).toHaveText('Success');
+  await expect.soft(page.locator('#eta')).toHaveText('1 day');
+
+  // ... and continue the test to check more things.
+  await page.locator('#next-page').click();
+  await expect.soft(page.locator('#title')).toHaveText('Make another order');
+  ```
+
+#### Custom error messages
+
+You can now specify a [**custom error message**](https://playwright.dev/docs/test-assertions#custom-error-message) as a second argument to the `expect` and `expect.soft` functions, for example:
+
+  ```js
+  await expect(page.locator('text=Name'), 'should be logged in').toBeVisible();
+  ```
+
+  The error would look like this:
+
+  ```bash
+      Error: should be logged in
+
+      Call log:
+        - expect.toBeVisible with timeout 5000ms
+        - waiting for selector "text=Name"
+
+
+        2 |
+        3 | test('example test', async({ page }) => {
+      > 4 |   await expect(page.locator('text=Name'), 'should be logged in').toBeVisible();
+          |                                                                  ^
+        5 | });
+        6 |
+  ```
+
+#### Parallel mode in file
+
+By default, tests in a single file are run in order. If you have many independent tests in a single file, you can now
+  run them in parallel with [`method: test.describe.configure`](https://playwright.dev/docs/api/class-test#test-describe-configure):
+
+  ```js
+  import { test } from '@playwright/test';
+
+  test.describe.configure({ mode: 'parallel' });
+
+  test('parallel 1', async () => {});
+  test('parallel 2', async () => {});
+  ```
+
+
+### [⚠️](https://emojipedia.org/warning/#:~:text=A%20triangle%20with%20an%20exclamation,to%20Emoji%201.0%20in%202015.) Potentially breaking change in Playwright Test Global Setup
+
+
+It is unlikely that this change will affect you, no action is required if your tests keep running as they did.
+
+We've noticed that in rare cases, the set of tests to be executed was configured in the global setup by means of the environment variables. We also noticed some applications that were post processing the reporters' output in the global teardown. If you are doing one of the two, [learn more](https://github.com/microsoft/playwright/issues/12018)
+
+
+### Locator Updates
+
+
+#### Locator now supports a `has` option that makes sure it contains another locator inside:
+
+
+  ```js
+  await page.locator('article', {
+    has: page.locator('.highlight'),
+  }).locator('button').click();
+  ```
+
+  The snippet above will select article that has highlight in it and will press the button in it.
+  Read more in [locator documentation](https://playwright.dev/docs/api/class-locator#locator-locator-option-has)
+
+### Other Updates
+
+
+- New [`method: Locator.page`](https://playwright.dev/docs/api/class-locator#locator-page)
+- [`method: Page.screenshot`](https://playwright.dev/docs/api/class-page#page-screenshot) and [`method: Locator.screenshot`](https://playwright.dev/docs/api/class-locator#locator-screenshot) now automatically hides blinking caret
+- Playwright Codegen now generates locators and frame locators
+- New option `url`  in [`testConfig.webServer`](https://playwright.dev/docs/api/class-testconfig#test-config-web-server) to ensure your web server is ready before running the tests
+- New [`property: TestInfo.errors`](https://playwright.dev/docs/api/class-testinfo#test-info-errors) and [`property: TestResult.errors`](https://playwright.dev/docs/api/class-testresult#test-result-errors) that contain all failed assertions and soft assertions.
+
+### Browser Versions
+
+
+- Chromium 100.0.4863.0
+- Mozilla Firefox 96.0.1
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 98
+- Microsoft Edge 98
+
+---
+
+
+
+## [v1.18.1](https://github.com/microsoft/playwright/releases/tag/v1.18.1)
+
+### Highlights
+
+
+This patch includes improvements to the TypeScript support and the following bug fixes:
+
+https://github.com/microsoft/playwright/issues/11550 - [REGRESSION]: Errors inside route handler does not lead to unhandled rejections anymore
+https://github.com/microsoft/playwright/issues/11552 - [BUG] Could not resolve "C:\repo\framework\utils" in file C:\repo\tests\test.ts.
+
+### Browser Versions
+
+
+- Chromium 99.0.4812.0
+- Mozilla Firefox 95.0
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 97
+- Microsoft Edge 97
+
+
+
+
+## [v1.18.0](https://github.com/microsoft/playwright/releases/tag/v1.18.0)
 
 ### Locator Improvements
-- [locator.dragTo(target[, options])](./api/class-locator.mdx#locator-drag-to)
-- [`expect(locator).toBeChecked({ checked })`](./api/class-locatorassertions#locator-assertions-to-be-checked)
-- Each locator can now be optionally filtered by the text it contains: [`locator('button', { hasText: 'Submit' })`](./api/class-locator#locator-locator-option-has-text)
+
+
+- [`locator.dragTo(locator)`]
+- [`expect(locator).toBeChecked({ checked })`]
+- Each locator can now be optionally filtered by the text it contains: 
+    ```js
+    await page.locator('li', { hasText: 'my item' }).locator('button').click();
+    ```
+    Read more in [locator documentation].
+
 
 ### Testing API improvements
-- [`expect(response).toBeOK()`](./api/class-apiresponseassertions)
-- [`testInfo.attach()`](./api/class-testinfo#test-info-attach)
-- [`test.info()`](./api/class-test#test-info)
+
+
+- [`expect(response).toBeOK()`]
+- [`testInfo.attach()`]
+- [`test.info()`]
 
 ### Improved TypeScript Support
+
+
 1. Playwright Test now respects `tsconfig.json`'s [`baseUrl`](https://www.typescriptlang.org/tsconfig#baseUrl) and [`paths`](https://www.typescriptlang.org/tsconfig#paths), so you can use aliases
 1. There is a new environment variable `PW_EXPERIMENTAL_TS_ESM` that allows importing ESM modules in your TS code, without the need for the compile step. Don't forget the `.js` suffix when you are importing your esm modules. Run your tests as follows:
 
 ```bash
-npm i --save-dev @playwright/test@1.18.0-rc1
+npm i --save-dev @playwright/test@1.18.0
 PW_EXPERIMENTAL_TS_ESM=1 npx playwright test
 ```
 
 ### Create Playwright
 
+
 The `npm init playwright` command is now generally available for your use:
 
-This will create a Playwright Test configuration file, optionally add examples, a GitHub Action workflow and a first test `example.spec.ts`.
+```sh
+### Run from your project's root directory
+
+npm init playwright
+### Or create a new project
+
+npm init playwright new-project
+```
+
+This will scaffold everything needed to get started with Playwright Test: configuration file, optionally add examples, a GitHub Action workflow and a first test `example.spec.ts`.
+
 
 ### New APIs & changes
-- new [`testCase.repeatEachIndex`](./api/class-testcase#test-case-repeat-each-index) API
-- [`acceptDownloads`](./api/class-browser#browser-new-context-option-accept-downloads) option now defaults to `true`
+
+
+- new [`testCase.repeatEachIndex`] API
+- [`acceptDownloads`] option now defaults to `true`
 
 ### Breaking change: custom config options
 
-Custom config options are a convenient way to parametrize projects with different values. Learn more in [this guide](./test-parameterize#parameterized-projects).
 
-Previously, any fixture introduced through [test.extend(fixtures)](./api/class-test.mdx#test-extend) could be overridden in the [testProject.use](./api/class-testproject.mdx#test-project-use) config section. For example,
+Custom config options are a convenient way to parametrize projects with different values. Learn more in the [parametrization guide].
+
+Previously, any fixture introduced through [`test.extend`] could be overridden in the [`testProject.use`] config section. For example,
 
 ```js
 // WRONG: THIS SNIPPET DOES NOT WORK SINCE v1.18.
@@ -92,36 +354,182 @@ module.exports = {
 ```
 
 ### Browser Versions
+
+
 - Chromium 99.0.4812.0
 - Mozilla Firefox 95.0
 - WebKit 15.4
 
 This version was also tested against the following stable channels:
+
 - Google Chrome 97
 - Microsoft Edge 97
 
-## Version 1.17
+---
+
+[`locator.dragTo(locator)`]: https://playwright.dev/docs/api/class-locator#locator-drag-to
+[`expect(locator).toBeChecked({ checked })`]: https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-be-checked
+[locator documentation]: https://playwright.dev/docs/api/class-locator#locator-locator-option-has-text
+[`expect(response).toBeOK()`]: https://playwright.dev/docs/api/class-apiresponseassertions
+[`testInfo.attach()`]: https://playwright.dev/docs/api/class-testinfo#test-info-attach
+[`test.info()`]: https://playwright.dev/docs/api/class-test#test-info
+[`testCase.repeatEachIndex`]: https://playwright.dev/docs/api/class-testcase#test-case-repeat-each-index
+[parametrization guide]: https://playwright.dev/docs/test-parameterize#parameterized-projects
+[`acceptDownloads`]: https://playwright.dev/docs/api/class-browser#browser-new-context-option-accept-downloads
+[`test.extend`]: https://playwright.dev/docs/api/class-test#test-extend
+[`testProject.use`]: https://playwright.dev/docs/api/class-testproject#test-project-use
+
+(`1.18.0-beta-1642620709000`)
+
+
+
+## [v1.18.0-rc1](https://github.com/microsoft/playwright/releases/tag/v1.18.0-rc1)
+
+### Locator Improvements
+
+
+- [`locator.dragTo(locator)`]
+- [`expect(locator).toBeChecked({ checked })`]
+- Each locator can now be optionally filtered by the text it contains: 
+    ```js
+    await page.locator('li', { hasText: 'my item' }).locator('button').click();
+    ```
+    Read more in [locator documentation].
+
+
+### Testing API improvements
+
+
+- [`expect(response).toBeOK()`]
+- [`testInfo.attach()`]
+- [`test.info()`]
+
+### Improved TypeScript Support
+
+
+1. Playwright Test now respects `tsconfig.json`'s [`baseUrl`](https://www.typescriptlang.org/tsconfig#baseUrl) and [`paths`](https://www.typescriptlang.org/tsconfig#paths), so you can use aliases
+1. There is a new environment variable `PW_EXPERIMENTAL_TS_ESM` that allows importing ESM modules in your TS code, without the need for the compile step. Don't forget the `.js` suffix when you are importing your esm modules. Run your tests as follows:
+
+```bash
+npm i --save-dev @playwright/test@1.18.0-rc1
+PW_EXPERIMENTAL_TS_ESM=1 npx playwright test
+```
+
+### Create Playwright
+
+
+The `npm init playwright` command is now generally available for your use:
+
+```sh
+### Run from your project's root directory
+
+npm init playwright
+### Or create a new project
+
+npm init playwright new-project
+```
+
+This will scaffold everything needed to get started with Playwright Test: configuration file, optionally add examples, a GitHub Action workflow and a first test `example.spec.ts`.
+
+
+### New APIs & changes
+
+
+- new [`testCase.repeatEachIndex`] API
+- new [option fixtures]
+- [`acceptDownloads`] option now defaults to `true`
+
+### Browser Versions
+
+
+- Chromium 99.0.4812.0
+- Mozilla Firefox 95.0
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 97
+- Microsoft Edge 97
+
+---
+
+[`locator.dragTo(locator)`]: https://playwright.dev/docs/api/class-locator#locator-drag-to
+[`expect(locator).toBeChecked({ checked })`]: https://playwright.dev/docs/api/class-locatorassertions#locator-assertions-to-be-checked
+[locator documentation]: https://playwright.dev/docs/api/class-locator#locator-locator-option-has-text
+[`expect(response).toBeOK()`]: https://playwright.dev/docs/api/class-apiresponseassertions
+[`testInfo.attach()`]: https://playwright.dev/docs/api/class-testinfo#test-info-attach
+[`test.info()`]: https://playwright.dev/docs/api/class-test#test-info
+[`testCase.repeatEachIndex`]: https://playwright.dev/docs/api/class-testcase#test-case-repeat-each-index
+[option fixtures]: https://playwright.dev/docs/test-fixtures#fixtures-options
+[`acceptDownloads`]: https://playwright.dev/docs/api/class-browser#browser-new-context-option-accept-downloads
+
+
+
+## [v1.17.2](https://github.com/microsoft/playwright/releases/tag/v1.17.2)
+
+### Bugfixes
+
+[11274](https://github.com/microsoft/playwright/issue/11274)
+[11228](https://github.com/microsoft/playwright/issue/11228)
+
+
+
+## [v1.17.1](https://github.com/microsoft/playwright/releases/tag/v1.17.1)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/10638 - [BUG] Locator.click -> subtree intercepts pointer events since version 1.17.0
+https://github.com/microsoft/playwright/issues/10632 - [BUG] Playwright 1.17.0 -> After clicking the element - I get an error that click action was failed
+https://github.com/microsoft/playwright/issues/10627 - [REGRESSION]: Can no longer click Material UI select box
+https://github.com/microsoft/playwright/issues/10620 - [BUG] trailing zero width whitespace fails toHaveText
+
+
+### Browser Versions
+
+
+- Chromium 98.0.4695.0
+- Mozilla Firefox 94.0.1
+- WebKit 15.4
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 96
+- Microsoft Edge 96
+
+---
+
+(1.17.1)
+
+
+
+## [v1.17.0](https://github.com/microsoft/playwright/releases/tag/v1.17.0)
 
 ### Frame Locators
 
-Playwright 1.17 introduces [frame locators](./api/class-framelocator) - a locator to the iframe on the page. Frame locators capture the logic sufficient to retrieve the `iframe` and then locate elements in that iframe. Frame locators are strict by default, will wait for `iframe` to appear and can be used in Web-First assertions.
+
+Playwright 1.17 introduces [frame locators] - a locator to the iframe on the page. Frame locators capture the logic sufficient to retrieve the `iframe` and then locate elements in that iframe. Frame locators are strict by default, will wait for `iframe` to appear and can be used in Web-First assertions.
 
 ![Graphics](https://user-images.githubusercontent.com/746130/142082759-2170db38-370d-43ec-8d41-5f9941f57d83.png)
 
-Frame locators can be created with either [page.frameLocator(selector)](./api/class-page.mdx#page-frame-locator) or [locator.frameLocator(selector)](./api/class-locator.mdx#locator-frame-locator) method.
+Frame locators can be created with either [`page.frameLocator(selector)`] or [`locator.frameLocator(selector)`] method.
 
 ```js
 const locator = page.frameLocator('#my-iframe').locator('text=Submit');
 await locator.click();
 ```
 
-Read more at [our documentation](./api/class-framelocator).
+Read more at [our documentation](https://playwright.dev/docs/next/api/class-framelocator).
 
 ### Trace Viewer Update
+
 
 Playwright Trace Viewer is now **available online** at https://trace.playwright.dev! Just drag-and-drop your `trace.zip` file to inspect its contents.
 
 > **NOTE**: trace files are not uploaded anywhere; [trace.playwright.dev](https://trace.playwright.dev) is a [progressive web application](https://web.dev/progressive-web-apps/) that processes traces locally.
+
 - Playwright Test traces now include sources by default (these could be turned off with tracing option)
 - Trace Viewer now shows test name
 - New trace metadata tab with browser details
@@ -130,113 +538,451 @@ Playwright Trace Viewer is now **available online** at https://trace.playwright.
 ![image](https://user-images.githubusercontent.com/746130/141877831-29e37cd1-e574-4bd9-aab5-b13a463bb4ae.png)
 
 ### HTML Report Update
+
+
 - HTML report now supports dynamic filtering
 - Report is now a **single static HTML file** that could be sent by e-mail or as a slack attachment.
 
 ![image](https://user-images.githubusercontent.com/746130/141877402-e486643d-72c7-4db3-8844-ed2072c5d676.png)
 
 ### Ubuntu ARM64 support + more
+
+
 - Playwright now supports **Ubuntu 20.04 ARM64**. You can now run Playwright tests inside Docker on Apple M1 and on Raspberry Pi.
 - You can now use Playwright to install stable version of Edge on Linux:
+    ```bash
+    npx playwright install msedge
+    ```
 
-  ```bash
-  npx playwright install msedge
-  ```
 
 ### New APIs
-- Tracing now supports a [`'title'`](./api/class-tracing#tracing-start-option-title) option
-- Page navigations support a new [`'commit'`](./api/class-page#page-goto) waiting option
-- HTML reporter got [new configuration options](./test-reporters#html-reporter)
-- [`testConfig.snapshotDir` option](./api/class-testconfig#test-config-snapshot-dir)
-- [`testInfo.parallelIndex`](./api/class-testinfo#test-info-parallel-index)
-- [`testInfo.titlePath`](./api/class-testinfo#test-info-title-path)
-- [`testOptions.trace`](./api/class-testoptions#test-options-trace) has new options
-- [`expect.toMatchSnapshot`](./test-assertions#expectvaluetomatchsnapshotname-options) supports subdirectories
-- [`reporter.printsToStdio()`](./api/class-reporter#reporter-prints-to-stdio)
 
-## Version 1.16
 
-### 🎭 Playwright Test
-
-#### API Testing
-
-Playwright 1.16 introduces new [API Testing](./api/class-apirequestcontext) that lets you send requests to the server directly from Node.js! Now you can:
-- test your server API
-- prepare server side state before visiting the web application in a test
-- validate server side post-conditions after running some actions in the browser
-
-To do a request on behalf of Playwright's Page, use **new [page.request](./api/class-page.mdx#page-request) API**:
-
-To do a stand-alone request from node.js to an API endpoint, use **new [`request` fixture](./api/class-fixtures#fixtures-request)**:
-
-Read more about it in our [API testing guide](./test-api-testing).
-
-#### Response Interception
-
-It is now possible to do response interception by combining [API Testing](./test-api-testing) with [request interception](./network#modify-requests).
-
-For example, we can blur all the images on the page:
-
-Read more about [response interception](./network#modify-responses).
-
-#### New HTML reporter
-
-Try it out new HTML reporter with either `--reporter=html` or a `reporter` entry in `playwright.config.ts` file:
-
-```bash
-$ npx playwright test --reporter=html
-```
-
-The HTML reporter has all the information about tests and their failures, including surfacing trace and image artifacts.
-
-![html reporter](https://user-images.githubusercontent.com/746130/138324311-94e68b39-b51a-4776-a446-f60037a77f32.png)
-
-Read more about [our reporters](./test-reporters/#html-reporter).
-
-### 🎭 Playwright Library
-
-#### locator.waitFor
-
-Wait for a locator to resolve to a single element with a given state. Defaults to the `state: 'visible'`.
-
-Comes especially handy when working with lists:
-
-Read more about [locator.waitFor([options])](./api/class-locator.mdx#locator-wait-for).
-
-### Docker support for Arm64
-
-Playwright Docker image is now published for Arm64 so it can be used on Apple Silicon.
-
-Read more about [Docker integration](./docker).
-
-### 🎭 Playwright Trace Viewer
-- web-first assertions inside trace viewer
-- run trace viewer with `npx playwright show-trace` and drop trace files to the trace viewer PWA
-- API testing is integrated with trace viewer
-- better visual attribution of action targets
-
-Read more about [Trace Viewer](./trace-viewer).
+- Tracing now supports a [`'title'`](https://playwright.dev/docs/next/api/class-tracing#tracing-start-option-title) option
+- Page navigations support a new [`'commit'`](https://playwright.dev/docs/next/api/class-page#page-goto) waiting option
+- HTML reporter got [new configuration options](https://playwright.dev/docs/next/test-reporters#html-reporter)
+- [`testConfig.snapshotDir` option](https://playwright.dev/docs/next/api/class-testconfig#test-config-snapshot-dir)
+- [`testInfo.parallelIndex`](https://playwright.dev/docs/next/api/class-testinfo#test-info-parallel-index)
+- [`testInfo.titlePath`](https://playwright.dev/docs/next/api/class-testinfo#test-info-title-path)
+- [`testOptions.trace`](https://playwright.dev/docs/next/api/class-testoptions#test-options-trace) has new options
+- [`expect.toMatchSnapshot`](https://playwright.dev/docs/next/test-assertions#expectvaluetomatchsnapshotname-options) supports subdirectories
+- [`reporter.printsToStdio()`](https://playwright.dev/docs/next/api/class-reporter#reporter-prints-to-stdio)
 
 ### Browser Versions
+
+
+- Chromium 98.0.4695.0
+- Mozilla Firefox 94.0.1
+- WebKit 15.4
+
+This version was also tested against the following stable channels:
+
+- Google Chrome 96
+- Microsoft Edge 96
+
+
+---
+
+
+[frame locators]: https://playwright.dev/docs/next/api/class-framelocator
+[`page.frameLocator(selector)`]: https://playwright.dev/docs/next/api/class-page#page-frame-locator
+[`locator.frameLocator(selector)`]: https://playwright.dev/docs/next/api/class-locator#locator-frame-locator
+
+
+
+## [v1.17.0-rc1](https://github.com/microsoft/playwright/releases/tag/v1.17.0-rc1)
+
+### Frame Locators
+
+
+Playwright 1.17 introduces [frame locators] - a locator to the iframe on the page. Frame locators capture the logic sufficient to retrieve the `iframe` and then locate elements in that iframe. Frame locators are strict by default, will wait for `iframe` to appear and can be used in Web-First assertions.
+
+![Graphics](https://user-images.githubusercontent.com/746130/142082759-2170db38-370d-43ec-8d41-5f9941f57d83.png)
+
+Frame locators can be created with either [`page.frameLocator(selector)`] or [`locator.frameLocator(selector)`] method.
+
+```js
+const locator = page.frameLocator('#my-iframe').locator('text=Submit');
+await locator.click();
+```
+
+Read more at [our documentation](https://playwright.dev/docs/next/api/class-framelocator).
+
+### Trace Viewer Update
+
+
+Playwright Trace Viewer is now **available online** at https://trace.playwright.dev! Just drag-and-drop your `trace.zip` file to inspect its contents.
+
+> **NOTE**: trace files are not uploaded anywhere; [trace.playwright.dev](https://trace.playwright.dev) is a [progressive web application](https://web.dev/progressive-web-apps/) that processes traces locally.
+
+- Playwright Test traces now include sources by default (these could be turned off with tracing option)
+- Trace Viewer now shows test name
+- New trace metadata tab with browser details
+- Snapshots now have URL bar
+
+![image](https://user-images.githubusercontent.com/746130/141877831-29e37cd1-e574-4bd9-aab5-b13a463bb4ae.png)
+
+### HTML Report Update
+
+
+- HTML report now supports dynamic filtering
+- Report is now a **single static HTML file** that could be sent by e-mail or as a slack attachment.
+
+![image](https://user-images.githubusercontent.com/746130/141877402-e486643d-72c7-4db3-8844-ed2072c5d676.png)
+
+### Ubuntu ARM64 support + more
+
+
+- Playwright now supports **Ubuntu 20.04 ARM64**. You can now run Playwright tests inside Docker on Apple M1 and on Raspberry Pi.
+- You can now use Playwright to install stable version of Edge on Linux:
+    ```bash
+    npx playwright install msedge
+    ```
+
+
+### New APIs
+
+
+- Tracing now supports a [`'title'`](https://playwright.dev/docs/next/api/class-tracing#tracing-start-option-title) option
+- Page navigations support a new [`'commit'`](https://playwright.dev/docs/next/api/class-page#page-goto) waiting option
+- HTML reporter got [new configuration options](https://playwright.dev/docs/next/test-reporters#html-reporter)
+- [`testConfig.snapshotDir` option](https://playwright.dev/docs/next/api/class-testconfig#test-config-snapshot-dir)
+- [`testInfo.parallelIndex`](https://playwright.dev/docs/next/api/class-testinfo#test-info-parallel-index)
+- [`testInfo.titlePath`](https://playwright.dev/docs/next/api/class-testinfo#test-info-title-path)
+- [`testOptions.trace`](https://playwright.dev/docs/next/api/class-testoptions#test-options-trace) has new options
+- [`expect.toMatchSnapshot`](https://playwright.dev/docs/next/test-assertions#expectvaluetomatchsnapshotname-options) supports subdirectories
+- [`reporter.printsToStdio()`](https://playwright.dev/docs/next/api/class-reporter#reporter-prints-to-stdio)
+
+---
+
+
+[frame locators]: https://playwright.dev/docs/next/api/class-framelocator
+[`page.frameLocator(selector)`]: https://playwright.dev/docs/next/api/class-page#page-frame-locator
+[`locator.frameLocator(selector)`]: https://playwright.dev/docs/next/api/class-locator#locator-frame-locator
+
+
+
+## [v1.16.3](https://github.com/microsoft/playwright/releases/tag/v1.16.3)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/9849 - [BUG]: toHaveCount fails with serialization error in 1.16 when elements do not yet exists
+https://github.com/microsoft/playwright/issues/9897 - [Bug]: TraceViewer doesn't show actions
+https://github.com/microsoft/playwright/issues/9902 - [BUG] Warn if the html-report gets opened with file://
+
+
+### Browser Versions
+
+
 - Chromium 97.0.4666.0
 - Mozilla Firefox 93.0
 - WebKit 15.4
 
 This version of Playwright was also tested against the following stable channels:
+
 - Google Chrome 94
 - Microsoft Edge 94
 
-## Version 1.15
+---
+
+(1.16.3-1635814179000)
+
+
+
+## [v1.16.2](https://github.com/microsoft/playwright/releases/tag/v1.16.2)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/7818 - [Bug]: dedup snapshot CSS images
+https://github.com/microsoft/playwright/issues/9741 - [BUG] Error while an attempt to install Playwright in CI -> Failed at the playwright@1.16.1 install script
+https://github.com/microsoft/playwright/issues/9756 - [Regression] Page.screenshot does not work inside Docker with BrowserServer
+https://github.com/microsoft/playwright/issues/9759 - [BUG] 1.16.x the package.json is not export anymore
+https://github.com/microsoft/playwright/issues/9760 - [BUG] snapshot updating causes failures for all tries except the last
+https://github.com/microsoft/playwright/issues/9768 - [BUG] ignoreHTTPSErrors not working on page.request
+
+
+### Browser Versions
+
+
+- Chromium 97.0.4666.0
+- Mozilla Firefox 93.0
+- WebKit 15.4
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 94
+- Microsoft Edge 94
+
+---
+
+(1.16.2-1635322350000)
+
+
+
+
+## [v1.16.1](https://github.com/microsoft/playwright/releases/tag/v1.16.1)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/9688 - [REGRESSION]: toHaveCount does not work anymore with 0 elements
+https://github.com/microsoft/playwright/issues/9692 - [BUG] HTML report shows locator._withElement for locator.evaluate
+
+### Browser Versions
+
+
+- Chromium 97.0.4666.0
+- Mozilla Firefox 93.0
+- WebKit 15.4
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 94
+- Microsoft Edge 94
+
+---
+
+(1.16.0-1634781227000)
+
+
+
+
+## [v1.16.0](https://github.com/microsoft/playwright/releases/tag/v1.16.0)
+
+### 🎭 Playwright Test
+
+
+### API Testing
+
+
+Playwright 1.16 introduces new [API Testing] that lets you send requests to the server directly from Node.js!
+Now you can:
+
+- test your server API
+- prepare server side state before visiting the web application in a test
+- validate server side post-conditions after running some actions in the browser
+
+To do a request on behalf of Playwright's Page, use **new [`page.request`] API**:
+
+```ts
+import { test, expect } from '@playwright/test';
+
+test('context fetch', async ({ page }) => {
+  // Do a GET request on behalf of page
+  const response = await page.request.get('http://example.com/foo.json');
+  // ... 
+});
+```
+
+To do a stand-alone request from node.js to an API endpoint, use **new [`request` fixture]**:
+
+```ts
+import { test, expect } from '@playwright/test';
+
+test('context fetch', async ({ request }) => {
+  // Do a GET request on behalf of page
+  const response = await request.get('http://example.com/foo.json');
+  // ... 
+});
+```
+
+Read more about it in our [API testing guide].
+
+### Response Interception
+
+
+It is now possible to do response interception by combining [API Testing] with [request interception].
+
+For example, we can blur all the images on the page:
+
+```ts
+import { test, expect } from '@playwright/test';
+import jimp from 'jimp'; // image processing library
+
+test('response interception', async ({ page }) => {
+  await page.route('**/*.jpeg', async route => {
+    const response = await page._request.fetch(route.request());
+    const image = await jimp.read(await response.body());
+    await image.blur(5);
+    route.fulfill({
+      response,
+      body: await image.getBufferAsync('image/jpeg'),
+    });
+  });
+  const response = await page.goto('https://playwright.dev');
+  expect(response.status()).toBe(200);
+});
+```
+
+Read more about [response interception].
+
+### New HTML reporter
+
+
+Try it out new HTML reporter with either `--reporter=html` or a `reporter` entry
+in `playwright.config.ts` file:
+
+```bash
+$ npx playwright test --reporter=html
+```
+
+The HTML reporter has all the information about tests and their failures, including surfacing
+trace and image artifacts.
+
+![html reporter](https://user-images.githubusercontent.com/746130/138324311-94e68b39-b51a-4776-a446-f60037a77f32.png)
+
+Read more about [our reporters].
 
 ### 🎭 Playwright Library
 
-#### 🖱️ Mouse Wheel
+
+### locator.waitFor
+
+
+Wait for a locator to resolve to a single element with a given state.
+Defaults to the `state: 'visible'`.
+
+Comes especially handy when working with lists:
+
+```ts
+import { test, expect } from '@playwright/test';
+
+test('context fetch', async ({ page }) => {
+  const completeness = page.locator('text=Success');
+  await completeness.waitFor();
+  expect(await page.screenshot()).toMatchSnapshot('screen.png');
+});
+```
+
+Read more about [`locator.waitFor()`].
+
+### 🎭 Playwright Trace Viewer
+
+
+- web-first assertions inside trace viewer
+- run trace viewer with `npx playwright show-trace` and drop trace files to the trace viewer PWA
+- API testing is integrated with trace viewer
+- better visual attribution of action targets
+
+Read more about [Trace Viewer].
+
+### Browser Versions
+
+
+- Chromium 97.0.4666.0
+- Mozilla Firefox 93.0
+- WebKit 15.4
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 94
+- Microsoft Edge 94
+
+---
+
+(1.16.0-1634781227000)
+
+[API Testing]: https://playwright.dev/docs/next/api/class-apirequestcontext
+[`page.request`]: https://playwright.dev/docs/next/api/class-page#page-request
+[`request` fixture]: https://playwright.dev/docs/next/api/class-fixtures#fixtures-request
+[API testing guide]: https://playwright.dev/docs/next/test-api-testing
+[Trace Viewer]: https://playwright.dev/docs/next/trace-viewer
+[Docker integration]: https://playwright.dev/docs/next/docker
+[`locator.waitFor()`]: https://playwright.dev/docs/next/api/class-locator#locator-wait-for
+[our reporters]: https://playwright.dev/docs/next/test-reporters#html-reporter
+[response interception]: https://playwright.dev/docs/next/network#modify-responses
+[request interception]: https://playwright.dev/docs/next/api/class-page#page-route
+
+
+
+## [v1.15.2](https://github.com/microsoft/playwright/releases/tag/v1.15.2)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+https://github.com/microsoft/playwright/issues/9261 - [BUG] npm init playwright fails on path spaces
+https://github.com/microsoft/playwright/issues/9298 - [Question]: Should new Headers methods work in RouteAsync ?
+
+### Browser Versions
+
+
+- Chromium 96.0.4641.0
+- Mozilla Firefox 92.0
+- WebKit 15.0
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 93
+- Microsoft Edge 93
+
+---
+
+1.15.2-1633455481000
+
+
+
+
+## [v1.15.1](https://github.com/microsoft/playwright/releases/tag/v1.15.1)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+[9065](https://github.com/microsoft/playwright/issue/9065)
+[9092](https://github.com/microsoft/playwright/issue/9092)
+[9048](https://github.com/microsoft/playwright/issue/9048)
+[8955](https://github.com/microsoft/playwright/issue/8955)
+[8921](https://github.com/microsoft/playwright/issue/8921)
+[8975](https://github.com/microsoft/playwright/issue/8975)
+[9071](https://github.com/microsoft/playwright/issue/9071)
+[8999](https://github.com/microsoft/playwright/issue/8999)
+[9038](https://github.com/microsoft/playwright/issue/9038)
+
+### Browser Versions
+
+
+- Chromium 96.0.4641.0
+- Mozilla Firefox 92.0
+- WebKit 15.0
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 93
+- Microsoft Edge 93
+
+---
+
+1.15.0-1633020276000
+
+
+
+
+## [v1.15.0](https://github.com/microsoft/playwright/releases/tag/v1.15.0)
+
+### 🎭 Playwright Library
+
+
+### 🖱️ Mouse Wheel
+
 
 By using [`Page.mouse.wheel`](https://playwright.dev/docs/api/class-mouse#mouse-wheel) you are now able to scroll vertically or horizontally.
 
-#### 📜 New Headers API
+### 📜 New Headers API
+
 
 Previously it was not possible to get multiple header values of a response. This is now  possible and additional helper functions are available:
+
 - [Request.allHeaders()](https://playwright.dev/docs/api/class-request#request-all-headers)
 - [Request.headersArray()](https://playwright.dev/docs/api/class-request#request-headers-array)
 - [Request.headerValue(name: string)](https://playwright.dev/docs/api/class-request#request-header-value)
@@ -245,11 +991,14 @@ Previously it was not possible to get multiple header values of a response. This
 - [Response.headerValue(name: string)](https://playwright.dev/docs/api/class-response#response-header-value)
 - [Response.headerValues(name: string)](https://playwright.dev/docs/api/class-response/#response-header-values)
 
-#### 🌈 Forced-Colors emulation
+### 🌈 Forced-Colors emulation
+
 
 Its now possible to emulate the `forced-colors` CSS media feature by passing it in the [context options](https://playwright.dev/docs/api/class-browser#browser-new-context-option-forced-colors) or calling [Page.emulateMedia()](https://playwright.dev/docs/api/class-page#page-emulate-media).
 
-#### New APIs
+### New APIs
+
+
 - [Page.route()](https://playwright.dev/docs/api/class-page#page-route) accepts new `times` option to specify how many times this route should be matched.
 - [Page.setChecked(selector: string, checked: boolean)](https://playwright.dev/docs/api/class-page#page-set-checked) and [Locator.setChecked(selector: string, checked: boolean)](https://playwright.dev/docs/api/class-locator#locator-set-checked) was introduced to set the checked state of a checkbox.
 - [Request.sizes()](https://playwright.dev/docs/api/class-request#request-sizes) Returns resource size information for given http request.
@@ -258,26 +1007,77 @@ Its now possible to emulate the `forced-colors` CSS media feature by passing it 
 
 ### 🎭 Playwright Test
 
-#### 🤝 `test.parallel()` run tests in the same file in parallel
+
+### 🤝 `test.parallel()` run tests in the same file in parallel
+
+
+```ts
+test.describe.parallel('group', () => {
+  test('runs in parallel 1', async ({ page }) => {
+  });
+  test('runs in parallel 2', async ({ page }) => {
+  });
+});
+```
 
 By default, tests in a single file are run in order. If you have many independent tests in a single file, you can now run them in parallel with [test.describe.parallel(title, callback)](https://playwright.dev/docs/api/class-test#test-describe-parallel).
 
-#### 🛠 Add `--debug` CLI flag
+### 🛠 Add `--debug` CLI flag
+
 
 By using `npx playwright test --debug` it will enable the [Playwright Inspector](https://playwright.dev/docs/debug#playwright-inspector) for you to debug your tests.
 
 ### Browser Versions
+
+
 - Chromium 96.0.4641.0
 - Mozilla Firefox 92.0
 - WebKit 15.0
 
-## Version 1.14
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 93
+- Microsoft Edge 93
+
+
+
+
+## [v1.14.1](https://github.com/microsoft/playwright/releases/tag/v1.14.1)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+[8287](https://github.com/microsoft/playwright/issue/8287)
+[8281](https://github.com/microsoft/playwright/issue/8281)
+[8230](https://github.com/microsoft/playwright/issue/8230)
+[8366](https://github.com/microsoft/playwright/issue/8366)
+
+### Browser Versions
+
+
+- Chromium 94.0.4595.0
+- Mozilla Firefox 91.0
+- WebKit 15.0
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 92
+- Microsoft Edge 92
+
+
+
+## [v1.14.0](https://github.com/microsoft/playwright/releases/tag/v1.14.0)
 
 ### 🎭 Playwright Library
 
-#### ⚡️ New "strict" mode
 
-Selector ambiguity is a common problem in automation testing. **"strict" mode** ensures that your selector points to a single element and throws otherwise.
+### ⚡️ New "strict" mode
+
+
+Selector ambiguity is a common problem in automation testing. **"strict" mode**
+ensures that your selector points to a single element and throws otherwise.
 
 Pass `strict: true` into your action calls to opt in.
 
@@ -286,11 +1086,12 @@ Pass `strict: true` into your action calls to opt in.
 await page.click('button', { strict: true });
 ```
 
-#### 📍 New [**Locators API**](./api/class-locator)
+### 📍 New [**Locators API**](https://playwright.dev/docs/api/class-locator)
+
 
 Locator represents a view to the element(s) on the page. It captures the logic sufficient to retrieve the element at any given moment.
 
-The difference between the [Locator](./api/class-locator) and [ElementHandle](./api/class-elementhandle) is that the latter points to a particular element, while [Locator](./api/class-locator) captures the logic of how to retrieve that element.
+The difference between the [Locator](https://playwright.dev/docs/api/class-locator) and [ElementHandle](https://playwright.dev/docs/api/class-elementhandle) is that the latter points to a particular element, while [Locator](https://playwright.dev/docs/api/class-locator) captures the logic of how to retrieve that element.
 
 Also, locators are **"strict" by default**!
 
@@ -299,9 +1100,10 @@ const locator = page.locator('button');
 await locator.click();
 ```
 
-Learn more in the [documentation](./api/class-locator).
+Learn more in the [documentation](https://playwright.dev/docs/api/class-locator).
 
-#### 🧩 Experimental [**React**](./selectors#react-selectors) and [**Vue**](./selectors#vue-selectors) selector engines
+### 🧩 Experimental [**React**](https://playwright.dev/docs/selectors#react-selectors) and [**Vue**](https://playwright.dev/docs/selectors#vue-selectors) selector engines
+
 
 React and Vue selectors allow selecting elements by its component name and/or property values. The syntax is very similar to [attribute selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) and supports all attribute selector operators.
 
@@ -310,11 +1112,13 @@ await page.click('_react=SubmitButton[enabled=true]');
 await page.click('_vue=submit-button[enabled=true]');
 ```
 
-Learn more in the [react selectors documentation](./selectors#react-selectors) and the [vue selectors documentation](./selectors#vue-selectors).
+Learn more in the [react selectors documentation](https://playwright.dev/docs/selectors#react-selectors) and the [vue selectors documentation](https://playwright.dev/docs/selectors#vue-selectors).
 
-#### ✨ New [**`nth`**](./selectors#n-th-element-selector) and [**`visible`**](./selectors#selecting-visible-elements) selector engines
-- [`nth`](./selectors#n-th-element-selector) selector engine is equivalent to the `:nth-match` pseudo class, but could be combined with other selector engines.
-- [`visible`](./selectors#selecting-visible-elements) selector engine is equivalent to the `:visible` pseudo class, but could be combined with other selector engines.
+### ✨ New [**`nth`**](https://playwright.dev/docs/selectors#n-th-element-selector) and [**`visible`**](https://playwright.dev/docs/selectors#selecting-visible-elements) selector engines
+
+
+- [`nth`](https://playwright.dev/docs/selectors#n-th-element-selector) selector engine is equivalent to the `:nth-match` pseudo class, but could be combined with other selector engines.
+- [`visible`](https://playwright.dev/docs/selectors#selecting-visible-elements) selector engine is equivalent to the `:visible` pseudo class, but could be combined with other selector engines.
 
 ```js
 // select the first button among all buttons
@@ -328,7 +1132,9 @@ await button.click('button >> visible=true');
 
 ### 🎭 Playwright Test
 
-#### ✅ Web-First Assertions
+
+### ✅ Web-First Assertions
+
 
 `expect` now supports lots of new web-first assertions.
 
@@ -338,108 +1144,313 @@ Consider the following example:
 await expect(page.locator('.status')).toHaveText('Submitted');
 ```
 
-Playwright Test will be re-testing the node with the selector `.status` until fetched Node has the `"Submitted"` text. It will be re-fetching the node and checking it over and over, until the condition is met or until the timeout is reached. You can either pass this timeout or configure it once via the [`testProject.expect`](./api/class-testproject/#test-project-expect) value in test config.
+Playwright Test will be re-testing the node with the selector `.status` until fetched Node has the `"Submitted"` text. It will be re-fetching the node and checking it over and over, until the condition is met or until the timeout is reached. You can either pass this timeout or configure it once via the [`testProject.expect`](https://playwright.dev/docs/api/class-testproject/#test-project-expect) value in test config.
 
 By default, the timeout for assertions is not set, so it'll wait forever, until the whole test times out.
 
 List of all new assertions:
-- [`expect(locator).toBeChecked()`](./test-assertions#expectlocatortobechecked)
-- [`expect(locator).toBeDisabled()`](./test-assertions#expectlocatortobedisabled)
-- [`expect(locator).toBeEditable()`](./test-assertions#expectlocatortobeeditable)
-- [`expect(locator).toBeEmpty()`](./test-assertions#expectlocatortobeempty)
-- [`expect(locator).toBeEnabled()`](./test-assertions#expectlocatortobeenabled)
-- [`expect(locator).toBeFocused()`](./test-assertions#expectlocatortobefocused)
-- [`expect(locator).toBeHidden()`](./test-assertions#expectlocatortobehidden)
-- [`expect(locator).toBeVisible()`](./test-assertions#expectlocatortobevisible)
-- [`expect(locator).toContainText(text, options?)`](./test-assertions#expectlocatortocontaintexttext-options)
-- [`expect(locator).toHaveAttribute(name, value)`](./test-assertions#expectlocatortohaveattributename-value)
-- [`expect(locator).toHaveClass(expected)`](./test-assertions#expectlocatortohaveclassexpected)
-- [`expect(locator).toHaveCount(count)`](./test-assertions#expectlocatortohavecountcount)
-- [`expect(locator).toHaveCSS(name, value)`](./test-assertions#expectlocatortohavecssname-value)
-- [`expect(locator).toHaveId(id)`](./test-assertions#expectlocatortohaveidid)
-- [`expect(locator).toHaveJSProperty(name, value)`](./test-assertions#expectlocatortohavejspropertyname-value)
-- [`expect(locator).toHaveText(expected, options)`](./test-assertions#expectlocatortohavetextexpected-options)
-- [`expect(page).toHaveTitle(title)`](./test-assertions#expectpagetohavetitletitle)
-- [`expect(page).toHaveURL(url)`](./test-assertions#expectpagetohaveurlurl)
-- [`expect(locator).toHaveValue(value)`](./test-assertions#expectlocatortohavevaluevalue)
 
-#### ⛓ Serial mode with [`describe.serial`](./api/class-test#test-describe-serial)
+- [`expect(locator).toBeChecked()`](https://playwright.dev/docs/test-assertions#expectlocatortobechecked)
+- [`expect(locator).toBeDisabled()`](https://playwright.dev/docs/test-assertions#expectlocatortobedisabled)
+- [`expect(locator).toBeEditable()`](https://playwright.dev/docs/test-assertions#expectlocatortobeeditable)
+- [`expect(locator).toBeEmpty()`](https://playwright.dev/docs/test-assertions#expectlocatortobeempty)
+- [`expect(locator).toBeEnabled()`](https://playwright.dev/docs/test-assertions#expectlocatortobeenabled)
+- [`expect(locator).toBeFocused()`](https://playwright.dev/docs/test-assertions#expectlocatortobefocused)
+- [`expect(locator).toBeHidden()`](https://playwright.dev/docs/test-assertions#expectlocatortobehidden)
+- [`expect(locator).toBeVisible()`](https://playwright.dev/docs/test-assertions#expectlocatortobevisible)
+- [`expect(locator).toContainText(text, options?)`](https://playwright.dev/docs/test-assertions#expectlocatortocontaintexttext-options)
+- [`expect(locator).toHaveAttribute(name, value)`](https://playwright.dev/docs/test-assertions#expectlocatortohaveattributename-value)
+- [`expect(locator).toHaveClass(expected)`](https://playwright.dev/docs/test-assertions#expectlocatortohaveclassexpected)
+- [`expect(locator).toHaveCount(count)`](https://playwright.dev/docs/test-assertions#expectlocatortohavecountcount)
+- [`expect(locator).toHaveCSS(name, value)`](https://playwright.dev/docs/test-assertions#expectlocatortohavecssname-value)
+- [`expect(locator).toHaveId(id)`](https://playwright.dev/docs/test-assertions#expectlocatortohaveidid)
+- [`expect(locator).toHaveJSProperty(name, value)`](https://playwright.dev/docs/test-assertions#expectlocatortohavejspropertyname-value)
+- [`expect(locator).toHaveText(expected, options)`](https://playwright.dev/docs/test-assertions#expectlocatortohavetextexpected-options)
+- [`expect(page).toHaveTitle(title)`](https://playwright.dev/docs/test-assertions#expectpagetohavetitletitle)
+- [`expect(page).toHaveURL(url)`](https://playwright.dev/docs/test-assertions#expectpagetohaveurlurl)
+- [`expect(locator).toHaveValue(value)`](https://playwright.dev/docs/test-assertions#expectlocatortohavevaluevalue)
+
+### ⛓ Serial mode with [`describe.serial`](https://playwright.dev/docs/api/class-test#test-describe-serial)
+
 
 Declares a group of tests that should always be run serially. If one of the tests fails, all subsequent tests are skipped. All tests in a group are retried together.
 
-Learn more in the [documentation](./api/class-test#test-describe-serial).
+```ts
+test.describe.serial('group', () => {
+  test('runs first', async ({ page }) => { /* ... */ });
+  test('runs second', async ({ page }) => { /* ... */ });
+});
+```
 
-#### 🐾 Steps API with [`test.step`](./api/class-test#test-step)
+Learn more in the [documentation](https://playwright.dev/docs/api/class-test#test-describe-serial).
+
+### 🐾 Steps API with [`test.step`](https://playwright.dev/docs/api/class-test#test-step)
+
 
 Split long tests into multiple steps using `test.step()` API:
 
+```ts
+import { test, expect } from '@playwright/test';
+
+test('test', async ({ page }) => {
+  await test.step('Log in', async () => {
+    // ...
+  });
+  await test.step('news feed', async () => {
+    // ...
+  });
+});
+```
+
 Step information is exposed in reporters API.
 
-#### 🌎 Launch web server before running tests
+### 🌎 Launch web server before running tests
 
-To launch a server during the tests, use the [`webServer`](./test-advanced/#launching-a-development-web-server-during-the-tests) option in the configuration file. The server will wait for a given port to be available before running the tests, and the port will be passed over to Playwright as a [`baseURL`](./api/class-fixtures#fixtures-base-url) when creating a context.
 
-Learn more in the [documentation](./test-advanced#launching-a-development-web-server-during-the-tests).
+To launch a server during the tests, use the [`webServer`](https://playwright.dev/docs/test-advanced/#launching-a-development-web-server-during-the-tests) option in the configuration file. The server will wait for a given port to be available before running the tests, and the port will be passed over to Playwright as a [`baseURL`](https://playwright.dev/docs/api/class-fixtures#fixtures-base-url) when creating a context.
+
+```ts
+// playwright.config.ts
+import { PlaywrightTestConfig } from '@playwright/test';
+const config: PlaywrightTestConfig = {
+  webServer: {
+    command: 'npm run start', // command to launch
+    port: 3000, // port to await for 
+    timeout: 120 * 1000, 
+    reuseExistingServer: !process.env.CI,
+  },
+};
+export default config;
+```
+
+Learn more in the [documentation](https://playwright.dev/docs/test-advanced#launching-a-development-web-server-during-the-tests).
 
 ### Browser Versions
+
+
 - Chromium 94.0.4595.0
 - Mozilla Firefox 91.0
 - WebKit 15.0
 
-## Version 1.13
+This version of Playwright was also tested against the following stable channels:
 
-#### Playwright Test
-- **⚡️ Introducing [Reporter API](https://github.com/microsoft/playwright/blob/65a9037461ffc15d70cdc2055832a0c5512b227c/packages/playwright-test/types/testReporter.d.ts)** which is already used to create an [Allure Playwright reporter](https://github.com/allure-framework/allure-js/pull/297).
-- **⛺️ New [`baseURL` fixture](./test-configuration#basic-options)** to support relative paths in tests.
+- Google Chrome 92
+- Microsoft Edge 92
 
-#### Playwright
-- **🖖 Programmatic drag-and-drop support** via the [page.dragAndDrop(source, target[, options])](./api/class-page.mdx#page-drag-and-drop) API.
-- **🔎 Enhanced HAR** with body sizes for requests and responses. Use via `recordHar` option in [browser.newContext([options])](./api/class-browser.mdx#browser-new-context).
 
-#### Tools
-- Playwright Trace Viewer now shows parameters, returned values and `console.log()` calls.
-- Playwright Inspector can generate Playwright Test tests.
 
-#### New and Overhauled Guides
-- [Intro](./intro.mdx)
-- [Authentication](./auth.mdx)
-- [Chome Extensions](./chrome-extensions.mdx)
-- [Playwright Test Annotations](./test-annotations.mdx)
-- [Playwright Test Configuration](./test-configuration.mdx)
-- [Playwright Test Fixtures](./test-fixtures.mdx)
+## [v1.13.1](https://github.com/microsoft/playwright/releases/tag/v1.13.1)
 
-#### Browser Versions
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+[7800](https://github.com/microsoft/playwright/issue/7800)
+[7785](https://github.com/microsoft/playwright/issue/7785)
+[7746](https://github.com/microsoft/playwright/issue/7746)
+[7849](https://github.com/microsoft/playwright/issue/7849)
+
+### Browser Versions
+
+
 - Chromium 93.0.4576.0
 - Mozilla Firefox 90.0
 - WebKit 14.2
 
-#### New Playwright APIs
-- new `baseURL` option in [browser.newContext([options])](./api/class-browser.mdx#browser-new-context) and [browser.newPage([options])](./api/class-browser.mdx#browser-new-page)
-- [response.securityDetails()](./api/class-response.mdx#response-security-details) and [response.serverAddr()](./api/class-response.mdx#response-server-addr)
-- [page.dragAndDrop(source, target[, options])](./api/class-page.mdx#page-drag-and-drop) and [frame.dragAndDrop(source, target[, options])](./api/class-frame.mdx#frame-drag-and-drop)
-- [download.cancel()](./api/class-download.mdx#download-cancel)
-- [page.inputValue(selector[, options])](./api/class-page.mdx#page-input-value), [frame.inputValue(selector[, options])](./api/class-frame.mdx#frame-input-value) and [elementHandle.inputValue([options])](./api/class-elementhandle.mdx#element-handle-input-value)
-- new `force` option in [page.fill(selector, value[, options])](./api/class-page.mdx#page-fill), [frame.fill(selector, value[, options])](./api/class-frame.mdx#frame-fill), and [elementHandle.fill(value[, options])](./api/class-elementhandle.mdx#element-handle-fill)
-- new `force` option in [page.selectOption(selector, values[, options])](./api/class-page.mdx#page-select-option), [frame.selectOption(selector, values[, options])](./api/class-frame.mdx#frame-select-option), and [elementHandle.selectOption(values[, options])](./api/class-elementhandle.mdx#element-handle-select-option)
 
-## Version 1.12
 
-#### ⚡️ Introducing Playwright Test
 
-[Playwright Test](./intro.mdx) is a **new test runner** built from scratch by Playwright team specifically to accommodate end-to-end testing needs:
+## [v1.13.0](https://github.com/microsoft/playwright/releases/tag/v1.13.0)
+
+### Playwright Test
+
+
+- **⚡️ Introducing [Reporter API](https://github.com/microsoft/playwright/blob/master/types/testReporter.d.ts)** which is already used to create an [Allure Playwright reporter](https://github.com/allure-framework/allure-js/pull/297).
+- **⛺️ New [`baseURL` fixture](https://playwright.dev/docs/next/test-configuration#basic-options)** to support relative paths in tests.
+
+
+### Playwright
+
+
+- **🖖 Programmatic drag-and-drop support** via the [`page.dragAndDrop()`] API.
+- **🔎 Enhanced HAR** with body sizes for requests and responses. Use via `recordHar` option in [`browser.newContext()`].
+
+### Tools
+
+
+- Playwright Trace Viewer now shows parameters, returned values and `console.log()` calls.
+- Playwright Inspector can generate Playwright Test tests.
+
+### New and Overhauled Guides
+
+
+- [Intro](https://playwright.dev/docs/next/intro/)
+- [Authentication](https://playwright.dev/docs/next/auth)
+- [Chome Extensions](https://playwright.dev/docs/next/chrome-extensions)
+- [Playwright Test Configuration](https://playwright.dev/docs/next/test-configuration)
+- [Playwright Test Annotations](https://playwright.dev/docs/next/test-annotations)
+- [Playwright Test Fixtures](https://playwright.dev/docs/next/test-fixtures)
+
+### Browser Versions
+
+
+- Chromium 93.0.4576.0
+- Mozilla Firefox 90.0
+- WebKit 14.2
+
+### New Playwright APIs
+
+
+- new `baseURL` option in [`browser.newContext()`] and [`browser.newPage()`]
+- [`response.securityDetails()`] and [`response.serverAddr()`]
+- [`page.dragAndDrop()`] and [`frame.dragAndDrop()`]
+- [`download.cancel()`]
+- [`page.inputValue()`], [`frame.inputValue()`] and [`elementHandle.inputValue()`]
+- new `force` option in [`page.fill()`], [`frame.fill()`], and [`elementHandle.fill()`]
+- new `force` option in [`page.selectOption()`], [`frame.selectOption()`], and [`elementHandle.selectOption()`]
+
+[`download.cancel()`]: https://playwright.dev/docs/next/api/class-download#download-cancel
+
+[`page.fill()`]: https://playwright.dev/docs/next/api/class-page#page-fill
+[`frame.fill()`]: https://playwright.dev/docs/next/api/class-frame#frame-fill
+[`elementHandle.fill()`]: https://playwright.dev/docs/next/api/class-elementhandle#elementhandle-fill
+
+[`page.inputValue()`]: https://playwright.dev/docs/next/api/class-page#page-input-value
+[`frame.inputValue()`]: https://playwright.dev/docs/next/api/class-frame#frame-input-value
+[`elementHandle.inputValue()`]: https://playwright.dev/docs/next/api/class-ElementHandle#elementhandle-input-value
+
+[`page.selectOption()`]: https://playwright.dev/docs/next/api/class-page#page-select-option
+[`frame.selectOption()`]: https://playwright.dev/docs/next/api/class-frame#frame-select-option
+[`elementHandle.selectOption()`]: https://playwright.dev/docs/next/api/class-elementhandle#elementhandle-select-option
+
+[`page.dragAndDrop()`]: https://playwright.dev/docs/next/api/class-page#page-drag-and-drop
+[`frame.dragAndDrop()`]: https://playwright.dev/docs/next/api/class-frame#frame-drag-and-drop
+
+[`response.securityDetails()`]: https://playwright.dev/docs/next/api/class-response#response-security-details
+[`response.serverAddr()`]: https://playwright.dev/docs/next/api/class-response#response-server-addr
+
+[`browser.newContext()`]: https://playwright.dev/docs/next/api/class-browser#browser-new-context
+[`browser.newPage()`]: https://playwright.dev/docs/next/api/class-browser#browser-new-page
+
+
+
+
+## [v1.12.3](https://github.com/microsoft/playwright/releases/tag/v1.12.3)
+
+### Highlights
+
+
+This patch release includes bug fixes for the following issues:
+
+[7085](https://github.com/microsoft/playwright/issue/7085)
+[7093](https://github.com/microsoft/playwright/issue/7093)
+[7099](https://github.com/microsoft/playwright/issue/7099)
+[7124](https://github.com/microsoft/playwright/issue/7124)
+[7141](https://github.com/microsoft/playwright/issue/7141)
+[7163](https://github.com/microsoft/playwright/issue/7163)
+[7223](https://github.com/microsoft/playwright/issue/7223)
+[7284](https://github.com/microsoft/playwright/issue/7284)
+[7304](https://github.com/microsoft/playwright/issue/7304)
+[7326](https://github.com/microsoft/playwright/issue/7326)
+
+
+### Browser Versions
+
+
+- Chromium 93.0.4530.0
+- Mozilla Firefox 89.0
+- WebKit 14.2
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 91
+- Microsoft Edge 91
+
+
+
+## [v1.12.2](https://github.com/microsoft/playwright/releases/tag/v1.12.2)
+
+### Highlights
+
+
+This patch release includes bugfixes for the following issues:
+
+- #7015 - [BUG] Firefox: strange undefined toJSON property on JS objects
+- #7004 - [test runner] Error: Error while reading global-setup.ts: Cannot find module 'global-setup.ts'
+- #7048 - [BUG] Dialogs cannot be dismissed if tracing is on in Chromium or Webkit
+- #7058 - [BUG] Getting no video frame error for mobile chrome
+- #7020 - [Feature] Codegen should be able to emit @playwright/test syntax
+
+### Browser Versions
+
+
+- Chromium 93.0.4530.0
+- Mozilla Firefox 89.0
+- WebKit 14.2
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 91
+- Microsoft Edge 91
+
+
+
+## [v1.12.1](https://github.com/microsoft/playwright/releases/tag/v1.12.1)
+
+### Highlights
+
+
+This patch includes bug fixes for the following issues:
+
+[6984](https://github.com/microsoft/playwright/issue/6984)
+[6982](https://github.com/microsoft/playwright/issue/6982)
+[6981](https://github.com/microsoft/playwright/issue/6981)
+
+### Browser Versions
+
+
+- Chromium 93.0.4530.0
+- Mozilla Firefox 89.0
+- WebKit 14.2
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 91
+- Microsoft Edge 91
+
+
+
+
+## [v1.12.0](https://github.com/microsoft/playwright/releases/tag/v1.12.0)
+
+### ⚡️ Introducing Playwright Test
+
+
+[Playwright Test](https://playwright.dev/docs/next/test-intro) is a **new test runner** built from scratch by Playwright team specifically to accommodate end-to-end testing needs:
+
 - Run tests across all browsers.
 - Execute tests in parallel.
 - Enjoy context isolation and sensible defaults out of the box.
-- Capture videos, screenshots and other artifacts on failure.
-- Integrate your POMs as extensible fixtures.
+- Capture traces, videos, screenshots and other artifacts on failure.
+- Infinitely extensible with fixtures.
 
 Installation:
-
 ```bash
 npm i -D @playwright/test
 ```
 
 Simple test `tests/foo.spec.ts`:
+
+```ts
+import { test, expect } from '@playwright/test';
+
+test('basic test', async ({ page }) => {
+  await page.goto('https://playwright.dev/');
+  const name = await page.innerText('.navbar__title');
+  expect(name).toBe('Playwright');
+});
+```
 
 Running:
 
@@ -447,45 +1458,532 @@ Running:
 npx playwright test
 ```
 
-👉  Read more in [Playwright Test documentation](./intro.mdx).
+👉  Read more in [testrunner documentation](https://playwright.dev/docs/next/test-intro).
 
-#### 🧟‍♂️ Introducing Playwright Trace Viewer
+### 🧟‍♂️ Introducing Playwright Trace & TraceViewer
 
-[Playwright Trace Viewer](./trace-viewer.mdx) is a new GUI tool that helps exploring recorded Playwright traces after the script ran. Playwright traces let you examine:
+
+[Playwright TraceViewer](https://playwright.dev/docs/next/trace-viewer) is a new GUI tool that helps exploring recorded Playwright traces after the script ran. Playwright traces let you examine:
 - page DOM before and after each Playwright action
 - page rendering before and after each Playwright action
-- browser network during script execution
+- browse network during script execution
 
-Traces are recorded using the new [browserContext.tracing](./api/class-browsercontext.mdx#browser-context-tracing) API:
+Traces are recorded using the new [`browserContext.tracing`] API:
+
+```ts
+const browser = await chromium.launch();
+const context = await browser.newContext();
+
+// Start tracing before creating / navigating a page.
+await context.tracing.start({ screenshots: true, snapshots: true });
+
+const page = await context.newPage();
+await page.goto('https://playwright.dev');
+
+// Stop tracing and export it into a zip archive.
+await context.tracing.stop({ path: 'trace.zip' });
+```
 
 Traces are examined later with the Playwright CLI:
+
+
+```sh
+npx playwright show-trace trace.zip
+```
 
 That will open the following GUI:
 
 ![image](https://user-images.githubusercontent.com/746130/121109654-d66c4480-c7c0-11eb-8d4d-eb70d2b03811.png)
 
-👉 Read more in [trace viewer documentation](./trace-viewer.mdx).
+👉 Read more in [trace viewer documentation](https://playwright.dev/docs/next/trace-viewer).
 
-#### Browser Versions
+---
+
+### Browser Versions
+
+
 - Chromium 93.0.4530.0
 - Mozilla Firefox 89.0
 - WebKit 14.2
 
 This version of Playwright was also tested against the following stable channels:
+
 - Google Chrome 91
 - Microsoft Edge 91
 
-#### New APIs
-- `reducedMotion` option in [page.emulateMedia([options])](./api/class-page.mdx#page-emulate-media), [browserType.launchPersistentContext(userDataDir[, options])](./api/class-browsertype.mdx#browser-type-launch-persistent-context), [browser.newContext([options])](./api/class-browser.mdx#browser-new-context) and [browser.newPage([options])](./api/class-browser.mdx#browser-new-page)
-- [browserContext.on('request')](./api/class-browsercontext.mdx#browser-context-event-request)
-- [browserContext.on('requestfailed')](./api/class-browsercontext.mdx#browser-context-event-request-failed)
-- [browserContext.on('requestfinished')](./api/class-browsercontext.mdx#browser-context-event-request-finished)
-- [browserContext.on('response')](./api/class-browsercontext.mdx#browser-context-event-response)
-- `tracesDir` option in [browserType.launch([options])](./api/class-browsertype.mdx#browser-type-launch) and [browserType.launchPersistentContext(userDataDir[, options])](./api/class-browsertype.mdx#browser-type-launch-persistent-context)
-- new [browserContext.tracing](./api/class-browsercontext.mdx#browser-context-tracing) API namespace
-- new [download.page()](./api/class-download.mdx#download-page) method
+### New APIs
 
-## Version 1.11
+
+- `reducedMotion` option in [`page.emulateMedia()`], [`browserType.launchPersistentContext()`], [`browser.newContext()`] and [`browser.newPage()`]
+- [`browserContext.on('request')`]
+- [`browserContext.on('requestfailed')`]
+- [`browserContext.on('requestfinished')`]
+- [`browserContext.on('response')`]
+- `tracesDir` option in [`browserType.launch()`] and [`browserType.launchPersistentContext()`]
+- new [`browserContext.tracing`] API namespace
+- new [`download.page()`] method
+- new options in [`electron.launch()`]:
+    * `acceptDownloads`
+    * `bypassCSP`
+    * `colorScheme`
+    * `extraHTTPHeaders`
+    * `geolocation`
+    * `httpCredentials`
+
+[`page.emulateMedia()`]: https://playwright.dev/docs/next/api/class-page#page-emulate-media
+[`browserType.launchPersistentContext()`]: https://playwright.dev/docs/next/api/class-browsertype#browser-type-launch-persistent-context
+[`electron.launch()`]: https://playwright.dev/docs/next/api/class-electron#electron-launch
+[`browserContext.tracing`]: https://playwright.dev/docs/next/api/class-browsercontext#browser-context-tracing
+[`download.page()`]: https://playwright.dev/docs/next/api/class-download#download-page
+[`browserType.launch()`]: https://playwright.dev/docs/next/api/class-browsertype#browser-type-launch
+[`browser.newContext()`]: https://playwright.dev/docs/next/api/class-browser#browser-new-context
+[`browser.newPage()`]: https://playwright.dev/docs/next/api/class-browser#browser-new-page
+[`browserContext.on('request')`]: https://playwright.dev/docs/next/api/class-browsercontext#browser-context-event-request
+[`browserContext.on('requestfailed')`]: https://playwright.dev/docs/next/api/class-browsercontext#browser-context-event-request-failed
+[`browserContext.on('requestfinished')`]: https://playwright.dev/docs/next/api/class-browsercontext#browser-context-event-request-finished
+[`browserContext.on('response')`]: https://playwright.dev/docs/next/api/class-browsercontext#browser-context-event-response
+
+<details>
+  <summary><b>Issues Closed (41)</b></summary>
+
+[1094](https://github.com/microsoft/playwright/issue/1094)
+[3320](https://github.com/microsoft/playwright/issue/3320)
+[4054](https://github.com/microsoft/playwright/issue/4054)
+[5189](https://github.com/microsoft/playwright/issue/5189)
+[4535](https://github.com/microsoft/playwright/issue/4535)
+[4704](https://github.com/microsoft/playwright/issue/4704)
+[4752](https://github.com/microsoft/playwright/issue/4752)
+[5136](https://github.com/microsoft/playwright/issue/5136)
+[5151](https://github.com/microsoft/playwright/issue/5151)
+[5446](https://github.com/microsoft/playwright/issue/5446)
+[5501](https://github.com/microsoft/playwright/issue/5501)
+[5510](https://github.com/microsoft/playwright/issue/5510)
+[5537](https://github.com/microsoft/playwright/issue/5537)
+[5542](https://github.com/microsoft/playwright/issue/5542)
+[5617](https://github.com/microsoft/playwright/issue/5617)
+[5695](https://github.com/microsoft/playwright/issue/5695)
+[5753](https://github.com/microsoft/playwright/issue/5753)
+[5775](https://github.com/microsoft/playwright/issue/5775)
+[5947](https://github.com/microsoft/playwright/issue/5947)
+[5962](https://github.com/microsoft/playwright/issue/5962)
+[6026](https://github.com/microsoft/playwright/issue/6026)
+[6137](https://github.com/microsoft/playwright/issue/6137)
+[6239](https://github.com/microsoft/playwright/issue/6239)
+[6240](https://github.com/microsoft/playwright/issue/6240)
+[6264](https://github.com/microsoft/playwright/issue/6264)
+[6340](https://github.com/microsoft/playwright/issue/6340)
+[6373](https://github.com/microsoft/playwright/issue/6373)
+[6390](https://github.com/microsoft/playwright/issue/6390)
+[6403](https://github.com/microsoft/playwright/issue/6403)
+[6415](https://github.com/microsoft/playwright/issue/6415)
+[6431](https://github.com/microsoft/playwright/issue/6431)
+[6439](https://github.com/microsoft/playwright/issue/6439)
+[6447](https://github.com/microsoft/playwright/issue/6447)
+[6453](https://github.com/microsoft/playwright/issue/6453)
+[6460](https://github.com/microsoft/playwright/issue/6460)
+[6469](https://github.com/microsoft/playwright/issue/6469)
+[6473](https://github.com/microsoft/playwright/issue/6473)
+[6477](https://github.com/microsoft/playwright/issue/6477)
+[6480](https://github.com/microsoft/playwright/issue/6480)
+[6483](https://github.com/microsoft/playwright/issue/6483)
+[6485](https://github.com/microsoft/playwright/issue/6485)
+
+</details>
+<details>
+  <summary><b>Commits (342)</b></summary>
+
+d22fa868 - devops: update trigger for firefox beta builder
+12d8c54e - chore: swap firefox-stable and firefox (#6950)
+bd193ca6 - feat: nicer stub for WebKit on MacOS 10.14 (#6948)
+55da16d8 - Revert "feat: switch to the Firefox Stable equivalent by default (#6926)" (#6947)
+a1e8d2d5 - feat: switch to the Firefox Stable equivalent by default (#6926)
+15668f04 - chore: make WebKit @ MacOS 10.14 error more prominent (#6943)
+d0eaec36 - chore: clarify that we download Playwright browser builds (#6938)
+334096ed - docs(pom): fixed JS example which contained TS (#6917)
+52878bb1 - docs: use proper option name for --workers (#6942)
+99ec32ae - chore: more doc nits (#6937)
+8960584b - fix(chromium): drag and drop works in chromium (#6207)
+42a9e4a0 - docs(mobile): make experimental Android support more present (#6932)
+8c13f679 - fix(test runner): remove folio/jest namespaces in expect matchers (#6930)
+cfd49b5c - feat: support `npx playwright install msedge` (#6861)
+46a02137 - chore: remove internal uses of "folio" (#6931)
+b556ee6f - chore: brush up playwright-test types (#6928)
+f745bf1f - chore: bring in folio source (#6923)
+d4e50bed - fix: do not install media pack on non-server windows (#6925)
+4b5ad33c - doc: fix first .net script (#6922)
+82041b2f - test: roll to folio@0.4.0-alpha28 (#6918)
+f4417556 - docs(dotnet): add test runner docs (#6919)
+69b73462 - fix: various test-related fixes (#6916)
+a8364668 - fix(tracing): error handling (#6888)
+b5ac3932 - docs(showcase): fixed typo in showcase.md (#6915)
+9ad507d9 - doc(test): pass through test docs (#6914)
+ec2b6a7d - test: add a glob test (#6911)
+ff3ad7a3 - fix(android): to not call Browser.setDownloadBehavior (#6913)
+9142d8c2 - docs: fix that test-runner is not included (#6912)
+233f1874 - feat(inspector): remove snapshots (#6909)
+a96491cb - feat(downloads): subscribe to download events in Browser domain instead of Page (#6082)
+e37c078e - test(nonStallingRawEvaluateInExistingMainContext): fix broken test (#6908)
+21b00d0b - test: roll to folio@0.4.0-alpha27 (#6897)
+85786b1a - feat(trace viewer): fix UI issues (#6890)
+cfcf6a88 - feat: use WebKit stub on MacOS 10.14 (#6892)
+657aa04b - browser(webkit): import `<optional>` to fix win compilation (#6895)
+abc66c6e - docs(api): add missing callback parameter to waitForRequestFinished (#6893)
+2663c0bf - browser(webkit): import `<optional>` to fix mac compilation (#6894)
+cce62da3 - browser(webkit): roll to 06/03 (#6889)
+fb0004c2 - feat(webkit): bump to 1492 (#6887)
+8a81b11d - devops: replace WebKit for MacOS 10.14 build with a stub (#6886)
+401dcfde - chore: do not use a subshell hack when using XVFB (#6884)
+f264e85a - chore: bump dependency to fix vulnerability (#6882)
+d4482f3a - chore: do not use Array.from in injected script (#6876)
+f2cc439d - chore: move electron back from FYI bots to CQ1 bots (#6883)
+b19b2dc3 - devops: introduce manual @next NPM publishing (#6881)
+e41979a5 - chore: import @playwright/test (#6880)
+375ceca9 - test: disable chromium headed tracing test (#6878)
+0830c85d - test: roll to folio@0.4.0-alpha26 (#6877)
+d7c202ca - browser(webkit): fix time formatting and mac compilation (#6875)
+064150f8 - chore: use fs.promises API instead of promisify (#6871)
+d16afef7 - doc(tracing): add a trace viewer doc (#6864)
+3de3a889 - feat(test): introduce `npx playwright test` (#6816)
+13b6444b - docs(python): add docs for installing with conda (#6845)
+cc2c6917 - test: roll to folio@0.4.0-alpha25 (#6863)
+b2143a95 - chore: make tracing zero config (#6859)
+837ee08a - fix(waitForSelector): retry when context is gone during node adoption (#6851)
+8a68fa1e - docs(test runner): advanced section (#6862)
+c09726b0 - test: add tests for port-forwarding via playwrightclient (#6860)q
+4fa792ee - browser(webkit): getLocalStorageData command (#6858)
+c5e1c8b9 - docs: use explicit tab suffixes (#6855)
+e91e49e5 - feat(port-forwarding): add playwrightclient support (#6786)
+33c2f6c3 - chore: do not bundle api.json and protocol.yml (#6841)
+254ec155 - feat(user-agent): Adding User-Agent in headers while making connection to browser (#6813)
+17b6f06b - feat: install media pack on windows with `npx playwright install-deps` (#6836)
+2fde9bc1 - fix(webkit): use new awaitPromise parameter instead of separate command (#6852)
+d28f45b6 - api(tracing): export -> stop({path}) (#6802)
+79b244a2 - chore: use bash instead of sh in code blocks (#6847)
+f9c8b78c - feat(webkit): bump to 1490 (#6842)
+ec7d37d9 - chore: update eslint config (#6840)
+831a1c84 - feat(firefox-stable): roll Firefox-Stable to Firefox v89 (#6833)
+ffe89c4e - docs(installation): use RFC5735 IPs for examples (#6729)
+919d2583 - feat: support `npx playwright install chrome` (#6835)
+1020d3d3 - feat(webkit): bump to 1488 (#6826)
+251c7d8d - test: properly disable electron test (#6839)
+d767fc2f - browser(firefox-stable): disable proton UI in firefox stable (#6838)
+a1106e5d - test: disable test that fails on Electron (#6837)
+c9613b36 - devops: introduce "FYI" test bots (#6834)
+cb4adb14 - feat: install chrome-beta via cli (#6831)
+3c3a7f92 - feat(chromium): roll Chromium to r888113 (#6832)
+4f5b65f4 - chore: update package-lock.json to v2 (#6830)
+24dca969 - chore: remove electron/android from build_packages (#6827)
+b4ffe86f - browser(webkit): add missing override annotations (#6829)
+9b81dccc - browser(webkit): add awaitPromise parameter to Runtime.callFunctionOn (#6828)
+d79110dc - fix(port-forwarding): close socket on unexpected payloads (#6753)
+531d35f9 - browser(chromium): revert swiftshader fixes (#6824)
+17585a36 - devops: do not run tests for docs changes (#6825)
+c8c849e1 - docs(page): add TypeScript $eval type-hint notes (#6693)
+0f7a7604 - browser(firefox): roll Firefox-stable to 89 (#6823)
+d21a72e7 - chore: create new Playwright instance when launching server (#6820)
+2951f4b0 - chore(evaluate): remove private _evaluateInUtility methods (#6815)
+5fd15d8a - docs(test runner): put more example in various sections (#6812)
+98fc8b17 - docs(test runner): update reporters and snapshots docs (#6811)
+c8c77e4d - docs: use sha256 for exposeFunction everywhere (#6805)
+329fdb18 - chore(deps): bump ws from 7.4.5 to 7.4.6 (#6792)
+9c421922 - docs(python): add expect wrapper aliases for roll (#6809)
+47d4d473 - docs: fixed wrong waitForRequestFinished description (#6808)
+d6fe9f0b - docs(test runner): more basic docs (#6803)
+709a4cbe - docs(test runner): configuration docs (#6801)
+f7e72056 - docs: update test runner docs (#6795)
+7f0d817a - test: side effects of context.storageState() (#6793)
+58e74b47 - browser(webkit): fix compilation on Ubuntu 18 (#6794)
+8fefac9b - test: roll to folio@0.4.0-alpha21 (#6789)
+a7afcf24 - docs: js/ts snippets for tests (#6791)
+040e9013 - browser(webkit): roll to 05/27/21 (#6787)
+9a160c9f - feat(webkit): bump to 1486 (#6741)
+c54c4871 - docs(build): add more logging hints to the cheatsheet (#6785)
+d2ab1951 - feat(firefox): bump to 1268 (#6779)
+0f760627 - docs: add test runner docs (#6784)
+93a0efa8 - docs(runner): start adding runner docs (3) (#6777)
+2f36feef - browser(firefox-stable): merge do not use Array.prototype.toJSON for serialization (#6783)
+c8ee008a - browser(webkit): fix headless popup window crash (#6782)
+ee7e38c6 - test: roll to folio@0.4.0-alpha19 (#6774)
+2c9e6e81 - docs(runner): start adding runner docs (2) (#6776)
+4578d579 - docs(runner): start adding runner docs (#6773)
+ddce546e - chore(lint): upgrade @typescript-eslint/eslint-plugin to 4.25.0 (#6770)
+7b4af6b2 - docs: text nits (3)
+250c51fd - docs: text nits (2)
+9233a61b - doc: text nit
+3b220e50 - test: add failing test for eval with overridden Array.toJSON (#6766)
+fb3c6e50 - api(dotnet): remove whenall (#6768)
+9f3e6656 - fix(inspector): do not pause while recording (#6604)
+95bd4b31 - chore: fix codegen to emit new C# api (#6763)
+f60b79a3 - browser(firefox): do not use Array.prototype.toJSON for serialization (#6767)
+d36bffb9 - fix(connect): respect timeout in all scenarios (#6762)
+bb0e196b - api(dotnet): specialize waitForEvent (#6761)
+3aa14714 - chore: better logging for Windows CrashPad problem (#6758)
+1d0cdb35 - chore(chromium): disable GlobalMediaControls feature (#6754)
+93648aaf - chore: generate dotnet initializers (#6755)
+1778e117 - fix(port-forwarding): on WebKit Win (#6745)
+59d591bc - chore(port-forwarding): validate forwarded ports on the client side (#6756)
+792f3d41 - api(dotnet): use jsonelement (#6749)
+c60974d9 - feat: do not rely on chocolatey to install Google Chrome Beta (#6735)
+24a23260 - api(dotnet): use lists, not collections (#6746)
+9b5bcba1 - devops: fix goma to use new authentication (#6747)
+f7f08c9c - api(dotnet): normalize enums, remove browser channel enum (#6738)
+15bf6a0a - docs(class-page.md): Add additional clarification on requestFailed event (#6724)
+9dd2f833 - fix(codegen): update csharp boilerplate (#6742)
+3f43db5c - feat(browserServer): forward local ports (#6375)
+c9f35fb8 - test: revert partly 8770c64 (#6740)
+01d8f879 - chore(CLI): let other langs specify exec name (#6719)
+39a8abd9 - fix(install): prevent new-lines on CI/without TTY (#6703)
+f629cbe0 - docs: provide examples for PowerShell when settings env vars (#6718)
+30e5681b - chore: report correct browser channel for Android tests (#6733)
+4076110e - browser(webkit): fix jpeg encoding on mac after last roll (#6732)
+05e5ed25 - test: revert .only (#6728)
+8770c646 - browser(webkit): fix mac compilation after latest roll (#6727)
+2321abb2 - api(dotnet): fix json api (#6723)
+adf87fe9 - browser(webkit): roll to 05/24/21 (#6722)
+2e8d65e9 - test: skip falky raw headers test in Chromium (#6721)
+88defbd5 - docs(network): fixed proxy typo with username (#6716)
+48b48828 - test: roll to folio@0.4.0-alpha17 (#6712)
+ac0980e1 - chore(linting): enable required semicolons rule in TS (#6701)
+3097b9a4 - api(dotnet): use json element for a11y (#6710)
+be95cf48 - api(dotnet): make headers a dict (#6709)
+3bdb1c35 - api(dotnet): generate api in a specific folder (#6708)
+7d0b4c26 - chore: fix model types generation (#6706)
+17553e25 - api(dotnet): hide reducedMotion from csharp until C# 1.11 release (#6705)
+f9357531 - doc(dotnet): add a self-contained example (#6702)
+ba29e99a - feat: added reduced motion media query emulation (#6646)
+af2fec6b - fix(codegen): generate all options for java (#6698)
+f529f0a2 - fix(codegen): generate acceptDownloads option for download signals (#6697)
+d1d49b34 - feat(chromium): roll Chromium to r884693 (#6686)
+485638e4 - feat(webkit): roll Deprecated WebKit to 1444 (#6696)
+72c6f4f6 - Corrected JavaScript lambda in python sections (#6692)
+544ca37c - chore(dotnet): generate clone constructors for options (#6684)
+2cdf1e12 - chore: add more logging while installing browsers (#6688)
+e4946b79 - fix(codegen): update csharp scripts to new syntax (#6685)
+08773e83 - browser(firefox-beta): roll Firefox to 89.0b15 (#6689)
+f8981962 - browser(chromium): build Chromium r885250 (#6687)
+b2b45afc - browser(firefox): override reduced motion no-preference (#6683)
+57f3a53a - test: roll to folio@0.4.0-alpha16 (#6656)
+ae35906f - devops: flakiness dashboard to support new folio report (#6677)
+447a0c4b - feat(types): export ScreenshotOptions (#6419)
+8490eb3c - docs: small tweaks (#6681)
+6281b95a - docs(dotnet): follow up to Anze's changes (#6672)
+88591d49 - feat(firefox): roll to 1265 (#6678)
+bae57944 - feat(webkit): roll to 1482 (#6676)
+6b8b75d1 - docs: add JUnit examples (#6668)
+c80e9fa5 - docs(dotnet): guides (#6639)
+0aa9e063 - docs(dotnet): First part/pass for guides (#6583)
+2f9b0575 - browser(firefox): partially revert scrollbars patch (#6670)
+fad77e2f - docs(dotnet): udpate existing examples (#6669)
+ba637e6e - chore: bring back dblclick alias (#6667)
+2ef47b95 - fix: wait for video to finish when persistent context closes (#6664)
+e679d994 - chore: remove input files and selected option overrides (#6665)
+1f22673c - api(dotnet): introduce RunAndWaitForAsync (#6660)
+202511d6 - docs: chromiumSandbox is by default false (#6662)
+277eca1b - devops: install all FF system dependencies with --full on build (#6657)
+4e979fd9 - browser(chromium): roll to latests Chromium (#6661)
+e19aea73 - docs: do not recommend context for parallel execution (#6659)
+8d4e6168 - browser(webkit): added reduced motion emulation (#6645)
+0bf4c407 - feat(webkit): bump to 1481 (#6652)
+5076cb32 - browsr(webkit): cherry-pick(mac-14): bootstrap script in utility world (#6591) (#6655)
+8cc103f4 - test: unflake sync predicate test (#6654)
+754ee13c - feat(electron): accept BrowserContextOptions in electron.launch (#6621)
+972f0ec2 - api(dotnet): migrate to options (#6651)
+b9464378 - fix: wait for ffmpeg to finish writing even if page was closed (#6648)
+e804d16d - test: unflake webview tests (#6644)
+475a417d - fix: compute payload mime type on server (#6647)
+33a505b1 - chore: add logging for installation steps (#6565)
+dc4f37c9 - feat(chromium): roll Chromium to r879910 (#6635)
+c2de35e0 - browser(webkit): roll to 05-18-21 (#6643)
+c4a6c2bc - browser(firefox): added reduced motion emulation (#6618)
+36c0765c - api(dotnet): remove serializer options (#6641)
+345f7da5 - fix(codegen): move injected recorder scripts to utility world (#6187)
+b52cbfdb - fix(chromium): close background pages on close (#6608)
+d2938d0a - api(dotnet): generate options (#6630)
+95924862 - feat: use up2date Chromium user-agents for device descriptors (#6594)
+1e6f899c - chore(dotnet): simplify enum generation (2) (#6628)
+debffa74 - browser(firefox): make Juggler types compliant with protocol viewer (#6626)
+50d24387 - chore(dotnet): simplify enum generation (#6623)
+7eca573e - api(dotnet): remove some overrides (#6622)
+69164466 - chore: jsify dotnet generator (#6620)
+a728a892 - test: unskip a few tests previously skipped with channels (#6609)
+68a15fc0 - fix(tests): force a new worker for channels.spec (#6616)
+c23a06c9 - test: mark "should produce screencast frames fit" as flaky on wk linux (#6617)
+c4b78183 - feat(webkit): bindings in util world (#6592)
+be8d8364 - feat(webkit): bump to 1480 (#6605)
+4c3bd118 - test: roll to folio@0.4.0-alpha14 (#6602)
+c497c32e - fix(dotnet): follow up, add WaitFor(action) in order
+3aa9ab88 - api(dotnet): introduce WaitFor*(action) (#6610)
+5aafae39 - test: enable download url test on webkit (#6588)
+d2a23a4a - fix(md): bring generic launch args into class-browsertype (#6607)
+333397c0 - chore(dotnet): fix generator escaping, make script lf-friendly (#6606)
+fd1e62b8 - docs(dotnet): examples for dialogs, fixes (#6599)
+52658cf5 - chore(dotnet): revert opener async (#6600)
+b5884b95 - docs(dotnet): examples for events, handles (#6598)
+9aa61006 - docs(dotnet): examples for verification, video, fixes (#6597)
+bbc3ebd5 - docs(dotnet): examples for input, intro, languages, multi-pages (#6596)
+ffa83f1f - browser(webkit): bootstrap script in utility world (#6591)
+5e84eade - test: roll to folio@0.4.0-alpha13 (#6570)
+cff3bd04 - test: mark android test as failing (#6575)
+c01c5dbb - docs(dotnet): examples for navigation.md, network.md, selectors.md (#6593)
+7bbb91f2 - test(downloads): add passing test for downloads and interception (#6586)
+37d03e8b - browser(webkit): roll to safari-612.1.15-branch (#6587)
+bc185291 - docs(ff): temporarily remove ff-stable reference (#6585)
+5b223f92 - browser(firefox): Browser.setScrollbarsHidden (#6457)
+2b887bf8 - chore(dotnet): remove StatusCode property (#6582)
+885285be - docs(dotnet): Video and Worker examples (#6581)
+c9d2f6bf - docs(dotnet): selectors example (#6580)
+8845484a - chore(dotnet): page.opener sync (#6579)
+ec0b4e90 - docs(dotnet): route examples (#6578)
+2477dcce - chore(dotnet): generate `As` as a method (#6576)
+d7c6720c - chore: include context options into the trace (#6572)
+7b844c5f - chore(tracing): simplify resource treatment (#6571)
+9b0aeeff - fix(install-deps): install deps on mint (#6569)
+0678f482 - chore(tracing): trim network urls for readability (#6566)
+ab36fdeb - api(download): hide new api until c# is public (#6567)
+654446a7 - devops: fix Chromium windows archiving logic (#6568)
+fbae295c - fix(har): save popup's main request/response (#6562)
+e87fbfcc - feat(download): add Page in Download (#6501)
+3bded358 - fix(chromium): wait for existing pages when connecting (#6511)
+92fa7dde - feat(firefox): roll to latest Firefoxes (#6561)
+81a57ea2 - docs(dotnet): generate 1.11 api off tot (#6564)
+c4321887 - chore(dotnet): remove set properties (#6531)
+6a39b866 - chore: GoToAsync -> GotoAsync (#6563)
+bdb4aefc - docs(tracing): remove the relative link
+7adf907f - docs(dotnet): rename getPayloadAsJson to PostDataJsonAsync (#6533)
+4b3e5e5c - feat(network): expose network events via browser context (#6370)
+30dd0240 - docs(dotnet): BrowserContext and BrowserType (#6503)
+d6b98eff - docs(dotnet): examples for dialog, download and filechooser (#6526)
+8b6b894d - test: prepare test to use options as passed (#6557)
+ddfbffa1 - docs(dotnet): Page examples (#6556)
+ea59fd8f - docs(dotnet): Playwright examples (#6558)
+47645ec8 - docs(dotnet): Frame examples (#6555)
+62265905 - docs(dotnet): Request Examples (#6560)
+d27ce8a8 - feat(webkit): bump to 1478 (#6550)
+fce904fa - docs(dotnet): Keyboard examples (#6539)
+17e9dd95 - feat(trace): support loading trace from zip (#6551)
+a7ea00d0 - chore: show preview for page under cursor (#6548)
+cc43b0d2 - chore: remove storybook (#6549)
+d02472a9 - browser(firefox): fix uploads of large files in Firefox (#6547)
+1a39843d - docs: follow up on adding trace dir, unify launch options (#6545)
+41df6607 - fix: enable util world bindings in firefox (#6546)
+dc7f7f9a - fix(chromium): handle backgroundPages() onClose (#6541)
+eb7b4dea - tests: disable certain installation tests on Node v16 (#6544)
+d6273761 - browser(webkit): use correct request when navigation turns into download (#6516)
+21cb726b - chore(tracing): expose tracing api (#6523)
+460cc319 - fix: propagate custom executable path to codegen (#6509)
+d540b447 - browser(firefox-stable): simplify isolated world structures (#6542)
+2697f838 - devops(docker): upgrade to node 16 (#6498)
+bcccafea - docs(dotnet): ElementHandle and JSHandle examples (#6527)
+08ed5602 - chore(docs): update section id to keep alphabetic order (#6515)
+ab559189 - feat(firefox): bump to 1259 (#6510)
+84031d4a - browser(firefox): simplify isolated world structures (#6521)
+45ee257a - chore(test): fix some screencast tests (#6522)
+6023c674 - docs(dotnet): add devices property (#6530)
+0d3d2d33 - chore(dotet): fix goto casing (#6529)
+5aa00d1e - docs(dotnet): fix link regex on xmldocs (#6528)
+60a7b061 - docs(cli): add example on how to install-deps for a single browser (#6534)
+2945f05c - docs(dotnet): accessibility docs (#6489)
+8af8b634 - docs: add ref to waitForSelector from querySelector (#6514)
+a04c54ac - devops: do not run workflows when all changes are browser-only (#6520)
+bf81a284 - devops: run less tests on each PR (#6518)
+958629fa - browser(webkit): roll to safari-612.1.14-branch (#6517)
+a22ae131 - docs(java): add  multithreading section (#6512)
+1c10c4cb - fix: fix har entry time calculation (#6472)
+33823a91 - docs(download): improve documentation (#6486)
+d08c50d2 - feat(screencast): scale fixes (#6475)
+2ea465bc - test(chromium): add failing test for connecting to a browser with pages (#6502)
+e0aaef5e - docs: get rid of dollar sign prefix in code snippets (#6494)
+6c821a08 - test(network): adding failing post data test for chromium and webkit (#6484)
+269a1b64 - browser(firefox-stable): bindings in isolated worlds (#6504)
+f8039bed - browser(firefox): bindings in isolated worlds (#6493)
+d243ae7e - doc(contribute): fix link to tests (#6499)
+b01ccc28 - test: roll to folio@0.4.0-alpha11 (#6496)
+8d21b124 - browser(firefox): fit screencast images into given frame (#6495)
+9a6d09fe - docs: update release notes (#6492)
+3f646118 - docs(dotnet): Browser examples (#6490)
+00ec4397 - test: fix android test failure (#6487)
+f1a888de - feat: support Moto G4 device in emulated devices for performance testing (#5946)
+845054d2 - feat(firefox): bump to 1257 and 1247 (stable) (#6476)
+5f773996 - chore: get rid of trailing spaces in types.d.ts (#6481)
+76e40963 - test: simplify more tests (#6471)
+a5143eba - browser(webkit): fix the screencast scale and toolbar offset on Mac (#6474)
+5c1ddc7f - fix: fix method elementHandle.frameElement() for framesets (#6468)
+f1a65820 - browser(firefox): fix addBinding on pages with CSP (#6470)
+2d4538c2 - test: cleanup tests and configs after last folio update (#6463)
+a9523d9d - feat(ff): roll to 1256/1246 (#6466)
+b4261ec0 - browser(ff-stable): pick up screencast changes (#6464)
+edd2cc80 - browser(ff): migrate screencast to client interfaces
+918ae429 - chore(deps): bump lodash from 4.17.20 to 4.17.21 (#6461)
+573327b7 - test: roll to folio@0.4.0-alpha8 (#6451)
+5e4badd6 - feat(firefox-beta): roll Firefox to 1254 - v89.0b9 (#6454)
+78ec0571 - browser(firefox): implement screencast (#6452)
+262824de - devops: fix chromium archiving with FILES.cfg (#6450)
+45d92890 - fix(webkit): quick fix for screencast (#6448)
+11012686 - devops: fix `//browser_patches/export.sh` for deprecated-webkit (#6446)
+7c85846f - test: remove "headless should be able to read cookies by headful" (#6444)
+b1f80bad - browser(firefox-beta): roll Firefox to v89.0b9 (May 6, 2021) (#6443)
+fa7b5f3c - browser(chromium): roll Chromium to 879910 (#6441)
+aab602cc - fix: use old screencast protocol calls for Mac 10.14 (#6440)
+7906a8f2 - feat: add best-effort support for Ubuntu 21.04 (#6429)
+c7751b9f - devops: use chromium's FILES.cfg to compute archive files (#6438)
+e4272fab - browser(webkit): add stdc++fs lib to wtf to fix Ubuntu 18.04 (#6437)
+298b7aef - devops: install Google Chrome Beta testers (#6389)
+b29b7df4 - fix(connect): handle disconnect in various situations (#6276)
+d902b06f - test: fixed flaky connectOverCDP tests (#6436)
+217cbe3e - test: cleanup bad usages of pageTest (#6430)
+67f98d00 - chore(dotnet): split unions into multiple overloads (#6400)
+9433cae4 - test: move all page tests to a subdirectory (#6427)
+c44f2dc1 - chore: cut v1.11 release (#6426)
+
+</details>
+
+
+
+
+## [v1.11.1](https://github.com/microsoft/playwright/releases/tag/v1.11.1)
+
+### Highlights
+
+
+This patch includes bug fixes across all languages for the following issues:
+- https://github.com/microsoft/playwright-python/issues/679 - can't get browser's context pages after connect_over_cdp
+- https://github.com/microsoft/playwright-java/issues/432 - [Bug] Videos are not complete when an exception is thrown
+
+### Browser Versions
+
+
+- Chromium 92.0.4498.0
+- Mozilla Firefox 89.0b6
+- WebKit 14.2
+
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 90
+- Microsoft Edge 90
+
+<details>
+  <summary><b>Issues Closed (2)</b></summary>
+
+https://github.com/microsoft/playwright-python/issues/679 - can't get browser's context pages after connect_over_cdp
+https://github.com/microsoft/playwright-java/issues/432 - [Bug] Videos are not complete when an exception is thrown
+
+</details>
+<details>
+  <summary><b>Commits (4)</b></summary>
+
+57c3011b2b678f7125388570875a5b3411322f6a - chore: mark v1.11.1 (#6675)
+c51bd43575d50fb68b61721b9be3e1441db5d72f - cherry-pick(release-1.11): fix video saving (#6671)
+6f0923bdea0b201ac6234df84da0901147128355 - fix(release-1.11): fix tests after cherry-pick
+97aacf3cdef0b7fbcb788fdca7fb6ae8485fd602 - cherry-pick(release-1.11): wait for existing pages when connecting (#6619)
+
+</details>
+
+
+
+## [v1.11.0](https://github.com/microsoft/playwright/releases/tag/v1.11.0)
+
+### Highlights
+
 
 🎥  New video: [Playwright: A New Test Automation Framework for the Modern Web](https://youtu.be/_Jla6DyuEu4) ([slides](https://docs.google.com/presentation/d/1xFhZIJrdHkVe2CuMKOrni92HoG2SWslo0DhJJQMR1DI/edit?usp=sharing))
 - We talked about Playwright
@@ -493,193 +1991,727 @@ This version of Playwright was also tested against the following stable channels
 - Did live demos with new features ✨
 - **Special thanks** to [applitools](http://applitools.com/) for hosting the event and inviting us!
 
-#### Browser Versions
+
+### Browser Versions
+
+
 - Chromium 92.0.4498.0
 - Mozilla Firefox 89.0b6
 - WebKit 14.2
 
-#### New APIs
-- support for **async predicates** across the API in methods such as [page.waitForRequest(urlOrPredicate[, options])](./api/class-page.mdx#page-wait-for-request) and others
+This version of Playwright was also tested against the following stable channels:
+
+- Google Chrome 90
+- Microsoft Edge 90
+
+### New APIs
+
+
+- support for **async predicates** across the API in methods such as [`page.waitForEvent()`], [`page.waitForRequest()`] and others
 - new **emulation devices**: Galaxy S8, Galaxy S9+, Galaxy Tab S4, Pixel 3, Pixel 4
 - new methods:
-  * [page.waitForURL(url[, options])](./api/class-page.mdx#page-wait-for-url) to await navigations to URL
-  * [video.delete()](./api/class-video.mdx#video-delete) and [video.saveAs(path)](./api/class-video.mdx#video-save-as) to manage screen recording
+    * [`page.waitForURL()`] to await navigations to URL
+    * [`video.delete()`] and [`video.saveAs()`] to manage screen recording
+    * [`electronApplication.browserWindow()`] to access browser window
 - new options:
-  * `screen` option in the [browser.newContext([options])](./api/class-browser.mdx#browser-new-context) method to emulate `window.screen` dimensions
-  * `position` option in [page.check(selector[, options])](./api/class-page.mdx#page-check) and [page.uncheck(selector[, options])](./api/class-page.mdx#page-uncheck) methods
-  * `trial` option to dry-run actions in [page.check(selector[, options])](./api/class-page.mdx#page-check), [page.uncheck(selector[, options])](./api/class-page.mdx#page-uncheck), [page.click(selector[, options])](./api/class-page.mdx#page-click), [page.dblclick(selector[, options])](./api/class-page.mdx#page-dblclick), [page.hover(selector[, options])](./api/class-page.mdx#page-hover) and [page.tap(selector[, options])](./api/class-page.mdx#page-tap)
+    * `screen` option in the [`browser.newContext()`] method to emulate `window.screen` dimensions
+    * `position` option in [`page.check()`] and [`page.uncheck()`] methods
+    * `trial` option to dry-run actions in [`page.check()`], [`page.uncheck()`], [`page.click()`], [`page.dblclick()`], [`page.hover()`] and [`page.tap()`]
+    * `headers` option in [`browserType.connect()`]
 
-## Version 1.10
+<details>
+  <summary><b>Issues Closed (45)</b></summary>
+
+[2370](https://github.com/microsoft/playwright/issue/2370)
+[2995](https://github.com/microsoft/playwright/issue/2995)
+[3933](https://github.com/microsoft/playwright/issue/3933)
+[4610](https://github.com/microsoft/playwright/issue/4610)
+[4740](https://github.com/microsoft/playwright/issue/4740)
+[4761](https://github.com/microsoft/playwright/issue/4761)
+[5105](https://github.com/microsoft/playwright/issue/5105)
+[5523](https://github.com/microsoft/playwright/issue/5523)
+[5591](https://github.com/microsoft/playwright/issue/5591)
+[5614](https://github.com/microsoft/playwright/issue/5614)
+[5687](https://github.com/microsoft/playwright/issue/5687)
+[5693](https://github.com/microsoft/playwright/issue/5693)
+[5762](https://github.com/microsoft/playwright/issue/5762)
+[5765](https://github.com/microsoft/playwright/issue/5765)
+[5779](https://github.com/microsoft/playwright/issue/5779)
+[5796](https://github.com/microsoft/playwright/issue/5796)
+[5815](https://github.com/microsoft/playwright/issue/5815)
+[5816](https://github.com/microsoft/playwright/issue/5816)
+[5833](https://github.com/microsoft/playwright/issue/5833)
+[5839](https://github.com/microsoft/playwright/issue/5839)
+[5840](https://github.com/microsoft/playwright/issue/5840)
+[5845](https://github.com/microsoft/playwright/issue/5845)
+[5846](https://github.com/microsoft/playwright/issue/5846)
+[5853](https://github.com/microsoft/playwright/issue/5853)
+[5854](https://github.com/microsoft/playwright/issue/5854)
+[5858](https://github.com/microsoft/playwright/issue/5858)
+[5862](https://github.com/microsoft/playwright/issue/5862)
+[5872](https://github.com/microsoft/playwright/issue/5872)
+[5874](https://github.com/microsoft/playwright/issue/5874)
+[5875](https://github.com/microsoft/playwright/issue/5875)
+[5888](https://github.com/microsoft/playwright/issue/5888)
+[5890](https://github.com/microsoft/playwright/issue/5890)
+[5893](https://github.com/microsoft/playwright/issue/5893)
+[5894](https://github.com/microsoft/playwright/issue/5894)
+[5895](https://github.com/microsoft/playwright/issue/5895)
+[5896](https://github.com/microsoft/playwright/issue/5896)
+[5897](https://github.com/microsoft/playwright/issue/5897)
+[5901](https://github.com/microsoft/playwright/issue/5901)
+[5914](https://github.com/microsoft/playwright/issue/5914)
+[5915](https://github.com/microsoft/playwright/issue/5915)
+[5916](https://github.com/microsoft/playwright/issue/5916)
+[5918](https://github.com/microsoft/playwright/issue/5918)
+[5921](https://github.com/microsoft/playwright/issue/5921)
+[5929](https://github.com/microsoft/playwright/issue/5929)
+[5936](https://github.com/microsoft/playwright/issue/5936)
+
+</details>
+<details>
+  <summary><b>Commits (285)</b></summary>
+
+f427d438 - chore: mark v1.11.0
+791443d7 - feat(webkit): roll to r1472 (#6425)
+477b93b1 - feat(firefox-stable): bump to 1245 (#6424)
+8737207d - feat(devices): add more Android device descriptions (#6413)
+765d7498 - chore(ff): remove some dead code (#6423)
+9e36f5cc - docs(consoleMessage): add missing console message comments (#6320)
+90de8642 - docs(dotnet): introduce separate csharp viewport option (#6198)
+42a55666 - fix(types): fix waitForSelector typing to not union null when appropriate (#6344)
+8d66edf6 - browser(webkit): roll to safari-612.1.13-branch (#6422)
+9b8dc4ae - browser(webkit): fix Ubuntu18, make vp9 build hermetic (#6421)
+47cf9c3e - feat(chromium): bump to r878941 (#6216)
+ab850afb - fix: support relative downloadsPath directory for downloads (#6402)
+55095279 - devops: do a full browser checkout by default on Dev machines (#6411)
+ee835fba - fix(webkit): fix screencast compilation on win (#6412)
+77c10201 - devops: re-use firefox checkout for firefox-stable (#6410)
+5c519610 - browser(firefox-stable): cherry pick recent changes from browser_patches/firefox (#6409)
+14ebcfdf - docs: update fill/selectOption docs to mention label retargeting (#6406)
+fc9454eb - browser(webkit): implement screencast (#6404)
+86df1df8 - test: update download test expectations (#6394)
+5326f390 - browser(chromium): build 878941 that reverts shader changes (#6407)
+1a582813 - browser(firefox): don't record video outside the viewport (#6361)
+2945daca - devops: fixed broken GitHub Actions workflow (#6399)
+b8eb2b89 - feat(firefox-beta): roll Firefox to beta 89.0b6 (1250) (#6393)
+ce7a72b2 - test: disable certain screencast tests on Firefox. (#6396)
+4e0e13cf - browser(firefox-beta): roll Firefox to beta 89.0b8 - May 2, 2021 (#6397)
+4cd5673c - chore: add debugging information on bots to trace unzipping (#6395)
+653d483b - docs: add firefox-stable channel documentation (#6328)
+fe94dc5c - docs: expose tracing API in java (#6387)
+6219042c - fix(webkit): swallow requests from detached frames (#6242)
+fd425399 - devops: fix swiftshader on Chromium Windows (#6391)
+dddfbaae - chore(dotnet): run dotnet format after generation (#6376)
+1a859ebe - chore(electron): fix node/browser race conditions, expose browser window asynchronously (#6381)
+6da7e702 - chore: regenerate types after non-clean merge Follow-up to #6379
+af92565b - Update class-page example code (#6379)
+07fb81a4 - fix(launcher): improve error message for missing channel distribution (#6380)
+018f3146 - fix(electron): deliver promised _nodeElectronHandle (#6348)
+de21a94b - test: roll to folio@0.4.0-alpha6 (#6366)
+29164a62 - devops: use Node.js 12 on Windows bots (#6377)
+6ce56dde - test(accessibility): remove and update tests for new chromium (#6372)
+5e8d9d20 - feat(firefox): roll Firefox to r1248 @ v89.0b2 (#6281)
+a59a494e - chore: drop support for Node.js 10 (#6371)
+7405655c - docs(cli): add install-deps command and reference to it (#6374)
+934bc672 - test(tracing): start adding tracing tests (#6369)
+9da718d6 - docs: change the position argument location in check functions (#6191)
+ba652c17 - docs: inline parsing should honor template location (#6289)
+bb845397 - chore(dotnet): don't generate setters on interfaces (#6293)
+d9015b99 - chore(dotnet): translate Javascript words to csharp (#6321)
+dec97361 - docs(page): add missing docs on emulateMedia (#6322)
+6c04b822 - browser(firefox-beta): roll @ beta Apr 29, 2021 - v89.0b6 (#6368)
+0abcaf02 - browser(webkit): roll to safari-612.1.12-branch (#6367)
+b0fae0f8 - browser(firefox): merge FrameData into Frame (#6365)
+1c40c94e - chore: only throw the proxy on launch required on win/CR (#6350)
+263a0fd2 - fix: evaluate in utility for screenshots (#6364)
+a4561310 - test: set 20 minutes timeout for installation tests (#6363)
+11882cdd - test: roll to folio@0.4.0-alpha3 (#6262)
+2333eb09 - chore: adjust GitHub template envinfo command (#6359)
+434f474c - chore(evaluate): implement non-stalling evaluate (#6354)
+06a92684 - Reapply #6363 w/ modification--amend
+0becd942 - Revert "Revert "fix: break require cycle (#6353)""
+17e966bc - Revert "fix: break require cycle (#6353)"
+0bcfa923 - fix: break require cycle (#6353)
+560bea5f - fix: do not close stream until all bytes have been read (#6351)
+3b1bfdff - devops(chromium): build a new Chromium 876873 (#6349)
+369bd55e - feat(webkit): bump to 1468 (#6345)
+1b771ed3 - docs(python): add Error base class (#6315)
+0039b313 - browser(webkit): support downloads larger than 16Kb on Windows (#6343)
+34135746 - feat(webkit): bump to 1467 (#6295)
+922d9ce1 - chore(tracing): fix some of the start/stop scenarios (#6337)
+abb61456 - docs(keyboard): clarify how page.type works for non-US characters (#6273)
+83480850 - browser(webkit): preserve color scheme override after navigation (#6333)
+5be005b1 - Revert "fix: increas recent logs buffer (#6330)" (#6332)
+b6b2366d - fix: browser logging (#6331)
+3c126024 - fix: increas recent logs buffer (#6330)
+a51dc50d - fix(accessibiltiy): ignore new roles that came with new chromium (#6329)
+f4b8c3a8 - browser(firefox): disable proton UI for now (#6327)
+2f290cc9 - fix: fix docs for BrowserType headers (#6314)
+ce033103 - docs: add route example with some logic (#6324)
+be27f473 - feat(tracing): introduce context.tracing, allow exporting trace (#6313)
+a9219aa8 - chore: start / stop context tracing (#6309)
+97cf86d2 - chore: make instrumentation per-context (#6302)
+10c76ff5 - browser(firefox): fix race between idleTasksFinishedPromise and window closure (#6308)
+d31107f3 - fix(docs): make headers and option, not param (#6307)
+fd31ea8b - feat: support extra http headers in browserType.connect() (#6301)
+83758fa4 - devops: add swiftshader DLL to chromium archive (#6305)
+f63f92be - chore: repair run_static_server.js (#6298)
+a1f9152f - chore(deps): bump ssri from 6.0.1 to 6.0.2 (#6299)
+cc4782a7 - Revert "fix(chromium): force --use-gl=swiftshader on Windows (#6272)" (#6300)
+0ed328f6 - chore(tracing): include events in the trace (#6285)
+6d38b106 - chore: abbreviate roll-browser to roll (#6296)
+ff147b00 - docs: update waitForRequest/Response snippets (#6294)
+6e9b76fa - chore(dotnet): enable nullable enum arguments (#6271)
+7a3f8ef7 - feat(firefox-stable): roll to r1244 @ v88.0 (#6280)
+cffab1f5 - chore: update `//utils/roll_browser.js` script to roll anything (#6279)
+531bf4dc - browser(chromium): roll Chromium to new Dev (#6283)
+f9478b12 - browser(webkit): fix compilation for drag drop and duplicated macro (#6278)
+2755d5e3 - browser(webkit): fix timezone override on Windows (#6277)
+111e5599 - devops: roll Chromium to r871980 (#6275)
+59d1d2df - devops: add swiftshader file to Chromium builds (#6274)
+97b485bd - docs(python): add BrowserType.connectOverCDP (#6270)
+357224d6 - fix(chromium): force --use-gl=swiftshader on Windows (#6272)
+3a93c419 - chore: remove stack from WaitForEventInfo (#6259)
+fe4fba4a - chore: extract debugger model from inspector (#6261)
+34e03fc7 - browser(webkit): roll to 04-21 (#6257)
+7053ac90 - chore(types): add channel to launchServer (#6256)
+6bdc67ac - feat(actions): `trial` option that only performs the checks (#6246)
+640b10c7 - fix(codegen): missing await before newPage.goto (#6253)
+85e2db24 - chore: push dispatcher guid into object, reuse it in trace (#6250)
+06b06192 - fix(codegen): do not commit last action on mouse move (#6252)
+faf39a23 - devops: fix firefox-stable roll build (#6255)
+ad731c15 - feat(debug): PWDEBUG=console vs PWDEBUG=inspector (#6213)
+4dd8a1c8 - browser(firefox-stable): roll to Firefox 88.0 (#6249)
+09c35adb - browser(firefox): roll firefox-beta to Apr 20, 2021 - version 89.0b2 (#6247)
+9cd89ae0 - fix: host dependency validation (#6227)
+f9af4c37 - chore(tracing): render error snapshot as Action (#6241)
+23dfaf9e - feat: start downloading firefox-stable channel (#6177)
+033bc9bf - chore(tracing): sync timeline and list highlight (#6235)
+27e720f2 - feat(tracing): keyboard navigate lists (#6224)
+8ca58e34 - fix(page): add name property to pageerror event (#5970)
+7dccfd42 - chore(dotnet): generate IDownload.createReadStream method (#6192)
+7ec57c0c - chore: read browsers.json with require (#6186)
+6296d276 - devops(gha): remove obsolete comment (#6234)
+27ed123a - feat: remove core dumps from bots (#6231)
+329980be - feat: use --no-service-autorun in Chromium (#6232)
+243ede5d - feat(waitForEvent): allow async predicate (#6201)
+fd1f3fa3 - docs(python): add BrowserType.connect (#6230)
+bd0614b0 - added Selenium Box (#6228)
+2c34eaea - devops: better upload flakiness dashboard upload script (#6176)
+90913160 - chore: render wait for on trace timeline (#6222)
+17ead282 - fix(server): disconnect ws clients on server close (#6215)
+e4ae6503 - fix(inspector): fall back to custom executable path for UI (#6214)
+8c1b994f - feat(webkit): bump to 1463 (#6210)
+ce969142 - fix(remote): unregister selectors after client disconnect (#6195)
+ce0098d9 - devops(chromium): build a new Chromium Dev 870763 (#6203)
+e81a3c59 - api: add option `position` to check/uncheck (#6153)
+96cee438 - browser(webkit): roll to safari-612.1.11-branch (#6185)
+fff1f3d4 - chore: simplify remote connection protocol (#6164)
+c4c9809f - docs: move waitUntil doc before timeout (#6138)
+cd249042 - chore(dotnet): waitForCloseAsync (#6184)
+610d1fd4 - docs: fix typo on waitForConsoleMessage (#6183)
+b3b87f6c - fix(codegen): ignore AltGraph when typing (#6086)
+b62a4360 - feat(selectors): support max distance in layout selectors (#6172)
+82e8c722 - devops: fix firefox-stable build script (#6175)
+ad8b4346 - devops: trigger Firefox Stable builds (#6174)
+17c6406e - devops: add firefox-stable channel browser (#6173)
+bba7ca34 - feat(chromium): roll to r869727 (#6170)
+994939f8 - feat(webkit): bump to 1462 (#6169)
+f3b44d18 - fix(screencast): wait for ffmpeg to finish before reporting video (#6167)
+957abc49 - devops(chromium): build a new Chromium Dev 869727 (#6149)
+5fe3ee13 - browser(webkit): fix assertion unsafe to ref/deref from different threads (#6163)
+e26d98d6 - docs(csharp): add viewport back (#6161)
+ec07a581 - test: disable test on mac 10.14 (#6157)
+bd8433ba - test: cleanup various testing env variables (#6155)
+856ced6e - tests: attribute electron tests to electron on the dashboard (#6156)
+f6606d50 - fix: finish all artifacts when browser exits (#6151)
+16c8fe74 - docs: fix typo in language filter (#6154)
+e6f5ce90 - chore: allow running multiple snapshotters for tests (#6147)
+db09275d - docs: reject -> throw, fix small typos (#6152)
+63d0d466 - feat(cdp): replace wsEndpoint with protocol neutral endpointURL (#6141)
+53d50f9b - fix(screencast): properly stop screencast on context closure (#6146)
+f7e7ea93 - chore: skip click test based on the browser version (#6127)
+476ff217 - feat(webkit): bump to 1461 (#6143)
+779355ad - feat(types): make the template on BrowserType optional (#6142)
+310692b1 - test: run page tests on electron bot (#6122)
+d9546fd0 - chore: read all traces from the folder (#6134)
+e82b5460 - docs(dotnet): generate arguments in a consistent order (#5800)
+632ff111 - test: properly annotate Android tests for flakiness dashbboard (#6133)
+bd0043b8 - browser(webkit): keep browser process running when all windows closed (#6131)
+d0db4f67 - feat: include screencast in trace (#6128)
+0c00891b - devops: prepare flakiness dashboard cloud function to Android tests (#6129)
+09c17591 - feat(webkit): bump to 1460 (#6124)
+b37116d7 - chore(dotnet): fix generating from parent directory (#6095)
+ee44fbe2 - devops: upload test results for android bots (#6121)
+6ff209cd - fea(firefox): roll Firefox to r1245 (#6114)
+2897df69 - devops: restore flakiness dashboard upload (#6116)
+d6c41574 - browser(webkit): fix curl compilation (#6115)
+cdbf52f6 - docs: add basic intro page for C# (#6110)
+83c7a3ba - docs: pass wsEndpoint as param in java (#6112)
+4bec81b1 - browser(firefox): roll Firefox to beta @ Apr 6, 2021 (#6111)
+4bd74679 - docs: add missing connectOverCDP.wsEndpoint param in java (#6109)
+36a54699 - test: roll to folio 0.3.21-alpha (#6108)
+0dfde2e9 - fix(screenshot): never throw page is navigating (#6103)
+f61ec3fd - docs(docker): update docker documentation to inlcude java (#6102)
+9abed117 - docs: expose connectOverCDP in java (#6107)
+112ac2f9 - feat(chromium): roll Chromium to r867878 (#6065)
+fb7c7031 - browser(webkit): roll to 06-04-21 (#6106)
+fd40c92a - chore(dotnet): generate generic EventHandlers (#6076)
+33198c3d - chore(dotnet): format generateDotnetApi (#6075)
+e5b011ae - chore(dotnet): remove Get prefix (#6074)
+ee396421 - chore(dotnet): alias for dblclick in C# (#5899)
+da3ddb07 - devops: start uploading test reports from chrome stable runs (#6092)
+ba5ba52e - test: expose browserVersion in the tests (#6090)
+481034bd - chore: trace viewer actions sidebar (#6083)
+63e471ca - test: cleanup proxy and context tests (#6085)
+1a44f681 - devops: migrate flakiness dashboard to the new folio reporter format (#6089)
+6a767d1a - docs(docker): use focal by default (#5746)
+5afe282f - test: move remaining files from old test/ directory (#6081)
+8e6639b7 - test(keyboard): add test with contenteditable and selection (#5938)
+e3cf6756 - test: remove a copy of folio, use upstream (#6080)
+af48a8a1 - devops: use ubuntu focal on bots and docs (#5951)
+e9f0f6c8 - fix: mark disposed dispatchers as such (#6051)
+bd61f863 - test: print "Using executable at ..." for custom executable (#6077)
+4f7e7450 - test: migrate last tests to new folio (#6071)
+f21f4788 - test: migrate more page tests to folio (#6062)
+ee1bcd76 - docs: fix the Electron example
+da1dafca - fix: start downloading firefox build for ubuntu 20.04 (#6064)
+2c6c816a - devops: add firefox-ubuntu-20.04 as expected build (#6063)
+f5781f90 - test: migrate most non-page tests to new folio (#6059)
+5a1974cc - devops(chromium): build a new Chromium Dev 867878 (#6061)
+4da2d6e1 - feat(firefox): roll Firefox to r1244 (#6052)
+06299227 - test: migrate page tests to new folio (#6054)
+46949cd2 - devops: start doing separate builds for Firefox @ Ubuntu 20.04 (#6058)
+d0afa9d8 - test: migrate cli tests to new folio (#6048)
+561cb23e - fix: dispatch popup event on the client end (#6044)
+4f2827f3 - fix(dom): click on links inside shadow dom (#5850)
+1444cc87 - test: migrate electron tests to new folio (#6043)
+2357f0b5 - browser(firefox): fix bootstrap on bots with --no-interactive (#6047)
+a4eb4c0b - test: migrate remoteServer tests to new folio (#6042)
+a7630c91 - api: remove Chromium* classes (#6040)
+d862deea - fix(deps): added missing unicode and emoji dependencies (#6039)
+d662eba8 - browser(firefox): roll Firefox to beta @ Apr 1, 2021 (#6041)
+be79b388 - test: bring new folio and migrate small amount of tests to it (#5994)
+66541552 - browser(firefox): make dpr emulation optional, take screenshots at 1x (#5555)
+2290d8f8 - test: remove unnecessary folio.extend calls before test migration (#6030)
+8f71f597 - fix(input): do not retarget from input/textarea/select to an ancestor button (#6036)
+d71c147a - browser(firefox): fix some missing mac edit commands (#6034)
+37b07ada - docs: replace headful with headed (#6017)
+cb15603c - browser(firefox): do not report console messages twice. (#6031)
+9b2e4ebf - browser(webkit): make dpr emulation optional, take screenshots at 1x (#5557)
+b81238ca - test: migrate fixtures.spec.ts to use beforeEach/afterEach (#6029)
+16d98cb4 - chore(launcher): add more logging to processKill (#6025)
+f472c961 - feat: support webkit technology preview (#5885)
+9d9599c6 - api(video): implement video.saveAs and video.delete (#6005)
+9532d0bd - feat(webkit): bump to 1457 (#6021)
+587682e0 - feat(chromium): bump to r865012 (#5963)
+26f9e296 - docs(route): add note about unroute (#6019)
+2f5bf04f - browser(webkit): fix double deref
+3455c326 - browser(webkit): restore occlusion detection disabled
+ceb4bc25 - test: add a test for hidden shadow host (#6008)
+ba89603b - test: add test for new RTCPeerConnection() (#6013)
+85ab1dc7 - feat(waitForURL): add a new waitForURL api (#6010)
+98f1f715 - chore: ensure we emit Page event before resoliving pageOrError (#6012)
+36d2d93e - fix(firefox): roll Firefox to 1239 (#6007)
+72a2dff5 - Add Sauce Labs showcase (#5990)
+93d532b5 - browser(webkit): fix windows compilation (#6011)
+97955247 - browser(webkit): roll to safari-612.1.9-branch (#6002)
+77993c3e - fix(installer): add libx11-xcb1 to the list of chromium deps (#6003)
+94252231 - fix(devops): include libANGLE-shared.dylib into mac archive (#6004)
+0d3d27d3 - browser(webkit): trigger new build after updating cleanup script (#5997)
+28b14fc5 - feat(docker): use playwright install-deps for building docker image (#5995)
+9473f39b - fix(devops): cleanup now removes entire webkit build dir on mac (#5996)
+061f9ea6 - test: failing test for websockets + offline context (#4912)
+fdb3c1f1 - chore(dotnet): don't generate set only properties (#5982)
+5c1e8dcd - chore(dotnet): fix properties with Is prefix (#5981)
+ca7cd7a6 - devops: skip flakiness upload for forks (#5978)
+0b6625bb - docs: fix HEADFUL run instructions (#5980)
+6d6f802e - fix: favicon with color pref crashes firefox (#5977) (#5979)
+f1c0d097 - feat(size): emulate window.screen size (#5967)
+8c6822bd - fix(docker): update native deps and docker files for chromium (#5989)
+2262d873 - Update nativeDeps.ts (#5988)
+4cf0568a - browser(webkit): support safe area insets (#5987)
+bc6dc1d1 - chore(dotnet): treat file as a reserved word (#5960)
+0943af28 - fix: kill browser if process doesnt exit for 30s after close (#5968)
+779037a7 - chore(dotnet): avoid adding two prefixes (#5974)
+49bbc2bc - test(proxy): add a failing test for HTTPS proxy CONNECT User Agent (#5972)
+2cce8850 - browser(webkit): roll to safari-612.1.8-branch (#5965)
+dfe07818 - docs: fixed various typos (#5958)
+475a6fe3 - chore(dotnet): use csharp types in Frame and Page (#5961)
+12e00629 - docs: update channels doc to mention manual installation (#5964)
+6c1d3f65 - browser(webkit): refresh embedder UI on macOS (#5957)
+3ce02a95 - fix(selectors): properly generate selectors for tricky ids (#5940)
+01208967 - test: interception breaks remote importScripts (#5953)
+0076e46e - chore: remove stray test logs (#5955)
+5872d040 - browser(chromium): build current dev chromium (865012) (#5950)
+f7914956 - chore(dotnet): Improve enum values (#5939)
+601c09f7 - docs(page): remove note that screenshot takes 1/6+s (#5945)
+4fea83c6 - docs: commit new release notes (#5944)
+6b3f4cd1 - chore: calculate video size in a single place (#5942)
+8e976073 - fix(viedo): do not stall video in popups (#5941)
+24ee49b9 - chore(dotnet): improve goto name in csharp (#5917)
+2cf4caa4 - chore: implement mixins in protocol.yml (#5932)
+76781122 - tests: do not run video tests with Chrome Stable on Linux (#5931)
+cc265fe1 - docs(websocket): add web socket examples (#5927)
+1b802332 - infra: remove shards from mac builds to remove 6 bots (#5928)
+7d7e5ede - browser(webkit): roll back to safari-612.1.7-branch first commit (#5920)
+2016fdbc - chore: cut v1.10.0 (#5925)
+
+</details>
+
+[`page.check()`]: https://playwright.dev/docs/next/api/class-page#pagecheckselector-options
+[`page.uncheck()`]: https://playwright.dev/docs/next/api/class-page#pageuncheckselector-options
+[`page.click()`]: https://playwright.dev/docs/next/api/class-page#pageclickselector-options
+[`page.dblclick()`]: https://playwright.dev/docs/next/api/class-page#pagedblclickselector-options
+[`page.hover()`]: https://playwright.dev/docs/next/api/class-page#pagehoverselector-options
+[`page.tap()`]: https://playwright.dev/docs/next/api/class-page#pagetapselector-options
+[`page.waitForEvent()`]: https://playwright.dev/docs/next/api/class-page#pagewaitforeventevent-optionsorpredicate
+[`page.waitForRequest()`]: https://playwright.dev/docs/next/api/class-page#pagewaitforrequesturlorpredicate-options
+[`page.waitForURL()`]: https://playwright.dev/docs/next/api/class-page#pagewaitforurlurl-options
+[`browser.newContext()`]: https://playwright.dev/docs/next/api/class-browser#browsernewcontextoptions
+[`electronApplication.browserWindow()`]: https://playwright.dev/docs/next/api/class-electronapplication#electronapplicationbrowserwindowpage
+[`video.delete()`]: https://playwright.dev/docs/next/api/class-video#videodelete
+[`video.saveAs()`]: https://playwright.dev/docs/next/api/class-video#videosaveaspath
+[`browserType.connect()`]: https://playwright.dev/docs/next/api/class-browsertype#browsertypeconnectparams
+
+
+
+
+
+## [v1.10.0](https://github.com/microsoft/playwright/releases/tag/v1.10.0)
+
+### Highlights
+
+
 - [Playwright for Java v1.10](https://github.com/microsoft/playwright-java) is **now stable**!
-- Run Playwright against **Google Chrome** and **Microsoft Edge** stable channels with the [new channels API](./browsers).
+- Run Playwright against **Google Chrome** and **Microsoft Edge** stable channels with the [new channels API](https://playwright.dev/docs/browsers).
 - Chromium screenshots are **fast** on Mac & Windows.
 
-#### Bundled Browser Versions
+### Bundled Browser Versions
+
+
 - Chromium 90.0.4430.0
 - Mozilla Firefox 87.0b10
 - WebKit 14.2
 
 This version of Playwright was also tested against the following stable channels:
+
 - Google Chrome 89
 - Microsoft Edge 89
 
-#### New APIs
-- [`browserType.launch()`](./api/class-browsertype#browsertypelaunchoptions) now accepts the new `'channel'` option. Read more in [our documentation](./browsers).
+### New APIs
 
-## Version 1.9
-- [Playwright Inspector](./inspector.mdx) is a **new GUI tool** to author and debug your tests.
-  - **Line-by-line debugging** of your Playwright scripts, with play, pause and step-through.
-  - Author new scripts by **recording user actions**.
-  - **Generate element selectors** for your script by hovering over elements.
-  - Set the `PWDEBUG=1` environment variable to launch the Inspector
-- **Pause script execution** with [page.pause()](./api/class-page.mdx#page-pause) in headed mode. Pausing the page launches [Playwright Inspector](./inspector.mdx) for debugging.
-- **New has-text pseudo-class** for CSS selectors. `:has-text("example")` matches any element containing `"example"` somewhere inside, possibly in a child or a descendant element. See [more examples](./selectors.mdx#text-selector).
-- **Page dialogs are now auto-dismissed** during execution, unless a listener for `dialog` event is configured. [Learn more](./dialogs.mdx) about this.
-- [Playwright for Python](https://github.com/microsoft/playwright-python) is **now stable** with an idiomatic snake case API and pre-built [Docker image](./docker.mdx) to run tests in CI/CD.
 
-#### Browser Versions
+- [`browserType.launch()`](https://playwright.dev/docs/api/class-browsertype#browsertypelaunchoptions) now accepts the new `'channel'` option. Read more in [our documentation](https://playwright.dev/docs/browsers).
+
+<details>
+  <summary><b>Issues Closed (61)</b></summary>
+
+[742](https://github.com/microsoft/playwright/issue/742)
+[1063](https://github.com/microsoft/playwright/issue/1063)
+[1797](https://github.com/microsoft/playwright/issue/1797)
+[2089](https://github.com/microsoft/playwright/issue/2089)
+[2220](https://github.com/microsoft/playwright/issue/2220)
+[2238](https://github.com/microsoft/playwright/issue/2238)
+[2308](https://github.com/microsoft/playwright/issue/2308)
+[2747](https://github.com/microsoft/playwright/issue/2747)
+[2767](https://github.com/microsoft/playwright/issue/2767)
+[2902](https://github.com/microsoft/playwright/issue/2902)
+[3032](https://github.com/microsoft/playwright/issue/3032)
+[3184](https://github.com/microsoft/playwright/issue/3184)
+[3265](https://github.com/microsoft/playwright/issue/3265)
+[3540](https://github.com/microsoft/playwright/issue/3540)
+[3648](https://github.com/microsoft/playwright/issue/3648)
+[3828](https://github.com/microsoft/playwright/issue/3828)
+[3989](https://github.com/microsoft/playwright/issue/3989)
+[4263](https://github.com/microsoft/playwright/issue/4263)
+[4377](https://github.com/microsoft/playwright/issue/4377)
+[4390](https://github.com/microsoft/playwright/issue/4390)
+[4441](https://github.com/microsoft/playwright/issue/4441)
+[4507](https://github.com/microsoft/playwright/issue/4507)
+[4543](https://github.com/microsoft/playwright/issue/4543)
+[4902](https://github.com/microsoft/playwright/issue/4902)
+[5228](https://github.com/microsoft/playwright/issue/5228)
+[5633](https://github.com/microsoft/playwright/issue/5633)
+[5634](https://github.com/microsoft/playwright/issue/5634)
+[5636](https://github.com/microsoft/playwright/issue/5636)
+[5642](https://github.com/microsoft/playwright/issue/5642)
+[5648](https://github.com/microsoft/playwright/issue/5648)
+[5649](https://github.com/microsoft/playwright/issue/5649)
+[5684](https://github.com/microsoft/playwright/issue/5684)
+[5716](https://github.com/microsoft/playwright/issue/5716)
+[5733](https://github.com/microsoft/playwright/issue/5733)
+[5735](https://github.com/microsoft/playwright/issue/5735)
+[5747](https://github.com/microsoft/playwright/issue/5747)
+[5748](https://github.com/microsoft/playwright/issue/5748)
+[5749](https://github.com/microsoft/playwright/issue/5749)
+[5752](https://github.com/microsoft/playwright/issue/5752)
+[5767](https://github.com/microsoft/playwright/issue/5767)
+[5778](https://github.com/microsoft/playwright/issue/5778)
+[5780](https://github.com/microsoft/playwright/issue/5780)
+[5781](https://github.com/microsoft/playwright/issue/5781)
+[5786](https://github.com/microsoft/playwright/issue/5786)
+[5792](https://github.com/microsoft/playwright/issue/5792)
+[5793](https://github.com/microsoft/playwright/issue/5793)
+[5794](https://github.com/microsoft/playwright/issue/5794)
+[5795](https://github.com/microsoft/playwright/issue/5795)
+[5797](https://github.com/microsoft/playwright/issue/5797)
+[5799](https://github.com/microsoft/playwright/issue/5799)
+[5801](https://github.com/microsoft/playwright/issue/5801)
+[5802](https://github.com/microsoft/playwright/issue/5802)
+[5804](https://github.com/microsoft/playwright/issue/5804)
+[5809](https://github.com/microsoft/playwright/issue/5809)
+[5818](https://github.com/microsoft/playwright/issue/5818)
+[5821](https://github.com/microsoft/playwright/issue/5821)
+[5822](https://github.com/microsoft/playwright/issue/5822)
+[5841](https://github.com/microsoft/playwright/issue/5841)
+[5842](https://github.com/microsoft/playwright/issue/5842)
+[5851](https://github.com/microsoft/playwright/issue/5851)
+[5857](https://github.com/microsoft/playwright/issue/5857)
+
+
+</details>
+<details>
+  <summary><b>Commits (187)</b></summary>
+
+a61487f4 - chore: mark v1.10.0
+543582b4 - chore: expose channel name literals for types (#5922)
+f70eaf4f - docs(android): android doc nits (#5924)
+8f1d03f8 - docs(options): clarify recordHarPath and recordVideoDir behavior (#5923)
+ca35da0a - test(android): run selected page tests on android (3) (#5910)
+3a27bdd3 - chore(dotnet): improve name generation for objects (#5860)
+9f1b2f68 - test(resize): add a screenshot resize test (#5907)
+ec6453d1 - fix: installer compilation (#5908)
+172de408 - browser(chromium): build current dev chromium (#5911)
+b74af226 - browser(webkit): fix mac compilation after latest roll (#5909)
+14ccc80c - fix(android): bundle android driver in all settings (#5883)
+cac5aeb6 - docs(browser): wording nits
+1bcbb152 - set system default python3 to python3.8 (#5892)
+2064d27d - fix(installer): retain browsers installed via Playwrigth CLI (#5904)
+6dd4d756 - browser(webkit): roll to 03-22-21 (#5903)
+67c29e81 - chore: add missing await to floating promises (#5813)
+be9fa743 - docs(intro): remove stray wait from sync snippet
+23725192 - docs: add event listener guide (#5881)
+fbb46264 - chore(dotnet): support for optional properties in generated objects (#5889)
+1f1c8b74 - test(android): run selected page tests on android (2) (#5882)
+ad5c028f - test(android): run selected page tests on android (#5879)
+cbebf64f - docs: fix circleci invalid yaml (#5880)
+16bf462e - test: organize tests to not depend on context (#5878)
+5c753b76 - docs: add the browsers section (#5876)
+c68bd310 - test: make init script test strict again (#5877)
+c4410d3f - Revert "chore(docs): add support for language specific notes (#5810)"
+516f13e7 - Revert "chore(docs): reference the available constants for csharp (#5785)"
+c435ff35 - feat(firefox): roll Firefox to r1238 (#5873)
+9a50304d - fix: work-around electron's broken event loop (#5867)
+dfb1c99a - chore(docs): reference the available constants for csharp (#5785)
+d53cea70 - fix(pageOrError): throw in launchPersistentContext if context page has errors (#5868)
+bb21faf4 - fix: disable firefox's webrender on Darwin (#5870)
+9bd35d82 - test: disable shortcuts test on Firefox darwin (#5869)
+de16d177 - docs(dotnet): move options arguments last (#5856)
+2367039a - chore(stable): throw user-friendly message when ffmpeg is missing (#5865)
+141583c7 - infra(chrome_stable): add more bots (#5863)
+84efdfcb - chore(autowait): auto-wait for top level navigations only (#5861)
+5ae731a3 - chore(evaluate): respect signals when evaluating on handle (#5847)
+7011e573 - chore(evaluate): explicitly annotate methods that wait for signals (#5859)
+c5500081 - docs(dotnet): adds option parameters for csharp on element handle (#5823)
+ae460f01 - devops: start downloading webkit fork on Mac 10.14 (#5837)
+693e5699 - chore(docs): add support for language specific notes (#5810)
+1fab8457 - browser(firefox): roll Firefox to beta @ Mar 16, 2021 (#5852)
+e8a33c40 - feat(firefox): roll Firefox to r1237 (#5849)
+bf36b487 - fix(rimraf): allow 10 retires when removing the profile folder (#5826)
+d1a3a5d5 - chore: cleanup test logging on CI (#5848)
+8df4dcb0 - feat(webkit): bump to 1446 (#5844)
+d81ebff4 - fix(inspector): do not collect action signals while on pause (#5843)
+36a61c36 - docs(dotnet): ability to generate generics and null on path args (#5824)
+ab4629af - devops: add trigger workflow to deprecated webkit builds (#5836)
+8dc74057 - devops: refactor check_cdn.sh script (#5835)
+e64f6668 - devops: fork webkit into a separate browser (#5834)
+5cf13612 - chore: pretty print storage state (#5830)
+c2db8da4 - fix(inspector): await inspector init to avoid races (#5829)
+8565e72e - chore: consolidate browser cheatsheets (#5832)
+5835c7e5 - browser(webkit): fix linux builds, install liblcms2-dev (#5831)
+095ad633 - chore: update error message when using userDataDir arg (#5814)
+ea32ad2b - infra(channel): add edge stable bot (#5825)
+95affe93 - chore: do not delete unused browsers when PLAYWRIGHT_SKIP_BROWSER_GC is specified (#5827)
+226bee01 - browser(webkit): roll to 03-15-21 (#5828)
+defd1a33 - fix(chromium): fix crash if connecting to a browser with a serviceworker (#5803)
+1dd6bd33 - infra(channel): wire release channel to all tests (#5820)
+a96d6a7d - feat: allow to pick stable channel (#5817)
+0d32b053 - chore(deps): bump react-dev-utils from 11.0.3 to 11.0.4 (#5811)
+c4578f19 - chore: organize per-browser dependencies (#5787)
+a185da9d - chore: allow skipping host requirements validation (#5806)
+7fcb8926 - fix(firefox): ensure a exception catch when async send call to a dead object; (#5805)
+ad69b2af - chore: unify recorder & tracer uis (#5791)
+43de2595 - fix(xmldocs): over-greedy regex for md links and clean-up (#5798)
+6a8c8d9c - docs: fix Dialog class reference (#5788)
+720dea40 - docs(dotnet): adding missing methods from dotnet port (#5763)
+b01f6ec9 - test: add a test for css selector being relative to the root handle (#5789)
+7706e5a2 - docs(python): removed wrong quotes for enum (#5784)
+ddfdf8a7 - fix: install chromium along with ffmpeg (#5774)
+fea66694 - feat(trace): highlight action target (#5776)
+42e9a470 - chore(xmldocs): resolve MD links to XmlDocs tags (#5782)
+9560da75 - chore(deps): bump elliptic from 6.5.3 to 6.5.4 (#5783)
+7fa59f6d - infra(stable): add chrome stable bot (#5768)
+13977301 - test: click links in shadow dom (#5773)
+c020278f - docs(readme): use aka.ms Playwright Slack invite link (#5741)
+0bc39f27 - chore(generator): change dotnet default value from null to default (#5764)
+1d6feb2a - fix(inspect): highlight on explore input change (#5726)
+d3110582 - fix(BrowserContext): race between continue and close (#5729)
+aae8cc83 - docs: improve Download methods documentation (#5760)
+1a94ea5f - chore: refactor trace viewer to reuse snapshot storage (#5756)
+659d3c3b - docs: use custom link element in waitForNavigation example (#5755)
+bc3a0fb9 - browser(webkit): roll to 03-08-21 (#5754)
+47104746 - docs(dotnet): marking methods async (#5751)
+0ca56a8b - docs(dotnet): mark waitForClose as async (#5730)
+53a62a3a - test: add post data test with PUT request (#5745)
+9e205662 - fix(postData): do not require content type when retrieving post data (#5736)
+b5aeba90 - docs: update java version to alpha in the intro (#5744)
+b3561e6c - feat(chromium): bump to 857950 (#5742)
+ea9485ec - docs: document PlaywrightException in java (#5743)
+8ed49622 - test(downloads): make logging only show up on CI (#5732)
+976f35aa - fix: update codegen to produce set* instead of with* (#5738)
+70beef83 - docs: rename with* to set* for java (#5737)
+0306fcb1 - docs: add java examples for CLI (#5727)
+e56f56c1 - browser(firefox): pass null for the data transfer (#5723)
+8ffcbb38 - docs: add a pom.xml example for java intro (#5720)
+26b7db96 - feat(cli): launch-server command (#5713)
+5c46a61d - docs(dotnet): csharp example for worker (#5718)
+2e4f6454 - docs(dotnet): csharp mouse example (#5717)
+2af8b8ac - chore: inspector snapshot nits (#5676)
+a9238ce2 - feat(debug): introduce npx playwright debug (#5679)
+ff91858b - docs: instpector launch params for java (#5711)
+217a593e - docs: remove current accessbility api from java (#5708)
+d3eff503 - feat(java): implement codegen (#5692)
+5903e771 - browser(chromium): roll to 857950 (#5709)
+f0242910 - docs: add Page.onceDialog for java (#5706)
+d87522f2 - fix(text selector): revert quoted match to match by text nodes only (#5690)
+986286a3 - chore(dotnet): add examples to accessibility docs (#5702)
+ad27f3bf - docs(xml): code escaping for XMLDocs generation (#5703)
+23b035b0 - chore(dotnet): add documentation on result classes and include property name (#5694)
+5ad8da96 - devops(docker): fix typo in docker build (#5705)
+2a6bb504 - docs(python): fix outdated waitForResponse example (#5685)
+28d9f244 - browser(firefox): roll Firefox to Beta @ Feb 28, 2021 (#5659)
+e4d33f56 - fix(click): do not retarget from label to control when clicking (#5683)
+30e88c36 - docs: enable BowserType.connect in java (#5686)
+ff243f1a - fix(addInitScript): make it work on new pages without navigations (#5675)
+2cdb6b49 - fix(inspector): inlcude sdkLang in the error (#5682)
+2973ecea - docs: string constant quoting (#5681)
+1eb0f429 - chore(dotnet): unique name for generated files, change root namespace (#5678)
+1a0ccc13 - feat(webkit): bump to 1443 (#5665)
+19bd32f6 - docs: add video and proxy docs (#5668)
+3b9d4f2b - docs: Add ffmpeg to roll_browser.js usage output (#5643)
+850e3c5a - test: add debugging output for downloads tests (#5673)
+f925a033 - fix(docs): broken link to method (#5669)
+f637b030 - devops(docker): fix registry to be accessible by Azure Pipelines user (#5672)
+f2a3d21a - browser(chromium): roll to 858453 (#5670)
+9042ca21 - docs: rename Page.console to consoleMessage in java (#5640)
+cd2e976c - docs: unfork installation docs (#5661)
+cad76349 - docs: spread parameters of page.setViewportSize in java (#5664)
+c390f395 - fix: include parsed .md spec into api.json (#5662)
+b253ee80 - chore(snapshot): brush up, start adding tests (#5646)
+ee69de77 - docs: docs typos (#5658)
+eb980207 - test: add a test for 2 cdp sessions against the browser (#5655)
+01abeac4 - browser(webkit): roll to 03/2 (#5656)
+86c7d779 - chore(dotnet): handle setters and ordering bug (#5654)
+6c9e8066 - docs: add java snippets to the examples in guides (#5638)
+aeb2b2f6 - feat(inspector): wire snapshots to inspector (#5628)
+c652794b - chore: bump webkit version (#5637)
+28f3fe8e - chore(dotnet): generate dotnet API from Markdown (#5089)
+4b541749 - feat(webkit): bump to 1442 (#5622)
+96e099ac - docs: use "argument: `<type>`" notation for events (#5626)
+cb0a890a - docs: java snippets for api classes (#5629)
+612bb022 - docs(intro): fixed wrong Python option (#5625)
+992f8082 - chore(snapshot): implement in-memory snapshot (#5624)
+b2859367 - docs: more clarity in the attribute selectors (#5621)
+f7e5db4d - chore: remove ProgressController.abort (#5620)
+2ff6d54f - chore: extract snapshotter from trace viewer (#5618)
+af89ab7a - chore: make trace server generic (#5616)
+1cd398e7 - chore: bump storybook dependency (#5619)
+f72b098a - chore: encapsulate parsed snapshot id in the trace viewer (#5607)
+ca8998b1 - feat(log): prepend browser pid to browser logs (#5569)
+5ae26611 - chore: simplify overrides management in trace viewer (#5606)
+0102e080 - fix(text selector): make quoted selector match by text nodes (#5603)
+8906ba33 - chore: spell overridden (#5605)
+c91159f3 - chore: make stack filtering playwright dev-friendly (#5604)
+f85deeba - docs: no [File] links (#5601)
+6bf3fe84 - chore: make trace model a class (#5600)
+f71bf9a4 - chore: move trace viewer into server (#5597)
+b07dba80 - test: improve test names (#5511)
+3dd06815 - chore: udpate scripts that generates release draft (#5556)
+5fb77935 - chore: move logic from sw to server (#5582)
+070cfdcd - fix(inspector): skip stack trace playwright/src lines only under tests (#5594)
+aa94dfbc - chore: remove invalid link from release notes (#5577)
+bd31817c - docs(readme): fixed broken docs links (#5587)
+fefe37e9 - fix(inspector): stacktrace with browser specific NPM package (#5589)
+48c237b3 - chore: move trace to server (#5565)
+180446d2 - fix(types): restore electron types (#5574)
+841264c9 - fix(test): disable failing drag and drop test on mac and windows (#5575)
+f3a09210 - test: move installation tests out of playwright tree (#5573)
+1dc7fb1f - test: add more tests for Set-Cookie in fulfill (#5570)
+5cb914b2 - fix(types): do not use import('electron') (#5572)
+8f79b8c1 - docs: update release-notes.md (#5571)
+e3cd52d0 - test(drag): enable drag tests everywhere but chromium (#5553)
+ec9a5349 - docs: describe playwright.create in java (#5566)
+dc3fd3f6 - test(drag): test for dropEffect (#5559)
+8ef6cb73 - feat(codegen): use the name attribute for more elements (#5376)
+11d3eb6b - browser(webkit): fix mac compilation take 2 (#5567)
+e677e7ba - browser(firefox): pass drag action test (#5560)
+df4b9846 - browser(webkit): fix mac compilation (#5564)
+4f9b7d5a - docs: add intro docs for java (#5563)
+0ad2aceb - docs: filter out devices section in java (#5562)
+1ee46a8c - docs: fix docusaurus build (#5554)
+0eb96d77 - chore: cut v1.9.0 (#5551)
+
+</details>
+
+
+
+
+## [v1.9.2](https://github.com/microsoft/playwright/releases/tag/v1.9.2)
+
+### Highlights
+
+
+Text selector and `click()` fixes.
+
+### Browser Versions
+
+
 - Chromium 90.0.4421.0
 - Mozilla Firefox 86.0b10
 - WebKit 14.1
 
-#### New APIs
-- [page.pause()](./api/class-page.mdx#page-pause).
+<details>
+  <summary><b>Issues Closed (2)</b></summary>
 
-## Version 1.8
-- [Selecting elements based on layout](./selectors.mdx#selecting-elements-based-on-layout) with `:left-of()`, `:right-of()`, `:above()` and `:below()`.
-- Playwright now includes [command line interface](./cli.mdx), former playwright-cli.
+[5634](https://github.com/microsoft/playwright/issue/5634)
+[5674](https://github.com/microsoft/playwright/issue/5674)
 
-  ```bash
-  npx playwright --help
-  ```
+</details>
+<details>
+  <summary><b>Commits (18)</b></summary>
 
-- [page.selectOption(selector, values[, options])](./api/class-page.mdx#page-select-option) now waits for the options to be present.
-- New methods to [assert element state](./actionability#assertions) like [page.isEditable(selector[, options])](./api/class-page.mdx#page-is-editable).
+e42fe217 - cherry-pick(release-1.9): fix(BrowserContext): race between continue and close (#5771)
+11968ce3 - chore: mark v1.9.2 (#5770)
+1dae530f - cherry-pick(release-1.9): fix(click): do not retarget from label to control when clicking (#5769)
+ccc89e35 - cherry-pick(release-1.9): fix(text selector): revert quoted match to match by text nodes only (#5766)
+3fcc57c5 - fix: update codegen to produce set* instead of with* (#5738) (#5740)
+07438f61 - cherry-pick(release-1.9): rename with* to set* for java (#5739)
+097f7c3f - feat(java): implement codegen (#5692)
+ab3b8a1c -  cherry-pick(release-1.9): launch-server command (#5713) (#5719)
+4e317b3f - docs: remove current accessbility api from java (#5708) (#5712)
+563254a9 - docs: add Page.onceDialog for java (#5706) (#5710)
+c6a29011 - cherry-pick(release-1.9): fix registry to be accessible by Azure Pipe… (#5704)
+f41d000c - docs: enable BowserType.connect in java (#5686) (#5691)
+75b83cbe - docs: rename Page.console to consoleMessage in java (#5640) (#5671)
+1d7d08c3 - docs: spread parameters of page.setViewportSize in java (#5664) (#5667)
+5d275f10 - docs: describe playwright.create in java (#5566) (#5666)
+6b4d528f - fix: include parsed .md spec into api.json (#5662) (#5663)
+9a4d6904 - cherry-pick(release-1.9): add java snippets to the examples in guides (#5638) (#5660)
+948e658c - docs: java snippets for api classes (#5629) (#5657)
 
-#### New APIs
-- [elementHandle.isChecked()](./api/class-elementhandle.mdx#element-handle-is-checked).
-- [elementHandle.isDisabled()](./api/class-elementhandle.mdx#element-handle-is-disabled).
-- [elementHandle.isEditable()](./api/class-elementhandle.mdx#element-handle-is-editable).
-- [elementHandle.isEnabled()](./api/class-elementhandle.mdx#element-handle-is-enabled).
-- [elementHandle.isHidden()](./api/class-elementhandle.mdx#element-handle-is-hidden).
-- [elementHandle.isVisible()](./api/class-elementhandle.mdx#element-handle-is-visible).
-- [page.isChecked(selector[, options])](./api/class-page.mdx#page-is-checked).
-- [page.isDisabled(selector[, options])](./api/class-page.mdx#page-is-disabled).
-- [page.isEditable(selector[, options])](./api/class-page.mdx#page-is-editable).
-- [page.isEnabled(selector[, options])](./api/class-page.mdx#page-is-enabled).
-- [page.isHidden(selector[, options])](./api/class-page.mdx#page-is-hidden).
-- [page.isVisible(selector[, options])](./api/class-page.mdx#page-is-visible).
-- New option `'editable'` in [elementHandle.waitForElementState(state[, options])](./api/class-elementhandle.mdx#element-handle-wait-for-element-state).
+</details>
 
-#### Browser Versions
-- Chromium 90.0.4392.0
-- Mozilla Firefox 85.0b5
-- WebKit 14.1
 
-## Version 1.7
-- **New Java SDK**: [Playwright for Java](https://github.com/microsoft/playwright-java) is now on par with [JavaScript](https://github.com/microsoft/playwright), [Python](https://github.com/microsoft/playwright-python) and [.NET bindings](https://github.com/microsoft/playwright-dotnet).
-- **Browser storage API**: New convenience APIs to save and load browser storage state (cookies, local storage) to simplify automation scenarios with authentication.
-- **New CSS selectors**: We heard your feedback for more flexible selectors and have revamped the selectors implementation. Playwright 1.7 introduces [new CSS extensions](./selectors.mdx) and there's more coming soon.
-- **New website**: The docs website at [playwright.dev](https://playwright.dev/) has been updated and is now built with [Docusaurus](https://v2.docusaurus.io/).
-- **Support for Apple Silicon**: Playwright browser binaries for WebKit and Chromium are now built for Apple Silicon.
 
-#### New APIs
-- [browserContext.storageState([options])](./api/class-browsercontext.mdx#browser-context-storage-state) to get current state for later reuse.
-- `storageState` option in [browser.newContext([options])](./api/class-browser.mdx#browser-new-context) and [browser.newPage([options])](./api/class-browser.mdx#browser-new-page) to setup browser context state.
-
-#### Browser Versions
-- Chromium 89.0.4344.0
-- Mozilla Firefox 84.0b9
-- WebKit 14.1
-
-[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
-[Android]: ./api/class-android.mdx "Android"
-[AndroidDevice]: ./api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: ./api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: ./api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: ./api/class-androidwebview.mdx "AndroidWebView"
-[APIRequest]: ./api/class-apirequest.mdx "APIRequest"
-[APIRequestContext]: ./api/class-apirequestcontext.mdx "APIRequestContext"
-[APIResponse]: ./api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: ./api/class-apiresponseassertions.mdx "APIResponseAssertions"
-[Browser]: ./api/class-browser.mdx "Browser"
-[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
-[BrowserServer]: ./api/class-browserserver.mdx "BrowserServer"
-[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
-[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
-[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
-[Coverage]: ./api/class-coverage.mdx "Coverage"
-[Dialog]: ./api/class-dialog.mdx "Dialog"
-[Download]: ./api/class-download.mdx "Download"
-[Electron]: ./api/class-electron.mdx "Electron"
-[ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
-[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
-[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
-[Frame]: ./api/class-frame.mdx "Frame"
-[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
-[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
-[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
-[Locator]: ./api/class-locator.mdx "Locator"
-[LocatorAssertions]: ./api/class-locatorassertions.mdx "LocatorAssertions"
-[Logger]: ./api/class-logger.mdx "Logger"
-[Mouse]: ./api/class-mouse.mdx "Mouse"
-[Page]: ./api/class-page.mdx "Page"
-[PageAssertions]: ./api/class-pageassertions.mdx "PageAssertions"
-[Playwright]: ./api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: ./api/class-playwrightassertions.mdx "PlaywrightAssertions"
-[Request]: ./api/class-request.mdx "Request"
-[Response]: ./api/class-response.mdx "Response"
-[Route]: ./api/class-route.mdx "Route"
-[Selectors]: ./api/class-selectors.mdx "Selectors"
-[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
-[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
-[Tracing]: ./api/class-tracing.mdx "Tracing"
-[Video]: ./api/class-video.mdx "Video"
-[WebSocket]: ./api/class-websocket.mdx "WebSocket"
-[Worker]: ./api/class-worker.mdx "Worker"
-[Fixtures]: ./api/class-fixtures.mdx "Fixtures"
-[Test]: ./api/class-test.mdx "Test"
-[TestConfig]: ./api/class-testconfig.mdx "TestConfig"
-[TestError]: ./api/class-testerror.mdx "TestError"
-[TestInfo]: ./api/class-testinfo.mdx "TestInfo"
-[TestOptions]: ./api/class-testoptions.mdx "TestOptions"
-[TestProject]: ./api/class-testproject.mdx "TestProject"
-[WorkerInfo]: ./api/class-workerinfo.mdx "WorkerInfo"
-[Location]: ./api/class-location.mdx "Location"
-[Reporter]: ./api/class-reporter.mdx "Reporter"
-[Suite]: ./api/class-suite.mdx "Suite"
-[TestCase]: ./api/class-testcase.mdx "TestCase"
-[TestResult]: ./api/class-testresult.mdx "TestResult"
-[TestStep]: ./api/class-teststep.mdx "TestStep"
-[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
-[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
-[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
-[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
-[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
-[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
-[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
-[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
-
-[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
-[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
-[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
-[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
-[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
-[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
-[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
-[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
-[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
-[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
-[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
-[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
-[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
-[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
-[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
-[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
-[URL]: https://nodejs.org/api/url.html "URL"
-
-[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
-[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
-[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
