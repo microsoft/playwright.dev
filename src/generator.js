@@ -256,11 +256,9 @@ import TabItem from '@theme/TabItem';
 
   /**
    * @param {MarkdownNode[]} nodes
-   * @param {number} tocIndex
    */
-  insertAssertionClassesDocs(nodes, tocIndex) {
-    if (tocIndex === -1)
-      tocIndex = nodes.length - 1;
+  insertAssertionClassesDocs(nodes) {
+    const tocIndex = nodes.length - 1;
     // Insert in this order.
     const assertionClassNames = ['LocatorAssertions', 'PageAssertions', 'APIResponseAssertions'];
     if (this.lang === 'js')
@@ -300,16 +298,8 @@ title: "Assertions"
 
   generateDocFromMd(nodes, outName) {
     this.documentation.renderLinksInText(nodes);
-    const tocIndex = nodes.findIndex(node => node.text === '<!-- TOC -->' || node.text === '<!-- TOC3 -->');
-    if (tocIndex !== -1) {
-      const node = nodes[tocIndex];
-      if (node.text === '<!-- TOC -->')
-        node.text = md.generateToc(nodes);
-      if (node.text === '<!-- TOC3 -->')
-        node.text = md.generateToc(nodes, true);
-    }
     if (outName.toLowerCase().includes('test-assertion'))
-      this.insertAssertionClassesDocs(nodes, tocIndex);
+      this.insertAssertionClassesDocs(nodes);
 
     nodes = this.formatComment(nodes);
     md.visitAll(nodes, node => {
