@@ -24,6 +24,7 @@ By default, the timeout for assertions is set to 5 seconds. Learn more about [va
 - [Negating Matchers](#negating-matchers)
 - [Soft Assertions](#soft-assertions)
 - [Custom Expect Message](#custom-expect-message)
+- [Polling](#polling)
 - [API reference](#api-reference)
 - [expect(locator).toBeChecked([options])](./test-assertions.mdx#locator-assertions-to-be-checked)
 - [expect(locator).toBeDisabled([options])](./test-assertions.mdx#locator-assertions-to-be-disabled)
@@ -116,6 +117,24 @@ The same works with soft assertions:
 
 ```js
 expect.soft(value, 'my soft assertion').toBe(56);
+```
+
+## Polling
+
+You can convert any synchronous `expect` to an asynchronous polling one using `expect.poll`.
+
+The following method will poll given function until it returns HTTP status 200:
+
+```js
+expect.poll(async () => {
+  const response = await page.request.get('https://api.example.com');
+  return response.status();
+}, {
+  // Custom error message
+  message: 'make sure API eventually succeeds', // custom error message
+  // Poll for 10 seconds; defaults to 5 seconds. Pass 0 to disable timeout.
+  timeout: 10000,
+}).toBe(200);
 ```
 
 ## API reference
