@@ -188,5 +188,5 @@ module.exports = {
         target: isServer ? 'node12' : 'es2017',
       },
     }),
-  },
+  }
 };
