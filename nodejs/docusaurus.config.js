@@ -158,7 +158,12 @@ module.exports = {
         },
       ],
       copyright: `Copyright © ${new Date().getFullYear()} Microsoft`,
-    }
+    },
+    algolia: {
+      indexName: 'playwright-nodejs',
+      appId: 'K09ICMCV6X',
+      apiKey: 'a5b64422711c37ab6a0ce4d86d16cdd9',
+    },
   },
   themes: [
     [
@@ -167,16 +172,7 @@ module.exports = {
         customCss: require.resolve("./src/css/custom.css"),
       },
     ],
-    [
-      require.resolve(
-        "./third_party/docusaurus-search-local/dist/server/server/index"
-      ),
-      {
-        hashed: true,
-        language: ["en", "zh"],
-        searchResultLimits: 8,
-      },
-    ],
+    '@docusaurus/theme-search-algolia',
   ],
   plugins,
   customFields: {
