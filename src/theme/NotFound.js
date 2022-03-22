@@ -21,7 +21,7 @@ function NotFound() {
             </h1>
             <p>
               We could not find what you were looking for, you can file an issue
-              for the missing page <a href={generateGitHubIssueLink(location.pathname)}>here</a>.
+              for the missing page <a href={generateGitHubIssueLink(location.pathname)} rel="noopener noreferrer">here</a>.
             </p>
           </div>
         </div>
@@ -34,7 +34,7 @@ function NotFound() {
  * @param {string} path
  * @returns {string}
  */
-function getLanguageByPath(path) {
+ function getLanguageByPath(path) {
   if (path.startsWith('/python'))
     return 'Python';
   if (path.startsWith('/java'))
@@ -49,12 +49,11 @@ function getLanguageByPath(path) {
  * @returns {string}
  */
 function generateGitHubIssueLink(path) {
-  const params = new URLSearchParams();
-  params.set('title', `[Docs]: Page not found ${path}`);
-  params.set('body', `Hello!
+  const title = `[Docs]: Page not found ${path}`;
+  const body = `Hello!
 
-I was navigating to the following URL: https://playwright.dev/${path} and it resulted in a 404 error.`);
-  return `https://github.com/microsoft/playwright/issues/new?${params.toString()}`;
+I was navigating to the following URL: https://playwright.dev/${path} and it resulted in a 404 error.`;
+  return `https://github.com/microsoft/playwright/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
 }
 
 export default NotFound;
