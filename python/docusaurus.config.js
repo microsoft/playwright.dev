@@ -181,7 +181,6 @@ module.exports = {
   plugins,
   customFields: {
     repositoryName: "playwright-python",
-    languageName: 'Python',
   },
   trailingSlash: false,
   webpack: {

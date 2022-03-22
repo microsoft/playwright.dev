@@ -181,7 +181,6 @@ module.exports = {
   plugins,
   customFields: {
     repositoryName: "playwright-dotnet",
-    languageName: '.NET',
   },
   trailingSlash: false,
   webpack: {
