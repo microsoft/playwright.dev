@@ -30,7 +30,7 @@ if (!process.env.SRC_DIR)
   throw new Error(`'SRC_DIR' environment variable needs to be set`);
 
 const DIR_SRC = path.join(process.env.SRC_DIR, 'docs', 'src');
-const commonSnippets = new Set(['txt', 'html', 'xml', 'yml', 'yaml', 'json', 'groovy', 'html', 'bash']);
+const commonSnippets = new Set(['txt', 'html', 'xml', 'yml', 'yaml', 'json', 'groovy', 'html', 'bash', 'sh']);
 
 // -------- HACKS BEGIN --------
 /**
@@ -63,6 +63,7 @@ function rewriteContent(text) {
  *   formatPromise: function(string): string,
  *   formatArrayType?: function(Documentation.Type, string, Documentation.Member): string?,
  *   preprocessComment: function(MarkdownNode[]): MarkdownNode[]
+ *   filterComment: function(MarkdownNode): boolean
  *   renderType: function(Documentation.Type, string, Documentation.Member): string,
  * }} GeneratorFormatter
  */
@@ -231,7 +232,7 @@ import TabItem from '@theme/TabItem';
         return true;
 
       // Our lang - Ok.
-      if (c.codeLang === this.lang || c.codeLang === highlighterName(this.lang)) {
+      if (this.formatter.filterComment(c) || c.codeLang === highlighterName(this.lang)) {
         c.codeLang = highlighterName(this.lang);
         return true;
       }

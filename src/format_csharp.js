@@ -157,6 +157,14 @@ class CSharpFormatter {
   preprocessComment(spec) {
     return generateTabGroup(spec, this.lang, 'bash');
   }
+
+  /**
+   * @param {import('./markdown').MarkdownNode} spec 
+   * @returns boolean
+   */
+   filterComment(spec) {
+    return spec.codeLang === this.lang;
+  }
 }
 
 /**
