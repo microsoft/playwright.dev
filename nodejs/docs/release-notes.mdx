@@ -43,7 +43,28 @@ import TabItem from '@theme/TabItem';
 
   It is most convenient to specify `maxDiffPixels` or `maxDiffPixelRatio` once in [testConfig.expect](./api/class-testconfig.mdx#test-config-expect).
 - Playwright Test now adds [testConfig.fullyParallel](./api/class-testconfig.mdx#test-config-fully-parallel) mode. By default, Playwright Test parallelizes between files. In fully parallel mode, tests inside a single file are also run in parallel. You can also use `--fully-parallel` command line flag.
+
+  ```js
+  // playwright.config.ts
+  export default {
+    fullyParallel: true,
+  };
+  ```
+
 - [testProject.grep](./api/class-testproject.mdx#test-project-grep) and [testProject.grepInvert](./api/class-testproject.mdx#test-project-grep-invert) are now configurable per project. For example, you can now configure smoke tests project using `grep`:
+
+  ```js
+  // playwright.config.ts
+  export default {
+    projects: [
+      {
+        name: 'smoke tests',
+        grep: /@smoke/,
+      },
+    ],
+  };
+  ```
+
 - [Trace Viewer](./trace-viewer) now shows [API testing requests](./test-api-testing).
 - [locator.highlight()](./api/class-locator.mdx#locator-highlight) visually reveals element(s) for easier debugging.
 
@@ -166,6 +187,13 @@ PW_EXPERIMENTAL_TS_ESM=1 npx playwright test
 ### Create Playwright
 
 The `npm init playwright` command is now generally available for your use:
+
+```sh
+# Run from your project's root directory
+npm init playwright@latest
+# Or create a new project
+npm init playwright@latest new-project
+```
 
 This will create a Playwright Test configuration file, optionally add examples, a GitHub Action workflow and a first test `example.spec.ts`.
 
@@ -291,7 +319,27 @@ Playwright 1.16 introduces new [API Testing](./api/class-apirequestcontext) that
 
 To do a request on behalf of Playwright's Page, use **new [page.request](./api/class-page.mdx#page-request) API**:
 
+```js
+import { test, expect } from '@playwright/test';
+
+test('context fetch', async ({ page }) => {
+  // Do a GET request on behalf of page
+  const response = await page.request.get('http://example.com/foo.json');
+  // ...
+});
+```
+
 To do a stand-alone request from node.js to an API endpoint, use **new [`request` fixture](./api/class-fixtures#fixtures-request)**:
+
+```js
+import { test, expect } from '@playwright/test';
+
+test('context fetch', async ({ request }) => {
+  // Do a GET request on behalf of page
+  const response = await request.get('http://example.com/foo.json');
+  // ...
+});
+```
 
 Read more about it in our [API testing guide](./test-api-testing).
 
@@ -300,6 +348,25 @@ Read more about it in our [API testing guide](./test-api-testing).
 It is now possible to do response interception by combining [API Testing](./test-api-testing) with [request interception](./network#modify-requests).
 
 For example, we can blur all the images on the page:
+
+```js
+import { test, expect } from '@playwright/test';
+import jimp from 'jimp'; // image processing library
+
+test('response interception', async ({ page }) => {
+  await page.route('**/*.jpeg', async route => {
+    const response = await page._request.fetch(route.request());
+    const image = await jimp.read(await response.body());
+    await image.blur(5);
+    route.fulfill({
+      response,
+      body: await image.getBufferAsync('image/jpeg'),
+    });
+  });
+  const response = await page.goto('https://playwright.dev');
+  expect(response.status()).toBe(200);
+});
+```
 
 Read more about [response interception](./network#modify-responses).
 
@@ -324,6 +391,16 @@ Read more about [our reporters](./test-reporters/#html-reporter).
 Wait for a locator to resolve to a single element with a given state. Defaults to the `state: 'visible'`.
 
 Comes especially handy when working with lists:
+
+```js
+import { test, expect } from '@playwright/test';
+
+test('context fetch', async ({ page }) => {
+  const completeness = page.locator('text=Success');
+  await completeness.waitFor();
+  expect(await page.screenshot()).toMatchSnapshot('screen.png');
+});
+```
 
 Read more about [locator.waitFor([options])](./api/class-locator.mdx#locator-wait-for).
 
@@ -383,6 +460,15 @@ Its now possible to emulate the `forced-colors` CSS media feature by passing it 
 ### 🎭 Playwright Test
 
 #### 🤝 `test.parallel()` run tests in the same file in parallel
+
+```js
+test.describe.parallel('group', () => {
+  test('runs in parallel 1', async ({ page }) => {
+  });
+  test('runs in parallel 2', async ({ page }) => {
+  });
+});
+```
 
 By default, tests in a single file are run in order. If you have many independent tests in a single file, you can now run them in parallel with [test.describe.parallel(title, callback)](https://playwright.dev/docs/api/class-test#test-describe-parallel).
 
@@ -491,17 +577,51 @@ List of all new assertions:
 
 Declares a group of tests that should always be run serially. If one of the tests fails, all subsequent tests are skipped. All tests in a group are retried together.
 
+```js
+test.describe.serial('group', () => {
+  test('runs first', async ({ page }) => { /* ... */ });
+  test('runs second', async ({ page }) => { /* ... */ });
+});
+```
+
 Learn more in the [documentation](./api/class-test#test-describe-serial).
 
 #### 🐾 Steps API with [`test.step`](./api/class-test#test-step)
 
 Split long tests into multiple steps using `test.step()` API:
 
+```js
+import { test, expect } from '@playwright/test';
+
+test('test', async ({ page }) => {
+  await test.step('Log in', async () => {
+    // ...
+  });
+  await test.step('news feed', async () => {
+    // ...
+  });
+});
+```
+
 Step information is exposed in reporters API.
 
 #### 🌎 Launch web server before running tests
 
 To launch a server during the tests, use the [`webServer`](./test-advanced/#launching-a-development-web-server-during-the-tests) option in the configuration file. The server will wait for a given port to be available before running the tests, and the port will be passed over to Playwright as a [`baseURL`](./api/class-fixtures#fixtures-base-url) when creating a context.
+
+```js
+// playwright.config.ts
+import { PlaywrightTestConfig } from '@playwright/test';
+const config: PlaywrightTestConfig = {
+  webServer: {
+    command: 'npm run start', // command to launch
+    port: 3000, // port to await for
+    timeout: 120 * 1000,
+    reuseExistingServer: !process.env.CI,
+  },
+};
+export default config;
+```
 
 Learn more in the [documentation](./test-advanced#launching-a-development-web-server-during-the-tests).
 
@@ -565,6 +685,16 @@ npm i -D @playwright/test
 
 Simple test `tests/foo.spec.ts`:
 
+```js
+import { test, expect } from '@playwright/test';
+
+test('basic test', async ({ page }) => {
+  await page.goto('https://playwright.dev/');
+  const name = await page.innerText('.navbar__title');
+  expect(name).toBe('Playwright');
+});
+```
+
 Running:
 
 ```bash
@@ -582,7 +712,25 @@ npx playwright test
 
 Traces are recorded using the new [browserContext.tracing](./api/class-browsercontext.mdx#browser-context-tracing) API:
 
+```js
+const browser = await chromium.launch();
+const context = await browser.newContext();
+
+// Start tracing before creating / navigating a page.
+await context.tracing.start({ screenshots: true, snapshots: true });
+
+const page = await context.newPage();
+await page.goto('https://playwright.dev');
+
+// Stop tracing and export it into a zip archive.
+await context.tracing.stop({ path: 'trace.zip' });
+```
+
 Traces are examined later with the Playwright CLI:
+
+```sh
+npx playwright show-trace trace.zip
+```
 
 That will open the following GUI:
 

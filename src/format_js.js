@@ -95,6 +95,14 @@ class JavaScriptFormatter {
    const newSpec = generateTabGroup(spec, this.lang, 'js');
    return generateTabGroup(newSpec, this.lang, 'bash')
   }
+
+  /**
+   * @param {MarkdownNode} spec 
+   * @returns boolean
+   */
+  filterComment(spec) {
+    return spec.codeLang === 'ts' || spec.codeLang === 'js';
+  }
 }
 
 module.exports = { JavaScriptFormatter };

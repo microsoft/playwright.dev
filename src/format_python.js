@@ -38,7 +38,7 @@ class PythonFormatter {
     if (member.clazz.varName === 'playwrightAssertions') {
       prefix = '';
     } else if (member.clazz.varName.includes('Assertions')) {
-      const varName = member.clazz.varName.substring(0, member.clazz.varName.length -'Assertions'.length);
+      const varName = member.clazz.varName.substring(0, member.clazz.varName.length - 'Assertions'.length);
       // Generate `expect(locator).` instead of `locatorAssertions.`
       prefix = `expect(${toSnakeCase(varName)}).`;
     }
@@ -125,7 +125,7 @@ class PythonFormatter {
   ]
 }>
 <TabItem value="sync">
-${md.render([spec[i+1]])}
+${md.render([spec[i + 1]])}
 </TabItem>
 <TabItem value="async">
 ${md.render([spec[i]])}
@@ -141,6 +141,14 @@ ${md.render([spec[i]])}
       }
     }
     return generateTabGroup(newSpec, this.lang, 'bash');
+  }
+
+  /**
+   * @param {MarkdownNode} spec 
+   * @returns boolean
+   */
+  filterComment(spec) {
+    return spec.codeLang === this.lang;
   }
 }
 
