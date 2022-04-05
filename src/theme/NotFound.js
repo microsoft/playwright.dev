@@ -20,8 +20,7 @@ function NotFound() {
               This page is not available for {language}.
             </h1>
             <p>
-              We could not find what you were looking for, you can file an issue
-              for the missing page <a href={generateGitHubIssueLink(location.pathname)} rel="noopener noreferrer">here</a>.
+              We could not find what you were looking for.
             </p>
           </div>
         </div>
@@ -42,18 +41,6 @@ function NotFound() {
   if (path.startsWith('/dotnet'))
     return '.NET';
   return 'Node.js'
-}
-
-/**
- * @param {string} path
- * @returns {string}
- */
-function generateGitHubIssueLink(path) {
-  const title = `[Docs]: Page not found ${path}`;
-  const body = `Hello!
-
-I was navigating to the following URL: https://playwright.dev/${path} and it resulted in a 404 error.`;
-  return `https://github.com/microsoft/playwright/issues/new?title=${encodeURIComponent(title)}&body=${encodeURIComponent(body)}`;
 }
 
 export default NotFound;
