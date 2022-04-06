@@ -41,17 +41,15 @@ By default, the timeout for assertions is set to 5 seconds. Learn more about [va
 - [expect(locator).toHaveCSS(name, value[, options])](./test-assertions.mdx#locator-assertions-to-have-css)
 - [expect(locator).toHaveId(id[, options])](./test-assertions.mdx#locator-assertions-to-have-id)
 - [expect(locator).toHaveJSProperty(name, value[, options])](./test-assertions.mdx#locator-assertions-to-have-js-property)
-- [expect(locator).toHaveScreenshot([options])](./test-assertions.mdx#locator-assertions-to-have-screenshot)
 - [expect(locator).toHaveText(expected[, options])](./test-assertions.mdx#locator-assertions-to-have-text)
 - [expect(locator).toHaveValue(value[, options])](./test-assertions.mdx#locator-assertions-to-have-value)
 - [expect(locator).not](./test-assertions.mdx#locator-assertions-not)
-- [expect(page).toHaveScreenshot([options])](./test-assertions.mdx#page-assertions-to-have-screenshot)
 - [expect(page).toHaveTitle(titleOrRegExp[, options])](./test-assertions.mdx#page-assertions-to-have-title)
 - [expect(page).toHaveURL(urlOrRegExp[, options])](./test-assertions.mdx#page-assertions-to-have-url)
 - [expect(page).not](./test-assertions.mdx#page-assertions-not)
 - [expect(apiResponse).toBeOK()](./test-assertions.mdx#api-response-assertions-to-be-ok)
 - [expect(apiResponse).not](./test-assertions.mdx#api-response-assertions-not)
-- [expect(screenshot).toMatchSnapshot(name[, options])](./test-assertions.mdx#screenshot-assertions-to-match-snapshot)
+- [expect(screenshot).toMatchSnapshot([nameOrOptions, options])](./test-assertions.mdx#screenshot-assertions-to-match-snapshot)
 
 ## Negating Matchers
 
@@ -361,30 +359,6 @@ const locator = page.locator('.component');
 await expect(locator).toHaveJSProperty('loaded', true);
 ```
 
-## expect(locator).toHaveScreenshot([options]) {#locator-assertions-to-have-screenshot}
-- `options` &#60;[Object]&#62;
-  - `animations`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-screenshot-option-animations"/> &#60;"disabled"|"allow"&#62; When set to `"disabled"`, stops CSS animations, CSS transitions and Web Animations. Animations get different treatment depending on their duration:<a href="#locator-assertions-to-have-screenshot-option-animations" class="list-anchor">#</a>
-    * finite animations are fast-forwarded to completion, so they'll fire `transitionend` event.
-    * infinite animations are canceled to initial state, and then played over after the screenshot.
-
-    Defaults to `"allow"` that leaves animations untouched.
-  - `mask`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-screenshot-option-mask"/> &#60;[Array]<[Locator]>&#62; Specify locators that should be masked when the screenshot is taken. Masked elements will be overlayed with a pink box `#FF00FF` that completely covers its bounding box.<a href="#locator-assertions-to-have-screenshot-option-mask" class="list-anchor">#</a>
-  - `maxDiffPixelRatio`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-screenshot-option-max-diff-pixel-ratio"/> &#60;[number]&#62; An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1`. Default is configurable with `TestConfig.expect`. Unset by default.<a href="#locator-assertions-to-have-screenshot-option-max-diff-pixel-ratio" class="list-anchor">#</a>
-  - `maxDiffPixels`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-screenshot-option-max-diff-pixels"/> &#60;[number]&#62; An acceptable amount of pixels that could be different, default is configurable with `TestConfig.expect`. Default is configurable with `TestConfig.expect`. Unset by default.<a href="#locator-assertions-to-have-screenshot-option-max-diff-pixels" class="list-anchor">#</a>
-  - `omitBackground`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-screenshot-option-omit-background"/> &#60;[boolean]&#62; Hides default white background and allows capturing screenshots with transparency. Not applicable to `jpeg` images. Defaults to `false`.<a href="#locator-assertions-to-have-screenshot-option-omit-background" class="list-anchor">#</a>
-  - `threshold`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-screenshot-option-threshold"/> &#60;[number]&#62; An acceptable perceived color difference in the [YIQ color space](https://en.wikipedia.org/wiki/YIQ) between the same pixel in compared images, between zero (strict) and one (lax), default is configurable with `TestConfig.expect`. Defaults to `0.2`.<a href="#locator-assertions-to-have-screenshot-option-threshold" class="list-anchor">#</a>
-  - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-screenshot-option-timeout"/> &#60;[number]&#62; Time to retry the assertion for. Defaults to `timeout` in `TestConfig.expect`.<a href="#locator-assertions-to-have-screenshot-option-timeout" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-screenshot-return"/> &#60;[Promise]<[void]>&#62;<a href="#locator-assertions-to-have-screenshot-return" class="list-anchor">#</a>
-
-Ensures that [Locator] resolves to a given screenshot. This function will re-take screenshots until it matches with the saved expectation.
-
-If there's no expectation yet, it will wait until two consecutive screenshots yield the same result, and save the last one as an expectation.
-
-```js
-const locator = page.locator('button');
-await expect(locator).toHaveScreenshot();
-```
-
 ## expect(locator).toHaveText(expected[, options]) {#locator-assertions-to-have-text}
 - `expected`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-text-option-expected"/> &#60;[string]|[RegExp]|[Array]<[string]|[RegExp]>&#62; Expected substring or RegExp or a list of those.<a href="#locator-assertions-to-have-text-option-expected" class="list-anchor">#</a>
 - `options` &#60;[Object]&#62;
@@ -429,36 +403,6 @@ Makes the assertion check for the opposite condition. For example, this code tes
 await expect(page).not.toHaveURL('error');
 ```
 
-## expect(page).toHaveScreenshot([options]) {#page-assertions-to-have-screenshot}
-- `options` &#60;[Object]&#62;
-  - `animations`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-option-animations"/> &#60;"disabled"|"allow"&#62; When set to `"disabled"`, stops CSS animations, CSS transitions and Web Animations. Animations get different treatment depending on their duration:<a href="#page-assertions-to-have-screenshot-option-animations" class="list-anchor">#</a>
-    * finite animations are fast-forwarded to completion, so they'll fire `transitionend` event.
-    * infinite animations are canceled to initial state, and then played over after the screenshot.
-
-    Defaults to `"allow"` that leaves animations untouched.
-  - `caret`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-option-caret"/> &#60;"hide"|"initial"&#62; When set to `"hide"`, screenshot will hide text caret. When set to `"initial"`, text caret behavior will not be changed.  Defaults to `"hide"`.<a href="#page-assertions-to-have-screenshot-option-caret" class="list-anchor">#</a>
-  - `clip`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-option-clip"/> &#60;[Object]&#62; An object which specifies clipping of the resulting image. Should have the following fields:<a href="#page-assertions-to-have-screenshot-option-clip" class="list-anchor">#</a>
-    - `x` &#60;[number]&#62; x-coordinate of top-left corner of clip area
-    - `y` &#60;[number]&#62; y-coordinate of top-left corner of clip area
-    - `width` &#60;[number]&#62; width of clipping area
-    - `height` &#60;[number]&#62; height of clipping area
-  - `fullPage`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-option-full-page"/> &#60;[boolean]&#62; When true, takes a screenshot of the full scrollable page, instead of the currently visible viewport. Defaults to `false`.<a href="#page-assertions-to-have-screenshot-option-full-page" class="list-anchor">#</a>
-  - `mask`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-option-mask"/> &#60;[Array]<[Locator]>&#62; Specify locators that should be masked when the screenshot is taken. Masked elements will be overlayed with a pink box `#FF00FF` that completely covers its bounding box.<a href="#page-assertions-to-have-screenshot-option-mask" class="list-anchor">#</a>
-  - `maxDiffPixelRatio`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-option-max-diff-pixel-ratio"/> &#60;[number]&#62; An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1`. Default is configurable with `TestConfig.expect`. Unset by default.<a href="#page-assertions-to-have-screenshot-option-max-diff-pixel-ratio" class="list-anchor">#</a>
-  - `maxDiffPixels`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-option-max-diff-pixels"/> &#60;[number]&#62; An acceptable amount of pixels that could be different, default is configurable with `TestConfig.expect`. Default is configurable with `TestConfig.expect`. Unset by default.<a href="#page-assertions-to-have-screenshot-option-max-diff-pixels" class="list-anchor">#</a>
-  - `omitBackground`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-option-omit-background"/> &#60;[boolean]&#62; Hides default white background and allows capturing screenshots with transparency. Not applicable to `jpeg` images. Defaults to `false`.<a href="#page-assertions-to-have-screenshot-option-omit-background" class="list-anchor">#</a>
-  - `threshold`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-option-threshold"/> &#60;[number]&#62; An acceptable perceived color difference in the [YIQ color space](https://en.wikipedia.org/wiki/YIQ) between the same pixel in compared images, between zero (strict) and one (lax), default is configurable with `TestConfig.expect`. Defaults to `0.2`.<a href="#page-assertions-to-have-screenshot-option-threshold" class="list-anchor">#</a>
-  - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-option-timeout"/> &#60;[number]&#62; Time to retry the assertion for. Defaults to `timeout` in `TestConfig.expect`.<a href="#page-assertions-to-have-screenshot-option-timeout" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-return"/> &#60;[Promise]<[void]>&#62;<a href="#page-assertions-to-have-screenshot-return" class="list-anchor">#</a>
-
-Ensures that the page resolves to a given screenshot. This function will re-take screenshots until it matches with the saved expectation.
-
-If there's no expectation yet, it will wait until two consecutive screenshots yield the same result, and save the last one as an expectation.
-
-```js
-await expect(page).toHaveScreenshot();
-```
-
 ## expect(page).toHaveTitle(titleOrRegExp[, options]) {#page-assertions-to-have-title}
 - `titleOrRegExp`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-title-option-title-or-reg-exp"/> &#60;[string]|[RegExp]&#62; Expected title or RegExp.<a href="#page-assertions-to-have-title-option-title-or-reg-exp" class="list-anchor">#</a>
 - `options` &#60;[Object]&#62;
@@ -501,8 +445,8 @@ Ensures the response status code is within [200..299] range.
 await expect(response).toBeOK();
 ```
 
-## expect(screenshot).toMatchSnapshot(name[, options]) {#screenshot-assertions-to-match-snapshot}
-- `name`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="screenshot-assertions-to-match-snapshot-option-name"/> &#60;[string]|[Array]<[string]>&#62; Snapshot name.<a href="#screenshot-assertions-to-match-snapshot-option-name" class="list-anchor">#</a>
+## expect(screenshot).toMatchSnapshot([nameOrOptions, options]) {#screenshot-assertions-to-match-snapshot}
+- `nameOrOptions`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="screenshot-assertions-to-match-snapshot-option-name-or-options"/> &#60;[string]|[Array]<[string]>|[Object]&#62; Optional snapshot name. If not passed, the test name and ordinals are used when called multiple times. Also passing the options here is supported.<a href="#screenshot-assertions-to-match-snapshot-option-name-or-options" class="list-anchor">#</a>
 - `options` &#60;[Object]&#62;
   - `maxDiffPixelRatio`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="screenshot-assertions-to-match-snapshot-option-max-diff-pixel-ratio"/> &#60;[number]&#62; An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1`. Default is configurable with `TestConfig.expect`. Unset by default.<a href="#screenshot-assertions-to-match-snapshot-option-max-diff-pixel-ratio" class="list-anchor">#</a>
   - `maxDiffPixels`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="screenshot-assertions-to-match-snapshot-option-max-diff-pixels"/> &#60;[number]&#62; An acceptable amount of pixels that could be different, default is configurable with `TestConfig.expect`. Default is configurable with `TestConfig.expect`. Unset by default.<a href="#screenshot-assertions-to-match-snapshot-option-max-diff-pixels" class="list-anchor">#</a>
@@ -514,6 +458,14 @@ Ensures that passed value, either a [string] or a [Buffer], matches the expected
 ```js
 // Basic usage.
 expect(await page.screenshot()).toMatchSnapshot('landing-page.png');
+
+// Basic usage and the file name is derived from the test name.
+expect(await page.screenshot()).toMatchSnapshot();
+
+// Pass options to customize the snapshot comparison and have a generated name.
+expect(await page.screenshot()).toMatchSnapshot({
+  maxDiffPixels: 27, // allow no more than 27 different pixels.
+});
 
 // Configure image matching threshold.
 expect(await page.screenshot()).toMatchSnapshot('landing-page.png', { threshold: 0.3 });
