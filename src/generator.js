@@ -190,7 +190,12 @@ import TabItem from '@theme/TabItem';
         if (!this.heading2ExplicitId.has(member))
           throw new Error(`Header ${text} needs to have an explicit ID`)
         memberNode.text = `${text} {#${this.heading2ExplicitId.get(member)}}`;
-        memberNode.children.push(...args.map(a => this.renderProperty(`\`${this.formatter.formatArgumentName(a.alias)}\``, a, a.spec, 'in')));
+        memberNode.children.push(...args.map(a => {
+          let name = this.formatter.formatArgumentName(a.alias);
+          if (this.lang === 'js' && !a.required)
+            name += '?';
+          return this.renderProperty(`\`${name}\``, a, a.spec, 'in');
+        }));
 
         // Append type
         if (member.type && (member.type.name !== 'void' || member.kind === 'method')) {
@@ -418,7 +423,9 @@ import TabItem from '@theme/TabItem';`);
           alias = `set${toTitleCase(alias)}`;
         if (this.lang === 'csharp' && member.kind === 'property' && direction === 'in')
           alias = toTitleCase(alias);
-        return this.renderProperty(`\`${alias}\``, p, p.spec, direction, false)
+        if (this.lang === 'js' && !p.required)
+          alias = alias + '?';
+        return this.renderProperty(`\`${alias}\``, p, p.spec, direction, false);
       }));
       if (spec && spec.length > 1)
         children.push({ type: 'text', text: '<br />' });
