@@ -1,158 +1,174 @@
 ---
-id: mock
-title: "Mock APIs"
+id: class-globalinfo
+title: "GlobalInfo"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright provides native support for most of the browser features. However, there are some experimental APIs and APIs which are not (yet) fully supported by all browsers. Playwright usually doesn't provide dedicated atomation APIs in such cases. You can use mocks to test behavior of your application in such cases. This guide gives a few examples.
+`GlobalInfo` contains information on the overall test run. The information spans projects and tests. Some reporters show global info.
 
-- [Introduction](#introduction)
-- [Creating mocks](#creating-mocks)
-- [Verifying API calls](#verifying-api-calls)
-- [Updating mock](#updating-mock)
+You can write to GlobalInfo via your Global Setup hook, and read from it in a [Custom Reporter](../test-reporters.mdx):
 
-## Introduction
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
 
-Let's consider a web app that uses [battery API](https://developer.mozilla.org/en-US/docs/Web/API/Navigator/getBattery) to show your device's battery status. We'll mock the battery API and check that the page correctly displays the battery status.
+```ts
+// global-setup.ts
+import { chromium, FullConfig, GlobalInfo } from '@playwright/test';
 
-## Creating mocks
+async function globalSetup(config: FullConfig, info: GlobalInfo) {
+  await info.attach('agent.config.txt', { path: './agent.config.txt' });
+}
 
-Since the page may be calling the API very early while loading it's important to setup all the mocks before the 
-
-page started loading. The easiest way to achieve that is to call [page.addInitScript(script[, arg])](./api/class-page.mdx#page-add-init-script):
-
-```js
-await page.addInitScript(() => {
-  const mockBattery = {
-    level: 0.75,
-    charging: true,
-    chargingTime: 1800,
-    dischargingTime: Infinity,
-    addEventListener: () => { }
-  };
-  // Override the method to always return mock battery info.
-  window.navigator.getBattery = async () => mockBattery;
-});
+export default globalSetup;
 ```
 
-Once this is done you can navigate the page and check its UI state:
+</TabItem>
+<TabItem value="js">
 
 ```js
-// Configure mock API before each test.
-test.beforeEach(async ({ page }) => {
-  await page.addInitScript(() => {
-    const mockBattery = {
-      level: 0.90,
-      charging: true,
-      chargingTime: 1800, // seconds
-      dischargingTime: Infinity,
-      addEventListener: () => { }
-    };
-    // Override the method to always return mock battery info.
-    window.navigator.getBattery = async () => mockBattery;
-  });
-});
-
-test('show battery status', async ({ page }) => {
-  await page.goto('/');
-  await expect(page.locator('.battery-percentage')).toHaveText('90%');
-  await expect(page.locator('.battery-status')).toHaveText('Adapter');
-  await expect(page.locator('.battery-fully')).toHaveText('00:30');
-});
-
+// global-setup.js
+module.exports = async (config, info) => {
+  await info.attach('agent.config.txt', { path: './agent.config.txt' });
+};
 ```
 
-## Verifying API calls
+</TabItem>
+</Tabs>
 
-Sometimes it is useful to check if the page made all expected APIs calls. You can record all API method invocations and then compare them with golden result. [page.exposeFunction(name, callback)](./api/class-page.mdx#page-expose-function) may come in handy for passing message from the page back to the test code:
+Access the attachments from the Root Suite in the Reporter:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+// my-awesome-reporter.ts
+import { Reporter } from '@playwright/test/reporter';
+
+class MyReporter implements Reporter {
+  private _suite;
+
+  onBegin(config, suite) {
+    this._suite = suite;
+  }
+
+  onEnd(result) {
+    console.log(`Finished the run with ${this._suite.attachments.length} global attachments!`);
+  }
+}
+export default MyReporter;
+```
+
+</TabItem>
+<TabItem value="js">
 
 ```js
-test('log battery calls', async ({ page }) => {
-  const log = [];
-  // Expose function for pushing messages to the Node.js script.
-  await page.exposeFunction('logCall', msg => log.push(msg));
-  await page.addInitScript(() => {
-    const mockBattery = {
-      level: 0.75,
-      charging: true,
-      chargingTime: 1800,
-      dischargingTime: Infinity,
-      // Log addEventListener calls.
-      addEventListener: (name, cb) => logCall(`addEventListener:${name}`)
-    };
-    // Override the method to always return mock battery info.
-    window.navigator.getBattery = async () => {
-      logCall('getBattery');
-      return mockBattery;
-    };
-  });
+// my-awesome-reporter.js
+// @ts-check
 
-  await page.goto('/');
-  await expect(page.locator('.battery-percentage')).toHaveText('75%');
+/** @implements {import('@playwright/test/reporter').Reporter} */
+class MyReporter {
+  onBegin(config, suite) {
+    this._suite = suite;
+  }
 
-  // Compare actual calls with golden.
-  expect(log).toEqual([
-    'getBattery',
-    'addEventListener:chargingchange',
-    'addEventListener:levelchange'
-  ]);
-});
+  onEnd(result) {
+    console.log(`Finished the run with ${this._suite.attachments.length} global attachments!`);
+  }
+}
+
+module.exports = MyReporter;
 ```
 
-## Updating mock
+</TabItem>
+</Tabs>
 
-To test that the app correctly reflects battery status updates it's important to make sure that the mock battery object fires same events that the browser implementation would. The following test demonstrates how to achieve that:
+Finally, specify `globalSetup` in the configuration file and `reporter`:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+// playwright.config.ts
+import { PlaywrightTestConfig } from '@playwright/test';
+
+const config: PlaywrightTestConfig = {
+  globalSetup: require.resolve('./global-setup'),
+  reporter: require.resolve('./my-awesome-reporter'),
+};
+export default config;
+```
+
+</TabItem>
+<TabItem value="js">
 
 ```js
-test('update battery status (no golden)', async ({ page }) => {
-  await page.addInitScript(() => {
-    // Mock class that will notify corresponding listners when battery status changes.
-    class BatteryMock {
-      level = 0.10;
-      charging = false;
-      chargingTime = 1800;
-      dischargingTime = Infinity;
-      _chargingListeners = [];
-      _levelListeners = [];
-      addEventListener(eventName, listener) {
-        if (eventName === 'chargingchange')
-          this._chargingListeners.push(listener);
-        if (eventName === 'levelchange')
-          this._levelListeners.push(listener);
-      }
-      // Will be called by the test.
-      _setLevel(value) {
-        this.level = value;
-        this._levelListeners.forEach(cb => cb());
-      }
-      _setCharging(value) {
-        this.charging = value;
-        this._chargingListeners.forEach(cb => cb());
-      }
-    };
-    const mockBattery = new BatteryMock();
-    // Override the method to always return mock battery info.
-    window.navigator.getBattery = async () => mockBattery;
-    // Save the mock object on window for easier access.
-    window.mockBattery = mockBattery;
-  });
-
-  await page.goto('/');
-  await expect(page.locator('.battery-percentage')).toHaveText('10%');
-
-  // Update level to 27.5%
-  await page.evaluate(() => window.mockBattery._setLevel(0.275));
-  await expect(page.locator('.battery-percentage')).toHaveText('27.5%');
-  await expect(page.locator('.battery-status')).toHaveText('Battery');
-
-  // Emulate connected adapter
-  await page.evaluate(() => window.mockBattery._setCharging(true));
-  await expect(page.locator('.battery-status')).toHaveText('Adapter');
-  await expect(page.locator('.battery-fully')).toHaveText('00:30');
-});
+// playwright.config.js
+// @ts-check
+/** @type {import('@playwright/test').PlaywrightTestConfig} */
+const config = {
+  globalSetup: require.resolve('./global-setup'),
+  reporter: require.resolve('./my-awesome-reporter'),
+};
+module.exports = config;
 ```
 
+</TabItem>
+</Tabs>
+
+See [`TestInfo`](./class-testinfo.md) for related attachment functionality scoped to the test-level.
+
+
+- [globalInfo.attach(name[, options])](./api/class-globalinfo.mdx#global-info-attach)
+- [globalInfo.attachments()](./api/class-globalinfo.mdx#global-info-attachments)
+
+## globalInfo.attach(name[, options]) {#global-info-attach}
+- `name`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="global-info-attach-option-name"/> &#60;[string]&#62;<a href="#global-info-attach-option-name" class="list-anchor">#</a>
+- `options?` &#60;[Object]&#62;
+  - `body?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="global-info-attach-option-body"/> &#60;[string]|[Buffer]&#62;<a href="#global-info-attach-option-body" class="list-anchor">#</a>
+  - `contentType?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="global-info-attach-option-content-type"/> &#60;[string]&#62;<a href="#global-info-attach-option-content-type" class="list-anchor">#</a>
+  - `path?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="global-info-attach-option-path"/> &#60;[string]&#62;<a href="#global-info-attach-option-path" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="global-info-attach-return"/> &#60;[void]&#62;<a href="#global-info-attach-return" class="list-anchor">#</a>
+
+Attach a value or a file from disk to the overall test run. Some reporters show global attachments. Either `path` or `body` must be specified, but not both.
+
+See [testInfo.attach(name[, options])](./api/class-testinfo.mdx#test-info-attach) if you are looking for test-scoped attachments.
+
+:::note
+[globalInfo.attach(name[, options])](./api/class-globalinfo.mdx#global-info-attach) automatically takes care of copying attached files to a location that is accessible to reporters. You can safely remove the attachment after awaiting the attach call.
+:::
+
+## globalInfo.attachments() {#global-info-attachments}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="global-info-attachments-return"/> &#60;[Array]<[Object]>&#62;<a href="#global-info-attachments-return" class="list-anchor">#</a>
+  - `name` &#60;[string]&#62; Attachment name.
+  - `contentType` &#60;[string]&#62; Content type of this attachment to properly present in the report, for example `'application/json'` or `'image/png'`.
+  - `path?` &#60;[string]&#62; Optional path on the filesystem to the attached file.
+  - `body?` &#60;[Buffer]&#62; Optional attachment body used instead of a file.
+
+The list of files or buffers attached to the overall test run. Some reporters show global attachments.
+
+To add an attachment, use [globalInfo.attach(name[, options])](./api/class-globalinfo.mdx#global-info-attach). See [testInfo.attachments](./api/class-testinfo.mdx#test-info-attachments) if you are looking for test-scoped attachments.
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"
