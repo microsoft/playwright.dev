@@ -221,7 +221,7 @@ import TabItem from '@theme/TabItem';
    */
   mdxLinks(text) {
     for (const name of this.generatedFiles)
-      text = text.replace(new RegExp('\\' + name, 'g'), name + 'x');
+      text = text.replace(new RegExp(`/(${path.basename(name)})`, 'g'), '/$1x');
     return rewriteContent(text);
   }
 
