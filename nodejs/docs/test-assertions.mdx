@@ -49,7 +49,8 @@ By default, the timeout for assertions is set to 5 seconds. Learn more about [va
 - [expect(page).not](./test-assertions.mdx#page-assertions-not)
 - [expect(apiResponse).toBeOK()](./test-assertions.mdx#api-response-assertions-to-be-ok)
 - [expect(apiResponse).not](./test-assertions.mdx#api-response-assertions-not)
-- [expect(screenshot).toMatchSnapshot(nameOrOptions[, options])](./test-assertions.mdx#screenshot-assertions-to-match-snapshot)
+- [expect(screenshot).toMatchSnapshot(name[, options])](./test-assertions.mdx#screenshot-assertions-to-match-snapshot-1)
+- [expect(screenshot).toMatchSnapshot([options])](./test-assertions.mdx#screenshot-assertions-to-match-snapshot-2)
 
 ## Negating Matchers
 
@@ -445,13 +446,13 @@ Ensures the response status code is within [200..299] range.
 await expect(response).toBeOK();
 ```
 
-## expect(screenshot).toMatchSnapshot(nameOrOptions[, options]) {#screenshot-assertions-to-match-snapshot}
-- `nameOrOptions`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="screenshot-assertions-to-match-snapshot-option-name-or-options"/> &#60;[string]|[Array]<[string]>|[Object]&#62; Optional snapshot name. If not passed, the test name and ordinals are used when called multiple times. Also passing the options here is supported.<a href="#screenshot-assertions-to-match-snapshot-option-name-or-options" class="list-anchor">#</a>
+## expect(screenshot).toMatchSnapshot(name[, options]) {#screenshot-assertions-to-match-snapshot-1}
+- `name`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="screenshot-assertions-to-match-snapshot-1-option-name"/> &#60;[string]|[Array]<[string]>&#62; Snapshot name.<a href="#screenshot-assertions-to-match-snapshot-1-option-name" class="list-anchor">#</a>
 - `options?` &#60;[Object]&#62;
-  - `maxDiffPixelRatio?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="screenshot-assertions-to-match-snapshot-option-max-diff-pixel-ratio"/> &#60;[number]&#62; An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1`. Default is configurable with `TestConfig.expect`. Unset by default.<a href="#screenshot-assertions-to-match-snapshot-option-max-diff-pixel-ratio" class="list-anchor">#</a>
-  - `maxDiffPixels?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="screenshot-assertions-to-match-snapshot-option-max-diff-pixels"/> &#60;[number]&#62; An acceptable amount of pixels that could be different, default is configurable with `TestConfig.expect`. Default is configurable with `TestConfig.expect`. Unset by default.<a href="#screenshot-assertions-to-match-snapshot-option-max-diff-pixels" class="list-anchor">#</a>
-  - `threshold?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="screenshot-assertions-to-match-snapshot-option-threshold"/> &#60;[number]&#62; An acceptable perceived color difference in the [YIQ color space](https://en.wikipedia.org/wiki/YIQ) between the same pixel in compared images, between zero (strict) and one (lax), default is configurable with `TestConfig.expect`. Defaults to `0.2`.<a href="#screenshot-assertions-to-match-snapshot-option-threshold" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="screenshot-assertions-to-match-snapshot-return"/> &#60;[void]&#62;<a href="#screenshot-assertions-to-match-snapshot-return" class="list-anchor">#</a>
+  - `maxDiffPixelRatio?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="screenshot-assertions-to-match-snapshot-1-option-max-diff-pixel-ratio"/> &#60;[number]&#62; An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1`. Default is configurable with `TestConfig.expect`. Unset by default.<a href="#screenshot-assertions-to-match-snapshot-1-option-max-diff-pixel-ratio" class="list-anchor">#</a>
+  - `maxDiffPixels?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="screenshot-assertions-to-match-snapshot-1-option-max-diff-pixels"/> &#60;[number]&#62; An acceptable amount of pixels that could be different, default is configurable with `TestConfig.expect`. Default is configurable with `TestConfig.expect`. Unset by default.<a href="#screenshot-assertions-to-match-snapshot-1-option-max-diff-pixels" class="list-anchor">#</a>
+  - `threshold?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="screenshot-assertions-to-match-snapshot-1-option-threshold"/> &#60;[number]&#62; An acceptable perceived color difference in the [YIQ color space](https://en.wikipedia.org/wiki/YIQ) between the same pixel in compared images, between zero (strict) and one (lax), default is configurable with `TestConfig.expect`. Defaults to `0.2`.<a href="#screenshot-assertions-to-match-snapshot-1-option-threshold" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="screenshot-assertions-to-match-snapshot-1-return"/> &#60;[void]&#62;<a href="#screenshot-assertions-to-match-snapshot-1-return" class="list-anchor">#</a>
 
 Ensures that passed value, either a [string] or a [Buffer], matches the expected snapshot stored in the test snapshots directory.
 
@@ -459,11 +460,8 @@ Ensures that passed value, either a [string] or a [Buffer], matches the expected
 // Basic usage.
 expect(await page.screenshot()).toMatchSnapshot('landing-page.png');
 
-// Basic usage and the file name is derived from the test name.
-expect(await page.screenshot()).toMatchSnapshot();
-
 // Pass options to customize the snapshot comparison and have a generated name.
-expect(await page.screenshot()).toMatchSnapshot({
+expect(await page.screenshot()).toMatchSnapshot('landing-page.png', {
   maxDiffPixels: 27, // allow no more than 27 different pixels.
 });
 
@@ -473,6 +471,34 @@ expect(await page.screenshot()).toMatchSnapshot('landing-page.png', { threshold:
 // Bring some structure to your snapshot files by passing file path segments.
 expect(await page.screenshot()).toMatchSnapshot(['landing', 'step2.png']);
 expect(await page.screenshot()).toMatchSnapshot(['landing', 'step3.png']);
+```
+
+Learn more about [visual comparisons](./test-snapshots.mdx).
+
+## expect(screenshot).toMatchSnapshot([options]) {#screenshot-assertions-to-match-snapshot-2}
+- `options?` &#60;[Object]&#62;
+  - `maxDiffPixelRatio?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="screenshot-assertions-to-match-snapshot-2-option-max-diff-pixel-ratio"/> &#60;[number]&#62; An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1`. Default is configurable with `TestConfig.expect`. Unset by default.<a href="#screenshot-assertions-to-match-snapshot-2-option-max-diff-pixel-ratio" class="list-anchor">#</a>
+  - `maxDiffPixels?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="screenshot-assertions-to-match-snapshot-2-option-max-diff-pixels"/> &#60;[number]&#62; An acceptable amount of pixels that could be different, default is configurable with `TestConfig.expect`. Default is configurable with `TestConfig.expect`. Unset by default.<a href="#screenshot-assertions-to-match-snapshot-2-option-max-diff-pixels" class="list-anchor">#</a>
+  - `name?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="screenshot-assertions-to-match-snapshot-2-option-name"/> &#60;[string]|[Array]<[string]>&#62; Snapshot name. If not passed, the test name and ordinals are used when called multiple times.<a href="#screenshot-assertions-to-match-snapshot-2-option-name" class="list-anchor">#</a>
+  - `threshold?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="screenshot-assertions-to-match-snapshot-2-option-threshold"/> &#60;[number]&#62; An acceptable perceived color difference in the [YIQ color space](https://en.wikipedia.org/wiki/YIQ) between the same pixel in compared images, between zero (strict) and one (lax), default is configurable with `TestConfig.expect`. Defaults to `0.2`.<a href="#screenshot-assertions-to-match-snapshot-2-option-threshold" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="screenshot-assertions-to-match-snapshot-2-return"/> &#60;[void]&#62;<a href="#screenshot-assertions-to-match-snapshot-2-return" class="list-anchor">#</a>
+
+Ensures that passed value, either a [string] or a [Buffer], matches the expected snapshot stored in the test snapshots directory.
+
+```js
+// Basic usage and the file name is derived from the test name.
+expect(await page.screenshot()).toMatchSnapshot();
+
+// Pass options to customize the snapshot comparison and have a generated name.
+expect(await page.screenshot()).toMatchSnapshot({
+  maxDiffPixels: 27, // allow no more than 27 different pixels.
+});
+
+// Configure image matching threshold and snapshot name.
+expect(await page.screenshot()).toMatchSnapshot({
+  name: 'landing-page.png',
+  threshold: 0.3,
+});
 ```
 
 Learn more about [visual comparisons](./test-snapshots.mdx).
