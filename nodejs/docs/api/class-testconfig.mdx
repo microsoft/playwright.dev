@@ -501,7 +501,7 @@ Whether to suppress stdio and stderr output from the tests.
 The number of times to repeat each test, useful for debugging flaky tests.
 
 ## testConfig.reportSlowTests {#test-config-report-slow-tests}
-- type: &#60;[Object]&#62;
+- type: &#60;[null]|[Object]&#62;
   - `max` &#60;[number]&#62; The maximum number of slow test files to report. Defaults to `5`.
   - `threshold` &#60;[number]&#62; Test duration in milliseconds that is considered slow. Defaults to 15 seconds.
 
@@ -605,7 +605,7 @@ module.exports = config;
 </Tabs>
 
 ## testConfig.shard {#test-config-shard}
-- type: &#60;[Object]&#62;
+- type: &#60;[null]|[Object]&#62;
   - `total` &#60;[number]&#62; The total number of shards.
   - `current` &#60;[number]&#62; The index of the shard to execute, one-based.
 
@@ -666,7 +666,7 @@ module.exports = config;
 </Tabs>
 
 ## testConfig.testIgnore {#test-config-test-ignore}
-- type: &#60;[string]|[RegExp]|[Array]<[string]>|[Array]<[RegExp]>&#62;
+- type: &#60;[string]|[RegExp]|[Array]<[string]|[RegExp]>&#62;
 
 Files matching one of these patterns are not executed as test files. Matching is performed against the absolute file path. Strings are treated as glob patterns.
 
@@ -711,7 +711,7 @@ module.exports = config;
 </Tabs>
 
 ## testConfig.testMatch {#test-config-test-match}
-- type: &#60;[string]|[RegExp]|[Array]<[string]>|[Array]<[RegExp]>&#62;
+- type: &#60;[string]|[RegExp]|[Array]<[string]|[RegExp]>&#62;
 
 Only the files matching one of these patterns are executed as test files. Matching is performed against the absolute file path. Strings are treated as glob patterns.
 
@@ -859,14 +859,14 @@ module.exports = config;
 
 ## testConfig.webServer {#test-config-web-server}
 - type: &#60;[Object]&#62;
-  - `command` &#60;[string]&#62; Command which gets executed
-  - `port` &#60;[number]&#62; Port to wait on for the web server (exactly one of `port` or `url` is required)
-  - `url` &#60;[string]&#62; URL to wait on for the web server (exactly one of `port` or `url` is required)
-  - `ignoreHTTPSErrors` &#60;[boolean]&#62; Whether to ignore HTTPS errors when fetching the `url`. Defaults to `false`.
-  - `timeout` &#60;[number]&#62; Maximum duration to wait on until the web server is ready
-  - `reuseExistingServer` &#60;[boolean]&#62; If true, reuse the existing server if it is already running, otherwise it will fail
-  - `cwd` &#60;[string]&#62; Working directory to run the command in
-  - `env` &#60;[Object]<[string], [string]>&#62; Environment variables to set for the command
+  - `command` &#60;[string]&#62; Shell command to start. For example `npm run start`..
+  - `port?` &#60;[number]&#62; The port that your http server is expected to appear on. It does wait until it accepts connections. Exactly one of `port` or `url` is required.
+  - `url?` &#60;[string]&#62; The url on your http server that is expected to return a 2xx status code when the server is ready to accept connections. Exactly one of `port` or `url` is required.
+  - `ignoreHTTPSErrors?` &#60;[boolean]&#62; Whether to ignore HTTPS errors when fetching the `url`. Defaults to `false`.
+  - `timeout?` &#60;[number]&#62; How long to wait for the process to start up and be available in milliseconds. Defaults to 60000.
+  - `reuseExistingServer?` &#60;[boolean]&#62; If true, it will re-use an existing server on the `port` or `url` when available. If no server is running on that `port` or `url`, it will run the command to start a new server. If `false`, it will throw if an existing process is listening on the `port` or `url`. This should be commonly set to `!process.env.CI` to allow the local dev server when running tests locally.
+  - `cwd?` &#60;[string]&#62; Current working directory of the spawned process, `process.cwd()` by default.
+  - `env?` &#60;[Object]<[string], [string]>&#62; Environment variables to set for the command, `process.env` by default.
 
 Launch a development web server during the tests.
 
