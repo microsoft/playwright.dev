@@ -16,6 +16,7 @@ Selectors are strings that are used to create [Locator]s. Locators are used to p
 - [Selecting elements matching one of the conditions](#selecting-elements-matching-one-of-the-conditions)
 - [Selecting elements in Shadow DOM](#selecting-elements-in-shadow-dom)
 - [Selecting elements based on layout](#selecting-elements-based-on-layout)
+- [Selecting elements by label text](#selecting-elements-by-label-text)
 - [XPath selectors](#xpath-selectors)
 - [N-th element selector](#n-th-element-selector)
 - [React selectors](#react-selectors)
@@ -329,11 +330,13 @@ Layout selectors depend on the page layout and may produce unexpected results. F
 :::
 
 Layout selectors use [bounding client rect](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect) to compute distance and relative position of the elements.
-* `:right-of(inner > selector)` - Matches elements that are to the right of any element matching the inner selector.
-* `:left-of(inner > selector)` - Matches elements that are to the left of any element matching the inner selector.
-* `:above(inner > selector)` - Matches elements that are above any of the elements matching the inner selector.
-* `:below(inner > selector)` - Matches elements that are below any of the elements matching the inner selector.
+* `:right-of(inner > selector)` - Matches elements that are to the right of any element matching the inner selector, at any vertical position.
+* `:left-of(inner > selector)` - Matches elements that are to the left of any element matching the inner selector, at any vertical position.
+* `:above(inner > selector)` - Matches elements that are above any of the elements matching the inner selector, at any horizontal position.
+* `:below(inner > selector)` - Matches elements that are below any of the elements matching the inner selector, at any horizontal position.
 * `:near(inner > selector)` - Matches elements that are near (within 50 CSS pixels) any of the elements matching the inner selector.
+
+Note that resulting matches are sorted by their distance to the anchor element, so you can use [locator.first()](./api/class-locator.mdx#locator-first) to pick the closest one.
 
 ```js
 // Fill an input to the right of "Username".
@@ -341,9 +344,31 @@ await page.locator('input:right-of(:text("Username"))').fill('value');
 
 // Click a button near the promo card.
 await page.locator('button:near(.promo-card)').click();
+
+// Click the radio input in the list closest to the "Label 3".
+await page.locator('[type=radio]:left-of(:text("Label 3"))').first().click();
 ```
 
 All layout selectors support optional maximum pixel distance as the last argument. For example `button:near(:text("Username"), 120)` matches a button that is at most 120 pixels away from the element with the text "Username".
+
+## Selecting elements by label text
+
+Targeted input actions in Playwright automatically distinguish between labels and controls, so you can target the label to perform an action on the associated control.
+
+For example, consider the following DOM structure: `<label for="password">Password:</label><input id="password" type="password">`. You can target the label with something like `text=Password` and perform the following actions on the input instead:
+- `click` will click the label and automatically focus the input field;
+- `fill` will fill the input field;
+- `inputValue` will return the value of the input field;
+- `selectText` will select text in the input field;
+- `setInputFiles` will set files for the input field with `type=file`;
+- `selectOption` will select an option from the select box.
+
+```js
+// Fill the input by targeting the label.
+await page.fill('text=Password', 'secret');
+```
+
+However, other methods will target the label itself, for example `textContent` will return the text content of the label, not the input field.
 
 ## XPath selectors
 
@@ -692,6 +717,7 @@ await page.locator('//*[@id="tsf"]/div[2]/div[1]/div[1]/div/div[2]/input').click
 [TestError]: ./api/class-testerror.mdx "TestError"
 [TestInfo]: ./api/class-testinfo.mdx "TestInfo"
 [TestOptions]: ./api/class-testoptions.mdx "TestOptions"
+[TestPlugin]: ./api/class-testplugin.mdx "TestPlugin"
 [TestProject]: ./api/class-testproject.mdx "TestProject"
 [WorkerInfo]: ./api/class-workerinfo.mdx "WorkerInfo"
 [Location]: ./api/class-location.mdx "Location"

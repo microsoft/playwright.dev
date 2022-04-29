@@ -63,6 +63,48 @@ await locator.click()
 </TabItem>
 </Tabs>
 
+## Creating Locators
+
+Use [page.locator(selector, **kwargs)](./api/class-page.mdx#page-locator) method to create a locator. This method takes a selector that describes how to find an element in the page. Playwright supports many different selectors like [Text](./selectors.mdx#text-selector), [CSS](./selectors.mdx#css-selector), [XPath](./selectors.mdx#xpath-selectors) and many more. Learn more about available selectors and how to pick one in this [in-depth guide](./selectors.mdx).
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Find by text.
+page.locator("text=Sign up").click()
+
+# Find by CSS.
+page.locator("button.sign-up").click()
+
+# Find by test id.
+page.locator("data-testid=sign-up").click()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Find by text.
+await page.locator("text=Sign up").click()
+
+# Find by CSS.
+await page.locator("button.sign-up").click()
+
+# Find by test id.
+await page.locator("data-testid=sign-up").click()
+```
+
+</TabItem>
+</Tabs>
+
 ## Strictness
 
 Locators are strict. This means that all operations on locators that imply some target DOM element will throw an exception if more than one element matches given selector.
@@ -154,6 +196,92 @@ for i in range(count):
 # Pattern 3: resolve locator to elements on page and map them to their text content.
 # Note: the code inside evaluateAll runs in page, you can call any DOM apis there.
 texts = await rows.evaluate_all("list => list.map(element => element.textContent)")
+```
+
+</TabItem>
+</Tabs>
+
+## Filtering Locators
+
+When creating a locator, you can pass additional options to filter it.
+
+Filtering by text will search for a particular string somewhere inside the element, possibly in a descendant element, case-insensitively. You can also pass a regular expression.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.locator("button", has_text="Sign up").click()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.locator("button", has_text="Sign up").click()
+```
+
+</TabItem>
+</Tabs>
+
+Locators also support an option to only select elements that have a descendant matching another locator. Note that inner locator is matched starting from the outer one, not from the document root.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.locator("article", has=page.locator("button.subscribe"))
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+page.locator("article", has=page.locator("button.subscribe"))
+```
+
+</TabItem>
+</Tabs>
+
+You can also filter an existing locator with [locator.that(**kwargs)](./api/class-locator.mdx#locator-that) method.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+button_locator = page.locator("button")
+# ...
+button_locator.that(has_text="Sign up").click()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+button_locator = page.locator("button")
+# ...
+await button_locator.that(has_text="Sign up").click()
 ```
 
 </TabItem>

@@ -21,6 +21,21 @@ await locator.hover();
 await locator.click();
 ```
 
+## Creating Locators
+
+Use [page.locator(selector[, options])](./api/class-page.mdx#page-locator) method to create a locator. This method takes a selector that describes how to find an element in the page. Playwright supports many different selectors like [Text](./selectors.mdx#text-selector), [CSS](./selectors.mdx#css-selector), [XPath](./selectors.mdx#xpath-selectors) and many more. Learn more about available selectors and how to pick one in this [in-depth guide](./selectors.mdx).
+
+```js
+// Find by text.
+await page.locator('text=Sign up').click();
+
+// Find by CSS.
+await page.locator('button.sign-up').click();
+
+// Find by test id.
+await page.locator('data-testid=sign-up').click();
+```
+
 ## Strictness
 
 Locators are strict. This means that all operations on locators that imply some target DOM element will throw an exception if more than one element matches given selector.
@@ -55,6 +70,30 @@ for (let i = 0; i < count; ++i)
 // Pattern 3: resolve locator to elements on page and map them to their text content.
 // Note: the code inside evaluateAll runs in page, you can call any DOM apis there.
 const texts = await rows.evaluateAll(list => list.map(element => element.textContent));
+```
+
+## Filtering Locators
+
+When creating a locator, you can pass additional options to filter it.
+
+Filtering by text will search for a particular string somewhere inside the element, possibly in a descendant element, case-insensitively. You can also pass a regular expression.
+
+```js
+await page.locator('button', { hasText: 'Sign up' }).click();
+```
+
+Locators also support an option to only select elements that have a descendant matching another locator. Note that inner locator is matched starting from the outer one, not from the document root.
+
+```js
+page.locator('article', { has: page.locator('button.subscribe') })
+```
+
+You can also filter an existing locator with [locator.that([options])](./api/class-locator.mdx#locator-that) method.
+
+```js
+const buttonLocator = page.locator('button');
+// ...
+await buttonLocator.that({ hasText: 'Sign up' }).click();
 ```
 
 ## Locator vs ElementHandle
@@ -137,6 +176,7 @@ await locator.click();
 [TestError]: ./api/class-testerror.mdx "TestError"
 [TestInfo]: ./api/class-testinfo.mdx "TestInfo"
 [TestOptions]: ./api/class-testoptions.mdx "TestOptions"
+[TestPlugin]: ./api/class-testplugin.mdx "TestPlugin"
 [TestProject]: ./api/class-testproject.mdx "TestProject"
 [WorkerInfo]: ./api/class-workerinfo.mdx "WorkerInfo"
 [Location]: ./api/class-location.mdx "Location"
