@@ -1,173 +1,30 @@
 ---
-id: trace-viewer
-title: "Trace Viewer"
+id: class-testplugin
+title: "TestPlugin"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright Trace Viewer is a GUI tool that helps exploring recorded Playwright traces after the script ran. Open traces [locally](#viewing-the-trace) or in your browser on [`trace.playwright.dev`](https://trace.playwright.dev).
 
-<img width="1212" alt="Playwright Trace Viewer" src="https://user-images.githubusercontent.com/883973/120585896-6a1bca80-c3e7-11eb-951a-bd84002480f5.png"></img>
+- [testPlugin.configure(config, configDir)](./api/class-testplugin.mdx#test-plugin-configure)
+- [testPlugin.setup(suite)](./api/class-testplugin.mdx#test-plugin-setup)
+- [testPlugin.teardown()](./api/class-testplugin.mdx#test-plugin-teardown)
+- [testPlugin.name](./api/class-testplugin.mdx#test-plugin-name)
 
-- [Recording a trace](#recording-a-trace)
-- [Viewing the trace](#viewing-the-trace)
-- [Actions](#actions)
-- [Screenshots](#screenshots)
-- [Snapshots](#snapshots)
-- [Viewing remote Traces](#viewing-remote-traces)
-- [Using [trace.playwright.dev](https://trace.playwright.dev)](#using-traceplaywrightdevhttpstraceplaywrightdev)
+## testPlugin.configure(config, configDir) {#test-plugin-configure}
+- `config`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-plugin-configure-option-config"/> &#60;[TestConfig]&#62;<a href="#test-plugin-configure-option-config" class="list-anchor">#</a>
+- `configDir`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-plugin-configure-option-config-dir"/> &#60;[string]&#62;<a href="#test-plugin-configure-option-config-dir" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-plugin-configure-return"/> &#60;[Promise]<[void]>&#62;<a href="#test-plugin-configure-return" class="list-anchor">#</a>
 
-## Recording a trace
+## testPlugin.setup(suite) {#test-plugin-setup}
+- `suite`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-plugin-setup-option-suite"/> &#60;[Suite]&#62;<a href="#test-plugin-setup-option-suite" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-plugin-setup-return"/> &#60;[Promise]<[void]>&#62;<a href="#test-plugin-setup-return" class="list-anchor">#</a>
 
-Set the `trace: 'on-first-retry'` option in the test configuration file. This will produce `trace.zip` file for each test that was retried.
+## testPlugin.teardown() {#test-plugin-teardown}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-plugin-teardown-return"/> &#60;[Promise]<[void]>&#62;<a href="#test-plugin-teardown-return" class="list-anchor">#</a>
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'},
-    {label: 'Library', value: 'library'}
-  ]
-}>
-<TabItem value="ts">
-
-```ts
-import { PlaywrightTestConfig } from '@playwright/test';
-const config: PlaywrightTestConfig = {
-  retries: 1,
-  use: {
-    trace: 'on-first-retry',
-  },
-};
-export default config;
-```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-// @ts-check
-
-/** @type {import('@playwright/test').PlaywrightTestConfig} */
-const config = {
-  retries: 1,
-  use: {
-    trace: 'on-first-retry',
-  },
-};
-
-module.exports = config;
-```
-
-</TabItem>
-<TabItem value="library">
-
-```library
-const browser = await chromium.launch();
-const context = await browser.newContext();
-
-// Start tracing before creating / navigating a page.
-await context.tracing.start({ screenshots: true, snapshots: true });
-
-const page = await context.newPage();
-await page.goto('https://playwright.dev');
-
-// Stop tracing and export it into a zip archive.
-await context.tracing.stop({ path: 'trace.zip' });
-```
-
-</TabItem>
-</Tabs>
-
-You can also use `trace: 'retain-on-failure'` if you do not enable retries but still want traces for failed tests.
-
-Available options to record a trace:
-- `'off'` - Do not record a trace.
-- `'on'` - Record a trace for each test.
-- `'retain-on-failure'` - Record a trace for each test, but remove it from successful test runs.
-- `'on-first-retry'` - Record a trace only when retrying a test for the first time.
-
-If you are not using Playwright Test, use the [browserContext.tracing](./api/class-browsercontext.mdx#browser-context-tracing) API instead.
-
-## Viewing the trace
-
-You can open the saved trace using Playwright CLI or in your browser on [`trace.playwright.dev`](https://trace.playwright.dev).
-
-```bash
-npx playwright show-trace trace.zip
-```
-
-## Actions
-
-Once trace is opened, you will see the list of actions Playwright performed on the left hand side:
-
-<img width="301" alt="Actions" src="https://user-images.githubusercontent.com/883973/120588303-d39dd800-c3eb-11eb-9e8b-bfea8b775354.png"></img>
-
-Selecting each action reveals:
-- action snapshots,
-- action log,
-- source code location,
-- network log for this action
-
-in the properties pane. You will also see rendered DOM snapshots associated with each action.
-
-## Screenshots
-
-When tracing with the `screenshots` option turned on, each trace records screencast and renders it as a film strip:
-
-<img width="353" alt="Film strip" src="https://user-images.githubusercontent.com/883973/120588069-5d997100-c3eb-11eb-97a3-acbd5e0eb358.png"></img>
-
-You can hover over the film strip to see a magnified image:
-
-<img width="617" alt="Magnify" src="https://user-images.githubusercontent.com/883973/120588147-8f123c80-c3eb-11eb-864b-19d800619234.png"></img>
-
-That helps locating the action of interest very quickly.
-
-## Snapshots
-
-When tracing with the `snapshots` option turned on, Playwright captures a set of complete DOM snapshots for each action. Depending on the type of the action, it will capture:
-
-| Type | Description |
-|------|-------------|
-|Before|A snapshot at the time action is called.|
-|Action|A snapshot at the moment of the performed input. This type of snapshot is especially useful when exploring where exactly Playwright clicked.|
-|After|A snapshot after the action.|
-
-<br/>
-
-Here is what the typical Action snapshot looks like:
-
-<img width="682" alt="Snapshots" src="https://user-images.githubusercontent.com/883973/120588728-879f6300-c3ec-11eb-85d6-e67b0e92e4e3.png">
-
-</img>
-
-Notice how it highlights both, the DOM Node as well as the exact click position.
-
-## Viewing remote Traces
-
-You can open remote traces using it's URL. They could be generated in a CI run and makes it easy to view the remote trace without having to manually download the file.
-
-```bash
-npx playwright show-trace https://example.com/trace.zip
-```
-
-## Using [trace.playwright.dev](https://trace.playwright.dev)
-
-[trace.playwright.dev](https://trace.playwright.dev) is a statically hosted variant of the Trace Viewer. 
-
-### Viewing local traces
-
-When navigating to [trace.playwright.dev](https://trace.playwright.dev), you can upload trace files using drag and drop.
-
-### Remote traces
-
-You can also pass the URL of your uploaded trace (e.g. inside your CI) from some accessible storage as a parameter. CORS (Cross-Origin Resource Sharing) rules might apply.
-
-```txt
-https://trace.playwright.dev/?trace=https://demo.playwright.dev/reports/todomvc/data/cb0fa77ebd9487a5c899f3ae65a7ffdbac681182.zip
-```
-
+## testPlugin.name {#test-plugin-name}
+- type: &#60;[string]&#62;
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"
