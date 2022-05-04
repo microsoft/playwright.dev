@@ -33,6 +33,7 @@ module.exports = {
         { "type": "doc", "id": "test-advanced" },
         { "type": "doc", "id": "test-fixtures" },
         { "type": "doc", "id": "test-typescript" },
+        { "type": "doc", "id": "test-components" },
       ],
       "collapsed": false
     },
