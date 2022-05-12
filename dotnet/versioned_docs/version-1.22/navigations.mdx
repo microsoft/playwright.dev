@@ -1,0 +1,244 @@
+---
+id: navigations
+title: "Navigations"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Playwright can navigate to URLs and handle navigations caused by page interactions. This guide covers common scenarios to wait for page navigations and loading to complete.
+
+- [Navigation lifecycle](#navigation-lifecycle)
+- [Scenarios initiated by browser UI](#scenarios-initiated-by-browser-ui)
+- [Scenarios initiated by page interaction](#scenarios-initiated-by-page-interaction)
+- [Advanced patterns](#advanced-patterns)
+
+## Navigation lifecycle
+
+Playwright splits the process of showing a new document in a page into **navigation** and **loading**.
+
+**Navigation starts** by changing the page URL or by interacting with the page (e.g., clicking a link). The navigation intent may be canceled, for example, on hitting an unresolved DNS address or transformed into a file download.
+
+**Navigation is committed** when the response headers have been parsed and session history is updated. Only after the navigation succeeds (is committed), the page starts **loading** the document.
+
+**Loading** covers getting the remaining response body over the network, parsing, executing the scripts and firing load events:
+- [Page.Url](./api/class-page.mdx#page-url) is set to the new url
+- document content is loaded over network and parsed
+- [event Page.DOMContentLoaded](./api/class-page.mdx#page-event-dom-content-loaded) event is fired
+- page executes some scripts and loads resources like stylesheets and images
+- [event Page.Load](./api/class-page.mdx#page-event-load) event is fired
+- page executes dynamically loaded scripts
+- `networkidle` is fired when no new network requests are made for 500 ms
+
+## Scenarios initiated by browser UI
+
+Navigations can be initiated by changing the URL bar, reloading the page or going back or forward in session history.
+
+### Auto-wait
+
+Navigating to a URL auto-waits for the page to fire the `load` event. If the page does a client-side redirect before `load`, [Page.GotoAsync(url, options)](./api/class-page.mdx#page-goto) will auto-wait for the redirected page to fire the `load` event.
+
+```csharp
+// Navigate the page
+await page.GotoAsync("https://example.com");
+```
+
+### Custom wait
+
+Override the default behavior to wait until a specific event, like `networkidle`.
+
+```csharp
+// Navigate and wait until network is idle
+await page.GotoAsync("https://example.com", new PageGotoOptions { WaitUntil = WaitUntilState.NetworkIdle });
+```
+
+### Wait for element
+
+In lazy-loaded pages, it can be useful to wait until an element is visible with [Locator.WaitForAsync(options)](./api/class-locator.mdx#locator-wait-for). Alternatively, page interactions like [Page.ClickAsync(selector, options)](./api/class-page.mdx#page-click) auto-wait for elements.
+
+```csharp
+// Navigate and wait for element
+await page.GotoAsync("https://example.com");
+await page.Locator("text=Example Domain").WaitForAsync();
+
+// Navigate and click element
+// Click will auto-wait for the element
+await page.GotoAsync("https://example.com");
+await page.ClickAsync("text=Example Domain");
+```
+
+### API reference
+- [Page.GotoAsync(url, options)](./api/class-page.mdx#page-goto)
+- [Page.ReloadAsync(options)](./api/class-page.mdx#page-reload)
+- [Page.GoBackAsync(options)](./api/class-page.mdx#page-go-back)
+- [Page.GoForwardAsync(options)](./api/class-page.mdx#page-go-forward)
+
+## Scenarios initiated by page interaction
+
+In the scenarios below, [Page.ClickAsync(selector, options)](./api/class-page.mdx#page-click) initiates a navigation and then waits for the navigation to complete.
+
+### Auto-wait
+
+By default, [Page.ClickAsync(selector, options)](./api/class-page.mdx#page-click) will wait for the navigation step to complete. This can be combined with a page interaction on the navigated page which would auto-wait for an element.
+
+```csharp
+// Click will auto-wait for navigation to complete
+await page.ClickAsync("text=Login");
+
+// Fill will auto-wait for element on navigated page
+await page.FillAsync("#username", "John Doe");
+```
+
+### Custom wait
+
+`page.click` can be combined with [Page.WaitForLoadStateAsync(state, options)](./api/class-page.mdx#page-wait-for-load-state) to wait for a loading event.
+
+```csharp
+await page.ClickAsync("button"); // Click triggers navigation
+await page.WaitForLoadStateAsync(LoadState.NetworkIdle); // This resolves after "networkidle"
+```
+
+### Wait for element
+
+In lazy-loaded pages, it can be useful to wait until an element is visible with [Locator.WaitForAsync(options)](./api/class-locator.mdx#locator-wait-for). Alternatively, page interactions like [Page.ClickAsync(selector, options)](./api/class-page.mdx#page-click) auto-wait for elements.
+
+```csharp
+// Click will auto-wait for the element and trigger navigation
+await page.ClickAsync("text=Login");
+// Wait for the element
+await page.Locator("#username").WaitForAsync();
+
+// Click triggers navigation
+await page.ClickAsync("text=Login");
+// Fill will auto-wait for element
+await page.FillAsync("#username", "John Doe");
+```
+
+### Asynchronous navigation
+
+Clicking an element could trigger asynchronous processing before initiating the navigation. In these cases, it is recommended to explicitly call [Page.RunAndWaitForNavigationAsync(action, options)](./api/class-page.mdx#page-wait-for-navigation). For example:
+* Navigation is triggered from a `setTimeout`
+* Page waits for network requests before navigation
+
+```csharp
+// Using waitForNavigation with a callback prevents a race condition
+// between clicking and waiting for a navigation.
+await page.RunAndWaitForNavigationAsync(async () =>
+{
+    // Triggers a navigation after a timeout
+    await page.ClickAsync("div.delayed-navigation");
+});
+```
+
+### Multiple navigations
+
+Clicking an element could trigger multiple navigations. In these cases, it is recommended to explicitly [Page.RunAndWaitForNavigationAsync(action, options)](./api/class-page.mdx#page-wait-for-navigation) to a specific url. For example:
+* Client-side redirects issued after the `load` event
+* Multiple pushes to history state
+
+```csharp
+// Running action in the callback of waitForNavigation prevents a race
+// condition between clicking and waiting for a navigation.
+await page.RunAndWaitForNavigationAsync(async () =>
+{
+    // Triggers a navigation with a script redirect.
+    await page.ClickAsync("a");
+}, new PageWaitForNavigationOptions
+{
+    UrlString = "**/login"
+});
+```
+
+### Loading a popup
+
+When popup is opened, explicitly calling [Page.WaitForLoadStateAsync(state, options)](./api/class-page.mdx#page-wait-for-load-state) ensures that popup is loaded to the desired state.
+
+```csharp
+var popup = await page.RunAndWaitForPopupAsync(async () =>
+{
+    await page.ClickAsync("a[target='_blank']"); // Opens popup
+});
+popup.WaitForLoadStateAsync(LoadState.Load);
+```
+
+### API reference
+- [Page.ClickAsync(selector, options)](./api/class-page.mdx#page-click)
+- [Page.WaitForLoadStateAsync(state, options)](./api/class-page.mdx#page-wait-for-load-state)
+- [Page.RunAndWaitForNavigationAsync(action, options)](./api/class-page.mdx#page-wait-for-navigation)
+- [Page.WaitForFunctionAsync(expression, arg, options)](./api/class-page.mdx#page-wait-for-function)
+
+## Advanced patterns
+
+For pages that have complicated loading patterns, [Page.WaitForFunctionAsync(expression, arg, options)](./api/class-page.mdx#page-wait-for-function) is a powerful and extensible approach to define a custom wait criteria.
+
+```csharp
+await page.GotoAsync("http://example.com");
+await page.WaitForFunctionAsync("() => window.amILoadedYet()");
+// Ready to take a screenshot, according to the page itself.
+await page.ScreenshotAsync();
+```
+
+### API reference
+- [Page.WaitForFunctionAsync(expression, arg, options)](./api/class-page.mdx#page-wait-for-function)
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Locator]: ./api/class-locator.mdx "Locator"
+[LocatorAssertions]: ./test-assertions.mdx "LocatorAssertions"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[PageAssertions]: ./test-assertions.mdx "PageAssertions"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: ./test-assertions.mdx "PlaywrightAssertions"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[bool]: https://docs.microsoft.com/en-us/dotnet/api/system.boolean "bool"
+[double]: https://docs.microsoft.com/en-us/dotnet/api/system.double "double"
+[byte]: https://docs.microsoft.com/en-us/dotnet/api/system.byte "byte"
+[int]: https://docs.microsoft.com/en-us/dotnet/api/system.int32 "int"
+[void]: https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/void "void"
+[string]: https://docs.microsoft.com/en-us/dotnet/api/system.string "string"
+[URL]: https://nodejs.org/api/url.html "URL"
+[Regex]: https://docs.microsoft.com/en-us/dotnet/api/system.text.regularexpressions.regex "Regex"
+
+[Action]: https://docs.microsoft.com/en-us/dotnet/api/system.action-1 "Action"
+[Func]: https://docs.microsoft.com/en-us/dotnet/api/system.func-2 "Func"
+[IEnumerable]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.ienumerable "IEnumerable"
+[IDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.idictionary "IDictionary"
+[Task]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-5.0 "Task"
+[IReadOnlyDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlydictionary-2 "IReadOnlyDictionary"
+[JsonElement]: https://docs.microsoft.com/en-us/dotnet/api/system.text.json.jsonelement "JsonElement"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
