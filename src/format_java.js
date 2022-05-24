@@ -140,7 +140,6 @@ class JavaFormatter {
           case 'Request.headersArray': return '`HttpHeader`';
           case 'Response.headersArray': return '`HttpHeader`';
           case 'ApiResponse.headersArray': return '`HttpHeader`';
-          case 'FetchResponse.headersArray': return '`HttpHeader`';
         }
         if (!type.templates)
           return `${toTitleCase(member.alias)}`;
