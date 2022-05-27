@@ -19,6 +19,7 @@ module.exports = {
       "label": "Guides",
       "items": [
         { "type": "doc", "id": "actionability" },
+        { "type": "doc", "id": "api-testing" },
         { "type": "doc", "id": "auth" },
         { "type": "doc", "id": "browsers" },
         { "type": "doc", "id": "browser-contexts" },
@@ -31,8 +32,8 @@ module.exports = {
         { "type": "doc", "id": "extensibility" },
         { "type": "doc", "id": "frames" },
         { "type": "doc", "id": "handles" },
-        { "type": "doc", "id": "locators" },
         { "type": "doc", "id": "input" },
+        { "type": "doc", "id": "locators" },
         { "type": "doc", "id": "navigations" },
         { "type": "doc", "id": "network" },
         { "type": "doc", "id": "pages" },
