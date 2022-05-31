@@ -1,3 +1,4 @@
+// @ts-check
 const fs = require('fs');
 const path = require('path');
 const rimraf = require('rimraf');
@@ -18,17 +19,20 @@ function removeVersion(version) {
 }
 
 /**
- * @param {string} version
  * @param {number} keepRecentMinorVersions
  */
-function removeRecentVersions(version, keepRecentMinorVersions) {
-  const currentMinorVersion = parseInt(version.split('.')[1], 10);
+function removeRecentVersions(keepRecentMinorVersions) {
   /** @type {string[]} */
   const existingVersions = require(path.join(rootDir, 'nodejs', 'versions.json'));
-  for (const version of existingVersions) {
-    const [, minor] = version.split('.').map(v => parseInt(v, 10));
-    if (minor <= (currentMinorVersion - keepRecentMinorVersions))
-      removeVersion(version);
+  existingVersions.sort((a, b) => {
+    const [aMajor, aMinor] = a.split('.').map(v => parseInt(v, 10));
+    const [bMajor, bMinor] = b.split('.').map(v => parseInt(v, 10));
+    if (aMajor !== bMajor)
+      return aMajor - bMajor;
+    return aMinor - bMinor;
+  });
+  for (const version of existingVersions.slice(0, existingVersions.length - keepRecentMinorVersions)) {
+    removeVersion(version);
   }
 }
 
@@ -48,9 +52,7 @@ switch (process.argv[2]) {
     break;
 
   case '--delete-unwanted-versions':
-    if (!process.argv[3])
-      throw new Error('Missing version');
-    removeRecentVersions(process.argv[3], 3);
+    removeRecentVersions(2);
     break;
 
   default:
