@@ -19,27 +19,24 @@ function removeVersion(version) {
 }
 
 /**
- * @param {number} keepRecentMinorVersions
+ * @param {string} currentVersion
  */
-function removeRecentVersions(keepRecentMinorVersions) {
+function removeStaleMinorVersions(currentVersion) {
+  const kKeepRecentMinorVersions = 3;
+  const [currentMajorVersion, currentMinorVersion] = currentVersion.split('.').map(v => parseInt(v, 10));
   /** @type {string[]} */
   const existingVersions = require(path.join(rootDir, 'nodejs', 'versions.json'));
-  existingVersions.sort((a, b) => {
-    const [aMajor, aMinor] = a.split('.').map(v => parseInt(v, 10));
-    const [bMajor, bMinor] = b.split('.').map(v => parseInt(v, 10));
-    if (aMajor !== bMajor)
-      return aMajor - bMajor;
-    return aMinor - bMinor;
-  });
-  for (const version of existingVersions.slice(0, existingVersions.length - keepRecentMinorVersions)) {
-    removeVersion(version);
+  for (const version of existingVersions) {
+    const [majorVersion, minorVersion] = version.split('.').map(v => parseInt(v, 10));
+    if (currentMajorVersion === majorVersion && minorVersion <= (currentMinorVersion - kKeepRecentMinorVersions))
+      removeVersion(version);
   }
 }
 
 if (!process.argv[2]) {
   console.error([
     'Usage: node versions.js --delete <version>',
-    'Usage: node versions.js --delete-unwanted-versions <version>',
+    'Usage: node versions.js --delete-stale-minor-versions <version>',
   ].join('\n'));
   process.exit(1);
 }
@@ -51,8 +48,10 @@ switch (process.argv[2]) {
     removeVersion(process.argv[3]);
     break;
 
-  case '--delete-unwanted-versions':
-    removeRecentVersions(2);
+  case '--delete-stale-minor-versions':
+    if (!process.argv[3])
+      throw new Error('Missing version');
+    removeStaleMinorVersions(process.argv[3]);
     break;
 
   default:
