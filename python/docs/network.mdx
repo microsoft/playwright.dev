@@ -13,6 +13,7 @@ Playwright provides APIs to **monitor** and **modify** network traffic, both HTT
 - [Handle requests](#handle-requests)
 - [Modify requests](#modify-requests)
 - [Abort requests](#abort-requests)
+- [Modify responses](#modify-responses)
 - [WebSockets](#websockets)
 
 <br/>
@@ -424,6 +425,75 @@ await page.route("**/*", lambda route: route.abort() if route.request.resource_t
 - [page.route(url, handler, **kwargs)](./api/class-page.mdx#page-route)
 - [browser_context.route(url, handler, **kwargs)](./api/class-browsercontext.mdx#browser-context-route)
 - [route.abort(**kwargs)](./api/class-route.mdx#route-abort)
+
+<br/>
+
+## Modify responses
+
+To modify a response use [APIRequestContext] to get original response and then pass the response to [route.fulfill(**kwargs)](./api/class-route.mdx#route-fulfill). You can override individual fields on the response via options:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+def handle_route(route: Route) -> None:
+    # Fetch original response.
+    response = page.request.fetch(route.request)
+    # Add a prefix to the title.
+    body = response.text()
+    body = body.replace("<title>", "<title>My prefix:")
+    route.fulfill(
+        # Pass all fields from the response.
+        response=response,
+        # Override response body.
+        body=body,
+        # Force content type to be html.
+        headers={**response.headers, "content-type": "text/html"},
+    )
+
+page.route("**/title.html", handle_route)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+async def handle_route(route: Route) -> None:
+    # Fetch original response.
+    response = await page.request.fetch(route.request)
+    # Add a prefix to the title.
+    body = await response.text()
+    body = body.replace("<title>", "<title>My prefix:")
+    await route.fulfill(
+        # Pass all fields from the response.
+        response=response,
+        # Override response body.
+        body=body,
+        # Force content type to be html.
+        headers={**response.headers, "content-type": "text/html"},
+    )
+
+await page.route("**/title.html", handle_route)
+```
+
+</TabItem>
+</Tabs>
+
+### API reference
+- [APIRequestContext]
+- [page.route(url, handler, **kwargs)](./api/class-page.mdx#page-route)
+- [browser_context.route(url, handler, **kwargs)](./api/class-browsercontext.mdx#browser-context-route)
+- [playwright.request](./api/class-playwright.mdx#playwright-request)
+- [browser_context.request](./api/class-browsercontext.mdx#browser-context-request)
+- [page.request](./api/class-page.mdx#page-request)
+- [route.fulfill(**kwargs)](./api/class-route.mdx#route-fulfill)
 
 <br/>
 

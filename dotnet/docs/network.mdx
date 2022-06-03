@@ -13,6 +13,7 @@ Playwright provides APIs to **monitor** and **modify** network traffic, both HTT
 - [Handle requests](#handle-requests)
 - [Modify requests](#modify-requests)
 - [Abort requests](#abort-requests)
+- [Modify responses](#modify-responses)
 - [WebSockets](#websockets)
 
 <br/>
@@ -175,6 +176,45 @@ else
 - [Page.RouteAsync(url, handler, options)](./api/class-page.mdx#page-route)
 - [BrowserContext.RouteAsync(url, handler, options)](./api/class-browsercontext.mdx#browser-context-route)
 - [Route.AbortAsync(errorCode)](./api/class-route.mdx#route-abort)
+
+<br/>
+
+## Modify responses
+
+To modify a response use [APIRequestContext] to get original response and then pass the response to [Route.FulfillAsync(options)](./api/class-route.mdx#route-fulfill). You can override individual fields on the response via options:
+
+```csharp
+await Page.RouteAsync("**/title.html", async route =>
+{
+    // Fetch original response.
+    var response = await Page.APIRequest.FetchAsync(route.Request);
+    // Add a prefix to the title.
+    var body = await response.TextAsync();
+    body = body.Replace("<title>", "<title>My prefix:");
+
+    var headers = response.Headers;
+    headers.Add("Content-Type", "text/html");
+
+    await route.FulfillAsync(new()
+    {
+        // Pass all fields from the response.
+        Response = response,
+        // Override response body.
+        Body = body,
+        // Force content type to be html.
+        Headers = headers,
+    });
+});
+```
+
+### API reference
+- [APIRequestContext]
+- [Page.RouteAsync(url, handler, options)](./api/class-page.mdx#page-route)
+- [BrowserContext.RouteAsync(url, handler, options)](./api/class-browsercontext.mdx#browser-context-route)
+- [Playwright.APIRequest](./api/class-playwright.mdx#playwright-request)
+- [BrowserContext.APIRequest](./api/class-browsercontext.mdx#browser-context-request)
+- [Page.APIRequest](./api/class-page.mdx#page-request)
+- [Route.FulfillAsync(options)](./api/class-route.mdx#route-fulfill)
 
 <br/>
 

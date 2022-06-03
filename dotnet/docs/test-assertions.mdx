@@ -46,6 +46,7 @@ By default, the timeout for assertions is set to 5 seconds.
 - [Expect(Locator).ToHaveJSPropertyAsync(name, value, options)](./test-assertions.mdx#locator-assertions-to-have-js-property)
 - [Expect(Locator).ToHaveTextAsync(expected, options)](./test-assertions.mdx#locator-assertions-to-have-text)
 - [Expect(Locator).ToHaveValueAsync(value, options)](./test-assertions.mdx#locator-assertions-to-have-value)
+- [Expect(Locator).ToHaveValuesAsync(values, options)](./test-assertions.mdx#locator-assertions-to-have-values)
 - [Expect(Locator).Not](./test-assertions.mdx#locator-assertions-not)
 - [Expect(Page).ToHaveTitleAsync(titleOrRegExp, options)](./test-assertions.mdx#page-assertions-to-have-title)
 - [Expect(Page).ToHaveURLAsync(urlOrRegExp, options)](./test-assertions.mdx#page-assertions-to-have-url)
@@ -295,7 +296,7 @@ await Expect(locator).toHaveTextAsync(new string[]{ "Text 1", "Text 2", "Text 3"
 ```
 
 ## Expect(Locator).ToHaveValueAsync(value, options) {#locator-assertions-to-have-value}
-- `value`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-value-option-value"/> &#60;[string]|[Regex]|[IEnumerable]<[string]|[Regex]>&#62; Expected value. A list of expected values can be used if the Locator is a `select` element with the `multiple` attribute.<a href="#locator-assertions-to-have-value-option-value" class="list-anchor">#</a>
+- `value`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-value-option-value"/> &#60;[string]|[Regex]&#62; Expected value.<a href="#locator-assertions-to-have-value-option-value" class="list-anchor">#</a>
 - `options` &#60;`LocatorAssertionsToHaveValueOptions?`&#62;
   - `Timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-value-option-timeout"/> &#60;[double]?&#62; Time to retry the assertion for.<a href="#locator-assertions-to-have-value-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-value-return"/> &#60;[void]&#62;<a href="#locator-assertions-to-have-value-return" class="list-anchor">#</a>
@@ -305,6 +306,30 @@ Ensures the [Locator] points to an element with the given input value. You can u
 ```csharp
 var locator = Page.Locator("input[type=number]");
 await Expect(locator).ToHaveValueAsync(new Regex("[0-9]"));
+```
+
+## Expect(Locator).ToHaveValuesAsync(values, options) {#locator-assertions-to-have-values}
+- `values`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-values-option-values"/> &#60;[IEnumerable]<[string]|[Regex]>&#62; Expected options currently selected.<a href="#locator-assertions-to-have-values-option-values" class="list-anchor">#</a>
+- `options` &#60;`LocatorAssertionsToHaveValuesOptions?`&#62;
+  - `Timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-values-option-timeout"/> &#60;[double]?&#62; Time to retry the assertion for.<a href="#locator-assertions-to-have-values-option-timeout" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-values-return"/> &#60;[void]&#62;<a href="#locator-assertions-to-have-values-return" class="list-anchor">#</a>
+
+Ensures the [Locator] points to multi-select/combobox (i.e. a `select` with the `multiple` attribute) and the specified values are selected.
+
+For example, given the following element:
+
+```html
+<select id="favorite-colors" multiple>
+  <option value="R">Red</option>
+  <option value="G">Green</option>
+  <option value="B">Blue</option>
+</select>
+```
+
+```csharp
+var locator = Page.Locator("id=favorite-colors");
+await locator.SelectOptionAsync(new string[] { "R", "G" })
+await Expect(locator).ToHaveValuesAsync(new Regex[] { new Regex("R"), new Regex("G") });
 ```
 
 ## Expect(Page).Not {#page-assertions-not}
