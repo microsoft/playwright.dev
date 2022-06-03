@@ -13,6 +13,7 @@ Playwright provides APIs to **monitor** and **modify** network traffic, both HTT
 - [Handle requests](#handle-requests)
 - [Modify requests](#modify-requests)
 - [Abort requests](#abort-requests)
+- [Modify responses](#modify-responses)
 - [WebSockets](#websockets)
 
 <br/>
@@ -172,6 +173,40 @@ page.route("**/*", route -> {
 - [Page.route(url, handler[, options])](./api/class-page.mdx#page-route)
 - [BrowserContext.route(url, handler[, options])](./api/class-browsercontext.mdx#browser-context-route)
 - [Route.abort([errorCode])](./api/class-route.mdx#route-abort)
+
+<br/>
+
+## Modify responses
+
+To modify a response use [APIRequestContext] to get original response and then pass the response to [Route.fulfill([options])](./api/class-route.mdx#route-fulfill). You can override individual fields on the response via options:
+
+```java
+page.route("**/title.html", route -> {
+  // Fetch original response.
+  APIResponse response = page.request().fetch(route.request());
+  // Add a prefix to the title.
+  String body = response.text();
+  body = body.replace("<title>", "<title>My prefix:");
+  Map<String, String> headers = response.headers();
+  headers.put("content-type": "text/html");
+  route.fulfill(new Route.FulfillOptions()
+    // Pass all fields from the response.
+    .setResponse(response)
+    // Override response body.
+    .setBody(body)
+    // Force content type to be html.
+    .setHeaders(headers));
+});
+```
+
+### API reference
+- [APIRequestContext]
+- [Page.route(url, handler[, options])](./api/class-page.mdx#page-route)
+- [BrowserContext.route(url, handler[, options])](./api/class-browsercontext.mdx#browser-context-route)
+- [Playwright.request()](./api/class-playwright.mdx#playwright-request)
+- [BrowserContext.request()](./api/class-browsercontext.mdx#browser-context-request)
+- [Page.request()](./api/class-page.mdx#page-request)
+- [Route.fulfill([options])](./api/class-route.mdx#route-fulfill)
 
 <br/>
 

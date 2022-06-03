@@ -45,6 +45,7 @@ By default, the timeout for assertions is set to 5 seconds. Learn more about [va
 - [expect(locator).toHaveScreenshot([options])](./test-assertions.mdx#locator-assertions-to-have-screenshot-2)
 - [expect(locator).toHaveText(expected[, options])](./test-assertions.mdx#locator-assertions-to-have-text)
 - [expect(locator).toHaveValue(value[, options])](./test-assertions.mdx#locator-assertions-to-have-value)
+- [expect(locator).toHaveValues(values[, options])](./test-assertions.mdx#locator-assertions-to-have-values)
 - [expect(locator).not](./test-assertions.mdx#locator-assertions-not)
 - [expect(page).toHaveScreenshot(name[, options])](./test-assertions.mdx#page-assertions-to-have-screenshot-1)
 - [expect(page).toHaveScreenshot([options])](./test-assertions.mdx#page-assertions-to-have-screenshot-2)
@@ -455,7 +456,7 @@ await expect(locator).toHaveText(['Text 1', 'Text 2', 'Text 3']);
 ```
 
 ## expect(locator).toHaveValue(value[, options]) {#locator-assertions-to-have-value}
-- `value`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-value-option-value"/> &#60;[string]|[RegExp]|[Array]<[string]|[RegExp]>&#62; Expected value. A list of expected values can be used if the Locator is a `select` element with the `multiple` attribute.<a href="#locator-assertions-to-have-value-option-value" class="list-anchor">#</a>
+- `value`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-value-option-value"/> &#60;[string]|[RegExp]&#62; Expected value.<a href="#locator-assertions-to-have-value-option-value" class="list-anchor">#</a>
 - `options?` &#60;[Object]&#62;
   - `timeout?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-value-option-timeout"/> &#60;[number]&#62; Time to retry the assertion for. Defaults to `timeout` in `TestConfig.expect`.<a href="#locator-assertions-to-have-value-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-value-return"/> &#60;[Promise]<[void]>&#62;<a href="#locator-assertions-to-have-value-return" class="list-anchor">#</a>
@@ -465,6 +466,30 @@ Ensures the [Locator] points to an element with the given input value. You can u
 ```js
 const locator = page.locator('input[type=number]');
 await expect(locator).toHaveValue(/[0-9]/);
+```
+
+## expect(locator).toHaveValues(values[, options]) {#locator-assertions-to-have-values}
+- `values`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-values-option-values"/> &#60;[Array]<[string]|[RegExp]>&#62; Expected options currently selected.<a href="#locator-assertions-to-have-values-option-values" class="list-anchor">#</a>
+- `options?` &#60;[Object]&#62;
+  - `timeout?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-values-option-timeout"/> &#60;[number]&#62; Time to retry the assertion for. Defaults to `timeout` in `TestConfig.expect`.<a href="#locator-assertions-to-have-values-option-timeout" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-values-return"/> &#60;[Promise]<[void]>&#62;<a href="#locator-assertions-to-have-values-return" class="list-anchor">#</a>
+
+Ensures the [Locator] points to multi-select/combobox (i.e. a `select` with the `multiple` attribute) and the specified values are selected.
+
+For example, given the following element:
+
+```html
+<select id="favorite-colors" multiple>
+  <option value="R">Red</option>
+  <option value="G">Green</option>
+  <option value="B">Blue</option>
+</select>
+```
+
+```js
+const locator = page.locator("id=favorite-colors");
+await locator.selectOption(["R", "G"]);
+await expect(locator).toHaveValues([/R/, /G/]);
 ```
 
 ## expect(page).not {#page-assertions-not}
