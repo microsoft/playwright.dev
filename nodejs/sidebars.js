@@ -73,6 +73,7 @@ module.exports = {
       "label": "Migration",
       "items": [
         { "type": "doc", "id": "protractor" },
+        { "type": "doc", "id": "testing-library" },
       ],
       "collapsed": true
     },
