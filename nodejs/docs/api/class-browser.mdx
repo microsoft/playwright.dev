@@ -22,6 +22,7 @@ const { firefox } = require('playwright');  // Or 'chromium' or 'webkit'.
 
 
 - [browser.on('disconnected')](./api/class-browser.mdx#browser-event-disconnected)
+- [browser.browserType()](./api/class-browser.mdx#browser-browser-type)
 - [browser.close()](./api/class-browser.mdx#browser-close)
 - [browser.contexts()](./api/class-browser.mdx#browser-contexts)
 - [browser.isConnected()](./api/class-browser.mdx#browser-is-connected)
@@ -38,6 +39,11 @@ const { firefox } = require('playwright');  // Or 'chromium' or 'webkit'.
 Emitted when Browser gets disconnected from the browser application. This might happen because of one of the following:
 * Browser application is closed or crashed.
 * The [browser.close()](./api/class-browser.mdx#browser-close) method was called.
+
+## browser.browserType() {#browser-browser-type}
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-browser-type-return"/> &#60;[BrowserType]&#62;<a href="#browser-browser-type-return" class="list-anchor">#</a>
+
+Get the browser type (chromium, firefox or webkit) that the browser belongs to.
 
 ## browser.close() {#browser-close}
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-close-return"/> &#60;[Promise]<[void]>&#62;<a href="#browser-close-return" class="list-anchor">#</a>
@@ -122,6 +128,7 @@ Returns the newly created browser session.
   - `recordHar?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-record-har"/> &#60;[Object]&#62; Enables [HAR](http://www.softwareishard.com/blog/har-12-spec) recording for all pages into `recordHar.path` file. If not specified, the HAR is not recorded. Make sure to await [browserContext.close()](./api/class-browsercontext.mdx#browser-context-close) for the HAR to be saved.<a href="#browser-new-context-option-record-har" class="list-anchor">#</a>
     - `omitContent?` &#60;[boolean]&#62; Optional setting to control whether to omit request content from the HAR. Defaults to `false`.
     - `path` &#60;[string]&#62; Path on the filesystem to write the HAR file to.
+    - `urlFilter?` &#60;[string]|[RegExp]&#62; A glob or regex pattern to filter requests that are stored in the HAR. When a `baseURL` via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.
   - `recordVideo?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-record-video"/> &#60;[Object]&#62; Enables video recording for all pages into `recordVideo.dir` directory. If not specified videos are not recorded. Make sure to await [browserContext.close()](./api/class-browsercontext.mdx#browser-context-close) for videos to be saved.<a href="#browser-new-context-option-record-video" class="list-anchor">#</a>
     - `dir` &#60;[string]&#62; Path to the directory to put videos into.
     - `size?` &#60;[Object]&#62; Optional dimensions of the recorded videos. If not specified the size will be equal to `viewport` scaled down to fit into 800x800. If `viewport` is not configured explicitly the video size defaults to 800x450. Actual picture of each page will be scaled down if necessary to fit the specified size.
@@ -131,6 +138,10 @@ Returns the newly created browser session.
   - `screen?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-screen"/> &#60;[Object]&#62; Emulates consistent window screen size available inside web page via `window.screen`. Is only used when the `viewport` is set.<a href="#browser-new-context-option-screen" class="list-anchor">#</a>
     - `width` &#60;[number]&#62; page width in pixels.
     - `height` &#60;[number]&#62; page height in pixels.
+  - `serviceWorkers?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-service-workers"/> &#60;"allow"|"block"&#62; `"allow"`: [Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) can be registered by sites.<a href="#browser-new-context-option-service-workers" class="list-anchor">#</a>
+    * `"block"`: Playwright will block all registration of Service Workers.
+
+    Defaults to `"allow"`.
   - `storageState?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-storage-state"/> &#60;[string]|[Object]&#62; Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [browserContext.storageState([options])](./api/class-browsercontext.mdx#browser-context-storage-state). Either a path to the file with saved storage, or an object with the following fields:<a href="#browser-new-context-option-storage-state" class="list-anchor">#</a>
     - `cookies` &#60;[Array]<[Object]>&#62; cookies to set for context
       - `name` &#60;[string]&#62;
@@ -146,7 +157,7 @@ Returns the newly created browser session.
       - `localStorage` &#60;[Array]<[Object]>&#62;
         - `name` &#60;[string]&#62;
         - `value` &#60;[string]&#62;
-  - `strictSelectors?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-strict-selectors"/> &#60;[boolean]&#62; It specified, enables strict selectors mode for this context. In the strict selectors mode all operations on selectors that imply single target DOM element will throw when more than one element matches the selector. See [Locator] to learn more about the strict mode.<a href="#browser-new-context-option-strict-selectors" class="list-anchor">#</a>
+  - `strictSelectors?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-strict-selectors"/> &#60;[boolean]&#62; If specified, enables strict selectors mode for this context. In the strict selectors mode all operations on selectors that imply single target DOM element will throw when more than one element matches the selector. See [Locator] to learn more about the strict mode.<a href="#browser-new-context-option-strict-selectors" class="list-anchor">#</a>
   - `timezoneId?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-timezone-id"/> &#60;[string]&#62; Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.<a href="#browser-new-context-option-timezone-id" class="list-anchor">#</a>
   - `userAgent?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-user-agent"/> &#60;[string]&#62; Specific user agent to use in this context.<a href="#browser-new-context-option-user-agent" class="list-anchor">#</a>
   - `videoSize?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-video-size"/> &#60;[Object]&#62; **DEPRECATED** Use `recordVideo` instead.<a href="#browser-new-context-option-video-size" class="list-anchor">#</a>
@@ -218,6 +229,7 @@ Creates a new browser context. It won't share cookies/cache with other browser c
   - `recordHar?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-record-har"/> &#60;[Object]&#62; Enables [HAR](http://www.softwareishard.com/blog/har-12-spec) recording for all pages into `recordHar.path` file. If not specified, the HAR is not recorded. Make sure to await [browserContext.close()](./api/class-browsercontext.mdx#browser-context-close) for the HAR to be saved.<a href="#browser-new-page-option-record-har" class="list-anchor">#</a>
     - `omitContent?` &#60;[boolean]&#62; Optional setting to control whether to omit request content from the HAR. Defaults to `false`.
     - `path` &#60;[string]&#62; Path on the filesystem to write the HAR file to.
+    - `urlFilter?` &#60;[string]|[RegExp]&#62; A glob or regex pattern to filter requests that are stored in the HAR. When a `baseURL` via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.
   - `recordVideo?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-record-video"/> &#60;[Object]&#62; Enables video recording for all pages into `recordVideo.dir` directory. If not specified videos are not recorded. Make sure to await [browserContext.close()](./api/class-browsercontext.mdx#browser-context-close) for videos to be saved.<a href="#browser-new-page-option-record-video" class="list-anchor">#</a>
     - `dir` &#60;[string]&#62; Path to the directory to put videos into.
     - `size?` &#60;[Object]&#62; Optional dimensions of the recorded videos. If not specified the size will be equal to `viewport` scaled down to fit into 800x800. If `viewport` is not configured explicitly the video size defaults to 800x450. Actual picture of each page will be scaled down if necessary to fit the specified size.
@@ -227,6 +239,10 @@ Creates a new browser context. It won't share cookies/cache with other browser c
   - `screen?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-screen"/> &#60;[Object]&#62; Emulates consistent window screen size available inside web page via `window.screen`. Is only used when the `viewport` is set.<a href="#browser-new-page-option-screen" class="list-anchor">#</a>
     - `width` &#60;[number]&#62; page width in pixels.
     - `height` &#60;[number]&#62; page height in pixels.
+  - `serviceWorkers?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-service-workers"/> &#60;"allow"|"block"&#62; `"allow"`: [Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) can be registered by sites.<a href="#browser-new-page-option-service-workers" class="list-anchor">#</a>
+    * `"block"`: Playwright will block all registration of Service Workers.
+
+    Defaults to `"allow"`.
   - `storageState?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-storage-state"/> &#60;[string]|[Object]&#62; Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [browserContext.storageState([options])](./api/class-browsercontext.mdx#browser-context-storage-state). Either a path to the file with saved storage, or an object with the following fields:<a href="#browser-new-page-option-storage-state" class="list-anchor">#</a>
     - `cookies` &#60;[Array]<[Object]>&#62; cookies to set for context
       - `name` &#60;[string]&#62;
@@ -242,7 +258,7 @@ Creates a new browser context. It won't share cookies/cache with other browser c
       - `localStorage` &#60;[Array]<[Object]>&#62;
         - `name` &#60;[string]&#62;
         - `value` &#60;[string]&#62;
-  - `strictSelectors?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-strict-selectors"/> &#60;[boolean]&#62; It specified, enables strict selectors mode for this context. In the strict selectors mode all operations on selectors that imply single target DOM element will throw when more than one element matches the selector. See [Locator] to learn more about the strict mode.<a href="#browser-new-page-option-strict-selectors" class="list-anchor">#</a>
+  - `strictSelectors?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-strict-selectors"/> &#60;[boolean]&#62; If specified, enables strict selectors mode for this context. In the strict selectors mode all operations on selectors that imply single target DOM element will throw when more than one element matches the selector. See [Locator] to learn more about the strict mode.<a href="#browser-new-page-option-strict-selectors" class="list-anchor">#</a>
   - `timezoneId?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-timezone-id"/> &#60;[string]&#62; Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.<a href="#browser-new-page-option-timezone-id" class="list-anchor">#</a>
   - `userAgent?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-user-agent"/> &#60;[string]&#62; Specific user agent to use in this context.<a href="#browser-new-page-option-user-agent" class="list-anchor">#</a>
   - `videoSize?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-video-size"/> &#60;[Object]&#62; **DEPRECATED** Use `recordVideo` instead.<a href="#browser-new-page-option-video-size" class="list-anchor">#</a>

@@ -1235,7 +1235,7 @@ test('very slow test', async ({ page }) => {
 </TabItem>
 </Tabs>
 
-Changing timeout from a slow hook:
+Changing timeout from a slow `beforeEach` or `afterEach` hook. Note that this affects the test timeout that is shared with `beforeEach`/`afterEach` hooks.
 
 <Tabs
   groupId="js-flavor"
@@ -1265,6 +1265,86 @@ const { test, expect } = require('@playwright/test');
 test.beforeEach(async ({ page }, testInfo) => {
   // Extend timeout for all tests running this hook by 30 seconds.
   test.setTimeout(testInfo.timeout + 30000);
+});
+```
+
+</TabItem>
+</Tabs>
+
+Changing timeout for a `beforeAll` or `afterAll` hook. Note this affects the hook's timeout, not the test timeout.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+import { test, expect } from '@playwright/test';
+
+test.beforeAll(async () => {
+  // Set timeout for this hook.
+  test.setTimeout(60000);
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+const { test, expect } = require('@playwright/test');
+
+test.beforeAll(async () => {
+  // Set timeout for this hook.
+  test.setTimeout(60000);
+});
+```
+
+</TabItem>
+</Tabs>
+
+Changing timeout for all tests in a [test.describe(title, callback)](./api/class-test.mdx#test-describe) group.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```ts
+import { test, expect } from '@playwright/test';
+
+test.describe('group', () => {
+  // Applies to all tests in this group.
+  test.setTimeout(60000);
+
+  test('test one', async () => { /* ... */ });
+  test('test two', async () => { /* ... */ });
+  test('test three', async () => { /* ... */ });
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+const { test, expect } = require('@playwright/test');
+
+test.describe('group', () => {
+  // Applies to all tests in this group.
+  test.setTimeout(60000);
+
+  test('test one', async () => { /* ... */ });
+  test('test two', async () => { /* ... */ });
+  test('test three', async () => { /* ... */ });
 });
 ```
 
@@ -1559,6 +1639,10 @@ test('slow test', async ({ page }) => {
 
 </TabItem>
 </Tabs>
+
+:::note
+[test.slow()](./api/class-test.mdx#test-slow-1) cannot be used in a `beforeAll` or `afterAll` hook. Use [test.setTimeout(timeout)](./api/class-test.mdx#test-set-timeout) instead.
+:::
 
 ## test.slow(condition[, description]) {#test-slow-2}
 - `condition`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-slow-2-option-condition"/> &#60;[boolean]&#62; Test is marked as "slow" when the condition is `true`.<a href="#test-slow-2-option-condition" class="list-anchor">#</a>
