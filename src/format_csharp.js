@@ -17,7 +17,6 @@
 //@ts-check
 
 const Documentation = require('./documentation');
-const { generateTabGroup } = require('./format_utils');
 const { toTitleCase } = require('./generator');
 /** @typedef {import('./generator').GeneratorFormatter} GeneratorFormatter */
 
@@ -155,7 +154,7 @@ class CSharpFormatter {
   }
 
   preprocessComment(spec) {
-    return generateTabGroup(spec, this.lang, 'bash');
+    return spec;
   }
 
   /**

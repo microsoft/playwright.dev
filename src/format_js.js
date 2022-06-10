@@ -16,10 +16,8 @@
 
 //@ts-check
 
-const md = require('./markdown');
 const Documentation = require('./documentation');
-const { toTitleCase, renderJSSignature } = require('./generator');
-const { generateTabGroup } = require('./format_utils');
+const { renderJSSignature } = require('./generator');
 /** @typedef {import('./generator').GeneratorFormatter} GeneratorFormatter */
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
 
@@ -92,8 +90,7 @@ class JavaScriptFormatter {
    * @returns {MarkdownNode[]}
    */
   preprocessComment(spec) {
-   const newSpec = generateTabGroup(spec, this.lang, 'js');
-   return generateTabGroup(newSpec, this.lang, 'bash')
+    return spec;
   }
 
   /**

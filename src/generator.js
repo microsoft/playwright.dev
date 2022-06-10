@@ -22,6 +22,7 @@ const path = require('path');
 const md = require('./markdown');
 const { parseApi } = require('./api_parser');
 const Documentation = require('./documentation');
+const { generateTabGroups } = require('./format_utils');
 
 /** @typedef {import('./documentation').Type} Type */
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
@@ -232,30 +233,26 @@ import TabItem from '@theme/TabItem';
    */
   formatComment(spec) {
     spec = this.formatter.preprocessComment(spec);
+    spec = generateTabGroups(spec, this.lang);
+
     spec = spec.filter(c => {
       // No lang or common lang - Ok.
       if (!c.codeLang || commonSnippets.has(c.codeLang))
         return true;
 
       // Our lang - Ok.
-      if (this.formatter.filterComment(c) || c.codeLang === highlighterName(this.lang)) {
-        c.codeLang = highlighterName(this.lang);
+      if (this.formatter.filterComment(c) || c.codeLang === md.codeLangToHighlighter(this.lang))
         return true;
-      }
 
       // '* browser' - always Ok
       // 'sh python' - Ok for Python.
       const tokens = c.codeLang.split(' ');
-      if (tokens[1] === 'browser' || tokens[1] === this.lang) {
-        c.codeLang = highlighterName(tokens[0]);
+      if (tokens[1] === 'browser' || tokens[1] === this.lang)
         return true;
-      }
+
       // python * - Ok for Python
-      if (tokens[0] === this.lang) {
-        c.lines.unshift('# ' + tokens[1], '');
-        c.codeLang = highlighterName(this.lang);
+      if (tokens[0] === this.lang)
         return true;
-      }
       return false;
     });
     return spec;
@@ -557,15 +554,6 @@ function toTitleCase(name, options) {
   return result;
 }
 
-
-/**
- * @param {string} lang
- */
-function highlighterName(lang) {
-  if (lang === 'python')
-    return 'py';
-  return lang;
-}
 
 /**
  * @param {Documentation.Class} clazz
