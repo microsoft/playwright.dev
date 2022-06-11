@@ -17,7 +17,6 @@
 //@ts-check
 
 const Documentation = require('./documentation');
-const { generateTabGroup } = require('./format_utils');
 const { toTitleCase, renderJSSignature } = require('./generator');
 /** @typedef {import('./generator').GeneratorFormatter} GeneratorFormatter */
 
@@ -163,7 +162,7 @@ class JavaFormatter {
       if (n.text === 'extends: [Error]')
         n.text = 'extends: [PlaywrightException]';
     });
-    return generateTabGroup(spec, this.lang, 'bash');
+    return spec;
   }
 
   /**

@@ -19,7 +19,6 @@
 const md = require('./markdown');
 const Documentation = require('./documentation');
 const { toSnakeCase } = require('./generator');
-const { generateTabGroup } = require('./format_utils');
 /** @typedef {import('./generator').GeneratorFormatter} GeneratorFormatter */
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
 
@@ -106,41 +105,7 @@ class PythonFormatter {
    * @returns {MarkdownNode[]}
    */
   preprocessComment(spec) {
-    /** @type {MarkdownNode[]} */
-    const newSpec = [];
-    for (let i = 0; i < spec.length; ++i) {
-      if (spec[i].codeLang === 'python async') {
-        if (spec[i + 1].codeLang !== 'python sync') {
-          console.error(spec[i]);
-          throw new Error('Bad Python snippet pair');
-        }
-        spec[i].codeLang = 'py';
-        spec[i + 1].codeLang = 'py';
-        const text = `<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-${md.render([spec[i + 1]])}
-</TabItem>
-<TabItem value="async">
-${md.render([spec[i]])}
-</TabItem>
-</Tabs>`;
-        newSpec.push({
-          type: 'text',
-          text
-        });
-        ++i;
-      } else {
-        newSpec.push(spec[i]);
-      }
-    }
-    return generateTabGroup(newSpec, this.lang, 'bash');
+    return spec;
   }
 
   /**

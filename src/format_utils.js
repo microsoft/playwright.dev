@@ -23,25 +23,26 @@ const md = require('./markdown');
 /**
  * @param {MarkdownNode[]} spec
  * @param {string} language
- * @param {string} tabGroupName
  * @returns {MarkdownNode[]}
  */
-function generateTabGroup(spec, language, tabGroupName) {
+function generateTabGroups(spec, language) {
   /** @type {MarkdownNode[]} */
   const newSpec = [];
   for (let i = 0; i < spec.length; ++i) {
     /** @type {{value: string, groupId: string, spec: md.MarkdownNode}[]} */
     const tabs = [];
     for (;i < spec.length; i++) {
-      const match = spec[i].codeLang && spec[i].codeLang.match(new RegExp(`^${tabGroupName} ([\\w+-_]+)=([\\w+-_]+)( lang=(\\w+))?`))
-      if (!match)
+      const tabInfo = parseTabInfo(spec[i].codeLang);
+      if (!tabInfo)
         break
+
+      const codeLanguage = parseLanguage(spec[i].codeLang);
       // Language filter
-      if (match[4] && match[4] !== language) {
+      if (codeLanguage && codeLanguage !== language)
         continue;
-      }
-      spec[i].codeLang = match[2];
-      tabs.push({ groupId: match[1], value: match[2], spec: spec[i] });
+
+      const [groupId, value] = tabInfo.split('-');
+      tabs.push({ groupId: groupId + '-flavor', value, spec: spec[i] });
     }
     if (tabs.length) {
       if (tabs.length === 1)
@@ -55,7 +56,7 @@ function generateTabGroup(spec, language, tabGroupName) {
         if (tab.groupId !== groupId)
           throw new Error('Mixed group ids: ' + md.render(spec));
         if (values.has(tab.value))
-          throw new Error('Dupe tabs: ' + md.render(spec));
+          throw new Error('Dupe tabs: ' + [...values] + ' ' + tab.value + '\n' + md.render(spec));
         values.add(tab.value);
       }
 
@@ -64,7 +65,7 @@ function generateTabGroup(spec, language, tabGroupName) {
   groupId="${groupId}"
   defaultValue="${tabs[0].value}"
   values={[`);
-      tokens.push(...tabs.map((t, i) => `    {label: '${tabLabel(t.value)}', value: '${t.value}'}${ i === tabs.length - 1 ? '' : ','}`))
+      tokens.push(...tabs.map((t, i) => `    {label: '${tabLabel(groupId, t.value)}', value: '${t.value}'}${ i === tabs.length - 1 ? '' : ','}`))
       tokens.push(`  ]
 }>`);
       tokens.push(...tabs.map(t => `<TabItem value="${t.value}">
@@ -83,20 +84,28 @@ ${md.render([t.spec])}
   return newSpec;
 }
 
-function tabLabel(type) {
-  if (type === 'ts')
+/**
+ * @param {string} groupId
+ * @param {string} value
+ */
+function tabLabel(groupId, value) {
+  if (groupId === 'python-flavor' && value === 'sync')
+    return 'Sync';
+  if (groupId === 'python-flavor' && value === 'async')
+    return 'Async';
+  if (value === 'ts')
     return 'TypeScript';
-  if (type === 'js')
+  if (value === 'js')
     return 'JavaScript';
-  if (type === 'library')
+  if (value === 'library')
     return 'Library';
-  if (type === 'bash')
+  if (value === 'bash')
     return 'Bash';
-  if (type === 'batch')
+  if (value === 'batch')
     return 'Batch';
-    if (type === 'powershell')
+    if (value === 'powershell')
     return 'PowerShell'
-  throw new Error(`Unknown label type: ${type}`)
+  throw new Error(`Unknown label type: ${value}`)
 }
 
 /**
@@ -112,12 +121,46 @@ function tabWeight(type) {
     ['bash', 3],
     ['powershell', 2],
     ['batch', 1],
+
+    ['sync', 2],
+    ['async', 1],
   ])
   if (!weights.has(type))
     throw new Error(`Unrecognized language: ${type}`)
   return weights.get(type);
 }
 
+/**
+ * @param {string} codeLang
+ */
+function parseTabInfo(codeLang) {
+  if (!codeLang)
+    return '';
+  if (codeLang === 'python async')
+    return 'python-async';
+  if (codeLang === 'python sync')
+    return 'python-sync';
+  const tab = codeLang.match(/ tab=([\w\d-]+)/);
+  return tab ? tab[1] : '';
+}
+
+/**
+ * @param {string} codeLang
+ */
+function parseLanguage(codeLang) {
+  const lang = codeLang.match(/ lang=([\w\d]+)/);
+  if (lang)
+    return lang[1];
+  if (codeLang.startsWith('js') || codeLang.startsWith('ts'))
+    return 'js';
+  if (codeLang.startsWith('py'))
+    return 'python';
+  if (codeLang.startsWith('csharp'))
+    return 'csharp';
+  if (codeLang.startsWith('java'))
+    return 'java';
+}
+
 module.exports = {
-  generateTabGroup,
+  generateTabGroups,
 }
