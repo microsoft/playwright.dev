@@ -14,6 +14,7 @@ Playwright provides APIs to **monitor** and **modify** network traffic, both HTT
 - [Modify requests](#modify-requests)
 - [Abort requests](#abort-requests)
 - [Modify responses](#modify-responses)
+- [Record and replay requests](#record-and-replay-requests)
 - [WebSockets](#websockets)
 
 <br/>
@@ -493,6 +494,104 @@ await page.route("**/title.html", handle_route)
 - [playwright.request](./api/class-playwright.mdx#playwright-request)
 - [browser_context.request](./api/class-browsercontext.mdx#browser-context-request)
 - [page.request](./api/class-page.mdx#page-request)
+- [route.fulfill(**kwargs)](./api/class-route.mdx#route-fulfill)
+
+<br/>
+
+## Record and replay requests
+
+You can record network activity as an HTTP Archive file (HAR). Later on, this archive can be used to mock responses to the network requests. You'll need to:
+1. Record a HAR file.
+1. Commit the HAR file alongside the tests.
+1. Route requests using the saved HAR files in the tests.
+
+### Recording HAR with CLI
+
+Open the browser with [Playwright CLI](./cli.mdx) and pass `--save-har` option to produce a HAR file. Optionally, use `--save-har-glob` to only save requests you are interested in, for example API endpoints.
+
+```bash
+# Save API requests from example.com as "example.har" archive.
+playwright open --save-har=example.har --save-har-glob="**/api/**" https://example.coms
+```
+
+### Recording HAR with a script
+
+Alternatively, instead of using the CLI, you can record HAR programmatically. Pass `har` option when creating a [BrowserContext] with [browser.new_context(**kwargs)](./api/class-browser.mdx#browser-new-context) to create an archive.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+context = browser.new_context(record_har_path="example.har", record_har_url_filter="**/api/**")
+
+# ... Perform actions ...
+
+# Close context to ensure HAR is saved to disk.
+context.close()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+context = await browser.new_context(record_har_path="example.har", record_har_url_filter="**/api/**")
+
+# ... Perform actions ...
+
+# Close context to ensure HAR is saved to disk.
+await context.close()
+```
+
+</TabItem>
+</Tabs>
+
+### Replaying from HAR
+
+Pass `har` option to the [route.fulfill(**kwargs)](./api/class-route.mdx#route-fulfill) method to use a matching response from the HAR file.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+def handle_route(route: Route) -> None:
+    # Either use a matching response from the HAR,
+    # or abort the request if nothing matches.
+    route.fulfill(har_path="example.har")
+
+page.route("**/api/**", handle_route)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+async def handle_route(route: Route) -> None:
+    # Either use a matching response from the HAR,
+    # or abort the request if nothing matches.
+    await route.fulfill(har_path="example.har")
+
+await page.route("**/api/**", handle_route)
+```
+
+</TabItem>
+</Tabs>
+
+### API reference
+- [browser.new_context(**kwargs)](./api/class-browser.mdx#browser-new-context)
 - [route.fulfill(**kwargs)](./api/class-route.mdx#route-fulfill)
 
 <br/>

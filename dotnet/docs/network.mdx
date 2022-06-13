@@ -14,6 +14,7 @@ Playwright provides APIs to **monitor** and **modify** network traffic, both HTT
 - [Modify requests](#modify-requests)
 - [Abort requests](#abort-requests)
 - [Modify responses](#modify-responses)
+- [Record and replay requests](#record-and-replay-requests)
 - [WebSockets](#websockets)
 
 <br/>
@@ -214,6 +215,60 @@ await Page.RouteAsync("**/title.html", async route =>
 - [Playwright.APIRequest](./api/class-playwright.mdx#playwright-request)
 - [BrowserContext.APIRequest](./api/class-browsercontext.mdx#browser-context-request)
 - [Page.APIRequest](./api/class-page.mdx#page-request)
+- [Route.FulfillAsync(options)](./api/class-route.mdx#route-fulfill)
+
+<br/>
+
+## Record and replay requests
+
+You can record network activity as an HTTP Archive file (HAR). Later on, this archive can be used to mock responses to the network requests. You'll need to:
+1. Record a HAR file.
+1. Commit the HAR file alongside the tests.
+1. Route requests using the saved HAR files in the tests.
+
+### Recording HAR with CLI
+
+Open the browser with [Playwright CLI](./cli.mdx) and pass `--save-har` option to produce a HAR file. Optionally, use `--save-har-glob` to only save requests you are interested in, for example API endpoints.
+
+```bash
+# Save API requests from example.com as "example.har" archive.
+pwsh bin\Debug\netX\playwright.ps1 open --save-har=example.har --save-har-glob="**/api/**" https://example.com
+```
+
+### Recording HAR with a script
+
+Alternatively, instead of using the CLI, you can record HAR programmatically. Pass `har` option when creating a [BrowserContext] with [Browser.NewContextAsync(options)](./api/class-browser.mdx#browser-new-context) to create an archive.
+
+```csharp
+var context = await browser.NewContextAsync(new () {
+    RecordHarPath = "example.har",
+    RecordHarUrlFilter = "**/api/**",
+});
+
+// ... Perform actions ...
+
+// Close context to ensure HAR is saved to disk.
+await context.CloseAsync();
+```
+
+### Replaying from HAR
+
+Pass `har` option to the [Route.FulfillAsync(options)](./api/class-route.mdx#route-fulfill) method to use a matching response from the HAR file.
+
+```csharp
+await Page.RouteAsync("**/api/**", async route =>
+{
+    // Either use a matching response from the HAR,
+    // or abort the request if nothing matches.
+    await route.FulfillAsync(new()
+    {
+        HarPath = "example.har",
+    });
+});
+```
+
+### API reference
+- [Browser.NewContextAsync(options)](./api/class-browser.mdx#browser-new-context)
 - [Route.FulfillAsync(options)](./api/class-route.mdx#route-fulfill)
 
 <br/>
