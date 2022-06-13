@@ -14,6 +14,7 @@ Playwright provides APIs to **monitor** and **modify** network traffic, both HTT
 - [Modify requests](#modify-requests)
 - [Abort requests](#abort-requests)
 - [Modify responses](#modify-responses)
+- [Record and replay requests](#record-and-replay-requests)
 - [WebSockets](#websockets)
 
 <br/>
@@ -206,6 +207,55 @@ page.route("**/title.html", route -> {
 - [Playwright.request()](./api/class-playwright.mdx#playwright-request)
 - [BrowserContext.request()](./api/class-browsercontext.mdx#browser-context-request)
 - [Page.request()](./api/class-page.mdx#page-request)
+- [Route.fulfill([options])](./api/class-route.mdx#route-fulfill)
+
+<br/>
+
+## Record and replay requests
+
+You can record network activity as an HTTP Archive file (HAR). Later on, this archive can be used to mock responses to the network requests. You'll need to:
+1. Record a HAR file.
+1. Commit the HAR file alongside the tests.
+1. Route requests using the saved HAR files in the tests.
+
+### Recording HAR with CLI
+
+Open the browser with [Playwright CLI](./cli.mdx) and pass `--save-har` option to produce a HAR file. Optionally, use `--save-har-glob` to only save requests you are interested in, for example API endpoints.
+
+```bash
+# Save API requests from example.com as "example.har" archive.
+mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="open --save-har=example.har --save-har-glob='**/api/**' https://example.com"
+```
+
+### Recording HAR with a script
+
+Alternatively, instead of using the CLI, you can record HAR programmatically. Pass `har` option when creating a [BrowserContext] with [Browser.newContext([options])](./api/class-browser.mdx#browser-new-context) to create an archive.
+
+```java
+BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+    .setRecordHarPath(Paths.get("example.har"))
+    .setRecordHarUrlFilter("**/api/**");
+
+// ... Perform actions ...
+
+// Close context to ensure HAR is saved to disk.
+context.close();
+```
+
+### Replaying from HAR
+
+Pass `har` option to the [Route.fulfill([options])](./api/class-route.mdx#route-fulfill) method to use a matching response from the HAR file.
+
+```java
+page.route("**/api/**", route -> {
+  // Either use a matching response from the HAR,
+  // or abort the request if nothing matches.
+  route.fulfill(new Route.FulfillOptions().setHarPath(Paths.get("example.har")));
+});
+```
+
+### API reference
+- [Browser.newContext([options])](./api/class-browser.mdx#browser-new-context)
 - [Route.fulfill([options])](./api/class-route.mdx#route-fulfill)
 
 <br/>
