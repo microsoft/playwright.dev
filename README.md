@@ -10,7 +10,7 @@ This website is built using [Docusaurus v2](https://v2.docusaurus.io/). Content 
 npm install
 ```
 
-The project uses a fork of the [docusaurus-search-local](https://github.com/easyops-cn/docusaurus-search-local) plugin for search. 
+The project uses a fork of the [docusaurus-search-local](https://github.com/easyops-cn/docusaurus-search-local) plugin for search.
 
 ### Roll docs
 
@@ -27,10 +27,19 @@ node src/versions.js --delete 1.16
 ### Run dev server
 
 ```sh
+npm run prepare-nodejs # or prepare-python, etc.
 npm run start
 ```
 
 Note that search indexes are only populated for prod build.
+
+If you get an error like:
+
+```
+[ERROR] Error: Config file at "/…/microsoft/playwright.dev/docusaurus.config.js" not found.
+```
+
+be sure to run the relevant `npm run prepare-*` command! See `package.json` for targets.
 
 ### Run prod build and serve
 
@@ -41,7 +50,7 @@ npm run serve
 
 ### Running this on Windows
 
-If you don't already, you might need to set the default shell to `bash`. 
+If you don't already, you might need to set the default shell to `bash`.
 
 ```powershell
 npm config set script-shell "C:\\Program Files\\git\\bin\\bash.exe"
