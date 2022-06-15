@@ -12,6 +12,7 @@ Learn more about [networking](../network.mdx).
 
 - [Route.AbortAsync(errorCode)](./api/class-route.mdx#route-abort)
 - [Route.ContinueAsync(options)](./api/class-route.mdx#route-continue)
+- [Route.FallbackAsync(options)](./api/class-route.mdx#route-fallback)
 - [Route.FulfillAsync(options)](./api/class-route.mdx#route-fulfill)
 - [Route.Request](./api/class-route.mdx#route-request)
 
@@ -54,16 +55,76 @@ await page.RouteAsync("**/*", route =>
 });
 ```
 
+## Route.FallbackAsync(options) {#route-fallback}
+- `options` &#60;`RouteFallbackOptions?`&#62;
+  - `Headers`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-headers"/> &#60;[IDictionary]?<[string], [string]>&#62; If set changes the request HTTP headers. Header values will be converted to a string.<a href="#route-fallback-option-headers" class="list-anchor">#</a>
+  - `Method`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-method"/> &#60;[string]?&#62; If set changes the request method (e.g. GET or POST)<a href="#route-fallback-option-method" class="list-anchor">#</a>
+  - `PostData`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-post-data"/> &#60;[string]?|[byte]&#91;&#93;?&#62; If set changes the post data of request<a href="#route-fallback-option-post-data" class="list-anchor">#</a>
+  - `Url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-url"/> &#60;[string]?&#62; If set changes the request URL. New URL must have same protocol as original one. Changing the URL won't affect the route matching, all the routes are matched using the original request URL.<a href="#route-fallback-option-url" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-return"/> &#60;[void]&#62;<a href="#route-fallback-return" class="list-anchor">#</a>
+
+When several routes match the given pattern, they run in the order opposite to their registration. That way the last registered route can always override all the previos ones. In the example below, request will be handled by the bottom-most handler first, then it'll fall back to the previous one and in the end will be aborted by the first registered route.
+
+```csharp
+await page.RouteAsync("**/*", route => {
+    // Runs last.
+    await route.AbortAsync();
+});
+
+await page.RouteAsync("**/*", route => {
+    // Runs second.
+    await route.FallbackAsync();
+});
+
+await page.RouteAsync("**/*", route => {
+    // Runs first.
+    await route.FallbackAsync();
+});
+```
+
+Registering multiple routes is useful when you want separate handlers to handle different kinds of requests, for example API calls vs page resources or GET requests vs POST requests as in the example below.
+
+```csharp
+// Handle GET requests.
+await page.RouteAsync("**/*", route => {
+    if (route.Request.Method != "GET") {
+        await route.FallbackAsync();
+        return;
+    }
+    // Handling GET only.
+    // ...
+});
+
+// Handle POST requests.
+await page.RouteAsync("**/*", route => {
+    if (route.Request.Method != "POST") {
+        await route.FallbackAsync();
+        return;
+    }
+    // Handling POST only.
+    // ...
+});
+```
+
+One can also modify request while falling back to the subsequent handler, that way intermediate route handler can modify url, method, headers and postData of the request.
+
+```csharp
+await page.RouteAsync("**/*", route =>
+{
+    var headers = new Dictionary<string, string>(route.Request.Headers) { { "foo", "foo-value" } };
+    headers.Remove("bar");
+    route.FallbackAsync(headers);
+});
+```
+
 ## Route.FulfillAsync(options) {#route-fulfill}
 - `options` &#60;`RouteFulfillOptions?`&#62;
   - `Body`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-body"/> &#60;[string]?&#62; Optional response body as text.<a href="#route-fulfill-option-body" class="list-anchor">#</a>
   - `BodyBytes`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-body-bytes"/> &#60;[byte]&#91;&#93;?&#62; Optional response body as raw bytes.<a href="#route-fulfill-option-body-bytes" class="list-anchor">#</a>
   - `ContentType`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-content-type"/> &#60;[string]?&#62; If set, equals to setting `Content-Type` response header.<a href="#route-fulfill-option-content-type" class="list-anchor">#</a>
-  - `HarFallback`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-har-fallback"/> &#60;`enum RouteHARFallback { Abort, Continue, Throw }?`&#62; Behavior in the case where matching entry was not found in the HAR. Either [Route.AbortAsync(errorCode)](./api/class-route.mdx#route-abort) the request, [Route.ContinueAsync(options)](./api/class-route.mdx#route-continue) it, or throw an error. Defaults to "abort".<a href="#route-fulfill-option-har-fallback" class="list-anchor">#</a>
-  - `HarPath`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-har-path"/> &#60;[string]?&#62; HAR file to extract the response from. If HAR file contains an entry with the matching url and HTTP method, then the entry's headers, status and body will be used to fulfill. An entry resulting in a redirect will be followed automatically. Individual fields such as headers can be overridden using fulfill options. If `path` is a relative path, then it is resolved relative to the current working directory.<a href="#route-fulfill-option-har-path" class="list-anchor">#</a>
   - `Headers`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-headers"/> &#60;[IDictionary]?<[string], [string]>&#62; Response headers. Header values will be converted to a string.<a href="#route-fulfill-option-headers" class="list-anchor">#</a>
   - `Path`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-path"/> &#60;[string]?&#62; File path to respond with. The content type will be inferred from file extension. If `path` is a relative path, then it is resolved relative to the current working directory.<a href="#route-fulfill-option-path" class="list-anchor">#</a>
-  - `Response`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-response"/> &#60;[APIResponse]?&#62; [APIResponse] to fulfill route's request with. Individual fields of the response (such as headers) can be overridden using fulfill options.<a href="#route-fulfill-option-response" class="list-anchor">#</a>
+  - `Response`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-response"/> &#60;[APIResponse]?|[HARResponse]?&#62; [APIResponse] or [HARResponse] to fulfill route's request with. Individual fields of the response (such as headers) can be overridden using fulfill options.<a href="#route-fulfill-option-response" class="list-anchor">#</a>
   - `Status`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-status"/> &#60;[int]?&#62; Response status code, defaults to `200`.<a href="#route-fulfill-option-status" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-return"/> &#60;[void]&#62;<a href="#route-fulfill-return" class="list-anchor">#</a>
 

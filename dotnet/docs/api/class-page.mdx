@@ -118,6 +118,7 @@ page.Load -= PageLoadHandler;
 - [Page.QuerySelectorAsync(selector, options)](./api/class-page.mdx#page-query-selector)
 - [Page.ReloadAsync(options)](./api/class-page.mdx#page-reload)
 - [Page.RouteAsync(url, handler, options)](./api/class-page.mdx#page-route)
+- [Page.RouteFromHarAsync(harPath, options)](./api/class-page.mdx#page-route-from-har)
 - [Page.RunAndWaitForConsoleMessageAsync(action, options)](./api/class-page.mdx#page-wait-for-console-message)
 - [Page.RunAndWaitForDownloadAsync(action, options)](./api/class-page.mdx#page-wait-for-download)
 - [Page.RunAndWaitForFileChooserAsync(action, options)](./api/class-page.mdx#page-wait-for-file-chooser)
@@ -143,6 +144,7 @@ page.Load -= PageLoadHandler;
 - [Page.TypeAsync(selector, text, options)](./api/class-page.mdx#page-type)
 - [Page.UncheckAsync(selector, options)](./api/class-page.mdx#page-uncheck)
 - [Page.UnrouteAsync(url, handler)](./api/class-page.mdx#page-unroute)
+- [Page.UnrouteFromHarAsync(harPath)](./api/class-page.mdx#page-unroute-from-har)
 - [Page.Url](./api/class-page.mdx#page-url)
 - [Page.Video](./api/class-page.mdx#page-video)
 - [Page.ViewportSize](./api/class-page.mdx#page-viewport-size)
@@ -1302,6 +1304,19 @@ To remove a route with its handler you can use [Page.UnrouteAsync(url, handler)]
 Enabling routing disables http cache.
 :::
 
+## Page.RouteFromHarAsync(harPath, options) {#page-route-from-har}
+- `harPath`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-har-path"/> &#60;[string]&#62; Path to the HAR file with prerecorded network data. If HAR file contains an entry with the matching url and HTTP method, then the entry's headers, status and body will be used to fulfill. An entry resulting in a redirect will be followed automatically. If there is no matching entry in the file the execution continues to try other configured HAR files and [Route] handlers. If `path` is a relative path, then it is resolved relative to the current working directory.<a href="#page-route-from-har-option-har-path" class="list-anchor">#</a>
+- `options` &#60;`PageRouteFromHarOptions?`&#62;
+  - `Strict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-strict"/> &#60;[bool]?&#62; If set to true any request not found in the HAR file will be aborted. If set to false missing requests will continue normal flow and can be handled by other [Route] handlers or served from other HAR files configured with [Page.RouteFromHarAsync(harPath, options)](./api/class-page.mdx#page-route-from-har). Defaults to true.<a href="#page-route-from-har-option-strict" class="list-anchor">#</a>
+  - `Url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-url"/> &#60;[string]?|[Regex]?&#62; A glob pattern or regular expression to match request URL while routing. Only requests with URL matching the pattern will be surved from the HAR file. If not specified, all requests are served from the HAR file.<a href="#page-route-from-har-option-url" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-return"/> &#60;[void]&#62;<a href="#page-route-from-har-return" class="list-anchor">#</a>
+
+Provides the capability to serve network requests that are made by a page from prerecorded HAR file.
+
+:::note
+[Page.RouteFromHarAsync(harPath, options)](./api/class-page.mdx#page-route-from-har) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception. Via `await context.addInitScript(() => delete window.navigator.serviceWorker);`
+:::
+
 ## Page.RunAndWaitForConsoleMessageAsync(action, options) {#page-wait-for-console-message}
 - `options` &#60;`PageRunAndWaitForConsoleMessageOptions?`&#62;
   - `Predicate`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-console-message-option-predicate"/> &#60;[Func]<[ConsoleMessage]?, bool>&#62; Receives the [ConsoleMessage] object and resolves to truthy value when the waiting should resolve.<a href="#page-wait-for-console-message-option-predicate" class="list-anchor">#</a>
@@ -1815,6 +1830,12 @@ Shortcut for main frame's [Frame.UncheckAsync(selector, options)](./api/class-fr
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-unroute-return"/> &#60;[void]&#62;<a href="#page-unroute-return" class="list-anchor">#</a>
 
 Removes a route created with [Page.RouteAsync(url, handler, options)](./api/class-page.mdx#page-route). When `handler` is not specified, removes all routes for the `url`.
+
+## Page.UnrouteFromHarAsync(harPath) {#page-unroute-from-har}
+- `harPath`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-unroute-from-har-option-har-path"/> &#60;[string]&#62; Path to the HAR file which was passed to [Page.RouteFromHarAsync(harPath, options)](./api/class-page.mdx#page-route-from-har).<a href="#page-unroute-from-har-option-har-path" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-unroute-from-har-return"/> &#60;[void]&#62;<a href="#page-unroute-from-har-return" class="list-anchor">#</a>
+
+Removes HAR handler previously added with [Page.RouteFromHarAsync(harPath, options)](./api/class-page.mdx#page-route-from-har).
 
 ## Page.Url {#page-url}
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-url-return"/> &#60;[string]&#62;<a href="#page-url-return" class="list-anchor">#</a>

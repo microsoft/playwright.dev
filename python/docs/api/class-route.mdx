@@ -12,6 +12,7 @@ Learn more about [networking](../network.mdx).
 
 - [route.abort(**kwargs)](./api/class-route.mdx#route-abort)
 - [route.continue_(**kwargs)](./api/class-route.mdx#route-continue)
+- [route.fallback(**kwargs)](./api/class-route.mdx#route-fallback)
 - [route.fulfill(**kwargs)](./api/class-route.mdx#route-fulfill)
 - [route.request](./api/class-route.mdx#route-request)
 
@@ -59,8 +60,8 @@ def handle(route, request):
     # override headers
     headers = {
         **request.headers,
-        "foo": "bar" # set "foo" header
-        "origin": None # remove "origin" header
+        "foo": "foo-value" # set "foo" header
+        "bar": None # remove "bar" header
     }
     route.continue_(headers=headers)
 }
@@ -75,10 +76,151 @@ async def handle(route, request):
     # override headers
     headers = {
         **request.headers,
-        "foo": "bar" # set "foo" header
-        "origin": None # remove "origin" header
+        "foo": "foo-value" # set "foo" header
+        "bar": None # remove "bar" header
     }
     await route.continue_(headers=headers)
+}
+await page.route("**/*", handle)
+```
+
+</TabItem>
+</Tabs>
+
+## route.fallback(**kwargs) {#route-fallback}
+- `headers`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-headers"/> &#60;[Dict]\[[str], [str]\]&#62; If set changes the request HTTP headers. Header values will be converted to a string.<a href="#route-fallback-option-headers" class="list-anchor">#</a>
+- `method`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-method"/> &#60;[str]&#62; If set changes the request method (e.g. GET or POST)<a href="#route-fallback-option-method" class="list-anchor">#</a>
+- `post_data`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-post-data"/> &#60;[str]|[bytes]&#62; If set changes the post data of request<a href="#route-fallback-option-post-data" class="list-anchor">#</a>
+- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-url"/> &#60;[str]&#62; If set changes the request URL. New URL must have same protocol as original one. Changing the URL won't affect the route matching, all the routes are matched using the original request URL.<a href="#route-fallback-option-url" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-return"/> &#60;[NoneType]&#62;<a href="#route-fallback-return" class="list-anchor">#</a>
+
+When several routes match the given pattern, they run in the order opposite to their registration. That way the last registered route can always override all the previos ones. In the example below, request will be handled by the bottom-most handler first, then it'll fall back to the previous one and in the end will be aborted by the first registered route.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.route("**/*", lambda route: route.abort())  # Runs last.
+page.route("**/*", lambda route: route.fallback())  # Runs second.
+page.route("**/*", lambda route: route.fallback())  # Runs first.
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.route("**/*", lambda route: route.abort())  # Runs last.
+await page.route("**/*", lambda route: route.fallback())  # Runs second.
+await page.route("**/*", lambda route: route.fallback())  # Runs first.
+```
+
+</TabItem>
+</Tabs>
+
+Registering multiple routes is useful when you want separate handlers to handle different kinds of requests, for example API calls vs page resources or GET requests vs POST requests as in the example below.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Handle GET requests.
+def handle_post(route):
+    if route.request.method != "GET":
+        route.fallback()
+        return
+  # Handling GET only.
+  # ...
+
+# Handle POST requests.
+def handle_post(route):
+    if route.request.method != "POST":
+        route.fallback()
+        return
+  # Handling POST only.
+  # ...
+
+page.route("**/*", handle_get)
+page.route("**/*", handle_post)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Handle GET requests.
+def handle_post(route):
+    if route.request.method != "GET":
+        route.fallback()
+        return
+  # Handling GET only.
+  # ...
+
+# Handle POST requests.
+def handle_post(route):
+    if route.request.method != "POST":
+        route.fallback()
+        return
+  # Handling POST only.
+  # ...
+
+await page.route("**/*", handle_get)
+await page.route("**/*", handle_post)
+```
+
+</TabItem>
+</Tabs>
+
+One can also modify request while falling back to the subsequent handler, that way intermediate route handler can modify url, method, headers and postData of the request.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+def handle(route, request):
+    # override headers
+    headers = {
+        **request.headers,
+        "foo": "foo-value" # set "foo" header
+        "bar": None # remove "bar" header
+    }
+    route.fallback(headers=headers)
+}
+page.route("**/*", handle)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+async def handle(route, request):
+    # override headers
+    headers = {
+        **request.headers,
+        "foo": "foo-value" # set "foo" header
+        "bar": None # remove "bar" header
+    }
+    await route.fallback(headers=headers)
 }
 await page.route("**/*", handle)
 ```
@@ -89,11 +231,9 @@ await page.route("**/*", handle)
 ## route.fulfill(**kwargs) {#route-fulfill}
 - `body`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-body"/> &#60;[str]|[bytes]&#62; Response body.<a href="#route-fulfill-option-body" class="list-anchor">#</a>
 - `content_type`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-content-type"/> &#60;[str]&#62; If set, equals to setting `Content-Type` response header.<a href="#route-fulfill-option-content-type" class="list-anchor">#</a>
-- `har_fallback`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-har-fallback"/> &#60;"abort"|"continue"|"throw"&#62; Behavior in the case where matching entry was not found in the HAR. Either [route.abort(**kwargs)](./api/class-route.mdx#route-abort) the request, [route.continue_(**kwargs)](./api/class-route.mdx#route-continue) it, or throw an error. Defaults to "abort".<a href="#route-fulfill-option-har-fallback" class="list-anchor">#</a>
-- `har_path`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-har-path"/> &#60;[Union]\[[str], [pathlib.Path]\]&#62; HAR file to extract the response from. If HAR file contains an entry with the matching url and HTTP method, then the entry's headers, status and body will be used to fulfill. An entry resulting in a redirect will be followed automatically. Individual fields such as headers can be overridden using fulfill options. If `path` is a relative path, then it is resolved relative to the current working directory.<a href="#route-fulfill-option-har-path" class="list-anchor">#</a>
 - `headers`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-headers"/> &#60;[Dict]\[[str], [str]\]&#62; Response headers. Header values will be converted to a string.<a href="#route-fulfill-option-headers" class="list-anchor">#</a>
 - `path`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-path"/> &#60;[Union]\[[str], [pathlib.Path]\]&#62; File path to respond with. The content type will be inferred from file extension. If `path` is a relative path, then it is resolved relative to the current working directory.<a href="#route-fulfill-option-path" class="list-anchor">#</a>
-- `response`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-response"/> &#60;[APIResponse]&#62; [APIResponse] to fulfill route's request with. Individual fields of the response (such as headers) can be overridden using fulfill options.<a href="#route-fulfill-option-response" class="list-anchor">#</a>
+- `response`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-response"/> &#60;[APIResponse]|[HARResponse]&#62; [APIResponse] or [HARResponse] to fulfill route's request with. Individual fields of the response (such as headers) can be overridden using fulfill options.<a href="#route-fulfill-option-response" class="list-anchor">#</a>
 - `status`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-status"/> &#60;[int]&#62; Response status code, defaults to `200`.<a href="#route-fulfill-option-status" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-return"/> &#60;[NoneType]&#62;<a href="#route-fulfill-return" class="list-anchor">#</a>
 
