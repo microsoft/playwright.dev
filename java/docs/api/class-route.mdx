@@ -11,6 +11,7 @@ Learn more about [networking](../network.mdx).
 
 
 - [Route.abort([errorCode])](./api/class-route.mdx#route-abort)
+- [Route.fallback([options])](./api/class-route.mdx#route-fallback)
 - [Route.fulfill([options])](./api/class-route.mdx#route-fulfill)
 - [Route.request()](./api/class-route.mdx#route-request)
 - [Route.resume([options])](./api/class-route.mdx#route-continue)
@@ -35,16 +36,77 @@ Learn more about [networking](../network.mdx).
 
 Aborts the route's request.
 
+## Route.fallback([options]) {#route-fallback}
+- `options` &#60;`Route.FallbackOptions`&#62;
+  - `setHeaders`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-headers"/> &#60;[Map]<[String], [String]>&#62; If set changes the request HTTP headers. Header values will be converted to a string.<a href="#route-fallback-option-headers" class="list-anchor">#</a>
+  - `setMethod`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-method"/> &#60;[String]&#62; If set changes the request method (e.g. GET or POST)<a href="#route-fallback-option-method" class="list-anchor">#</a>
+  - `setPostData`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-post-data"/> &#60;[String]|[byte&#91;&#93;]&#62; If set changes the post data of request<a href="#route-fallback-option-post-data" class="list-anchor">#</a>
+  - `setUrl`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-url"/> &#60;[String]&#62; If set changes the request URL. New URL must have same protocol as original one. Changing the URL won't affect the route matching, all the routes are matched using the original request URL.<a href="#route-fallback-option-url" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-return"/> &#60;[void]&#62;<a href="#route-fallback-return" class="list-anchor">#</a>
+
+When several routes match the given pattern, they run in the order opposite to their registration. That way the last registered route can always override all the previos ones. In the example below, request will be handled by the bottom-most handler first, then it'll fall back to the previous one and in the end will be aborted by the first registered route.
+
+```java
+page.route("**/*", route -> {
+  // Runs last.
+  route.abort();
+});
+
+page.route("**/*", route -> {
+  // Runs second.
+  route.fallback();
+});
+
+page.route("**/*", route -> {
+  // Runs first.
+  route.fallback();
+});
+```
+
+Registering multiple routes is useful when you want separate handlers to handle different kinds of requests, for example API calls vs page resources or GET requests vs POST requests as in the example below.
+
+```java
+// Handle GET requests.
+page.route("**/*", route -> {
+  if (!route.request().method().equals("GET")) {
+    route.fallback();
+    return;
+  }
+  // Handling GET only.
+  // ...
+});
+
+// Handle POST requests.
+page.route("**/*", route -> {
+  if (!route.request().method().equals("POST")) {
+    route.fallback();
+    return;
+  }
+  // Handling POST only.
+  // ...
+});
+```
+
+One can also modify request while falling back to the subsequent handler, that way intermediate route handler can modify url, method, headers and postData of the request.
+
+```java
+page.route("**/*", route -> {
+  // Override headers
+  Map<String, String> headers = new HashMap<>(route.request().headers());
+  headers.put("foo", "foo-value"); // set "foo" header
+  headers.remove("bar"); // remove "bar" header
+  route.fallback(new Route.ResumeOptions().setHeaders(headers));
+});
+```
+
 ## Route.fulfill([options]) {#route-fulfill}
 - `options` &#60;`Route.FulfillOptions`&#62;
   - `setBody`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-body"/> &#60;[String]&#62; Optional response body as text.<a href="#route-fulfill-option-body" class="list-anchor">#</a>
   - `setBodyBytes`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-body-bytes"/> &#60;[byte&#91;&#93;]&#62; Optional response body as raw bytes.<a href="#route-fulfill-option-body-bytes" class="list-anchor">#</a>
   - `setContentType`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-content-type"/> &#60;[String]&#62; If set, equals to setting `Content-Type` response header.<a href="#route-fulfill-option-content-type" class="list-anchor">#</a>
-  - `setHarFallback`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-har-fallback"/> &#60;`enum RouteHARFallback { ABORT, CONTINUE, THROW }`&#62; Behavior in the case where matching entry was not found in the HAR. Either [Route.abort([errorCode])](./api/class-route.mdx#route-abort) the request, [Route.resume([options])](./api/class-route.mdx#route-continue) it, or throw an error. Defaults to "abort".<a href="#route-fulfill-option-har-fallback" class="list-anchor">#</a>
-  - `setHarPath`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-har-path"/> &#60;[Path]&#62; HAR file to extract the response from. If HAR file contains an entry with the matching url and HTTP method, then the entry's headers, status and body will be used to fulfill. An entry resulting in a redirect will be followed automatically. Individual fields such as headers can be overridden using fulfill options. If `path` is a relative path, then it is resolved relative to the current working directory.<a href="#route-fulfill-option-har-path" class="list-anchor">#</a>
   - `setHeaders`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-headers"/> &#60;[Map]<[String], [String]>&#62; Response headers. Header values will be converted to a string.<a href="#route-fulfill-option-headers" class="list-anchor">#</a>
   - `setPath`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-path"/> &#60;[Path]&#62; File path to respond with. The content type will be inferred from file extension. If `path` is a relative path, then it is resolved relative to the current working directory.<a href="#route-fulfill-option-path" class="list-anchor">#</a>
-  - `setResponse`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-response"/> &#60;[APIResponse]&#62; [APIResponse] to fulfill route's request with. Individual fields of the response (such as headers) can be overridden using fulfill options.<a href="#route-fulfill-option-response" class="list-anchor">#</a>
+  - `setResponse`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-response"/> &#60;[APIResponse]|[HARResponse]&#62; [APIResponse] or [HARResponse] to fulfill route's request with. Individual fields of the response (such as headers) can be overridden using fulfill options.<a href="#route-fulfill-option-response" class="list-anchor">#</a>
   - `setStatus`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-status"/> &#60;[int]&#62; Response status code, defaults to `200`.<a href="#route-fulfill-option-status" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-return"/> &#60;[void]&#62;<a href="#route-fulfill-return" class="list-anchor">#</a>
 
@@ -87,8 +149,8 @@ Continues route's request with optional overrides.
 page.route("**/*", route -> {
   // Override headers
   Map<String, String> headers = new HashMap<>(route.request().headers());
-  headers.put("foo", "bar"); // set "foo" header
-  headers.remove("origin"); // remove "origin" header
+  headers.put("foo", "foo-value"); // set "foo" header
+  headers.remove("bar"); // remove "bar" header
   route.resume(new Route.ResumeOptions().setHeaders(headers));
 });
 ```

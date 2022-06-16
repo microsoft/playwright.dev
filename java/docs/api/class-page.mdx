@@ -117,6 +117,7 @@ page.offRequest(logRequest);
 - [Page.querySelectorAll(selector)](./api/class-page.mdx#page-query-selector-all)
 - [Page.reload([options])](./api/class-page.mdx#page-reload)
 - [Page.route(url, handler[, options])](./api/class-page.mdx#page-route)
+- [Page.routeFromHar(harPath[, options])](./api/class-page.mdx#page-route-from-har)
 - [Page.screenshot([options])](./api/class-page.mdx#page-screenshot)
 - [Page.selectOption(selector, values[, options])](./api/class-page.mdx#page-select-option)
 - [Page.setChecked(selector, checked[, options])](./api/class-page.mdx#page-set-checked)
@@ -132,6 +133,7 @@ page.offRequest(logRequest);
 - [Page.type(selector, text[, options])](./api/class-page.mdx#page-type)
 - [Page.uncheck(selector[, options])](./api/class-page.mdx#page-uncheck)
 - [Page.unroute(url[, handler])](./api/class-page.mdx#page-unroute)
+- [Page.unrouteFromHar(harPath)](./api/class-page.mdx#page-unroute-from-har)
 - [Page.url()](./api/class-page.mdx#page-url)
 - [Page.video()](./api/class-page.mdx#page-video)
 - [Page.viewportSize()](./api/class-page.mdx#page-viewport-size)
@@ -1336,6 +1338,19 @@ To remove a route with its handler you can use [Page.unroute(url[, handler])](./
 Enabling routing disables http cache.
 :::
 
+## Page.routeFromHar(harPath[, options]) {#page-route-from-har}
+- `harPath`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-har-path"/> &#60;[Path]&#62; Path to the HAR file with prerecorded network data. If HAR file contains an entry with the matching url and HTTP method, then the entry's headers, status and body will be used to fulfill. An entry resulting in a redirect will be followed automatically. If there is no matching entry in the file the execution continues to try other configured HAR files and [Route] handlers. If `path` is a relative path, then it is resolved relative to the current working directory.<a href="#page-route-from-har-option-har-path" class="list-anchor">#</a>
+- `options` &#60;`Page.RouteFromHarOptions`&#62;
+  - `setStrict`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-strict"/> &#60;[boolean]&#62; If set to true any request not found in the HAR file will be aborted. If set to false missing requests will continue normal flow and can be handled by other [Route] handlers or served from other HAR files configured with [Page.routeFromHar(harPath[, options])](./api/class-page.mdx#page-route-from-har). Defaults to true.<a href="#page-route-from-har-option-strict" class="list-anchor">#</a>
+  - `setUrl`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-url"/> &#60;[String]|[Pattern]&#62; A glob pattern or regular expression to match request URL while routing. Only requests with URL matching the pattern will be surved from the HAR file. If not specified, all requests are served from the HAR file.<a href="#page-route-from-har-option-url" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-return"/> &#60;[void]&#62;<a href="#page-route-from-har-return" class="list-anchor">#</a>
+
+Provides the capability to serve network requests that are made by a page from prerecorded HAR file.
+
+:::note
+[Page.routeFromHar(harPath[, options])](./api/class-page.mdx#page-route-from-har) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception. Via `await context.addInitScript(() => delete window.navigator.serviceWorker);`
+:::
+
 ## Page.screenshot([options]) {#page-screenshot}
 - `options` &#60;`Page.ScreenshotOptions`&#62;
   - `setAnimations`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-screenshot-option-animations"/> &#60;`enum ScreenshotAnimations { DISABLED, ALLOW }`&#62; When set to `"disabled"`, stops CSS animations, CSS transitions and Web Animations. Animations get different treatment depending on their duration:<a href="#page-screenshot-option-animations" class="list-anchor">#</a>
@@ -1600,6 +1615,12 @@ Shortcut for main frame's [Frame.uncheck(selector[, options])](./api/class-frame
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-unroute-return"/> &#60;[void]&#62;<a href="#page-unroute-return" class="list-anchor">#</a>
 
 Removes a route created with [Page.route(url, handler[, options])](./api/class-page.mdx#page-route). When `handler` is not specified, removes all routes for the `url`.
+
+## Page.unrouteFromHar(harPath) {#page-unroute-from-har}
+- `harPath`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-unroute-from-har-option-har-path"/> &#60;[Path]&#62; Path to the HAR file which was passed to [Page.routeFromHar(harPath[, options])](./api/class-page.mdx#page-route-from-har).<a href="#page-unroute-from-har-option-har-path" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-unroute-from-har-return"/> &#60;[void]&#62;<a href="#page-unroute-from-har-return" class="list-anchor">#</a>
+
+Removes HAR handler previously added with [Page.routeFromHar(harPath[, options])](./api/class-page.mdx#page-route-from-har).
 
 ## Page.url() {#page-url}
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-url-return"/> &#60;[String]&#62;<a href="#page-url-return" class="list-anchor">#</a>
