@@ -71,6 +71,17 @@ PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm i -D playwright
     - `latitude` &#60;[number]&#62; Latitude between -90 and 90.
     - `longitude` &#60;[number]&#62; Longitude between -180 and 180.
     - `accuracy?` &#60;[number]&#62; Non-negative accuracy value. Defaults to `0`.
+  - `har?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="electron-launch-option-har"/> &#60;[Object]&#62; If specified the network requests that are made in the context will be served from the HAR file.<a href="#electron-launch-option-har" class="list-anchor">#</a>
+    - `path` &#60;[string]&#62; Path to a [HAR](http://www.softwareishard.com/blog/har-12-spec) file with prerecorded network data. If the HAR file contains an entry with the matching URL and HTTP method, then the entry's headers, status and body will be used to fulfill the network request. An entry resulting in a redirect will be followed automatically. If `path` is a relative path, then it is resolved relative to the current working directory.
+    - `fallback?` &#60;"abort"|"continue"&#62; If set to 'abort' any request not found in the HAR file will be aborted. If set to'continue' missing requests will be sent to the network. Defaults to 'abort'.
+    - `urlFilter?` &#60;[string]|[RegExp]&#62; A glob pattern or regular expression to match request URL while routing. Only requests with URL matching the pattern will be surved from the HAR file. If not specified, all requests are served from the HAR file.
+
+    <br />
+
+    :::note
+    Playwright will not serve requests intercepted by Service Worker from the HAR file. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception. Via `await context.addInitScript(() => delete window.navigator.serviceWorker);`
+    :::
+
   - `httpCredentials?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="electron-launch-option-http-credentials"/> &#60;[Object]&#62; Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).<a href="#electron-launch-option-http-credentials" class="list-anchor">#</a>
     - `username` &#60;[string]&#62;
     - `password` &#60;[string]&#62;
@@ -78,8 +89,9 @@ PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm i -D playwright
   - `locale?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="electron-launch-option-locale"/> &#60;[string]&#62; Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.<a href="#electron-launch-option-locale" class="list-anchor">#</a>
   - `offline?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="electron-launch-option-offline"/> &#60;[boolean]&#62; Whether to emulate network being offline. Defaults to `false`.<a href="#electron-launch-option-offline" class="list-anchor">#</a>
   - `recordHar?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="electron-launch-option-record-har"/> &#60;[Object]&#62; Enables [HAR](http://www.softwareishard.com/blog/har-12-spec) recording for all pages into `recordHar.path` file. If not specified, the HAR is not recorded. Make sure to await [browserContext.close()](./api/class-browsercontext.mdx#browser-context-close) for the HAR to be saved.<a href="#electron-launch-option-record-har" class="list-anchor">#</a>
-    - `omitContent?` &#60;[boolean]&#62; Optional setting to control whether to omit request content from the HAR. Defaults to `false`.
-    - `path` &#60;[string]&#62; Path on the filesystem to write the HAR file to.
+    - `omitContent?` &#60;[boolean]&#62; Optional setting to control whether to omit request content from the HAR. Defaults to `false`. Deprecated, use `content` policy instead.
+    - `content?` &#60;"omit"|"embed"|"attach"&#62; Optional setting to control resource content management. If `omit` is specified, content is not persisted. If `attach` is specified, resources are persistet as separate files and all of these files are archived along with the HAR file. Defaults to `embed`, which stores content inline the HAR file as per HAR specification.
+    - `path` &#60;[string]&#62; Path on the filesystem to write the HAR file to. If the file name ends with `.zip`, `attach` mode is used by default.
     - `urlFilter?` &#60;[string]|[RegExp]&#62; A glob or regex pattern to filter requests that are stored in the HAR. When a `baseURL` via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.
   - `recordVideo?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="electron-launch-option-record-video"/> &#60;[Object]&#62; Enables video recording for all pages into `recordVideo.dir` directory. If not specified videos are not recorded. Make sure to await [browserContext.close()](./api/class-browsercontext.mdx#browser-context-close) for videos to be saved.<a href="#electron-launch-option-record-video" class="list-anchor">#</a>
     - `dir` &#60;[string]&#62; Path to the directory to put videos into.
