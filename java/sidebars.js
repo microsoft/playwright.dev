@@ -20,6 +20,7 @@ module.exports = {
       "items": [
         { "type": "doc", "id": "actionability" },
         { "type": "doc", "id": "api-testing" },
+        { "type": "doc", "id": "test-assertions" },
         { "type": "doc", "id": "auth" },
         { "type": "doc", "id": "browsers" },
         { "type": "doc", "id": "browser-contexts" },
@@ -70,7 +71,6 @@ module.exports = {
             { "type": "doc", "id": "api/class-apirequest" },
             { "type": "doc", "id": "api/class-apirequestcontext" },
             { "type": "doc", "id": "api/class-apiresponse" },
-            { "type": "doc", "id": "test-assertions" },
             { "type": "doc", "id": "api/class-browser" },
             { "type": "doc", "id": "api/class-browsercontext" },
             { "type": "doc", "id": "api/class-browsertype" },
