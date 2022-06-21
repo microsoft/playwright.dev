@@ -19,19 +19,82 @@
 const fs = require('fs');
 const path = require('path');
 const https = require('https');
+const chokidar = require('chokidar');
 const { Generator } = require('./generator');
 const { JavaScriptFormatter } = require('./format_js');
 const { PythonFormatter } = require('./format_python');
 const { JavaFormatter } = require('./format_java');
 const { CSharpFormatter } = require('./format_csharp');
 
-(async () => {
-  new Generator('js', path.join(__dirname, '..', 'nodejs', 'docs'), new JavaScriptFormatter());
-  new Generator('python', path.join(__dirname, '..', 'python', 'docs'), new PythonFormatter());
-  new Generator('java', path.join(__dirname, '..', 'java', 'docs'), new JavaFormatter());
-  new Generator('csharp', path.join(__dirname, '..', 'dotnet', 'docs'), new CSharpFormatter());
+const isWatch = process.argv.includes('--watch');
+const watchProject = process.argv[3];
 
-  await updateStarsButton();
+if (!process.env.SRC_DIR)
+  throw new Error(`'SRC_DIR' environment variable needs to be set`);
+const srcDir = path.join(process.env.SRC_DIR, 'docs', 'src');
+
+const lang2Folder = {
+  'js': 'nodejs',
+  'python': 'python',
+  'java': 'java',
+  'csharp': 'dotnet',
+}
+
+/**
+ * @param {string[]} languages
+ */
+async function generateDocsForLanguage (languages) {
+  const lang2Generator = {
+    'js': JavaScriptFormatter,
+    'python': PythonFormatter,
+    'java': JavaFormatter,
+    'csharp': CSharpFormatter,
+  };
+  for (const lang of languages)
+    new Generator(lang, srcDir, path.join(__dirname, '..', lang2Folder[lang], 'docs'), new lang2Generator[lang]);
+};
+
+/**
+ * @param {'add'|'addDir'|'change'|'unlink'|'unlinkDir'} event 
+ * @param {string} from 
+ */
+async function syncWithWorkingDirectory (event, from) {
+  const to = path.join(path.join(__dirname, '..', path.relative(path.join(__dirname, '..', lang2Folder[watchProject]), from)));
+  switch (event) {
+    case 'addDir':
+      if (!fs.existsSync(to))
+        fs.mkdirSync(to);
+      break;
+    case 'add':
+    case 'change':
+      fs.copyFileSync(from, to);
+      break;
+    case 'unlink':
+      fs.unlinkSync(to);
+    case 'unlinkDir':
+      fs.rmdirSync(to);
+      break;
+  }
+}
+
+(async () => {
+  if (isWatch) {
+    chokidar.watch(srcDir, { ignoreInitial: true }).on('all', (event, path) => {
+      generateDocsForLanguage([watchProject]).catch((error) => {
+        console.error(`Error auto syncing docs (generating): ${error}`);
+      })
+    });
+    chokidar.watch(path.join(__dirname, '..', lang2Folder[watchProject])).on('all', (event, path) => {
+      syncWithWorkingDirectory(event, path).catch(error => {
+        console.error(`Error auto syncing docs (mirroring): ${error}`);
+      })
+    });
+    await generateDocsForLanguage([watchProject]);
+  } else {
+    await generateDocsForLanguage(['js', 'python', 'java', 'csharp']);
+    await updateStarsButton();
+  }
+
 })().catch(error => {
   console.error(error);
   process.exit(error);
