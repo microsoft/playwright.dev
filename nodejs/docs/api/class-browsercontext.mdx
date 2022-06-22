@@ -47,6 +47,7 @@ await context.close();
 - [browserContext.newPage()](./api/class-browsercontext.mdx#browser-context-new-page)
 - [browserContext.pages()](./api/class-browsercontext.mdx#browser-context-pages)
 - [browserContext.route(url, handler[, options])](./api/class-browsercontext.mdx#browser-context-route)
+- [browserContext.routeFromHAR(har[, options])](./api/class-browsercontext.mdx#browser-context-route-from-har)
 - [browserContext.serviceWorkers()](./api/class-browsercontext.mdx#browser-context-service-workers)
 - [browserContext.setDefaultNavigationTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout)
 - [browserContext.setDefaultTimeout(timeout)](./api/class-browsercontext.mdx#browser-context-set-default-timeout)
@@ -378,7 +379,7 @@ Returns all open pages in the context.
 Routing provides the capability to modify network requests that are made by any page in the browser context. Once route is enabled, every request matching the url pattern will stall unless it's continued, fulfilled or aborted.
 
 :::note
-[page.route(url, handler[, options])](./api/class-page.mdx#page-route) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception. Via `await context.addInitScript(() => delete window.navigator.serviceWorker);`
+[browserContext.route(url, handler[, options])](./api/class-browsercontext.mdx#browser-context-route) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception by setting `Browser.newContext.serviceWorkers` to `'block'`.
 :::
 
 An example of a naive handler that aborts all image requests:
@@ -419,6 +420,20 @@ To remove a route with its handler you can use [browserContext.unroute(url[, han
 :::note
 Enabling routing disables http cache.
 :::
+
+## browserContext.routeFromHAR(har[, options]) {#browser-context-route-from-har}
+- `har`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-har"/> &#60;[string]&#62; Path to a [HAR](http://www.softwareishard.com/blog/har-12-spec) file with prerecorded network data. If `path` is a relative path, then it is resolved relative to the current working directory.<a href="#browser-context-route-from-har-option-har" class="list-anchor">#</a>
+- `options?` &#60;[Object]&#62;
+  - `notFound?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-not-found"/> &#60;"abort"|"fallback"&#62; If set to 'abort' any request not found in the HAR file will be aborted.<a href="#browser-context-route-from-har-option-not-found" class="list-anchor">#</a>
+    * If set to 'fallback' falls through to the next route handler in the handler chain.
+
+    Defaults to abort.
+  - `url?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-url"/> &#60;[string]|[RegExp]|[function]\([URL]\):[boolean]&#62; A glob pattern, regular expression or predicate to match the request URL. Only requests with URL matching the pattern will be surved from the HAR file. If not specified, all requests are served from the HAR file.<a href="#browser-context-route-from-har-option-url" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-from-har-return"/> &#60;[Promise]<[void]>&#62;<a href="#browser-context-route-from-har-return" class="list-anchor">#</a>
+
+If specified the network requests that are made in the context will be served from the HAR file. Read more about [Replaying from HAR](../network.mdx#replaying-from-har).
+
+Playwright will not serve requests intercepted by Service Worker from the HAR file. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception by setting `Browser.newContext.serviceWorkers` to `'block'`.
 
 ## browserContext.serviceWorkers() {#browser-context-service-workers}
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-service-workers-return"/> &#60;[Array]<[Worker]>&#62;<a href="#browser-context-service-workers-return" class="list-anchor">#</a>

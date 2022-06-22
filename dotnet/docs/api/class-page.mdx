@@ -118,6 +118,7 @@ page.Load -= PageLoadHandler;
 - [Page.QuerySelectorAsync(selector, options)](./api/class-page.mdx#page-query-selector)
 - [Page.ReloadAsync(options)](./api/class-page.mdx#page-reload)
 - [Page.RouteAsync(url, handler, options)](./api/class-page.mdx#page-route)
+- [Page.RouteFromHARAsync(har, options)](./api/class-page.mdx#page-route-from-har)
 - [Page.RunAndWaitForConsoleMessageAsync(action, options)](./api/class-page.mdx#page-wait-for-console-message)
 - [Page.RunAndWaitForDownloadAsync(action, options)](./api/class-page.mdx#page-wait-for-download)
 - [Page.RunAndWaitForFileChooserAsync(action, options)](./api/class-page.mdx#page-wait-for-file-chooser)
@@ -1263,7 +1264,7 @@ The handler will only be called for the first url if the response is a redirect.
 :::
 
 :::note
-[Page.RouteAsync(url, handler, options)](./api/class-page.mdx#page-route) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception. Via `await context.addInitScript(() => delete window.navigator.serviceWorker);`
+[Page.RouteAsync(url, handler, options)](./api/class-page.mdx#page-route) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception by setting `Browser.newContext.serviceWorkers` to `'block'`.
 :::
 
 An example of a naive handler that aborts all image requests:
@@ -1301,6 +1302,20 @@ To remove a route with its handler you can use [Page.UnrouteAsync(url, handler)]
 :::note
 Enabling routing disables http cache.
 :::
+
+## Page.RouteFromHARAsync(har, options) {#page-route-from-har}
+- `har`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-har"/> &#60;[string]&#62; Path to a [HAR](http://www.softwareishard.com/blog/har-12-spec) file with prerecorded network data. If `path` is a relative path, then it is resolved relative to the current working directory.<a href="#page-route-from-har-option-har" class="list-anchor">#</a>
+- `options` &#60;`PageRouteFromHAROptions?`&#62;
+  - `NotFound`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-not-found"/> &#60;`enum HarNotFound { Abort, Fallback }?`&#62; If set to 'abort' any request not found in the HAR file will be aborted.<a href="#page-route-from-har-option-not-found" class="list-anchor">#</a>
+    * If set to 'fallback' missing requests will be sent to the network.
+
+    Defaults to abort.
+  - `Url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-url"/> &#60;[string]?|[Regex]?|[Func]<[string]?, bool>&#62; A glob pattern, regular expression or predicate to match the request URL. Only requests with URL matching the pattern will be surved from the HAR file. If not specified, all requests are served from the HAR file.<a href="#page-route-from-har-option-url" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-return"/> &#60;[void]&#62;<a href="#page-route-from-har-return" class="list-anchor">#</a>
+
+If specified the network requests that are made in the page will be served from the HAR file. Read more about [Replaying from HAR](../network.mdx#replaying-from-har).
+
+Playwright will not serve requests intercepted by Service Worker from the HAR file. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception by setting `Browser.newContext.serviceWorkers` to `'block'`.
 
 ## Page.RunAndWaitForConsoleMessageAsync(action, options) {#page-wait-for-console-message}
 - `options` &#60;`PageRunAndWaitForConsoleMessageOptions?`&#62;
