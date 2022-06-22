@@ -29,9 +29,7 @@ const { CSharpFormatter } = require('./format_csharp');
 const isWatch = process.argv.includes('--watch');
 const watchProject = process.argv[3];
 
-if (!process.env.SRC_DIR)
-  throw new Error(`'SRC_DIR' environment variable needs to be set`);
-const srcDir = path.join(process.env.SRC_DIR, 'docs', 'src');
+const srcDir = path.join(process.env.SRC_DIR || '../playwright', 'docs', 'src');
 
 const lang2Folder = {
   'js': 'nodejs',
