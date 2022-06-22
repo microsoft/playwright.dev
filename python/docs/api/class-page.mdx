@@ -160,6 +160,7 @@ page.remove_listener("request", log_request)
 - [page.query_selector_all(selector)](./api/class-page.mdx#page-query-selector-all)
 - [page.reload(**kwargs)](./api/class-page.mdx#page-reload)
 - [page.route(url, handler, **kwargs)](./api/class-page.mdx#page-route)
+- [page.route_from_har(har, **kwargs)](./api/class-page.mdx#page-route-from-har)
 - [page.screenshot(**kwargs)](./api/class-page.mdx#page-screenshot)
 - [page.select_option(selector, **kwargs)](./api/class-page.mdx#page-select-option)
 - [page.set_checked(selector, checked, **kwargs)](./api/class-page.mdx#page-set-checked)
@@ -2053,7 +2054,7 @@ The handler will only be called for the first url if the response is a redirect.
 :::
 
 :::note
-[page.route(url, handler, **kwargs)](./api/class-page.mdx#page-route) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception. Via `await context.addInitScript(() => delete window.navigator.serviceWorker);`
+[page.route(url, handler, **kwargs)](./api/class-page.mdx#page-route) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception by setting `browser.new_context.service_workers` to `'block'`.
 :::
 
 An example of a naive handler that aborts all image requests:
@@ -2163,6 +2164,19 @@ To remove a route with its handler you can use [page.unroute(url, **kwargs)](./a
 :::note
 Enabling routing disables http cache.
 :::
+
+## page.route_from_har(har, **kwargs) {#page-route-from-har}
+- `har`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-har"/> &#60;[Union]\[[str], [pathlib.Path]\]&#62; Path to a [HAR](http://www.softwareishard.com/blog/har-12-spec) file with prerecorded network data. If `path` is a relative path, then it is resolved relative to the current working directory.<a href="#page-route-from-har-option-har" class="list-anchor">#</a>
+- `not_found`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-not-found"/> &#60;"abort"|"fallback"&#62; If set to 'abort' any request not found in the HAR file will be aborted.<a href="#page-route-from-har-option-not-found" class="list-anchor">#</a>
+  * If set to 'fallback' missing requests will be sent to the network.
+
+  Defaults to abort.
+- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-url"/> &#60;[str]|[Pattern]|[Callable]\[[URL]\]:[bool]&#62; A glob pattern, regular expression or predicate to match the request URL. Only requests with URL matching the pattern will be surved from the HAR file. If not specified, all requests are served from the HAR file.<a href="#page-route-from-har-option-url" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-return"/> &#60;[NoneType]&#62;<a href="#page-route-from-har-return" class="list-anchor">#</a>
+
+If specified the network requests that are made in the page will be served from the HAR file. Read more about [Replaying from HAR](../network.mdx#replaying-from-har).
+
+Playwright will not serve requests intercepted by Service Worker from the HAR file. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception by setting `browser.new_context.service_workers` to `'block'`.
 
 ## page.screenshot(**kwargs) {#page-screenshot}
 - `animations`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-screenshot-option-animations"/> &#60;"disabled"|"allow"&#62; When set to `"disabled"`, stops CSS animations, CSS transitions and Web Animations. Animations get different treatment depending on their duration:<a href="#page-screenshot-option-animations" class="list-anchor">#</a>
