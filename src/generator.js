@@ -18,6 +18,7 @@
 
 const toKebabCase = require('lodash/kebabCase')
 const fs = require('fs');
+const crypto = require('crypto');
 const path = require('path');
 const md = require('./markdown');
 const { parseApi } = require('./api_parser');
@@ -27,10 +28,6 @@ const { generateTabGroups } = require('./format_utils');
 /** @typedef {import('./documentation').Type} Type */
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
 
-if (!process.env.SRC_DIR)
-  throw new Error(`'SRC_DIR' environment variable needs to be set`);
-
-const DIR_SRC = path.join(process.env.SRC_DIR, 'docs', 'src');
 const commonSnippets = new Set(['txt', 'html', 'xml', 'yml', 'yaml', 'json', 'groovy', 'html', 'bash', 'sh']);
 
 // -------- HACKS BEGIN --------
@@ -74,18 +71,21 @@ class Generator {
 
   /**
    * @param {string} lang
+   * @param {string} srcDir
    * @param {string} outDir
    * @param {GeneratorFormatter} formatter
    */
-  constructor(lang, outDir, formatter) {
+  constructor(lang, srcDir, outDir, formatter) {
     this.lang = lang;
     this.outDir = outDir;
+    this.srcDir = srcDir;
     /** @type {Set<string>} */
     this.generatedFiles = new Set();
     this.formatter = formatter;
-    this.documentation = parseApi(path.join(DIR_SRC, 'api'))
-      .mergeWith(parseApi(path.join(DIR_SRC, 'test-api'), path.join(DIR_SRC, 'api', 'params.md')))
-      .mergeWith(parseApi(path.join(DIR_SRC, 'test-reporter-api')));
+
+    this.documentation = parseApi(path.join(srcDir, 'api'))
+      .mergeWith(parseApi(path.join(srcDir, 'test-api'), path.join(srcDir, 'api', 'params.md')))
+      .mergeWith(parseApi(path.join(srcDir, 'test-reporter-api')));
     this.documentation.filterForLanguage(lang);
     this.documentation.filterOutExperimental();
     this.documentation.setLinkRenderer(item => {
@@ -114,7 +114,7 @@ class Generator {
 
     /** @type {Map<string, string>} */
     const guides = new Map();
-    for (const entry of fs.readdirSync(DIR_SRC, { withFileTypes: true })) {
+    for (const entry of fs.readdirSync(srcDir, { withFileTypes: true })) {
       if (entry.isDirectory() || entry.name.startsWith('links'))
         continue;
       const supportedLanguages = ['js', 'python', 'java', 'csharp'];
@@ -175,7 +175,7 @@ import TabItem from '@theme/TabItem';
     result.push(...this.formatClassMembers(clazz));
     fs.mkdirSync(path.join(this.outDir, 'api'), { recursive: true });
     const output = [md.render(result), this.generatedLinksSuffix].join('\n');
-    fs.writeFileSync(path.join(this.outDir, 'api', `class-${clazz.name.toLowerCase()}.mdx`), this.mdxLinks(output));
+    writeFileSyncCached(path.join(this.outDir, 'api', `class-${clazz.name.toLowerCase()}.mdx`), this.mdxLinks(output));
   }
 
   /**
@@ -283,7 +283,7 @@ import TabItem from '@theme/TabItem';
    * @param {string} outName
    */
   generateDoc(name, outName) {
-    const content = fs.readFileSync(path.join(DIR_SRC, name)).toString();
+    const content = fs.readFileSync(path.join(this.srcDir, name)).toString();
     let nodes = this.filterForLanguage(md.parse(content));
     return this.generateDocFromMd(nodes, outName);
   }
@@ -327,7 +327,7 @@ title: "Assertions"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';`);
-    fs.writeFileSync(path.join(this.outDir, outName), this.mdxLinks(output));
+  writeFileSyncCached(path.join(this.outDir, outName), this.mdxLinks(output));
   }
 
   /**
@@ -592,6 +592,21 @@ function calculatePropertyHash(member, direction) {
   const propertyName = toKebabCase(member.name);
   const propertyDescription = member.paramOrOption ? 'param' : 'option';
   return `${prefix}-${propertyDescription}-${propertyName}`.toLowerCase();
+}
+
+const fileWriteCache = new Map();
+
+/**
+ * @param {string} file 
+ * @param {string} content 
+ * @returns {undefined}
+ */
+function writeFileSyncCached(file, content) {
+  const contentHash = crypto.createHash('sha256').update(content).digest('hex');
+  if (fileWriteCache.has(file) && fileWriteCache.get(file) === contentHash)
+    return;
+  fileWriteCache.set(file, contentHash);
+  fs.writeFileSync(file, content);
 }
 
 module.exports = { Generator, toTitleCase, toSnakeCase, renderJSSignature };
