@@ -1,0 +1,256 @@
+---
+id: testing-library
+title: "Migrating from Testing Library"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+- [Migration principles](#migration-principles)
+- [Cheat Sheet](#cheat-sheet)
+- [Example](#example)
+- [Migrating queries](#migrating-queries)
+- [Replacing `waitFor`](#replacing-waitfor)
+- [Replacing `within`](#replacing-within)
+- [Playwright Test Super Powers](#playwright-test-super-powers)
+- [Further Reading](#further-reading)
+
+## Migration principles
+
+This guide describes migration to Playwright's [Experimental Component Testing](./test-components) from [DOM Testing Library](https://testing-library.com/docs/dom-testing-library/intro/), [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/), [Vue Testing Library](https://testing-library.com/docs/vue-testing-library/intro) and [Svelte Testing Library](https://testing-library.com/docs/svelte-testing-library/intro).
+
+:::note
+If you use DOM Testing Library in the browser (for example, you bundle end-to-end tests with webpack), you can switch directly to Playwright Test. Examples below are focused on component tests, but for end-to-end test you just need to replace `await mount` with `await page.goto('http://localhost:3000/')` to open the page under test.
+:::
+
+## Cheat Sheet
+
+| Testing Library                                         | Playwright                                    |
+|---------------------------------------------------------|-----------------------------------------------|
+| [screen](https://testing-library.com/docs/queries/about#screen) | [page](./api/class-page) and [component](./api/class-locator) |
+| [queries](https://testing-library.com/docs/queries/about) | [locators](./locators) |
+| [async helpers](https://testing-library.com/docs/dom-testing-library/api-async) | [assertions](./test-assertions) |
+| [user events](https://testing-library.com/docs/user-event/intro) | [actions](./api/class-locator) |
+| `await user.click(screen.getByText('Click me'))`        | `await component.locator('text=Click me').click()` |
+| `await user.click(await screen.findByText('Click me'))` | `await component.locator('text=Click me').click()` |
+| `await user.type(screen.getByLabelText('Password'), 'secret')` | `await component.locator('text=Password').fill('secret')` |
+| `expect(screen.getByLabelText('Password')).toHaveValue('secret')` | `await expect(component.locator('text=Password')).toHaveValue('secret')` |
+| `screen.findByText('...')`                              | `component.locator('text=...')`                    |
+| `screen.getByTestId('...')`                             | `component.locator('data-testid=...')`             |
+| `screen.queryByPlaceholderText('...')`                  | `component.locator('[placeholder="..."]')`         |
+| `screen.getAllByRole('button', { pressed: true })`      | `component.locator('role=button[pressed]')`        |
+
+## Example
+
+Testing Library:
+
+```js
+import React from 'react';
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+test('should sign in', async () => {
+  // Setup the page.
+  const user = userEvent.setup();
+  render(<SignInPage />);
+
+  // Perform actions.
+  await user.type(screen.getByLabelText('Username'), 'John');
+  await user.type(screen.getByLabelText('Password'), 'secret');
+  await user.click(screen.getByText('Sign in'));
+
+  // Verify signed in state by waiting until "Welcome" message appears.
+  await screen.findByText('Welcome, John');
+});
+```
+
+Line-by-line migration to Playwright Test:
+
+```js
+const { test, expect } = require('@playwright/experimental-ct-react'); // 1
+
+test('should sign in', async ({ page, mount }) => { // 2
+  // Setup the page.
+  const component = await mount(<SignInPage />); // 3
+
+  // Perform actions.
+  await component.locator('text=Username').fill('John'); // 4
+  await component.locator('text=Password').fill('secret');
+  await component.locator('text=Sign in').click();
+
+  // Verify signed in state by waiting until "Welcome" message appears.
+  await expect(component.locator('text=Welcome, John')).toBeVisible(); // 5
+});
+```
+
+Migration highlights (see inline comments in the Playwright Test code snippet):
+1. Import everything from `@playwright/experimental-ct-react` (or -vue, -svelte) for component tests, or from `@playwright/test` for end-to-end tests.
+1. Test function is given a `page` that is isolated from other tests, and `mount` that renders a component in this page. These are two of the [useful fixtures](./api/class-fixtures) in Playwright Test.
+1. Replace `render` with `mount` that returns a [component locator](./locators).
+1. Use locators created with [locator.locator(selector[, options])](./api/class-locator.mdx#locator-locator) or [page.locator(selector[, options])](./api/class-page.mdx#page-locator) to perform most of the actions.
+1. Use [assertions](./test-assertions) to verify the state.
+
+## Migrating queries
+
+All queries like `getBy...`, `findBy...`, `queryBy...` and their multi-element counterparts are replaced with `page.locator('...')`. Locators always auto-wait and retry when needed, so you don't have to worry about choosing the right method. When you want to do a [list operation](./locators#lists), e.g. assert a list of texts, Playwright automatically performs multi-element opertations.
+1. `getByRole`: use [role selector](./selectors#role-selector) `component.locator('role=button[name="Sign up"]')`.
+1. `getByText`: use `component.locator('text=some value')` and other variations of the [text selector](./selectors#text-selector).
+1. `getByTestId`: use [test id selectors](./selectors#id-data-testid-data-test-id-data-test-selectors), for example `component.locator('data-testid=some value')`.
+1. `getByPlaceholderText`: use css alternative `component.locator('[placeholder="some value"]')`.
+1. `getByAltText`: use css alternative `component.locator('[alt="some value"]')` or [role selector](./selectors#role-selector) `component.locator('role=img[name="some value"]')`.
+1. `getByTitle`: use css alternative `component.locator('[title="some value"]')`
+
+## Replacing `waitFor`
+
+Playwright includes [assertions](./test-assertions) that automatically wait for the condition, so you don't usually need an explicit `waitFor`/`waitForElementToBeRemoved` call.
+
+```js
+// Testing Library
+await waitFor(() => {
+  expect(getByText('the lion king')).toBeInTheDocument()
+})
+await waitForElementToBeRemoved(() => queryByText('the mummy'))
+
+// Playwright
+await expect(page.locator('text=the lion king')).toBeVisible()
+await expect(page.locator('text=the mummy')).toBeHidden()
+```
+
+When you cannot find a suitable assertion, use [`expect.poll`](./test-assertions#polling) instead.
+
+```js
+await expect.poll(async () => {
+  const response = await page.request.get('https://api.example.com');
+  return response.status();
+}).toBe(200);
+```
+
+## Replacing `within`
+
+You can create a locator inside another locator with [locator.locator(selector[, options])](./api/class-locator.mdx#locator-locator) method.
+
+```js
+// Testing Library
+const messages = document.getElementById('messages')
+const helloMessage = within(messages).getByText('hello')
+
+// Playwright
+const messages = component.locator('id=messages')
+const helloMessage = messages.locator('text=hello')
+```
+
+## Playwright Test Super Powers
+
+Once you're on Playwright Test, you get a lot!
+- Full zero-configuration TypeScript support
+- Run tests across **all web engines** (Chrome, Firefox, Safari) on **any popular operating system** (Windows, macOS, Ubuntu)
+- Full support for multiple origins, [(i)frames](./api/class-frame), [tabs and contexts](./pages)
+- Run tests in isolation in parallel across multiple browsers
+- Built-in test artifact collection: [video recording](./test-configuration#record-video), [screenshots](./test-configuration#automatic-screenshots) and [playwright traces](./test-configuration#record-test-trace)
+
+Also you get all these ✨ awesome tools ✨ that come bundled with Playwright Test:
+- [Playwright Inspector](./inspector)
+- [Playwright Test Code generation](./auth#code-generation)
+- [Playwright Tracing](./trace-viewer) for post-mortem debugging
+
+## Further Reading
+
+Learn more about Playwright Test runner:
+- [Getting Started](./intro)
+- [Experimental Component Testing](./test-components)
+- [Locators](./api/class-locator)
+- [Selectors](./selectors)
+- [Assertions](./test-assertions)
+- [Auto-waiting](./actionability)
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Android]: ./api/class-android.mdx "Android"
+[AndroidDevice]: ./api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: ./api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: ./api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: ./api/class-androidwebview.mdx "AndroidWebView"
+[APIRequest]: ./api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: ./api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: ./api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: ./test-assertions.mdx "APIResponseAssertions"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: ./api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: ./api/class-coverage.mdx "Coverage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[Electron]: ./api/class-electron.mdx "Electron"
+[ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Locator]: ./api/class-locator.mdx "Locator"
+[LocatorAssertions]: ./test-assertions.mdx "LocatorAssertions"
+[Logger]: ./api/class-logger.mdx "Logger"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[PageAssertions]: ./test-assertions.mdx "PageAssertions"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: ./test-assertions.mdx "PlaywrightAssertions"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[ScreenshotAssertions]: ./test-assertions.mdx "ScreenshotAssertions"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Fixtures]: ./api/class-fixtures.mdx "Fixtures"
+[Test]: ./api/class-test.mdx "Test"
+[TestConfig]: ./api/class-testconfig.mdx "TestConfig"
+[TestError]: ./api/class-testerror.mdx "TestError"
+[TestInfo]: ./api/class-testinfo.mdx "TestInfo"
+[TestOptions]: ./api/class-testoptions.mdx "TestOptions"
+[TestProject]: ./api/class-testproject.mdx "TestProject"
+[WorkerInfo]: ./api/class-workerinfo.mdx "WorkerInfo"
+[Location]: ./api/class-location.mdx "Location"
+[Reporter]: ./api/class-reporter.mdx "Reporter"
+[Suite]: ./api/class-suite.mdx "Suite"
+[TestCase]: ./api/class-testcase.mdx "TestCase"
+[TestResult]: ./api/class-testresult.mdx "TestResult"
+[TestStep]: ./api/class-teststep.mdx "TestStep"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
