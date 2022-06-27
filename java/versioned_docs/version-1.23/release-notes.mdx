@@ -5,6 +5,7 @@ title: "Release notes"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
+- [Version 1.23](#version-123)
 - [Version 1.22](#version-122)
 - [Version 1.21](#version-121)
 - [Version 1.20](#version-120)
@@ -21,6 +22,93 @@ import TabItem from '@theme/TabItem';
 - [Version 1.9](#version-19)
 - [Version 1.8](#version-18)
 - [Version 1.7](#version-17)
+
+## Version 1.23
+
+### Network Replay
+
+Now you can record network traffic into a HAR file and re-use this traffic in your tests.
+
+To record network into HAR file:
+
+```bash
+mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="open --save-har=example.har --save-har-glob='**/api/**' https://example.com"
+```
+
+Alternatively, you can record HAR programmatically:
+
+```java
+BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+    .setRecordHarPath(Paths.get("example.har"))
+    .setRecordHarUrlFilter("**/api/**"));
+
+// ... Perform actions ...
+
+// Close context to ensure HAR is saved to disk.
+context.close();
+```
+
+Use the new methods [Page.routeFromHAR(har[, options])](./api/class-page.mdx#page-route-from-har) or [BrowserContext.routeFromHAR(har[, options])](./api/class-browsercontext.mdx#browser-context-route-from-har) to serve matching responses from the [HAR](http://www.softwareishard.com/blog/har-12-spec/) file:
+
+```java
+context.routeFromHAR(Paths.get("example.har"));
+```
+
+Read more in [our documentation](./network#record-and-replay-requests).
+
+### Advanced Routing
+
+You can now use [Route.fallback([options])](./api/class-route.mdx#route-fallback) to defer routing to other handlers.
+
+Consider the following example:
+
+```java
+// Remove a header from all requests.
+page.route("**/*", route -> {
+  Map<String, String> headers = new HashMap<>(route.request().headers());
+  headers.remove("X-Secret");
+  route.resume(new Route.ResumeOptions().setHeaders(headers));
+});
+
+// Abort all images.
+page.route("**/*", route -> {
+  if ("image".equals(route.request().resourceType()))
+    route.abort();
+  else
+    route.fallback();
+});
+```
+
+Note that the new methods [Page.routeFromHAR(har[, options])](./api/class-page.mdx#page-route-from-har) and [BrowserContext.routeFromHAR(har[, options])](./api/class-browsercontext.mdx#browser-context-route-from-har) also participate in routing and could be deferred to.
+
+### Web-First Assertions Update
+* New method [assertThat(locator).hasValues(values[, options])](./test-assertions.mdx#locator-assertions-to-have-values) that asserts all selected values of `<select multiple>` element.
+* Methods [assertThat(locator).containsText(expected[, options])](./test-assertions.mdx#locator-assertions-to-contain-text) and [assertThat(locator).hasText(expected[, options])](./test-assertions.mdx#locator-assertions-to-have-text) now accept `ignoreCase` option.
+
+### Miscellaneous
+* If there's a service worker that's in your way, you can now easily disable it with a new context option `serviceWorkers`:
+
+  ```java
+  BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+      .setServiceWorkers(ServiceWorkerPolicy.BLOCK));
+  ```
+
+* Using `.zip` path for `recordHar` context option automatically zips the resulting HAR:
+
+  ```java
+  BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+      .setRecordHarPath(Paths.get("example.har.zip")));
+  ```
+
+* If you intend to edit HAR by hand, consider using the `"minimal"` HAR recording mode that only records information that is essential for replaying:
+
+  ```java
+  BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+      .setRecordHarPath(Paths.get("example.har.zip"))
+      .setRecordHarMode(HarMode.MINIMAL));
+  ```
+
+* Playwright now runs on Ubuntu 22 amd64 and Ubuntu 22 arm64. We also publish new docker image `mcr.microsoft.com/playwright/java:v1.23.0-jammy`.
 
 ## Version 1.22
 
