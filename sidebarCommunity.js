@@ -9,7 +9,7 @@ module.exports = {
    
     {
       type: 'link',
-      label: 'Chat with us on Slack',
+      label: 'Join our Community Slack',
       href: 'https://aka.ms/playwright-slack',
     },
   ],
