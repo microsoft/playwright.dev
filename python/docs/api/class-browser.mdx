@@ -88,6 +88,10 @@ In case this browser is obtained using [browser_type.launch(**kwargs)](./api/cla
 
 In case this browser is connected to, clears all created contexts belonging to this browser and disconnects from the browser server.
 
+:::note
+This is similar to force quitting the browser. Therefore, you should call [browser_context.close()](./api/class-browsercontext.mdx#browser-context-close) on any [BrowserContext]'s you explicitly created earlier with [browser.new_context(**kwargs)](./api/class-browser.mdx#browser-new-context) **before** calling [browser.close()](./api/class-browser.mdx#browser-close).
+:::
+
 The [Browser] object itself is considered to be disposed and cannot be used anymore.
 
 ## browser.contexts {#browser-contexts}
@@ -223,6 +227,10 @@ Returns the newly created browser session.
 
 Creates a new browser context. It won't share cookies/cache with other browser contexts.
 
+:::note
+If directly using this method to create [BrowserContext]s, it is best practice to explicilty close the returned context via [browser_context.close()](./api/class-browsercontext.mdx#browser-context-close) when your code is done with the [BrowserContext], and before calling [browser.close()](./api/class-browser.mdx#browser-close). This will ensure the `context` is closed gracefully and any artifacts—like HARs and videos—are fully flushed and saved.
+:::
+
 <Tabs
   groupId="python-flavor"
   defaultValue="sync"
@@ -240,6 +248,10 @@ context = browser.new_context()
 # create a new page in a pristine context.
 page = context.new_page()
 page.goto("https://example.com")
+
+# gracefully close up everything
+context.close()
+browser.close()
 ```
 
 </TabItem>
@@ -252,6 +264,10 @@ context = await browser.new_context()
 # create a new page in a pristine context.
 page = await context.new_page()
 await page.goto("https://example.com")
+
+# gracefully close up everything
+await context.close()
+await browser.close()
 ```
 
 </TabItem>
