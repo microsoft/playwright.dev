@@ -54,6 +54,10 @@ In case this browser is obtained using [BrowserType.launch([options])](./api/cla
 
 In case this browser is connected to, clears all created contexts belonging to this browser and disconnects from the browser server.
 
+:::note
+This is similar to force quitting the browser. Therefore, you should call [BrowserContext.close()](./api/class-browsercontext.mdx#browser-context-close) on any [BrowserContext]'s you explicitly created earlier with [Browser.newContext([options])](./api/class-browser.mdx#browser-new-context) **before** calling [Browser.close()](./api/class-browser.mdx#browser-close).
+:::
+
 The [Browser] object itself is considered to be disposed and cannot be used anymore.
 
 ## Browser.contexts() {#browser-contexts}
@@ -144,6 +148,10 @@ Indicates that the browser is connected.
 
 Creates a new browser context. It won't share cookies/cache with other browser contexts.
 
+:::note
+If directly using this method to create [BrowserContext]s, it is best practice to explicilty close the returned context via [BrowserContext.close()](./api/class-browsercontext.mdx#browser-context-close) when your code is done with the [BrowserContext], and before calling [Browser.close()](./api/class-browser.mdx#browser-close). This will ensure the `context` is closed gracefully and any artifacts—like HARs and videos—are fully flushed and saved.
+:::
+
 ```java
 Browser browser = playwright.firefox().launch();  // Or 'chromium' or 'webkit'.
 // Create a new incognito browser context.
@@ -151,6 +159,10 @@ BrowserContext context = browser.newContext();
 // Create a new page in a pristine context.
 Page page = context.newPage();
 page.navigate('https://example.com');
+
+// Gracefull close up everything
+context.close();
+browser.close();
 ```
 
 ## Browser.newPage([options]) {#browser-new-page}
