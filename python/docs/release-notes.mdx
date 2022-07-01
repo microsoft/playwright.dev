@@ -5,6 +5,7 @@ title: "Release notes"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
+- [Version 1.23](#version-123)
 - [Version 1.22](#version-122)
 - [Version 1.21](#version-121)
 - [Version 1.20](#version-120)
@@ -21,6 +22,224 @@ import TabItem from '@theme/TabItem';
 - [Version 1.9](#version-19)
 - [Version 1.8](#version-18)
 - [Version 1.7](#version-17)
+
+## Version 1.23
+
+### Network Replay
+
+Now you can record network traffic into a HAR file and re-use this traffic in your tests.
+
+To record network into HAR file:
+
+```bash
+npx playwright open --save-har=github.har.zip https://github.com/microsoft
+```
+
+Alternatively, you can record HAR programmatically:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+context = browser.new_context(record_har_path="github.har.zip")
+# ... do stuff ...
+context.close()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+context = await browser.new_context(record_har_path="github.har.zip")
+# ... do stuff ...
+await context.close()
+```
+
+</TabItem>
+</Tabs>
+
+Use the new methods [page.route_from_har(har, **kwargs)](./api/class-page.mdx#page-route-from-har) or [browser_context.route_from_har(har, **kwargs)](./api/class-browsercontext.mdx#browser-context-route-from-har) to serve matching responses from the [HAR](http://www.softwareishard.com/blog/har-12-spec/) file:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+context.route_from_har("github.har.zip")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await context.route_from_har("github.har.zip")
+```
+
+</TabItem>
+</Tabs>
+
+Read more in [our documentation](./network#record-and-replay-requests).
+
+### Advanced Routing
+
+You can now use [route.fallback(**kwargs)](./api/class-route.mdx#route-fallback) to defer routing to other handlers.
+
+Consider the following example:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Remove a header from all requests
+def remove_header_handler(route: Route) -> None:
+    headers = route.request.all_headers()
+    if "if-none-match" in headers:
+        del headers["if-none-match"]
+    route.fallback(headers=headers)
+
+page.route("**/*", remove_header_handler)
+
+# Abort all images
+def abort_images_handler(route: Route) -> None:
+    if route.request.resource_type == "image":
+        route.abort()
+    else:
+        route.fallback()
+
+page.route("**/*", abort_images_handler)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Remove a header from all requests
+async def remove_header_handler(route: Route) -> None:
+    headers = await route.request.all_headers()
+    if "if-none-match" in headers:
+        del headers["if-none-match"]
+    await route.fallback(headers=headers)
+
+await page.route("**/*", remove_header_handler)
+
+# Abort all images
+async def abort_images_handler(route: Route) -> None:
+    if route.request.resource_type == "image":
+        await route.abort()
+    else:
+        await route.fallback()
+
+await page.route("**/*", abort_images_handler)
+```
+
+</TabItem>
+</Tabs>
+
+Note that the new methods [page.route_from_har(har, **kwargs)](./api/class-page.mdx#page-route-from-har) and [browser_context.route_from_har(har, **kwargs)](./api/class-browsercontext.mdx#browser-context-route-from-har) also participate in routing and could be deferred to.
+
+### Web-First Assertions Update
+* New method [expect(locator).to_have_values(values, **kwargs)](./test-assertions.mdx#locator-assertions-to-have-values) that asserts all selected values of `<select multiple>` element.
+* Methods [expect(locator).to_contain_text(expected, **kwargs)](./test-assertions.mdx#locator-assertions-to-contain-text) and [expect(locator).to_have_text(expected, **kwargs)](./test-assertions.mdx#locator-assertions-to-have-text) now accept `ignore_case` option.
+
+### Miscellaneous
+* If there's a service worker that's in your way, you can now easily disable it with a new context option `service_workers`:
+
+  <Tabs
+    groupId="python-flavor"
+    defaultValue="sync"
+    values={[
+      {label: 'Sync', value: 'sync'},
+      {label: 'Async', value: 'async'}
+    ]
+  }>
+  <TabItem value="sync">
+  
+  ```py
+  context = browser.new_context(service_workers="block")
+  page = context.new_page()
+  ```
+  
+  </TabItem>
+  <TabItem value="async">
+  
+  ```py
+  context = await browser.new_context(service_workers="block")
+  page = await context.new_page()
+  ```
+  
+  </TabItem>
+  </Tabs>
+* Using `.zip` path for `recordHar` context option automatically zips the resulting HAR:
+
+  <Tabs
+    groupId="python-flavor"
+    defaultValue="sync"
+    values={[
+      {label: 'Sync', value: 'sync'},
+      {label: 'Async', value: 'async'}
+    ]
+  }>
+  <TabItem value="sync">
+  
+  ```py
+  context = browser.new_context(record_har_path="github.har.zip")
+  ```
+  
+  </TabItem>
+  <TabItem value="async">
+  
+  ```py
+  context = await browser.new_context(record_har_path="github.har.zip")
+  ```
+  
+  </TabItem>
+  </Tabs>
+* If you intend to edit HAR by hand, consider using the `"minimal"` HAR recording mode that only records information that is essential for replaying:
+
+  <Tabs
+    groupId="python-flavor"
+    defaultValue="sync"
+    values={[
+      {label: 'Sync', value: 'sync'},
+      {label: 'Async', value: 'async'}
+    ]
+  }>
+  <TabItem value="sync">
+  
+  ```py
+  context = browser.new_context(record_har_mode="minimal", record_har_path="har.har")
+  ```
+  
+  </TabItem>
+  <TabItem value="async">
+  
+  ```py
+  context = await browser.new_context(record_har_mode="minimal", record_har_path="har.har")
+  ```
+  
+  </TabItem>
+  </Tabs>
+* Playwright now runs on Ubuntu 22 amd64 and Ubuntu 22 arm64. We also publish new docker image `mcr.microsoft.com/playwright/python:v1.24.0-jammy`.
 
 ## Version 1.22
 
