@@ -1,0 +1,274 @@
+---
+id: ci
+title: "Continuous Integration"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Playwright tests can be executed in CI environments. We have created sample configurations for common CI providers.
+
+- [Introduction](#introduction)
+- [CI configurations](#ci-configurations)
+- [Caching browsers](#caching-browsers)
+- [Debugging browser launches](#debugging-browser-launches)
+- [Running headed](#running-headed)
+
+## Introduction
+
+3 steps to get your tests running on CI:
+1. **Ensure CI agent can run browsers**: Use [our Docker image](./docker.mdx) in Linux agents or install your dependencies using the [CLI](./cli.mdx#install-system-dependencies).
+1. **Install Playwright**:
+
+   ```bash
+   mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"
+   ```
+
+1. **Run your tests**:
+
+## CI configurations
+
+The [Command line tools](./cli.mdx#install-system-dependencies) can be used to install all operating system dependencies on GitHub Actions.
+
+### GitHub Actions
+
+We run [our tests](https://github.com/microsoft/playwright/blob/main/.github/workflows/tests_secondary.yml) on GitHub Actions, across a matrix of 3 platforms (Windows, Linux, macOS) and 3 browsers (Chromium, Firefox, WebKit).
+
+### GitHub Actions on deployment
+
+This will start the tests after a [GitHub Deployment](https://developer.github.com/v3/repos/deployments/) went into the `success` state. Services like Vercel use this pattern so you can run your end-to-end tests on their deployed environment.
+
+```yml
+name: Playwright Tests
+on:
+  deployment_status:
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    if: github.event.deployment_status.state == 'success'
+    steps:
+    - uses: actions/checkout@v2
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '14.x'
+    - name: Install dependencies
+      run: npm ci
+    - name: Install Playwright
+      run: npx playwright install --with-deps
+    - name: Run Playwright tests
+      run: npm run test:e2e
+      env:
+        # This might depend on your test-runner/language binding
+        PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.target_url }}
+```
+
+### Docker
+
+We have a [pre-built Docker image](./docker.mdx) which can either be used directly, or as a reference to update your existing Docker definitions.
+
+Suggested configuration
+1. Using `--ipc=host` is also recommended when using Chromium—without it Chromium can run out of memory and crash. Learn more about this option in [Docker docs](https://docs.docker.com/engine/reference/run/#ipc-settings---ipc).
+1. Seeing other weird errors when launching Chromium? Try running your container with `docker run --cap-add=SYS_ADMIN` when developing locally.
+1. Using `--init` Docker flag or [dumb-init](https://github.com/Yelp/dumb-init) is recommended to avoid special treatment for processes with PID=1. This is a common reason for zombie processes.
+
+### Azure Pipelines
+
+For Windows or macOS agents, no additional configuration required, just install Playwright and run your tests.
+
+For Linux agents, you can use [our Docker container](./docker.mdx) with Azure Pipelines support [running containerized jobs](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/container-phases?view=azure-devops). Alternatively, you can use [Command line tools](./cli.mdx#install-system-dependencies) to install all necessary dependencies.
+
+```yml
+pool:
+  vmImage: 'ubuntu-20.04'
+
+container: mcr.microsoft.com/playwright:v1.24.0-focal
+
+steps:
+...
+```
+
+### CircleCI
+
+Running Playwright on CircleCI requires the following steps:
+1. Use the pre-built [Docker image](./docker.mdx) in your config like so:
+
+   ```yml
+   docker:
+     - image: mcr.microsoft.com/playwright:v1.24.0-focal
+   environment:
+     NODE_ENV: development # Needed if playwright is in `devDependencies`
+   ```
+
+1. If you’re using Playwright through Jest, then you may encounter an error spawning child processes:
+
+   ```
+   [00:00.0]  jest args: --e2e --spec --max-workers=36
+   Error: spawn ENOMEM
+      at ChildProcess.spawn (internal/child_process.js:394:11)
+   ```
+
+   This is likely caused by Jest autodetecting the number of processes on the entire machine (`36`) rather than the number allowed to your container (`2`). To fix this, set `jest --maxWorkers=2` in your test command.
+
+### Jenkins
+
+Jenkins supports Docker agents for pipelines. Use the [Playwright Docker image](./docker.mdx) to run tests on Jenkins.
+
+```groovy
+pipeline {
+   agent { docker { image 'mcr.microsoft.com/playwright:v1.24.0-focal' } }
+   stages {
+      stage('e2e-tests') {
+         steps {
+            sh 'npm install'
+            sh 'npm run test'
+         }
+      }
+   }
+}
+```
+
+### Bitbucket Pipelines
+
+Bitbucket Pipelines can use public [Docker images as build environments](https://confluence.atlassian.com/bitbucket/use-docker-images-as-build-environments-792298897.html). To run Playwright tests on Bitbucket, use our public Docker image ([see Dockerfile](./docker.mdx)).
+
+```yml
+image: mcr.microsoft.com/playwright:v1.24.0-focal
+```
+
+### GitLab CI
+
+To run Playwright tests on GitLab, use our public Docker image ([see Dockerfile](./docker.mdx)).
+
+```yml
+stages:
+  - test
+
+tests:
+  stage: test
+  image: mcr.microsoft.com/playwright:v1.24.0-focal
+  script:
+  ...
+```
+
+## Caching browsers
+
+By default, Playwright downloads browser binaries when the Playwright NPM package is installed. The NPM packages have a `postinstall` hook that downloads the browser binaries. This behavior can be [customized with environment variables](./browsers.mdx#managing-browser-binaries).
+
+Caching browsers on CI is **strictly optional**: The `postinstall` hooks should execute and download the browser binaries on every run.
+
+#### Exception: `node_modules` are cached (Node-specific)
+
+Most CI providers cache the [npm-cache](https://docs.npmjs.com/cli-commands/cache.html) directory (located at `$HOME/.npm`). If your CI pipelines caches the `node_modules` directory and you run `npm install` (instead of `npm ci`), the default configuration
+
+**will not work**. This is because the `npm install` step will find the Playwright NPM package on disk and not execute the `postinstall` step.
+
+> Travis CI automatically caches `node_modules` if your repo does not have a `package-lock.json` file.
+
+This behavior can be fixed with one of the following approaches:
+1. Move to caching `$HOME/.npm` or the npm-cache directory. (This is the default behavior in most CI providers.)
+1. Set `PLAYWRIGHT_BROWSERS_PATH=0` as the environment variable before running `npm install`. This will download the browser binaries in the `node_modules` directory and cache them with the package code. See [managing browser binaries](./browsers.mdx#managing-browser-binaries).
+1. Use `npm ci` (instead of `npm install`) which forces a clean install: by removing the existing `node_modules` directory. See [npm docs](https://docs.npmjs.com/cli/ci.html).
+1. Cache the browser binaries, with the steps below.
+
+#### Directories to cache
+
+With the default behavior, Playwright downloads the browser binaries in the following directories:
+- `%USERPROFILE%\AppData\Local\ms-playwright` on Windows
+- `~/Library/Caches/ms-playwright` on MacOS
+- `~/.cache/ms-playwright` on Linux
+
+To cache the browser downloads between CI runs, cache this location in your CI configuration, against a hash of the Playwright version.
+
+## Debugging browser launches
+
+Playwright supports the `DEBUG` environment variable to output debug logs during execution. Setting it to `pw:browser*` is helpful while debugging `Error: Failed to launch browser` errors.
+
+## Running headed
+
+By default, Playwright launches browsers in headless mode. This can be changed by passing a flag when the browser is launched.
+
+```java
+// Works across chromium, firefox and webkit
+import com.microsoft.playwright.*;
+
+public class Example {
+  public static void main(String[] args) {
+    try (Playwright playwright = Playwright.create()) {
+      BrowserType chromium = playwright.chromium();
+      Browser browser = chromium.launch(new BrowserType.LaunchOptions().setHeadless(false));
+    }
+  }
+}
+```
+
+On Linux agents, headed execution requires [Xvfb](https://en.wikipedia.org/wiki/Xvfb) to be installed. Our [Docker image](./docker.mdx) and GitHub Action have Xvfb pre-installed. To run browsers in headed mode with Xvfb, add `xvfb-run` before the Node.js command.
+
+[APIRequest]: ./api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: ./api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: ./api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: ./test-assertions.mdx "APIResponseAssertions"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[FormData]: ./api/class-formdata.mdx "FormData"
+[Frame]: ./api/class-frame.mdx "Frame"
+[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Locator]: ./api/class-locator.mdx "Locator"
+[LocatorAssertions]: ./test-assertions.mdx "LocatorAssertions"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[PageAssertions]: ./test-assertions.mdx "PageAssertions"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: ./test-assertions.mdx "PlaywrightAssertions"
+[PlaywrightException]: ./api/class-playwrightexception.mdx "PlaywrightException"
+[Request]: ./api/class-request.mdx "Request"
+[RequestOptions]: ./api/class-requestoptions.mdx "RequestOptions"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
+[byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
+[Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
+[double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
+[InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
+[int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"
+[Map]: https://docs.oracle.com/javase/8/docs/api/java/util/Map.html "Map"
+[null]: https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.7 "null"
+[Object]: https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html "Object"
+[Path]: https://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html "Path"
+[Pattern]: https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html "Pattern"
+[Predicate]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Predicate.html "Predicate"
+[void]: https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html "void"
+[Runnable]: https://docs.oracle.com/javase/8/docs/api/java/lang/Runnable.html "Runnable"
+[RuntimeException]: https://docs.oracle.com/javase/8/docs/api/java/lang/RuntimeException.html "RuntimeException"
+[String]: https://docs.oracle.com/javase/8/docs/api/java/lang/String.html "String"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/java/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright-java "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright-java/blob/master/Dockerfile.focal "Dockerfile.focal"
