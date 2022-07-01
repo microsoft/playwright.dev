@@ -28,15 +28,15 @@ if (path) {
     // ------------------- python ---------------------
     { from: '/python/docs/assertions', to: '/python/docs/api/class-playwrightassertions' },
     { from: '/python/next/docs/assertions', to: '/python/next/docs/api/class-playwrightassertions' },
-    { from: '/python/blog', to: '/python/community/welcome' },
+    { from: '/python/blog', to: '/community/welcome' },
     // ------------------- dotnet ---------------------
     { from: '/dotnet/docs/assertions', to: '/dotnet/docs/api/class-playwrightassertions' },
     { from: '/dotnet/next/docs/assertions', to: '/dotnet/next/docs/api/class-playwrightassertions' },
-    { from: '/dotnet/blog', to: '/dotnet/community/welcome' },
+    { from: '/dotnet/blog', to: '/community/welcome' },
     // ------------------- java -----------------------
     { from: '/java/docs/assertions', to: '/java/docs/api/class-playwrightassertions' },
     { from: '/java/next/docs/assertions', to: '/java/next/docs/api/class-playwrightassertions' },
-    { from: '/java/blog', to: '/java/community/welcome' },
+    { from: '/java/blog', to: '/community/welcome' },
   ];
   const pathname = window.location.pathname;
   for (const redirect of redirects) {
