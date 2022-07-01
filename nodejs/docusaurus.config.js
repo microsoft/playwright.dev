@@ -9,6 +9,16 @@ let plugins = [
     },
   ],
   [
+      'content-docs',
+      /** @type {import('@docusaurus/plugin-content-docs').Options} */
+      ({
+        id: 'community',
+        path: 'community',
+        routeBasePath: 'community',
+        sidebarPath: require.resolve('./sidebarCommunity.js'),
+      }),
+    ],
+  [
     require.resolve("@docusaurus/plugin-content-blog"),
     {
       showReadingTime: true,
@@ -63,6 +73,7 @@ module.exports = {
           label: "API",
           position: "left",
         },
+        
         {
           href: "https://github.com/microsoft/playwright",
           position: "right",
@@ -103,6 +114,12 @@ module.exports = {
               href: '#',
             },
           ],
+        },
+        {
+            to: '/community/welcome',
+            label: 'Community',
+            position: 'left',
+            activeBaseRegex: `/community/`,
         },
       ],
     },
@@ -152,7 +169,7 @@ module.exports = {
             },
             {
               label: "Conference videos",
-              href: "/blog/",
+              href: "/community/conference-videos",
             },
           ],
         },
