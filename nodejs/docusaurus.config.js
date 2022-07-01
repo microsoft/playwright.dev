@@ -16,8 +16,6 @@ let plugins = [
         path: 'community',
         routeBasePath: 'community',
         sidebarPath: require.resolve('./sidebarCommunity.js'),
-        //showLastUpdateAuthor: true,
-        //showLastUpdateTime: true,
       }),
     ],
   [
