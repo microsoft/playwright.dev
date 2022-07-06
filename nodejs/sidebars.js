@@ -4,6 +4,8 @@ module.exports = {
       "type": "category",
       "label": "Introduction",
       "items": [
+        { "type": "doc", "id": "getting-started-vscode" },
+        { "type": "doc", "id": "getting-started-cli" },
         { "type": "doc", "id": "intro" },
         { "type": "doc", "id": "inspector" },
         { "type": "doc", "id": "trace-viewer" },
