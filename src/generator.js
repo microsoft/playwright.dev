@@ -192,6 +192,13 @@ import TabItem from '@theme/TabItem';
         if (!this.heading2ExplicitId.has(member))
           throw new Error(`Header ${text} needs to have an explicit ID`)
         memberNode.text = `${text} {#${this.heading2ExplicitId.get(member)}}`;
+
+        // Append version.
+        memberNode.children.push({
+          type: 'text',
+          text: `<font size="2" style={{position: "relative", top: "-20px"}}>Added in: ${member.since}</font>\n`
+        });
+
         memberNode.children.push(...args.map(a => {
           let name = this.formatter.formatArgumentName(a.alias);
           if (this.lang === 'js' && !a.required)
@@ -212,6 +219,7 @@ import TabItem from '@theme/TabItem';
 
         // Append member doc
         memberNode.children.push(...this.formatComment(member.spec));
+
         result.push(memberNode);
       }
     }
@@ -437,9 +445,12 @@ import TabItem from '@theme/TabItem';`);
 
     let linkTag = '';
     let linkAnchor = '';
+    let sinceVersion = '';
     if (member.enclosingMethod && member.name !== 'options') {
       const hash = calculatePropertyHash(member, direction);
       linkTag = `<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="${hash}"/>`;
+      if (member.enclosingMethod.since !== member.since)
+        sinceVersion = ` <font size="2">Added in: ${member.since}</font>`;
       linkAnchor = `<a href="#${hash}" class="list-anchor">#</a>`;
     }
 
@@ -447,7 +458,7 @@ import TabItem from '@theme/TabItem';`);
     const result = {
       type: 'li',
       liType: 'default',
-      text: `${name}${linkTag} &#60;${typeText}&#62;${comment ? ' ' + comment : ''}${linkAnchor}`,
+      text: `${name}${linkTag} &#60;${typeText}&#62;${comment ? ' ' + comment : ''}${sinceVersion}${linkAnchor}`,
       children
     };
     return result;
