@@ -6,18 +6,28 @@ module.exports = {
       "items": [
         { "type": "doc", "id": "getting-started-vscode" },
         { "type": "doc", "id": "getting-started-cli" },
-        { "type": "doc", "id": "intro" },
-        { "type": "doc", "id": "inspector" },
-        { "type": "doc", "id": "trace-viewer" },
+        {
+      "type": "category",
+      "label": "Tooling",
+      "items": [
         { "type": "doc", "id": "codegen" },
         { "type": "doc", "id": "debug" },
-        { "type": "doc", "id": "release-notes" }
+        { "type": "doc", "id": "inspector" },
+        { "type": "doc", "id": "html-reporter" },
+        { "type": "doc", "id": "trace-viewer" },
+        { "type": "doc", "id": "vs-code-extension" },
       ],
       "collapsed": false
     },
+
+      ],
+      "collapsed": false
+    },
+
+     { "type": "doc", "id": "release-notes" },
     {
       "type": "category",
-      "label": "Playwright Test",
+      "label": "Deep Dive",
       "items": [
         { "type": "doc", "id": "test-annotations" },
         { "type": "doc", "id": "test-api-testing" },
@@ -43,7 +53,7 @@ module.exports = {
       "type": "category",
       "label": "Guides",
       "items": [
-        { "type": "doc", "id": "library" },
+        
         { "type": "doc", "id": "accessibility-testing" },
         { "type": "doc", "id": "actionability" },
         { "type": "doc", "id": "auth" },
@@ -71,6 +81,15 @@ module.exports = {
       ],
       "collapsed": false
     },
+     {
+      "type": "category",
+      "label": "Library",
+      "items": [
+        { "type": "doc", "id": "library" },
+      ],
+      "collapsed": true
+    },
+    
     {
       "type": "category",
       "label": "Migration",
