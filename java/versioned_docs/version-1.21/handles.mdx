@@ -1,0 +1,158 @@
+---
+id: handles
+title: "Handles"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Playwright can create handles to the page DOM elements or any other objects inside the page. These handles live in the Playwright process, whereas the actual objects live in the browser. There are two types of handles:
+- [JSHandle] to reference any JavaScript objects in the page
+- [ElementHandle] to reference DOM elements in the page, it has extra methods that allow performing actions on the elements and asserting their properties.
+
+Since any DOM element in the page is also a JavaScript object, any [ElementHandle] is a [JSHandle] as well.
+
+Handles are used to perform operations on those actual objects in the page. You can evaluate on a handle, get handle properties, pass handle as an evaluation parameter, serialize page object into JSON etc. See the [JSHandle] class API for these and methods.
+
+### API reference
+- [JSHandle]
+- [ElementHandle]
+
+Here is the easiest way to obtain a [JSHandle].
+
+```java
+JSHandle jsHandle = page.evaluateHandle("window");
+//  Use jsHandle for evaluations.
+```
+
+## Element Handles
+
+:::caution Discouraged
+The use of [ElementHandle] is discouraged, use [Locator] objects and web-first assertions instead.
+:::
+
+When [ElementHandle] is required, it is recommended to fetch it with the [Page.waitForSelector(selector[, options])](./api/class-page.mdx#page-wait-for-selector) or [Frame.waitForSelector(selector[, options])](./api/class-frame.mdx#frame-wait-for-selector) methods. These APIs wait for the element to be attached and visible.
+
+```java
+// Get the element handle
+JSHandle jsHandle = page.waitForSelector("#box");
+ElementHandle elementHandle = jsHandle.asElement();
+
+// Assert bounding box for the element
+BoundingBox boundingBox = elementHandle.boundingBox();
+assertEquals(100, boundingBox.width);
+
+// Assert attribute for the element
+String classNames = elementHandle.getAttribute("class");
+assertTrue(classNames.contains("highlighted"));
+```
+
+## Handles as parameters
+
+Handles can be passed into the [Page.evaluate(expression[, arg])](./api/class-page.mdx#page-evaluate) and similar methods. The following snippet creates a new array in the page, initializes it with data and returns a handle to this array into Playwright. It then uses the handle in subsequent evaluations:
+
+```java
+// Create new array in page.
+JSHandle myArrayHandle = page.evaluateHandle("() => {\n" +
+  "  window.myArray = [1];\n" +
+  "  return myArray;\n" +
+  "}");
+
+// Get the length of the array.
+int length = (int) page.evaluate("a => a.length", myArrayHandle);
+
+// Add one more element to the array using the handle
+Map<String, Object> arg = new HashMap<>();
+arg.put("myArray", myArrayHandle);
+arg.put("newElement", 2);
+page.evaluate("arg => arg.myArray.add(arg.newElement)", arg);
+
+// Release the object when it is no longer needed.
+myArrayHandle.dispose();
+```
+
+## Handle Lifecycle
+
+Handles can be acquired using the page methods such as [Page.evaluateHandle(expression[, arg])](./api/class-page.mdx#page-evaluate-handle), [Page.querySelector(selector[, options])](./api/class-page.mdx#page-query-selector) or [Page.querySelectorAll(selector)](./api/class-page.mdx#page-query-selector-all) or their frame counterparts [Frame.evaluateHandle(expression[, arg])](./api/class-frame.mdx#frame-evaluate-handle), [Frame.querySelector(selector[, options])](./api/class-frame.mdx#frame-query-selector) or [Frame.querySelectorAll(selector)](./api/class-frame.mdx#frame-query-selector-all). Once created, handles will retain object from [garbage collection](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Memory_Management) unless page navigates or the handle is manually disposed via the [JSHandle.dispose()](./api/class-jshandle.mdx#js-handle-dispose) method.
+
+### API reference
+- [JSHandle]
+- [ElementHandle]
+- [ElementHandle.boundingBox()](./api/class-elementhandle.mdx#element-handle-bounding-box)
+- [ElementHandle.getAttribute(name)](./api/class-elementhandle.mdx#element-handle-get-attribute)
+- [ElementHandle.innerText()](./api/class-elementhandle.mdx#element-handle-inner-text)
+- [ElementHandle.innerHTML()](./api/class-elementhandle.mdx#element-handle-inner-html)
+- [ElementHandle.textContent()](./api/class-elementhandle.mdx#element-handle-text-content)
+- [JSHandle.evaluate(expression[, arg])](./api/class-jshandle.mdx#js-handle-evaluate)
+- [Page.evaluateHandle(expression[, arg])](./api/class-page.mdx#page-evaluate-handle)
+- [Page.querySelector(selector[, options])](./api/class-page.mdx#page-query-selector)
+- [Page.querySelectorAll(selector)](./api/class-page.mdx#page-query-selector-all)
+
+[APIRequest]: ./api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: ./api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: ./api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: ./test-assertions.mdx "APIResponseAssertions"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[FormData]: ./api/class-formdata.mdx "FormData"
+[Frame]: ./api/class-frame.mdx "Frame"
+[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Locator]: ./api/class-locator.mdx "Locator"
+[LocatorAssertions]: ./test-assertions.mdx "LocatorAssertions"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[PageAssertions]: ./test-assertions.mdx "PageAssertions"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: ./test-assertions.mdx "PlaywrightAssertions"
+[PlaywrightException]: ./api/class-playwrightexception.mdx "PlaywrightException"
+[Request]: ./api/class-request.mdx "Request"
+[RequestOptions]: ./api/class-requestoptions.mdx "RequestOptions"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
+[byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
+[Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
+[double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
+[InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
+[int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"
+[Map]: https://docs.oracle.com/javase/8/docs/api/java/util/Map.html "Map"
+[null]: https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.7 "null"
+[Object]: https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html "Object"
+[Path]: https://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html "Path"
+[Pattern]: https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html "Pattern"
+[Predicate]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Predicate.html "Predicate"
+[void]: https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html "void"
+[Runnable]: https://docs.oracle.com/javase/8/docs/api/java/lang/Runnable.html "Runnable"
+[RuntimeException]: https://docs.oracle.com/javase/8/docs/api/java/lang/RuntimeException.html "RuntimeException"
+[String]: https://docs.oracle.com/javase/8/docs/api/java/lang/String.html "String"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/java/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright-java "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright-java/blob/master/Dockerfile.focal "Dockerfile.focal"

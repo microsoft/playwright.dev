@@ -18,9 +18,25 @@ function removeVersion(version) {
   }
 }
 
+/**
+ * @param {string} currentVersion
+ */
+function removeStaleMinorVersions(currentVersion) {
+  const kKeepRecentMinorVersions = 3;
+  const [currentMajorVersion, currentMinorVersion] = currentVersion.split('.').map(v => parseInt(v, 10));
+  /** @type {string[]} */
+  const existingVersions = require(path.join(rootDir, 'nodejs', 'versions.json'));
+  for (const version of existingVersions) {
+    const [majorVersion, minorVersion] = version.split('.').map(v => parseInt(v, 10));
+    if (currentMajorVersion === majorVersion && minorVersion <= (currentMinorVersion - kKeepRecentMinorVersions))
+      removeVersion(version);
+  }
+}
+
 if (!process.argv[2]) {
   console.error([
     'Usage: node versions.js --delete <version>',
+    'Usage: node versions.js --delete-stale-minor-versions <version>',
   ].join('\n'));
   process.exit(1);
 }
@@ -30,6 +46,12 @@ switch (process.argv[2]) {
     if (!process.argv[3])
       throw new Error('Missing version');
     removeVersion(process.argv[3]);
+    break;
+
+  case '--delete-stale-minor-versions':
+    if (!process.argv[3])
+      throw new Error('Missing version');
+    removeStaleMinorVersions(process.argv[3]);
     break;
 
   default:
