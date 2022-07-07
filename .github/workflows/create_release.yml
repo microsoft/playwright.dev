@@ -30,18 +30,14 @@ jobs:
       - run: npm i -g npm@8
       - name: Install dependencies
         run: npm ci
-      - name: Delete optionally previous version
-        run: node src/versions.js --delete ${{ github.event.inputs.version }}
-      - name: Delete stale versions
-        run: node src/versions.js --delete-stale-minor-versions ${{ github.event.inputs.version }}
+      - name: Delete previous Stable
+        run: node src/versions.js --delete stable
       - name: Roll
         run: npm run roll
         env:
           SRC_DIR: ./playwright
       - name: Create new version
         run: npm run version-all
-        env:
-          NEW_VERSION: ${{ github.event.inputs.version }}
       - name: Prepare branch
         id: prepare-branch
         run: |
