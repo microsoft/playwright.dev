@@ -1,0 +1,396 @@
+---
+id: getting-started-cli
+title: "Getting started (CLI)"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Playwright Test was created specifically to accommodate the needs of end-to-end testing. It does everything you would expect from a regular test runner, and more. Here you will learn how to:
+- [Install Playwright using the CLI](#installation)
+- [Generate tests though user actions with Codegen](#generating-tests-with-codegen)
+- [Write assertions, use fixtures and test hooks](#writing-assertions)
+- [Run tests](#running-tests)
+- [Debug tests using the Playwright Explorer](#debugging-tests)
+- [See a detailed HTML report of your tests](#test-reports)
+- [Run tests on CI](#running-tests-on-ci)
+- [See a trace view of your test with DOM snapshots](#viewing-test-traces)
+
+## Installation
+
+Install Playwright and follow the instructions to get started choosing either TypeScript or JavaScript, what name you would like your tests folder to be called and if you would like GitHub Actions to be set up.
+- Install Playwright in project's root directory
+
+  ```bash
+  npm init playwright@latest
+  ```
+
+- Install Playwright in a new project
+
+  ```bash
+  npm init playwright@latest new-project
+  ```
+
+For installing using the CLI see the [Getting Started (VS Code)](./getting-started-vscode.mdx) guide.
+
+## Generating Tests with Codegen
+
+[CodeGen](./codegen.mdx) will auto generate your tests for you and is a great way to quickly get started. It will open two windows, a browser window where you interact with the website you wish to test and the Playwright Inspector window where you can record your tests, copy the tests, clear your tests as well as change the language of your tests. The Playwright inspector is also used for debugging your tests.
+- Open Codegen
+
+  ```bash
+  npx playwright codegen
+  ```
+
+- Open Codegen on a specific URL
+
+  ```bash
+  npx playwright codegen playwright.dev
+  ```
+
+<img width="1916" alt="image" src="https://user-images.githubusercontent.com/13063165/177550119-4e202a56-7d8e-43ac-ad91-bf2f7b2579bd.png"/>
+
+To learn more about codegen please see the [Playwright Inspector](./codegen.mdx) docs.
+
+## Writing Assertions
+
+Playwright Test uses the [expect](https://jestjs.io/docs/expect) library for test assertions. It extends it with the Playwright-specific matchers to achieve greater testing ergonomics.
+
+Learn more about [test assertions](./test-assertions.mdx).
+
+Here is a quick example of using them:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+// example.spec.ts
+import { test, expect } from "@playwright/test";
+
+test("my test", async ({ page }) => {
+  await page.goto("https://playwright.dev/");
+
+  // Expect a title "to contain" a substring.
+  await expect(page).toHaveTitle(/Playwright/);
+
+  // Expect an attribute "to be strictly equal" to the value.
+  await expect(page.locator("text=Get Started").first()).toHaveAttribute(
+    "href",
+    "/docs/intro"
+  );
+
+  await page.click("text=Get Started");
+  // Expect some text to be visible on the page.
+  await expect(page.locator("text=Introduction").first()).toBeVisible();
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// example.spec.js
+const { test, expect } = require("@playwright/test");
+
+test("my test", async ({ page }) => {
+  await page.goto("https://playwright.dev/");
+
+  // Expect a title "to contain" a substring.
+  await expect(page).toHaveTitle(/Playwright/);
+
+  // Expect an attribute "to be strictly equal" to the value.
+  await expect(page.locator("text=Get Started").first()).toHaveAttribute(
+    "href",
+    "/docs/intro"
+  );
+
+  await page.click("text=Get Started");
+  // Expect some text to be visible on the page.
+  await expect(page.locator("text=Introduction").first()).toBeVisible();
+});
+```
+
+</TabItem>
+</Tabs>
+
+## Using test fixtures
+
+You noticed an argument `{ page }` that the test above has access to:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+test('basic test', async ({ page }) => {
+  ...
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+test('basic test', async ({ page }) => {
+  ...
+```
+
+</TabItem>
+</Tabs>
+
+We call these arguments `fixtures`. Fixtures are objects that are created for each test run. Playwright Test comes loaded with those fixtures, and you can add your own fixtures as well. When running tests, Playwright Test looks at each test declaration, analyses the set of fixtures the test needs and prepares those fixtures specifically for the test.
+
+Here is a list of the pre-defined fixtures that you are likely to use most of the time:
+
+| Fixture     | Type             | Description                                                                                                                                        |
+| :---------- | :--------------- | :------------------------------------------------------------------------------------------------------------------------------------------------- |
+| page        | [Page]           | Isolated page for this test run.                                                                                                                   |
+| context     | [BrowserContext] | Isolated context for this test run. The `page` fixture belongs to this context as well. Learn how to [configure context](./test-configuration.mdx). |
+| browser     | [Browser]        | Browsers are shared across tests to optimize resources. Learn how to [configure browser](./test-configuration.mdx).                                 |
+| browserName | [string]         | The name of the browser currently running the test. Either `chromium`, `firefox` or `webkit`.                                                      |
+
+## Using test hooks
+
+You can use `test.beforeAll` and `test.afterAll` hooks to set up and tear down resources shared between tests. And you can use `test.beforeEach` and `test.afterEach` hooks to set up and tear down resources for each test individually.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+// example.spec.ts
+import { test, expect } from "@playwright/test";
+
+test.describe("feature foo", () => {
+  test.beforeEach(async ({ page }) => {
+    // Go to the starting url before each test.
+    await page.goto("https://playwright.dev/");
+  });
+
+  test("my test", async ({ page }) => {
+    // Assertions use the expect API.
+    await expect(page).toHaveURL("https://playwright.dev/");
+  });
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// example.spec.js
+const { test, expect } = require("@playwright/test");
+
+test.describe("feature foo", () => {
+  test.beforeEach(async ({ page }) => {
+    // Go to the starting url before each test.
+    await page.goto("https://playwright.dev/");
+  });
+
+  test("my test", async ({ page }) => {
+    // Assertions use the expect API.
+    await expect(page).toHaveURL("https://playwright.dev/");
+  });
+});
+```
+
+</TabItem>
+</Tabs>
+
+## Running Tests
+
+You can run a single test, a set of tests or all tests. Tests can be run on one browser or multiple browsers. By default tests are run in a headless manner meaning no browser window will be opened while running the tests and results will be seen in the terminal. If you prefer you can run your tests in headed mode by using the `--headed` flag.
+- Running all tests
+
+  ```bash
+  npx playwright test
+  ```
+
+- Running a single test file
+
+  ```bash
+  npx playwright test test-1
+  ```
+
+- Run a set of test files
+
+  ```bash
+  npx playwright test tests/todo-page/ tests/landing-page/
+  ```
+
+- Run files that have `my-spec` or `my-spec-2` in the file name
+
+  ```bash
+  npx playwright test my-spec my-spec-2
+  ```
+
+- Run the test with the title
+
+  ```bash
+  npx playwright test -g "add a todo item"
+  ```
+
+- Running tests in headed mode
+
+  ```bash
+  npx playwright test test-1 --headed
+  ```
+
+- Running Tests on specific browsers
+
+  ```bash
+  npx playwright test test-1.spec.ts --project=chromium
+  ```
+
+## Debugging Tests
+
+The Playwright inspector is a great tool to help with debugging. It opens up a browser window highlighting the selectors as you step through each line of the test. You can also use the explore button to find other available [selectors](./selectors.mdx) which you can then copy into your test file and rerun your tests to see if it passes.
+- Debugging all Tests
+
+  ```bash
+  npx playwright test --debug
+  ```
+
+- Debugging one test
+
+  ```bash
+  npx playwright test test-1 --debug
+  ```
+
+<img width="1904" alt="image" src="https://user-images.githubusercontent.com/13063165/177560786-c561f428-3a81-415f-a3d4-9ba889ead99e.png"></img>
+
+To learn more about the Playwright Inspector please see the [Playwright Inspector](./inspector.mdx) docs.
+
+## Test Reports
+
+The [HTML Reporter](./html-reporter.mdx) shows you a full report of your tests allowing you to filter the report by browsers, passed tests, failed tests, skipped tests and flaky tests. You can click on each test and explore the tests errors as well as each step of the test. By default, the HTML report is opened automatically if some of the tests failed.
+
+```bash
+npx playwright show-report
+```
+
+<img width="739" alt="image" src="https://user-images.githubusercontent.com/13063165/178003817-3bd2f088-4173-406c-a9e9-74c89181f381.png" />
+
+To learn more about the HTML Reporter please see the [HTML Reporter](./html-reporter.mdx) docs.
+
+## Running Tests on CI
+
+Run your tests locally or on CI on each pull request with GitHub actions. Tests can be run on a local dev environment or on a staging URL. Checkout our guide for more options on [CI Configurations](./ci.mdx).
+
+## Viewing Test Traces
+
+Playwright Trace Viewer is a GUI tool where you can explore recorded Playwright traces after the script has ran. See your test's DOM snapshot before and after the action item. View the test's timeline, log, source, network and console. Open traces locally or in your browser on [`trace.playwright.dev`](https://trace.playwright.dev).
+
+<img width="1212" alt="Playwright Trace Viewer" src="https://user-images.githubusercontent.com/883973/120585896-6a1bca80-c3e7-11eb-951a-bd84002480f5.png"></img>
+
+To learn more about the Trace Viewer please see the [Trace Viewer](./trace-viewer.mdx) docs.
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Android]: ./api/class-android.mdx "Android"
+[AndroidDevice]: ./api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: ./api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: ./api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: ./api/class-androidwebview.mdx "AndroidWebView"
+[APIRequest]: ./api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: ./api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: ./api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: ./test-assertions.mdx "APIResponseAssertions"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: ./api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: ./api/class-coverage.mdx "Coverage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[Electron]: ./api/class-electron.mdx "Electron"
+[ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Locator]: ./api/class-locator.mdx "Locator"
+[LocatorAssertions]: ./test-assertions.mdx "LocatorAssertions"
+[Logger]: ./api/class-logger.mdx "Logger"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[PageAssertions]: ./test-assertions.mdx "PageAssertions"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: ./test-assertions.mdx "PlaywrightAssertions"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[ScreenshotAssertions]: ./test-assertions.mdx "ScreenshotAssertions"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Fixtures]: ./api/class-fixtures.mdx "Fixtures"
+[Test]: ./api/class-test.mdx "Test"
+[TestConfig]: ./api/class-testconfig.mdx "TestConfig"
+[TestError]: ./api/class-testerror.mdx "TestError"
+[TestInfo]: ./api/class-testinfo.mdx "TestInfo"
+[TestOptions]: ./api/class-testoptions.mdx "TestOptions"
+[TestProject]: ./api/class-testproject.mdx "TestProject"
+[WorkerInfo]: ./api/class-workerinfo.mdx "WorkerInfo"
+[Location]: ./api/class-location.mdx "Location"
+[Reporter]: ./api/class-reporter.mdx "Reporter"
+[Suite]: ./api/class-suite.mdx "Suite"
+[TestCase]: ./api/class-testcase.mdx "TestCase"
+[TestResult]: ./api/class-testresult.mdx "TestResult"
+[TestStep]: ./api/class-teststep.mdx "TestStep"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
