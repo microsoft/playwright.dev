@@ -6,7 +6,12 @@ module.exports = {
       "items": [
         { "type": "doc", "id": "getting-started-vscode" },
         { "type": "doc", "id": "getting-started-cli" },
-        {
+        
+
+      ],
+      "collapsed": false
+    },
+    {
       "type": "category",
       "label": "Tooling",
       "items": [
@@ -19,11 +24,6 @@ module.exports = {
       ],
       "collapsed": false
     },
-
-      ],
-      "collapsed": false
-    },
-
      { "type": "doc", "id": "release-notes" },
     {
       "type": "category",
@@ -53,7 +53,7 @@ module.exports = {
       "type": "category",
       "label": "Guides",
       "items": [
-        
+        { "type": "doc", "id": "library" },
         { "type": "doc", "id": "accessibility-testing" },
         { "type": "doc", "id": "actionability" },
         { "type": "doc", "id": "auth" },
@@ -81,14 +81,7 @@ module.exports = {
       ],
       "collapsed": false
     },
-     {
-      "type": "category",
-      "label": "Library",
-      "items": [
-        { "type": "doc", "id": "library" },
-      ],
-      "collapsed": true
-    },
+
     
     {
       "type": "category",
