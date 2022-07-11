@@ -1,91 +1,21 @@
 ---
-id: chrome-extensions
-title: "Chrome Extensions"
+id: html-reporter
+title: "HTML Reporter"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-:::note
-Extensions only work in Chrome / Chromium in non-headless mode, launched with a persistent context.
-:::
+The HTML Reporter shows you a full report of your tests allowing you to filter the report by browsers, passed tests, failed tests, skipped tests and flaky tests. By default, the HTML report is opened automatically if some of the tests failed.
 
-The following is code for getting a handle to the [background page](https://developer.chrome.com/extensions/background_pages) of a [Manifest v2](https://developer.chrome.com/docs/extensions/mv2/) extension whose source is located in `./my-extension`:
-
-```js
-const { chromium } = require('playwright');
-
-(async () => {
-  const pathToExtension = require('path').join(__dirname, 'my-extension');
-  const userDataDir = '/tmp/test-user-data-dir';
-  const browserContext = await chromium.launchPersistentContext(userDataDir,{
-    headless: false,
-    args: [
-      `--disable-extensions-except=${pathToExtension}`,
-      `--load-extension=${pathToExtension}`
-    ]
-  });
-  let [backgroundPage] = browserContext.backgroundPages();
-  if (!backgroundPage)
-    backgroundPage = await browserContext.waitForEvent('backgroundpage');
-
-  // Test the background page as you would any other page.
-  await browserContext.close();
-})();
+```bash
+npx playwright show-report
 ```
 
-## Testing
+<img width="739" alt="image" src="https://user-images.githubusercontent.com/13063165/178003817-3bd2f088-4173-406c-a9e9-74c89181f381.png" />
 
-To have the extension loaded when running tests you can use a test fixture to set the context. You can also dynamically retrieve the extension id and use it that to load and test the popup page for example.
+You can click on each test to get more info on the test and explore the errors section which will show you what errors there are and on what line as well as suggestions on how to fix the errors. Each step of the test can be expanded and looked into in detail.
 
-```ts
-import { test as base, expect, BrowserContext } from "@playwright/test";
-import path from "path";
-
-export const test = base.extend<{
-  context: BrowserContext;
-  extensionId: string;
-}>({
-  context: async ({ }, use) => {
-    const pathToExtension = path.join(__dirname, "my-extension");
-    const context = await chromium.launchPersistentContext("", {
-      headless: false,
-      args: [
-        `--disable-extensions-except=${pathToExtension}`,
-        `--load-extension=${pathToExtension}`,
-      ],
-    });
-    await use(context);
-    await context.close();
-  },
-  extensionId: async ({ context }, use) => {
-    /*
-    // for manifest v2:
-    let [background] = context.backgroundPages()
-    if (!background)
-      background = await context.waitForEvent("backgroundpage")
-    */
-
-    // for manifest v3:
-    let [background] = context.serviceWorkers();
-    if (!background)
-      background = await context.waitForEvent("serviceworker");
-
-    const extensionId = background.url().split("/")[2];
-    await use(extensionId);
-  },
-});
-
-test("example test", async ({ page }) => {
-  await page.goto("https://example.com");
-  await expect(page.locator("body")).toHaveText("Changed by my-extension");
-});
-
-test("popup page", async ({ page, extensionId }) => {
-  await page.goto(`chrome-extension://${extensionId}/popup.html`);
-  await expect(page.locator("body")).toHaveText("my-extension popup");
-});
-```
-
+<img width="747" alt="image" src="https://user-images.githubusercontent.com/13063165/178007807-b88e4d22-cd40-4a07-81ab-50096eb3ea1b.png" />
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"
