@@ -4,18 +4,30 @@ module.exports = {
       "type": "category",
       "label": "Introduction",
       "items": [
-        { "type": "doc", "id": "intro" },
-        { "type": "doc", "id": "inspector" },
-        { "type": "doc", "id": "trace-viewer" },
-        { "type": "doc", "id": "codegen" },
-        { "type": "doc", "id": "debug" },
-        { "type": "doc", "id": "release-notes" }
+        { "type": "doc", "id": "getting-started-vscode" },
+        { "type": "doc", "id": "getting-started-cli" },
+        
+
       ],
       "collapsed": false
     },
     {
       "type": "category",
-      "label": "Playwright Test",
+      "label": "Tooling",
+      "items": [
+        { "type": "doc", "id": "codegen" },
+        { "type": "doc", "id": "debug" },
+        { "type": "doc", "id": "inspector" },
+        { "type": "doc", "id": "html-reporter" },
+        { "type": "doc", "id": "trace-viewer" },
+        { "type": "doc", "id": "vs-code-extension" },
+      ],
+      "collapsed": false
+    },
+     { "type": "doc", "id": "release-notes" },
+    {
+      "type": "category",
+      "label": "Deep Dive",
       "items": [
         { "type": "doc", "id": "test-annotations" },
         { "type": "doc", "id": "test-api-testing" },
