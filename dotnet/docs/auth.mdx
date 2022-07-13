@@ -24,12 +24,12 @@ The following example automates login on GitHub. Once these steps are executed, 
 
 ```csharp
 var page = await context.NewPageAsync();
-await page.NavigateAsync("https://github.com/login");
+await page.GotoAsync("https://github.com/login");
 // Interact with login form
-await page.ClickAsync("text=Login");
-await page.FillAsync("input[name='login']", USERNAME);
-await page.FillAsync("input[name='password']", PASSWORD);
-await page.ClickAsync("text=Submit");
+await page.Locator("text=Login").ClickAsync();
+await page.Locator("input[name='login']").FillAsync(USERNAME);
+await page.Locator("input[name='password']").FillAsync(PASSWORD);
+await page.Locator("text=Submit").ClickAsync();
 // Verify app is logged in
 ```
 
@@ -45,13 +45,13 @@ The following code snippet retrieves state from an authenticated context and cre
 
 ```csharp
 // Save storage state into the file.
-await context.StorageStateAsync(new BrowserContextStorageStateOptions
+await context.StorageStateAsync(new()
 {
     Path = "state.json"
 });
 
 // Create a new context with the saved storage state.
-var context = await browser.NewContextAsync(new BrowserNewContextOptions
+var context = await browser.NewContextAsync(new()
 {
     StorageStatePath = "state.json"
 });
@@ -117,7 +117,7 @@ class Program
     {
         using var playwright = await Playwright.CreateAsync();
         var chromium = playwright.Chromium;
-        var context = chromium.LaunchPersistentContextAsync(@"C:\path\to\directory\", new BrowserTypeLaunchPersistentContextOptions
+        var context = chromium.LaunchPersistentContextAsync(@"C:\path\to\directory\", new()
         {
             Headless = false
         });

@@ -20,25 +20,25 @@ This is the easiest way to fill out the form fields. It focuses the element and 
 
 ```csharp
 // Text input
-await page.FillAsync("#name", "Peter");
+await page.Locator("#name").FillAsync("Peter");
 
 // Date input
-await page.FillAsync("#date", "2020-02-02");
+await page.Locator("#date").FillAsync("2020-02-02");
 
 // Time input
-await page.FillAsync("#time", "13-15");
+await page.Locator("#time").FillAsync("13-15");
 
 // Local datetime input
-await page.FillAsync("#local", "2020-03-02T05:15");
+await page.Locator("#local").FillAsync("2020-03-02T05:15");
 
 // Input through label
-await page.FillAsync("text=First Name", "Peter");
+await page.Locator("text=First Name").FillAsync("Peter");
 ```
 
 ### API reference
+- [Locator.FillAsync(value, options)](./api/class-locator.mdx#locator-fill)
 - [Page.FillAsync(selector, value, options)](./api/class-page.mdx#page-fill)
 - [Frame.FillAsync(selector, value, options)](./api/class-frame.mdx#frame-fill)
-- [ElementHandle.FillAsync(value, options)](./api/class-elementhandle.mdx#element-handle-fill)
 
 <br/>
 
@@ -48,51 +48,47 @@ This is the easiest way to check and uncheck a checkbox or a radio button. This 
 
 ```csharp
 // Check the checkbox
-await page.CheckAsync("#agree");
+await page.Locator("#agree").CheckAsync();
 
 // Assert the checked state
-Assert.True(await page.IsCheckedAsync("#agree"));
+Assert.True(await page.Locator("#agree").IsCheckedAsync());
 
 // Uncheck by input <label>.
-await page.UncheckAsync("#subscribe-label");
+await page.Locator("#subscribe-label").UncheckAsync();
 
 // Select the radio button
-await page.CheckAsync("text=XL");
+await page.Locator("text=XL").CheckAsync();
 ```
 
 ### API reference
-- [Page.CheckAsync(selector, options)](./api/class-page.mdx#page-check)
-- [Page.IsCheckedAsync(selector, options)](./api/class-page.mdx#page-is-checked)
-- [Page.UncheckAsync(selector, options)](./api/class-page.mdx#page-uncheck)
 - [Locator.CheckAsync(options)](./api/class-locator.mdx#locator-check)
 - [Locator.IsCheckedAsync(options)](./api/class-locator.mdx#locator-is-checked)
 - [Locator.UncheckAsync(options)](./api/class-locator.mdx#locator-uncheck)
+- [Page.CheckAsync(selector, options)](./api/class-page.mdx#page-check)
+- [Page.IsCheckedAsync(selector, options)](./api/class-page.mdx#page-is-checked)
+- [Page.UncheckAsync(selector, options)](./api/class-page.mdx#page-uncheck)
 
 <br/>
 
 ## Select options
 
-Selects one or multiple options in the `<select>` element. You can specify option `value`, `label` or `elementHandle` to select. Multiple options can be selected.
+Selects one or multiple options in the `<select>` element. You can specify option `value`, or `label` to select. Multiple options can be selected.
 
 ```csharp
 // Single selection matching the value
-await page.SelectOptionAsync("select#colors", "blue");
+await page.Locator("select#colors").SelectOptionAsync("blue");
 
 // Single selection matching the label
-await page.SelectOptionAsync("select#colors", new SelectOptionValue { Label = "blue" }));
+await page.Locator("select#colors").SelectOptionAsync(new SelectOptionValue { Label = "blue" }));
 
 // Multiple selected items
-await page.SelectOptionAsync("select#colors", new[] { "blue", "green", "red" });
-
-// Select the option via element handle
-var option = await page.QuerySelectorAsync("#best-option");
-await page.SelectOptionAsync("select#colors", option);
+await page.Locator("select#colors").SelectOptionAsync(new[] { "blue", "green", "red" });
 ```
 
 ### API reference
+- [Locator.SelectOptionAsync(values, options)](./api/class-locator.mdx#locator-select-option)
 - [Page.SelectOptionAsync(selector, values, options)](./api/class-page.mdx#page-select-option)
 - [Frame.SelectOptionAsync(selector, values, options)](./api/class-frame.mdx#frame-select-option)
-- [ElementHandle.SelectOptionAsync(values, options)](./api/class-elementhandle.mdx#element-handle-select-option)
 
 <br/>
 
@@ -102,22 +98,22 @@ Performs a simple human click.
 
 ```csharp
 // Generic click
-await page.ClickAsync("button#submit");
+await page.Locator("button#submit").ClickAsync();
 
 // Double click
-await page.DblClickAsync("#item");
+await page.Locator("#item").DblClickAsync();
 
 // Right click
-await page.ClickAsync("#item", new PageClickOptions { Button = MouseButton.Right });
+await page.Locator("#item").ClickAsync(new() { Button = MouseButton.Right });
 
 // Shift + click
-await page.ClickAsync("#item", new PageClickOptions { Modifiers = new[] { KeyboardModifier.Shift } });
+await page.Locator("#item").ClickAsync(new() { Modifiers = new[] { KeyboardModifier.Shift } });
 
 // Hover over element
-await page.HoverAsync("#item");
+await page.Locator("#item").HoverAsync();
 
 // Click the top left corner
-await page.ClickAsync("#item", new PageClickOptions { position = new Position { X = 0, Y = 0 } });
+await page.Locator("#item").ClickAsync(new() { position = new Position { X = 0, Y = 0 } });
 ```
 
 Under the hood, this and other pointer-related methods:
@@ -133,7 +129,7 @@ Under the hood, this and other pointer-related methods:
 Sometimes, apps use non-trivial logic where hovering the element overlays it with another element that intercepts the click. This behavior is indistinguishable from a bug where element gets covered and the click is dispatched elsewhere. If you know this is taking place, you can bypass the [actionability](./actionability.mdx) checks and force the click:
 
 ```csharp
-await page.ClickAsync("button#submit", new PageClickOptions { Force = true });
+await page.Locator("button#submit").ClickAsync(new() { Force = true });
 ```
 
 #### Programmatic click
@@ -141,22 +137,22 @@ await page.ClickAsync("button#submit", new PageClickOptions { Force = true });
 If you are not interested in testing your app under the real conditions and want to simulate the click by any means possible, you can trigger the [`HTMLElement.click()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click) behavior via simply dispatching a click event on the element:
 
 ```csharp
-await page.DispatchEventAsync("button#submit", "click");
+await page.Locator("button#submit").DispatchEventAsync("click");
 ```
 
 ### API reference
+- [Locator.ClickAsync(options)](./api/class-locator.mdx#locator-click)
 - [Page.ClickAsync(selector, options)](./api/class-page.mdx#page-click)
 - [Frame.ClickAsync(selector, options)](./api/class-frame.mdx#frame-click)
-- [ElementHandle.ClickAsync(options)](./api/class-elementhandle.mdx#element-handle-click)
+- [Locator.DblClickAsync(options)](./api/class-locator.mdx#locator-dblclick)
 - [Page.DblClickAsync(selector, options)](./api/class-page.mdx#page-dblclick)
 - [Frame.DblClickAsync(selector, options)](./api/class-frame.mdx#frame-dblclick)
-- [ElementHandle.DblClickAsync(options)](./api/class-elementhandle.mdx#element-handle-dblclick)
+- [Locator.HoverAsync(options)](./api/class-locator.mdx#locator-hover)
 - [Page.HoverAsync(selector, options)](./api/class-page.mdx#page-hover)
 - [Frame.HoverAsync(selector, options)](./api/class-frame.mdx#frame-hover)
-- [ElementHandle.HoverAsync(options)](./api/class-elementhandle.mdx#element-handle-hover)
+- [Locator.DispatchEventAsync(type, eventInit, options)](./api/class-locator.mdx#locator-dispatch-event)
 - [Page.DispatchEventAsync(selector, type, eventInit, options)](./api/class-page.mdx#page-dispatch-event)
 - [Frame.DispatchEventAsync(selector, type, eventInit, options)](./api/class-frame.mdx#frame-dispatch-event)
-- [ElementHandle.DispatchEventAsync(type, eventInit)](./api/class-elementhandle.mdx#element-handle-dispatch-event)
 
 <br/>
 
@@ -166,7 +162,7 @@ Type into the field character by character, as if it was a user with a real keyb
 
 ```csharp
 // Type character by character
-await page.TypeAsync("#area", "Hello World!");
+await page.Locator("#area").TypeAsync("Hello World!");
 ```
 
 This method will emit all the necessary keyboard events, with all the `keydown`, `keyup`, `keypress` events in place. You can even specify the optional `delay` between the key presses to simulate real user behavior.
@@ -176,9 +172,9 @@ Most of the time, [Page.FillAsync(selector, value, options)](./api/class-page.md
 :::
 
 ### API reference
+- [Locator.TypeAsync(text, options)](./api/class-locator.mdx#locator-type)
 - [Page.TypeAsync(selector, text, options)](./api/class-page.mdx#page-type)
 - [Frame.TypeAsync(selector, text, options)](./api/class-frame.mdx#frame-type)
-- [ElementHandle.TypeAsync(text, options)](./api/class-elementhandle.mdx#element-handle-type)
 - [Keyboard.TypeAsync(text, options)](./api/class-keyboard.mdx#keyboard-type)
 
 <br/>
@@ -187,13 +183,13 @@ Most of the time, [Page.FillAsync(selector, value, options)](./api/class-page.md
 
 ```csharp
 // Hit Enter
-await page.PressAsync("#submit", "Enter");
+await page.Locator("#submit").PressAsync("Enter");
 
 // Dispatch Control+Right
-await page.PressAsync("#name", "Control+ArrowRight");
+await page.Locator("#name").PressAsync("Control+ArrowRight");
 
 // Press $ sign on keyboard
-await page.PressAsync("#value", "$");
+await page.Locator("#value").PressAsync("$");
 ```
 
 This method focuses the selected element and produces a single keystroke. It accepts the logical key names that are emitted in the [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) property of the keyboard events:
@@ -211,10 +207,10 @@ Simple version produces a single character. This character is case-sensitive, so
 
 ```csharp
 // <input id=name>
-await page.PressAsync("#name", "Shift+A");
+await page.Locator("#name").PressAsync("Shift+A");
 
 // <input id=name>
-await page.PressAsync("#name", "Shift+ArrowLeft");
+await page.Locator("#name").PressAsync("Shift+ArrowLeft");
 ```
 
 Shortcuts such as `"Control+o"` or `"Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
@@ -222,9 +218,9 @@ Shortcuts such as `"Control+o"` or `"Control+Shift+T"` are supported as well. Wh
 Note that you still need to specify the capital `A` in `Shift-A` to produce the capital character. `Shift-a` produces a lower-case one as if you had the `CapsLock` toggled.
 
 ### API reference
+- [Locator.PressAsync(key, options)](./api/class-locator.mdx#locator-press)
 - [Page.PressAsync(selector, key, options)](./api/class-page.mdx#page-press)
 - [Frame.PressAsync(selector, key, options)](./api/class-frame.mdx#frame-press)
-- [ElementHandle.PressAsync(key, options)](./api/class-elementhandle.mdx#element-handle-press)
 - [Keyboard.PressAsync(key, options)](./api/class-keyboard.mdx#keyboard-press)
 
 <br/>
@@ -235,16 +231,16 @@ You can select input files for upload using the [Page.SetInputFilesAsync(selecto
 
 ```csharp
 // Select one file
-await page.SetInputFilesAsync("input#upload", "myfile.pdf");
+await page.Locator("input#upload").SetInputFilesAsync("myfile.pdf");
 
 // Select multiple files
-await page.SetInputFilesAsync("input#upload", new[] { "file1.txt", "file12.txt" });
+await page.Locator("input#upload").SetInputFilesAsync(new[] { "file1.txt", "file12.txt" });
 
 // Remove all the selected files
-await page.SetInputFilesAsync("input#upload", new[] {});
+await page.Locator("input#upload").SetInputFilesAsync(new[] {});
 
 // Upload buffer from memory
-await page.SetInputFilesAsync("input#upload", new FilePayload
+await page.Locator("input#upload").SetInputFilesAsync(new FilePayload
 {
     Name = "file.txt",
     MimeType = "text/plain",
@@ -257,16 +253,16 @@ If you don't have input element in hand (it is created dynamically), you can han
 ```csharp
 var fileChooser = page.RunAndWaitForFileChooserAsync(async () =>
 {
-    await page.ClickAsync("upload");
+    await page.Locator("upload").ClickAsync();
 });
 await fileChooser.SetFilesAsync("myfile.pdf");
 ```
 
 ### API reference
 - [FileChooser]
+- [Locator.SetInputFilesAsync(files, options)](./api/class-locator.mdx#locator-set-input-files)
 - [Page.SetInputFilesAsync(selector, files, options)](./api/class-page.mdx#page-set-input-files)
 - [Frame.SetInputFilesAsync(selector, files, options)](./api/class-frame.mdx#frame-set-input-files)
-- [ElementHandle.SetInputFilesAsync(files, options)](./api/class-elementhandle.mdx#element-handle-set-input-files)
 
 <br/>
 
@@ -275,13 +271,13 @@ await fileChooser.SetFilesAsync("myfile.pdf");
 For the dynamic pages that handle focus events, you can focus the given element.
 
 ```csharp
-await page.FocusAsync("input#name");
+await page.Locator("input#name").FocusAsync();
 ```
 
 ### API reference
+- [Locator.FocusAsync(options)](./api/class-locator.mdx#locator-focus)
 - [Page.FocusAsync(selector, options)](./api/class-page.mdx#page-focus)
 - [Frame.FocusAsync(selector, options)](./api/class-frame.mdx#frame-focus)
-- [ElementHandle.FocusAsync()](./api/class-elementhandle.mdx#element-handle-focus)
 
 <br/>
 

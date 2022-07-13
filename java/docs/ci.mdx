@@ -25,11 +25,30 @@ Playwright tests can be executed in CI environments. We have created sample conf
 
 1. **Run your tests**:
 
+   ```bash
+   mvn test
+   ```
+
 ## CI configurations
 
 The [Command line tools](./cli.mdx#install-system-dependencies) can be used to install all operating system dependencies on GitHub Actions.
 
 ### GitHub Actions
+
+```yml
+steps:
+  - uses: actions/checkout@v3
+  - uses: actions/setup-java@v3
+    with:
+      distribution: 'temurin'
+      java-version: '17'
+  - name: Build & Install
+    run: mvn -B install -D skipTests --no-transfer-progress
+  - name: Install Playwright
+    run: mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"
+  - name: Run tests
+    run: mvn test
+```
 
 We run [our tests](https://github.com/microsoft/playwright/blob/main/.github/workflows/tests_secondary.yml) on GitHub Actions, across a matrix of 3 platforms (Windows, Linux, macOS) and 3 browsers (Chromium, Firefox, WebKit).
 
@@ -47,7 +66,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.deployment_status.state == 'success'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: actions/setup-node@v2
       with:
         node-version: '14.x'
@@ -74,6 +93,27 @@ Suggested configuration
 ### GitHub Actions (via containers)
 
 GitHub Actions support [running jobs in a container](https://docs.github.com/en/actions/using-jobs/running-jobs-in-a-container) by using the [`jobs.<job_id>.container`](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idcontainer) option.
+
+```yml
+steps:
+  playwright:
+    name: 'Playwright Tests'
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.24.0-focal
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: '17'
+      - name: Build & Install
+        run: mvn -B install -D skipTests --no-transfer-progress
+      - name: Install Playwright
+        run: mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="install --with-deps"
+      - name: Run tests
+        run: mvn test
+```
 
 ### Azure Pipelines
 
@@ -123,6 +163,7 @@ pipeline {
    stages {
       stage('e2e-tests') {
          steps {
+            // Depends on your language / test framework
             sh 'npm install'
             sh 'npm run test'
          }
