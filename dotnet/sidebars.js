@@ -2,18 +2,17 @@ module.exports = {
   "docs": [
     {
       "type": "category",
-      "label": "Introduction",
+      "label": "Getting Started",
       "items": [
         { "type": "doc", "id": "intro" },
-        { "type": "doc", "id": "inspector" },
-        { "type": "doc", "id": "trace-viewer" },
-        { "type": "doc", "id": "codegen" },
         { "type": "doc", "id": "debug" },
-        { "type": "doc", "id": "release-notes" },
+        { "type": "doc", "id": "codegen" },
+        { "type": "doc", "id": "trace-viewer" },
         { "type": "doc", "id": "test-runners" }
       ],
       "collapsed": false
     },
+    { "type": "doc", "id": "release-notes" },
     {
       "type": "category",
       "label": "Guides",
