@@ -20,25 +20,25 @@ This is the easiest way to fill out the form fields. It focuses the element and 
 
 ```js
 // Text input
-await page.fill('#name', 'Peter');
+await page.locator('#name').fill('Peter');
 
 // Date input
-await page.fill('#date', '2020-02-02');
+await page.locator('#date').fill('2020-02-02');
 
 // Time input
-await page.fill('#time', '13:15');
+await page.locator('#time').fill('13:15');
 
 // Local datetime input
-await page.fill('#local', '2020-03-02T05:15');
+await page.locator('#local').fill('2020-03-02T05:15');
 
 // Input through label
-await page.fill('text=First Name', 'Peter');
+await page.locator('text=First Name').fill('Peter');
 ```
 
 ### API reference
+- [locator.fill(value[, options])](./api/class-locator.mdx#locator-fill)
 - [page.fill(selector, value[, options])](./api/class-page.mdx#page-fill)
 - [frame.fill(selector, value[, options])](./api/class-frame.mdx#frame-fill)
-- [elementHandle.fill(value[, options])](./api/class-elementhandle.mdx#element-handle-fill)
 
 <br/>
 
@@ -48,51 +48,47 @@ This is the easiest way to check and uncheck a checkbox or a radio button. This 
 
 ```js
 // Check the checkbox
-await page.check('#agree');
+await page.locator('#agree').check();
 
 // Assert the checked state
-expect(await page.isChecked('#agree')).toBeTruthy()
+expect(await page.locator('#agree').isChecked()).toBeTruthy()
 
 // Uncheck by input <label>.
-await page.uncheck('#subscribe-label');
+await page.locator('#subscribe-label').uncheck();
 
 // Select the radio button
-await page.check('text=XL');
+await page.locator('text=XL').check();
 ```
 
 ### API reference
-- [page.check(selector[, options])](./api/class-page.mdx#page-check)
-- [page.isChecked(selector[, options])](./api/class-page.mdx#page-is-checked)
-- [page.uncheck(selector[, options])](./api/class-page.mdx#page-uncheck)
 - [locator.check([options])](./api/class-locator.mdx#locator-check)
 - [locator.isChecked([options])](./api/class-locator.mdx#locator-is-checked)
 - [locator.uncheck([options])](./api/class-locator.mdx#locator-uncheck)
+- [page.check(selector[, options])](./api/class-page.mdx#page-check)
+- [page.isChecked(selector[, options])](./api/class-page.mdx#page-is-checked)
+- [page.uncheck(selector[, options])](./api/class-page.mdx#page-uncheck)
 
 <br/>
 
 ## Select options
 
-Selects one or multiple options in the `<select>` element. You can specify option `value`, `label` or `elementHandle` to select. Multiple options can be selected.
+Selects one or multiple options in the `<select>` element. You can specify option `value`, or `label` to select. Multiple options can be selected.
 
 ```js
 // Single selection matching the value
-await page.selectOption('select#colors', 'blue');
+await page.locator('select#colors').selectOption('blue');
 
 // Single selection matching the label
-await page.selectOption('select#colors', { label: 'Blue' });
+await page.locator('select#colors').selectOption({ label: 'Blue' });
 
 // Multiple selected items
-await page.selectOption('select#colors', ['red', 'green', 'blue']);
-
-// Select the option via element handle
-const option = await page.$('#best-option');
-await page.selectOption('select#colors', option);
+await page.locator('select#colors').selectOption(['red', 'green', 'blue']);
 ```
 
 ### API reference
+- [locator.selectOption(values[, options])](./api/class-locator.mdx#locator-select-option)
 - [page.selectOption(selector, values[, options])](./api/class-page.mdx#page-select-option)
 - [frame.selectOption(selector, values[, options])](./api/class-frame.mdx#frame-select-option)
-- [elementHandle.selectOption(values[, options])](./api/class-elementhandle.mdx#element-handle-select-option)
 
 <br/>
 
@@ -102,22 +98,22 @@ Performs a simple human click.
 
 ```js
 // Generic click
-await page.click('button#submit');
+await page.locator('button#submit').click();
 
 // Double click
-await page.dblclick('#item');
+await page.locator('#item').dblclick();
 
 // Right click
-await page.click('#item', { button: 'right' });
+await page.locator('#item').click({ button: 'right' });
 
 // Shift + click
-await page.click('#item', { modifiers: ['Shift'] });
+await page.locator('#item').click({ modifiers: ['Shift'] });
 
 // Hover over element
-await page.hover('#item');
+await page.locator('#item').hover();
 
 // Click the top left corner
-await page.click('#item', { position: { x: 0, y: 0} });
+await page.locator('#item').click({ position: { x: 0, y: 0} });
 ```
 
 Under the hood, this and other pointer-related methods:
@@ -133,7 +129,7 @@ Under the hood, this and other pointer-related methods:
 Sometimes, apps use non-trivial logic where hovering the element overlays it with another element that intercepts the click. This behavior is indistinguishable from a bug where element gets covered and the click is dispatched elsewhere. If you know this is taking place, you can bypass the [actionability](./actionability.mdx) checks and force the click:
 
 ```js
-await page.click('button#submit', { force: true });
+await page.locator('button#submit').click({ force: true });
 ```
 
 #### Programmatic click
@@ -141,22 +137,22 @@ await page.click('button#submit', { force: true });
 If you are not interested in testing your app under the real conditions and want to simulate the click by any means possible, you can trigger the [`HTMLElement.click()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click) behavior via simply dispatching a click event on the element:
 
 ```js
-await page.dispatchEvent('button#submit', 'click');
+await page.locator('button#submit').dispatchEvent('click');
 ```
 
 ### API reference
+- [locator.click([options])](./api/class-locator.mdx#locator-click)
 - [page.click(selector[, options])](./api/class-page.mdx#page-click)
 - [frame.click(selector[, options])](./api/class-frame.mdx#frame-click)
-- [elementHandle.click([options])](./api/class-elementhandle.mdx#element-handle-click)
+- [locator.dblclick([options])](./api/class-locator.mdx#locator-dblclick)
 - [page.dblclick(selector[, options])](./api/class-page.mdx#page-dblclick)
 - [frame.dblclick(selector[, options])](./api/class-frame.mdx#frame-dblclick)
-- [elementHandle.dblclick([options])](./api/class-elementhandle.mdx#element-handle-dblclick)
+- [locator.hover([options])](./api/class-locator.mdx#locator-hover)
 - [page.hover(selector[, options])](./api/class-page.mdx#page-hover)
 - [frame.hover(selector[, options])](./api/class-frame.mdx#frame-hover)
-- [elementHandle.hover([options])](./api/class-elementhandle.mdx#element-handle-hover)
+- [locator.dispatchEvent(type[, eventInit, options])](./api/class-locator.mdx#locator-dispatch-event)
 - [page.dispatchEvent(selector, type[, eventInit, options])](./api/class-page.mdx#page-dispatch-event)
 - [frame.dispatchEvent(selector, type[, eventInit, options])](./api/class-frame.mdx#frame-dispatch-event)
-- [elementHandle.dispatchEvent(type[, eventInit])](./api/class-elementhandle.mdx#element-handle-dispatch-event)
 
 <br/>
 
@@ -166,7 +162,7 @@ Type into the field character by character, as if it was a user with a real keyb
 
 ```js
 // Type character by character
-await page.type('#area', 'Hello World!');
+await page.locator('#area').type('Hello World!');
 ```
 
 This method will emit all the necessary keyboard events, with all the `keydown`, `keyup`, `keypress` events in place. You can even specify the optional `delay` between the key presses to simulate real user behavior.
@@ -176,9 +172,9 @@ Most of the time, [page.fill(selector, value[, options])](./api/class-page.mdx#p
 :::
 
 ### API reference
+- [locator.type(text[, options])](./api/class-locator.mdx#locator-type)
 - [page.type(selector, text[, options])](./api/class-page.mdx#page-type)
 - [frame.type(selector, text[, options])](./api/class-frame.mdx#frame-type)
-- [elementHandle.type(text[, options])](./api/class-elementhandle.mdx#element-handle-type)
 - [keyboard.type(text[, options])](./api/class-keyboard.mdx#keyboard-type)
 
 <br/>
@@ -187,13 +183,13 @@ Most of the time, [page.fill(selector, value[, options])](./api/class-page.mdx#p
 
 ```js
 // Hit Enter
-await page.press('#submit', 'Enter');
+await page.locator('#submit').press('Enter');
 
 // Dispatch Control+Right
-await page.press('#name', 'Control+ArrowRight');
+await page.locator('#name').press('Control+ArrowRight');
 
 // Press $ sign on keyboard
-await page.press('#value', '$');
+await page.locator('#value').press('$');
 ```
 
 This method focuses the selected element and produces a single keystroke. It accepts the logical key names that are emitted in the [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) property of the keyboard events:
@@ -211,10 +207,10 @@ Simple version produces a single character. This character is case-sensitive, so
 
 ```js
 // <input id=name>
-await page.press('#name', 'Shift+A');
+await page.locator('#name').press('Shift+A');
 
 // <input id=name>
-await page.press('#name', 'Shift+ArrowLeft');
+await page.locator('#name').press('Shift+ArrowLeft');
 ```
 
 Shortcuts such as `"Control+o"` or `"Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
@@ -222,9 +218,9 @@ Shortcuts such as `"Control+o"` or `"Control+Shift+T"` are supported as well. Wh
 Note that you still need to specify the capital `A` in `Shift-A` to produce the capital character. `Shift-a` produces a lower-case one as if you had the `CapsLock` toggled.
 
 ### API reference
+- [locator.press(key[, options])](./api/class-locator.mdx#locator-press)
 - [page.press(selector, key[, options])](./api/class-page.mdx#page-press)
 - [frame.press(selector, key[, options])](./api/class-frame.mdx#frame-press)
-- [elementHandle.press(key[, options])](./api/class-elementhandle.mdx#element-handle-press)
 - [keyboard.press(key[, options])](./api/class-keyboard.mdx#keyboard-press)
 
 <br/>
@@ -235,16 +231,16 @@ You can select input files for upload using the [page.setInputFiles(selector, fi
 
 ```js
 // Select one file
-await page.setInputFiles('input#upload', 'myfile.pdf');
+await page.locator('input#upload').setInputFiles('myfile.pdf');
 
 // Select multiple files
-await page.setInputFiles('input#upload', ['file1.txt', 'file2.txt']);
+await page.locator('input#upload').setInputFiles(['file1.txt', 'file2.txt']);
 
 // Remove all the selected files
-await page.setInputFiles('input#upload', []);
+await page.locator('input#upload').setInputFiles([]);
 
 // Upload buffer from memory
-await page.setInputFiles('input#upload', {
+await page.locator('input#upload').setInputFiles({
   name: 'file.txt',
   mimeType: 'text/plain',
   buffer: Buffer.from('this is test')
@@ -266,9 +262,9 @@ await fileChooser.setFiles('myfile.pdf');
 
 ### API reference
 - [FileChooser]
+- [locator.setInputFiles(files[, options])](./api/class-locator.mdx#locator-set-input-files)
 - [page.setInputFiles(selector, files[, options])](./api/class-page.mdx#page-set-input-files)
 - [frame.setInputFiles(selector, files[, options])](./api/class-frame.mdx#frame-set-input-files)
-- [elementHandle.setInputFiles(files[, options])](./api/class-elementhandle.mdx#element-handle-set-input-files)
 
 <br/>
 
@@ -277,13 +273,13 @@ await fileChooser.setFiles('myfile.pdf');
 For the dynamic pages that handle focus events, you can focus the given element.
 
 ```js
-await page.focus('input#name');
+await page.locator('input#name').focus();
 ```
 
 ### API reference
+- [locator.focus([options])](./api/class-locator.mdx#locator-focus)
 - [page.focus(selector[, options])](./api/class-page.mdx#page-focus)
 - [frame.focus(selector[, options])](./api/class-frame.mdx#frame-focus)
-- [elementHandle.focus()](./api/class-elementhandle.mdx#element-handle-focus)
 
 <br/>
 
