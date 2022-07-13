@@ -63,7 +63,7 @@ await page.Locator("text=Example Domain").WaitForAsync();
 // Navigate and click element
 // Click will auto-wait for the element
 await page.GotoAsync("https://example.com");
-await page.ClickAsync("text=Example Domain");
+await page.Locator("text=Example Domain").ClickAsync();
 ```
 
 ### API reference
@@ -74,43 +74,43 @@ await page.ClickAsync("text=Example Domain");
 
 ## Scenarios initiated by page interaction
 
-In the scenarios below, [Page.ClickAsync(selector, options)](./api/class-page.mdx#page-click) initiates a navigation and then waits for the navigation to complete.
+In the scenarios below, [Locator.ClickAsync(options)](./api/class-locator.mdx#locator-click) initiates a navigation and then waits for the navigation to complete.
 
 ### Auto-wait
 
-By default, [Page.ClickAsync(selector, options)](./api/class-page.mdx#page-click) will wait for the navigation step to complete. This can be combined with a page interaction on the navigated page which would auto-wait for an element.
+By default, [Locator.ClickAsync(options)](./api/class-locator.mdx#locator-click) will wait for the navigation step to complete. This can be combined with a page interaction on the navigated page which would auto-wait for an element.
 
 ```csharp
 // Click will auto-wait for navigation to complete
-await page.ClickAsync("text=Login");
+await page.Locator("text=Login").ClickAsync();
 
 // Fill will auto-wait for element on navigated page
-await page.FillAsync("#username", "John Doe");
+await page.Locator("#username").FillAsync("John Doe");
 ```
 
 ### Custom wait
 
-`page.click` can be combined with [Page.WaitForLoadStateAsync(state, options)](./api/class-page.mdx#page-wait-for-load-state) to wait for a loading event.
+`locator.click` can be combined with [Page.WaitForLoadStateAsync(state, options)](./api/class-page.mdx#page-wait-for-load-state) to wait for a loading event.
 
 ```csharp
-await page.ClickAsync("button"); // Click triggers navigation
+await page.Locator("button").ClickAsync(); // Click triggers navigation
 await page.WaitForLoadStateAsync(LoadState.NetworkIdle); // This resolves after "networkidle"
 ```
 
 ### Wait for element
 
-In lazy-loaded pages, it can be useful to wait until an element is visible with [Locator.WaitForAsync(options)](./api/class-locator.mdx#locator-wait-for). Alternatively, page interactions like [Page.ClickAsync(selector, options)](./api/class-page.mdx#page-click) auto-wait for elements.
+In lazy-loaded pages, it can be useful to wait until an element is visible with [Locator.WaitForAsync(options)](./api/class-locator.mdx#locator-wait-for). Alternatively, page interactions like [Locator.ClickAsync(options)](./api/class-locator.mdx#locator-click) auto-wait for elements.
 
 ```csharp
 // Click will auto-wait for the element and trigger navigation
-await page.ClickAsync("text=Login");
+await page.Locator("text=Login").ClickAsync();
 // Wait for the element
 await page.Locator("#username").WaitForAsync();
 
 // Click triggers navigation
-await page.ClickAsync("text=Login");
+await page.Locator("text=Login").ClickAsync();
 // Fill will auto-wait for element
-await page.FillAsync("#username", "John Doe");
+await page.Locator("#username").FillAsync("John Doe");
 ```
 
 ### Asynchronous navigation
@@ -125,7 +125,7 @@ Clicking an element could trigger asynchronous processing before initiating the 
 await page.RunAndWaitForNavigationAsync(async () =>
 {
     // Triggers a navigation after a timeout
-    await page.ClickAsync("div.delayed-navigation");
+    await page.Locator("div.delayed-navigation").ClickAsync();
 });
 ```
 
@@ -141,8 +141,8 @@ Clicking an element could trigger multiple navigations. In these cases, it is re
 await page.RunAndWaitForNavigationAsync(async () =>
 {
     // Triggers a navigation with a script redirect.
-    await page.ClickAsync("a");
-}, new PageWaitForNavigationOptions
+    await page.Locator("a").ClickAsync();
+}, new()
 {
     UrlString = "**/login"
 });
@@ -155,13 +155,13 @@ When popup is opened, explicitly calling [Page.WaitForLoadStateAsync(state, opti
 ```csharp
 var popup = await page.RunAndWaitForPopupAsync(async () =>
 {
-    await page.ClickAsync("a[target='_blank']"); // Opens popup
+    await page.Locator("a[target='_blank']").ClickAsync(); // Opens popup
 });
 popup.WaitForLoadStateAsync(LoadState.Load);
 ```
 
 ### API reference
-- [Page.ClickAsync(selector, options)](./api/class-page.mdx#page-click)
+- [Locator.ClickAsync(options)](./api/class-locator.mdx#locator-click)
 - [Page.WaitForLoadStateAsync(state, options)](./api/class-page.mdx#page-wait-for-load-state)
 - [Page.RunAndWaitForNavigationAsync(action, options)](./api/class-page.mdx#page-wait-for-navigation)
 - [Page.WaitForFunctionAsync(expression, arg, options)](./api/class-page.mdx#page-wait-for-function)

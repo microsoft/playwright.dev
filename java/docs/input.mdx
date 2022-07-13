@@ -20,25 +20,25 @@ This is the easiest way to fill out the form fields. It focuses the element and 
 
 ```java
 // Text input
-page.fill("#name", "Peter");
+page.locator("#name").fill("Peter");
 
 // Date input
-page.fill("#date", "2020-02-02");
+page.locator("#date").fill("2020-02-02");
 
 // Time input
-page.fill("#time", "13-15");
+page.locator("#time").fill("13-15");
 
 // Local datetime input
-page.fill("#local", "2020-03-02T05:15");
+page.locator("#local").fill("2020-03-02T05:15");
 
 // Input through label
-page.fill("text=First Name", "Peter");
+page.locator("text=First Name").fill("Peter");
 ```
 
 ### API reference
+- [Locator.fill(value[, options])](./api/class-locator.mdx#locator-fill)
 - [Page.fill(selector, value[, options])](./api/class-page.mdx#page-fill)
 - [Frame.fill(selector, value[, options])](./api/class-frame.mdx#frame-fill)
-- [ElementHandle.fill(value[, options])](./api/class-elementhandle.mdx#element-handle-fill)
 
 <br/>
 
@@ -48,51 +48,47 @@ This is the easiest way to check and uncheck a checkbox or a radio button. This 
 
 ```java
 // Check the checkbox
-page.check("#agree");
+page.locator("#agree").check();
 
 // Assert the checked state
-assertTrue(page.isChecked("#agree"));
+assertTrue(page.locator("#agree").isChecked());
 
 // Uncheck by input <label>.
-page.uncheck("#subscribe-label");
+page.locator("#subscribe-label").uncheck();
 
 // Select the radio button
-page.check("text=XL");
+page.locator("text=XL").check();
 ```
 
 ### API reference
-- [Page.check(selector[, options])](./api/class-page.mdx#page-check)
-- [Page.isChecked(selector[, options])](./api/class-page.mdx#page-is-checked)
-- [Page.uncheck(selector[, options])](./api/class-page.mdx#page-uncheck)
 - [Locator.check([options])](./api/class-locator.mdx#locator-check)
 - [Locator.isChecked([options])](./api/class-locator.mdx#locator-is-checked)
 - [Locator.uncheck([options])](./api/class-locator.mdx#locator-uncheck)
+- [Page.check(selector[, options])](./api/class-page.mdx#page-check)
+- [Page.isChecked(selector[, options])](./api/class-page.mdx#page-is-checked)
+- [Page.uncheck(selector[, options])](./api/class-page.mdx#page-uncheck)
 
 <br/>
 
 ## Select options
 
-Selects one or multiple options in the `<select>` element. You can specify option `value`, `label` or `elementHandle` to select. Multiple options can be selected.
+Selects one or multiple options in the `<select>` element. You can specify option `value`, or `label` to select. Multiple options can be selected.
 
 ```java
 // Single selection matching the value
-page.selectOption("select#colors", "blue");
+page.locator("select#colors").selectOption("blue");
 
 // Single selection matching the label
-page.selectOption("select#colors", new SelectOption().setLabel("Blue"));
+page.locator("select#colors").selectOption(new SelectOption().setLabel("Blue"));
 
 // Multiple selected items
-page.selectOption("select#colors", new String[] {"red", "green", "blue"});
-
-// Select the option via element handle
-ElementHandle option = page.querySelector("#best-option");
-page.selectOption("select#colors", option);
+page.locator("select#colors").selectOption(new String[] {"red", "green", "blue"});
 ```
 
 ### API reference
+- [Locator.selectOption(values[, options])](./api/class-locator.mdx#locator-select-option)
 - [Page.selectOption(selector, values[, options])](./api/class-page.mdx#page-select-option)
 - [Frame.selectOption(selector, values[, options])](./api/class-frame.mdx#frame-select-option)
-- [ElementHandle.selectOption(values[, options])](./api/class-elementhandle.mdx#element-handle-select-option)
 
 <br/>
 
@@ -102,22 +98,22 @@ Performs a simple human click.
 
 ```java
 // Generic click
-page.click("button#submit");
+page.locator("button#submit").click();
 
 // Double click
-page.dblclick("#item");
+page.locator("#item").dblclick();
 
 // Right click
-page.click("#item", new Page.ClickOptions().setButton(MouseButton.RIGHT));
+page.locator("#item").click(new Locator.ClickOptions().setButton(MouseButton.RIGHT));
 
 // Shift + click
-page.click("#item", new Page.ClickOptions().setModifiers(Arrays.asList(KeyboardModifier.SHIFT)));
+page.locator("#item").click(new Locator.ClickOptions().setModifiers(Arrays.asList(KeyboardModifier.SHIFT)));
 
 // Hover over element
-page.hover("#item");
+page.locator("#item").hover();
 
 // Click the top left corner
-page.click("#item", new Page.ClickOptions().setPosition(0, 0));
+page.locator("#item").click(new Locator.ClickOptions().setPosition(0, 0));
 ```
 
 Under the hood, this and other pointer-related methods:
@@ -133,7 +129,7 @@ Under the hood, this and other pointer-related methods:
 Sometimes, apps use non-trivial logic where hovering the element overlays it with another element that intercepts the click. This behavior is indistinguishable from a bug where element gets covered and the click is dispatched elsewhere. If you know this is taking place, you can bypass the [actionability](./actionability.mdx) checks and force the click:
 
 ```java
-page.click("button#submit", new Page.ClickOptions().setForce(true));
+page.locator("button#submit").click(new Locator.ClickOptions().setForce(true));
 ```
 
 #### Programmatic click
@@ -141,22 +137,22 @@ page.click("button#submit", new Page.ClickOptions().setForce(true));
 If you are not interested in testing your app under the real conditions and want to simulate the click by any means possible, you can trigger the [`HTMLElement.click()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click) behavior via simply dispatching a click event on the element:
 
 ```java
-page.dispatchEvent("button#submit", "click");
+page.locator("button#submit").dispatchEvent("click");
 ```
 
 ### API reference
+- [Locator.click([options])](./api/class-locator.mdx#locator-click)
 - [Page.click(selector[, options])](./api/class-page.mdx#page-click)
 - [Frame.click(selector[, options])](./api/class-frame.mdx#frame-click)
-- [ElementHandle.click([options])](./api/class-elementhandle.mdx#element-handle-click)
+- [Locator.dblclick([options])](./api/class-locator.mdx#locator-dblclick)
 - [Page.dblclick(selector[, options])](./api/class-page.mdx#page-dblclick)
 - [Frame.dblclick(selector[, options])](./api/class-frame.mdx#frame-dblclick)
-- [ElementHandle.dblclick([options])](./api/class-elementhandle.mdx#element-handle-dblclick)
+- [Locator.hover([options])](./api/class-locator.mdx#locator-hover)
 - [Page.hover(selector[, options])](./api/class-page.mdx#page-hover)
 - [Frame.hover(selector[, options])](./api/class-frame.mdx#frame-hover)
-- [ElementHandle.hover([options])](./api/class-elementhandle.mdx#element-handle-hover)
+- [Locator.dispatchEvent(type[, eventInit, options])](./api/class-locator.mdx#locator-dispatch-event)
 - [Page.dispatchEvent(selector, type[, eventInit, options])](./api/class-page.mdx#page-dispatch-event)
 - [Frame.dispatchEvent(selector, type[, eventInit, options])](./api/class-frame.mdx#frame-dispatch-event)
-- [ElementHandle.dispatchEvent(type[, eventInit])](./api/class-elementhandle.mdx#element-handle-dispatch-event)
 
 <br/>
 
@@ -166,7 +162,7 @@ Type into the field character by character, as if it was a user with a real keyb
 
 ```java
 // Type character by character
-page.type("#area", "Hello World!");
+page.locator("#area").type("Hello World!");
 ```
 
 This method will emit all the necessary keyboard events, with all the `keydown`, `keyup`, `keypress` events in place. You can even specify the optional `delay` between the key presses to simulate real user behavior.
@@ -176,9 +172,9 @@ Most of the time, [Page.fill(selector, value[, options])](./api/class-page.mdx#p
 :::
 
 ### API reference
+- [Locator.type(text[, options])](./api/class-locator.mdx#locator-type)
 - [Page.type(selector, text[, options])](./api/class-page.mdx#page-type)
 - [Frame.type(selector, text[, options])](./api/class-frame.mdx#frame-type)
-- [ElementHandle.type(text[, options])](./api/class-elementhandle.mdx#element-handle-type)
 - [Keyboard.type(text[, options])](./api/class-keyboard.mdx#keyboard-type)
 
 <br/>
@@ -187,13 +183,13 @@ Most of the time, [Page.fill(selector, value[, options])](./api/class-page.mdx#p
 
 ```java
 // Hit Enter
-page.press("#submit", "Enter");
+page.locator("#submit").press("Enter");
 
 // Dispatch Control+Right
-page.press("#name", "Control+ArrowRight");
+page.locator("#name").press("Control+ArrowRight");
 
 // Press $ sign on keyboard
-page.press("#value", "$");
+page.locator("#value").press("$");
 ```
 
 This method focuses the selected element and produces a single keystroke. It accepts the logical key names that are emitted in the [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) property of the keyboard events:
@@ -211,10 +207,10 @@ Simple version produces a single character. This character is case-sensitive, so
 
 ```java
 // <input id=name>
-page.press("#name", "Shift+A");
+page.locator("#name").press("Shift+A");
 
 // <input id=name>
-page.press("#name", "Shift+ArrowLeft");
+page.locator("#name").press("Shift+ArrowLeft");
 ```
 
 Shortcuts such as `"Control+o"` or `"Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
@@ -222,9 +218,9 @@ Shortcuts such as `"Control+o"` or `"Control+Shift+T"` are supported as well. Wh
 Note that you still need to specify the capital `A` in `Shift-A` to produce the capital character. `Shift-a` produces a lower-case one as if you had the `CapsLock` toggled.
 
 ### API reference
+- [Locator.press(key[, options])](./api/class-locator.mdx#locator-press)
 - [Page.press(selector, key[, options])](./api/class-page.mdx#page-press)
 - [Frame.press(selector, key[, options])](./api/class-frame.mdx#frame-press)
-- [ElementHandle.press(key[, options])](./api/class-elementhandle.mdx#element-handle-press)
 - [Keyboard.press(key[, options])](./api/class-keyboard.mdx#keyboard-press)
 
 <br/>
@@ -235,16 +231,16 @@ You can select input files for upload using the [Page.setInputFiles(selector, fi
 
 ```java
 // Select one file
-page.setInputFiles("input#upload", Paths.get("myfile.pdf"));
+page.locator("input#upload").setInputFiles(Paths.get("myfile.pdf"));
 
 // Select multiple files
-page.setInputFiles("input#upload", new Path[] {Paths.get("file1.txt"), Paths.get("file2.txt")});
+page.locator("input#upload").setInputFiles(new Path[] {Paths.get("file1.txt"), Paths.get("file2.txt")});
 
 // Remove all the selected files
-page.setInputFiles("input#upload", new Path[0]);
+page.locator("input#upload").setInputFiles(new Path[0]);
 
 // Upload buffer from memory
-page.setInputFiles("input#upload", new FilePayload(
+page.locator("input#upload").setInputFiles(new FilePayload(
   "file.txt", "text/plain", "this is test".getBytes(StandardCharsets.UTF_8)));
 ```
 
@@ -252,16 +248,16 @@ If you don't have input element in hand (it is created dynamically), you can han
 
 ```java
 FileChooser fileChooser = page.waitForFileChooser(() -> {
-  page.click("upload");
+  page.locator("upload").click();
 });
 fileChooser.setFiles(Paths.get("myfile.pdf"));
 ```
 
 ### API reference
 - [FileChooser]
+- [Locator.setInputFiles(files[, options])](./api/class-locator.mdx#locator-set-input-files)
 - [Page.setInputFiles(selector, files[, options])](./api/class-page.mdx#page-set-input-files)
 - [Frame.setInputFiles(selector, files[, options])](./api/class-frame.mdx#frame-set-input-files)
-- [ElementHandle.setInputFiles(files[, options])](./api/class-elementhandle.mdx#element-handle-set-input-files)
 
 <br/>
 
@@ -270,13 +266,13 @@ fileChooser.setFiles(Paths.get("myfile.pdf"));
 For the dynamic pages that handle focus events, you can focus the given element.
 
 ```java
-page.focus("input#name");
+page.locator("input#name").focus();
 ```
 
 ### API reference
+- [Locator.focus([options])](./api/class-locator.mdx#locator-focus)
 - [Page.focus(selector[, options])](./api/class-page.mdx#page-focus)
 - [Frame.focus(selector[, options])](./api/class-frame.mdx#frame-focus)
-- [ElementHandle.focus()](./api/class-elementhandle.mdx#element-handle-focus)
 
 <br/>
 

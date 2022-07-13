@@ -25,11 +25,29 @@ Playwright tests can be executed in CI environments. We have created sample conf
 
 1. **Run your tests**:
 
+   ```bash
+   dotnet test
+   ```
+
 ## CI configurations
 
 The [Command line tools](./cli.mdx#install-system-dependencies) can be used to install all operating system dependencies on GitHub Actions.
 
 ### GitHub Actions
+
+```yml
+steps:
+  - uses: actions/checkout@v3
+  - name: Setup dotnet
+    uses: actions/setup-dotnet@v2
+    with:
+      dotnet-version: 6.0.x
+  - run: dotnet build
+  - name: Ensure browsers are installed
+    run: pwsh bin\Debug\net6.0\playwright.ps1 install --with-deps
+  - name: Run your tests
+    run: dotnet test
+```
 
 We run [our tests](https://github.com/microsoft/playwright/blob/main/.github/workflows/tests_secondary.yml) on GitHub Actions, across a matrix of 3 platforms (Windows, Linux, macOS) and 3 browsers (Chromium, Firefox, WebKit).
 
@@ -47,7 +65,7 @@ jobs:
     runs-on: ubuntu-latest
     if: github.event.deployment_status.state == 'success'
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - uses: actions/setup-node@v2
       with:
         node-version: '14.x'
@@ -74,6 +92,26 @@ Suggested configuration
 ### GitHub Actions (via containers)
 
 GitHub Actions support [running jobs in a container](https://docs.github.com/en/actions/using-jobs/running-jobs-in-a-container) by using the [`jobs.<job_id>.container`](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idcontainer) option.
+
+```yml
+steps:
+  playwright:
+    name: 'Playwright Tests'
+    runs-on: ubuntu-latest
+    container:
+      image: mcr.microsoft.com/playwright:v1.24.0-focal
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup dotnet
+        uses: actions/setup-dotnet@v2
+        with:
+          dotnet-version: 6.0.x
+      - run: dotnet build
+      - name: Ensure browsers are installed
+        run: pwsh bin\Debug\net6.0\playwright.ps1 install --with-deps
+      - name: Run your tests
+        run: dotnet test
+```
 
 ### Azure Pipelines
 
@@ -123,6 +161,7 @@ pipeline {
    stages {
       stage('e2e-tests') {
          steps {
+            // Depends on your language / test framework
             sh 'npm install'
             sh 'npm run test'
          }
@@ -195,7 +234,7 @@ By default, Playwright launches browsers in headless mode. This can be changed b
 using Microsoft.Playwright;
 
 using var playwright = await Playwright.CreateAsync();
-await playwright.Chromium.LaunchAsync(new BrowserTypeLaunchOptions
+await playwright.Chromium.LaunchAsync(new()
 {
     Headless = false
 });

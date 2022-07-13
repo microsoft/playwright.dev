@@ -22,7 +22,7 @@ Playwright provides APIs to **monitor** and **modify** network traffic, both HTT
 ## HTTP Authentication
 
 ```csharp
-using var context = await Browser.NewContextAsync(new BrowserNewContextOptions
+using var context = await Browser.NewContextAsync(new()
 {
     HttpCredentials = new HttpCredentials
     {
@@ -52,7 +52,7 @@ var proxy = new Proxy
     Username = "user",
     Password = "pwd"
 };
-await using var browser = await BrowserType.LaunchAsync(new BrowserTypeLaunchOptions
+await using var browser = await BrowserType.LaunchAsync(new()
 {
     Proxy = proxy
 });
@@ -62,12 +62,12 @@ When specifying proxy for each context individually, **Chromium on Windows** nee
 
 ```csharp
 var proxy = new Proxy { Server = "per-context" };
-await using var browser = await BrowserType.LaunchAsync(new BrowserTypeLaunchOptions
+await using var browser = await BrowserType.LaunchAsync(new()
 {
     // Browser proxy option is required for Chromium on Windows.
     Proxy = proxy
 });
-using var context = await Browser.NewContextAsync(new BrowserNewContextOptions
+using var context = await Browser.NewContextAsync(new()
 {
     Proxy = new Proxy { Server = "http://myproxy.com:3128" })
 });
@@ -93,7 +93,7 @@ Or wait for a network response after the button click:
 ```csharp
 // Use a glob URL pattern
 var waitForResponseTask = page.WaitForResponseAsync("**/api/fetch_data");
-await page.ClickAsync("button#update");
+await page.Locator("button#update").ClickAsync();
 var response = await waitForResponseTask;
 ```
 
@@ -102,12 +102,12 @@ var response = await waitForResponseTask;
 ```csharp
 // Use a regular expression
 var waitForResponseTask = page.WaitForResponseAsync(new Regex("\\.jpeg$"));
-await page.ClickAsync("button#update");
+await page.Locator("button#update").ClickAsync();
 var response = await waitForResponseTask;
 
 // Use a predicate taking a Response object
 var waitForResponseTask = page.WaitForResponseAsync(r => r.Url.Contains(token));
-await page.ClickAsync("button#update");
+await page.Locator("button#update").ClickAsync();
 var response = await waitForResponseTask;
 ```
 
@@ -240,7 +240,7 @@ pwsh bin\Debug\netX\playwright.ps1 open --save-har=example.har --save-har-glob="
 Alternatively, instead of using the CLI, you can record HAR programmatically. Pass `har` option when creating a [BrowserContext] with [Browser.NewContextAsync(options)](./api/class-browser.mdx#browser-new-context) to create an archive. If the har file name ends with `.zip`, artifacts are written as separate files and are all compressed into a single `zip`.
 
 ```csharp
-var context = await browser.NewContextAsync(new () {
+var context = await browser.NewContextAsync(new() {
     RecordHarPath = "example.har",
     RecordHarUrlFilter = "**/api/**",
 });
