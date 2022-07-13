@@ -115,7 +115,7 @@ page.locator("text=example domain").wait_for()
 # Navigate and click element
 # Click will auto-wait for the element
 page.goto("https://example.com")
-page.click("text=example domain")
+page.locator("text=example domain").click()
 ```
 
 </TabItem>
@@ -129,7 +129,7 @@ await page.locator("text=example domain").wait_for()
 # Navigate and click element
 # Click will auto-wait for the element
 await page.goto("https://example.com")
-await page.click("text=example domain")
+await page.locator("text=example domain").click()
 ```
 
 </TabItem>
@@ -143,11 +143,11 @@ await page.click("text=example domain")
 
 ## Scenarios initiated by page interaction
 
-In the scenarios below, [page.click(selector, **kwargs)](./api/class-page.mdx#page-click) initiates a navigation and then waits for the navigation to complete.
+In the scenarios below, [locator.click(**kwargs)](./api/class-locator.mdx#locator-click) initiates a navigation and then waits for the navigation to complete.
 
 ### Auto-wait
 
-By default, [page.click(selector, **kwargs)](./api/class-page.mdx#page-click) will wait for the navigation step to complete. This can be combined with a page interaction on the navigated page which would auto-wait for an element.
+By default, [locator.click(**kwargs)](./api/class-locator.mdx#locator-click) will wait for the navigation step to complete. This can be combined with a page interaction on the navigated page which would auto-wait for an element.
 
 <Tabs
   groupId="python-flavor"
@@ -161,10 +161,10 @@ By default, [page.click(selector, **kwargs)](./api/class-page.mdx#page-click) wi
 
 ```py
 # Click will auto-wait for navigation to complete
-page.click("text=Login")
+page.locator("text=Login").click()
 
 # Fill will auto-wait for element on navigated page
-page.fill("#username", "John Doe")
+page.locator("#username").fill("John Doe")
 ```
 
 </TabItem>
@@ -172,10 +172,10 @@ page.fill("#username", "John Doe")
 
 ```py
 # Click will auto-wait for navigation to complete
-await page.click("text=Login")
+await page.locator("text=Login").click()
 
 # Fill will auto-wait for element on navigated page
-await page.fill("#username", "John Doe")
+await page.locator("#username").fill("John Doe")
 ```
 
 </TabItem>
@@ -183,7 +183,7 @@ await page.fill("#username", "John Doe")
 
 ### Custom wait
 
-`page.click` can be combined with [page.wait_for_load_state(**kwargs)](./api/class-page.mdx#page-wait-for-load-state) to wait for a loading event.
+`locator.click` can be combined with [page.wait_for_load_state(**kwargs)](./api/class-page.mdx#page-wait-for-load-state) to wait for a loading event.
 
 <Tabs
   groupId="python-flavor"
@@ -196,7 +196,7 @@ await page.fill("#username", "John Doe")
 <TabItem value="sync">
 
 ```py
-page.click("button"); # Click triggers navigation
+page.locator("button").click(); # Click triggers navigation
 page.wait_for_load_state("networkidle"); # This waits for the "networkidle"
 ```
 
@@ -204,7 +204,7 @@ page.wait_for_load_state("networkidle"); # This waits for the "networkidle"
 <TabItem value="async">
 
 ```py
-await page.click("button"); # Click triggers navigation
+await page.locator("button").click(); # Click triggers navigation
 await page.wait_for_load_state("networkidle"); # This waits for the "networkidle"
 ```
 
@@ -213,7 +213,7 @@ await page.wait_for_load_state("networkidle"); # This waits for the "networkidle
 
 ### Wait for element
 
-In lazy-loaded pages, it can be useful to wait until an element is visible with [locator.wait_for(**kwargs)](./api/class-locator.mdx#locator-wait-for). Alternatively, page interactions like [page.click(selector, **kwargs)](./api/class-page.mdx#page-click) auto-wait for elements.
+In lazy-loaded pages, it can be useful to wait until an element is visible with [locator.wait_for(**kwargs)](./api/class-locator.mdx#locator-wait-for). Alternatively, page interactions like [locator.click(**kwargs)](./api/class-locator.mdx#locator-click) auto-wait for elements.
 
 <Tabs
   groupId="python-flavor"
@@ -227,14 +227,14 @@ In lazy-loaded pages, it can be useful to wait until an element is visible with 
 
 ```py
 # Click triggers navigation
-page.click("text=Login")
+page.locator("text=Login").click()
 # Click will auto-wait for the element
 page.locator("#username").wait_for()
 
 # Click triggers navigation
-page.click("text=Login")
+page.locator("text=Login").click()
 # Fill will auto-wait for element
-page.fill("#username", "John Doe")
+page.locator("#username").fill("John Doe")
 ```
 
 </TabItem>
@@ -242,14 +242,14 @@ page.fill("#username", "John Doe")
 
 ```py
 # Click will auto-wait for the element and trigger navigation
-await page.click("text=Login")
+await page.locator("text=Login").click()
 # Wait for the element
 await page.locator("#username").wait_for()
 
 # Click triggers navigation
-await page.click("text=Login")
+await page.locator("text=Login").click()
 # Fill will auto-wait for element
-await page.fill("#username", "John Doe")
+await page.locator("#username").fill("John Doe")
 ```
 
 </TabItem>
@@ -276,7 +276,7 @@ Clicking an element could trigger asynchronous processing before initiating the 
 # prevents a race condition between clicking and waiting for a navigation.
 with page.expect_navigation():
     # Triggers a navigation after a timeout
-    page.click("a")
+    page.locator("a").click()
 ```
 
 </TabItem>
@@ -287,7 +287,7 @@ with page.expect_navigation():
 # prevents a race condition between clicking and waiting for a navigation.
 async with page.expect_navigation():
     # Triggers a navigation after a timeout
-    await page.click("div.delayed-navigation")
+    await page.locator("div.delayed-navigation").click()
 ```
 
 </TabItem>
@@ -314,7 +314,7 @@ Clicking an element could trigger multiple navigations. In these cases, it is re
 # between clicking and waiting for a navigation.
 with page.expect_navigation(url="**/login"):
     # Triggers a navigation with a script redirect
-    page.click("a")
+    page.locator("a").click()
 ```
 
 </TabItem>
@@ -325,7 +325,7 @@ with page.expect_navigation(url="**/login"):
 # between clicking and waiting for a navigation.
 async with page.expect_navigation(url="**/login"):
     # Triggers a navigation with a script redirect
-    await page.click("a")
+    await page.locator("a").click()
 ```
 
 </TabItem>
@@ -347,7 +347,7 @@ When popup is opened, explicitly calling [page.wait_for_load_state(**kwargs)](./
 
 ```py
 with page.expect_popup() as popup_info:
-    page.click('a[target="_blank"]') # Opens popup
+    page.locator('a[target="_blank"]').click() # Opens popup
 popup = popup_info.value
 popup.wait_for_load_state("load")
 ```
@@ -357,7 +357,7 @@ popup.wait_for_load_state("load")
 
 ```py
 async with page.expect_popup() as popup_info:
-    await page.click('a[target="_blank"]') # Opens popup
+    await page.locator('a[target="_blank"]').click() # Opens popup
 popup = await popup_info.value
 await popup.wait_for_load_state("load")
 ```
@@ -366,7 +366,7 @@ await popup.wait_for_load_state("load")
 </Tabs>
 
 ### API reference
-- [page.click(selector, **kwargs)](./api/class-page.mdx#page-click)
+- [locator.click(**kwargs)](./api/class-locator.mdx#locator-click)
 - [page.wait_for_load_state(**kwargs)](./api/class-page.mdx#page-wait-for-load-state)
 - [page.expect_navigation(**kwargs)](./api/class-page.mdx#page-wait-for-navigation)
 - [page.wait_for_function(expression, **kwargs)](./api/class-page.mdx#page-wait-for-function)
