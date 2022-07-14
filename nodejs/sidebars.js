@@ -2,28 +2,19 @@ module.exports = {
   "docs": [
     {
       "type": "category",
-      "label": "Introduction",
+      "label": "Getting Started",
       "items": [
-        { "type": "doc", "id": "getting-started-vscode" },
-        { "type": "doc", "id": "getting-started-cli" },
-        
-
-      ],
-      "collapsed": false
-    },
-    {
-      "type": "category",
-      "label": "Tooling",
-      "items": [
-        { "type": "doc", "id": "codegen" },
+        { "type": "doc", "id": "intro" },
+        { "type": "doc", "id": "writing-tests" },
+        { "type": "doc", "id": "running-tests" },
         { "type": "doc", "id": "debug" },
-        { "type": "doc", "id": "inspector" },
-        { "type": "doc", "id": "html-reporter" },
+        { "type": "doc", "id": "codegen" },
         { "type": "doc", "id": "trace-viewer" },
-        { "type": "doc", "id": "vs-code-extension" },
       ],
       "collapsed": false
     },
+    { "type": "doc", "id": "getting-started-vscode" },
+   
      { "type": "doc", "id": "release-notes" },
     {
       "type": "category",

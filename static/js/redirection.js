@@ -24,18 +24,22 @@ if (path) {
     { from: '/docs/next/installation', to: '/docs/next/library' },
     { from: '/docs/assertions', to: '/docs/test-assertions' },
     { from: '/docs/next/assertions', to: '/next/docs/test-assertions' },
+    { from: '/docs/inspector', to: '/docs/debug' },
     { from: '/blog', to: '/community/welcome' },
     // ------------------- python ---------------------
     { from: '/python/docs/assertions', to: '/python/docs/api/class-playwrightassertions' },
     { from: '/python/next/docs/assertions', to: '/python/next/docs/api/class-playwrightassertions' },
+    { from: '/python/docs/inspector', to: '/python/docs/debug' },
     { from: '/python/blog', to: '/community/welcome' },
     // ------------------- dotnet ---------------------
     { from: '/dotnet/docs/assertions', to: '/dotnet/docs/api/class-playwrightassertions' },
     { from: '/dotnet/next/docs/assertions', to: '/dotnet/next/docs/api/class-playwrightassertions' },
+    { from: '/dotnet/inspector', to: '/dotnet/docs/debug' },
     { from: '/dotnet/blog', to: '/community/welcome' },
     // ------------------- java -----------------------
     { from: '/java/docs/assertions', to: '/java/docs/api/class-playwrightassertions' },
     { from: '/java/next/docs/assertions', to: '/java/next/docs/api/class-playwrightassertions' },
+    { from: '/java/docs/inspector', to: '/java/docs/debug' },
     { from: '/java/blog', to: '/community/welcome' },
   ];
   const pathname = window.location.pathname;

@@ -1,41 +1,173 @@
 ---
-id: vs-code-extension
-title: "VS Code Extension"
+id: writing-tests
+title: "Writing Tests"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Install the VS Code extension from the [marketplace](https://marketplace.visualstudio.com/items?itemName=ms-playwright.playwright).
+Playwright assertions are created specifically for the dynamic web. Checks are automatically retried until the necessary conditions are met. Playwright comes with auto-wait built in meaning it waits for elements to be actionable prior to performing actions. Playwright provides a [test](./api/class-test.mdx) function to declare tests and the [expect](https://jestjs.io/docs/expect) function to write assertions.
 
-### Run tests with a single click
+Take a look at the example test included when installing Playwright to see how to write a test using web first assertions, locators and selectors.
 
-You can use Tests sidebar to run a test or a group of tests with a single click.
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
 
-![run_tests](https://user-images.githubusercontent.com/883973/152095110-46667a83-1f56-4964-8e99-094b880b70a0.gif)
+```js
+import { test, expect } from '@playwright/test';
 
-### Follow the execution line
+test('homepage has Playwright in title and get started link linking to the intro page', async ({ page }) => {
+  await page.goto('https://playwright.dev/');
 
-While tests are running, execution line is highlighted, once the line has completed, step time is rendered as an editor decoration.
+  // Expect a title "to contain" a substring.
+  await expect(page).toHaveTitle(/Playwright/);
 
-![execution_line](https://user-images.githubusercontent.com/883973/152095192-b85fb222-051a-40b2-8a6e-899d43d383c0.gif)
+  // create a locator
+  const getStarted = page.locator('text=Get Started');
 
-### Debug step-by-step, explore selectors
+  // Expect an attribute "to be strictly equal" to the value.
+  await expect(getStarted).toHaveAttribute('href', '/docs/intro');
 
-Right click and start breakpoint debugging. Set a breakpoint, hover over a value. When your cursor is on some Playwright action or a locator, corresponding element (or elements) are highlighted in the browser.
+  // Click the get started link.
+  await getStarted.click();
 
-![step_explore](https://user-images.githubusercontent.com/883973/152095220-b68a2a3c-8395-4252-9be8-5c6adf35eddf.gif)
+  // Expects the URL to contain intro.
+  await expect(page).toHaveURL(/.*intro/);
+});
+```
 
-### Record new tests
+</TabItem>
+<TabItem value="js">
 
-Record new tests via performing the test actions in the browser.
+```js
+// @ts-check
+const { test, expect } = require('@playwright/test');
 
-![recording](https://user-images.githubusercontent.com/883973/153694515-f25fdd12-7a7c-4fec-9695-36b19b1d6a6b.gif)
+test('homepage has Playwright in title and get started link linking to the intro page', async ({ page }) => {
+  await page.goto('https://playwright.dev/');
 
-### Tune selectors
+  // Expect a title "to contain" a substring.
+  await expect(page).toHaveTitle(/Playwright/);
 
-You can edit test source code to fine-tune selectors while on a breakpoint. A selector playground on every line of your test script!
+  // create a locator
+  const getStarted = page.locator('text=Get Started');
 
-![tune_selectors](https://user-images.githubusercontent.com/883973/152095248-7dda7d77-b8ee-42ab-8902-9cf462d1f334.gif)
+  // Expect an attribute "to be strictly equal" to the value.
+  await expect(getStarted).toHaveAttribute('href', '/docs/intro');
+
+  // Click the get started link.
+  await getStarted.click();
+ 
+  // Expects the URL to contain intro.
+  await expect(page).toHaveURL(/.*intro/);
+});
+```
+
+</TabItem>
+</Tabs>
+
+:::note
+Add `// @ts-check` at the start of each test file when using JavaScript in VS Code to get automatic type checking.
+:::
+
+### Assertions
+
+Playwright Test uses the [expect](https://jestjs.io/docs/expect) library for [test assertions](./test-assertions.mdx) which provides matchers like `toEqual`, `toContain`, `toMatch`, `toBe` and many more. Playwright also extends this library with convenience async matchers that will wait until the expected condition is met.
+
+```js
+await expect(page).toHaveTitle(/Playwright/);
+```
+
+### Locators
+
+[Locators](./locators.mdx) are the central piece of Playwright's auto-waiting and retry-ability. Locators represent a way to find element(s) on the page at any moment and are used to perform actions on elements such as .click. fill etc. Custom locators can be created with the [page.locator(selector[, options])](./api/class-page.mdx#page-locator) method.
+
+```js
+const getStarted = page.locator('text=Get Started');
+
+await expect(getStarted).toHaveAttribute('href', '/docs/installation');
+await getStarted.click();
+```
+
+[Selectors](./selectors.mdx) are strings that are used to create Locators. Playwright supports many different selectors like [Text](./selectors.mdx#text-selector), [CSS](./selectors.mdx#css-selector), [XPath](./selectors.mdx#xpath-selectors) and many more.
+
+```js
+await expect(page.locator('text=Installation')).toBeVisible();
+```
+
+### Test Isolation
+
+Playwright Test is based on the concept of [test fixtures](./test-fixtures.mdx) such as the [built in page fixture](./test-fixtures#built-in-fixtures), which is passed into your test. Pages are isolated between tests due to the Browser Context, which is equivalent to a brand new browser profile, where every test gets a fresh environment, even when multiple tests run in a single Browser.
+
+```js
+test('basic test', async ({ page }) => {
+  ...
+```
+
+### Using Test Hooks
+
+You can use various [test hooks](./api/class-test.mdx) such as `test.describe` to declare a group of tests and `test.beforeEach` and `test.afterEach` which are executed before/after each test. Other hooks include the `test.beforeAll` and `test.afterAll` which are executed once per worker before/after all tests.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import { test, expect } from "@playwright/test";
+
+test.describe("navigation", () => {
+  test.beforeEach(async ({ page }) => {
+    // Go to the starting url before each test.
+    await page.goto("https://playwright.dev/");
+  });
+
+  test("main navigation", async ({ page }) => {
+    // Assertions use the expect API.
+    await expect(page).toHaveURL("https://playwright.dev/");
+  });
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// @ts-check
+const { test, expect } = require("@playwright/test");
+
+test.describe("navigation", () => {
+  test.beforeEach(async ({ page }) => {
+    // Go to the starting url before each test.
+    await page.goto("https://playwright.dev/");
+  });
+
+  test("main navigation", async ({ page }) => {
+    // Assertions use the expect API.
+    await expect(page).toHaveURL("https://playwright.dev/");
+  });
+});
+```
+
+</TabItem>
+</Tabs>
+
+## What's Next
+- [Run single tests, multiple tests, headed mode](./running-tests.mdx)
+- [Debug tests with the Playwright Debugger](./debug.mdx)
+- [Generate tests with Codegen](./codegen.mdx)
+- [See a trace of your tests](./trace-viewer.mdx)
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"
