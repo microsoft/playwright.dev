@@ -68,7 +68,6 @@ module.exports = {
         { "type": "doc", "id": "pom" },
         { "type": "doc", "id": "screenshots" },
         { "type": "doc", "id": "selectors" },
-        { "type": "doc", "id": "service-workers" },
         { "type": "doc", "id": "videos" },
       ],
       "collapsed": false
