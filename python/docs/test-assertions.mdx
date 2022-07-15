@@ -72,7 +72,6 @@ By default, the timeout for assertions is set to 5 seconds.
 - [expect(locator).to_be_focused(**kwargs)](./test-assertions.mdx#locator-assertions-to-be-focused)
 - [expect(locator).to_be_hidden(**kwargs)](./test-assertions.mdx#locator-assertions-to-be-hidden)
 - [expect(locator).to_be_visible(**kwargs)](./test-assertions.mdx#locator-assertions-to-be-visible)
-- [expect(locator).to_contain_class(expected, **kwargs)](./test-assertions.mdx#locator-assertions-to-contain-class)
 - [expect(locator).to_contain_text(expected, **kwargs)](./test-assertions.mdx#locator-assertions-to-contain-text)
 - [expect(locator).to_have_attribute(name, value, **kwargs)](./test-assertions.mdx#locator-assertions-to-have-attribute)
 - [expect(locator).to_have_class(expected, **kwargs)](./test-assertions.mdx#locator-assertions-to-have-class)
@@ -582,68 +581,6 @@ await expect(locator).to_be_visible()
 </TabItem>
 </Tabs>
 
-## expect(locator).to_contain_class(expected, **kwargs) {#locator-assertions-to-contain-class}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.24</font>
-
-- `expected`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-contain-class-option-expected"/> &#60;[str]|[List]\[[str]\]&#62; Expected classnames, whitespace separated. When passing an array, the given classes must be present on the locator elements.<a href="#locator-assertions-to-contain-class-option-expected" class="list-anchor">#</a>
-- `ignore_case`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-contain-class-option-ignore-case"/> &#60;[bool]&#62; Whether to perform case-insensitive match.<a href="#locator-assertions-to-contain-class-option-ignore-case" class="list-anchor">#</a>
-- `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-contain-class-option-timeout"/> &#60;[float]&#62; Time to retry the assertion for.<a href="#locator-assertions-to-contain-class-option-timeout" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-contain-class-return"/> &#60;[NoneType]&#62;<a href="#locator-assertions-to-contain-class-return" class="list-anchor">#</a>
-
-Ensures the [Locator] points to an element that contains the given CSS class (or multiple). In contrast to [expect(locator).to_have_class(expected, **kwargs)](./test-assertions.mdx#locator-assertions-to-have-class) which requires that the [Locator] has exactly the provided classes, `toContainClass` verifies that the [Locator] has a subset (or all) of the given CSS classes.
-
-```html
-<div class='foo bar baz' id='component'>
-  <div class='item alice'></div>
-  <div class='item bob'></div>
-</div>
-```
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-from playwright.sync_api import expect
-
-locator = page.locator('#component')
-await expect(locator).to_contain_class('bar baz') # pass, both classes are on element
-await expect(locator).to_contain_class('ba') # fail, element has no 'ba' class
-
-item_locator = page.locator('#component .item')
-await expect(item_locator).to_contain_class(['alice', 'bob']) # pass, first element has alice, second bob
-await expect(item_locator).to_contain_class(['alice', 'bob carl']) # no carl class found on second item element
-await expect(item_locator).to_contain_class(['alice', 'bob', 'foobar']) # we expect 3 elements with the item class, but there are only 2
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-from playwright.async_api import expect
-
-locator = page.locator('#component')
-expect(locator).to_contain_class('bar baz') # pass, both classes are on element
-expect(locator).to_contain_class('ba') # fail, element has no 'ba' class
-
-item_locator = page.locator('#component .item')
-expect(item_locator).to_contain_class(['alice', 'bob']) # pass, first element has alice, second bob
-expect(item_locator).to_contain_class(['alice', 'bob carl']) # no carl class found on second item element
-expect(item_locator).to_contain_class(['alice', 'bob', 'foobar']) # we expect 3 elements with the item class, but there are only 2
-```
-
-</TabItem>
-</Tabs>
-
-Note that locator must point to a single element when passing a string or to multiple elements when passing an array.
-
 ## expect(locator).to_contain_text(expected, **kwargs) {#locator-assertions-to-contain-text}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font>
@@ -773,7 +710,7 @@ await expect(locator).to_have_attribute("type", "text")
 - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-class-option-timeout"/> &#60;[float]&#62; Time to retry the assertion for. <font size="2">Added in: v1.18</font><a href="#locator-assertions-to-have-class-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-class-return"/> &#60;[NoneType]&#62;<a href="#locator-assertions-to-have-class-return" class="list-anchor">#</a>
 
-Ensures the [Locator] points to an element with given CSS classes. This needs to be a full match or using a relaxed regular expression. For matching partial class names, use [expect(locator).to_contain_class(expected, **kwargs)](./test-assertions.mdx#locator-assertions-to-contain-class).
+Ensures the [Locator] points to an element with given CSS classes. This needs to be a full match or using a relaxed regular expression.
 
 ```html
 <div class='selected row' id='component'></div>
