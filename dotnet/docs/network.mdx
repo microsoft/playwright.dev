@@ -16,6 +16,7 @@ Playwright provides APIs to **monitor** and **modify** network traffic, both HTT
 - [Modify responses](#modify-responses)
 - [Record and replay requests](#record-and-replay-requests)
 - [WebSockets](#websockets)
+- [Missing Network Events and Service Workers](#missing-network-events-and-service-workers)
 
 <br/>
 
@@ -287,6 +288,15 @@ page.WebSocket += (_, ws) =>
 - [event WebSocket.FrameSent](./api/class-websocket.mdx#web-socket-event-frame-sent)
 - [event WebSocket.FrameReceived](./api/class-websocket.mdx#web-socket-event-frame-received)
 - [event WebSocket.Close](./api/class-websocket.mdx#web-socket-event-close)
+
+<br/>
+
+## Missing Network Events and Service Workers
+
+Playwright's built-in [BrowserContext.RouteAsync(url, handler, options)](./api/class-browsercontext.mdx#browser-context-route) and [Page.RouteAsync(url, handler, options)](./api/class-page.mdx#page-route) allow your tests to natively route requests and perform mocking and interception.
+1. If you're using Playwright's native [BrowserContext.RouteAsync(url, handler, options)](./api/class-browsercontext.mdx#browser-context-route) and [Page.RouteAsync(url, handler, options)](./api/class-page.mdx#page-route), and it appears network events are missing, disable Service Workers by setting `Browser.newContext.serviceWorkers` to `'block'`.
+1. It might be that you are using a mock tool such as Mock Service Worker (MSW). While this tool works out of the box for mocking responses, it adds its own Service Worker that takes over the network requests, hence making them invisible to [BrowserContext.RouteAsync(url, handler, options)](./api/class-browsercontext.mdx#browser-context-route) and [Page.RouteAsync(url, handler, options)](./api/class-page.mdx#page-route). If you are interested in both network testing and mocking, consider using built-in [BrowserContext.RouteAsync(url, handler, options)](./api/class-browsercontext.mdx#browser-context-route) and [Page.RouteAsync(url, handler, options)](./api/class-page.mdx#page-route) for [response mocking](#handle-requests).
+1. If you're interested in not solely using Service Workers for testing and network mocking, but in routing and listening for requests made by Service Workers themselves, please see [this experimental feature](https://github.com/microsoft/playwright/issues/15684).
 
 <br/>
 
