@@ -5,13 +5,16 @@ module.exports = {
       "label": "Getting Started",
       "items": [
         { "type": "doc", "id": "intro" },
+        { "type": "doc", "id": "writing-tests" },
+        { "type": "doc", "id": "running-tests" },
         { "type": "doc", "id": "debug" },
         { "type": "doc", "id": "codegen" },
         { "type": "doc", "id": "trace-viewer" },
-        { "type": "doc", "id": "test-runners" }
+        { "type": "doc", "id": "test-runners" },
       ],
       "collapsed": false
     },
+    { "type": "doc", "id": "library" },
     { "type": "doc", "id": "release-notes" },
     {
       "type": "category",
