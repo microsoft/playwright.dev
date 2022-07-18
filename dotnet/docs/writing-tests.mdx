@@ -1,75 +1,117 @@
 ---
-id: intro
-title: "Installation"
+id: writing-tests
+title: "Writing Tests"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright was created specifically to accommodate the needs of end-to-end testing. Playwright supports all modern rendering engines including Chromium, WebKit, and Firefox. Test on Windows, Linux, and macOS, locally or on CI, headless or headed with native mobile emulation.
+Playwright assertions are created specifically for the dynamic web. Checks are automatically retried until the necessary conditions are met. Playwright comes with auto-wait built in meaning it waits for elements to be actionable prior to performing actions. Playwright provides the [Expect](./test-assertions) function to write assertions.
 
-You can choose to use [NUnit base classes](./test-runners.mdx#nunit) or [MSTest base classes](./test-runners.mdx#nunit) that Playwright provides to write end-to-end tests. These classes support running tests on multiple browser engines, parallelizing tests, adjusting launch/context options and getting a [Page]/[BrowserContext] instance per test out of the box.
-
-Start by creating a new project with `dotnet new`. This will create the `PlaywrightTests` directory which includes a `UnitTest1.cs` file:
+Take a look at the example test to see how to write a test using web first assertions, locators and selectors.
 
 <Tabs defaultValue="nunit" values={[ {label: 'NUnit', value: 'nunit'}, {label: 'MSTest', value: 'mstest'} ] }>
 
 <TabItem value="nunit">
 
-```bash
-dotnet new nunit -n PlaywrightTests
-cd PlaywrightTests
+```csharp
+using System.Text.RegularExpressions;
+using Microsoft.Playwright.NUnit;
+
+namespace PlaywrightTests;
+
+[Parallelizable(ParallelScope.Self)]
+public class Tests : PageTest
+{
+    [Test]
+    async public Task HomepageHasPlaywrightInTitleAndGetStartedLinkLinkingtoTheIntroPage()
+    {
+        await Page.GotoAsync("https://playwright.dev");
+
+        // Expect a title "to contain" a substring.
+        await Expect(Page).ToHaveTitleAsync(new Regex("Playwright"));
+
+        // create a locator
+        var getStarted = Page.Locator("text=Get Started");
+
+        // Expect an attribute "to be strictly equal" to the value.
+        await Expect(getStarted).ToHaveAttributeAsync("href", "/docs/intro");
+
+        // Click the get started link.
+        await getStarted.ClickAsync();
+
+        // Expects the URL to contain intro.
+        await Expect(Page).ToHaveURLAsync(new Regex(".*intro"));
+    }
+}
 ```
 
 </TabItem>
 
 <TabItem value="mstest">
 
-```bash
-dotnet new mstest -n PlaywrightTests
-cd PlaywrightTests
+```csharp
+using System.Text.RegularExpressions;
+using Microsoft.Playwright.MSTest;
+
+namespace PlaywrightTests;
+
+public class UnitTest1 : PageTest
+{
+    [TestMethod]
+    async public Task HomepageHasPlaywrightInTitleAndGetStartedLinkLinkingtoTheIntroPage()
+    {
+        await Page.GotoAsync("https://playwright.dev");
+
+        // Expect a title "to contain" a substring.
+        await Expect(Page).ToHaveTitleAsync(new Regex("Playwright"));
+
+        // create a locator
+        var getStarted = Page.Locator("text=Get Started");
+
+        // Expect an attribute "to be strictly equal" to the value.
+        await Expect(getStarted).ToHaveAttributeAsync("href", "/docs/intro");
+
+        // Click the get started link.
+        await getStarted.ClickAsync();
+
+        // Expects the URL to contain intro.
+        await Expect(Page).ToHaveURLAsync(new Regex(".*intro"));
+    }
+}
 ```
 
 </TabItem>
 
 </Tabs>
 
-Install the necessary Playwright dependencies:
+### Assertions
 
-<Tabs defaultValue="nunit" values={[ {label: 'NUnit', value: 'nunit'}, {label: 'MSTest', value: 'mstest'} ] }>
+Playwright provides an async function called [Expect](./test-assertions) to assert and wait until the expected condition is met.
 
-<TabItem value="nunit">
-
-```bash
-dotnet add package Microsoft.Playwright.NUnit
+```csharp
+await Expect(Page).ToHaveTitleAsync(new Regex("Playwright"));
 ```
 
-</TabItem>
+### Locators
 
-<TabItem value="mstest">
+[Locators](./locators.mdx) are the central piece of Playwright's auto-waiting and retry-ability. Locators represent a way to find element(s) on the page at any moment and are used to perform actions on elements such as .click .fill etc. Custom locators can be created with the [Page.Locator(selector, options)](./api/class-page.mdx#page-locator) method.
 
-```bash
-dotnet add package Microsoft.Playwright.MSTest
+```csharp
+var getStarted = Page.Locator("text=Get Started");
+
+await Expect(getStarted).ToHaveAttributeAsync("href", "/docs/installation");
+await getStarted.ClickAsync();
 ```
 
-</TabItem>
+[Selectors](./selectors.mdx) are strings that are used to create Locators. Playwright supports many different selectors like [Text](./selectors.mdx#text-selector), [CSS](./selectors.mdx#css-selector), [XPath](./selectors.mdx#xpath-selectors) and many more.
 
-</Tabs>
-
-Build the project so the `playwright.ps1` is available inside the `bin` directory:
-
-```bash
-dotnet build
+```csharp
+await Expect(Page.Locator("text=Installation")).ToBeVisibleAsync();
 ```
 
-Install required browsers by replacing `netX` with the actual output folder name, e.g. `net6.0`:
+### Test Isolation
 
-```bash
-pwsh bin\Debug\netX\playwright.ps1 install
-```
-
-## Add Example Tests
-
-Edit the `UnitTest1.cs` file with the code below to create an example end-to-end test:
+The Playwright NUnit and MSTest test framework base classes will isolate each test from each other by providing a separate `Page` instance. Pages are isolated between tests due to the Browser Context, which is equivalent to a brand new browser profile, where every test gets a fresh environment, even when multiple tests run in a single Browser.
 
 <Tabs defaultValue="nunit" values={[ {label: 'NUnit', value: 'nunit'}, {label: 'MSTest', value: 'mstest'} ] }>
 
@@ -86,25 +128,9 @@ namespace PlaywrightTests;
 public class Tests : PageTest
 {
     [Test]
-    async public Task ShouldHaveTheCorrectSlogan()
+    public async Task BasicTest()
     {
         await Page.GotoAsync("https://playwright.dev");
-        await Expect(Page.Locator("text=enables reliable end-to-end testing for modern web apps")).ToBeVisibleAsync();
-    }
-
-    [Test]
-    public async Task ShouldHaveTheCorrectTitle()
-    {
-        await Page.GotoAsync("https://playwright.dev");
-        var title = Page.Locator(".navbar__inner .navbar__title");
-        await Expect(title).ToHaveTextAsync("Playwright");
-    }
-
-    [Test]
-    public async Task ShouldAdd()
-    {
-        var result = await Page.EvaluateAsync<int>("() => 7 + 3");
-        Assert.AreEqual(10, result);
     }
 }
 ```
@@ -121,25 +147,9 @@ namespace PlaywrightTests;
 public class UnitTest1 : PageTest
 {
     [TestMethod]
-    async public Task ShouldHaveTheCorrectSlogan()
+    public async Task BasicTest()
     {
         await Page.GotoAsync("https://playwright.dev");
-        await Expect(Page.Locator("text=enables reliable end-to-end testing for modern web apps")).ToBeVisibleAsync();
-    }
-
-    [TestMethod]
-    public async Task ShouldHaveTheCorrectTitle()
-    {
-        await Page.GotoAsync("https://playwright.dev");
-        var title = Page.Locator(".navbar__inner .navbar__title");
-        await Expect(title).ToHaveTextAsync("Playwright");
-    }
-
-    [TestMethod]
-    public async Task ShouldAdd()
-    {
-        var result = await Page.EvaluateAsync<int>("() => 7 + 3");
-        Assert.AreEqual(10, result);
     }
 }
 ```
@@ -148,40 +158,74 @@ public class UnitTest1 : PageTest
 
 </Tabs>
 
-## Running the Example Tests
+### Using Test Hooks
 
-By default tests will be run on Chromium. This can be configured via the `BROWSER` environment variable, or by adjusting the [launch configuration options](./test-runners.mdx). Tests are run in headless mode meaning no browser will open up when running the tests. Results of the tests and test logs will be shown in the terminal.
+You can use `SetUp`/`TearDown` in NUnit or `TestInitialize`/`TestCleanup` in MSTest to prepare and clean up your test environment:
 
 <Tabs defaultValue="nunit" values={[ {label: 'NUnit', value: 'nunit'}, {label: 'MSTest', value: 'mstest'} ] }>
 
 <TabItem value="nunit">
 
-```bash
-dotnet test -- NUnit.NumberOfTestWorkers=5
+```csharp
+using System.Threading.Tasks;
+using Microsoft.Playwright.NUnit;
+using NUnit.Framework;
+
+namespace PlaywrightTests;
+
+[Parallelizable(ParallelScope.Self)]
+public class Tests : PageTest
+{
+    [Test]
+    public async Task MainNavigation()
+    {
+        // Assertions use the expect API.
+        await Expect(Page).ToHaveURLAsync("https://playwright.dev/");
+    }
+
+    [SetUp]
+    public async Task SetUp()
+    {
+        await Page.GotoAsync("https://playwright.dev");
+    }
+}
 ```
 
 </TabItem>
 
 <TabItem value="mstest">
 
-```bash
-dotnet test -- MSTest.Parallelize.Workers=5
+```csharp
+using Microsoft.Playwright.MSTest;
+
+namespace PlaywrightTests;
+
+public class UnitTest1 : PageTest
+{
+    [TestMethod]
+    public async Task MainNavigation()
+    {
+        // Assertions use the expect API.
+        await Expect(Page).ToHaveURLAsync("https://playwright.dev/");
+    }
+
+    [TestInitialize]
+    public async Task TestInitialize()
+    {
+        await Page.GotoAsync("https://playwright.dev");
+    }
+}
 ```
 
 </TabItem>
 
 </Tabs>
 
-See our doc on [Test Runners](./test-runners.mdx) to learn more about running tests in headed mode, running multiple tests, running specific configurations etc.
-
-## What's next
-- [Write tests using web first assertions, page fixtures and locators](./writing-tests.mdx)
+## What's Next
 - [Run single tests, multiple tests, headed mode](./running-tests.mdx)
-- [Learn more about the NUnit and MSTest base classes](./test-runners.mdx)
 - [Debug tests with the Playwright Debugger](./debug.mdx)
 - [Generate tests with Codegen](./codegen.mdx)
 - [See a trace of your tests](./trace-viewer.mdx)
-- [Using Playwright as library](./library.mdx)
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [APIRequest]: ./api/class-apirequest.mdx "APIRequest"
