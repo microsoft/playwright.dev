@@ -1,49 +1,96 @@
 ---
-id: downloads
-title: "Downloads"
+id: running-tests
+title: "Running Tests"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-:::note
-For uploading files, see the [uploading files](./input.mdx#upload-files) section.
-:::
+You can run a single test, a set of tests or all tests. Tests can be run on different browsers. By default tests are run in a headless manner meaning no browser window will be opened while running the tests and results will be seen in the terminal. If you prefer you can run your tests in headed mode by using the `headless` test run parameter.
+- Running all tests
 
-For every attachment downloaded by the page, [event Page.Download](./api/class-page.mdx#page-event-download) event is emitted. All these attachments are going to be downloaded into a temporary folder. You can obtain the download url, file system path and payload stream using the [Download] object from the event.
+  ```bash
+  dotnet test
+  ```
 
-You can specify where to persist downloaded files using the `downloadsPath` option in [BrowserType.LaunchAsync(options)](./api/class-browsertype.mdx#browser-type-launch).
+- Running a single test file
 
-:::note
-Downloaded files are deleted when the browser context that produced them is closed.
-:::
+  ```bash
+  dotnet test --filter "MyClassName"
+  ```
 
-Here is the simplest way to handle the file download:
+- Run a set of test files
 
-```csharp
-// Start the task of waiting for the download
-var waitForDownloadTask = page.WaitForDownloadAsync();
-// Perform the action that initiates download
-await page.Locator("#downloadButton").ClickAsync();
-// Wait for the download process to complete
-var download = await waitForDownloadTask;
-Console.WriteLine(await download.PathAsync());
-// Save downloaded file somewhere
-await download.SaveAsAsync("/path/to/save/download/at.txt");
-```
+  ```bash
+  dotnet test --filter "MyClassName1|MyClassName2"
+  ```
 
-#### Variations
+- Run the test with the title
 
-If you have no idea what initiates the download, you can still handle the event:
+  ```bash
+  dotnet test --filter "Name~TestMethod1"
+  ```
 
-```csharp
-page.Download += (sender, download) => Console.WriteLine(download.Url);
-```
+- Running Tests on specific browsers
 
-Note that handling the event forks the control flow and makes script harder to follow. Your scenario might end while you are downloading a file since your main control flow is not awaiting for this operation to resolve.
+  <Tabs
+    groupId="bash-flavor"
+    defaultValue="bash"
+    values={[
+      {label: 'Bash', value: 'bash'},
+      {label: 'PowerShell', value: 'powershell'},
+      {label: 'Batch', value: 'batch'}
+    ]
+  }>
+  <TabItem value="bash">
+  
+  ```bash
+  BROWSER=webkit dotnet test
+  ```
+  
+  </TabItem>
+  <TabItem value="powershell">
+  
+  ```powershell
+  $env:BROWSER="webkit"
+  dotnet test
+  ```
+  
+  </TabItem>
+  <TabItem value="batch">
+  
+  ```batch
+  set BROWSER=webkit
+  dotnet test
+  ```
+  
+  </TabItem>
+  </Tabs>
+- Running Tests on multiple browsers
 
-### API reference
-- [Download]
-- [event Page.Download](./api/class-page.mdx#page-event-download)
+  To run your test on multiple browsers or configurations you need to invoke the `dotnet test` command multiple times. There you can then either specify the `BROWSER` environment variable (like the previous) or pass the `browser` via the runsettings file:
+
+  ```bash
+  dotnet test --settings:chromium.runsettings
+  dotnet test --settings:firefox.runsettings
+  dotnet test --settings:webkit.runsettings
+  ```
+
+  ```xml
+  <?xml version="1.0" encoding="utf-8"?>
+  <RunSettings>
+    <TestRunParameters>
+      <Parameter name="browser" value="chromium" />
+      <Parameter name="headless" value="false" />
+    </TestRunParameters>
+  </RunSettings>
+  ```
+
+For more information see [selective unit tests](https://docs.microsoft.com/en-us/dotnet/core/testing/selective-unit-tests?pivots=mstest) in the Microsoft docs.
+
+## What's Next
+- [Debug tests with the Playwright Debugger](./debug.mdx)
+- [Generate tests with Codegen](./codegen.mdx)
+- [See a trace of your tests](./trace-viewer.mdx)
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [APIRequest]: ./api/class-apirequest.mdx "APIRequest"
