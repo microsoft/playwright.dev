@@ -24,6 +24,7 @@ module.exports = {
         { "type": "doc", "id": "browsers" },
         { "type": "doc", "id": "browser-contexts" },
         { "type": "doc", "id": "cli" },
+        { "type": "doc", "id": "debug-selectors" },
         { "type": "doc", "id": "dialogs" },
         { "type": "doc", "id": "downloads" },
         { "type": "doc", "id": "emulation" },

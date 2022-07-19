@@ -52,6 +52,7 @@ module.exports = {
         { "type": "doc", "id": "browser-contexts" },
         { "type": "doc", "id": "chrome-extensions" },
         { "type": "doc", "id": "cli" },
+        { "type": "doc", "id": "debug-selectors" },
         { "type": "doc", "id": "dialogs" },
         { "type": "doc", "id": "downloads" },
         { "type": "doc", "id": "emulation" },

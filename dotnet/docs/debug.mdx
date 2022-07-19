@@ -62,22 +62,6 @@ Using `PWDEBUG=console` will configure the browser for debugging in Developer to
 * **Disables timeout**: Sets default timeout to 0 (= no timeout)
 * **Console helper**: Configures a `playwright` object in the browser to generate and highlight [Playwright selectors](./selectors.mdx). This can be used to verify text or composite selectors.
 
-#### Selectors in Developer Tools Console
-
-When running in Debug Mode with `PWDEBUG=console`, a `playwright` object is available in Developer tools console.
-1. Run with `PWDEBUG=console`
-1. Setup a breakpoint to pause the execution
-1. Open the console panel in browser developer tools
-1. Use the `playwright` API
-   * `playwright.$(selector)`: Highlight the first occurrence of the selector. This reflects how `page.$` would see the page.
-   * `playwright.$$(selector)`: Highlight all occurrences of the selector. This reflects how `page.$$` would see the page.
-   * `playwright.inspect(selector)`: Inspect the selector in the Elements panel.
-   * `playwright.locator(selector)`: Highlight the first occurrence of the locator.
-   * `playwright.clear()`: Clear existing highlights.
-   * `playwright.selector(element)`: Generate a selector that points to the element.
-
-<a href="https://user-images.githubusercontent.com/284612/86857345-299abc00-c073-11ea-9e31-02923a9f0d4b.png"><img src="https://user-images.githubusercontent.com/284612/86857345-299abc00-c073-11ea-9e31-02923a9f0d4b.png" width="500" alt="Highlight selectors"></img></a>
-
 ### Using page.pause
 
 Call [Page.PauseAsync()](./api/class-page.mdx#page-pause) method from your script when running in headed browser.
@@ -87,11 +71,11 @@ Call [Page.PauseAsync()](./api/class-page.mdx#page-pause) method from your scrip
 await page.PauseAsync();
 ```
 
-- Use `open` or `codegen` commands in the Playwright [CLI](./cli.mdx):
+Use `open` or `codegen` commands in the Playwright [CLI](./cli.mdx):
 
-  ```bash
-  pwsh bin\Debug\netX\playwright.ps1 codegen wikipedia.org
-  ```
+```bash
+pwsh bin\Debug\netX\playwright.ps1 codegen wikipedia.org
+```
 
 ## Stepping through the Playwright script
 
@@ -103,7 +87,7 @@ Now we know what action is about to be performed and we can look into the detail
 
 <img width="344" alt="Red dot on inspected page" src="https://user-images.githubusercontent.com/883973/108614363-b69a4780-73ae-11eb-8f5e-51f9c91ec9b4.png"></img>
 
-By the time Playwright has paused on that click action, it has already performed actionability checks that can be found in the log:
+By the time Playwright has paused on that click action, it has already performed [actionability checks](./actionability.mdx) that can be found in the log:
 
 <img width="712" alt="Action log" src="https://user-images.githubusercontent.com/883973/108614564-72a84200-73b0-11eb-9de2-828b28d78b36.png"></img>
 
@@ -124,7 +108,7 @@ You can use browser developer tools in Chromium, Firefox and WebKit while runnin
 
 <a href="https://user-images.githubusercontent.com/284612/77234134-5f21a500-6b69-11ea-92ec-1c146e1333ec.png"><img src="https://user-images.githubusercontent.com/284612/77234134-5f21a500-6b69-11ea-92ec-1c146e1333ec.png" width="500" alt="Chromium Developer Tools"></img></a>
 
-Using a [Page.PauseAsync()](./api/class-page.mdx#page-pause) method is an easy way to pause the Playwright script execution and inspect the page in Developer tools. It will also open [Playwright Inspector](./inspector.mdx) to help with debugging.
+Using a [Page.PauseAsync()](./api/class-page.mdx#page-pause) method is an easy way to pause the Playwright script execution and inspect the page in Developer tools. It will also open Playwright Inspector to help with debugging.
 
 **For Chromium**: you can also open developer tools through a launch option.
 
@@ -139,44 +123,6 @@ await using var browser = await playwright.Chromium.LaunchAsync(new()
 **For WebKit**: launching WebKit Inspector during the execution will   prevent the Playwright script from executing any further.
 :::
 
-## Debugging Selectors
-- Click the Explore button to hover over elements in the screen and click them to automatically generate selectors for those elements.
-- To verify where selector points, paste it into the inspector input field:
-
-<img width="602" alt="Selectors toolbar" src="https://user-images.githubusercontent.com/883973/108614696-ad5eaa00-73b1-11eb-81f5-9eebe62543a2.png"></img>
-
-You can also use the following API inside the Developer Tools Console of any browser.
-
-<img src="https://user-images.githubusercontent.com/284612/92536317-37dd9380-f1ee-11ea-875d-daf1b206dd56.png"></img>
-
-#### playwright.$(selector)
-
-Query Playwright selector, using the actual Playwright query engine, for example:
-
-#### playwright.$$(selector)
-
-Same as `playwright.$`, but returns all matching elements.
-
-#### playwright.inspect(selector)
-
-Reveal element in the Elements panel (if DevTools of the respective browser supports it).
-
-#### playwright.locator(selector)
-
-Query Playwright element using the actual Playwright query engine, for example:
-
-#### playwright.selector(element)
-
-Generates selector for the given element.
-
-<!-- ## Recording scripts
-
-At any moment, clicking Record action enables [codegen mode](./codegen.mdx). Every action on the target page is turned into the generated script:
-
-<img width="712" alt="Recorded script" src="https://user-images.githubusercontent.com/883973/108614897-85704600-73b3-11eb-8bcd-f2e129786c49.png"></img>
-
-You can copy entire generated script or clear it using toolbar actions. -->
-
 ## Run Tests in headed mode
 
 Playwright runs browsers in headless mode by default. To change this behavior, use `headless: false` as a launch option. You can also use the `slowMo` option to slow down execution and follow along while debugging.
@@ -189,44 +135,6 @@ await using var browser = await playwright.Chromium.LaunchAsync(new()
     SlowMo = 100
 });
 ```
-
-## Verbose API logs
-
-Playwright supports verbose logging with the `DEBUG` environment variable.
-
-<Tabs
-  groupId="bash-flavor"
-  defaultValue="bash"
-  values={[
-    {label: 'Bash', value: 'bash'},
-    {label: 'PowerShell', value: 'powershell'},
-    {label: 'Batch', value: 'batch'}
-  ]
-}>
-<TabItem value="bash">
-
-```bash
-DEBUG=pw:api dotnet run
-```
-
-</TabItem>
-<TabItem value="powershell">
-
-```powershell
-$env:DEBUG="pw:api"
-dotnet run
-```
-
-</TabItem>
-<TabItem value="batch">
-
-```batch
-set DEBUG=pw:api
-dotnet run
-```
-
-</TabItem>
-</Tabs>
 
 ## What's Next
 - [Generate tests with Codegen](./codegen.mdx)
