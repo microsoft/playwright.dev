@@ -14,7 +14,7 @@ module.exports = {
       "collapsed": false
     },
     { "type": "doc", "id": "getting-started-vscode" },
-   
+
      { "type": "doc", "id": "release-notes" },
     {
       "type": "category",
@@ -62,6 +62,7 @@ module.exports = {
         { "type": "doc", "id": "handles" },
         { "type": "doc", "id": "input" },
         { "type": "doc", "id": "locators" },
+        { "type": "doc", "id": "mock" },
         { "type": "doc", "id": "navigations" },
         { "type": "doc", "id": "network" },
         { "type": "doc", "id": "pages" },
