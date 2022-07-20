@@ -1,31 +1,13 @@
 ---
-id: intro
-title: "Installation"
+id: writing-tests
+title: "Writing Tests"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright was created specifically to accommodate the needs of end-to-end testing. Playwright supports all modern rendering engines including Chromium, WebKit, and Firefox. Test on Windows, Linux, and macOS, locally or on CI, headless or headed with native mobile emulation. 
+Playwright assertions are created specifically for the dynamic web. Checks are automatically retried until the necessary conditions are met. Playwright comes with [auto-wait](./actionability.mdx) built in meaning it waits for elements to be actionable prior to performing actions. Playwright provides an [expect](./test-assertions.mdx) function to write assertions.
 
-Playwright recommends using the official [Playwright Pytest plugin](./test-runners.mdx) to write end-to-end tests. It provides context isolation, running it on multiple browser configurations out of the box. Alternatively you can use the [library](./library.mdx) to manually write the testing infrastructure with your preferred test-runner. The Pytest plugin utilizes the sync version of Playwright, there is also an async version accessible via the library.
-
-Get started by installing Playwright and running the example test to see it in action.
-
-Install the [Pytest plugin](https://pypi.org/project/pytest-playwright/):
-
-```bash
-pip install pytest-playwright
-```
-
-Install the required browsers:
-
-```bash
-playwright install
-```
-
-## Add Example Test
-
-Create a `test_my_application.py` file inside the current working directory or in a sub-directory with the code below:
+Take a look at the example test below to see how to write a test using web first assertions, locators and selectors.
 
 ```py
 import re
@@ -53,18 +35,72 @@ def test_homepage_has_Playwright_in_title_and_get_started_link_linking_to_the_in
     expect(page).to_have_url(re.compile(".*intro"))
 ```
 
-## Running the Example Test
+### Assertions
 
-By default tests will be run on chromium. This can be configured via the CLI options. Tests are run in headless mode meaning no browser UI will open up when running the tests. Results of the tests and test logs will be shown in the terminal.
+Playwright provides the [`expect`](./test-assertions.mdx) function which will wait until the expected condition is met.
 
-```bash
-pytest
+```py
+import re
+from playwright.sync_api import expect
+
+expect(page).to_have_title(re.compile("Playwright"))
 ```
 
-See our doc on [Running Tests](./running-tests.mdx) to learn more about running tests in headed mode, running multiple tests, running specific tests etc.
+### Locators
 
-## What's next
-- [Write tests using web first assertions, page fixtures and locators](./writing-tests.mdx)
+[Locators](./locators.mdx) are the central piece of Playwright's auto-waiting and retry-ability. Locators represent a way to find element(s) on the page at any moment and are used to perform actions on elements such as `.click` `.fill` etc. Custom locators can be created with the [page.locator(selector, **kwargs)](./api/class-page.mdx#page-locator) method.
+
+```py
+from playwright.sync_api import expect
+
+get_started = page.locator("text=Get Started")
+
+expect(get_started).to_have_attribute("href", "/docs/installation")
+get_started.click()
+```
+
+[Selectors](./selectors.mdx) are strings that are used to create Locators. Playwright supports many different selectors like [Text](./selectors.mdx#text-selector), [CSS](./selectors.mdx#css-selector), [XPath](./selectors.mdx#xpath-selectors) and many more.
+
+```py
+from playwright.sync_api import expect
+
+expect(page.locator("text=Installation")).to_be_visible()
+```
+
+### Test Isolation
+
+The Playwright Pytest plugin is based on the concept of test fixtures such as the [built in page fixture](./test-runners.mdx), which is passed into your test. Pages are isolated between tests due to the Browser Context, which is equivalent to a brand new browser profile, where every test gets a fresh environment, even when multiple tests run in a single Browser.
+
+```py
+from playwright.sync_api import Page
+
+def test_basic_test(page: Page):
+  # ...
+```
+
+### Using Test Hooks
+
+You can use various [fixtures](https://docs.pytest.org/en/6.2.x/fixture.html#autouse-fixtures-fixtures-you-don-t-have-to-request) to execute code before or after your tests and to share objects between them. A `function` scoped fixture e.g. with autouse behaves like a beforeEach/afterEach. And a `module` scoped fixture with autouse behaves like a beforeAll/afterAll which runs before all and after all the tests.
+
+```py
+import pytest
+from playwright.sync_api import Page
+
+
+@pytest.fixture(scope="function", autouse=True)
+def before_each_after_each(page: Page):
+    print("beforeEach")
+    # Go to the starting url before each test.
+    page.goto("https://playwright.dev/")
+    yield
+    print("afterEach")
+
+def test_main_navigation(page: Page):
+    # Assertions use the expect API.
+    expect(page).to_have_url("https://playwright.dev/")
+```
+
+## What's Next
 - [Run single tests, multiple tests, headed mode](./running-tests.mdx)
 - [Debug tests with the Playwright Debugger](./debug.mdx)
 - [Generate tests with Codegen](./codegen.mdx)
