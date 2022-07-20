@@ -14,8 +14,7 @@ module.exports = {
       "collapsed": false
     },
     { "type": "doc", "id": "getting-started-vscode" },
-
-     { "type": "doc", "id": "release-notes" },
+    { "type": "doc", "id": "release-notes" },
     {
       "type": "category",
       "label": "Deep Dive",
