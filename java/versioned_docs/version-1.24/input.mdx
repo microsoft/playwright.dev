@@ -1,0 +1,347 @@
+---
+id: input
+title: "Input"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+- [Text input](#text-input)
+- [Checkboxes and radio buttons](#checkboxes-and-radio-buttons)
+- [Select options](#select-options)
+- [Mouse click](#mouse-click)
+- [Type characters](#type-characters)
+- [Keys and shortcuts](#keys-and-shortcuts)
+- [Upload files](#upload-files)
+- [Focus element](#focus-element)
+
+## Text input
+
+This is the easiest way to fill out the form fields. It focuses the element and triggers an `input` event with the entered text. It works for `<input>`, `<textarea>`, `[contenteditable]` and `<label>` associated with an input or textarea.
+
+```java
+// Text input
+page.locator("#name").fill("Peter");
+
+// Date input
+page.locator("#date").fill("2020-02-02");
+
+// Time input
+page.locator("#time").fill("13-15");
+
+// Local datetime input
+page.locator("#local").fill("2020-03-02T05:15");
+
+// Input through label
+page.locator("text=First Name").fill("Peter");
+```
+
+### API reference
+- [Locator.fill(value[, options])](./api/class-locator.mdx#locator-fill)
+- [Page.fill(selector, value[, options])](./api/class-page.mdx#page-fill)
+- [Frame.fill(selector, value[, options])](./api/class-frame.mdx#frame-fill)
+
+<br/>
+
+## Checkboxes and radio buttons
+
+This is the easiest way to check and uncheck a checkbox or a radio button. This method can be used with `input[type=checkbox]`, `input[type=radio]`, `[role=checkbox]` or `label` associated with checkbox or radio button.
+
+```java
+// Check the checkbox
+page.locator("#agree").check();
+
+// Assert the checked state
+assertTrue(page.locator("#agree").isChecked());
+
+// Uncheck by input <label>.
+page.locator("#subscribe-label").uncheck();
+
+// Select the radio button
+page.locator("text=XL").check();
+```
+
+### API reference
+- [Locator.check([options])](./api/class-locator.mdx#locator-check)
+- [Locator.isChecked([options])](./api/class-locator.mdx#locator-is-checked)
+- [Locator.uncheck([options])](./api/class-locator.mdx#locator-uncheck)
+- [Page.check(selector[, options])](./api/class-page.mdx#page-check)
+- [Page.isChecked(selector[, options])](./api/class-page.mdx#page-is-checked)
+- [Page.uncheck(selector[, options])](./api/class-page.mdx#page-uncheck)
+
+<br/>
+
+## Select options
+
+Selects one or multiple options in the `<select>` element. You can specify option `value`, or `label` to select. Multiple options can be selected.
+
+```java
+// Single selection matching the value
+page.locator("select#colors").selectOption("blue");
+
+// Single selection matching the label
+page.locator("select#colors").selectOption(new SelectOption().setLabel("Blue"));
+
+// Multiple selected items
+page.locator("select#colors").selectOption(new String[] {"red", "green", "blue"});
+```
+
+### API reference
+- [Locator.selectOption(values[, options])](./api/class-locator.mdx#locator-select-option)
+- [Page.selectOption(selector, values[, options])](./api/class-page.mdx#page-select-option)
+- [Frame.selectOption(selector, values[, options])](./api/class-frame.mdx#frame-select-option)
+
+<br/>
+
+## Mouse click
+
+Performs a simple human click.
+
+```java
+// Generic click
+page.locator("button#submit").click();
+
+// Double click
+page.locator("#item").dblclick();
+
+// Right click
+page.locator("#item").click(new Locator.ClickOptions().setButton(MouseButton.RIGHT));
+
+// Shift + click
+page.locator("#item").click(new Locator.ClickOptions().setModifiers(Arrays.asList(KeyboardModifier.SHIFT)));
+
+// Hover over element
+page.locator("#item").hover();
+
+// Click the top left corner
+page.locator("#item").click(new Locator.ClickOptions().setPosition(0, 0));
+```
+
+Under the hood, this and other pointer-related methods:
+- wait for element with given selector to be in DOM
+- wait for it to become displayed, i.e. not empty, no `display:none`, no `visibility:hidden`
+- wait for it to stop moving, for example, until css transition finishes
+- scroll the element into view
+- wait for it to receive pointer events at the action point, for example, waits until element becomes non-obscured by other elements
+- retry if the element is detached during any of the above checks
+
+#### Forcing the click
+
+Sometimes, apps use non-trivial logic where hovering the element overlays it with another element that intercepts the click. This behavior is indistinguishable from a bug where element gets covered and the click is dispatched elsewhere. If you know this is taking place, you can bypass the [actionability](./actionability.mdx) checks and force the click:
+
+```java
+page.locator("button#submit").click(new Locator.ClickOptions().setForce(true));
+```
+
+#### Programmatic click
+
+If you are not interested in testing your app under the real conditions and want to simulate the click by any means possible, you can trigger the [`HTMLElement.click()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click) behavior via simply dispatching a click event on the element:
+
+```java
+page.locator("button#submit").dispatchEvent("click");
+```
+
+### API reference
+- [Locator.click([options])](./api/class-locator.mdx#locator-click)
+- [Page.click(selector[, options])](./api/class-page.mdx#page-click)
+- [Frame.click(selector[, options])](./api/class-frame.mdx#frame-click)
+- [Locator.dblclick([options])](./api/class-locator.mdx#locator-dblclick)
+- [Page.dblclick(selector[, options])](./api/class-page.mdx#page-dblclick)
+- [Frame.dblclick(selector[, options])](./api/class-frame.mdx#frame-dblclick)
+- [Locator.hover([options])](./api/class-locator.mdx#locator-hover)
+- [Page.hover(selector[, options])](./api/class-page.mdx#page-hover)
+- [Frame.hover(selector[, options])](./api/class-frame.mdx#frame-hover)
+- [Locator.dispatchEvent(type[, eventInit, options])](./api/class-locator.mdx#locator-dispatch-event)
+- [Page.dispatchEvent(selector, type[, eventInit, options])](./api/class-page.mdx#page-dispatch-event)
+- [Frame.dispatchEvent(selector, type[, eventInit, options])](./api/class-frame.mdx#frame-dispatch-event)
+
+<br/>
+
+## Type characters
+
+Type into the field character by character, as if it was a user with a real keyboard.
+
+```java
+// Type character by character
+page.locator("#area").type("Hello World!");
+```
+
+This method will emit all the necessary keyboard events, with all the `keydown`, `keyup`, `keypress` events in place. You can even specify the optional `delay` between the key presses to simulate real user behavior.
+
+:::note
+Most of the time, [Page.fill(selector, value[, options])](./api/class-page.mdx#page-fill) will just work. You only need to type characters if there is special keyboard handling on the page.
+:::
+
+### API reference
+- [Locator.type(text[, options])](./api/class-locator.mdx#locator-type)
+- [Page.type(selector, text[, options])](./api/class-page.mdx#page-type)
+- [Frame.type(selector, text[, options])](./api/class-frame.mdx#frame-type)
+- [Keyboard.type(text[, options])](./api/class-keyboard.mdx#keyboard-type)
+
+<br/>
+
+## Keys and shortcuts
+
+```java
+// Hit Enter
+page.locator("#submit").press("Enter");
+
+// Dispatch Control+Right
+page.locator("#name").press("Control+ArrowRight");
+
+// Press $ sign on keyboard
+page.locator("#value").press("$");
+```
+
+This method focuses the selected element and produces a single keystroke. It accepts the logical key names that are emitted in the [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) property of the keyboard events:
+
+```
+Backquote, Minus, Equal, Backslash, Backspace, Tab, Delete, Escape,
+ArrowDown, End, Enter, Home, Insert, PageDown, PageUp, ArrowRight,
+ArrowUp, F1 - F12, Digit0 - Digit9, KeyA - KeyZ, etc.
+```
+
+- You can alternatively specify a single character you'd like to produce such as `"a"` or `"#"`.
+- Following modification shortcuts are also supported: `Shift, Control, Alt, Meta`.
+
+Simple version produces a single character. This character is case-sensitive, so `"a"` and `"A"` will produce different results.
+
+```java
+// <input id=name>
+page.locator("#name").press("Shift+A");
+
+// <input id=name>
+page.locator("#name").press("Shift+ArrowLeft");
+```
+
+Shortcuts such as `"Control+o"` or `"Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
+
+Note that you still need to specify the capital `A` in `Shift-A` to produce the capital character. `Shift-a` produces a lower-case one as if you had the `CapsLock` toggled.
+
+### API reference
+- [Locator.press(key[, options])](./api/class-locator.mdx#locator-press)
+- [Page.press(selector, key[, options])](./api/class-page.mdx#page-press)
+- [Frame.press(selector, key[, options])](./api/class-frame.mdx#frame-press)
+- [Keyboard.press(key[, options])](./api/class-keyboard.mdx#keyboard-press)
+
+<br/>
+
+## Upload files
+
+You can select input files for upload using the [Page.setInputFiles(selector, files[, options])](./api/class-page.mdx#page-set-input-files) method. It expects first argument to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input) with the type `"file"`. Multiple files can be passed in the array. If some of the file paths are relative, they are resolved relative to the current working directory. Empty array clears the selected files.
+
+```java
+// Select one file
+page.locator("input#upload").setInputFiles(Paths.get("myfile.pdf"));
+
+// Select multiple files
+page.locator("input#upload").setInputFiles(new Path[] {Paths.get("file1.txt"), Paths.get("file2.txt")});
+
+// Remove all the selected files
+page.locator("input#upload").setInputFiles(new Path[0]);
+
+// Upload buffer from memory
+page.locator("input#upload").setInputFiles(new FilePayload(
+  "file.txt", "text/plain", "this is test".getBytes(StandardCharsets.UTF_8)));
+```
+
+If you don't have input element in hand (it is created dynamically), you can handle the [Page.onFileChooser(handler)](./api/class-page.mdx#page-event-file-chooser) event or use a corresponding waiting method upon your action:
+
+```java
+FileChooser fileChooser = page.waitForFileChooser(() -> {
+  page.locator("upload").click();
+});
+fileChooser.setFiles(Paths.get("myfile.pdf"));
+```
+
+### API reference
+- [FileChooser]
+- [Locator.setInputFiles(files[, options])](./api/class-locator.mdx#locator-set-input-files)
+- [Page.setInputFiles(selector, files[, options])](./api/class-page.mdx#page-set-input-files)
+- [Frame.setInputFiles(selector, files[, options])](./api/class-frame.mdx#frame-set-input-files)
+
+<br/>
+
+## Focus element
+
+For the dynamic pages that handle focus events, you can focus the given element.
+
+```java
+page.locator("input#name").focus();
+```
+
+### API reference
+- [Locator.focus([options])](./api/class-locator.mdx#locator-focus)
+- [Page.focus(selector[, options])](./api/class-page.mdx#page-focus)
+- [Frame.focus(selector[, options])](./api/class-frame.mdx#frame-focus)
+
+<br/>
+
+[APIRequest]: ./api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: ./api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: ./api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: ./test-assertions.mdx "APIResponseAssertions"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[FormData]: ./api/class-formdata.mdx "FormData"
+[Frame]: ./api/class-frame.mdx "Frame"
+[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Locator]: ./api/class-locator.mdx "Locator"
+[LocatorAssertions]: ./test-assertions.mdx "LocatorAssertions"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[PageAssertions]: ./test-assertions.mdx "PageAssertions"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: ./test-assertions.mdx "PlaywrightAssertions"
+[PlaywrightException]: ./api/class-playwrightexception.mdx "PlaywrightException"
+[Request]: ./api/class-request.mdx "Request"
+[RequestOptions]: ./api/class-requestoptions.mdx "RequestOptions"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
+[byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
+[Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
+[double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
+[InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
+[int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"
+[Map]: https://docs.oracle.com/javase/8/docs/api/java/util/Map.html "Map"
+[null]: https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.7 "null"
+[Object]: https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html "Object"
+[Path]: https://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html "Path"
+[Pattern]: https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html "Pattern"
+[Predicate]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Predicate.html "Predicate"
+[void]: https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html "void"
+[Runnable]: https://docs.oracle.com/javase/8/docs/api/java/lang/Runnable.html "Runnable"
+[RuntimeException]: https://docs.oracle.com/javase/8/docs/api/java/lang/RuntimeException.html "RuntimeException"
+[String]: https://docs.oracle.com/javase/8/docs/api/java/lang/String.html "String"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/java/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright-java "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright-java/blob/master/Dockerfile.focal "Dockerfile.focal"

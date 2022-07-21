@@ -1,0 +1,693 @@
+---
+id: network
+title: "Network"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Playwright provides APIs to **monitor** and **modify** network traffic, both HTTP and HTTPS. Any requests that page does, including [XHRs](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) requests, can be tracked, modified and handled.
+
+- [HTTP Authentication](#http-authentication)
+- [HTTP Proxy](#http-proxy)
+- [Network events](#network-events)
+- [Handle requests](#handle-requests)
+- [Modify requests](#modify-requests)
+- [Abort requests](#abort-requests)
+- [Modify responses](#modify-responses)
+- [Record and replay requests](#record-and-replay-requests)
+- [WebSockets](#websockets)
+- [Missing Network Events and Service Workers](#missing-network-events-and-service-workers)
+
+<br/>
+
+## HTTP Authentication
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+context = browser.new_context(
+    http_credentials={"username": "bill", "password": "pa55w0rd"}
+)
+page = context.new_page()
+page.goto("https://example.com")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+context = await browser.new_context(
+    http_credentials={"username": "bill", "password": "pa55w0rd"}
+)
+page = await context.new_page()
+await page.goto("https://example.com")
+```
+
+</TabItem>
+</Tabs>
+
+### API reference
+- [browser.new_context(**kwargs)](./api/class-browser.mdx#browser-new-context)
+
+## HTTP Proxy
+
+You can configure pages to load over the HTTP(S) proxy or SOCKSv5. Proxy can be either set globally for the entire browser, or for each browser context individually.
+
+You can optionally specify username and password for HTTP(S) proxy, you can also specify hosts to bypass proxy for.
+
+Here is an example of a global proxy:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+browser = chromium.launch(proxy={
+  "server": "http://myproxy.com:3128",
+  "username": "usr",
+  "password": "pwd"
+})
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+browser = await chromium.launch(proxy={
+  "server": "http://myproxy.com:3128",
+  "username": "usr",
+  "password": "pwd"
+})
+```
+
+</TabItem>
+</Tabs>
+
+When specifying proxy for each context individually, **Chromium on Windows** needs a hint that proxy will be set. This is done via passing a non-empty proxy server to the browser itself. Here is an example of a context-specific proxy:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Browser proxy option is required for Chromium on Windows.
+browser = chromium.launch(proxy={"server": "per-context"})
+context = browser.new_context(proxy={"server": "http://myproxy.com:3128"})
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Browser proxy option is required for Chromium on Windows.
+browser = await chromium.launch(proxy={"server": "per-context"})
+context = await browser.new_context(proxy={"server": "http://myproxy.com:3128"})
+```
+
+</TabItem>
+</Tabs>
+
+## Network events
+
+You can monitor all the requests and responses:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+from playwright.sync_api import sync_playwright
+
+def run(playwright):
+    chromium = playwright.chromium
+    browser = chromium.launch()
+    page = browser.new_page()
+    # Subscribe to "request" and "response" events.
+    page.on("request", lambda request: print(">>", request.method, request.url))
+    page.on("response", lambda response: print("<<", response.status, response.url))
+    page.goto("https://example.com")
+    browser.close()
+
+with sync_playwright() as playwright:
+    run(playwright)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+import asyncio
+from playwright.async_api import async_playwright
+
+async def run(playwright):
+    chromium = playwright.chromium
+    browser = await chromium.launch()
+    page = await browser.new_page()
+    # Subscribe to "request" and "response" events.
+    page.on("request", lambda request: print(">>", request.method, request.url))
+    page.on("response", lambda response: print("<<", response.status, response.url))
+    await page.goto("https://example.com")
+    await browser.close()
+
+async def main():
+    async with async_playwright() as playwright:
+        await run(playwright)
+asyncio.run(main())
+```
+
+</TabItem>
+</Tabs>
+
+Or wait for a network response after the button click:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Use a glob url pattern
+with page.expect_response("**/api/fetch_data") as response_info:
+    page.locator("button#update").click()
+response = response_info.value
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Use a glob url pattern
+async with page.expect_response("**/api/fetch_data") as response_info:
+    await page.locator("button#update").click()
+response = await response_info.value
+```
+
+</TabItem>
+</Tabs>
+
+#### Variations
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Use a regular expression
+with page.expect_response(re.compile(r"\.jpeg$")) as response_info:
+    page.locator("button#update").click()
+response = response_info.value
+
+# Use a predicate taking a response object
+with page.expect_response(lambda response: token in response.url) as response_info:
+    page.locator("button#update").click()
+response = response_info.value
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Use a regular expression
+async with page.expect_response(re.compile(r"\.jpeg$")) as response_info:
+    await page.locator("button#update").click()
+response = await response_info.value
+
+# Use a predicate taking a response object
+async with page.expect_response(lambda response: token in response.url) as response_info:
+    await page.locator("button#update").click()
+response = await response_info.value
+```
+
+</TabItem>
+</Tabs>
+
+### API reference
+- [Request]
+- [Response]
+- [page.on("request")](./api/class-page.mdx#page-event-request)
+- [page.on("response")](./api/class-page.mdx#page-event-response)
+- [page.expect_request(url_or_predicate, **kwargs)](./api/class-page.mdx#page-wait-for-request)
+- [page.expect_response(url_or_predicate, **kwargs)](./api/class-page.mdx#page-wait-for-response)
+
+<br/>
+
+## Handle requests
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.route(
+    "**/api/fetch_data",
+    lambda route: route.fulfill(status=200, body=test_data))
+page.goto("https://example.com")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.route(
+    "**/api/fetch_data",
+    lambda route: route.fulfill(status=200, body=test_data))
+await page.goto("https://example.com")
+```
+
+</TabItem>
+</Tabs>
+
+You can mock API endpoints via handling the network requests in your Playwright script.
+
+#### Variations
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Set up route on the entire browser context.
+# It will apply to popup windows and opened links.
+context.route(
+    "**/api/login",
+    lambda route: route.fulfill(status=200, body="accept"))
+page.goto("https://example.com")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Set up route on the entire browser context.
+# It will apply to popup windows and opened links.
+await context.route(
+    "**/api/login",
+    lambda route: route.fulfill(status=200, body="accept"))
+await page.goto("https://example.com")
+```
+
+</TabItem>
+</Tabs>
+
+### API reference
+- [browser_context.route(url, handler, **kwargs)](./api/class-browsercontext.mdx#browser-context-route)
+- [browser_context.unroute(url, **kwargs)](./api/class-browsercontext.mdx#browser-context-unroute)
+- [page.route(url, handler, **kwargs)](./api/class-page.mdx#page-route)
+- [page.unroute(url, **kwargs)](./api/class-page.mdx#page-unroute)
+- [Route]
+
+<br/>
+
+## Modify requests
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Delete header
+def handle_route(route):
+    headers = route.request.headers
+    del headers["x-secret"]
+    route.continue_(headers=headers)
+page.route("**/*", handle_route)
+
+# Continue requests as POST.
+page.route("**/*", lambda route: route.continue_(method="POST"))
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Delete header
+async def handle_route(route):
+    headers = route.request.headers
+    del headers["x-secret"]
+    route.continue_(headers=headers)
+await page.route("**/*", handle_route)
+
+# Continue requests as POST.
+await page.route("**/*", lambda route: route.continue_(method="POST"))
+```
+
+</TabItem>
+</Tabs>
+
+You can continue requests with modifications. Example above removes an HTTP header from the outgoing requests.
+
+## Abort requests
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.route("**/*.{png,jpg,jpeg}", lambda route: route.abort())
+
+# Abort based on the request type
+page.route("**/*", lambda route: route.abort() if route.request.resource_type == "image"  else route.continue_())
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.route("**/*.{png,jpg,jpeg}", lambda route: route.abort())
+
+# Abort based on the request type
+await page.route("**/*", lambda route: route.abort() if route.request.resource_type == "image"  else route.continue_())
+```
+
+</TabItem>
+</Tabs>
+
+### API reference
+- [page.route(url, handler, **kwargs)](./api/class-page.mdx#page-route)
+- [browser_context.route(url, handler, **kwargs)](./api/class-browsercontext.mdx#browser-context-route)
+- [route.abort(**kwargs)](./api/class-route.mdx#route-abort)
+
+<br/>
+
+## Modify responses
+
+To modify a response use [APIRequestContext] to get original response and then pass the response to [route.fulfill(**kwargs)](./api/class-route.mdx#route-fulfill). You can override individual fields on the response via options:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+def handle_route(route: Route) -> None:
+    # Fetch original response.
+    response = page.request.fetch(route.request)
+    # Add a prefix to the title.
+    body = response.text()
+    body = body.replace("<title>", "<title>My prefix:")
+    route.fulfill(
+        # Pass all fields from the response.
+        response=response,
+        # Override response body.
+        body=body,
+        # Force content type to be html.
+        headers={**response.headers, "content-type": "text/html"},
+    )
+
+page.route("**/title.html", handle_route)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+async def handle_route(route: Route) -> None:
+    # Fetch original response.
+    response = await page.request.fetch(route.request)
+    # Add a prefix to the title.
+    body = await response.text()
+    body = body.replace("<title>", "<title>My prefix:")
+    await route.fulfill(
+        # Pass all fields from the response.
+        response=response,
+        # Override response body.
+        body=body,
+        # Force content type to be html.
+        headers={**response.headers, "content-type": "text/html"},
+    )
+
+await page.route("**/title.html", handle_route)
+```
+
+</TabItem>
+</Tabs>
+
+### API reference
+- [APIRequestContext]
+- [page.route(url, handler, **kwargs)](./api/class-page.mdx#page-route)
+- [browser_context.route(url, handler, **kwargs)](./api/class-browsercontext.mdx#browser-context-route)
+- [playwright.request](./api/class-playwright.mdx#playwright-request)
+- [browser_context.request](./api/class-browsercontext.mdx#browser-context-request)
+- [page.request](./api/class-page.mdx#page-request)
+- [route.fulfill(**kwargs)](./api/class-route.mdx#route-fulfill)
+
+<br/>
+
+## Record and replay requests
+
+You can record network activity as an HTTP Archive file (HAR). Later on, this archive can be used to mock responses to the network requests. You'll need to:
+1. Record a HAR file.
+1. Commit the HAR file alongside the tests.
+1. Route requests using the saved HAR files in the tests.
+
+### Recording HAR with CLI
+
+Open the browser with [Playwright CLI](./cli.mdx) and pass `--save-har` option to produce a HAR file. Optionally, use `--save-har-glob` to only save requests you are interested in, for example API endpoints. If the har file name ends with `.zip`, artifacts are written as separate files and are all compressed into a single `zip`.
+
+```bash
+# Save API requests from example.com as "example.har" archive.
+playwright open --save-har=example.har --save-har-glob="**/api/**" https://example.coms
+```
+
+### Recording HAR with a script
+
+Alternatively, instead of using the CLI, you can record HAR programmatically. Pass `har` option when creating a [BrowserContext] with [browser.new_context(**kwargs)](./api/class-browser.mdx#browser-new-context) to create an archive. If the har file name ends with `.zip`, artifacts are written as separate files and are all compressed into a single `zip`.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+context = browser.new_context(record_har_path="example.har", record_har_url_filter="**/api/**")
+
+# ... Perform actions ...
+
+# Close context to ensure HAR is saved to disk.
+context.close()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+context = await browser.new_context(record_har_path="example.har", record_har_url_filter="**/api/**")
+
+# ... Perform actions ...
+
+# Close context to ensure HAR is saved to disk.
+await context.close()
+```
+
+</TabItem>
+</Tabs>
+
+### Replaying from HAR
+
+Use [page.route_from_har(har, **kwargs)](./api/class-page.mdx#page-route-from-har) or [browser_context.route_from_har(har, **kwargs)](./api/class-browsercontext.mdx#browser-context-route-from-har) to serve matching responses from the [HAR](http://www.softwareishard.com/blog/har-12-spec/) file.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Either use a matching response from the HAR,
+# or abort the request if nothing matches.
+page.route_from_har("example.har")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Either use a matching response from the HAR,
+# or abort the request if nothing matches.
+await page.route_from_har("example.har")
+```
+
+</TabItem>
+</Tabs>
+
+HAR replay matches URL and HTTP method strictly. For POST requests, it also matches POST payloads strictly. If multiple recordings match a request, the one with the most matching headers is picked. An entry resulting in a redirect will be followed automatically.
+
+Similar to when recording, if given HAR file name ends with `.zip`, it is considered an archive containing the HAR file along with network payloads stored as separate entries. You can also extract this archive, edit payloads or HAR log manually and point to the extracted har file. All the payloads will be resolved relative to the extracted har file on the file system.
+
+<br/>
+
+## WebSockets
+
+Playwright supports [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) inspection out of the box. Every time WebSocket is created, [page.on("websocket")](./api/class-page.mdx#page-event-web-socket) event is fired. This event contains the [WebSocket] instance for further web socket frames inspection:
+
+```py
+def on_web_socket(ws):
+    print(f"WebSocket opened: {ws.url}")
+    ws.on("framesent", lambda payload: print(payload))
+    ws.on("framereceived", lambda payload: print(payload))
+    ws.on("close", lambda payload: print("WebSocket closed"))
+
+page.on("websocket", on_web_socket)
+```
+
+### API reference
+- [WebSocket]
+- [page.on("websocket")](./api/class-page.mdx#page-event-web-socket)
+- [web_socket.on("framesent")](./api/class-websocket.mdx#web-socket-event-frame-sent)
+- [web_socket.on("framereceived")](./api/class-websocket.mdx#web-socket-event-frame-received)
+- [web_socket.on("close")](./api/class-websocket.mdx#web-socket-event-close)
+
+<br/>
+
+## Missing Network Events and Service Workers
+
+Playwright's built-in [browser_context.route(url, handler, **kwargs)](./api/class-browsercontext.mdx#browser-context-route) and [page.route(url, handler, **kwargs)](./api/class-page.mdx#page-route) allow your tests to natively route requests and perform mocking and interception.
+1. If you're using Playwright's native [browser_context.route(url, handler, **kwargs)](./api/class-browsercontext.mdx#browser-context-route) and [page.route(url, handler, **kwargs)](./api/class-page.mdx#page-route), and it appears network events are missing, disable Service Workers by setting `browser.new_context.service_workers` to `'block'`.
+1. It might be that you are using a mock tool such as Mock Service Worker (MSW). While this tool works out of the box for mocking responses, it adds its own Service Worker that takes over the network requests, hence making them invisible to [browser_context.route(url, handler, **kwargs)](./api/class-browsercontext.mdx#browser-context-route) and [page.route(url, handler, **kwargs)](./api/class-page.mdx#page-route). If you are interested in both network testing and mocking, consider using built-in [browser_context.route(url, handler, **kwargs)](./api/class-browsercontext.mdx#browser-context-route) and [page.route(url, handler, **kwargs)](./api/class-page.mdx#page-route) for [response mocking](#handle-requests).
+1. If you're interested in not solely using Service Workers for testing and network mocking, but in routing and listening for requests made by Service Workers themselves, please see [this experimental feature](https://github.com/microsoft/playwright/issues/15684).
+
+<br/>
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[APIRequest]: ./api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: ./api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: ./api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: ./test-assertions.mdx "APIResponseAssertions"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[Error]: ./api/class-error.mdx "Error"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Locator]: ./api/class-locator.mdx "Locator"
+[LocatorAssertions]: ./test-assertions.mdx "LocatorAssertions"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[PageAssertions]: ./test-assertions.mdx "PageAssertions"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: ./test-assertions.mdx "PlaywrightAssertions"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
+[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[bytes]: https://docs.python.org/3/library/stdtypes.html#bytes "bytes"
+[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
+[Exception]: https://docs.python.org/3/library/exceptions.html#Exception "Exception"
+[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
+[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
+[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
+[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
+[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
+[URL]: https://en.wikipedia.org/wiki/URL "URL"
+[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
+[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
+[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"

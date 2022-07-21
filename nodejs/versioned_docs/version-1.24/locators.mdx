@@ -1,0 +1,224 @@
+---
+id: locators
+title: "Locators"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+[Locator]s are the central piece of Playwright's auto-waiting and retry-ability. In a nutshell, locators represent a way to find element(s) on the page at any moment. Locator can be created with the [page.locator(selector[, options])](./api/class-page.mdx#page-locator) method.
+
+```js
+const locator = page.locator('text=Submit');
+await locator.click();
+```
+
+Every time locator is used for some action, up-to-date DOM element is located in the page. So in the snippet below, underlying DOM element is going to be located twice, prior to every action. This means that if the DOM changes in between the calls due to re-render, the new element corresponding to the locator will be used.
+
+```js
+const locator = page.locator('text=Submit');
+// ...
+await locator.hover();
+await locator.click();
+```
+
+## Creating Locators
+
+Use [page.locator(selector[, options])](./api/class-page.mdx#page-locator) method to create a locator. This method takes a selector that describes how to find an element in the page. Playwright supports many different selectors like [Text](./selectors.mdx#text-selector), [CSS](./selectors.mdx#css-selector), [XPath](./selectors.mdx#xpath-selectors) and many more. Learn more about available selectors and how to pick one in this [in-depth guide](./selectors.mdx).
+
+```js
+// Find by text.
+await page.locator('text=Sign up').click();
+
+// Find by CSS.
+await page.locator('button.sign-up').click();
+
+// Find by test id.
+await page.locator('data-testid=sign-up').click();
+```
+
+## Strictness
+
+Locators are strict. This means that all operations on locators that imply some target DOM element will throw an exception if more than one element matches given selector.
+
+```js
+// Throws if there are several buttons in DOM:
+await page.locator('button').click();
+
+// Works because we explicitly tell locator to pick the first element:
+await page.locator('button').first().click(); // ⚠️ using first disables strictness
+
+// Works because count knows what to do with multiple matches:
+await page.locator('button').count();
+```
+
+:::caution
+Using [locator.first()](./api/class-locator.mdx#locator-first), [locator.last()](./api/class-locator.mdx#locator-last), and [locator.nth(index)](./api/class-locator.mdx#locator-nth) is discouraged since it disables the concept of strictness, and as your page changes, Playwright may click on an element you did not intend. It's better to make your locator more specific. Learn more below in [Filtering Locators](#filtering-locators) and the [selectors guide](./selectors.mdx).
+:::
+
+## Lists
+
+You can also use locators to work with the element lists.
+
+```js
+// Locate elements, this locator points to a list.
+const rows = page.locator('table tr');
+
+// Pattern 1: use locator methods to calculate text on the whole list.
+const texts = await rows.allTextContents();
+
+// Pattern 2: do something with each element in the list.
+const count = await rows.count()
+for (let i = 0; i < count; ++i)
+  console.log(await rows.nth(i).textContent());
+
+// Pattern 3: resolve locator to elements on page and map them to their text content.
+// Note: the code inside evaluateAll runs in page, you can call any DOM apis there.
+const texts = await rows.evaluateAll(list => list.map(element => element.textContent));
+```
+
+## Filtering Locators
+
+When creating a locator, you can pass additional options to filter it.
+
+Filtering by text will search for a particular string somewhere inside the element, possibly in a descendant element, case-insensitively. You can also pass a regular expression.
+
+```js
+await page.locator('button', { hasText: 'Sign up' }).click();
+```
+
+Locators also support an option to only select elements that have a descendant matching another locator. Note that inner locator is matched starting from the outer one, not from the document root.
+
+```js
+page.locator('article', { has: page.locator('button.subscribe') })
+```
+
+You can also filter an existing locator with [locator.filter([options])](./api/class-locator.mdx#locator-filter) method, possibly chaining it multiple times.
+
+```js
+const rowLocator = page.locator('tr');
+// ...
+await rowLocator
+    .filter({ hasText: 'text in column 1' })
+    .filter({ has: page.locator('button', { hasText: 'column 2 button' }) })
+    .screenshot();
+```
+
+## Locator vs ElementHandle
+
+:::caution
+We only recommend using [ElementHandle] in the rare cases when you need to perform extensive DOM traversal on a static page. For all user actions and assertions use locator instead.
+:::
+
+The difference between the [Locator] and [ElementHandle] is that the latter points to a particular element, while Locator captures the logic of how to retrieve that element.
+
+In the example below, handle points to a particular DOM element on page. If that element changes text or is used by React to render an entirely different component, handle is still pointing to that very stale DOM element. This can lead to unexpected behaviors.
+
+```js
+const handle = await page.$('text=Submit');
+// ...
+await handle.hover();
+await handle.click();
+```
+
+With the locator, every time the locator is used, up-to-date DOM element is located in the page using the selector. So in the snippet below, underlying DOM element is going to be located twice.
+
+```js
+const locator = page.locator('text=Submit');
+// ...
+await locator.hover();
+await locator.click();
+```
+
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Android]: ./api/class-android.mdx "Android"
+[AndroidDevice]: ./api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: ./api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: ./api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: ./api/class-androidwebview.mdx "AndroidWebView"
+[APIRequest]: ./api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: ./api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: ./api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: ./test-assertions.mdx "APIResponseAssertions"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: ./api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: ./api/class-coverage.mdx "Coverage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[Electron]: ./api/class-electron.mdx "Electron"
+[ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Locator]: ./api/class-locator.mdx "Locator"
+[LocatorAssertions]: ./test-assertions.mdx "LocatorAssertions"
+[Logger]: ./api/class-logger.mdx "Logger"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[PageAssertions]: ./test-assertions.mdx "PageAssertions"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: ./test-assertions.mdx "PlaywrightAssertions"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[ScreenshotAssertions]: ./test-assertions.mdx "ScreenshotAssertions"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Fixtures]: ./api/class-fixtures.mdx "Fixtures"
+[Test]: ./api/class-test.mdx "Test"
+[TestConfig]: ./api/class-testconfig.mdx "TestConfig"
+[TestError]: ./api/class-testerror.mdx "TestError"
+[TestInfo]: ./api/class-testinfo.mdx "TestInfo"
+[TestOptions]: ./api/class-testoptions.mdx "TestOptions"
+[TestProject]: ./api/class-testproject.mdx "TestProject"
+[WorkerInfo]: ./api/class-workerinfo.mdx "WorkerInfo"
+[Location]: ./api/class-location.mdx "Location"
+[Reporter]: ./api/class-reporter.mdx "Reporter"
+[Suite]: ./api/class-suite.mdx "Suite"
+[TestCase]: ./api/class-testcase.mdx "TestCase"
+[TestResult]: ./api/class-testresult.mdx "TestResult"
+[TestStep]: ./api/class-teststep.mdx "TestStep"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"
