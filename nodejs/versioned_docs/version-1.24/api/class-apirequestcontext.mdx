@@ -1,0 +1,288 @@
+---
+id: class-apirequestcontext
+title: "APIRequestContext"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+This API is used for the Web API testing. You can use it to trigger API endpoints, configure micro-services, prepare environment or the service to your e2e test.
+
+Each Playwright browser context has associated with it [APIRequestContext] instance which shares cookie storage with the browser context and can be accessed via [browserContext.request](./api/class-browsercontext.mdx#browser-context-request) or [page.request](./api/class-page.mdx#page-request). It is also possible to create a new APIRequestContext instance manually by calling [apiRequest.newContext([options])](./api/class-apirequest.mdx#api-request-new-context).
+
+**Cookie management**
+
+[APIRequestContext] retuned by [browserContext.request](./api/class-browsercontext.mdx#browser-context-request) and [page.request](./api/class-page.mdx#page-request) shares cookie storage with the corresponding [BrowserContext]. Each API request will have `Cookie` header populated with the values from the browser context. If the API response contains `Set-Cookie` header it will automatically update [BrowserContext] cookies and requests made from the page will pick them up. This means that if you log in using this API, your e2e test will be logged in and vice versa.
+
+If you want API requests to not interfere with the browser cookies you shoud create a new [APIRequestContext] by calling [apiRequest.newContext([options])](./api/class-apirequest.mdx#api-request-new-context). Such `APIRequestContext` object will have its own isolated cookie storage.
+
+
+- [apiRequestContext.delete(url[, options])](./api/class-apirequestcontext.mdx#api-request-context-delete)
+- [apiRequestContext.dispose()](./api/class-apirequestcontext.mdx#api-request-context-dispose)
+- [apiRequestContext.fetch(urlOrRequest[, options])](./api/class-apirequestcontext.mdx#api-request-context-fetch)
+- [apiRequestContext.get(url[, options])](./api/class-apirequestcontext.mdx#api-request-context-get)
+- [apiRequestContext.head(url[, options])](./api/class-apirequestcontext.mdx#api-request-context-head)
+- [apiRequestContext.patch(url[, options])](./api/class-apirequestcontext.mdx#api-request-context-patch)
+- [apiRequestContext.post(url[, options])](./api/class-apirequestcontext.mdx#api-request-context-post)
+- [apiRequestContext.put(url[, options])](./api/class-apirequestcontext.mdx#api-request-context-put)
+- [apiRequestContext.storageState([options])](./api/class-apirequestcontext.mdx#api-request-context-storage-state)
+
+## apiRequestContext.delete(url[, options]) {#api-request-context-delete}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font>
+
+- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-delete-option-url"/> &#60;[string]&#62; Target URL.<a href="#api-request-context-delete-option-url" class="list-anchor">#</a>
+- `options?` &#60;[Object]&#62;
+  - `data?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-delete-option-data"/> &#60;[string]|[Buffer]|[Serializable]&#62; Allows to set post data of the request. If the data parameter is an object, it will be serialized to json string and `content-type` header will be set to `application/json` if not explicitly set. Otherwise the `content-type` header will be set to `application/octet-stream` if not explicitly set. <font size="2">Added in: v1.17</font><a href="#api-request-context-delete-option-data" class="list-anchor">#</a>
+  - `failOnStatusCode?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-delete-option-fail-on-status-code"/> &#60;[boolean]&#62; Whether to throw on response codes other than 2xx and 3xx. By default response object is returned for all status codes.<a href="#api-request-context-delete-option-fail-on-status-code" class="list-anchor">#</a>
+  - `form?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-delete-option-form"/> &#60;[Object]<[string], [string]|[number]|[boolean]>&#62; Provides an object that will be serialized as html form using `application/x-www-form-urlencoded` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `application/x-www-form-urlencoded` unless explicitly provided. <font size="2">Added in: v1.17</font><a href="#api-request-context-delete-option-form" class="list-anchor">#</a>
+  - `headers?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-delete-option-headers"/> &#60;[Object]<[string], [string]>&#62; Allows to set HTTP headers.<a href="#api-request-context-delete-option-headers" class="list-anchor">#</a>
+  - `ignoreHTTPSErrors?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-delete-option-ignore-https-errors"/> &#60;[boolean]&#62; Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.<a href="#api-request-context-delete-option-ignore-https-errors" class="list-anchor">#</a>
+  - `multipart?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-delete-option-multipart"/> &#60;[Object]<[string], [string]|[number]|[boolean]|[ReadStream]|[Object]>&#62; Provides an object that will be serialized as html form using `multipart/form-data` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `multipart/form-data` unless explicitly provided. File values can be passed either as [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream) or as file-like object containing file name, mime-type and its content. <font size="2">Added in: v1.17</font><a href="#api-request-context-delete-option-multipart" class="list-anchor">#</a>
+    - `name` &#60;[string]&#62; File name
+    - `mimeType` &#60;[string]&#62; File type
+    - `buffer` &#60;[Buffer]&#62; File content
+  - `params?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-delete-option-params"/> &#60;[Object]<[string], [string]|[number]|[boolean]>&#62; Query parameters to be sent with the URL.<a href="#api-request-context-delete-option-params" class="list-anchor">#</a>
+  - `timeout?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-delete-option-timeout"/> &#60;[number]&#62; Request timeout in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.<a href="#api-request-context-delete-option-timeout" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-delete-return"/> &#60;[Promise]<[APIResponse]>&#62;<a href="#api-request-context-delete-return" class="list-anchor">#</a>
+
+Sends HTTP(S) [DELETE](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/DELETE) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
+
+## apiRequestContext.dispose() {#api-request-context-dispose}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font>
+
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-dispose-return"/> &#60;[Promise]<[void]>&#62;<a href="#api-request-context-dispose-return" class="list-anchor">#</a>
+
+All responses returned by [apiRequestContext.get(url[, options])](./api/class-apirequestcontext.mdx#api-request-context-get) and similar methods are stored in the memory, so that you can later call [apiResponse.body()](./api/class-apiresponse.mdx#api-response-body). This method discards all stored responses, and makes [apiResponse.body()](./api/class-apiresponse.mdx#api-response-body) throw "Response disposed" error.
+
+## apiRequestContext.fetch(urlOrRequest[, options]) {#api-request-context-fetch}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font>
+
+- `urlOrRequest`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-fetch-option-url-or-request"/> &#60;[string]|[Request]&#62; Target URL or Request to get all parameters from.<a href="#api-request-context-fetch-option-url-or-request" class="list-anchor">#</a>
+- `options?` &#60;[Object]&#62;
+  - `data?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-fetch-option-data"/> &#60;[string]|[Buffer]|[Serializable]&#62; Allows to set post data of the request. If the data parameter is an object, it will be serialized to json string and `content-type` header will be set to `application/json` if not explicitly set. Otherwise the `content-type` header will be set to `application/octet-stream` if not explicitly set.<a href="#api-request-context-fetch-option-data" class="list-anchor">#</a>
+  - `failOnStatusCode?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-fetch-option-fail-on-status-code"/> &#60;[boolean]&#62; Whether to throw on response codes other than 2xx and 3xx. By default response object is returned for all status codes.<a href="#api-request-context-fetch-option-fail-on-status-code" class="list-anchor">#</a>
+  - `form?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-fetch-option-form"/> &#60;[Object]<[string], [string]|[number]|[boolean]>&#62; Provides an object that will be serialized as html form using `application/x-www-form-urlencoded` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `application/x-www-form-urlencoded` unless explicitly provided.<a href="#api-request-context-fetch-option-form" class="list-anchor">#</a>
+  - `headers?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-fetch-option-headers"/> &#60;[Object]<[string], [string]>&#62; Allows to set HTTP headers.<a href="#api-request-context-fetch-option-headers" class="list-anchor">#</a>
+  - `ignoreHTTPSErrors?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-fetch-option-ignore-https-errors"/> &#60;[boolean]&#62; Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.<a href="#api-request-context-fetch-option-ignore-https-errors" class="list-anchor">#</a>
+  - `method?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-fetch-option-method"/> &#60;[string]&#62; If set changes the fetch method (e.g. [PUT](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PUT) or [POST](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST)). If not specified, GET method is used.<a href="#api-request-context-fetch-option-method" class="list-anchor">#</a>
+  - `multipart?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-fetch-option-multipart"/> &#60;[Object]<[string], [string]|[number]|[boolean]|[ReadStream]|[Object]>&#62; Provides an object that will be serialized as html form using `multipart/form-data` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `multipart/form-data` unless explicitly provided. File values can be passed either as [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream) or as file-like object containing file name, mime-type and its content.<a href="#api-request-context-fetch-option-multipart" class="list-anchor">#</a>
+    - `name` &#60;[string]&#62; File name
+    - `mimeType` &#60;[string]&#62; File type
+    - `buffer` &#60;[Buffer]&#62; File content
+  - `params?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-fetch-option-params"/> &#60;[Object]<[string], [string]|[number]|[boolean]>&#62; Query parameters to be sent with the URL.<a href="#api-request-context-fetch-option-params" class="list-anchor">#</a>
+  - `timeout?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-fetch-option-timeout"/> &#60;[number]&#62; Request timeout in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.<a href="#api-request-context-fetch-option-timeout" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-fetch-return"/> &#60;[Promise]<[APIResponse]>&#62;<a href="#api-request-context-fetch-return" class="list-anchor">#</a>
+
+Sends HTTP(S) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
+
+## apiRequestContext.get(url[, options]) {#api-request-context-get}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font>
+
+- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-option-url"/> &#60;[string]&#62; Target URL.<a href="#api-request-context-get-option-url" class="list-anchor">#</a>
+- `options?` &#60;[Object]&#62;
+  - `failOnStatusCode?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-option-fail-on-status-code"/> &#60;[boolean]&#62; Whether to throw on response codes other than 2xx and 3xx. By default response object is returned for all status codes.<a href="#api-request-context-get-option-fail-on-status-code" class="list-anchor">#</a>
+  - `headers?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-option-headers"/> &#60;[Object]<[string], [string]>&#62; Allows to set HTTP headers.<a href="#api-request-context-get-option-headers" class="list-anchor">#</a>
+  - `ignoreHTTPSErrors?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-option-ignore-https-errors"/> &#60;[boolean]&#62; Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.<a href="#api-request-context-get-option-ignore-https-errors" class="list-anchor">#</a>
+  - `params?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-option-params"/> &#60;[Object]<[string], [string]|[number]|[boolean]>&#62; Query parameters to be sent with the URL.<a href="#api-request-context-get-option-params" class="list-anchor">#</a>
+  - `timeout?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-option-timeout"/> &#60;[number]&#62; Request timeout in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.<a href="#api-request-context-get-option-timeout" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-return"/> &#60;[Promise]<[APIResponse]>&#62;<a href="#api-request-context-get-return" class="list-anchor">#</a>
+
+Sends HTTP(S) [GET](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
+
+## apiRequestContext.head(url[, options]) {#api-request-context-head}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font>
+
+- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-option-url"/> &#60;[string]&#62; Target URL.<a href="#api-request-context-head-option-url" class="list-anchor">#</a>
+- `options?` &#60;[Object]&#62;
+  - `failOnStatusCode?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-option-fail-on-status-code"/> &#60;[boolean]&#62; Whether to throw on response codes other than 2xx and 3xx. By default response object is returned for all status codes.<a href="#api-request-context-head-option-fail-on-status-code" class="list-anchor">#</a>
+  - `headers?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-option-headers"/> &#60;[Object]<[string], [string]>&#62; Allows to set HTTP headers.<a href="#api-request-context-head-option-headers" class="list-anchor">#</a>
+  - `ignoreHTTPSErrors?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-option-ignore-https-errors"/> &#60;[boolean]&#62; Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.<a href="#api-request-context-head-option-ignore-https-errors" class="list-anchor">#</a>
+  - `params?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-option-params"/> &#60;[Object]<[string], [string]|[number]|[boolean]>&#62; Query parameters to be sent with the URL.<a href="#api-request-context-head-option-params" class="list-anchor">#</a>
+  - `timeout?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-option-timeout"/> &#60;[number]&#62; Request timeout in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.<a href="#api-request-context-head-option-timeout" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-return"/> &#60;[Promise]<[APIResponse]>&#62;<a href="#api-request-context-head-return" class="list-anchor">#</a>
+
+Sends HTTP(S) [HEAD](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
+
+## apiRequestContext.patch(url[, options]) {#api-request-context-patch}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font>
+
+- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-patch-option-url"/> &#60;[string]&#62; Target URL.<a href="#api-request-context-patch-option-url" class="list-anchor">#</a>
+- `options?` &#60;[Object]&#62;
+  - `data?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-patch-option-data"/> &#60;[string]|[Buffer]|[Serializable]&#62; Allows to set post data of the request. If the data parameter is an object, it will be serialized to json string and `content-type` header will be set to `application/json` if not explicitly set. Otherwise the `content-type` header will be set to `application/octet-stream` if not explicitly set.<a href="#api-request-context-patch-option-data" class="list-anchor">#</a>
+  - `failOnStatusCode?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-patch-option-fail-on-status-code"/> &#60;[boolean]&#62; Whether to throw on response codes other than 2xx and 3xx. By default response object is returned for all status codes.<a href="#api-request-context-patch-option-fail-on-status-code" class="list-anchor">#</a>
+  - `form?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-patch-option-form"/> &#60;[Object]<[string], [string]|[number]|[boolean]>&#62; Provides an object that will be serialized as html form using `application/x-www-form-urlencoded` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `application/x-www-form-urlencoded` unless explicitly provided.<a href="#api-request-context-patch-option-form" class="list-anchor">#</a>
+  - `headers?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-patch-option-headers"/> &#60;[Object]<[string], [string]>&#62; Allows to set HTTP headers.<a href="#api-request-context-patch-option-headers" class="list-anchor">#</a>
+  - `ignoreHTTPSErrors?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-patch-option-ignore-https-errors"/> &#60;[boolean]&#62; Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.<a href="#api-request-context-patch-option-ignore-https-errors" class="list-anchor">#</a>
+  - `multipart?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-patch-option-multipart"/> &#60;[Object]<[string], [string]|[number]|[boolean]|[ReadStream]|[Object]>&#62; Provides an object that will be serialized as html form using `multipart/form-data` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `multipart/form-data` unless explicitly provided. File values can be passed either as [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream) or as file-like object containing file name, mime-type and its content.<a href="#api-request-context-patch-option-multipart" class="list-anchor">#</a>
+    - `name` &#60;[string]&#62; File name
+    - `mimeType` &#60;[string]&#62; File type
+    - `buffer` &#60;[Buffer]&#62; File content
+  - `params?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-patch-option-params"/> &#60;[Object]<[string], [string]|[number]|[boolean]>&#62; Query parameters to be sent with the URL.<a href="#api-request-context-patch-option-params" class="list-anchor">#</a>
+  - `timeout?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-patch-option-timeout"/> &#60;[number]&#62; Request timeout in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.<a href="#api-request-context-patch-option-timeout" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-patch-return"/> &#60;[Promise]<[APIResponse]>&#62;<a href="#api-request-context-patch-return" class="list-anchor">#</a>
+
+Sends HTTP(S) [PATCH](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PATCH) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
+
+## apiRequestContext.post(url[, options]) {#api-request-context-post}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font>
+
+- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-post-option-url"/> &#60;[string]&#62; Target URL.<a href="#api-request-context-post-option-url" class="list-anchor">#</a>
+- `options?` &#60;[Object]&#62;
+  - `data?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-post-option-data"/> &#60;[string]|[Buffer]|[Serializable]&#62; Allows to set post data of the request. If the data parameter is an object, it will be serialized to json string and `content-type` header will be set to `application/json` if not explicitly set. Otherwise the `content-type` header will be set to `application/octet-stream` if not explicitly set.<a href="#api-request-context-post-option-data" class="list-anchor">#</a>
+  - `failOnStatusCode?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-post-option-fail-on-status-code"/> &#60;[boolean]&#62; Whether to throw on response codes other than 2xx and 3xx. By default response object is returned for all status codes.<a href="#api-request-context-post-option-fail-on-status-code" class="list-anchor">#</a>
+  - `form?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-post-option-form"/> &#60;[Object]<[string], [string]|[number]|[boolean]>&#62; Provides an object that will be serialized as html form using `application/x-www-form-urlencoded` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `application/x-www-form-urlencoded` unless explicitly provided.<a href="#api-request-context-post-option-form" class="list-anchor">#</a>
+  - `headers?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-post-option-headers"/> &#60;[Object]<[string], [string]>&#62; Allows to set HTTP headers.<a href="#api-request-context-post-option-headers" class="list-anchor">#</a>
+  - `ignoreHTTPSErrors?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-post-option-ignore-https-errors"/> &#60;[boolean]&#62; Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.<a href="#api-request-context-post-option-ignore-https-errors" class="list-anchor">#</a>
+  - `multipart?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-post-option-multipart"/> &#60;[Object]<[string], [string]|[number]|[boolean]|[ReadStream]|[Object]>&#62; Provides an object that will be serialized as html form using `multipart/form-data` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `multipart/form-data` unless explicitly provided. File values can be passed either as [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream) or as file-like object containing file name, mime-type and its content.<a href="#api-request-context-post-option-multipart" class="list-anchor">#</a>
+    - `name` &#60;[string]&#62; File name
+    - `mimeType` &#60;[string]&#62; File type
+    - `buffer` &#60;[Buffer]&#62; File content
+  - `params?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-post-option-params"/> &#60;[Object]<[string], [string]|[number]|[boolean]>&#62; Query parameters to be sent with the URL.<a href="#api-request-context-post-option-params" class="list-anchor">#</a>
+  - `timeout?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-post-option-timeout"/> &#60;[number]&#62; Request timeout in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.<a href="#api-request-context-post-option-timeout" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-post-return"/> &#60;[Promise]<[APIResponse]>&#62;<a href="#api-request-context-post-return" class="list-anchor">#</a>
+
+Sends HTTP(S) [POST](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
+
+## apiRequestContext.put(url[, options]) {#api-request-context-put}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font>
+
+- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-put-option-url"/> &#60;[string]&#62; Target URL.<a href="#api-request-context-put-option-url" class="list-anchor">#</a>
+- `options?` &#60;[Object]&#62;
+  - `data?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-put-option-data"/> &#60;[string]|[Buffer]|[Serializable]&#62; Allows to set post data of the request. If the data parameter is an object, it will be serialized to json string and `content-type` header will be set to `application/json` if not explicitly set. Otherwise the `content-type` header will be set to `application/octet-stream` if not explicitly set.<a href="#api-request-context-put-option-data" class="list-anchor">#</a>
+  - `failOnStatusCode?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-put-option-fail-on-status-code"/> &#60;[boolean]&#62; Whether to throw on response codes other than 2xx and 3xx. By default response object is returned for all status codes.<a href="#api-request-context-put-option-fail-on-status-code" class="list-anchor">#</a>
+  - `form?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-put-option-form"/> &#60;[Object]<[string], [string]|[number]|[boolean]>&#62; Provides an object that will be serialized as html form using `application/x-www-form-urlencoded` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `application/x-www-form-urlencoded` unless explicitly provided.<a href="#api-request-context-put-option-form" class="list-anchor">#</a>
+  - `headers?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-put-option-headers"/> &#60;[Object]<[string], [string]>&#62; Allows to set HTTP headers.<a href="#api-request-context-put-option-headers" class="list-anchor">#</a>
+  - `ignoreHTTPSErrors?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-put-option-ignore-https-errors"/> &#60;[boolean]&#62; Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.<a href="#api-request-context-put-option-ignore-https-errors" class="list-anchor">#</a>
+  - `multipart?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-put-option-multipart"/> &#60;[Object]<[string], [string]|[number]|[boolean]|[ReadStream]|[Object]>&#62; Provides an object that will be serialized as html form using `multipart/form-data` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `multipart/form-data` unless explicitly provided. File values can be passed either as [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream) or as file-like object containing file name, mime-type and its content.<a href="#api-request-context-put-option-multipart" class="list-anchor">#</a>
+    - `name` &#60;[string]&#62; File name
+    - `mimeType` &#60;[string]&#62; File type
+    - `buffer` &#60;[Buffer]&#62; File content
+  - `params?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-put-option-params"/> &#60;[Object]<[string], [string]|[number]|[boolean]>&#62; Query parameters to be sent with the URL.<a href="#api-request-context-put-option-params" class="list-anchor">#</a>
+  - `timeout?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-put-option-timeout"/> &#60;[number]&#62; Request timeout in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.<a href="#api-request-context-put-option-timeout" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-put-return"/> &#60;[Promise]<[APIResponse]>&#62;<a href="#api-request-context-put-return" class="list-anchor">#</a>
+
+Sends HTTP(S) [PUT](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PUT) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
+
+## apiRequestContext.storageState([options]) {#api-request-context-storage-state}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font>
+
+- `options?` &#60;[Object]&#62;
+  - `path?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-path"/> &#60;[string]&#62; The file path to save the storage state to. If `path` is a relative path, then it is resolved relative to current working directory. If no path is provided, storage state is still returned, but won't be saved to the disk.<a href="#api-request-context-storage-state-option-path" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-storage-state-return"/> &#60;[Promise]<[Object]>&#62;<a href="#api-request-context-storage-state-return" class="list-anchor">#</a>
+  - `cookies` &#60;[Array]<[Object]>&#62;
+    - `name` &#60;[string]&#62;
+    - `value` &#60;[string]&#62;
+    - `domain` &#60;[string]&#62;
+    - `path` &#60;[string]&#62;
+    - `expires` &#60;[number]&#62; Unix time in seconds.
+    - `httpOnly` &#60;[boolean]&#62;
+    - `secure` &#60;[boolean]&#62;
+    - `sameSite` &#60;"Strict"|"Lax"|"None"&#62;
+  - `origins` &#60;[Array]<[Object]>&#62;
+    - `origin` &#60;[string]&#62;
+    - `localStorage` &#60;[Array]<[Object]>&#62;
+      - `name` &#60;[string]&#62;
+      - `value` &#60;[string]&#62;
+
+Returns storage state for this request context, contains current cookies and local storage snapshot if it was passed to the constructor.
+
+[Accessibility]: ./api/class-accessibility.mdx "Accessibility"
+[Android]: ./api/class-android.mdx "Android"
+[AndroidDevice]: ./api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: ./api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: ./api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: ./api/class-androidwebview.mdx "AndroidWebView"
+[APIRequest]: ./api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: ./api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: ./api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: ./test-assertions.mdx "APIResponseAssertions"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: ./api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[CDPSession]: ./api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: ./api/class-coverage.mdx "Coverage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[Electron]: ./api/class-electron.mdx "Electron"
+[ElectronApplication]: ./api/class-electronapplication.mdx "ElectronApplication"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[Frame]: ./api/class-frame.mdx "Frame"
+[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Locator]: ./api/class-locator.mdx "Locator"
+[LocatorAssertions]: ./test-assertions.mdx "LocatorAssertions"
+[Logger]: ./api/class-logger.mdx "Logger"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[PageAssertions]: ./test-assertions.mdx "PageAssertions"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: ./test-assertions.mdx "PlaywrightAssertions"
+[Request]: ./api/class-request.mdx "Request"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[ScreenshotAssertions]: ./test-assertions.mdx "ScreenshotAssertions"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Fixtures]: ./api/class-fixtures.mdx "Fixtures"
+[Test]: ./api/class-test.mdx "Test"
+[TestConfig]: ./api/class-testconfig.mdx "TestConfig"
+[TestError]: ./api/class-testerror.mdx "TestError"
+[TestInfo]: ./api/class-testinfo.mdx "TestInfo"
+[TestOptions]: ./api/class-testoptions.mdx "TestOptions"
+[TestProject]: ./api/class-testproject.mdx "TestProject"
+[WorkerInfo]: ./api/class-workerinfo.mdx "WorkerInfo"
+[Location]: ./api/class-location.mdx "Location"
+[Reporter]: ./api/class-reporter.mdx "Reporter"
+[Suite]: ./api/class-suite.mdx "Suite"
+[TestCase]: ./api/class-testcase.mdx "TestCase"
+[TestResult]: ./api/class-testresult.mdx "TestResult"
+[TestStep]: ./api/class-teststep.mdx "TestStep"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/master/utils/docker/Dockerfile.focal "Dockerfile.focal"

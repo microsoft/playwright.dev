@@ -1,0 +1,196 @@
+---
+id: auth
+title: "Authentication"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+Playwright can be used to automate scenarios that require authentication.
+
+Tests written with Playwright execute in isolated clean-slate environments called [browser contexts](./browser-contexts.mdx). This isolation model improves reproducibility and prevents cascading test failures. New browser contexts can load existing authentication state. This eliminates the need to login in every context and speeds up test execution.
+
+> Note: This guide covers cookie/token-based authentication (logging in via the app UI). For [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication) use [Browser.newContext([options])](./api/class-browser.mdx#browser-new-context).
+
+- [Automate logging in](#automate-logging-in)
+- [Reuse authentication state](#reuse-authentication-state)
+- [Session storage](#session-storage)
+- [Multi-factor authentication](#multi-factor-authentication)
+
+## Automate logging in
+
+The Playwright API can automate interaction with a login form. See [Input guide](./input.mdx) for more details.
+
+The following example automates login on GitHub. Once these steps are executed, the browser context will be authenticated.
+
+```java
+Page page = context.newPage();
+page.navigate("https://github.com/login");
+// Interact with login form
+page.locator("text=Login").click();
+page.locator("input[name='login']").fill(USERNAME);
+page.locator("input[name='password']").fill(PASSWORD);
+page.locator("text=Submit").click();
+// Verify app is logged in
+```
+
+These steps can be executed for every browser context. However, redoing login for every test can slow down test execution. To prevent that, we will reuse existing authentication state in new browser contexts.
+
+## Reuse authentication state
+
+Web apps use cookie-based or token-based authentication, where authenticated state is stored as [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) or in [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage). Playwright provides [BrowserContext.storageState([options])](./api/class-browsercontext.mdx#browser-context-storage-state) method that can be used to retrieve storage state from authenticated contexts and then create new contexts with prepopulated state.
+
+Cookies and local storage state can be used across different browsers. They depend on your application's authentication model: some apps might require both cookies and local storage.
+
+The following code snippet retrieves state from an authenticated context and creates a new context with that state.
+
+```java
+// Save storage state into the file.
+context.storageState(new BrowserContext.StorageStateOptions().setPath(Paths.get("state.json")));
+
+// Create a new context with the saved storage state.
+BrowserContext context = browser.newContext(
+  new Browser.NewContextOptions().setStorageStatePath(Paths.get("state.json")));
+```
+
+### Code generation
+
+Logging in via the UI and then reusing authentication state can be combined to implement **login once and run multiple scenarios**. The lifecycle looks like:
+1. Run tests (for example, with `mvn test`). 2. Login via UI and retrieve authentication state. 3. In each test, load authentication state in `@beforeEach` or `@beforeAll` step.
+
+This approach will also **work in CI environments**, since it does not rely on any external state.
+
+### API reference
+- [BrowserContext.storageState([options])](./api/class-browsercontext.mdx#browser-context-storage-state)
+- [Browser.newContext([options])](./api/class-browser.mdx#browser-new-context)
+
+## Session storage
+
+Rarely, [session storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage) is used for storing information associated with the logged-in state. Session storage is specific to a particular domain and is not persisted across page loads. Playwright does not provide API to persist session storage, but the following snippet can be used to save/load session storage.
+
+```java
+// Get session storage and store as env variable
+String sessionStorage = (String) page.evaluate("JSON.stringify(sessionStorage)");
+System.getenv().put("SESSION_STORAGE", sessionStorage);
+
+// Set session storage in a new context
+String sessionStorage = System.getenv("SESSION_STORAGE");
+context.addInitScript("(storage => {\n" +
+  "  if (window.location.hostname === 'example.com') {\n" +
+  "    const entries = JSON.parse(storage);\n" +
+  "     for (const [key, value] of Object.entries(entries)) {\n" +
+  "      window.sessionStorage.setItem(key, value);\n" +
+  "    };\n" +
+  "  }\n" +
+  "})('" + sessionStorage + "')");
+```
+
+### API reference
+- [BrowserContext.storageState([options])](./api/class-browsercontext.mdx#browser-context-storage-state)
+- [Browser.newContext([options])](./api/class-browser.mdx#browser-new-context)
+- [Page.evaluate(expression[, arg])](./api/class-page.mdx#page-evaluate)
+- [BrowserContext.addInitScript(script)](./api/class-browsercontext.mdx#browser-context-add-init-script)
+
+## Multi-factor authentication
+
+Accounts with multi-factor authentication (MFA) cannot be fully automated, and need manual intervention. Persistent authentication can be used to partially automate MFA scenarios.
+
+### Persistent authentication
+
+Note that persistent authentication is not suited for CI environments since it relies on a disk location. User data directories are specific to browser types and cannot be shared across browser types.
+
+User data directories can be used with the [BrowserType.launchPersistentContext(userDataDir[, options])](./api/class-browsertype.mdx#browser-type-launch-persistent-context) API.
+
+```java
+import com.microsoft.playwright.*;
+
+public class Example {
+  public static void main(String[] args) {
+    try (Playwright playwright = Playwright.create()) {
+      BrowserType chromium = playwright.chromium();
+      Path userDataDir = Paths.get("/path/to/directory");
+      BrowserContext context = chromium.launchPersistentContext(userDataDir,
+        new BrowserType.LaunchPersistentContextOptions().setHeadless(false));
+      // Execute login steps manually in the browser window
+    }
+  }
+}
+```
+
+### Lifecycle
+1. Create a user data directory on disk.
+1. Launch a persistent context with the user data directory and login the MFA account.
+1. Reuse user data directory to run automation scenarios.
+
+### API reference
+- [BrowserContext]
+- [BrowserType.launchPersistentContext(userDataDir[, options])](./api/class-browsertype.mdx#browser-type-launch-persistent-context)
+
+[APIRequest]: ./api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: ./api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: ./api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: ./test-assertions.mdx "APIResponseAssertions"
+[Browser]: ./api/class-browser.mdx "Browser"
+[BrowserContext]: ./api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: ./api/class-browsertype.mdx "BrowserType"
+[ConsoleMessage]: ./api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: ./api/class-dialog.mdx "Dialog"
+[Download]: ./api/class-download.mdx "Download"
+[ElementHandle]: ./api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: ./api/class-filechooser.mdx "FileChooser"
+[FormData]: ./api/class-formdata.mdx "FormData"
+[Frame]: ./api/class-frame.mdx "Frame"
+[FrameLocator]: ./api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: ./api/class-jshandle.mdx "JSHandle"
+[Keyboard]: ./api/class-keyboard.mdx "Keyboard"
+[Locator]: ./api/class-locator.mdx "Locator"
+[LocatorAssertions]: ./test-assertions.mdx "LocatorAssertions"
+[Mouse]: ./api/class-mouse.mdx "Mouse"
+[Page]: ./api/class-page.mdx "Page"
+[PageAssertions]: ./test-assertions.mdx "PageAssertions"
+[Playwright]: ./api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: ./test-assertions.mdx "PlaywrightAssertions"
+[PlaywrightException]: ./api/class-playwrightexception.mdx "PlaywrightException"
+[Request]: ./api/class-request.mdx "Request"
+[RequestOptions]: ./api/class-requestoptions.mdx "RequestOptions"
+[Response]: ./api/class-response.mdx "Response"
+[Route]: ./api/class-route.mdx "Route"
+[Selectors]: ./api/class-selectors.mdx "Selectors"
+[TimeoutError]: ./api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: ./api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: ./api/class-tracing.mdx "Tracing"
+[Video]: ./api/class-video.mdx "Video"
+[WebSocket]: ./api/class-websocket.mdx "WebSocket"
+[WebSocketFrame]: ./api/class-websocketframe.mdx "WebSocketFrame"
+[Worker]: ./api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: ./evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
+[byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
+[Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
+[double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
+[InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
+[int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"
+[Map]: https://docs.oracle.com/javase/8/docs/api/java/util/Map.html "Map"
+[null]: https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.7 "null"
+[Object]: https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html "Object"
+[Path]: https://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html "Path"
+[Pattern]: https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html "Pattern"
+[Predicate]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Predicate.html "Predicate"
+[void]: https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html "void"
+[Runnable]: https://docs.oracle.com/javase/8/docs/api/java/lang/Runnable.html "Runnable"
+[RuntimeException]: https://docs.oracle.com/javase/8/docs/api/java/lang/RuntimeException.html "RuntimeException"
+[String]: https://docs.oracle.com/javase/8/docs/api/java/lang/String.html "String"
+
+[all available image tags]: https://mcr.microsoft.com/v2/playwright/java/tags/list "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright-java "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright-java/blob/master/Dockerfile.focal "Dockerfile.focal"
