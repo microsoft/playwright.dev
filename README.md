@@ -78,7 +78,7 @@ In [microsoft/playwright](https://github.com/microsoft/playwright):
    $ git cherry-pick <commit from main>
    ```
 
-3. Open PR in against the `release-1.XY` branch with your cherry-picked commit
+3. Open PR against the `release-1.XY` branch with your cherry-picked commit
 
 In [microsoft/playwright.dev](https://github.com/microsoft/playwright.dev):
 
