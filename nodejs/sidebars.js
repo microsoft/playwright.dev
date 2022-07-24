@@ -108,6 +108,7 @@ module.exports = {
             { "type": "doc", "id": "api/class-apirequest" },
             { "type": "doc", "id": "api/class-apirequestcontext" },
             { "type": "doc", "id": "api/class-apiresponse" },
+            { "type": "doc", "id": "api/class-accessibility" },
             { "type": "doc", "id": "api/class-browser" },
             { "type": "doc", "id": "api/class-browsercontext" },
             { "type": "doc", "id": "api/class-browserserver" },
