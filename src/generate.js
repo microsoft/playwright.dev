@@ -38,18 +38,11 @@ const lang2Folder = {
   'csharp': 'dotnet',
 }
 
-/**
- * @param {string[]} languages
- */
-async function generateDocsForLanguage (languages) {
-  const lang2Generator = {
-    'js': JavaScriptFormatter,
-    'python': PythonFormatter,
-    'java': JavaFormatter,
-    'csharp': CSharpFormatter,
-  };
-  for (const lang of languages)
-    new Generator(lang, srcDir, path.join(__dirname, '..', lang2Folder[lang], 'docs'), new lang2Generator[lang]);
+async function generateDocsForLanguages () {
+  new Generator('js', srcDir, path.join(__dirname, '..', 'nodejs', 'docs'), new JavaScriptFormatter());
+  new Generator('python', srcDir, path.join(__dirname, '..', 'python', 'docs'), new PythonFormatter());
+  new Generator('java', srcDir, path.join(__dirname, '..', 'java', 'docs'), new JavaFormatter());
+  new Generator('csharp', srcDir, path.join(__dirname, '..', 'dotnet', 'docs'), new CSharpFormatter());
 };
 
 /**
@@ -78,7 +71,7 @@ async function syncWithWorkingDirectory (event, from) {
 (async () => {
   if (isWatch) {
     chokidar.watch(srcDir, { ignoreInitial: true }).on('all', (event, path) => {
-      generateDocsForLanguage([watchProject]).catch((error) => {
+      generateDocsForLanguages().catch((error) => {
         console.error(`Error auto syncing docs (generating): ${error}`);
       })
     });
@@ -87,9 +80,9 @@ async function syncWithWorkingDirectory (event, from) {
         console.error(`Error auto syncing docs (mirroring): ${error}`);
       })
     });
-    await generateDocsForLanguage([watchProject]);
+    await generateDocsForLanguages();
   } else {
-    await generateDocsForLanguage(['js', 'python', 'java', 'csharp']);
+    await generateDocsForLanguages();
     await updateStarsButton();
   }
 
@@ -112,7 +105,7 @@ async function updateStarsButton() {
         data += chunk;
       });
       res.on('end', () => {
-        if (res.statusCode >= 200 && res.statusCode < 300)
+        if (res.statusCode && res.statusCode >= 200 && res.statusCode < 300)
           resolve(JSON.parse(data));
         else
           reject(new Error(`Request failed with status code ${res.statusCode}: ${data}`));

@@ -28,7 +28,7 @@ class JavaFormatter {
     this.lang = 'java';
   }
   formatMember(member) {
-    let text;
+    let text = '';
     let args = [];
 
     let prefix = `${member.clazz.name}.`;

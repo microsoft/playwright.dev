@@ -29,7 +29,7 @@ class JavaScriptFormatter {
     this.lang = 'js';
   }
   formatMember(member) {
-    let text;
+    let text = '';
     let args = [];
 
     let prefix = `${member.clazz.varName}.`;
