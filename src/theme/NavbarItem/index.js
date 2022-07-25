@@ -1,54 +1,45 @@
 /**
- * Copyright (c) Facebook, Inc. and its affiliates.
+ * Copyright (c) Microsoft Corporation.
  *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+
+// @ts-check
 import React from 'react';
-import DefaultNavbarItem from '@theme/NavbarItem/DefaultNavbarItem';
-import DropdownNavbarItem from '@theme/NavbarItem/DropdownNavbarItem';
-import LocaleDropdownNavbarItem from '@theme/NavbarItem/LocaleDropdownNavbarItem';
-import SearchNavbarItem from '@theme/NavbarItem/SearchNavbarItem';
-const NavbarItemComponents = {
-  default: () => DefaultNavbarItem,
-  localeDropdown: () => LocaleDropdownNavbarItem,
-  search: () => SearchNavbarItem,
-  dropdown: () => DropdownNavbarItem,
-  // Need to lazy load these items as we don't know for sure the docs plugin is loaded
-  // See https://github.com/facebook/docusaurus/issues/3360
+import NavbarItem from '@theme-original/NavbarItem';
+import { useLocation } from '@docusaurus/router';
 
-  /* eslint-disable @typescript-eslint/no-var-requires, global-require */
-  docsVersion: () => require('@theme/NavbarItem/DocsVersionNavbarItem').default,
-  docsVersionDropdown: () =>
-    require('@theme/NavbarItem/DocsVersionDropdownNavbarItem').default,
-  doc: () => require('@theme/NavbarItem/DocNavbarItem').default,
-  /* eslint-enable @typescript-eslint/no-var-requires, global-require */
-};
+export default function NavbarItemWrapper(props) {
+  const location = useLocation();
+  const languagePrefix = props['data-language-prefix'];
+  const propsOverrides = {};
+  if (languagePrefix) {
+    // Rewrite the new link
+    const newPathname = location.pathname.replace(/^(\/(java|dotnet|python))?\/(.*)/, '$3');
+    propsOverrides.href = "pathname://" + languagePrefix + newPathname + location.hash;
+    propsOverrides.autoAddBaseUrl = false
+    propsOverrides.target = '_self';
 
-const getNavbarItemComponent = (type) => {
-  const navbarItemComponentFn = NavbarItemComponents[type];
-
-  if (!navbarItemComponentFn) {
-    throw new Error(`No NavbarItem component found for type "${type}".`);
+    // Detect if the link is active
+    const languagesInSubfolders = ['java', 'dotnet', 'python'];
+    const currentLanguageIsInSubfolder = languagesInSubfolders.some(l => location.pathname.startsWith(`/${l}`));
+    if (location.pathname.startsWith(languagePrefix) && currentLanguageIsInSubfolder && languagePrefix.length > 1 || languagePrefix.length === 1 && !currentLanguageIsInSubfolder) {
+      propsOverrides.className += ` ${props.activeClassName}`;
+    }
   }
-
-  return navbarItemComponentFn();
-};
-
-function getComponentType(type, isDropdown) {
-  // Backward compatibility: navbar item with no type set
-  // but containing dropdown items should use the type "dropdown"
-  if (!type || type === 'default') {
-    return isDropdown ? 'dropdown' : 'default';
-  }
-
-  return type;
-}
-
-export const getInfimaActiveClassName = (mobile) =>
-  mobile ? 'menu__link--active' : 'navbar__link--active';
-export default function NavbarItem({type, ...props}) {
-  const componentType = getComponentType(type, props.items !== undefined);
-  const NavbarItemComponent = getNavbarItemComponent(componentType);
-  return <NavbarItemComponent {...props} />;
+  return (
+    <>
+      <NavbarItem {...props} {...propsOverrides} />
+    </>
+  );
 }
