@@ -105,7 +105,7 @@ export function Ambassadors(): JSX.Element {
       ></ProfileCardCol>
       <ProfileCardCol
         name='Katrik KK'
-        location='Auchland, New Zealand'
+        location='Auckland, New Zealand'
         githubUrl='https://github.com/executeautomation'
         twitterUrl='https://twitter.com/ExecuteAuto'
       ></ProfileCardCol>
