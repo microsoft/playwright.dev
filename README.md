@@ -65,6 +65,26 @@ To roll the docs in PowerShell, make sure you set the env variable correctly, i.
 $env:SRC_DIR="C:\Users\user\src\playwright"; npm run roll
 ```
 
+### Run end-to-end tests
+
+#### Run on local machine
+
+Run this on one terminal:
+
+```sh
+npm run start-nodejs
+```
+
+and this on another, it will automatically use the local docusaurus server:
+
+```sh
+npx playwright test nodejs
+```
+
+#### Run on different environment
+
+You can set the `BASE_URL=https://playwright.dev` env var, otherwise `http://localhost:3000` gets used by default.
+
 ### Publishing Doc Changes After a Release
 
 In [microsoft/playwright](https://github.com/microsoft/playwright):
