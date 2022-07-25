@@ -47,25 +47,10 @@ export function Team(): JSX.Element {
   return (
     <div className='row'>
       <ProfileCardCol
-        name='Pavel Feldman'
-        location='San Francisco, USA'
-        githubUrl='https://github.com/pavelfeldman'
-      ></ProfileCardCol>
-      <ProfileCardCol
-        name='Dmitry Gozman'
-        location='San Francisco, USA'
-        githubUrl='https://github.com/dgozman'
-      ></ProfileCardCol>
-      <ProfileCardCol
-        name='Andrey Lushnikov'
-        location='San Francisco, USA'
-        githubUrl='https://github.com/aslushnikov'
-        twitterUrl='https://twitter.com/aslushnikov'
-      ></ProfileCardCol>
-      <ProfileCardCol
-        name='Yury Semikhatsky'
-        location='San Francisco, USA'
-        githubUrl='https://github.com/yury-s'
+        name="Debbie O'Brien"
+        location='Mallorca, Spain'
+        githubUrl='https://github.com/debs-obrien'
+        twitterUrl='https://twitter.com/debs_obrien'
       ></ProfileCardCol>
       <ProfileCardCol
         name='Max Schmitt'
@@ -78,12 +63,6 @@ export function Team(): JSX.Element {
         location='San Francisco, USA'
         githubUrl='https://github.com/rwoll'
         twitterUrl='https://twitter.com/rwoll_dev'
-      ></ProfileCardCol>
-      <ProfileCardCol
-        name="Debbie O'Brien"
-        location='Mallorca, Spain'
-        githubUrl='https://github.com/debs-obrien'
-        twitterUrl='https://twitter.com/debs_obrien'
       ></ProfileCardCol>
     </div>
   );

@@ -12,7 +12,7 @@ module.exports = {
       ],
       collapsed: false
     },
-    'team',
+    'ambassadors',
     {
       type: 'link',
       label: 'Join our Community Slack',
