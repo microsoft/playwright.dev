@@ -1,37 +1,15 @@
 ---
-id: debug
+id: debug-intro
 title: "Debugging Tests"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-The Playwright inspector is a great tool to help with debugging. It opens up a browser window highlighting the selectors as you step through each line of the test. You can also use the explore button to find other available [selectors](./selectors.mdx) which you can then copy into your test file and rerun your tests to see if it passes. For debugging selectors, see [here](./debug-selectors.mdx).
+You can debug Playwright with your debugger of choice e.g. inside your IDE. Playwright comes with the Playwright Inspector which allows you to step through Playwright API calls, see their debug logs and explore [selectors](./selectors.mdx).
 
 ## Playwright Inspector
 
-Playwright Inspector is a GUI tool that helps authoring and debugging Playwright scripts. That's our default recommended tool for scripts troubleshooting.
-
-<img width="712" alt="Playwright Inspector" src="https://user-images.githubusercontent.com/883973/108614092-8c478a80-73ac-11eb-9597-67dfce110e00.png"></img>
-
-There are several ways of opening Playwright Inspector:
-
-### --debug
-- langs: js
-* Debugging all Tests
-
-  ```bash
-  npx playwright test --debug
-  ```
-
-* Debugging one test
-
-  ```bash
-  npx playwright test example --debug
-  ```
-
-### PWDEBUG
-
-Set the `PWDEBUG` environment variable to run your scripts in debug mode. This configures Playwright for debugging and opens the inspector.
+Set the `PWDEBUG` environment variable to run your scripts in debug mode. This configures Playwright for debugging and opens the inspector. However there are other ways including with [Browser Developer Tools](./debug.mdx#browser-developer-tools), and [page.pause](./debug.mdx#page.pause)
 
 <Tabs
   groupId="bash-flavor"
@@ -67,84 +45,9 @@ pytest -s
 </TabItem>
 </Tabs>
 
-Additional useful defaults are configured when `PWDEBUG=1` is set:
-- Browsers launch in the headed mode
-- Default timeout is set to 0 (= no timeout)
+<img width="712" alt="Playwright Inspector" src="https://user-images.githubusercontent.com/883973/108614092-8c478a80-73ac-11eb-9597-67dfce110e00.png"></img>
 
-Using `PWDEBUG=console` will configure the browser for debugging in Developer tools console:
-- **Runs headed**: Browsers always launch in headed mode
-- **Disables timeout**: Sets default timeout to 0 (= no timeout)
-- **Console helper**: Configures a `playwright` object in the browser to generate and highlight [Playwright selectors](./selectors.mdx). This can be used to verify text or composite selectors.
-
-<Tabs
-  groupId="bash-flavor"
-  defaultValue="bash"
-  values={[
-    {label: 'Bash', value: 'bash'},
-    {label: 'PowerShell', value: 'powershell'},
-    {label: 'Batch', value: 'batch'}
-  ]
-}>
-<TabItem value="bash">
-
-```bash
-PWDEBUG=console pytest -s
-```
-
-</TabItem>
-<TabItem value="powershell">
-
-```powershell
-$env:PWDEBUG="console"
-pytest -s
-```
-
-</TabItem>
-<TabItem value="batch">
-
-```batch
-set PWDEBUG=console
-pytest -s
-```
-
-</TabItem>
-</Tabs>
-
-### page.pause
-
-Call [page.pause()](./api/class-page.mdx#page-pause) method from your script when running in headed browser.
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-# Pause on the following line.
-page.pause()
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-# Pause on the following line.
-await page.pause()
-```
-
-</TabItem>
-</Tabs>
-
-Use `open` or `codegen` commands in the Playwright [CLI](./cli.mdx):
-
-```bash
-playwright codegen wikipedia.org
-```
+Check out our [advanced debugging guide](./debug.mdx#PWDEBUG) for more debugging options with [PWDEBUG](./debug.mdx#PWDEBUG) as well as [page.pause](./debug.mdx#page.pause) and debugging with [Browser Developer Tools](./debug.mdx).
 
 ### Stepping through the Playwright script
 
@@ -174,74 +77,13 @@ If actionability can't be reached, it'll show action as pending:
 
 Use the Explore button to hover over an element on the page and explore it's selector by clicking on it. You can then copy this selector into your tests and rerun your tests to see if they now pass with this selector. You can also debug selectors, checkout our [debugging selectors](./debug-selectors.mdx) guide for more details.
 
-## Browser Developer Tools
+### Advanced Debugging
 
-You can use browser developer tools in Chromium, Firefox and WebKit while running a Playwright script in headed mode. Developer tools help to:
-- Inspect the DOM tree and **find element selectors**
-- **See console logs** during execution (or learn how to [read logs via API](./api/class-page.mdx#page-event-console))
-- Check **network activity** and other developer tools features
-
-<a href="https://user-images.githubusercontent.com/284612/77234134-5f21a500-6b69-11ea-92ec-1c146e1333ec.png"><img src="https://user-images.githubusercontent.com/284612/77234134-5f21a500-6b69-11ea-92ec-1c146e1333ec.png" width="500" alt="Chromium Developer Tools"></img></a>
-
-Using a [page.pause()](./api/class-page.mdx#page-pause) method is an easy way to pause the Playwright script execution and inspect the page in Developer tools. It will also open Playwright Inspector to help with debugging.
-
-**For Chromium**: you can also open developer tools through a launch option.
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-chromium.launch(devtools=True)
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-await chromium.launch(devtools=True)
-```
-
-</TabItem>
-</Tabs>
-
-:::note
-**For WebKit**: launching WebKit Inspector during the execution will prevent the Playwright script from executing any further.
-:::
-
-## Headed mode
-
-Playwright runs browsers in headless mode by default. To change this behavior, use `headless: false` as a launch option. You can also use the `slow_mo` option to slow down execution and follow along while debugging.
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-chromium.launch(headless=False, slow_mo=100) # or firefox, webkit
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-await chromium.launch(headless=False, slow_mo=100) # or firefox, webkit
-```
-
-</TabItem>
-</Tabs>
+For more advanced debugging check out out our guides on:
+- [Browser Developer Tools](./debug.mdx#browser-developer-tools)
+- [PWDEBUG](./debug.mdx#PWDEBUG)
+- [page.pause](./debug.mdx#page.pause)
+- [debugging selectors](./debug-selectors.mdx)
 
 ## What's Next
 - [Generate tests with Codegen](./codegen.mdx)
