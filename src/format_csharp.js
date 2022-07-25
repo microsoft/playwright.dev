@@ -31,7 +31,7 @@ class CSharpFormatter {
    * @param {Documentation.Member} member 
    */
   formatMember(member) {
-    let text;
+    let text = '';
     let args = [];
 
     let prefix = `${toTitleCase(member.clazz.varName)}.`;

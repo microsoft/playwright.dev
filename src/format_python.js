@@ -30,7 +30,7 @@ class PythonFormatter {
     this.lang = 'python';
   }
   formatMember(member) {
-    let text;
+    let text = '';
     const args = [];
 
     let prefix = `${toSnakeCase(member.clazz.varName)}.`;
