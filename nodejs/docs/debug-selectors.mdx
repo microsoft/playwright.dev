@@ -1,112 +1,136 @@
 ---
-id: test-cli
-title: "Command line"
+id: debug-selectors
+title: "Debugging Selectors"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-- [Examples](#examples)
-- [Reference](#reference)
+Playwright will throw a timeout exception like `locator.click: Timeout 30000ms exceeded` when an element does not exist on the page. There are multiple ways of debugging selectors:
+- [Playwright Inspector](#using-playwright-inspector) to step over each Playwright API call to inspect the page.
+- [Browser DevTools](#using-devtools) to inspect selectors with the DevTools element panel.
+- [Trace Viewer](./trace-viewer.mdx) to see what the page looked like during the test run.
+- [Verbose API logs](#verbose-api-logs) shows [actionability checks](./actionability.mdx) when locating the element.
 
-## Examples
+## Using Playwright Inspector
 
-Here are the most common options available in the command line.
-- Run all the tests
+Open the [Playwright Inspector](./debug.mdx) and click the `Explore` button to hover over elements in the screen and click them to automatically generate selectors for those elements. To verify where selector points, paste it into the inspector input field:
 
-  ```bash
-  npx playwright test
-  ```
+<img width="602" alt="Selectors toolbar" src="https://user-images.githubusercontent.com/883973/108614696-ad5eaa00-73b1-11eb-81f5-9eebe62543a2.png"></img>
 
-- Run a single test file
+## Using DevTools
 
-  ```bash
-  npx playwright test tests/todo-page.spec.ts
-  ```
+You can also use the following API inside the Developer Tools Console of any browser.
 
-- Run a set of test files
+When running in Debug Mode with `PWDEBUG=console`, a `playwright` object is available in Developer tools console.
+1. Run with `PWDEBUG=console`
+1. Setup a breakpoint to pause the execution
+1. Open the console panel in browser developer tools
 
-  ```bash
-  npx playwright test tests/todo-page/ tests/landing-page/
-  ```
+<img src="https://user-images.githubusercontent.com/284612/92536317-37dd9380-f1ee-11ea-875d-daf1b206dd56.png"></img>
 
-- Run files that have `my-spec` or `my-spec-2` in the file name
+### playwright.$(selector)
 
-  ```bash
-  npx playwright test my-spec my-spec-2
-  ```
+Query Playwright selector, using the actual Playwright query engine, for example:
 
-- Run files that are in line 42 in my-spec.ts
+```txt
+> playwright.$('.auth-form >> text=Log in');
 
-  ```bash
-  npx playwright test my-spec.ts:42
-  ```
+<button>Log in</button>
+```
 
-- Run the test with the title
+### playwright.$$(selector)
 
-  ```bash
-  npx playwright test -g "add a todo item"
-  ```
+Same as `playwright.$`, but returns all matching elements.
 
-- Run tests in headed browsers
+```txt
+> playwright.$$('li >> text=John')
 
-  ```bash
-  npx playwright test --headed
-  ```
+> [<li>, <li>, <li>, <li>]
+```
 
-- Run all the tests against a specific project
+### playwright.inspect(selector)
 
-  ```bash
-  npx playwright test --project=chromium
-  ```
+Reveal element in the Elements panel (if DevTools of the respective browser supports it).
 
-- Disable [parallelization](./test-parallel.mdx)
+```txt
+> playwright.inspect('text=Log in')
+```
 
-  ```bash
-  npx playwright test --workers=1
-  ```
+### playwright.locator(selector)
 
-- Choose a [reporter](./test-reporters.mdx)
+Query Playwright element using the actual Playwright query engine, for example:
 
-  ```bash
-  npx playwright test --reporter=dot
-  ```
+```txt
+> playwright.locator('.auth-form', { hasText: 'Log in' });
 
-- Run in debug mode with [Playwright Inspector](./debug.mdx)
+> Locator ()
+>   - element: button
+>   - elements: [button]
+```
 
-  ```bash
-  npx playwright test --debug
-  ```
+### playwright.highlight(selector)
 
-- Ask for help
+Highlight the first occurrence of the locator:
 
-  ```bash
-  npx playwright test --help
-  ```
+```txt
+> playwright.hightlight('.auth-form');
+```
 
-## Reference
+### playwright.clear()
 
-Complete set of Playwright Test options is available in the [configuration file](./test-advanced.mdx). Following options can be passed to a command line and take a priority over the configuration file:
-- `--headed`: Run tests in headed browsers. Useful for debugging.
-- `--browser`: Run test in a specific browser. Available options are  `"chromium"`, `"firefox"`, `"webkit"` or `"all"` to run tests in all three browsers at the same time.
-- `--debug`: Run tests with Playwright Inspector. Shortcut for `PWDEBUG=1` environment variable and `--timeout=0 --maxFailures=1 --headed --workers=1` options.
-- `-c <file>` or `--config <file>`: Configuration file. If not passed, defaults to `playwright.config.ts` or `playwright.config.js` in the current directory.
-- `-c <dir>` or `--config <dir>`: Directory with the tests to run without configuration file.
-- `--forbid-only`: Whether to disallow `test.only`. Useful on CI.
-- `-g <grep>` or `--grep <grep>`: Only run tests matching this regular expression. For example, this will run `'should add to cart'` when passed `-g "add to cart"`.
-- `--grep-invert <grep>`: Only run tests **not** matching this regular expression. The opposite of `--grep`.
-- `--global-timeout <number>`: Total timeout for the whole test run in milliseconds. By default, there is no global timeout. Learn more about [various timeouts](./test-timeouts.mdx).
-- `--list`: List all the tests, but do not run them.
-- `--max-failures <N>` or `-x`: Stop after the first `N` test failures. Passing `-x` stops after the first failure.
-- `--output <dir>`: Directory for artifacts produced by tests, defaults to `test-results`.
-- `--project <name>`: Only run tests from one of the specified [projects](./test-advanced.mdx#projects). Defaults to running all projects defined in the configuration file.
-- `--quiet`: Whether to suppress stdout and stderr from the tests.
-- `--repeat-each <N>`: Run each test `N` times, defaults to one.
-- `--reporter <reporter>`: Choose a reporter: minimalist `dot`, concise `line` or detailed `list`. See [reporters](./test-reporters.mdx) for more information.
-- `--retries <number>`: The maximum number of [retries](./test-retries.mdx#retries) for flaky tests, defaults to zero (no retries).
-- `--shard <shard>`: [Shard](./test-parallel.mdx#shard-tests-between-multiple-machines) tests and execute only selected shard, specified in the form `current/all`, 1-based, for example `3/5`.
-- `--timeout <number>`: Maximum timeout in milliseconds for each test, defaults to 30 seconds. Learn more about [various timeouts](./test-timeouts.mdx).
-- `--update-snapshots` or `-u`: Whether to update [snapshots](./test-snapshots.mdx) with actual results instead of comparing them. Use this when snapshot expectations have changed.
-- `--workers <number>` or `-j <number>`: The maximum number of concurrent worker processes that run in [parallel](./test-parallel.mdx).
+```txt
+> playwright.clear()
+```
+
+Clear existing highlights.
+
+### playwright.selector(element)
+
+Generates selector for the given element.
+
+```txt
+> playwright.selector($0)
+
+"div[id="glow-ingress-block"] >> text=/.*Hello.*/"
+```
+
+## Verbose API logs
+
+Playwright supports verbose logging with the `DEBUG` environment variable.
+
+<Tabs
+  groupId="bash-flavor"
+  defaultValue="bash"
+  values={[
+    {label: 'Bash', value: 'bash'},
+    {label: 'PowerShell', value: 'powershell'},
+    {label: 'Batch', value: 'batch'}
+  ]
+}>
+<TabItem value="bash">
+
+```bash
+DEBUG=pw:api npm run test
+```
+
+</TabItem>
+<TabItem value="powershell">
+
+```powershell
+$env:DEBUG="pw:api"
+npm run test
+```
+
+</TabItem>
+<TabItem value="batch">
+
+```batch
+set DEBUG=pw:api
+npm run test
+```
+
+</TabItem>
+</Tabs>
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [Android]: ./api/class-android.mdx "Android"
