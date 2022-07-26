@@ -5,8 +5,11 @@ type ProfileProps = {
   className?: string;
   name: string;
   location: string;
-  githubUrl: string;
+  githubUrl?: string;
   twitterUrl?: string;
+  websiteUrl?: string;
+  linkedInUrl?: string;
+  imageUrl?: string;
 };
 
 function ProfileCard({
@@ -14,17 +17,22 @@ function ProfileCard({
   name,
   location,
   githubUrl,
-  twitterUrl
+  twitterUrl,
+  websiteUrl,
+  linkedInUrl,
+  imageUrl
 }: ProfileProps) {
   return (
     <div className={className}>
       <div className={styles.card}>
-        <div className='avatar avatar--vertical'>
-          <img
-            className='avatar__photo avatar__photo--xl'
-            src={`${githubUrl}.png`}
-            alt={`${name}'s avatar`}
-          />
+        <div className={styles.cardBody}>
+          <div className='avatar avatar--vertical'>
+            <img
+              className='avatar__photo avatar__photo--xl'
+              src={githubUrl ? `${githubUrl}.png` : imageUrl}
+              alt={`${name}'s avatar`}
+            />
+          </div>
           <div className={styles.intro}>
             <h3 className={styles.name}>{name}</h3>
             <h3 className={styles.location}>{location}</h3>
@@ -33,6 +41,8 @@ function ProfileCard({
         <div className={styles.socialLinks}>
           {githubUrl && <a className='header-github-link' href={githubUrl}></a>}
           {twitterUrl && <a className='twitter-link' href={twitterUrl}></a>}
+          {websiteUrl && <a className='website-link' href={websiteUrl}></a>}
+          {linkedInUrl && <a className='linkedIn-link' href={linkedInUrl}></a>}
         </div>
       </div>
     </div>
@@ -51,18 +61,21 @@ export function Team(): JSX.Element {
         location='Mallorca, Spain'
         githubUrl='https://github.com/debs-obrien'
         twitterUrl='https://twitter.com/debs_obrien'
+        linkedInUrl='https://www.linkedin.com/in/debbie-o-brien-1a199975/'
       ></ProfileCardCol>
       <ProfileCardCol
         name='Max Schmitt'
         location='Berlin, Germany'
         githubUrl='https://github.com/mxschmitt'
         twitterUrl='https://twitter.com/maxibanki'
+        linkedInUrl='https://www.linkedin.com/in/max-schmitt/'
       ></ProfileCardCol>
       <ProfileCardCol
         name='Ross Wollman'
         location='San Francisco, USA'
         githubUrl='https://github.com/rwoll'
         twitterUrl='https://twitter.com/rwoll_dev'
+        linkedInUrl='https://www.linkedin.com/in/rwoll/'
       ></ProfileCardCol>
     </div>
   );
@@ -76,6 +89,7 @@ export function Ambassadors(): JSX.Element {
         location='Berazategui, Argentina'
         githubUrl='https://github.com/charlyautomatiza'
         twitterUrl='https://twitter.com/char_automatiza'
+        websiteUrl='https://linktr.ee/charlyautomatiza'
       ></ProfileCardCol>
       <ProfileCardCol
         name='John Hill'
@@ -85,8 +99,8 @@ export function Ambassadors(): JSX.Element {
       <ProfileCardCol
         name='Katrik KK'
         location='Auckland, New Zealand'
-        githubUrl='https://github.com/executeautomation'
-        twitterUrl='https://twitter.com/ExecuteAuto'
+        imageUrl='https://media-exp1.licdn.com/dms/image/C5603AQFvGgrfen7F9Q/profile-displayphoto-shrink_400_400/0/1629605742823?e=1664409600&v=beta&t=yZx1w3KMdPxznERLrH1Rg7cRlNVuomVHzklnR9cMcVU'
+        linkedInUrl='https://www.linkedin.com/in/karthikkk/'
       ></ProfileCardCol>
       <ProfileCardCol
         name='Pandy Knight'
@@ -100,6 +114,7 @@ export function Ambassadors(): JSX.Element {
         location='Berlin, Germany'
         githubUrl='https://github.com/stefanjudis'
         twitterUrl='https://twitter.com/stefanjudis'
+        websiteUrl='https://www.stefanjudis.com'
       ></ProfileCardCol>
       <ProfileCardCol
         name='Tally Barak'

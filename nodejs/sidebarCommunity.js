@@ -1,6 +1,7 @@
 module.exports = {
   community: [
     'welcome',
+    'ambassadors',
     {
       type: 'category',
       label: 'Videos',
@@ -12,7 +13,6 @@ module.exports = {
       ],
       collapsed: false
     },
-    'ambassadors',
     {
       type: 'link',
       label: 'Join our Community Slack',
