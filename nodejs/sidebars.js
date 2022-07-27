@@ -16,7 +16,7 @@ module.exports = {
     { type: 'doc', id: 'release-notes' },
     {
       type: 'category',
-      label: 'Deep Dive',
+      label: 'Playwright Test',
       items: [
         { type: 'doc', id: 'test-annotations' },
         { type: 'doc', id: 'test-api-testing' },
