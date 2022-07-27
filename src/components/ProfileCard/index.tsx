@@ -93,6 +93,13 @@ export function Ambassadors(): JSX.Element {
   return (
     <div className='row'>
       <ProfileCardCol
+        name='Andrew Knight'
+        city='North Carolina'
+        country='USA'
+        githubUrl='https://github.com/AutomationPanda'
+        twitterUrl='https://twitter.com/AutomationPanda'
+      ></ProfileCardCol>
+      <ProfileCardCol
         name='Carlos Gauto'
         city='Berazategui'
         country='Argentina'
@@ -121,13 +128,7 @@ export function Ambassadors(): JSX.Element {
         imageUrl='https://media-exp1.licdn.com/dms/image/C5603AQFvGgrfen7F9Q/profile-displayphoto-shrink_400_400/0/1629605742823?e=1664409600&v=beta&t=yZx1w3KMdPxznERLrH1Rg7cRlNVuomVHzklnR9cMcVU'
         linkedInUrl='https://www.linkedin.com/in/karthikkk/'
       ></ProfileCardCol>
-      <ProfileCardCol
-        name='Andrew Knight'
-        city='North Carolina'
-        country='USA'
-        githubUrl='https://github.com/AutomationPanda'
-        twitterUrl='https://twitter.com/AutomationPanda'
-      ></ProfileCardCol>
+      
 
       <ProfileCardCol
         name='Stefan Judis'
