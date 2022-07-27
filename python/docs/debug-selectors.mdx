@@ -1,109 +1,136 @@
 ---
-id: writing-tests
-title: "Writing Tests"
+id: debug-selectors
+title: "Debugging Selectors"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright assertions are created specifically for the dynamic web. Checks are automatically retried until the necessary conditions are met. Playwright comes with [auto-wait](./actionability.mdx) built in meaning it waits for elements to be actionable prior to performing actions. Playwright provides an [expect](./test-assertions.mdx) function to write assertions.
+Playwright will throw a timeout exception like `locator.click: Timeout 30000ms exceeded` when an element does not exist on the page. There are multiple ways of debugging selectors:
+- [Playwright Inspector](#using-playwright-inspector) to step over each Playwright API call to inspect the page.
+- [Browser DevTools](#using-devtools) to inspect selectors with the DevTools element panel.
+- [Trace Viewer](./trace-viewer.mdx) to see what the page looked like during the test run.
+- [Verbose API logs](#verbose-api-logs) shows [actionability checks](./actionability.mdx) when locating the element.
 
-Take a look at the example test below to see how to write a test using web first assertions, locators and selectors.
+## Using Playwright Inspector
 
-```py
-import re
-from playwright.sync_api import Page, expect
+Open the [Playwright Inspector](./debug.mdx) and click the `Explore` button to hover over elements in the screen and click them to automatically generate selectors for those elements. To verify where selector points, paste it into the inspector input field:
 
+<img width="602" alt="Selectors toolbar" src="https://user-images.githubusercontent.com/883973/108614696-ad5eaa00-73b1-11eb-81f5-9eebe62543a2.png"></img>
 
-def test_homepage_has_Playwright_in_title_and_get_started_link_linking_to_the_intro_page(
-    page: Page, foo
-):
-    page.goto("https://playwright.dev/")
+## Using DevTools
 
-    # Expect a title "to contain" a substring.
-    expect(page).to_have_title(re.compile("Playwright"))
+You can also use the following API inside the Developer Tools Console of any browser.
 
-    # create a locator
-    get_started = page.locator("text=Get Started")
+When running in Debug Mode with `PWDEBUG=console`, a `playwright` object is available in Developer tools console.
+1. Run with `PWDEBUG=console`
+1. Setup a breakpoint to pause the execution
+1. Open the console panel in browser developer tools
 
-    # Expect an attribute "to be strictly equal" to the value.
-    expect(get_started).to_have_attribute("href", "/docs/intro")
+<img src="https://user-images.githubusercontent.com/284612/92536317-37dd9380-f1ee-11ea-875d-daf1b206dd56.png"></img>
 
-    # Click the get started link.
-    get_started.click()
+### playwright.$(selector)
 
-    # Expects the URL to contain intro.
-    expect(page).to_have_url(re.compile(".*intro"))
+Query Playwright selector, using the actual Playwright query engine, for example:
+
+```txt
+> playwright.$('.auth-form >> text=Log in');
+
+<button>Log in</button>
 ```
 
-### Assertions
+### playwright.$$(selector)
 
-Playwright provides the [`expect`](./test-assertions.mdx) function which will wait until the expected condition is met.
+Same as `playwright.$`, but returns all matching elements.
 
-```py
-import re
-from playwright.sync_api import expect
+```txt
+> playwright.$$('li >> text=John')
 
-expect(page).to_have_title(re.compile("Playwright"))
+> [<li>, <li>, <li>, <li>]
 ```
 
-### Locators
+### playwright.inspect(selector)
 
-[Locators](./locators.mdx) are the central piece of Playwright's auto-waiting and retry-ability. Locators represent a way to find element(s) on the page at any moment and are used to perform actions on elements such as `.click` `.fill` etc. Custom locators can be created with the [page.locator(selector, **kwargs)](./api/class-page.mdx#page-locator) method.
+Reveal element in the Elements panel (if DevTools of the respective browser supports it).
 
-```py
-from playwright.sync_api import expect
-
-get_started = page.locator("text=Get Started")
-
-expect(get_started).to_have_attribute("href", "/docs/installation")
-get_started.click()
+```txt
+> playwright.inspect('text=Log in')
 ```
 
-[Selectors](./selectors.mdx) are strings that are used to create Locators. Playwright supports many different selectors like [Text](./selectors.mdx#text-selector), [CSS](./selectors.mdx#css-selector), [XPath](./selectors.mdx#xpath-selectors) and many more. Learn more about available selectors and how to pick one in this [in-depth guide](./selectors.mdx).
+### playwright.locator(selector)
 
-```py
-from playwright.sync_api import expect
+Query Playwright element using the actual Playwright query engine, for example:
 
-expect(page.locator("text=Installation")).to_be_visible()
+```txt
+> playwright.locator('.auth-form', { hasText: 'Log in' });
+
+> Locator ()
+>   - element: button
+>   - elements: [button]
 ```
 
-### Test Isolation
+### playwright.highlight(selector)
 
-The Playwright Pytest plugin is based on the concept of test fixtures such as the [built in page fixture](./test-runners.mdx), which is passed into your test. Pages are isolated between tests due to the Browser Context, which is equivalent to a brand new browser profile, where every test gets a fresh environment, even when multiple tests run in a single Browser.
+Highlight the first occurrence of the locator:
 
-```py
-from playwright.sync_api import Page
-
-def test_basic_test(page: Page):
-  # ...
+```txt
+> playwright.hightlight('.auth-form');
 ```
 
-### Using Test Hooks
+### playwright.clear()
 
-You can use various [fixtures](https://docs.pytest.org/en/6.2.x/fixture.html#autouse-fixtures-fixtures-you-don-t-have-to-request) to execute code before or after your tests and to share objects between them. A `function` scoped fixture e.g. with autouse behaves like a beforeEach/afterEach. And a `module` scoped fixture with autouse behaves like a beforeAll/afterAll which runs before all and after all the tests.
-
-```py
-import pytest
-from playwright.sync_api import Page
-
-
-@pytest.fixture(scope="function", autouse=True)
-def before_each_after_each(page: Page):
-    print("beforeEach")
-    # Go to the starting url before each test.
-    page.goto("https://playwright.dev/")
-    yield
-    print("afterEach")
-
-def test_main_navigation(page: Page):
-    # Assertions use the expect API.
-    expect(page).to_have_url("https://playwright.dev/")
+```txt
+> playwright.clear()
 ```
 
-## What's Next
-- [Run single tests, multiple tests, headed mode](./running-tests.mdx)
-- [Generate tests with Codegen](./codegen.mdx)
-- [See a trace of your tests](./trace-viewer.mdx)
+Clear existing highlights.
+
+### playwright.selector(element)
+
+Generates selector for the given element.
+
+```txt
+> playwright.selector($0)
+
+"div[id="glow-ingress-block"] >> text=/.*Hello.*/"
+```
+
+## Verbose API logs
+
+Playwright supports verbose logging with the `DEBUG` environment variable.
+
+<Tabs
+  groupId="bash-flavor"
+  defaultValue="bash"
+  values={[
+    {label: 'Bash', value: 'bash'},
+    {label: 'PowerShell', value: 'powershell'},
+    {label: 'Batch', value: 'batch'}
+  ]
+}>
+<TabItem value="bash">
+
+```bash
+DEBUG=pw:api pytest -s
+```
+
+</TabItem>
+<TabItem value="powershell">
+
+```powershell
+$env:DEBUG="pw:api"
+pytest -s
+```
+
+</TabItem>
+<TabItem value="batch">
+
+```batch
+set DEBUG=pw:api
+pytest -s
+```
+
+</TabItem>
+</Tabs>
 
 [Accessibility]: ./api/class-accessibility.mdx "Accessibility"
 [APIRequest]: ./api/class-apirequest.mdx "APIRequest"
