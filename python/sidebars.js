@@ -7,7 +7,6 @@ module.exports = {
         { "type": "doc", "id": "intro" },
         { "type": "doc", "id": "writing-tests" },
         { "type": "doc", "id": "running-tests" },
-        { "type": "doc", "id": "debug" },
         { "type": "doc", "id": "codegen" },
         { "type": "doc", "id": "trace-viewer" },
         { "type": "doc", "id": "test-runners" }
@@ -29,6 +28,8 @@ module.exports = {
         { "type": "doc", "id": "browser-contexts" },
         { "type": "doc", "id": "chrome-extensions" },
         { "type": "doc", "id": "cli" },
+        { "type": "doc", "id": "debug" },
+        { "type": "doc", "id": "debug-selectors" },
         { "type": "doc", "id": "dialogs" },
         { "type": "doc", "id": "downloads" },
         { "type": "doc", "id": "emulation" },

@@ -1,8 +1,7 @@
-
-
 module.exports = {
   community: [
     'welcome',
+    'ambassadors',
     {
       type: 'category',
       label: 'Videos',
@@ -12,13 +11,12 @@ module.exports = {
         'feature-videos',
         'release-videos'
       ],
-      collapsed: false,
+      collapsed: false
     },
-   
     {
       type: 'link',
       label: 'Join our Community Slack',
-      href: 'https://aka.ms/playwright-slack',
-    },
-  ],
+      href: 'https://aka.ms/playwright-slack'
+    }
+  ]
 };
