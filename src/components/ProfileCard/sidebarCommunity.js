@@ -13,6 +13,7 @@ module.exports = {
       ],
       collapsed: false
     },
+
     {
       type: 'link',
       label: 'Join our Community Slack',
