@@ -101,8 +101,16 @@ export function Ambassadors(): JSX.Element {
         websiteUrl='https://linktr.ee/charlyautomatiza'
       ></ProfileCardCol>
       <ProfileCardCol
+        name='Giovanni Rago'
+        city='Berlin'
+        country='Germany'
+        imageUrl='https://media-exp1.licdn.com/dms/image/C4E03AQHNkQmEbZBVqA/profile-displayphoto-shrink_400_400/0/1517375686271?e=1664409600&v=beta&t=r7M2zqvKeA6Ogd_mHbq2-0YFZfNGGVBQtZK3b9tpFEw'
+        twitterUrl='https://twitter.com/rag0g'
+        websiteUrl='https://www.youtube.com/c/AutomateTogether'
+      ></ProfileCardCol>
+      <ProfileCardCol
         name='John Hill'
-        city='California'
+        city='Palo Alto'
         country='USA'
         githubUrl='https://github.com/unlikelyzero'
       ></ProfileCardCol>
