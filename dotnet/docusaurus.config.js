@@ -106,10 +106,35 @@ module.exports = {
           ],
         },
         {
-            to: '/community/welcome',
-            label: 'Community',
-            position: 'left',
-            activeBaseRegex: `/community/`,
+          type: 'dropdown',
+          label: 'Community',
+          position: 'left',
+          items: [
+            {
+              to: 'community/welcome',
+              label: 'Welcome',
+            },
+            {
+              to: 'community/ambassadors',
+              label: 'Ambassadors',
+            },
+            {
+              to: 'community/conference-videos',
+              label: 'Conference Videos',
+            },
+            {
+              to: 'community/live-streams',
+              label: 'Live Streams',
+            },
+            {
+              to: 'community/feature-videos',
+              label: 'Feature Videos',
+            },
+            {
+              to: 'community/Release-videos',
+              label: 'release Videos',
+            },
+          ],
         },
       ],
     },
