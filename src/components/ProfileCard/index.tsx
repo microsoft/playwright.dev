@@ -93,6 +93,13 @@ export function Ambassadors(): JSX.Element {
   return (
     <div className='row'>
       <ProfileCardCol
+        name='Andrew Knight'
+        city='North Carolina'
+        country='USA'
+        githubUrl='https://github.com/AutomationPanda'
+        twitterUrl='https://twitter.com/AutomationPanda'
+      ></ProfileCardCol>
+      <ProfileCardCol
         name='Carlos Gauto'
         city='Berazategui'
         country='Argentina'
@@ -101,8 +108,16 @@ export function Ambassadors(): JSX.Element {
         websiteUrl='https://linktr.ee/charlyautomatiza'
       ></ProfileCardCol>
       <ProfileCardCol
+        name='Giovanni Rago'
+        city='Berlin'
+        country='Germany'
+        imageUrl='https://media-exp1.licdn.com/dms/image/C4E03AQHNkQmEbZBVqA/profile-displayphoto-shrink_400_400/0/1517375686271?e=1664409600&v=beta&t=r7M2zqvKeA6Ogd_mHbq2-0YFZfNGGVBQtZK3b9tpFEw'
+        twitterUrl='https://twitter.com/rag0g'
+        websiteUrl='https://www.youtube.com/c/AutomateTogether'
+      ></ProfileCardCol>
+      <ProfileCardCol
         name='John Hill'
-        city='California'
+        city='Palo Alto'
         country='USA'
         githubUrl='https://github.com/unlikelyzero'
       ></ProfileCardCol>
@@ -113,13 +128,7 @@ export function Ambassadors(): JSX.Element {
         imageUrl='https://media-exp1.licdn.com/dms/image/C5603AQFvGgrfen7F9Q/profile-displayphoto-shrink_400_400/0/1629605742823?e=1664409600&v=beta&t=yZx1w3KMdPxznERLrH1Rg7cRlNVuomVHzklnR9cMcVU'
         linkedInUrl='https://www.linkedin.com/in/karthikkk/'
       ></ProfileCardCol>
-      <ProfileCardCol
-        name='Andrew Knight'
-        city='North Carolina'
-        country='USA'
-        githubUrl='https://github.com/AutomationPanda'
-        twitterUrl='https://twitter.com/AutomationPanda'
-      ></ProfileCardCol>
+      
 
       <ProfileCardCol
         name='Stefan Judis'
