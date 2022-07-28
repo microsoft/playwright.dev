@@ -125,8 +125,6 @@ export function Ambassadors(): JSX.Element {
         imageUrl='https://media-exp1.licdn.com/dms/image/C5603AQFvGgrfen7F9Q/profile-displayphoto-shrink_400_400/0/1629605742823?e=1664409600&v=beta&t=yZx1w3KMdPxznERLrH1Rg7cRlNVuomVHzklnR9cMcVU'
         linkedInUrl='https://www.linkedin.com/in/karthikkk/'
       ></ProfileCard>
-      
-
       <ProfileCard
         name='Stefan Judis'
         city='Berlin'
@@ -142,12 +140,12 @@ export function Ambassadors(): JSX.Element {
         githubUrl='https://github.com/Tallyb'
         twitterUrl='https://twitter.com/TallyBarak'
       ></ProfileCard>
-      <ProfileCard
+      <ProfileCardCol
         name='Are you the next Ambassador?'
         city=''
         country=''
         imageUrl='https://playwright.dev/img/playwright-logo.svg'
-      ></ProfileCard>
+      ></ProfileCardCol>
     </div>
   );
 }
