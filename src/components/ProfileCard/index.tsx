@@ -145,6 +145,27 @@ export function Ambassadors(): JSX.Element {
         githubUrl='https://github.com/Tallyb'
         twitterUrl='https://twitter.com/TallyBarak'
       ></ProfileCardCol>
+      <ProfileCardCol
+        name='Are you next?'
+        city='Berlin'
+        country='Germany'
+        githubUrl='https://github.com/stefanjudis'
+        twitterUrl='https://twitter.com/stefanjudis'
+        websiteUrl='https://www.stefanjudis.com'
+      ></ProfileCardCol>
+      <ProfileCardCol
+        name='Tally Barak'
+        city='Tel Aviv'
+        country='Israel'
+        githubUrl='https://github.com/Tallyb'
+        twitterUrl='https://twitter.com/TallyBarak'
+      ></ProfileCardCol>
+      <ProfileCardCol
+        name='Are you the next Ambassador?'
+        city=''
+        country=''
+        imageUrl='https://playwright.dev/img/playwright-logo.svg'
+      ></ProfileCardCol>
     </div>
   );
 }
