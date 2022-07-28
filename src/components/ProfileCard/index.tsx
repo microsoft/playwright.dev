@@ -153,12 +153,14 @@ export function Ambassadors(): JSX.Element {
         githubUrl='https://github.com/Tallyb'
         twitterUrl='https://twitter.com/TallyBarak'
       ></ProfileCard>
+      <a href="#join-the-program">
       <ProfileCard
         name='Are you the next Ambassador?'
         city=''
         country=''
         imageUrl='https://playwright.dev/img/playwright-logo.svg'
       ></ProfileCard>
+      </a>
     </div>
   );
 }
