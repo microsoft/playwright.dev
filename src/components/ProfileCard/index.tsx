@@ -126,6 +126,7 @@ export function Ambassadors(): JSX.Element {
         city='Palo Alto'
         country='USA'
         githubUrl='https://github.com/unlikelyzero'
+        linkedInUrl='https://www.linkedin.com/in/linkedjohnhill'
       ></ProfileCard>
       <ProfileCard
         name='Katrik K. K'
