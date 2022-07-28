@@ -140,12 +140,12 @@ export function Ambassadors(): JSX.Element {
         githubUrl='https://github.com/Tallyb'
         twitterUrl='https://twitter.com/TallyBarak'
       ></ProfileCard>
-      <ProfileCardCol
+      <ProfileCard
         name='Are you the next Ambassador?'
         city=''
         country=''
         imageUrl='https://playwright.dev/img/playwright-logo.svg'
-      ></ProfileCardCol>
+      ></ProfileCard>
     </div>
   );
 }
