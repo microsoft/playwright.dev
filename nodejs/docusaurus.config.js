@@ -133,7 +133,7 @@ module.exports = {
             },
             {
               to: 'community/Release-videos',
-              label: 'release Videos',
+              label: 'Release Videos',
             },
           ],
         },
