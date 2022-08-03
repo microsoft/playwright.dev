@@ -1,7 +1,7 @@
 const path = require("path");
 const isProd = process.env.NODE_ENV === "production";
 
-const hasStableVersion = require(path.join(__dirname, 'nodejs/versions.json')).includes('stable');
+const hasStableVersion = require(path.join(__dirname, 'java/versions.json')).includes('stable');
 
 let plugins = [
   [
