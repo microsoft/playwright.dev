@@ -1,30 +1,33 @@
 const path = require("path");
 const isProd = process.env.NODE_ENV === "production";
 
+const hasStableVersion = require(path.join(__dirname, 'java/versions.json')).includes('stable');
+
 let plugins = [
   [
     require.resolve("@docusaurus/plugin-content-docs"),
     {
       sidebarPath: require.resolve("./sidebars.js"),
+      // Docusaurus crashes if we don't have a stable version and run docusaurus commands.
+      // This is a workaround to make it work since during roll we temporarily remove the stable version.
+      ...(hasStableVersion ? {
+        versions: {
+          stable: {
+            badge: false,
+          }
+        }
+      } : {}),
     },
   ],
-   [
-      'content-docs',
-      /** @type {import('@docusaurus/plugin-content-docs').Options} */
-      ({
-        id: 'community',
-        path: 'community',
-        routeBasePath: 'community',
-        sidebarPath: require.resolve('./sidebarCommunity.js'),
-      }),
-    ],
   [
-    require.resolve("@docusaurus/plugin-content-blog"),
-    {
-      showReadingTime: true,
-      editUrl:
-        "https://github.com/microsoft/playwright.dev/edit/master/",
-    },
+    'content-docs',
+    /** @type {import('@docusaurus/plugin-content-docs').Options} */
+    ({
+      id: 'community',
+      path: 'community',
+      routeBasePath: 'community',
+      sidebarPath: require.resolve('./sidebarCommunity.js'),
+    }),
   ],
   require.resolve("@docusaurus/plugin-content-pages"),
   require.resolve("./plugins/playwright-analytics-integration/lib/index.js"),
@@ -49,6 +52,7 @@ module.exports = {
   themeConfig: {
     colorMode: {
       defaultMode: "dark",
+      respectPrefersColorScheme: true,
     },
     prism: {
       theme: require('prism-react-renderer/themes/dracula'),
@@ -106,10 +110,10 @@ module.exports = {
           ],
         },
         {
-            to: '/community/welcome',
-            label: 'Community',
-            position: 'left',
-            activeBaseRegex: `/community/`,
+          to: '/community/welcome',
+          label: 'Community',
+          position: 'left',
+          activeBaseRegex: `/community/`,
         },
       ],
     },

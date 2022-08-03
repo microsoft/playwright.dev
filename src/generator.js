@@ -231,7 +231,7 @@ import TabItem from '@theme/TabItem';
    */
   mdxLinks(text) {
     for (const name of this.generatedFiles)
-      text = text.replace(new RegExp(`/(${path.basename(name)})`, 'g'), '/$1x');
+      text = text.replace(new RegExp(`(${path.basename(name)})([^x])`, 'g'), "$1x$2");
     return rewriteContent(text);
   }
 
@@ -572,8 +572,8 @@ function toTitleCase(name, options) {
  */
 function apiClassLink(clazz) {
   if (clazz.name.endsWith('Assertions'))
-    return './test-assertions.md';
-  return `./api/class-${clazz.name.toLowerCase()}.md`;
+    return '/test-assertions.md';
+  return `/api/class-${clazz.name.toLowerCase()}.md`;
 }
 
 /**
