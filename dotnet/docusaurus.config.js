@@ -1,16 +1,22 @@
 const path = require("path");
 const isProd = process.env.NODE_ENV === "production";
 
+const hasStableVersion = require(path.join(__dirname, 'nodejs/versions.json')).includes('stable');
+
 let plugins = [
   [
     require.resolve("@docusaurus/plugin-content-docs"),
     {
       sidebarPath: require.resolve("./sidebars.js"),
-      versions: {
-        stable: {
-          badge: false,
+      // Docusaurus crashes if we don't have a stable version and run docusaurus commands.
+      // This is a workaround to make it work since during roll we temporarily remove the stable version.
+      ...(hasStableVersion ? {
+        versions: {
+          stable: {
+            badge: false,
+          }
         }
-      },
+      } : {}),
     },
   ],
   [
