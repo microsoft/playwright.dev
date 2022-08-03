@@ -6,25 +6,22 @@ let plugins = [
     require.resolve("@docusaurus/plugin-content-docs"),
     {
       sidebarPath: require.resolve("./sidebars.js"),
+      versions: {
+        stable: {
+          badge: false,
+        }
+      },
     },
   ],
-   [
-      'content-docs',
-      /** @type {import('@docusaurus/plugin-content-docs').Options} */
-      ({
-        id: 'community',
-        path: 'community',
-        routeBasePath: 'community',
-        sidebarPath: require.resolve('./sidebarCommunity.js'),
-      }),
-    ],
   [
-    require.resolve("@docusaurus/plugin-content-blog"),
-    {
-      showReadingTime: true,
-      editUrl:
-        "https://github.com/microsoft/playwright.dev/edit/master/",
-    },
+    'content-docs',
+    /** @type {import('@docusaurus/plugin-content-docs').Options} */
+    ({
+      id: 'community',
+      path: 'community',
+      routeBasePath: 'community',
+      sidebarPath: require.resolve('./sidebarCommunity.js'),
+    }),
   ],
   require.resolve("@docusaurus/plugin-content-pages"),
   require.resolve("./plugins/playwright-analytics-integration/lib/index.js"),
@@ -107,10 +104,10 @@ module.exports = {
           ],
         },
         {
-            to: '/community/welcome',
-            label: 'Community',
-            position: 'left',
-            activeBaseRegex: `/community/`,
+          to: '/community/welcome',
+          label: 'Community',
+          position: 'left',
+          activeBaseRegex: `/community/`,
         },
 
       ],
