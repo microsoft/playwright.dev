@@ -1,71 +1,136 @@
 ---
-id: intro
-title: "Installation"
+id: debug-selectors
+title: "Debugging Selectors"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright was created specifically to accommodate the needs of end-to-end testing. Playwright supports all modern rendering engines including Chromium, WebKit, and Firefox. Test on Windows, Linux, and macOS, locally or on CI, headless or headed with native mobile emulation. 
+Playwright will throw a timeout exception like `locator.click: Timeout 30000ms exceeded` when an element does not exist on the page. There are multiple ways of debugging selectors:
+- [Playwright Inspector](#using-playwright-inspector) to step over each Playwright API call to inspect the page.
+- [Browser DevTools](#using-devtools) to inspect selectors with the DevTools element panel.
+- [Trace Viewer](./trace-viewer.mdx) to see what the page looked like during the test run.
+- [Verbose API logs](#verbose-api-logs) shows [actionability checks](./actionability.mdx) when locating the element.
 
-Playwright recommends using the official [Playwright Pytest plugin](./test-runners.mdx) to write end-to-end tests. It provides context isolation, running it on multiple browser configurations out of the box. Alternatively you can use the [library](./library.mdx) to manually write the testing infrastructure with your preferred test-runner. The Pytest plugin utilizes the sync version of Playwright, there is also an async version accessible via the library.
+## Using Playwright Inspector
 
-Get started by installing Playwright and running the example test to see it in action.
+Open the [Playwright Inspector](./debug.mdx) and click the `Explore` button to hover over elements in the screen and click them to automatically generate selectors for those elements. To verify where selector points, paste it into the inspector input field:
 
-Install the [Pytest plugin](https://pypi.org/project/pytest-playwright/):
+<img width="602" alt="Selectors toolbar" src="https://user-images.githubusercontent.com/883973/108614696-ad5eaa00-73b1-11eb-81f5-9eebe62543a2.png"></img>
+
+## Using DevTools
+
+You can also use the following API inside the Developer Tools Console of any browser.
+
+When running in Debug Mode with `PWDEBUG=console`, a `playwright` object is available in Developer tools console.
+1. Run with `PWDEBUG=console`
+1. Setup a breakpoint to pause the execution
+1. Open the console panel in browser developer tools
+
+<img src="https://user-images.githubusercontent.com/284612/92536317-37dd9380-f1ee-11ea-875d-daf1b206dd56.png"></img>
+
+### playwright.$(selector)
+
+Query Playwright selector, using the actual Playwright query engine, for example:
+
+```txt
+> playwright.$('.auth-form >> text=Log in');
+
+<button>Log in</button>
+```
+
+### playwright.$$(selector)
+
+Same as `playwright.$`, but returns all matching elements.
+
+```txt
+> playwright.$$('li >> text=John')
+
+> [<li>, <li>, <li>, <li>]
+```
+
+### playwright.inspect(selector)
+
+Reveal element in the Elements panel (if DevTools of the respective browser supports it).
+
+```txt
+> playwright.inspect('text=Log in')
+```
+
+### playwright.locator(selector)
+
+Query Playwright element using the actual Playwright query engine, for example:
+
+```txt
+> playwright.locator('.auth-form', { hasText: 'Log in' });
+
+> Locator ()
+>   - element: button
+>   - elements: [button]
+```
+
+### playwright.highlight(selector)
+
+Highlight the first occurrence of the locator:
+
+```txt
+> playwright.hightlight('.auth-form');
+```
+
+### playwright.clear()
+
+```txt
+> playwright.clear()
+```
+
+Clear existing highlights.
+
+### playwright.selector(element)
+
+Generates selector for the given element.
+
+```txt
+> playwright.selector($0)
+
+"div[id="glow-ingress-block"] >> text=/.*Hello.*/"
+```
+
+## Verbose API logs
+
+Playwright supports verbose logging with the `DEBUG` environment variable.
+
+<Tabs
+  groupId="bash-flavor"
+  defaultValue="bash"
+  values={[
+    {label: 'Bash', value: 'bash'},
+    {label: 'PowerShell', value: 'powershell'},
+    {label: 'Batch', value: 'batch'}
+  ]
+}>
+<TabItem value="bash">
 
 ```bash
-pip install pytest-playwright
+DEBUG=pw:api pytest -s
 ```
 
-Install the required browsers:
+</TabItem>
+<TabItem value="powershell">
 
-```bash
-playwright install
+```powershell
+$env:DEBUG="pw:api"
+pytest -s
 ```
 
-## Add Example Test
+</TabItem>
+<TabItem value="batch">
 
-Create a `test_my_application.py` file inside the current working directory or in a sub-directory with the code below:
-
-```py
-import re
-from playwright.sync_api import Page, expect
-
-
-def test_homepage_has_Playwright_in_title_and_get_started_link_linking_to_the_intro_page(page: Page):
-    page.goto("https://playwright.dev/")
-
-    # Expect a title "to contain" a substring.
-    expect(page).to_have_title(re.compile("Playwright"))
-
-    # create a locator
-    get_started = page.locator("text=Get Started")
-
-    # Expect an attribute "to be strictly equal" to the value.
-    expect(get_started).to_have_attribute("href", "/docs/intro")
-
-    # Click the get started link.
-    get_started.click()
-
-    # Expects the URL to contain intro.
-    expect(page).to_have_url(re.compile(".*intro"))
+```batch
+set DEBUG=pw:api
+pytest -s
 ```
 
-## Running the Example Test
-
-By default tests will be run on chromium. This can be configured via the CLI options. Tests are run in headless mode meaning no browser UI will open up when running the tests. Results of the tests and test logs will be shown in the terminal.
-
-```bash
-pytest
-```
-
-See our doc on [Running Tests](./running-tests.mdx) to learn more about running tests in headed mode, running multiple tests, running specific tests etc.
-
-## What's next
-- [Write tests using web first assertions, page fixtures and locators](./writing-tests.mdx)
-- [Run single tests, multiple tests, headed mode](./running-tests.mdx)
-- [Generate tests with Codegen](./codegen.mdx)
-- [See a trace of your tests](./trace-viewer.mdx)
+</TabItem>
+</Tabs>
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
