@@ -8,7 +8,7 @@ module.exports = {
         { type: 'doc', id: 'writing-tests' },
         { type: 'doc', id: 'running-tests' },
         { type: 'doc', id: 'codegen' },
-        { type: 'doc', id: 'trace-viewer' }
+        { type: 'doc', id: 'trace-viewer-intro' }
       ],
       collapsed: false
     },
@@ -69,6 +69,7 @@ module.exports = {
         { type: 'doc', id: 'pom' },
         { type: 'doc', id: 'screenshots' },
         { type: 'doc', id: 'selectors' },
+        { type: 'doc', id: 'trace-viewer' },
         { type: 'doc', id: 'videos' }
       ],
       collapsed: false
