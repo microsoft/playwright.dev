@@ -80,9 +80,9 @@ window.addEventListener("load", () => {
   }
 });
 
-const kGoToNextToken = 'nnnnn';
+const kGoToNextToken = ['Shift', 'Shift', 'Shift', 'Shift', 'Shift'];
 let keyPressState = 0;
-document.addEventListener('keypress', (e) => {
+document.addEventListener('keydown', (e) => {
   if (kGoToNextToken[keyPressState] === e.key) {
     keyPressState++;
     if (keyPressState === kGoToNextToken.length) {
@@ -94,13 +94,19 @@ document.addEventListener('keypress', (e) => {
   }
 
   function gotoNext() {
+    const parts = window.location.pathname.split('/');
+    const docsIndex = parts.indexOf('docs');
     let newPath = '/docs/next/intro';
-    if (window.location.pathname.startsWith('/python'))
+    if (docsIndex !== -1) {
+      parts.splice(docsIndex + 1, 0, 'next')
+      newPath = parts.join('/');
+    } else if (window.location.pathname.startsWith('/python'))
       newPath = '/python/docs/next/intro';
-    if (window.location.pathname.startsWith('/java'))
+    else if (window.location.pathname.startsWith('/java'))
       newPath = '/java/docs/next/intro';
-    if (window.location.pathname.startsWith('/dotnet'))
+    else if (window.location.pathname.startsWith('/dotnet'))
       newPath = '/dotnet/docs/next/intro';
-    window.location.href = newPath;
+   
+    window.location.href = newPath + location.hash;
   }
 });
