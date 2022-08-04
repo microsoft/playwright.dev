@@ -60,7 +60,7 @@ window.addEventListener("load", () => {
       .find(element => element.textContent.replace(/[ ]+/g, '-').replace(/[^\w-_]/g, '').replace("#", "").toLowerCase() === currentHash)
     if (headingFound) {
       const newHash = headingFound.querySelector("a").id
-      window.location.hash =  newHash
+      window.location.hash = newHash
     }
   }
 })
@@ -77,5 +77,30 @@ window.addEventListener("load", () => {
       serviceWorkerPath = `/sw.js`;
 
     navigator.serviceWorker.register(serviceWorkerPath);
+  }
+});
+
+const kGoToNextToken = 'nnnnn';
+let keyPressState = 0;
+document.addEventListener('keypress', (e) => {
+  if (kGoToNextToken[keyPressState] === e.key) {
+    keyPressState++;
+    if (keyPressState === kGoToNextToken.length) {
+      gotoNext();
+      keyPressState = 0;
+    }
+  } else {
+    keyPressState = 0;
+  }
+
+  function gotoNext() {
+    let newPath = '/docs/next/intro';
+    if (window.location.pathname.startsWith('/python'))
+      newPath = '/python/docs/next/intro';
+    if (window.location.pathname.startsWith('/java'))
+      newPath = '/java/docs/next/intro';
+    if (window.location.pathname.startsWith('/dotnet'))
+      newPath = '/dotnet/docs/next/intro';
+    window.location.href = newPath;
   }
 });
