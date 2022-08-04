@@ -1,95 +1,102 @@
 ---
-id: running-tests
-title: "Running Tests"
+id: debug-selectors
+title: "Debugging Selectors"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-You can run a single test, a set of tests or all tests. Tests can be run on different browsers. By default tests are run in a headless manner meaning no browser window will be opened while running the tests and results will be seen in the terminal. If you prefer you can run your tests in headed mode by using the `headless` test run parameter.
-- Running all tests
+Playwright will throw a timeout exception like `locator.click: Timeout 30000ms exceeded` when an element does not exist on the page. There are multiple ways of debugging selectors:
+- [Playwright Inspector](#using-playwright-inspector) to step over each Playwright API call to inspect the page.
+- [Browser DevTools](#using-devtools) to inspect selectors with the DevTools element panel.
+- [Trace Viewer](./trace-viewer.mdx) to see what the page looked like during the test run.
+- [Verbose API logs](#verbose-api-logs) shows [actionability checks](./actionability.mdx) when locating the element.
 
-  ```bash
-  dotnet test
-  ```
+## Using Playwright Inspector
 
-- Running a single test file
+Open the [Playwright Inspector](./debug.mdx) and click the `Explore` button to hover over elements in the screen and click them to automatically generate selectors for those elements. To verify where selector points, paste it into the inspector input field:
 
-  ```bash
-  dotnet test --filter "MyClassName"
-  ```
+<img width="602" alt="Selectors toolbar" src="https://user-images.githubusercontent.com/883973/108614696-ad5eaa00-73b1-11eb-81f5-9eebe62543a2.png"></img>
 
-- Run a set of test files
+## Using DevTools
 
-  ```bash
-  dotnet test --filter "MyClassName1|MyClassName2"
-  ```
+You can also use the following API inside the Developer Tools Console of any browser.
 
-- Run the test with the title
+When running in Debug Mode with `PWDEBUG=console`, a `playwright` object is available in Developer tools console.
+1. Run with `PWDEBUG=console`
+1. Setup a breakpoint to pause the execution
+1. Open the console panel in browser developer tools
 
-  ```bash
-  dotnet test --filter "Name~TestMethod1"
-  ```
+<img src="https://user-images.githubusercontent.com/284612/92536317-37dd9380-f1ee-11ea-875d-daf1b206dd56.png"></img>
 
-- Running Tests on specific browsers
+### playwright.$(selector)
 
-  <Tabs
-    groupId="bash-flavor"
-    defaultValue="bash"
-    values={[
-      {label: 'Bash', value: 'bash'},
-      {label: 'PowerShell', value: 'powershell'},
-      {label: 'Batch', value: 'batch'}
-    ]
-  }>
-  <TabItem value="bash">
-  
-  ```bash
-  BROWSER=webkit dotnet test
-  ```
-  
-  </TabItem>
-  <TabItem value="powershell">
-  
-  ```powershell
-  $env:BROWSER="webkit"
-  dotnet test
-  ```
-  
-  </TabItem>
-  <TabItem value="batch">
-  
-  ```batch
-  set BROWSER=webkit
-  dotnet test
-  ```
-  
-  </TabItem>
-  </Tabs>
-- Running Tests on multiple browsers
+Query Playwright selector, using the actual Playwright query engine, for example:
 
-  To run your test on multiple browsers or configurations you need to invoke the `dotnet test` command multiple times. There you can then either specify the `BROWSER` environment variable (like the previous) or pass the `browser` via the runsettings file:
+```txt
+> playwright.$('.auth-form >> text=Log in');
 
-  ```bash
-  dotnet test --settings:chromium.runsettings
-  dotnet test --settings:firefox.runsettings
-  dotnet test --settings:webkit.runsettings
-  ```
+<button>Log in</button>
+```
 
-  ```xml
-  <?xml version="1.0" encoding="utf-8"?>
-  <RunSettings>
-    <TestRunParameters>
-      <Parameter name="browser" value="chromium" />
-      <Parameter name="headless" value="false" />
-    </TestRunParameters>
-  </RunSettings>
-  ```
+### playwright.$$(selector)
 
-For more information see [selective unit tests](https://docs.microsoft.com/en-us/dotnet/core/testing/selective-unit-tests?pivots=mstest) in the Microsoft docs.
+Same as `playwright.$`, but returns all matching elements.
 
-## Debugging Tests
+```txt
+> playwright.$$('li >> text=John')
 
-Since Playwright runs in .NET, you can debug it with your debugger of choice in e.g. Visual Studio Code or Visual Studio. Playwright comes with the Playwright Inspector which allows you to step through Playwright API calls, see their debug logs and explore [selectors](./selectors.mdx).
+> [<li>, <li>, <li>, <li>]
+```
+
+### playwright.inspect(selector)
+
+Reveal element in the Elements panel (if DevTools of the respective browser supports it).
+
+```txt
+> playwright.inspect('text=Log in')
+```
+
+### playwright.locator(selector)
+
+Query Playwright element using the actual Playwright query engine, for example:
+
+```txt
+> playwright.locator('.auth-form', { hasText: 'Log in' });
+
+> Locator ()
+>   - element: button
+>   - elements: [button]
+```
+
+### playwright.highlight(selector)
+
+Highlight the first occurrence of the locator:
+
+```txt
+> playwright.hightlight('.auth-form');
+```
+
+### playwright.clear()
+
+```txt
+> playwright.clear()
+```
+
+Clear existing highlights.
+
+### playwright.selector(element)
+
+Generates selector for the given element.
+
+```txt
+> playwright.selector($0)
+
+"div[id="glow-ingress-block"] >> text=/.*Hello.*/"
+```
+
+## Verbose API logs
+
+Playwright supports verbose logging with the `DEBUG` environment variable.
 
 <Tabs
   groupId="bash-flavor"
@@ -103,35 +110,27 @@ Since Playwright runs in .NET, you can debug it with your debugger of choice in 
 <TabItem value="bash">
 
 ```bash
-PWDEBUG=1 dotnet test
+DEBUG=pw:api dotnet run
 ```
 
 </TabItem>
 <TabItem value="powershell">
 
 ```powershell
-$env:PWDEBUG=1
-dotnet test
+$env:DEBUG="pw:api"
+dotnet run
 ```
 
 </TabItem>
 <TabItem value="batch">
 
 ```batch
-set PWDEBUG=1
-dotnet test
+set DEBUG=pw:api
+dotnet run
 ```
 
 </TabItem>
 </Tabs>
-
-<img width="712" alt="Playwright Inspector" src="https://user-images.githubusercontent.com/883973/108614092-8c478a80-73ac-11eb-9597-67dfce110e00.png"></img>
-
-Check out our [debugging guide](./debug.mdx) to learn more about the [Playwright Inspector](./debug.mdx#playwright-inspector) as well as debugging with [Browser Developer tools](./debug.mdx#browser-developer-tools).
-
-## What's Next
-- [Generate tests with Codegen](./codegen.mdx)
-- [See a trace of your tests](./trace-viewer.mdx)
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"

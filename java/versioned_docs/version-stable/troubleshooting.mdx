@@ -1,97 +1,41 @@
 ---
-id: docker
-title: "Docker"
+id: troubleshooting
+title: "Troubleshooting"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-[Dockerfile.focal] can be used to run Playwright scripts in Docker environment. These image includes all the dependencies needed to run browsers in a Docker container, and also include the browsers themselves.
+## Browser dependencies
 
-- [Usage](#usage)
-- [Image tags](#image-tags)
+Playwright does self-inspection every time it runs to make sure the browsers can be launched successfully. If there are missing dependencies, playwright will print instructions to acquire them.
 
-## Usage
+See also in the [Command line tools](./cli.mdx#install-system-dependencies) which has a command to install all necessary dependencies automatically for Ubuntu LTS releases.
 
-This image is published on [Docker Hub].
+## Java requirements
 
-### Pull the image
+Playwright requires **Java 8** or newer. 
 
-```bash
-docker pull mcr.microsoft.com/playwright/java:v1.24.2-focal
-```
+## System requirements
 
-### Run the image
+The browser binaries for Chromium, Firefox and WebKit work across the 3 platforms (Windows, macOS, Linux):
 
-By default, the Docker image will use the `root` user to run the browsers. This will disable the Chromium sandbox which is not available with root. If you run trusted code (e.g. End-to-end tests) and want to avoid the hassle of managing separate user then the root user may be fine. For web scraping or crawling, we recommend to create a separate user inside the Docker container and use the seccomp profile.
+### Windows
 
-#### End-to-end tests
+Works with Windows and Windows Subsystem for Linux (WSL).
 
-On trusted websites, you can avoid creating a separate user and use root for it since you trust the code which will run on the browsers.
+### macOS
 
-```bash
-docker run -it --rm --ipc=host mcr.microsoft.com/playwright/java:v1.24.2-focal /bin/bash
-```
+Requires 11 (Big Sur) or above.
 
-#### Crawling and scraping
+### Linux
 
-On untrusted websites, it's recommended to use a separate user for launching the browsers in combination with the seccomp profile. Inside the container or if you are using the Docker image as a base image you have to use `adduser` for it.
-
-```bash
-docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_profile.json mcr.microsoft.com/playwright/java:v1.24.2-focal /bin/bash
-```
-
-[`seccomp_profile.json`](https://github.com/microsoft/playwright/blob/main/utils/docker/seccomp_profile.json) is needed to run Chromium with sandbox. This is a [default Docker seccomp profile](https://github.com/docker/engine/blob/d0d99b04cf6e00ed3fc27e81fc3d94e7eda70af3/profiles/seccomp/default.json) with extra user namespace cloning permissions:
-
-```json
-[
-  {
-    "comment": "Allow create user namespaces",
-    "names": [
-      "clone",
-      "setns",
-      "unshare"
-    ],
-    "action": "SCMP_ACT_ALLOW",
-    "args": [],
-    "includes": {},
-    "excludes": {}
-  }
-]
-```
+Depending on your Linux distribution, you might need to install additional dependencies to run the browsers.
 
 :::note
-Using `--ipc=host` is recommended when using Chrome ([Docker docs](https://docs.docker.com/engine/reference/run/#ipc-settings---ipc)). Chrome can run out of memory without this flag.
+Only Ubuntu 18.04, 20.04, and 22.04 are officially supported.
 :::
 
-### Using on CI
-
-See our [Continuous Integration guides](./ci.mdx) for sample configs.
-
-## Image tags
-
-See [all available image tags].
-
-Docker images are published automatically by GitHub Actions. We currently publish images with the following tags (`v1.20.0` in this case is an example:):
-- `:next` - tip-of-tree image version based on Ubuntu 20.04 LTS (Focal Fossa).
-- `:next-focal` - tip-of-tree image version based on Ubuntu 20.04 LTS (Focal Fossa).
-- `:v1.20.0` - Playwright v1.20.0 release docker image based on Ubuntu 20.04 LTS (Focal Fossa).
-- `:v1.20.0-focal` - Playwright v1.20.0 release docker image based on Ubuntu 20.04 LTS (Focal Fossa).
-- `:sha-XXXXXXX` - docker image for every commit that changed docker files or browsers, marked with a [short sha](https://git-scm.com/book/en/v2/Git-Tools-Revision-Selection#Short-SHA-1) (first 7 digits of the SHA commit).
-
-:::note
-It is recommended to always pin your Docker image to a specific version if possible. If the Playwright version in your Docker image does not match the version in your project/tests, Playwright will be unable to locate browser executables.
-:::
-
-### Base images
-
-We currently publish images based on the following [Ubuntu](https://hub.docker.com/_/ubuntu) versions:
-- **Ubuntu 22.04 LTS** (Jammy Jellyfish), image tags include `jammy` (not published for Java and .NET)
-- **Ubuntu 20.04 LTS** (Focal Fossa), image tags include `focal`
-- **Ubuntu 18.04 LTS** (Bionic Beaver), image tags include `bionic` (not published for Java and .NET)
-
-#### Alpine
-
-Browser builds for Firefox and WebKit are built for the [glibc](https://en.wikipedia.org/wiki/Glibc) library. Alpine Linux and other distributions that are based on the [musl](https://en.wikipedia.org/wiki/Musl) standard library are not supported.
+See also in the [Command line tools](./cli.mdx#install-system-dependencies) which has a command to install all necessary dependencies automatically for Ubuntu LTS releases.
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
