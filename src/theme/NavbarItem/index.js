@@ -36,6 +36,7 @@ export default function NavbarItemWrapper(props) {
     if (location.pathname.startsWith(languagePrefix) && currentLanguageIsInSubfolder && languagePrefix.length > 1 || languagePrefix.length === 1 && !currentLanguageIsInSubfolder) {
       propsOverrides.className += ` ${props.activeClassName}`;
     }
+    propsOverrides.skipExternalLinkCheck = true;
   }
   return (
     <>
