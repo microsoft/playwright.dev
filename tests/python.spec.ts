@@ -23,7 +23,7 @@ test('homepage has Playwright in title and get started link linking to the intro
 test.describe('next switcher', () => {
   test('home -> next intro', async ({ page, switchToNext }) => {
     const getStarted = page.locator('text=Get Started');
-    await expect(getStarted).toHaveAttribute('href', '/docs/python/intro');
+    await expect(getStarted).toHaveAttribute('href', '/python/docs/intro');
     await expect(page).toHaveURL(/\/$/);
 
     await switchToNext();
@@ -33,7 +33,7 @@ test.describe('next switcher', () => {
   });
 
   test('community -> next intro', async ({ page, switchToNext }) => {
-    await page.goto('/community/welcome');
+    await page.goto('/python/community/welcome');
     await expect(page.locator('text=Welcome to the Playwright Community')).toBeVisible();
     await expect(page).toHaveURL(/\/python\/community\/welcome$/);
 
@@ -44,7 +44,7 @@ test.describe('next switcher', () => {
   });
   
   test('docs -> next docs', async ({ page, switchToNext }) => {
-    await page.goto('/docs/locators');
+    await page.goto('/python/docs/locators');
     await expect(page.locator('text=locators represent a way to find')).toBeVisible();
     await expect(page).toHaveURL(/\/python\/docs\/locators$/);
 
@@ -55,7 +55,7 @@ test.describe('next switcher', () => {
   });
 
   test('api -> next api (with fragment)', async ({ page, switchToNext }) => {
-    await page.goto('/docs/api/class-browser#browser-version');
+    await page.goto('/python/docs/api/class-browser#browser-version');
     await expect(page.locator('text=Returns the browser version.')).toBeVisible();
     await expect(page).toHaveURL(/\/python\/docs\/api\/class-browser#browser-version$/);
 
