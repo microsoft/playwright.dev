@@ -80,7 +80,7 @@ window.addEventListener("load", () => {
   }
 });
 
-const kGoToNextToken = 'gimmenext';
+const kGoToNextToken = 'nnnnn';
 let keyPressState = 0;
 document.addEventListener('keypress', (e) => {
   if (kGoToNextToken[keyPressState] === e.key) {
