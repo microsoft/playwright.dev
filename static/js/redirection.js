@@ -95,6 +95,8 @@ document.addEventListener('keydown', (e) => {
 
   function gotoNext() {
     const parts = window.location.pathname.split('/');
+    if (parts.includes('next'))
+      return;
     const docsIndex = parts.indexOf('docs');
     let newPath = '/docs/next/intro';
     if (docsIndex !== -1) {
