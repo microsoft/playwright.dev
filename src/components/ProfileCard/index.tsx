@@ -89,7 +89,6 @@ export function Team(): JSX.Element {
         country='USA'
         githubUrl='https://github.com/rwoll'
         twitterUrl='https://twitter.com/rwoll_dev'
-        linkedInUrl='https://www.linkedin.com/in/rwoll/'
       ></ProfileCard>
     </div>
   );
