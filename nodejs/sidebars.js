@@ -8,7 +8,8 @@ module.exports = {
         { type: 'doc', id: 'writing-tests' },
         { type: 'doc', id: 'running-tests' },
         { type: 'doc', id: 'codegen' },
-        { type: 'doc', id: 'trace-viewer' }
+        { type: 'doc', id: 'trace-viewer' },
+        { type: 'doc', id: 'ci-intro' }
       ],
       collapsed: false
     },
