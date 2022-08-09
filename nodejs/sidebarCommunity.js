@@ -13,6 +13,7 @@ module.exports = {
       ],
       collapsed: false
     },
+    'canary-releases',
     {
       type: 'link',
       label: 'Join our Community Slack',
