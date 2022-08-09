@@ -1,70 +1,42 @@
 ---
-id: pom
-title: "Page Object Models"
+id: canary-releases
+title: "Canary Releases"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Large test suites can be structured to optimize ease of authoring and maintenance. Page object models are one such approach to structure your test suite.
+Playwright for Node.js has a canary releases system.
 
-- [Playwright Test vs. Library](#playwright-test-vs-library)
-- [Introduction](#introduction)
-- [Implementation](#implementation)
+It permits you to **test new unreleased features** instead of waiting for a full release. They get released daily on the `next` NPM tag of Playwright.
 
-## Playwright Test vs. Library
+It is a good way to **give feedback to maintainers**, ensuring the newly implemented feature works as intended.
 
-:::caution
-This guide is for [Playwright Library](./library.mdx), if you are using Playwright Test (`@playwright/test`) see [here](./test-pom.mdx).
+:::note
+ Using a canary release in production might seem risky, but in practice, it's not.  A canary release passes all automated tests and is used to test e.g. the HTML report, Trace Viewer, or Playwright Inspector with end-to-end tests. 
 :::
 
-## Introduction
-
-A page object represents a part of your web application. An e-commerce web application might have a home page, a listings page and a checkout page. Each of them can be represented by page object models.
-
-Page objects **simplify authoring**. They create a higher-level API which suits your application.
-
-Page objects **simplify maintenance**. They capture element selectors in one place and create reusable code to avoid repetition.
-
-## Implementation
-
-Page object models wrap over a Playwright [Page].
-
-```js
-// models/Search.js
-class SearchPage {
-  /**
-   * @param {import('playwright').Page} page 
-   */
-  constructor(page) {
-    this.page = page;
-    this.searchTermInput = page.locator('[aria-label="Enter your search term"]');
-  }
-  async navigate() {
-    await this.page.goto('https://bing.com');
-  }
-  async search(text) {
-    await this.searchTermInput.fill(text);
-    await this.searchTermInput.press('Enter');
-  }
-}
-module.exports = { SearchPage };
+```
+npm install -D @playwright/test@next
 ```
 
-Page objects can then be used inside a test.
+## Next npm Dist Tag
 
-```js
-// search.spec.js
-const { SearchPage } = require('./models/Search');
+For any code-related commit on `main`, the continuous integration will publish a daily canary release under the `@next` npm dist tag.
 
-// In the test
-const page = await browser.newPage();
-const searchPage = new SearchPage(page);
-await searchPage.navigate();
-await searchPage.search('search query');
+You can see on [npm](https://www.npmjs.com/package/@playwright/test?activeTab=versions) the current dist tags:
+- `latest`: stable releases
+- `next`: next releases, published daily
+- `beta`: after a release-branch was cut, usually a week before a stable release each commit gets published under this tag
+
+## Using a Canary Release
+
+```
+npm install -D @playwright/test@next
 ```
 
-### API reference
-- [Page]
+## Documentation
+
+The stable and the `next` documentation is published on [playwright.dev](https://playwright.dev). To see the `next` documentation, press <kbd>Shift</kbd> on the keyboard `5` times.
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
