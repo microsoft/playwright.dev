@@ -305,11 +305,36 @@ await expect(locator).toContainText('substring');
 await expect(locator).toContainText(/\d messages/);
 ```
 
-Note that if array is passed as an expected value, entire lists of elements can be asserted:
+If you pass an array as an expected value, the expectations are:
+1. Locator resolves to a list of elements.
+1. Elements from a **subset** of this list contain text from the expected array, respectively.
+1. The matching subset of elements has the same order as the expected array.
+1. Each text value from the expected array is matched by some element from the list.
+
+For example, consider the following list:
+
+```html
+<ul>
+  <li>Item Text 1</li>
+  <li>Item Text 2</li>
+  <li>Item Text 3</li>
+</ul>
+```
+
+Let's see how we can use the assertion:
 
 ```js
-const locator = page.locator('list > .list-item');
-await expect(locator).toContainText(['Text 1', 'Text 4', 'Text 5']);
+// ✓ Contains the right items in the right order
+await expect(page.locator('ul > li')).toContainText(['Text 1', 'Text 3']);
+
+// ✖ Wrong order
+await expect(page.locator('ul > li')).toContainText(['Text 3', 'Text 2']);
+
+// ✖ No item contains this text
+await expect(page.locator('ul > li')).toContainText(['Some 33']);
+
+// ✖ Locator points to the outer list element, not to the list items
+await expect(page.locator('ul')).toContainText(['Text 3']);
 ```
 
 ## expect(locator).toHaveAttribute(name, value[, options]) {#locator-assertions-to-have-attribute}
@@ -435,7 +460,7 @@ await expect(locator).toHaveJSProperty('loaded', true);
 
     Defaults to `"disabled"` that disables animations.
   - `caret?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-screenshot-1-option-caret"/> &#60;"hide"|"initial"&#62; When set to `"hide"`, screenshot will hide text caret. When set to `"initial"`, text caret behavior will not be changed.  Defaults to `"hide"`.<a href="#locator-assertions-to-have-screenshot-1-option-caret" class="list-anchor">#</a>
-  - `mask?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-screenshot-1-option-mask"/> &#60;[Array]<[Locator]>&#62; Specify locators that should be masked when the screenshot is taken. Masked elements will be overlayed with a pink box `#FF00FF` that completely covers its bounding box.<a href="#locator-assertions-to-have-screenshot-1-option-mask" class="list-anchor">#</a>
+  - `mask?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-screenshot-1-option-mask"/> &#60;[Array]<[Locator]>&#62; Specify locators that should be masked when the screenshot is taken. Masked elements will be overlaid with a pink box `#FF00FF` that completely covers its bounding box.<a href="#locator-assertions-to-have-screenshot-1-option-mask" class="list-anchor">#</a>
   - `maxDiffPixelRatio?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-screenshot-1-option-max-diff-pixel-ratio"/> &#60;[number]&#62; An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1`. Default is configurable with `TestConfig.expect`. Unset by default.<a href="#locator-assertions-to-have-screenshot-1-option-max-diff-pixel-ratio" class="list-anchor">#</a>
   - `maxDiffPixels?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-screenshot-1-option-max-diff-pixels"/> &#60;[number]&#62; An acceptable amount of pixels that could be different. Default is configurable with `TestConfig.expect`. Unset by default.<a href="#locator-assertions-to-have-screenshot-1-option-max-diff-pixels" class="list-anchor">#</a>
   - `omitBackground?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-screenshot-1-option-omit-background"/> &#60;[boolean]&#62; Hides default white background and allows capturing screenshots with transparency. Not applicable to `jpeg` images. Defaults to `false`.<a href="#locator-assertions-to-have-screenshot-1-option-omit-background" class="list-anchor">#</a>
@@ -464,7 +489,7 @@ await expect(locator).toHaveScreenshot('image.png');
 
     Defaults to `"disabled"` that disables animations.
   - `caret?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-screenshot-2-option-caret"/> &#60;"hide"|"initial"&#62; When set to `"hide"`, screenshot will hide text caret. When set to `"initial"`, text caret behavior will not be changed.  Defaults to `"hide"`.<a href="#locator-assertions-to-have-screenshot-2-option-caret" class="list-anchor">#</a>
-  - `mask?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-screenshot-2-option-mask"/> &#60;[Array]<[Locator]>&#62; Specify locators that should be masked when the screenshot is taken. Masked elements will be overlayed with a pink box `#FF00FF` that completely covers its bounding box.<a href="#locator-assertions-to-have-screenshot-2-option-mask" class="list-anchor">#</a>
+  - `mask?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-screenshot-2-option-mask"/> &#60;[Array]<[Locator]>&#62; Specify locators that should be masked when the screenshot is taken. Masked elements will be overlaid with a pink box `#FF00FF` that completely covers its bounding box.<a href="#locator-assertions-to-have-screenshot-2-option-mask" class="list-anchor">#</a>
   - `maxDiffPixelRatio?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-screenshot-2-option-max-diff-pixel-ratio"/> &#60;[number]&#62; An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1`. Default is configurable with `TestConfig.expect`. Unset by default.<a href="#locator-assertions-to-have-screenshot-2-option-max-diff-pixel-ratio" class="list-anchor">#</a>
   - `maxDiffPixels?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-screenshot-2-option-max-diff-pixels"/> &#60;[number]&#62; An acceptable amount of pixels that could be different. Default is configurable with `TestConfig.expect`. Unset by default.<a href="#locator-assertions-to-have-screenshot-2-option-max-diff-pixels" class="list-anchor">#</a>
   - `omitBackground?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-screenshot-2-option-omit-background"/> &#60;[boolean]&#62; Hides default white background and allows capturing screenshots with transparency. Not applicable to `jpeg` images. Defaults to `false`.<a href="#locator-assertions-to-have-screenshot-2-option-omit-background" class="list-anchor">#</a>
@@ -501,11 +526,35 @@ await expect(locator).toHaveText(/Welcome, Test User/);
 await expect(locator).toHaveText(/Welcome, .*/);
 ```
 
-Note that if array is passed as an expected value, entire lists of elements can be asserted:
+If you pass an array as an expected value, the expectations are:
+1. Locator resolves to a list of elements.
+1. The number of elements equals the number of expected values in the array.
+1. Elements from the list have text matching expected array values, one by one, in order.
+
+For example, consider the following list:
+
+```html
+<ul>
+  <li>Text 1</li>
+  <li>Text 2</li>
+  <li>Text 3</li>
+</ul>
+```
+
+Let's see how we can use the assertion:
 
 ```js
-const locator = page.locator('list > .component');
-await expect(locator).toHaveText(['Text 1', 'Text 2', 'Text 3']);
+// ✓ Has the right items in the right order
+await expect(page.locator('ul > li')).toHaveText(['Text 1', 'Text 2', 'Text 3']);
+
+// ✖ Wrong order
+await expect(page.locator('ul > li')).toHaveText(['Text 3', 'Text 2', 'Text 1']);
+
+// ✖ Last item does not match
+await expect(page.locator('ul > li')).toHaveText(['Text 1', 'Text 2', 'Text']);
+
+// ✖ Locator points to the outer list element, not to the list items
+await expect(page.locator('ul')).toHaveText(['Text 1', 'Text 2', 'Text 3']);
 ```
 
 ## expect(locator).toHaveValue(value[, options]) {#locator-assertions-to-have-value}
@@ -581,7 +630,7 @@ await expect(page).not.toHaveURL('error');
     - `width` &#60;[number]&#62; width of clipping area
     - `height` &#60;[number]&#62; height of clipping area
   - `fullPage?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-full-page"/> &#60;[boolean]&#62; When true, takes a screenshot of the full scrollable page, instead of the currently visible viewport. Defaults to `false`.<a href="#page-assertions-to-have-screenshot-1-option-full-page" class="list-anchor">#</a>
-  - `mask?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-mask"/> &#60;[Array]<[Locator]>&#62; Specify locators that should be masked when the screenshot is taken. Masked elements will be overlayed with a pink box `#FF00FF` that completely covers its bounding box.<a href="#page-assertions-to-have-screenshot-1-option-mask" class="list-anchor">#</a>
+  - `mask?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-mask"/> &#60;[Array]<[Locator]>&#62; Specify locators that should be masked when the screenshot is taken. Masked elements will be overlaid with a pink box `#FF00FF` that completely covers its bounding box.<a href="#page-assertions-to-have-screenshot-1-option-mask" class="list-anchor">#</a>
   - `maxDiffPixelRatio?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-max-diff-pixel-ratio"/> &#60;[number]&#62; An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1`. Default is configurable with `TestConfig.expect`. Unset by default.<a href="#page-assertions-to-have-screenshot-1-option-max-diff-pixel-ratio" class="list-anchor">#</a>
   - `maxDiffPixels?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-max-diff-pixels"/> &#60;[number]&#62; An acceptable amount of pixels that could be different. Default is configurable with `TestConfig.expect`. Unset by default.<a href="#page-assertions-to-have-screenshot-1-option-max-diff-pixels" class="list-anchor">#</a>
   - `omitBackground?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-1-option-omit-background"/> &#60;[boolean]&#62; Hides default white background and allows capturing screenshots with transparency. Not applicable to `jpeg` images. Defaults to `false`.<a href="#page-assertions-to-have-screenshot-1-option-omit-background" class="list-anchor">#</a>
@@ -615,7 +664,7 @@ await expect(page).toHaveScreenshot('image.png');
     - `width` &#60;[number]&#62; width of clipping area
     - `height` &#60;[number]&#62; height of clipping area
   - `fullPage?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-2-option-full-page"/> &#60;[boolean]&#62; When true, takes a screenshot of the full scrollable page, instead of the currently visible viewport. Defaults to `false`.<a href="#page-assertions-to-have-screenshot-2-option-full-page" class="list-anchor">#</a>
-  - `mask?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-2-option-mask"/> &#60;[Array]<[Locator]>&#62; Specify locators that should be masked when the screenshot is taken. Masked elements will be overlayed with a pink box `#FF00FF` that completely covers its bounding box.<a href="#page-assertions-to-have-screenshot-2-option-mask" class="list-anchor">#</a>
+  - `mask?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-2-option-mask"/> &#60;[Array]<[Locator]>&#62; Specify locators that should be masked when the screenshot is taken. Masked elements will be overlaid with a pink box `#FF00FF` that completely covers its bounding box.<a href="#page-assertions-to-have-screenshot-2-option-mask" class="list-anchor">#</a>
   - `maxDiffPixelRatio?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-2-option-max-diff-pixel-ratio"/> &#60;[number]&#62; An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1`. Default is configurable with `TestConfig.expect`. Unset by default.<a href="#page-assertions-to-have-screenshot-2-option-max-diff-pixel-ratio" class="list-anchor">#</a>
   - `maxDiffPixels?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-2-option-max-diff-pixels"/> &#60;[number]&#62; An acceptable amount of pixels that could be different. Default is configurable with `TestConfig.expect`. Unset by default.<a href="#page-assertions-to-have-screenshot-2-option-max-diff-pixels" class="list-anchor">#</a>
   - `omitBackground?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-assertions-to-have-screenshot-2-option-omit-background"/> &#60;[boolean]&#62; Hides default white background and allows capturing screenshots with transparency. Not applicable to `jpeg` images. Defaults to `false`.<a href="#page-assertions-to-have-screenshot-2-option-omit-background" class="list-anchor">#</a>
