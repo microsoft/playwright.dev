@@ -1,137 +1,60 @@
 ---
-id: running-tests
-title: "Running Tests"
+id: trace-viewer-intro
+title: "Trace Viewer"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-You can run a single test, a set of tests or all tests. Tests can be run on different browsers. By default tests are run in a headless manner meaning no browser window will be opened while running the tests and results will be seen in the terminal. If you prefer you can run your tests in headed mode by using the `headless` test run parameter.
-- Running all tests
+Playwright Trace Viewer is a GUI tool that lets you explore recorded Playwright traces of your tests meaning you can go back and forward though each action of your test and visually see what was happening during each action.
 
-  ```bash
-  dotnet test
-  ```
+**You will learn**
+- How to record a trace
+- How to open the HTML report
+- How to open the trace viewer
 
-- Running a single test file
+## Recording a trace
 
-  ```bash
-  dotnet test --filter "MyClassName"
-  ```
+Traces can be recorded using the [BrowserContext.Tracing](/api/class-browsercontext.mdx#browser-context-tracing) API as follows:
 
-- Run a set of test files
+```csharp
+await using var browser = playwright.Chromium.LaunchAsync();
+await using var context = await browser.NewContextAsync();
 
-  ```bash
-  dotnet test --filter "MyClassName1|MyClassName2"
-  ```
+// Start tracing before creating / navigating a page.
+await context.Tracing.StartAsync(new()
+{
+  Screenshots = true,
+  Snapshots = true,
+  Sources = true
+});
 
-- Run the test with the title
+var page = context.NewPageAsync();
+await page.GotoAsync("https://playwright.dev");
 
-  ```bash
-  dotnet test --filter "Name~TestMethod1"
-  ```
+// Stop tracing and export it into a zip archive.
+await context.Tracing.StopAsync(new()
+{
+  Path = "trace.zip"
+});
+```
 
-- Running Tests on specific browsers
+This will record the trace and place it into the file named `trace.zip`.
 
-  <Tabs
-    groupId="bash-flavor"
-    defaultValue="bash"
-    values={[
-      {label: 'Bash', value: 'bash'},
-      {label: 'PowerShell', value: 'powershell'},
-      {label: 'Batch', value: 'batch'}
-    ]
-  }>
-  <TabItem value="bash">
-  
-  ```bash
-  BROWSER=webkit dotnet test
-  ```
-  
-  </TabItem>
-  <TabItem value="powershell">
-  
-  ```powershell
-  $env:BROWSER="webkit"
-  dotnet test
-  ```
-  
-  </TabItem>
-  <TabItem value="batch">
-  
-  ```batch
-  set BROWSER=webkit
-  dotnet test
-  ```
-  
-  </TabItem>
-  </Tabs>
-- Running Tests on multiple browsers
+## Opening the trace
 
-  To run your test on multiple browsers or configurations you need to invoke the `dotnet test` command multiple times. There you can then either specify the `BROWSER` environment variable (like the previous) or pass the `browser` via the runsettings file:
-
-  ```bash
-  dotnet test --settings:chromium.runsettings
-  dotnet test --settings:firefox.runsettings
-  dotnet test --settings:webkit.runsettings
-  ```
-
-  ```xml
-  <?xml version="1.0" encoding="utf-8"?>
-  <RunSettings>
-    <TestRunParameters>
-      <Parameter name="browser" value="chromium" />
-      <Parameter name="headless" value="false" />
-    </TestRunParameters>
-  </RunSettings>
-  ```
-
-For more information see [selective unit tests](https://docs.microsoft.com/en-us/dotnet/core/testing/selective-unit-tests?pivots=mstest) in the Microsoft docs.
-
-## Debugging Tests
-
-Since Playwright runs in .NET, you can debug it with your debugger of choice in e.g. Visual Studio Code or Visual Studio. Playwright comes with the Playwright Inspector which allows you to step through Playwright API calls, see their debug logs and explore [selectors](./selectors.mdx).
-
-<Tabs
-  groupId="bash-flavor"
-  defaultValue="bash"
-  values={[
-    {label: 'Bash', value: 'bash'},
-    {label: 'PowerShell', value: 'powershell'},
-    {label: 'Batch', value: 'batch'}
-  ]
-}>
-<TabItem value="bash">
+You can open the saved trace using Playwright CLI or in your browser on [`trace.playwright.dev`](https://trace.playwright.dev).
 
 ```bash
-PWDEBUG=1 dotnet test
+pwsh bin\Debug\netX\playwright.ps1 show-trace trace.zip
 ```
 
-</TabItem>
-<TabItem value="powershell">
+## Viewing the trace
 
-```powershell
-$env:PWDEBUG=1
-dotnet test
-```
+View traces of your test by clicking through each action or hovering using the timeline and see the state of the page before and after the action. Inspect the log, source and network during each step of the test. The trace viewer creates a DOM snapshot so you can fully interact with it, open devtools etc.
 
-</TabItem>
-<TabItem value="batch">
+<img width="941" alt="image" src="https://user-images.githubusercontent.com/13063165/182618490-3340cfbf-7ac9-46e2-8157-6a8ce52dca28.png" />
 
-```batch
-set PWDEBUG=1
-dotnet test
-```
-
-</TabItem>
-</Tabs>
-
-<img width="712" alt="Playwright Inspector" src="https://user-images.githubusercontent.com/883973/108614092-8c478a80-73ac-11eb-9597-67dfce110e00.png"></img>
-
-Check out our [debugging guide](./debug.mdx) to learn more about the [Playwright Inspector](./debug.mdx#playwright-inspector) as well as debugging with [Browser Developer tools](./debug.mdx#browser-developer-tools).
-
-## What's Next
-- [Generate tests with Codegen](./codegen.mdx)
-- [See a trace of your tests](./trace-viewer-intro.mdx)
+To learn more check out our detailed guide on [Trace Viewer](/trace-viewer.mdx).
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
