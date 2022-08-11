@@ -1,11 +1,14 @@
 ---
-id: codegen
+id: codegen-intro
 title: "Test Generator"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
 Playwright comes with the ability to generate tests out of the box and is a great way to quickly get started with testing. It will open two windows, a browser window where you interact with the website you wish to test and the Playwright Inspector window where you can record your tests, copy the tests, clear your tests as well as change the language of your tests.
+
+**You will learn**
+- [How to generate tests with Codegen](/codegen.mdx#running-codegen)
 
 ## Running Codegen
 
@@ -17,127 +20,16 @@ Run `codegen` and perform actions in the browser. Playwright will generate the c
 
 <img width="1183" alt="Codegen generating code for tests for playwright.dev website" src="https://user-images.githubusercontent.com/13063165/181852815-971c10da-0b55-4e54-8a73-77e1e825193c.png" />
 
-## Emulate viewport size
+When you have finished interacting with the page, press the **record** button to stop the recording and use the **copy** button to copy the generated code to your editor. 
 
-Playwright opens a browser window with it's viewport set to a specific width and height and is not responsive as tests need to be run under the same conditions. Use the `--viewport` option to generate tests with a different viewport size.
+<img width="1266" alt="Codegen generating code for tests for playwright.dev" src="https://user-images.githubusercontent.com/13063165/183905981-003c4173-0d5e-4960-8190-50e6ca71b2c3.png" />
 
-```bash
-playwright codegen --viewport-size=800,600 playwright.dev
-```
+Use the **clear** button to clear the code to start recording again. Once finished close the Playwright inspector window or stop the terminal command.
 
-<img width="1409" alt="Codegen generating code for tests for playwright.dev website with a specific viewport" src="https://user-images.githubusercontent.com/13063165/182360039-6db79ad6-fe82-4fd6-900a-b5e25f7f720f.png" />
+To learn more about generating tests check out or detailed guide on [Codegen](./codegen.mdx).
 
-## Emulate devices
-
-Record scripts and tests while emulating a mobile device using the `--device` option which sets the viewport size and user agent among others.
-
-```bash
-playwright codegen --device="iPhone 11" playwright.dev
-```
-
-<img width="1239" alt="Codegen generating code for tests for playwright.dev website emulated for iPhone 11" src="https://user-images.githubusercontent.com/13063165/182360089-9dc6d33d-480e-4bb2-86a3-fec51c1c228e.png" />
-
-## Emulate color scheme
-
-Record scripts and tests while emulating the color scheme with the `--color-scheme` option.
-
-```bash
-playwright codegen --color-scheme=dark playwright.dev
-```
-
-<img width="1258" alt="Codegen generating code for tests for playwright.dev website in dark mode" src="https://user-images.githubusercontent.com/13063165/182359371-0bb4a7a2-abbb-4f73-8550-d67e0101f0ad.png" />
-
-## Emulate geolocation, language and timezone
-
-Record scripts and tests while emulating timezone, language & location using the `--timezone`, `--geolocation` and `--lang` options. Once page opens, click the "show your location" icon at them bottom right corner of the map to see geolocation in action.
-
-```bash
-playwright codegen --timezone="Europe/Rome" --geolocation="41.890221,12.492348" --lang="it-IT" maps.google.com
-```
-
-<img width="1276" alt="Codegen generating code for tests for google maps showing timezone, geoloation as Rome, Italy and in Italian language" src="https://user-images.githubusercontent.com/13063165/182394434-73e1c2a8-767e-411a-94e4-0912c1c50ecc.png" />
-
-## Preserve authenticated state
-
-Run `codegen` with `--save-storage` to save [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) and [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) at the end of the session. This is useful to separately record an authentication step and reuse it later in the tests. 
-
-After performing authentication and closing the browser, `auth.json` will contain the storage state. 
-
-```bash
-playwright codegen --save-storage=auth.json
-```
-
-<img width="1264" alt="Screenshot 2022-08-03 at 13 28 02" src="https://user-images.githubusercontent.com/13063165/182599605-df2fbd05-622b-4cd7-8a32-0abdfea7d38d.png" />
-
-Run with `--load-storage` to consume previously loaded storage. This way, all [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) and [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) will be restored, bringing most web apps to the authenticated state without the need to login again.
-
-```bash
-playwright codegen --load-storage=auth.json github.com/microsoft/playwright
-```
-
-<img width="1261" alt="Screenshot 2022-08-03 at 13 33 40" src="https://user-images.githubusercontent.com/13063165/182599680-05297b4e-c258-4416-8daa-b8637c1db120.png" />
-
-Use the `open` command with `--load-storage` to open the saved `auth.json`.
-
-```bash
-playwright open --load-storage=auth.json github.com/microsoft/playwright
-```
-
-## Record using custom setup
-
-If you would like to use codegen in some non-standard setup (for example, use [browser_context.route(url, handler, **kwargs)](/api/class-browsercontext.mdx#browser-context-route)), it is possible to call [page.pause()](/api/class-page.mdx#page-pause) that will open a separate window with codegen controls.
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-from playwright.sync_api import sync_playwright
-
-with sync_playwright() as p:
-    # Make sure to run headed.
-    browser = p.chromium.launch(headless=False)
-
-    # Setup context however you like.
-    context = browser.new_context() # Pass any options
-    context.route('**/*', lambda route: route.continue_())
-
-    # Pause the page, and start recording manually.
-    page = context.new_page()
-    page.pause()
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-import asyncio
-from playwright.async_api import async_playwright
-
-async def main():
-    async with async_playwright() as p:
-        # Make sure to run headed.
-        browser = await p.chromium.launch(headless=False)
-
-        # Setup context however you like.
-        context = await browser.new_context() # Pass any options
-        await context.route('**/*', lambda route: route.continue_())
-
-        # Pause the page, and start recording manually.
-        page = await context.new_page()
-        await page.pause()
-
-asyncio.run(main())
-```
-
-</TabItem>
-</Tabs>
+## What's Next
+- [See a trace of your tests](./trace-viewer.mdx)
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
