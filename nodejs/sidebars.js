@@ -7,7 +7,7 @@ module.exports = {
         { type: 'doc', id: 'intro' },
         { type: 'doc', id: 'writing-tests' },
         { type: 'doc', id: 'running-tests' },
-        { type: 'doc', id: 'codegen' },
+        { type: 'doc', id: 'codegen-intro' },
         { type: 'doc', id: 'trace-viewer' },
         { type: 'doc', id: 'ci-intro' },
       ],
@@ -71,6 +71,7 @@ module.exports = {
         { type: 'doc', id: 'pom' },
         { type: 'doc', id: 'screenshots' },
         { type: 'doc', id: 'selectors' },
+        { type: 'doc', id: 'codegen' },
         { type: 'doc', id: 'videos' }
       ],
       collapsed: false
