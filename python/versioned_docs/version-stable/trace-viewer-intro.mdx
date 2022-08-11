@@ -1,71 +1,80 @@
 ---
-id: intro
-title: "Installation"
+id: trace-viewer-intro
+title: "Trace Viewer"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright was created specifically to accommodate the needs of end-to-end testing. Playwright supports all modern rendering engines including Chromium, WebKit, and Firefox. Test on Windows, Linux, and macOS, locally or on CI, headless or headed with native mobile emulation. 
+Playwright Trace Viewer is a GUI tool that lets you explore recorded Playwright traces of your tests meaning you can go back and forward though each action of your test and visually see what was happening during each action.
 
-Playwright recommends using the official [Playwright Pytest plugin](./test-runners.mdx) to write end-to-end tests. It provides context isolation, running it on multiple browser configurations out of the box. Alternatively you can use the [library](./library.mdx) to manually write the testing infrastructure with your preferred test-runner. The Pytest plugin utilizes the sync version of Playwright, there is also an async version accessible via the library.
+**You will learn**
+- How to record a trace
+- How to open the HTML report
+- How to open the trace viewer
 
-Get started by installing Playwright and running the example test to see it in action.
+## Recording a trace
 
-Install the [Pytest plugin](https://pypi.org/project/pytest-playwright/):
+Traces can be recorded using the [browser_context.tracing](/api/class-browsercontext.mdx#browser-context-tracing) API as follows:
 
-```bash
-pip install pytest-playwright
-```
-
-Install the required browsers:
-
-```bash
-playwright install
-```
-
-## Add Example Test
-
-Create a `test_my_application.py` file inside the current working directory or in a sub-directory with the code below:
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
 ```py
-import re
-from playwright.sync_api import Page, expect
+browser = chromium.launch()
+context = browser.new_context()
 
+# Start tracing before creating / navigating a page.
+context.tracing.start(screenshots=True, snapshots=True, sources=True)
 
-def test_homepage_has_Playwright_in_title_and_get_started_link_linking_to_the_intro_page(page: Page):
-    page.goto("https://playwright.dev/")
+page.goto("https://playwright.dev")
 
-    # Expect a title "to contain" a substring.
-    expect(page).to_have_title(re.compile("Playwright"))
-
-    # create a locator
-    get_started = page.locator("text=Get Started")
-
-    # Expect an attribute "to be strictly equal" to the value.
-    expect(get_started).to_have_attribute("href", "/docs/intro")
-
-    # Click the get started link.
-    get_started.click()
-
-    # Expects the URL to contain intro.
-    expect(page).to_have_url(re.compile(".*intro"))
+# Stop tracing and export it into a zip archive.
+context.tracing.stop(path = "trace.zip")
 ```
 
-## Running the Example Test
+</TabItem>
+<TabItem value="async">
 
-By default tests will be run on chromium. This can be configured via the CLI options. Tests are run in headless mode meaning no browser UI will open up when running the tests. Results of the tests and test logs will be shown in the terminal.
+```py
+browser = await chromium.launch()
+context = await browser.new_context()
+
+# Start tracing before creating / navigating a page.
+await context.tracing.start(screenshots=True, snapshots=True, sources=True)
+
+await page.goto("https://playwright.dev")
+
+# Stop tracing and export it into a zip archive.
+await context.tracing.stop(path = "trace.zip")
+```
+
+</TabItem>
+</Tabs>
+
+This will record the trace and place it into the file named `trace.zip`.
+
+## Opening the trace
+
+You can open the saved trace using Playwright CLI or in your browser on [`trace.playwright.dev`](https://trace.playwright.dev).
 
 ```bash
-pytest
+playwright show-trace trace.zip
 ```
 
-See our doc on [Running Tests](./running-tests.mdx) to learn more about running tests in headed mode, running multiple tests, running specific tests etc.
+## Viewing the trace
 
-## What's next
-- [Write tests using web first assertions, page fixtures and locators](./writing-tests.mdx)
-- [Run single tests, multiple tests, headed mode](./running-tests.mdx)
-- [Generate tests with Codegen](./codegen.mdx)
-- [See a trace of your tests](./trace-viewer-intro.mdx)
+View traces of your test by clicking through each action or hovering using the timeline and see the state of the page before and after the action. Inspect the log, source and network during each step of the test. The trace viewer creates a DOM snapshot so you can fully interact with it, open devtools etc.
+
+<img width="941" alt="image" src="https://user-images.githubusercontent.com/13063165/182618490-3340cfbf-7ac9-46e2-8157-6a8ce52dca28.png" />
+
+To learn more check out our detailed guide on [Trace Viewer](/trace-viewer.mdx).
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"

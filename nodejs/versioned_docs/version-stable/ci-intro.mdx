@@ -1,109 +1,113 @@
 ---
-id: codegen
-title: "Test Generator"
+id: ci-intro
+title: "CI Github Actions"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright comes with the ability to generate tests out of the box and is a great way to quickly get started with testing. It will open two windows, a browser window where you interact with the website you wish to test and the Playwright Inspector window where you can record your tests, copy the tests, clear your tests as well as change the language of your tests.
+When installing Playwright you are given the option to add a [GitHub Actions](https://docs.github.com/en/actions). This creates a `playwright.yml` file inside a `.github/workflows` folder containing everything you need so that your tests run on each push and pull request into the main/master branch.
 
-## Running Codegen
+**What you will learn:**
+- [How to use GitHub Actions to run your tests](#github-actions)
+- [How to create a repo and push to GitHub](#create-a-repo-and-push-to-github)
+- [How to open the workflows](#opening-the-workflows)
+- [How to view the test logs](#viewing-test-logs)
+- [How to download the report from GitHub](#downloading-the-playwright-report)
+- [How to view the report](#viewing-the-playwright-report)
+- [How to view the trace](#viewing-the-trace)
+
+## GitHub Actions
+
+Tests will run on push or pull request on branches main/master. The [workflow](https://docs.github.com/en/actions/using-workflows/about-workflows) will install all dependencies, install Playwright and then run the tests. It will also create the HTML report.
+
+```yaml
+name: Playwright Tests
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "14.x"
+      - name: Install dependencies
+        run: npm ci
+      - name: Install Playwright Browsers
+        run: npx playwright install --with-deps
+      - name: Run Playwright tests
+        run: npx playwright test
+      - uses: actions/upload-artifact@v2
+        if: always()
+        with:
+          name: playwright-report
+          path: playwright-report/
+          retention-days: 30
+```
+
+### Create a Repo and Push to GitHub
+
+[Create a repo on GitHub](https://docs.github.com/en/get-started/quickstart/create-a-repo) and create a new repository or push an existing repository. Follow the instructions on GitHub and don't forget to [initialize a git repository](https://github.com/git-guides/git-init) using the `git init` command so you can [add](https://github.com/git-guides/git-add), [commit](https://github.com/git-guides/git-commit) and [push](https://github.com/git-guides/git-push) your code.
+
+<img width="861" alt="Create a Repo and Push to GitHub" src="https://user-images.githubusercontent.com/13063165/183423254-d2735278-a2ab-4d63-bb99-48d8e5e447bc.png"/>
+
+### Opening the Workflows
+
+Click on the **Actions** tab to see the workflows. Here you will see if your tests have passed or failed.
+
+<img width="847" alt="Opening the Workflows" src="https://user-images.githubusercontent.com/13063165/183423584-2ea18038-cd49-4daa-a20c-2205352f0933.png"/>
+
+On Pull Requests you can also click on the **Details** link in the [PR status check](https://docs.github.com/en/pull-requests/collaborating-with-pull-requests/collaborating-on-repositories-with-code-quality-features/about-status-checks).
+
+<img width="645" alt="pr status checked" src="https://user-images.githubusercontent.com/13063165/183722462-17a985db-0e10-4205-b16c-8aaac36117b9.png" />
+
+### Viewing Test Logs
+
+Clicking on the workflow run will show you the all the actions that GitHub performed and clicking on **Run Playwright tests** will show the error messages, what was expected and what was received as well as the call log.
+
+<img width="839" alt="Viewing Test Logs" src="https://user-images.githubusercontent.com/13063165/183423783-58bf2008-514e-4f96-9c12-c9a55703960c.png"/>
+
+## HTML Report
+
+The HTML Report shows you a full report of your tests. You can filter the report by browsers, passed tests, failed tests, skipped tests and flaky tests.
+
+### Downloading the HTML Report
+
+In the Artifacts section click on the **playwright-report** to download your report in the format of a zip file.
+
+<img width="972" alt="Downloading the HTML Report" src="https://user-images.githubusercontent.com/13063165/183437023-524f1803-84e4-4862-9ce3-1d55af0e023e.png" />
+
+### Viewing the HTML Report
+
+Locally opening the report will not work as expected as you need a web server in order for everything to work correctly. First, extract the zip, preferably in a folder that already has Playwright installed. Using the command line change into the directory where the report is and use `npx playwright show-report` followed by the name of the extracted folder. This will serve up the report and enable you to view it in your browser.
 
 ```bash
-npx playwright codegen playwright.dev
+npx playwright show-report name-of-my-extracted-playwright-report
 ```
 
-Run `codegen` and perform actions in the browser. Playwright will generate the code for the user interactions. `Codegen` will attempt to generate resilient text-based selectors.
+<img width="752" alt="Viewing the HTML Report" src="https://user-images.githubusercontent.com/13063165/183437645-b47dd175-2e07-4ecc-a469-27d5b150b7ed.png" />
 
-<img width="1183" alt="Codegen generating code for tests for playwright.dev website" src="https://user-images.githubusercontent.com/13063165/181852815-971c10da-0b55-4e54-8a73-77e1e825193c.png" />
+To learn more about reports check out our detailed guide on [HTML Reporter](/test-reporters.mdx#html-reporter)
 
-## Emulate viewport size
+### Viewing the Trace
 
-Playwright opens a browser window with it's viewport set to a specific width and height and is not responsive as tests need to be run under the same conditions. Use the `--viewport` option to generate tests with a different viewport size.
+Once you have served the report using `npx playwright show-report`, click on the trace icon next to the test's file name as seen in the image above. You can then view the trace of your tests and inspect each action to try to find out why the tests are failing.
 
-```bash
-npx playwright codegen --viewport-size=800,600 playwright.dev
-```
+<img width="1907" alt="Viewing the Trace" src="https://user-images.githubusercontent.com/13063165/183879653-d442e6b4-14f5-4d0e-99f3-9ba19f82c7cf.png"/>
 
-<img width="1409" alt="Codegen generating code for tests for playwright.dev website with a specific viewport" src="https://user-images.githubusercontent.com/13063165/182360039-6db79ad6-fe82-4fd6-900a-b5e25f7f720f.png" />
+To learn more about traces check out our detailed guide on [Trace Viewer](/trace-viewer.mdx).
 
-## Emulate devices
+To learn more about running tests on CI check out our detailed guide on [Continuous Integration](/ci.mdx).
 
-Record scripts and tests while emulating a mobile device using the `--device` option which sets the viewport size and user agent among others.
-
-```bash
-npx playwright codegen --device="iPhone 11" playwright.dev
-```
-
-<img width="1239" alt="Codegen generating code for tests for playwright.dev website emulated for iPhone 11" src="https://user-images.githubusercontent.com/13063165/182360089-9dc6d33d-480e-4bb2-86a3-fec51c1c228e.png" />
-
-## Emulate color scheme
-
-Record scripts and tests while emulating the color scheme with the `--color-scheme` option.
-
-```bash
-npx playwright codegen --color-scheme=dark playwright.dev
-```
-
-<img width="1258" alt="Codegen generating code for tests for playwright.dev website in dark mode" src="https://user-images.githubusercontent.com/13063165/182359371-0bb4a7a2-abbb-4f73-8550-d67e0101f0ad.png" />
-
-## Emulate geolocation, language and timezone
-
-Record scripts and tests while emulating timezone, language & location using the `--timezone`, `--geolocation` and `--lang` options. Once page opens, click the "show your location" icon at them bottom right corner of the map to see geolocation in action.
-
-```bash
-npx playwright codegen --timezone="Europe/Rome" --geolocation="41.890221,12.492348" --lang="it-IT" maps.google.com
-```
-
-<img width="1276" alt="Codegen generating code for tests for google maps showing timezone, geoloation as Rome, Italy and in Italian language" src="https://user-images.githubusercontent.com/13063165/182394434-73e1c2a8-767e-411a-94e4-0912c1c50ecc.png" />
-
-## Preserve authenticated state
-
-Run `codegen` with `--save-storage` to save [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) and [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) at the end of the session. This is useful to separately record an authentication step and reuse it later in the tests. 
-
-After performing authentication and closing the browser, `auth.json` will contain the storage state. 
-
-```bash
-npx playwright codegen --save-storage=auth.json
-```
-
-<img width="1264" alt="Screenshot 2022-08-03 at 13 28 02" src="https://user-images.githubusercontent.com/13063165/182599605-df2fbd05-622b-4cd7-8a32-0abdfea7d38d.png" />
-
-Run with `--load-storage` to consume previously loaded storage. This way, all [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) and [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) will be restored, bringing most web apps to the authenticated state without the need to login again.
-
-```bash
-npx playwright codegen --load-storage=auth.json github.com/microsoft/playwright
-```
-
-<img width="1261" alt="Screenshot 2022-08-03 at 13 33 40" src="https://user-images.githubusercontent.com/13063165/182599680-05297b4e-c258-4416-8daa-b8637c1db120.png" />
-
-Use the `open` command with `--load-storage` to open the saved `auth.json`.
-
-```bash
-npx playwright open --load-storage=auth.json github.com/microsoft/playwright
-```
-
-## Record using custom setup
-
-If you would like to use codegen in some non-standard setup (for example, use [browserContext.route(url, handler[, options])](/api/class-browsercontext.mdx#browser-context-route)), it is possible to call [page.pause()](/api/class-page.mdx#page-pause) that will open a separate window with codegen controls.
-
-```js
-const { chromium } = require('@playwright/test');
-
-(async () => {
-  // Make sure to run headed.
-  const browser = await chromium.launch({ headless: false });
-
-  // Setup context however you like.
-  const context = await browser.newContext({ /* pass any options */ });
-  await context.route('**/*', route => route.continue());
-
-  // Pause the page, and start recording manually.
-  const page = await context.newPage();
-  await page.pause();
-})();
-```
-
+## What's Next
+- [Learn how to use Web First Assertions](/test-assertions.mdx)
+- [Learn how to use Selectors](/selectors.mdx)
+- [Learn how to use Locators](/locators.mdx)
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
