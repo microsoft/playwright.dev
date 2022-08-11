@@ -9,74 +9,136 @@ module.exports = {
         { type: 'doc', id: 'running-tests' },
         { type: 'doc', id: 'codegen-intro' },
         { type: 'doc', id: 'trace-viewer-intro' },
-        { type: 'doc', id: 'ci-intro' },
+        { type: 'doc', id: 'ci-intro' }
       ],
       collapsed: false
     },
     { type: 'doc', id: 'getting-started-vscode' },
-    { type: 'doc', id: 'release-notes' },
-    { type: 'doc', id: 'canary-releases' },
+
     {
       type: 'category',
-      label: 'Playwright Test',
+      label: 'Writing Tests',
       items: [
+        {
+          type: 'category',
+          label: 'Assertions',
+          items: [
+            { type: 'doc', id: 'test-assertions' },
+            { type: 'doc', id: 'test-assertions' },
+            { type: 'doc', id: 'test-assertions' }
+          ],
+          collapsed: true
+        },
+        {
+          type: 'category',
+          label: 'Selectors',
+          items: [
+            { type: 'doc', id: 'selectors' },
+            { type: 'doc', id: 'selectors' },
+            { type: 'doc', id: 'selectors' }
+          ],
+          collapsed: true
+        },
+        { type: 'doc', id: 'locators' },
+
         { type: 'doc', id: 'test-annotations' },
-        { type: 'doc', id: 'test-api-testing' },
-        { type: 'doc', id: 'test-assertions' },
+        { type: 'doc', id: 'dialogs' },
+        { type: 'doc', id: 'input' },
+        { type: 'doc', id: 'frames' },
+        { type: 'doc', id: 'downloads' },
+        { type: 'doc', id: 'pages' },
+
         { type: 'doc', id: 'test-auth' },
-        { type: 'doc', id: 'test-cli' },
-        { type: 'doc', id: 'test-configuration' },
+
         { type: 'doc', id: 'test-pom' },
-        { type: 'doc', id: 'test-parallel' },
-        { type: 'doc', id: 'test-parameterize' },
-        { type: 'doc', id: 'test-reporters' },
+
         { type: 'doc', id: 'test-retries' },
         { type: 'doc', id: 'test-timeouts' },
+        { type: 'doc', id: 'events' },
         { type: 'doc', id: 'test-snapshots' },
-        { type: 'doc', id: 'test-advanced' },
+        { type: 'doc', id: 'test-parameterize' },
+
         { type: 'doc', id: 'test-fixtures' },
         { type: 'doc', id: 'test-typescript' },
-        { type: 'doc', id: 'test-components' }
+
+        { type: 'doc', id: 'handles' },
+
+        { type: 'doc', id: 'evaluating' },
+
+        { type: 'doc', id: 'navigations' }
       ],
       collapsed: false
     },
     {
       type: 'category',
-      label: 'Guides',
+      label: 'Debugging',
       items: [
-        { type: 'doc', id: 'library' },
-        { type: 'doc', id: 'accessibility-testing' },
-        { type: 'doc', id: 'actionability' },
-        { type: 'doc', id: 'auth' },
-        { type: 'doc', id: 'browsers' },
-        { type: 'doc', id: 'browser-contexts' },
-        { type: 'doc', id: 'chrome-extensions' },
-        { type: 'doc', id: 'cli' },
         { type: 'doc', id: 'debug' },
-        { type: 'doc', id: 'debug-selectors' },
-        { type: 'doc', id: 'dialogs' },
-        { type: 'doc', id: 'downloads' },
-        { type: 'doc', id: 'emulation' },
-        { type: 'doc', id: 'evaluating' },
-        { type: 'doc', id: 'events' },
-        { type: 'doc', id: 'extensibility' },
-        { type: 'doc', id: 'frames' },
-        { type: 'doc', id: 'handles' },
-        { type: 'doc', id: 'input' },
-        { type: 'doc', id: 'locators' },
-        { type: 'doc', id: 'mock' },
-        { type: 'doc', id: 'navigations' },
+        { type: 'doc', id: 'debug-selectors' }
+      ],
+      collapsed: true
+    },
+
+    {
+      type: 'category',
+      label: 'Configuration',
+      items: [
+        { type: 'doc', id: 'test-configuration' },
+        { type: 'doc', id: 'test-parallel' },
+        { type: 'doc', id: 'test-reporters' },
+        { type: 'doc', id: 'test-advanced' },
+        { type: 'doc', id: 'browsers' }
+      ],
+      collapsed: true
+    },
+    { type: 'doc', id: 'actionability' },
+    { type: 'doc', id: 'test-components' },
+
+    { type: 'doc', id: 'test-cli' },
+    { type: 'doc', id: 'cli' },
+
+    {
+      type: 'category',
+      label: 'API Testing',
+      items: [
+        { type: 'doc', id: 'test-api-testing' },
+        { type: 'doc', id: 'mock' }
+      ],
+      collapsed: true
+    },
+    {
+      type: 'category',
+      label: 'Features',
+      items: [
         { type: 'doc', id: 'network' },
-        { type: 'doc', id: 'pages' },
-        { type: 'doc', id: 'pom' },
-        { type: 'doc', id: 'screenshots' },
-        { type: 'doc', id: 'selectors' },
+        { type: 'doc', id: 'chrome-extensions' },
         { type: 'doc', id: 'codegen' },
         { type: 'doc', id: 'trace-viewer' },
+        { type: 'doc', id: 'screenshots' }
+      ],
+      collapsed: true
+    },
+
+    { type: 'doc', id: 'accessibility-testing' },
+    { type: 'doc', id: 'extensibility' },
+
+    { type: 'doc', id: 'release-notes' },
+    { type: 'doc', id: 'canary-releases' },
+
+    {
+      type: 'category',
+      label: 'Library',
+      items: [
+        { type: 'doc', id: 'library' },
+        { type: 'doc', id: 'auth' },
+        { type: 'doc', id: 'browser-contexts' },
+        { type: 'doc', id: 'emulation' },
+        { type: 'doc', id: 'pom' },
         { type: 'doc', id: 'videos' }
       ],
-      collapsed: false
+      collapsed: true
     },
+
     {
       type: 'category',
       label: 'Migration',
