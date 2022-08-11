@@ -277,6 +277,11 @@ import TabItem from '@theme/TabItem';
     const assertionClassNames = ['LocatorAssertions', 'PageAssertions', 'APIResponseAssertions'];
     if (this.lang === 'js')
       assertionClassNames.push('ScreenshotAssertions');
+    if (this.lang === 'java') {
+      assertionClassNames.push('PlaywrightAssertions');
+      const relatedClass = this.documentation.classes.get('PlaywrightAssertions');
+      relatedClass.membersArray = relatedClass.membersArray.filter(m => !m.alias.startsWith('assertThat'));
+    }
     const extraToc = [];
     for (const name of assertionClassNames) {
       const relatedClass = this.documentation.classes.get(name);
