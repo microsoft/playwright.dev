@@ -1,152 +1,35 @@
 ---
-id: intro
-title: "Getting started"
+id: codegen-intro
+title: "Test Generator"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-- [Installation](#installation)
-- [Usage](#usage)
-- [First script](#first-script)
-- [Record scripts](#record-scripts)
-- [System requirements](#system-requirements)
-- [Release notes](./release-notes.mdx)
+Playwright comes with the ability to generate tests out of the box and is a great way to quickly get started with testing. It will open two windows, a browser window where you interact with the website you wish to test and the Playwright Inspector window where you can record your tests, copy the tests, clear your tests as well as change the language of your tests.
 
-## Installation
+**You will learn**
+- [How to generate tests with Codegen](/codegen.mdx#running-codegen)
 
-Playwright is distributed as a set of [Maven](https://maven.apache.org/what-is-maven.html) modules. The easiest way to use it is to add one dependency to your project's `pom.xml` as described below. If you're not familiar with Maven please refer to its [documentation](https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html).
-
-## Usage
-
-<Tabs defaultValue="java" values={[ {label: 'Example.java', value: 'java'}, {label: 'pom.xml', value: 'pom'} ] }>
-
-<TabItem value="java">
-
-```java
-package org.example;
-
-import com.microsoft.playwright.*;
-
-public class Example {
-  public static void main(String[] args) {
-    try (Playwright playwright = Playwright.create()) {
-      Browser browser = playwright.chromium().launch();
-      Page page = browser.newPage();
-      page.navigate("http://playwright.dev");
-      System.out.println(page.title());
-    }
-  }
-}
-```
-
-</TabItem>
-
-<TabItem value="pom">
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-
-  <groupId>org.example</groupId>
-  <artifactId>examples</artifactId>
-  <version>0.1-SNAPSHOT</version>
-  <name>Playwright Client Examples</name>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-  <dependencies>
-    <dependency>
-      <groupId>com.microsoft.playwright</groupId>
-      <artifactId>playwright</artifactId>
-      <version>1.25.0</version>
-    </dependency>
-  </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
-        <configuration>
-          <source>1.8</source>
-          <target>1.8</target>
-        </configuration>
-      </plugin>
-    </plugins>
-  </build>
-</project>
-```
-
-</TabItem>
-
-</Tabs>
-
-With the Example.java and pom.xml above, compile and execute your new program as follows:
+## Running Codegen
 
 ```bash
-mvn compile exec:java -Dexec.mainClass="org.example.Example"
+mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="codegen playwright.dev"
 ```
 
-Running it downloads the Playwright package and installs browser binaries for Chromium, Firefox and WebKit. To modify this behavior see [installation parameters](./browsers.mdx#installing-browsers).
+Run `codegen` and perform actions in the browser. Playwright will generate the code for the user interactions. `Codegen` will attempt to generate resilient text-based selectors.
 
-## First script
+<img width="1183" alt="Codegen generating code for tests for playwright.dev website" src="https://user-images.githubusercontent.com/13063165/181852815-971c10da-0b55-4e54-8a73-77e1e825193c.png" />
 
-In our first script, we will navigate to `whatsmyuseragent.org` and take a screenshot in WebKit.
+When you have finished interacting with the page, press the **record** button to stop the recording and use the **copy** button to copy the generated code to your editor. 
 
-```java
-import com.microsoft.playwright.*;
-import java.nio.file.Paths;
+<img width="1266" alt="Codegen generating code for tests for playwright.dev" src="https://user-images.githubusercontent.com/13063165/183905981-003c4173-0d5e-4960-8190-50e6ca71b2c3.png" />
 
-public class WebKitScreenshot {
-  public static void main(String[] args) {
-    try (Playwright playwright = Playwright.create()) {
-      Browser browser = playwright.webkit().launch();
-      Page page = browser.newPage();
-      page.navigate("http://whatsmyuseragent.org/");
-      page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get("example.png")));
-    }
-  }
-}
-```
+Use the **clear** button to clear the code to start recording again. Once finished close the Playwright inspector window or stop the terminal command.
 
-By default, Playwright runs the browsers in headless mode. To see the browser UI, pass the `headless=false` flag while launching the browser. You can also use `slowMo` to slow down execution. Learn more in the debugging tools [section](./debug.mdx).
+To learn more about generating tests check out or detailed guide on [Codegen](./codegen.mdx).
 
-```java
-playwright.firefox().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(50));
-```
-
-## Record scripts
-
-[Command line tools](./cli.mdx) can be used to record user interactions and generate Java code.
-
-```bash
-mvn exec:java -e -Dexec.mainClass=com.microsoft.playwright.CLI -Dexec.args="codegen wikipedia.org"
-```
-
-## System requirements
-
-Playwright requires **Java 8** or newer. The browser binaries for Chromium, Firefox and WebKit work across the 3 platforms (Windows, macOS, Linux):
-
-### Windows
-
-Works with Windows and Windows Subsystem for Linux (WSL).
-
-### macOS
-
-Requires 11 (Big Sur) or above.
-
-### Linux
-
-Depending on your Linux distribution, you might need to install additional dependencies to run the browsers.
-
-:::note
-Only Ubuntu 18.04, 20.04, and 22.04 are officially supported.
-:::
-
-See also in the [Command line tools](./cli.mdx#install-system-dependencies) which has a command to install all necessary dependencies automatically for Ubuntu LTS releases.
+## What's Next
+- [See a trace of your tests](./trace-viewer.mdx)
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"

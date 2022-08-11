@@ -40,9 +40,9 @@ You can use [browserContext.serviceWorkers()](/api/class-browsercontext.mdx#brow
 <TabItem value="ts">
 
 ```js
-const [serviceworker] = await Promise.all([
-  context.waitForEvent("serviceworker"),
-  page.goto("/example-with-a-service-worker.html"),
+const [ serviceworker ] = await Promise.all([
+  context.waitForEvent('serviceworker'),
+  page.goto('/example-with-a-service-worker.html'),
 ]);
 ```
 
@@ -50,16 +50,16 @@ const [serviceworker] = await Promise.all([
 <TabItem value="js">
 
 ```js
-const [serviceworker] = await Promise.all([
-  context.waitForEvent("serviceworker"),
-  page.goto("/example-with-a-service-worker.html"),
+const [ serviceworker ] = await Promise.all([
+  context.waitForEvent('serviceworker'),
+  page.goto('/example-with-a-service-worker.html'),
 ]);
 ```
 
 </TabItem>
 </Tabs>
 
-[browserContext.on('serviceworker')](/api/class-browsercontext.mdx#browser-context-event-service-worker) is fired **_before_** the Service Worker's main script has been evaluated, so **_before_** calling service[worker.evaluate(pageFunction[, arg])](/api/class-worker.mdx#worker-evaluate) you should wait on its activation.
+[browserContext.on('serviceworker')](/api/class-browsercontext.mdx#browser-context-event-service-worker) is fired ***before*** the Service Worker's main script has been evaluated, so ***before*** calling service[worker.evaluate(pageFunction[, arg])](/api/class-worker.mdx#worker-evaluate) you should wait on its activation.
 
 There are more iodiomatic methods of waiting for a Service Worker to be activated, but the following is an implementation agnostic method:
 
@@ -76,10 +76,9 @@ There are more iodiomatic methods of waiting for a Service Worker to be activate
 ```js
 await page.evaluate(async () => {
   const registration = await window.navigator.serviceWorker.getRegistration();
-  if (registration.active?.state === "activated") return;
-  await new Promise((res) =>
-    window.navigator.serviceWorker.addEventListener("controllerchange", res)
-  );
+  if (registration.active?.state === 'activated')
+    return;
+  await new Promise(res => window.navigator.serviceWorker.addEventListener('controllerchange', res));
 });
 ```
 
@@ -89,10 +88,9 @@ await page.evaluate(async () => {
 ```js
 await page.evaluate(async () => {
   const registration = await window.navigator.serviceWorker.getRegistration();
-  if (registration.active?.state === "activated") return;
-  await new Promise((res) =>
-    window.navigator.serviceWorker.addEventListener("controllerchange", res)
-  );
+  if (registration.active?.state === 'activated')
+    return;
+  await new Promise(res => window.navigator.serviceWorker.addEventListener('controllerchange', res));
 });
 ```
 
@@ -102,17 +100,17 @@ await page.evaluate(async () => {
 ### Network Events and Routing
 
 Any network request made by the **Service Worker** will have:
-- [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) and its correponding events ([browserContext.on('requestfinished')](/api/class-browsercontext.mdx#browser-context-event-request-finished) and [browserContext.on('response')](/api/class-browsercontext.mdx#browser-context-event-response), or [browserContext.on('requestfailed')](/api/class-browsercontext.mdx#browser-context-event-request-failed))
-- [browserContext.route(url, handler[, options])](/api/class-browsercontext.mdx#browser-context-route) will see the request
-- [request.serviceWorker()](/api/class-request.mdx#request-service-worker) will be set to the Service [Worker] instance, and [request.frame()](/api/class-request.mdx#request-frame) will **throw**
-- [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) will return `false`
+* [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) and its corresponding events ([browserContext.on('requestfinished')](/api/class-browsercontext.mdx#browser-context-event-request-finished) and [browserContext.on('response')](/api/class-browsercontext.mdx#browser-context-event-response), or [browserContext.on('requestfailed')](/api/class-browsercontext.mdx#browser-context-event-request-failed))
+* [browserContext.route(url, handler[, options])](/api/class-browsercontext.mdx#browser-context-route) will see the request
+* [request.serviceWorker()](/api/class-request.mdx#request-service-worker) will be set to the Service [Worker] instance, and [request.frame()](/api/class-request.mdx#request-frame) will **throw**
+* [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) will return `false`
 
 Additionally, any network request made by the **Page** (including its sub-[Frame]s) will have:
-- [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) and its correponding events ([browserContext.on('requestfinished')](/api/class-browsercontext.mdx#browser-context-event-request-finished) and [browserContext.on('response')](/api/class-browsercontext.mdx#browser-context-event-response), or [browserContext.on('requestfailed')](/api/class-browsercontext.mdx#browser-context-event-request-failed))
-- [page.on('request')](/api/class-page.mdx#page-event-request) and its correponding events ([page.on('requestfinished')](/api/class-page.mdx#page-event-request-finished) and [page.on('response')](/api/class-page.mdx#page-event-response), or [page.on('requestfailed')](/api/class-page.mdx#page-event-request-failed))
-- [page.route(url, handler[, options])](/api/class-page.mdx#page-route) and [page.route(url, handler[, options])](/api/class-page.mdx#page-route) will **not** see the request (if a Service Worker's fetch handler was registered)
-- [request.serviceWorker()](/api/class-request.mdx#request-service-worker) will be set to `null`, and [request.frame()](/api/class-request.mdx#request-frame) will return the [Frame]
-- [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) will return `true` (if a Service Worker's fetch handler was registered)
+* [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) and its corresponding events ([browserContext.on('requestfinished')](/api/class-browsercontext.mdx#browser-context-event-request-finished) and [browserContext.on('response')](/api/class-browsercontext.mdx#browser-context-event-response), or [browserContext.on('requestfailed')](/api/class-browsercontext.mdx#browser-context-event-request-failed))
+* [page.on('request')](/api/class-page.mdx#page-event-request) and its corresponding events ([page.on('requestfinished')](/api/class-page.mdx#page-event-request-finished) and [page.on('response')](/api/class-page.mdx#page-event-response), or [page.on('requestfailed')](/api/class-page.mdx#page-event-request-failed))
+* [page.route(url, handler[, options])](/api/class-page.mdx#page-route) and [page.route(url, handler[, options])](/api/class-page.mdx#page-route) will **not** see the request (if a Service Worker's fetch handler was registered)
+* [request.serviceWorker()](/api/class-request.mdx#request-service-worker) will be set to `null`, and [request.frame()](/api/class-request.mdx#request-frame) will return the [Frame]
+* [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) will return `true` (if a Service Worker's fetch handler was registered)
 
 Many Service Worker implementations simply execute the request from the page (possibly with some custom caching/offline logic omitted for simplicity):
 
@@ -120,7 +118,7 @@ Many Service Worker implementations simply execute the request from the page (po
 // filename: transparent-service-worker.js
 self.addEventListener("fetch", (event) => {
   // actually make the request
-  const responsePromise = fetch(event.request);
+  const responsePromise = fetch(event.request); 
   // send it back to the page
   event.respondWith(responsePromise);
 });
@@ -135,26 +133,24 @@ If a page registers the above Service Worker:
 ```html
 <!-- filename: index.html -->
 <script>
-  window.registrationPromise = navigator.serviceWorker.register(
-    "/transparent-service-worker.js"
-  );
+  window.registrationPromise = navigator.serviceWorker.register('/transparent-service-worker.js');
 </script>
 ```
 
 On the first visit to the page via [page.goto(url[, options])](/api/class-page.mdx#page-goto), the following Request/Response events would be emitted (along with the corresponding network lifecycle events):
 
-| Event                             | Owner            | URL                           | Routed | [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) |
-| --------------------------------- | ---------------- | ----------------------------- | ------ | -------------------------------------- |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | index.html                    | Yes    |                                        |
-| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | index.html                    | Yes    |                                        |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | transparent-service-worker.js | Yes    |                                        |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | data.json                     | Yes    |                                        |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | data.json                     |        | Yes                                    |
-| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | data.json                     |        | Yes                                    |
+| Event                             | Owner            | URL                            | Routed | [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) |
+| -                                 | -                | -                              | -      | -                                      |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | index.html                     | Yes    |                                        |
+| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | index.html                     | Yes    |                                        |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | transparent-service-worker.js  | Yes    |                                        |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | data.json                      | Yes    |                                        |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | data.json                      |        | Yes                                    |
+| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | data.json                      |        | Yes                                    |
 
 Since the example Service Worker just acts a basic transparent "proxy":
-- There's 2 [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) events for `data.json`; one [Frame]-owned, the other Service [Worker]-owned.
-- Only the Service [Worker]-owned request for the resource was routable via [browserContext.route(url, handler[, options])](/api/class-browsercontext.mdx#browser-context-route); the [Frame]-owned events for `data.json` are not routeable, as they would not have even had the possibility to hit the external network since the Service Worker has a fetch handler registered.
+* There's 2 [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) events for `data.json`; one [Frame]-owned, the other Service [Worker]-owned.
+* Only the Service [Worker]-owned request for the resource was routable via [browserContext.route(url, handler[, options])](/api/class-browsercontext.mdx#browser-context-route); the [Frame]-owned events for `data.json` are not routeable, as they would not have even had the possibility to hit the external network since the Service Worker has a fetch handler registered.
 
 :::caution
 It's important to note: calling [request.frame()](/api/class-request.mdx#request-frame) or [response.frame()](/api/class-response.mdx#response-frame) will **throw** an exception, if called on a [Request]/[Response] that has a non-null [request.serviceWorker()](/api/class-request.mdx#request-service-worker).
@@ -162,7 +158,7 @@ It's important to note: calling [request.frame()](/api/class-request.mdx#request
 
 #### Advanced Example
 
-When a Service Worker handles a page's request, the Service Worker can make 0 to n requests to the external network. The Service Worker might respond directly from a cache, generate a reponse in memory, rewrite the request, make two requests and then combine into 1, etc.
+When a Service Worker handles a page's request, the Service Worker can make 0 to n requests to the external network. The Service Worker might respond directly from a cache, generate a response in memory, rewrite the request, make two requests and then combine into 1, etc.
 
 Consider the code snippets below to understand Playwright's view into the Request/Responses and how it impacts routing in some of these cases.
 
@@ -211,20 +207,18 @@ And a page that simply registers the Service Worker:
 ```html
 <!-- filename: index.html -->
 <script>
-  window.registrationPromise = navigator.serviceWorker.register(
-    "/complex-service-worker.js"
-  );
+  window.registrationPromise = navigator.serviceWorker.register('/complex-service-worker.js');
 </script>
 ```
 
 On the first visit to the page via [page.goto(url[, options])](/api/class-page.mdx#page-goto), the following Request/Response events would be emitted:
 
-| Event                             | Owner            | URL                       | Routed | [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) |
-| --------------------------------- | ---------------- | ------------------------- | ------ | -------------------------------------- |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | index.html                | Yes    |                                        |
-| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | index.html                | Yes    |                                        |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | complex-service-worker.js | Yes    |                                        |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | addressbook.json          | Yes    |                                        |
+| Event                             | Owner            | URL                            | Routed | [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) |
+| -                                 | -                | -                              | -      | -                                      |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | index.html                     | Yes    |                                        |
+| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | index.html                     | Yes    |                                        |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | complex-service-worker.js      | Yes    |                                        |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | addressbook.json               | Yes    |                                        |
 
 It's important to note that [`cache.add`](https://developer.mozilla.org/en-US/docs/Web/API/Cache/add) caused the Service Worker to make a request (Service [Worker]-owned), even before `addressbook.json` was asked for in the page.
 
@@ -241,20 +235,20 @@ Once the Service Worker is activated and handling FetchEvents, if the page makes
 <TabItem value="ts">
 
 ```js
-await page.evaluate(() => fetch("/addressbook.json"));
-await page.evaluate(() => fetch("/foo"));
-await page.evaluate(() => fetch("/tracker.js"));
-await page.evaluate(() => fetch("/fallthrough.txt"));
+await page.evaluate(() => fetch('/addressbook.json'));
+await page.evaluate(() => fetch('/foo'));
+await page.evaluate(() => fetch('/tracker.js'));
+await page.evaluate(() => fetch('/fallthrough.txt'));
 ```
 
 </TabItem>
 <TabItem value="js">
 
 ```js
-await page.evaluate(() => fetch("/addressbook.json"));
-await page.evaluate(() => fetch("/foo"));
-await page.evaluate(() => fetch("/tracker.js"));
-await page.evaluate(() => fetch("/fallthrough.txt"));
+await page.evaluate(() => fetch('/addressbook.json'));
+await page.evaluate(() => fetch('/foo'));
+await page.evaluate(() => fetch('/tracker.js'));
+await page.evaluate(() => fetch('/fallthrough.txt'));
 ```
 
 </TabItem>
@@ -262,22 +256,22 @@ await page.evaluate(() => fetch("/fallthrough.txt"));
 
 The following Request/Response events would be emitted:
 
-| Event                             | Owner            | URL              | Routed | [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) |
-| --------------------------------- | ---------------- | ---------------- | ------ | -------------------------------------- |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | addressbook.json |        | Yes                                    |
-| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | addressbook.json |        | Yes                                    |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | bar              | Yes    |                                        |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | foo              |        | Yes                                    |
-| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | foo              |        | Yes                                    |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | tracker.js       |        | Yes                                    |
-| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | tracker.js       |        | Yes                                    |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | fallthrough.txt  | Yes    |                                        |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | fallthrough.txt  |        | Yes                                    |
-| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | fallthrough.txt  |        | Yes                                    |
+| Event                             | Owner            | URL                            | Routed | [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) |
+| -                                 | -                | -                              | -      | -                                      |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | addressbook.json               |        | Yes                                    |
+| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | addressbook.json               |        | Yes                                    |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | bar                            | Yes    |                                        |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | foo                            |        | Yes                                    |
+| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | foo                            |        | Yes                                    |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | tracker.js                     |        | Yes                                    |
+| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | tracker.js                     |        | Yes                                    |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | fallthrough.txt                | Yes    |                                        |
+| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | fallthrough.txt                |        | Yes                                    |
+| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | fallthrough.txt                |        | Yes                                    |
 
 It's important to note:
-- The page requested `/foo`, but the Service Worker requested `/bar`, so there are only [Frame]-owned events for `/foo`, but not `/bar`.
-- Likewise, the Service Worker never hit the network for `tracker.js`, so ony [Frame]-owned events were emitted for that request.
+* The page requested `/foo`, but the Service Worker requested `/bar`, so there are only [Frame]-owned events for `/foo`, but not `/bar`.
+* Likewise, the Service Worker never hit the network for `tracker.js`, so only [Frame]-owned events were emitted for that request.
 
 ## Routing Service Worker Requests Only
 
@@ -292,13 +286,13 @@ It's important to note:
 <TabItem value="ts">
 
 ```js
-await context.route("**", async (route) => {
+await context.route('**', async route => {
   if (route.request().serviceWorker()) {
     // NB: calling route.request().frame() here would THROW
     return route.fulfill({
-      contentType: "text/plain",
+      contentType: 'text/plain',
       status: 200,
-      body: "from sw",
+      body: 'from sw',
     });
   } else {
     return route.continue();
@@ -310,13 +304,13 @@ await context.route("**", async (route) => {
 <TabItem value="js">
 
 ```js
-await context.route("**", async (route) => {
+await context.route('**', async route => {
   if (route.request().serviceWorker()) {
     // NB: calling route.request().frame() here would THROW
     return route.fulfill({
-      contentType: "text/plain",
+      contentType: 'text/plain',
       status: 200,
-      body: "from sw",
+      body: 'from sw',
     });
   } else {
     return route.continue();
