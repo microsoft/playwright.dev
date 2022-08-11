@@ -6,7 +6,7 @@ module.exports = {
       items: [
         { type: 'doc', id: 'intro' },
         { type: 'doc', id: 'codegen-intro' },
-        { type: 'doc', id: 'trace-viewer' },
+        { type: 'doc', id: 'trace-viewer-intro' },
         { type: 'doc', id: 'test-runners' }
       ],
       collapsed: false
@@ -44,6 +44,7 @@ module.exports = {
         { type: 'doc', id: 'screenshots' },
         { type: 'doc', id: 'selectors' },
         { type: 'doc', id: 'codegen' },
+        { type: 'doc', id: 'trace-viewer' },
         { type: 'doc', id: 'videos' }
       ],
       collapsed: false
