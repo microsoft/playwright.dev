@@ -89,15 +89,11 @@ You can set the `BASE_URL=https://playwright.dev` env var, otherwise `http://loc
 
 #### Cherry-picking
 
-In [microsoft/playwright](https://github.com/microsoft/playwright):
-
 1. Go to the [Cherry-picking GitHub Actions workflow](https://github.com/microsoft/playwright/actions/workflows/cherry_pick_into_release_branch.yml)
 1. Execute it with the version number e.g. `1.25` and a comma separate list of commit SHA hashes (from the main branch)
 1. Wait for a PR [getting created](https://github.com/microsoft/playwright/pulls), review it and merge it
 
 #### Stable docs rolling
-
-In [microsoft/playwright.dev](https://github.com/microsoft/playwright.dev):
 
 1. Go to the [Release GitHub Actions workflow](https://github.com/microsoft/playwright.dev/actions/workflows/create_release.yml)
 1. Execute it with the version number e.g. `1.25` and wait for the PR [getting created](https://github.com/microsoft/playwright.dev/pulls)
