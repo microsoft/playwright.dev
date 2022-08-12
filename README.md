@@ -87,25 +87,18 @@ You can set the `BASE_URL=https://playwright.dev` env var, otherwise `http://loc
 
 ### Publishing Doc Changes After a Release
 
+#### Cherry-picking
+
 In [microsoft/playwright](https://github.com/microsoft/playwright):
 
-1. Open PR against `main` branch so the change is inlcuded in all future releases of Playwright.
-2. Cherry pick the landed commit on `main` into the release branch:
+1. Go to the [Cherry-picking GitHub Actions workflow](https://github.com/microsoft/playwright/actions/workflows/cherry_pick_into_release_branch.yml)
+1. Execute it with the version number e.g. `1.25` and a comma separate list of commit SHA hashes (from the main branch)
+1. Wait for a PR [getting created](https://github.com/microsoft/playwright/pulls), review it and merge it
 
-   ```
-   $ git fetch --all
-   $ git checkout -b cp/name-your-change-branch upstream/release-1.XY # (e.g. 1.24 instead of 1.XY)
-   $ git cherry-pick <commit from main>
-   ```
-
-3. Open PR against the `release-1.XY` branch with your cherry-picked commit
+#### Stable docs rolling
 
 In [microsoft/playwright.dev](https://github.com/microsoft/playwright.dev):
 
-1. Manually run https://github.com/microsoft/playwright.dev/actions/workflows/create_release.yml
-   1. _Run Workflow_ dropdown
-   2. Leave branch as `main`
-   3. Enter release version number (e.g. 1.24, NO `v` prefix)
-   4. _Run Workflow_
-2. Wait for action to finish. A PR will appear in https://github.com/microsoft/playwright.dev/pulls.
-3. Review PR and land!
+1. Go to the [Release GitHub Actions workflow](https://github.com/microsoft/playwright.dev/actions/workflows/create_release.yml)
+1. Execute it with the version number e.g. `1.25` and wait for the PR [getting created](https://github.com/microsoft/playwright.dev/pulls)
+2. Review the PR and merge it.
