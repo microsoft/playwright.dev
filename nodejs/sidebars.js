@@ -13,22 +13,29 @@ module.exports = {
       ],
       collapsible: false
     },
-    { type: 'doc', id: 'getting-started-vscode' }
+    { type: 'doc', id: 'getting-started-vscode' },
+    { type: 'doc', label: 'Writing Tests', id: 'locators' },
+    { type: 'doc', label: 'Running Tests', id: 'test-cli' },
+    { type: 'doc', label: 'Tools', id: 'cli' },
+    { type: 'doc', label: 'DevOps', id: 'ci' },
+    { type: 'doc', label: 'Library', id: 'library' }
   ],
   writingTests: [
+    { type: 'doc', label: 'Getting Started', id: 'intro' },
     {
       type: 'category',
       label: 'Writing Tests',
       items: [
+        { type: 'doc', id: 'locators' },
+        { type: 'doc', id: 'test-assertions' },
+        { type: 'doc', id: 'browser-contexts' },
+        { type: 'doc', id: 'actionability' },
         {
           type: 'category',
-          label: 'Basic Concepts',
+          label: 'Advanced',
           items: [
-            { type: 'doc', id: 'test-assertions' },
-            { type: 'doc', id: 'actionability' },
             { type: 'doc', id: 'test-auth' },
             { type: 'doc', id: 'test-parameterize' },
-            { type: 'doc', id: 'browser-contexts' },
             { type: 'doc', id: 'debug-selectors' },
             { type: 'doc', id: 'dialogs' },
             { type: 'doc', id: 'downloads' },
@@ -36,15 +43,6 @@ module.exports = {
             { type: 'doc', id: 'events' },
             { type: 'doc', id: 'frames' },
             { type: 'doc', id: 'input' },
-            { type: 'doc', id: 'locators' },
-            { type: 'doc', id: 'pages' }
-          ],
-          collapsible: false
-        },
-        {
-          type: 'category',
-          label: 'Advanced',
-          items: [
             { type: 'doc', id: 'test-snapshots' },
             { type: 'doc', id: 'test-typescript' }
           ],
@@ -75,33 +73,35 @@ module.exports = {
         }
       ],
       collapsed: false
-    }
+    },
+    { type: 'doc', label: 'Running Tests', id: 'test-cli' },
+    { type: 'doc', label: 'Tools', id: 'cli' },
+    { type: 'doc', label: 'DevOps', id: 'ci' },
+    { type: 'doc', label: 'Library', id: 'library' }
   ],
-  testRunner: [
+
+  runningTests: [
+    { type: 'doc', label: 'Getting Started', id: 'intro' },
+    { type: 'doc', label: 'Writing Tests', id: 'locators' },
     {
       type: 'category',
-      label: 'Test Runner',
+      label: 'Running Tests',
       items: [
-        {
-          type: 'category',
-          label: 'Basic Concepts',
-          items: [
-            { type: 'doc', id: 'test-annotations' },
-            { type: 'doc', id: 'test-cli' },
-            { type: 'doc', id: 'test-configuration' },
-            { type: 'doc', id: 'test-parallel' },
-            { type: 'doc', id: 'test-reporters' },
-            { type: 'doc', id: 'test-retries' },
-            { type: 'doc', id: 'test-timeouts' },
-            { type: 'doc', id: 'test-advanced' },
-            { type: 'doc', id: 'videos' }
-          ],
-          collapsible: false
-        },
+        { type: 'doc', id: 'test-cli' },
+        { type: 'doc', id: 'test-configuration' },
+        { type: 'doc', id: 'test-timeouts' },
+        { type: 'doc', id: 'test-reporters' },
         {
           type: 'category',
           label: 'Advanced',
-          items: [{ type: 'doc', id: 'test-fixtures' }],
+          items: [
+            { type: 'doc', id: 'test-annotations' },
+            { type: 'doc', id: 'test-parallel' },
+            { type: 'doc', id: 'test-retries' },
+            { type: 'doc', id: 'test-advanced' },
+            { type: 'doc', id: 'videos' },
+            { type: 'doc', id: 'test-fixtures' }
+          ],
           collapsed: true
         },
         {
@@ -112,9 +112,17 @@ module.exports = {
         }
       ],
       collapsed: false
-    }
+    },
+
+    { type: 'doc', label: 'Tools', id: 'cli' },
+    { type: 'doc', label: 'DevOps', id: 'ci' },
+    { type: 'doc', label: 'Library', id: 'library' }
   ],
   tools: [
+    { type: 'doc', label: 'Getting Started', id: 'intro' },
+    { type: 'doc', label: 'Writing Tests', id: 'locators' },
+    { type: 'doc', label: 'Running Tests', id: 'test-cli' },
+
     {
       type: 'category',
       label: 'Tools',
@@ -125,23 +133,38 @@ module.exports = {
         { type: 'doc', id: 'trace-viewer' }
       ],
       collapsible: false
-    }
+    },
+    { type: 'doc', label: 'DevOps', id: 'ci' },
+    { type: 'doc', label: 'Library', id: 'library' }
   ],
   devOps: [
+    { type: 'doc', label: 'Getting Started', id: 'intro' },
+    { type: 'doc', label: 'Writing Tests', id: 'locators' },
+    { type: 'doc', label: 'Running Tests', id: 'test-cli' },
+    { type: 'doc', label: 'Tools', id: 'cli' },
+
     {
       type: 'category',
       label: 'DevOps',
       items: [
+        { type: 'doc', id: 'ci' },
         { type: 'doc', id: 'browsers' },
         { type: 'doc', id: 'docker' },
-        { type: 'doc', id: 'ci' },
         { type: 'doc', id: 'troubleshooting' },
         { type: 'doc', id: 'selenium-grid' }
       ],
       collapsible: false
-    }
+    },
+    { type: 'doc', label: 'Library', id: 'library' }
   ],
-  library: [{ type: 'doc', id: 'library' }],
+  library: [
+    { type: 'doc', label: 'Getting Started', id: 'intro' },
+    { type: 'doc', label: 'Writing Tests', id: 'locators' },
+    { type: 'doc', label: 'Running Tests', id: 'test-cli' },
+    { type: 'doc', label: 'Tools', id: 'cli' },
+    { type: 'doc', label: 'DevOps', id: 'ci' },
+    { type: 'doc', id: 'library' }
+  ],
   // docs: [
   //   { type: 'doc', id: 'release-notes' },
   //   { type: 'doc', id: 'canary-releases' },
