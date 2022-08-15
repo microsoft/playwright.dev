@@ -14,14 +14,14 @@ module.exports = {
       collapsible: false
     },
     { type: 'doc', id: 'getting-started-vscode' },
-    { type: 'doc', label: 'Writing Tests', id: 'locators' },
-    { type: 'doc', label: 'Running Tests', id: 'test-cli' },
-    { type: 'doc', label: 'Tools', id: 'cli' },
-    { type: 'doc', label: 'DevOps', id: 'ci' },
-    { type: 'doc', label: 'Library', id: 'library' }
+    {type: 'ref', label: 'Writing Tests', id: 'locators'},
+    { type: 'ref', label: 'Running Tests', id: 'test-cli' },
+    { type: 'ref', label: 'Tools', id: 'cli' },
+    { type: 'ref', label: 'DevOps', id: 'ci' },
+    { type: 'ref', label: 'Library', id: 'library' }
   ],
   writingTests: [
-    { type: 'doc', label: 'Getting Started', id: 'intro' },
+    { type: 'ref', label: 'Getting Started', id: 'intro' },
     {
       type: 'category',
       label: 'Writing Tests',
@@ -74,15 +74,15 @@ module.exports = {
       ],
       collapsed: false
     },
-    { type: 'doc', label: 'Running Tests', id: 'test-cli' },
-    { type: 'doc', label: 'Tools', id: 'cli' },
-    { type: 'doc', label: 'DevOps', id: 'ci' },
-    { type: 'doc', label: 'Library', id: 'library' }
+    { type: 'ref', label: 'Running Tests', id: 'test-cli' },
+    { type: 'ref', label: 'Tools', id: 'cli' },
+    { type: 'ref', label: 'DevOps', id: 'ci' },
+    { type: 'ref', label: 'Library', id: 'library' }
   ],
 
   runningTests: [
-    { type: 'doc', label: 'Getting Started', id: 'intro' },
-    { type: 'doc', label: 'Writing Tests', id: 'locators' },
+    { type: 'ref', label: 'Getting Started', id: 'intro' },
+    { type: 'ref', label: 'Writing Tests', id: 'locators' },
     {
       type: 'category',
       label: 'Running Tests',
@@ -114,14 +114,14 @@ module.exports = {
       collapsed: false
     },
 
-    { type: 'doc', label: 'Tools', id: 'cli' },
-    { type: 'doc', label: 'DevOps', id: 'ci' },
-    { type: 'doc', label: 'Library', id: 'library' }
+    { type: 'ref', label: 'Tools', id: 'cli' },
+    { type: 'ref', label: 'DevOps', id: 'ci' },
+    { type: 'ref', label: 'Library', id: 'library' }
   ],
   tools: [
-    { type: 'doc', label: 'Getting Started', id: 'intro' },
-    { type: 'doc', label: 'Writing Tests', id: 'locators' },
-    { type: 'doc', label: 'Running Tests', id: 'test-cli' },
+    { type: 'ref', label: 'Getting Started', id: 'intro' },
+    { type: 'ref', label: 'Writing Tests', id: 'locators' },
+    { type: 'ref', label: 'Running Tests', id: 'test-cli' },
 
     {
       type: 'category',
@@ -134,14 +134,14 @@ module.exports = {
       ],
       collapsible: false
     },
-    { type: 'doc', label: 'DevOps', id: 'ci' },
-    { type: 'doc', label: 'Library', id: 'library' }
+    { type: 'ref', label: 'DevOps', id: 'ci' },
+    { type: 'ref', label: 'Library', id: 'library' }
   ],
   devOps: [
-    { type: 'doc', label: 'Getting Started', id: 'intro' },
-    { type: 'doc', label: 'Writing Tests', id: 'locators' },
-    { type: 'doc', label: 'Running Tests', id: 'test-cli' },
-    { type: 'doc', label: 'Tools', id: 'cli' },
+    { type: 'ref', label: 'Getting Started', id: 'intro' },
+    { type: 'ref', label: 'Writing Tests', id: 'locators' },
+    { type: 'ref', label: 'Running Tests', id: 'test-cli' },
+    { type: 'ref', label: 'Tools', id: 'cli' },
 
     {
       type: 'category',
@@ -155,14 +155,14 @@ module.exports = {
       ],
       collapsible: false
     },
-    { type: 'doc', label: 'Library', id: 'library' }
+    { type: 'ref', label: 'Library', id: 'library' }
   ],
   library: [
-    { type: 'doc', label: 'Getting Started', id: 'intro' },
-    { type: 'doc', label: 'Writing Tests', id: 'locators' },
-    { type: 'doc', label: 'Running Tests', id: 'test-cli' },
-    { type: 'doc', label: 'Tools', id: 'cli' },
-    { type: 'doc', label: 'DevOps', id: 'ci' },
+    { type: 'ref', label: 'Getting Started', id: 'intro' },
+    { type: 'ref', label: 'Writing Tests', id: 'locators' },
+    { type: 'ref', label: 'Running Tests', id: 'test-cli' },
+    { type: 'ref', label: 'Tools', id: 'cli' },
+    { type: 'ref', label: 'DevOps', id: 'ci' },
     { type: 'doc', id: 'library' }
   ],
   // docs: [
