@@ -66,42 +66,11 @@ module.exports = {
       },
       items: [
         {
-          type: 'dropdown',
-          label: 'Docs',
-          position: 'left',
-          items: [
-            {
-              to: 'docs/next/intro',
-              label: 'Getting Started'
-            },
-            {
-              to: 'docs/next/test-assertions',
-              label: 'Writing Tests'
-            },
-            {
-              to: 'docs/next/test-annotations',
-              label: 'Test Runner'
-            },
-            {
-              to: 'docs/next/cli',
-              label: 'Tools'
-            },
-            {
-              to: 'docs/next/browsers',
-              label: 'DevOps'
-            },
-            {
-              to: 'docs/next/library',
-              label: 'Library'
-            }
-          ]
+          type: "doc",
+          docId: "intro",
+          label: "Docs",
+          position: "left",
         },
-        // {
-        //   type: "doc",
-        //   docId: "intro",
-        //   label: "Docs",
-        //   position: "left",
-        // },
         {
           type: "doc",
           docId: "api/class-playwright",
