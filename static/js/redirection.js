@@ -26,25 +26,68 @@ if (path) {
     { from: '/docs/next/assertions', to: '/next/docs/test-assertions' },
     { from: '/docs/inspector', to: '/docs/debug' },
     { from: '/docs/browser-contexts', to: '/docs/isolation' },
+    { from: '/docs/auth', to: '/docs/test-auth' },
+    { from: '/docs/pom', to: '/docs/test-pom' },
+    { from: '/docs/screenshot', to: '/docs/test-snapshot' },
+    { from: '/docs/selectors', to: '/docs/locators' },
     { from: '/blog', to: '/community/welcome' },
     // ------------------- python ---------------------
-    { from: '/python/docs/assertions', to: '/python/docs/api/class-playwrightassertions' },
-    { from: '/python/next/docs/assertions', to: '/python/next/docs/api/class-playwrightassertions' },
+    {
+      from: '/python/docs/assertions',
+      to: '/python/docs/api/class-playwrightassertions'
+    },
+    {
+      from: '/python/next/docs/assertions',
+      to: '/python/next/docs/api/class-playwrightassertions'
+    },
     { from: '/python/docs/inspector', to: '/python/docs/debug' },
     { from: '/python/docs/browser-contexts', to: '/python/docs/isolation' },
+    { from: '/python/docs/auth', to: '/python/docs/test-auth' },
+    { from: '/python/docs/pom', to: '/python/docs/test-pom' },
+    { from: '/python/docs/screenshot', to: '/python/docs/test-snapshot' },
+    { from: '/python/docs/selectors', to: '/python/docs/locators' },
+    { from: '/python/docs/navigations', to: '/python/docs/intro' },
+    { from: '/python/docs/handles', to: '/python/docs/intro' },
+    { from: '/python/docs/extensibility', to: '/python/docs/intro' },
     { from: '/python/blog', to: '/community/welcome' },
     // ------------------- dotnet ---------------------
-    { from: '/dotnet/docs/assertions', to: '/dotnet/docs/api/class-playwrightassertions' },
-    { from: '/dotnet/next/docs/assertions', to: '/dotnet/next/docs/api/class-playwrightassertions' },
+    {
+      from: '/dotnet/docs/assertions',
+      to: '/dotnet/docs/api/class-playwrightassertions'
+    },
+    {
+      from: '/dotnet/next/docs/assertions',
+      to: '/dotnet/next/docs/api/class-playwrightassertions'
+    },
     { from: '/dotnet/inspector', to: '/dotnet/docs/debug' },
     { from: '/dotnet/docs/browser-contexts', to: '/dotnet/docs/isolation' },
+    { from: '/dotnet/docs/auth', to: '/dotnet/docs/test-auth' },
+    { from: '/dotnet/docs/pom', to: '/dotnet/docs/test-pom' },
+    { from: '/dotnet/docs/screenshot', to: '/dotnet/docs/test-snapshot' },
+    { from: '/dotnet/docs/selectors', to: '/dotnet/docs/locators' },
+    { from: '/dotnet/docs/navigations', to: '/dotnet/docs/intro' },
+    { from: '/dotnet/docs/handles', to: '/dotnet/docs/intro' },
+    { from: '/dotnet/docs/extensibility', to: '/dotnet/docs/intro' },
     { from: '/dotnet/blog', to: '/community/welcome' },
     // ------------------- java -----------------------
-    { from: '/java/docs/assertions', to: '/java/docs/api/class-playwrightassertions' },
-    { from: '/java/next/docs/assertions', to: '/java/next/docs/api/class-playwrightassertions' },
+    {
+      from: '/java/docs/assertions',
+      to: '/java/docs/api/class-playwrightassertions'
+    },
+    {
+      from: '/java/next/docs/assertions',
+      to: '/java/next/docs/api/class-playwrightassertions'
+    },
     { from: '/java/docs/inspector', to: '/java/docs/debug' },
     { from: '/java/docs/browser-contexts', to: '/java/docs/isolation' },
-    { from: '/java/blog', to: '/community/welcome' },
+    { from: '/java/docs/auth', to: '/java/docs/test-auth' },
+    { from: '/java/docs/pom', to: '/java/docs/test-pom' },
+    { from: '/java/docs/screenshot', to: '/java/docs/test-snapshot' },
+    { from: '/java/docs/selectors', to: '/java/docs/locators' },
+    { from: '/java/docs/navigations', to: '/java/docs/intro' },
+    { from: '/java/docs/handles', to: '/java/docs/intro' },
+    { from: '/java/docs/extensibility', to: '/java/docs/intro' },
+    { from: '/java/blog', to: '/community/welcome' }
   ];
   const pathname = window.location.pathname;
   for (const redirect of redirects) {
