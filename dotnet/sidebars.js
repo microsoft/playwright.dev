@@ -13,7 +13,7 @@ module.exports = {
       ],
       collapsible: false
     },
-    {type: 'ref', label: 'Writing Tests', id: 'locators'},
+    { type: 'ref', label: 'Writing Tests', id: 'locators' },
     { type: 'ref', label: 'Running Tests', id: 'videos' },
     { type: 'ref', label: 'Tools', id: 'cli' },
     { type: 'ref', label: 'DevOps', id: 'ci' },
@@ -43,7 +43,7 @@ module.exports = {
             { type: 'doc', id: 'events' },
             { type: 'doc', id: 'frames' },
             { type: 'doc', id: 'input' },
-            { type: 'doc', id: 'test-snapshots' },
+            { type: 'doc', id: 'test-snapshots' }
           ],
           collapsed: true
         },
@@ -56,7 +56,7 @@ module.exports = {
             { type: 'doc', id: 'network' }
           ],
           collapsed: true
-        },
+        }
       ],
       collapsed: false
     },
@@ -76,11 +76,9 @@ module.exports = {
         {
           type: 'category',
           label: 'Advanced',
-          items: [
-            { type: 'doc', id: 'videos' },
-          ],
+          items: [{ type: 'doc', id: 'videos' }],
           collapsed: true
-        },
+        }
       ],
       collapsed: false
     },
