@@ -1,32 +1,143 @@
 ---
-id: why-playwright
-title: "Why Playwright?"
-draft: true
+id: test-parameterize
+title: "Parametrize Tests"
 ---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
 
-Playwright enables fast, reliable and capable testing and automation across all modern browsers. This guide covers those key differentiators to help you decide on the right tool for your automated tests.
+## Emulation
 
-- [Support for all browsers](#support-for-all-browsers)
-- [Fast and reliable execution](#fast-and-reliable-execution)
-- [Powerful automation capabilities](#powerful-automation-capabilities)
-- [Release notes](./release-notes.mdx)
+Playwright allows overriding various parameters of the device where the browser is running:
+- viewport size, device scale factor, touch support
+- locale, timezone
+- color scheme
+- geolocation
 
-## Support for all browsers
-- **Test on Chromium, Firefox and WebKit**. Playwright has full API coverage for all modern browsers, including Google Chrome and Microsoft Edge (with [Chromium](https://www.chromium.org/)), Apple Safari (with [WebKit](https://webkit.org/)) and Mozilla Firefox.
-- **Cross-platform WebKit testing**. With Playwright, test how your app behaves in Apple Safari with WebKit builds for Windows, Linux and macOS. Test locally and on CI.
-- **Test for mobile**. Use device emulation to test your responsive web apps in mobile web browsers.
-- **Headless and headed**. Playwright supports headless (without browser UI) and headed (with browser UI) modes for all browsers and all platforms. Headed is great for debugging, and headless is faster and suited for CI/cloud executions.
+Most of these parameters are configured during the browser context construction, but some of them such as viewport size can be changed for individual pages.
 
-## Fast and reliable execution
-* **Timeout-free automation**. Playwright receives browser signals, like network requests, page navigations and page load events to eliminate the need for sleep timeouts that cause flakiness.
-* **Fast isolation with browser contexts**. Reuse a single browser instance for multiple isolated execution environments with [browser contexts](./browser-contexts.mdx).
-* **Resilient element selectors**. Playwright can rely on user-facing strings, like text content and accessibility labels to [select elements](./locators.mdx#selectors). These strings are more resilient than selectors tightly-coupled to the DOM structure.
+## User agent
 
-## Powerful automation capabilities
-- **Multiple domains, pages and frames**. Playwright is an out-of-process automation driver that is not limited by the scope of in-page JavaScript execution and can automate scenarios with [multiple pages](./pages.mdx).
-- **Powerful network control**. Playwright introduces context-wide [network interception](./network.mdx) to stub and mock network requests.
-* **Modern web features**. Playwright supports web components through [shadow-piercing selectors](./locators.mdx#selectors), geolocation, permissions, web workers and other modern web APIs.
-- **Capabilities to cover all scenarios**. Support for [file downloads](./downloads.mdx) and [uploads](./input.mdx), out-of-process iframes, native [input events](./input.mdx), and even dark mode.
+All pages created in the context above will share the user agent specified:
+
+```java
+BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+  .setUserAgent("My user agent"));
+```
+
+**API reference**
+- [Browser.newContext([options])](/api/class-browser.mdx#browser-new-context)
+
+## Viewport
+
+Create a context with custom viewport size:
+
+```java
+// Create context with given viewport
+BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+  .setViewportSize(1280, 1024));
+
+// Resize viewport for individual page
+page.setViewportSize(1600, 1200);
+
+// Emulate high-DPI
+BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+  .setViewportSize(2560, 1440)
+  .setDeviceScaleFactor(2);
+```
+
+**API reference**
+- [Browser.newContext([options])](/api/class-browser.mdx#browser-new-context)
+- [Page.setViewportSize(width, height)](/api/class-page.mdx#page-set-viewport-size)
+
+## Locale & timezone
+
+```java
+// Emulate locale and time
+BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+  .setLocale("de-DE")
+  .setTimezoneId("Europe/Berlin"));
+```
+
+**API reference**
+- [Browser.newContext([options])](/api/class-browser.mdx#browser-new-context)
+
+## Permissions
+
+Allow all pages in the context to show system notifications:
+
+```java
+BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+  .setPermissions(Arrays.asList("notifications"));
+```
+
+Grant all pages in the existing context access to current location:
+
+```java
+context.grantPermissions(Arrays.asList("geolocation"));
+```
+
+Grant notifications access from a specific domain:
+
+```java
+context.grantPermissions(Arrays.asList("notifications"),
+  new BrowserContext.GrantPermissionsOptions().setOrigin("https://skype.com"));
+```
+
+Revoke all permissions:
+
+```java
+context.clearPermissions();
+```
+
+**API reference**
+- [Browser.newContext([options])](/api/class-browser.mdx#browser-new-context)
+- [BrowserContext.grantPermissions(permissions[, options])](/api/class-browsercontext.mdx#browser-context-grant-permissions)
+- [BrowserContext.clearPermissions()](/api/class-browsercontext.mdx#browser-context-clear-permissions)
+
+## Geolocation
+
+Create a context with `"geolocation"` permissions granted:
+
+```java
+BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+  .setGeolocation(48.858455, 2.294474)
+  .setPermissions(Arrays.asList("geolocation")));
+```
+
+Change the location later:
+
+```java
+context.setGeolocation(new Geolocation(29.979097, 31.134256));
+```
+
+**Note** you can only change geolocation for all pages in the context.
+
+**API reference**
+- [Browser.newContext([options])](/api/class-browser.mdx#browser-new-context)
+- [BrowserContext.setGeolocation(geolocation)](/api/class-browsercontext.mdx#browser-context-set-geolocation)
+
+## Color scheme and media
+*  Create a context with dark or light mode. Pages created in this context will follow this color scheme preference.
+
+```java
+// Create context with dark mode
+BrowserContext context = browser.newContext(new Browser.NewContextOptions()
+  .setColorScheme(ColorScheme.DARK)); // or "light"
+
+// Create page with dark mode
+Page page = browser.newPage(new Browser.NewPageOptions()
+  .setColorScheme(ColorScheme.DARK)); // or "light"
+
+// Change color scheme for the page
+page.emulateMedia(new Page.EmulateMediaOptions().setColorScheme(ColorScheme.DARK));
+
+// Change media for page
+page.emulateMedia(new Page.EmulateMediaOptions().setMedia(Media.PRINT));
+```
+
+**API reference**
+- [Browser.newContext([options])](/api/class-browser.mdx#browser-new-context)
+- [Page.emulateMedia([options])](/api/class-page.mdx#page-emulate-media)
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
