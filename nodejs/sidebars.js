@@ -14,7 +14,7 @@ module.exports = {
       collapsible: false
     },
     { type: 'doc', id: 'getting-started-vscode' },
-    {type: 'ref', label: 'Writing Tests', id: 'locators'},
+    { type: 'ref', label: 'Writing Tests', id: 'locators' },
     { type: 'ref', label: 'Running Tests', id: 'test-cli' },
     { type: 'ref', label: 'Tools', id: 'cli' },
     { type: 'ref', label: 'DevOps', id: 'ci' },
