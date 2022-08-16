@@ -130,7 +130,7 @@ module.exports = {
   library: [
     { type: 'ref', label: 'Getting Started', id: 'intro' },
     { type: 'ref', label: 'Writing Tests', id: 'locators' },
-    { type: 'ref', label: 'Running Tests', id: 'video' },
+    { type: 'ref', label: 'Running Tests', id: 'videos' },
     { type: 'ref', label: 'Tools', id: 'cli' },
     { type: 'ref', label: 'DevOps', id: 'ci' },
     { type: 'doc', id: 'library' }
