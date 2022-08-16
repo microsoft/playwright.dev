@@ -1,5 +1,5 @@
 module.exports = {
-  docs: [
+  gettingStarted: [
     {
       type: 'category',
       label: 'Getting Started',
@@ -9,59 +9,118 @@ module.exports = {
         { type: 'doc', id: 'trace-viewer-intro' },
         { type: 'doc', id: 'test-runners' }
       ],
-      collapsed: false
+      collapsible: false
     },
-    { type: 'doc', id: 'release-notes' },
+    { type: 'ref', label: 'Writing Tests', id: 'locators' },
+    { type: 'ref', label: 'Running Tests', id: 'test-cli' },
+    { type: 'ref', label: 'Tools', id: 'cli' },
+    { type: 'ref', label: 'DevOps', id: 'ci' }
+  ],
+  writingTests: [
+    { type: 'ref', label: 'Getting Started', id: 'intro' },
     {
       type: 'category',
-      label: 'Guides',
+      label: 'Writing Tests',
       items: [
-        { type: 'doc', id: 'accessibility-testing' },
-        { type: 'doc', id: 'actionability' },
-        { type: 'doc', id: 'api-testing' },
-        { type: 'doc', id: 'test-assertions' },
-        { type: 'doc', id: 'auth' },
-        { type: 'doc', id: 'browsers' },
-        { type: 'doc', id: 'browser-contexts' },
-        { type: 'doc', id: 'cli' },
-        { type: 'doc', id: 'dialogs' },
-        { type: 'doc', id: 'debug' },
-        { type: 'doc', id: 'debug-selectors' },
-        { type: 'doc', id: 'downloads' },
-        { type: 'doc', id: 'emulation' },
-        { type: 'doc', id: 'evaluating' },
-        { type: 'doc', id: 'events' },
-        { type: 'doc', id: 'extensibility' },
-        { type: 'doc', id: 'frames' },
-        { type: 'doc', id: 'handles' },
-        { type: 'doc', id: 'input' },
         { type: 'doc', id: 'locators' },
-        { type: 'doc', id: 'multithreading' },
-        { type: 'doc', id: 'navigations' },
-        { type: 'doc', id: 'network' },
-        { type: 'doc', id: 'pages' },
-        { type: 'doc', id: 'pom' },
-        { type: 'doc', id: 'screenshots' },
-        { type: 'doc', id: 'selectors' },
-        { type: 'doc', id: 'codegen' },
-        { type: 'doc', id: 'trace-viewer' },
-        { type: 'doc', id: 'videos' }
+        { type: 'doc', id: 'test-assertions' },
+        { type: 'doc', id: 'isolation' },
+        { type: 'doc', id: 'actionability' },
+        {
+          type: 'category',
+          label: 'Advanced',
+          items: [
+            { type: 'doc', id: 'pages' },
+            { type: 'doc', id: 'test-auth' },
+            { type: 'doc', id: 'test-parameterize' },
+            { type: 'doc', id: 'debug-selectors' },
+            { type: 'doc', id: 'dialogs' },
+            { type: 'doc', id: 'downloads' },
+            { type: 'doc', id: 'evaluating' },
+            { type: 'doc', id: 'events' },
+            { type: 'doc', id: 'frames' },
+            { type: 'doc', id: 'input' },
+            { type: 'doc', id: 'test-snapshots' },
+            { type: 'doc', id: 'multithreading' }
+          ],
+          collapsed: true
+        },
+        {
+          type: 'category',
+          label: 'Specialized Testing',
+          items: [
+            { type: 'doc', id: 'api-testing' },
+            { type: 'doc', id: 'test-pom' },
+            { type: 'doc', id: 'accessibility-testing' },
+            { type: 'doc', id: 'network' }
+          ],
+          collapsed: true
+        }
       ],
       collapsed: false
     },
+    { type: 'ref', label: 'Running Tests', id: 'test-cli' },
+    { type: 'ref', label: 'Tools', id: 'cli' },
+    { type: 'ref', label: 'DevOps', id: 'ci' }
+  ],
+  runningTests: [
+    { type: 'ref', label: 'Getting Started', id: 'intro' },
+    { type: 'ref', label: 'Writing Tests', id: 'locators' },
     {
       type: 'category',
-      label: 'Integrations',
+      label: 'Running Tests',
       items: [
-        { type: 'doc', id: 'docker' },
+        {
+          type: 'category',
+          label: 'Advanced',
+          items: [{ type: 'doc', id: 'videos' }],
+          collapsed: true
+        }
+      ],
+      collapsed: false
+    },
+
+    { type: 'ref', label: 'Tools', id: 'cli' },
+    { type: 'ref', label: 'DevOps', id: 'ci' }
+  ],
+  tools: [
+    { type: 'ref', label: 'Getting Started', id: 'intro' },
+    { type: 'ref', label: 'Writing Tests', id: 'locators' },
+    { type: 'ref', label: 'Running Tests', id: 'videos' },
+
+    {
+      type: 'category',
+      label: 'Tools',
+      items: [
+        { type: 'doc', id: 'cli' },
+        { type: 'doc', id: 'debug' },
+        { type: 'doc', id: 'codegen' },
+        { type: 'doc', id: 'trace-viewer' }
+      ],
+      collapsible: false
+    },
+    { type: 'ref', label: 'DevOps', id: 'ci' }
+  ],
+  devOps: [
+    { type: 'ref', label: 'Getting Started', id: 'intro' },
+    { type: 'ref', label: 'Writing Tests', id: 'locators' },
+    { type: 'ref', label: 'Running Tests', id: 'videos' },
+    { type: 'ref', label: 'Tools', id: 'cli' },
+
+    {
+      type: 'category',
+      label: 'DevOps',
+      items: [
         { type: 'doc', id: 'ci' },
+        { type: 'doc', id: 'browsers' },
+        { type: 'doc', id: 'docker' },
+        { type: 'doc', id: 'troubleshooting' },
         { type: 'doc', id: 'selenium-grid' }
       ],
-      collapsed: true
-    },
-    { type: 'doc', id: 'troubleshooting' },
-    { type: 'doc', id: 'languages' }
+      collapsible: false
+    }
   ],
+
   api: [
     {
       type: 'category',
