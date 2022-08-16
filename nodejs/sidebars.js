@@ -28,7 +28,7 @@ module.exports = {
       items: [
         { type: 'doc', id: 'locators' },
         { type: 'doc', id: 'test-assertions' },
-        { type: 'doc', id: 'browser-contexts' },
+        { type: 'doc', id: 'isolation' },
         { type: 'doc', id: 'actionability' },
         {
           type: 'category',
