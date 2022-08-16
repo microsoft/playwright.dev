@@ -57,15 +57,6 @@ module.exports = {
             { type: 'doc', id: 'network' }
           ],
           collapsed: true
-        },
-        {
-          type: 'category',
-          label: 'Migration',
-          items: [
-            { type: 'doc', id: 'protractor' },
-            { type: 'doc', id: 'testing-library' }
-          ],
-          collapsed: true
         }
       ],
       collapsed: false
