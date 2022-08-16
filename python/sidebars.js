@@ -35,7 +35,8 @@ module.exports = {
           items: [
             { type: 'doc', id: 'pages' },
             { type: 'doc', id: 'test-auth' },
-            { type: 'doc', id: 'test-parameterize' },
+            // { type: 'doc', id: 'test-parameterize' },
+            { type: 'doc', id: 'emulation' },
             { type: 'doc', id: 'debug-selectors' },
             { type: 'doc', id: 'dialogs' },
             { type: 'doc', id: 'downloads' },
