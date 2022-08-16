@@ -34,6 +34,7 @@ module.exports = {
           type: 'category',
           label: 'Advanced',
           items: [
+            { type: 'doc', id: 'pages' },
             { type: 'doc', id: 'test-auth' },
             { type: 'doc', id: 'test-parameterize' },
             { type: 'doc', id: 'debug-selectors' },
@@ -165,45 +166,7 @@ module.exports = {
     { type: 'ref', label: 'DevOps', id: 'ci' },
     { type: 'doc', id: 'library' }
   ],
-  // docs: [
-  //   { type: 'doc', id: 'release-notes' },
-  //   { type: 'doc', id: 'canary-releases' },
-  //   {
-  //     type: 'category',
-  //     label: 'Playwright Test',
-  //     items: [],
-  //     collapsed: false
-  //   },
-  //   {
-  //     type: 'category',
-  //     label: 'Guides',
-  //     items: [
-  //       { type: 'doc', id: 'auth' },
 
-  //       { type: 'doc', id: 'emulation' },
-
-  //       { type: 'doc', id: 'extensibility' },
-
-  //       { type: 'doc', id: 'handles' },
-
-  //       { type: 'doc', id: 'navigations' },
-
-  //       { type: 'doc', id: 'pom' },
-  //       { type: 'doc', id: 'screenshots' },
-  //       { type: 'doc', id: 'selectors' }
-  //     ],
-  //     collapsed: false
-  //   },
-
-  //   {
-  //     type: 'category',
-  //     label: 'Integrations',
-  //     items: [],
-  //     collapsed: true
-  //   },
-
-  //   { type: 'doc', id: 'languages' }
-  // ],
   api: [
     {
       type: 'category',
