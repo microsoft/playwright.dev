@@ -407,7 +407,9 @@ import TabItem from '@theme/TabItem';`);
     result.sort((a, b) => {
       const atext = a.text.replace(/\[(.*)\].*/, '$1').replace(/\(.*\)/, '');
       const btext = b.text.replace(/\[(.*)\].*/, '$1').replace(/\(.*\)/, '');
-      return a.kind.localeCompare(b.kind) || atext.localeCompare(btext);
+      // Properties and methods are sorted by name within the same group.
+      const propertyAsMethod = kind => (kind === 'property') ? 'method' : kind;
+      return propertyAsMethod(a.kind).localeCompare(propertyAsMethod(b.kind)) || atext.localeCompare(btext);
     });
     return result;
   }
