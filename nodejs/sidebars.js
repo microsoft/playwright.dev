@@ -1,5 +1,6 @@
 module.exports = {
   docs: [
+    
     {
       type: 'category',
       label: 'Getting Started',
@@ -11,94 +12,137 @@ module.exports = {
         { type: 'doc', id: 'trace-viewer-intro' },
         { type: 'doc', id: 'ci-intro' },
       ],
-      collapsed: false
+      collapsed: true
     },
     { type: 'doc', id: 'getting-started-vscode' },
-    { type: 'doc', id: 'release-notes' },
-    { type: 'doc', id: 'canary-releases' },
+    // { type: 'doc', id: 'release-notes' },
+    // { type: 'doc', id: 'canary-releases' },
+
+
     {
       type: 'category',
-      label: 'Playwright Test',
+      label: 'Writing Tests',
       items: [
-        { type: 'doc', id: 'test-annotations' },
-        { type: 'doc', id: 'test-api-testing' },
         { type: 'doc', id: 'test-assertions' },
         { type: 'doc', id: 'test-auth' },
-        { type: 'doc', id: 'test-cli' },
-        { type: 'doc', id: 'test-configuration' },
-        { type: 'doc', id: 'test-pom' },
-        { type: 'doc', id: 'test-parallel' },
-        { type: 'doc', id: 'test-parameterize' },
-        { type: 'doc', id: 'test-reporters' },
-        { type: 'doc', id: 'test-retries' },
-        { type: 'doc', id: 'test-timeouts' },
-        { type: 'doc', id: 'test-snapshots' },
-        { type: 'doc', id: 'test-advanced' },
-        { type: 'doc', id: 'test-fixtures' },
-        { type: 'doc', id: 'test-typescript' },
-        { type: 'doc', id: 'test-components' }
-      ],
-      collapsed: false
-    },
-    {
-      type: 'category',
-      label: 'Guides',
-      items: [
-        { type: 'doc', id: 'library' },
-        { type: 'doc', id: 'accessibility-testing' },
-        { type: 'doc', id: 'actionability' },
         { type: 'doc', id: 'auth' },
-        { type: 'doc', id: 'browsers' },
+        { type: 'doc', id: 'test-parameterize' },
+        { type: 'doc', id: 'emulation' },
+        { type: 'doc', id: 'actionability' },
         { type: 'doc', id: 'browser-contexts' },
-        { type: 'doc', id: 'chrome-extensions' },
-        { type: 'doc', id: 'cli' },
-        { type: 'doc', id: 'debug' },
         { type: 'doc', id: 'debug-selectors' },
         { type: 'doc', id: 'dialogs' },
         { type: 'doc', id: 'downloads' },
-        { type: 'doc', id: 'emulation' },
         { type: 'doc', id: 'evaluating' },
         { type: 'doc', id: 'events' },
-        { type: 'doc', id: 'extensibility' },
         { type: 'doc', id: 'frames' },
-        { type: 'doc', id: 'handles' },
         { type: 'doc', id: 'input' },
         { type: 'doc', id: 'locators' },
-        { type: 'doc', id: 'mock' },
-        { type: 'doc', id: 'navigations' },
-        { type: 'doc', id: 'network' },
-        { type: 'doc', id: 'pages' },
-        { type: 'doc', id: 'pom' },
-        { type: 'doc', id: 'screenshots' },
         { type: 'doc', id: 'selectors' },
+        { type: 'doc', id: 'pages' },
+        {
+          type: 'category',
+          label: 'Specialized Testing',
+          items: [
+            { type: 'doc', id: 'test-api-testing' },
+            { type: 'doc', id: 'test-components' },
+            { type: 'doc', id: 'accessibility-testing' },
+            { type: 'doc', id: 'chrome-extensions' },
+            // { type: 'doc', id: 'extensibility' },
+            // { type: 'doc', id: 'handles' },
+            // { type: 'doc', id: 'navigations' },
+            { type: 'doc', id: 'mock' },
+            { type: 'doc', id: 'network' },
+          ],
+          collapsed: true
+        },
+        {
+          type: 'category',
+          label: 'Advanced',
+          items: [
+            { type: 'doc', id: 'test-snapshots' },
+            { type: 'doc', id: 'screenshots' },
+            { type: 'doc', id: 'test-typescript' },
+          ],
+          collapsed: true
+        },
+        {
+          type: 'category',
+          label: 'Migration',
+          items: [
+            { type: 'doc', id: 'protractor' },
+            { type: 'doc', id: 'testing-library' }
+          ],
+          collapsed: true
+        },
+        
+        { type: 'doc', id: 'test-pom' },
+        { type: 'doc', id: 'pom' },
+      ],
+      collapsed: true
+    },
+    {
+      type: 'category',
+      label: 'Test Runner',
+      items: [
+        { type: 'doc', id: 'test-annotations' },
+        { type: 'doc', id: 'test-cli' },
+        { type: 'doc', id: 'test-configuration' },
+        { type: 'doc', id: 'test-parallel' },
+        { type: 'doc', id: 'test-reporters' },
+        { type: 'doc', id: 'test-retries' },
+        { type: 'doc', id: 'test-timeouts' },
+        { type: 'doc', id: 'videos' },
+        {
+          type: 'category',
+          label: 'Advanced',
+          items: [
+            { type: 'doc', id: 'test-advanced' },
+            { type: 'doc', id: 'test-fixtures' },
+          ],
+          collapsed: true
+        },
+        {
+          type: 'category',
+          label: 'Appendix',
+          items: [
+            { type: 'doc', id: 'test-runners' },
+          ],
+          collapsed: true
+        },
+        
+      ],
+      collapsed: true
+    },
+
+    {
+      type: 'category',
+      label: 'Tools',
+      items: [
+        { type: 'doc', id: 'cli' },
+        { type: 'doc', id: 'debug' },
         { type: 'doc', id: 'codegen' },
         { type: 'doc', id: 'trace-viewer' },
-        { type: 'doc', id: 'videos' }
-      ],
-      collapsed: false
-    },
-    {
-      type: 'category',
-      label: 'Migration',
-      items: [
-        { type: 'doc', id: 'protractor' },
-        { type: 'doc', id: 'testing-library' }
       ],
       collapsed: true
     },
+
     {
       type: 'category',
-      label: 'Integrations',
+      label: 'DevOps',
       items: [
+        { type: 'doc', id: 'browsers' },
         { type: 'doc', id: 'docker' },
         { type: 'doc', id: 'ci' },
-        { type: 'doc', id: 'test-runners' },
-        { type: 'doc', id: 'selenium-grid' }
+        { type: 'doc', id: 'selenium-grid' },
+        { type: 'doc', id: 'troubleshooting' },
       ],
       collapsed: true
     },
-    { type: 'doc', id: 'troubleshooting' },
-    { type: 'doc', id: 'languages' }
+
+    { type: 'doc', id: 'library' },
+ // { type: 'doc', id: 'languages' }
+
   ],
   api: [
     {
