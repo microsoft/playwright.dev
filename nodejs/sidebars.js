@@ -1,16 +1,16 @@
 module.exports = {
-  docs: [
-    
+  gettingStarted: [
     {
       type: 'category',
       label: 'Getting Started',
       link: {
         type: 'generated-index',
         title: 'Getting Started with Playwright',
-        description: 'Learn how to install Playwright and run the example test. Explore the example test to understand locators and selectors and web first assertions. Run tests and debug tests. Generate tests with Codegen. Open the Trace viewer. Run tests on CI with GitHub Actions',
+        description:
+          'Learn how to install Playwright and run the example test. Explore the example test to understand locators and selectors and web first assertions. Run tests and debug tests. Generate tests with Codegen. Open the Trace viewer. Run tests on CI with GitHub Actions',
         slug: '/getting-started-index',
         keywords: ['getting started'],
-        image: '/img/docusaurus.png',
+        image: '/img/docusaurus.png'
       },
       items: [
         { type: 'doc', id: 'intro' },
@@ -18,68 +18,70 @@ module.exports = {
         { type: 'doc', id: 'running-tests' },
         { type: 'doc', id: 'codegen-intro' },
         { type: 'doc', id: 'trace-viewer-intro' },
-        { type: 'doc', id: 'ci-intro' },
-      ],
+        { type: 'doc', id: 'ci-intro' }
+      ]
     },
-    { type: 'doc', id: 'getting-started-vscode' },
+    { type: 'doc', id: 'getting-started-vscode' }
     // { type: 'doc', id: 'release-notes' },
     // { type: 'doc', id: 'canary-releases' },
-
-
+  ],
+  docs: [
     {
       type: 'category',
       label: 'Writing Tests',
       link: {
-        type: 'generated-index',
-        title: 'Writing Tests',
-        description: 'Learn how to write tests using locators, sectors and web first assertions. ',
-        slug: '/writing-tests-index',
-        keywords: ['getting started'],
-        image: '/img/docusaurus.png',
+        type: 'doc',
+        id: 'overview-writing-tests'
       },
       items: [
-        {type: 'doc', id: 'overview-writing-tests', label: 'Overview'},
-        { type: 'doc', id: 'actionability', label: 'Actionability'},
+        { type: 'doc', id: 'actionability', label: 'Actionability' },
         { type: 'doc', id: 'test-assertions', label: 'Assertions' },
-        { type: 'doc', id: 'test-auth', label: 'Authentication'},
+        { type: 'doc', id: 'test-auth', label: 'Authentication' },
         { type: 'doc', id: 'auth', label: 'Authentication' },
-        { type: 'doc', id: 'debug-selectors' , label: 'Debugging Selectors'},
-        { type: 'doc', id: 'dialogs' , label: 'Dialogs'},
-        { type: 'doc', id: 'downloads' , label: 'Dowloads'},
-        { type: 'doc', id: 'emulation' , label: 'Emulation'},
-        { type: 'doc', id: 'evaluating' , label: 'Evaluating'},
-        { type: 'doc', id: 'events' , label: 'Events'},
-        { type: 'doc', id: 'frames' , label: 'Frames'},
-        { type: 'doc', id: 'input' , label: 'Input'},
-        { type: 'doc', id: 'browser-contexts' , label: 'Isolation'},
+        { type: 'doc', id: 'debug-selectors', label: 'Debugging Selectors' },
+        { type: 'doc', id: 'dialogs', label: 'Dialogs' },
+        { type: 'doc', id: 'downloads', label: 'Dowloads' },
+        { type: 'doc', id: 'emulation', label: 'Emulation' },
+        { type: 'doc', id: 'evaluating', label: 'Evaluating' },
+        { type: 'doc', id: 'events', label: 'Events' },
+        { type: 'doc', id: 'frames', label: 'Frames' },
+        { type: 'doc', id: 'input', label: 'Input' },
+        { type: 'doc', id: 'browser-contexts', label: 'Isolation' },
         { type: 'doc', id: 'locators', label: 'Locators' },
         { type: 'doc', id: 'pages', label: 'Pages' },
-        { type: 'doc', id: 'test-parameterize', label: 'Parameterize'},
+        { type: 'doc', id: 'test-parameterize', label: 'Parameterize' },
         { type: 'doc', id: 'selectors', label: 'selectors' },
         {
           type: 'category',
           label: 'Specialized Testing',
           items: [
-            { type: 'doc', id: 'accessibility-testing', label: 'Accessability Testing'},
+            {
+              type: 'doc',
+              id: 'accessibility-testing',
+              label: 'Accessability Testing'
+            },
             { type: 'doc', id: 'test-api-testing', label: 'API Testing' },
-            { type: 'doc', id: 'chrome-extensions', label: 'Chrome Extensions'  },
-            { type: 'doc', id: 'test-components' , label: 'Component Testing' },
+            {
+              type: 'doc',
+              id: 'chrome-extensions',
+              label: 'Chrome Extensions'
+            },
+            { type: 'doc', id: 'test-components', label: 'Component Testing' },
             // { type: 'doc', id: 'extensibility' },
             // { type: 'doc', id: 'handles' },
             // { type: 'doc', id: 'navigations' },
-            { type: 'doc', id: 'mock', label: 'Mock APIs'  },
-            { type: 'doc', id: 'network' , label: 'Network Traffic' },
-          ],
+            { type: 'doc', id: 'mock', label: 'Mock APIs' },
+            { type: 'doc', id: 'network', label: 'Network Traffic' }
+          ]
         },
         {
           type: 'category',
           label: 'Advanced',
           items: [
-            
-            { type: 'doc', id: 'screenshots' , label: 'Screenshots'},
-            { type: 'doc', id: 'test-typescript' , label: 'TypeScript'},
-            { type: 'doc', id: 'test-snapshots', label: 'Visual Comparisons'},
-          ],
+            { type: 'doc', id: 'screenshots', label: 'Screenshots' },
+            { type: 'doc', id: 'test-typescript', label: 'TypeScript' },
+            { type: 'doc', id: 'test-snapshots', label: 'Visual Comparisons' }
+          ]
         },
         {
           type: 'category',
@@ -87,43 +89,42 @@ module.exports = {
           items: [
             { type: 'doc', id: 'protractor' },
             { type: 'doc', id: 'testing-library' }
-          ],
+          ]
         },
-        
-        { type: 'doc', id: 'test-pom', label: 'Page Object Models'},
-        { type: 'doc', id: 'pom' },
-      ],
+
+        { type: 'doc', id: 'test-pom', label: 'Page Object Models' },
+        { type: 'doc', id: 'pom' }
+      ]
     },
     {
       type: 'category',
       label: 'Test Runner',
-      link: {type: 'doc', id: 'overview-test-runner'},
+      link: { type: 'doc', id: 'overview-test-runner' },
       items: [
-        { type: 'doc', id: 'test-annotations', label: 'Annotations'},
-        { type: 'doc', id: 'test-cli', label: 'Command Line'},
-        { type: 'doc', id: 'test-configuration', label: 'Configuration'},
-        { type: 'doc', id: 'test-parallel' , label: 'Parallelism and Sharding'},
-        { type: 'doc', id: 'test-reporters' , label: 'Reporters'},
-        { type: 'doc', id: 'test-retries' , label: 'Retries'},
-        { type: 'doc', id: 'test-timeouts' , label: 'Timeouts'},
-        { type: 'doc', id: 'videos' , label: 'Videos'},
+        { type: 'doc', id: 'test-annotations', label: 'Annotations' },
+        { type: 'doc', id: 'test-cli', label: 'Command Line' },
+        { type: 'doc', id: 'test-configuration', label: 'Configuration' },
+        { type: 'doc', id: 'test-parallel', label: 'Parallelism and Sharding' },
+        { type: 'doc', id: 'test-reporters', label: 'Reporters' },
+        { type: 'doc', id: 'test-retries', label: 'Retries' },
+        { type: 'doc', id: 'test-timeouts', label: 'Timeouts' },
+        { type: 'doc', id: 'videos', label: 'Videos' },
         {
           type: 'category',
           label: 'Advanced',
           items: [
-            { type: 'doc', id: 'test-advanced', label: 'Configuration'},
-            { type: 'doc', id: 'test-fixtures', label: 'Fixtures'},
-          ],
+            { type: 'doc', id: 'test-advanced', label: 'Configuration' },
+            { type: 'doc', id: 'test-fixtures', label: 'Fixtures' }
+          ]
         },
         {
           type: 'category',
           label: 'Appendix',
           items: [
-            { type: 'doc', id: 'test-runners', label: 'Third Party Runners' },
-          ],
-        },
-        
-      ],
+            { type: 'doc', id: 'test-runners', label: 'Third Party Runners' }
+          ]
+        }
+      ]
     },
 
     {
@@ -135,14 +136,14 @@ module.exports = {
         description: 'Learn about the most important Docusaurus concepts!',
         slug: '/tools/overview',
         keywords: ['guides'],
-        image: '/img/docusaurus.png',
+        image: '/img/docusaurus.png'
       },
       items: [
-        { type: 'doc', id: 'cli' , label: 'Command Line Tools' },
-        { type: 'doc', id: 'debug' , label: 'Debugging Tests Inspector' },
-        { type: 'doc', id: 'codegen' , label: 'Codegen Test Generator ' },
-        { type: 'doc', id: 'trace-viewer' , label: 'Trace Viewer' },
-      ],
+        { type: 'doc', id: 'cli', label: 'Command Line Tools' },
+        { type: 'doc', id: 'debug', label: 'Debugging Tests Inspector' },
+        { type: 'doc', id: 'codegen', label: 'Codegen Test Generator ' },
+        { type: 'doc', id: 'trace-viewer', label: 'Trace Viewer' }
+      ]
     },
 
     {
@@ -152,15 +153,14 @@ module.exports = {
         { type: 'doc', id: 'browsers' },
         { type: 'doc', id: 'ci' },
         { type: 'doc', id: 'docker' },
-        
+
         { type: 'doc', id: 'selenium-grid' },
-        { type: 'doc', id: 'troubleshooting' },
-      ],
+        { type: 'doc', id: 'troubleshooting' }
+      ]
     },
 
-    { type: 'doc', id: 'library' },
- // { type: 'doc', id: 'languages' }
-
+    { type: 'doc', id: 'library' }
+    // { type: 'doc', id: 'languages' }
   ],
   api: [
     {

@@ -74,6 +74,12 @@ module.exports = {
         {
           type: "doc",
           docId: "intro",
+          label: "Getting Started",
+          position: "left",
+        },
+        {
+          type: "doc",
+          docId: "overview-writing-tests",
           label: "Docs",
           position: "left",
         },
