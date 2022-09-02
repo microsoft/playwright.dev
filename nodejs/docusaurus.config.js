@@ -58,6 +58,12 @@ module.exports = {
       theme: require('prism-react-renderer/themes/dracula'),
       additionalLanguages: ['bash', 'batch', 'powershell'],
     },
+    docs: {
+      sidebar: {
+        hideable: true,
+        autoCollapseCategories: true,
+      },
+    },
     navbar: {
       title: "Playwright",
       logo: {

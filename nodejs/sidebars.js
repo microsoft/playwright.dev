@@ -20,7 +20,6 @@ module.exports = {
         { type: 'doc', id: 'trace-viewer-intro' },
         { type: 'doc', id: 'ci-intro' },
       ],
-      collapsed: true
     },
     { type: 'doc', id: 'getting-started-vscode' },
     // { type: 'doc', id: 'release-notes' },
@@ -71,7 +70,6 @@ module.exports = {
             { type: 'doc', id: 'mock', label: 'Mock APIs'  },
             { type: 'doc', id: 'network' , label: 'Network Traffic' },
           ],
-          collapsed: true
         },
         {
           type: 'category',
@@ -82,7 +80,6 @@ module.exports = {
             { type: 'doc', id: 'test-typescript' , label: 'TypeScript'},
             { type: 'doc', id: 'test-snapshots', label: 'Visual Comparisons'},
           ],
-          collapsed: true
         },
         {
           type: 'category',
@@ -91,13 +88,11 @@ module.exports = {
             { type: 'doc', id: 'protractor' },
             { type: 'doc', id: 'testing-library' }
           ],
-          collapsed: true
         },
         
         { type: 'doc', id: 'test-pom', label: 'Page Object Models'},
         { type: 'doc', id: 'pom' },
       ],
-      collapsed: true
     },
     {
       type: 'category',
@@ -119,7 +114,6 @@ module.exports = {
             { type: 'doc', id: 'test-advanced', label: 'Configuration'},
             { type: 'doc', id: 'test-fixtures', label: 'Fixtures'},
           ],
-          collapsed: true
         },
         {
           type: 'category',
@@ -127,11 +121,9 @@ module.exports = {
           items: [
             { type: 'doc', id: 'test-runners', label: 'Third Party Runners' },
           ],
-          collapsed: true
         },
         
       ],
-      collapsed: true
     },
 
     {
@@ -151,7 +143,6 @@ module.exports = {
         { type: 'doc', id: 'codegen' , label: 'Codegen Test Generator ' },
         { type: 'doc', id: 'trace-viewer' , label: 'Trace Viewer' },
       ],
-      collapsed: true
     },
 
     {
@@ -165,7 +156,6 @@ module.exports = {
         { type: 'doc', id: 'selenium-grid' },
         { type: 'doc', id: 'troubleshooting' },
       ],
-      collapsed: true
     },
 
     { type: 'doc', id: 'library' },
