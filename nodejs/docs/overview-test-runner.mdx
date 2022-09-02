@@ -1,0 +1,299 @@
+---
+id: overview-test-runner
+title: "Test Runner Overview"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Annotations
+
+Playwright supports test annotations to deal with failures, flakiness, skip, focus and tag tests. Annotations can be used on a single test or a group of tests. Annotations can be conditional, in which case they apply when the condition is truthy. Annotations may depend on test fixtures. There could be multiple annotations on the same test, possibly in different configurations.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+test.skip('skip this test', async ({ page }) => {
+  // This test is not run
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+test.skip('skip this test', async ({ page }) => {
+  // This test is not run
+});
+```
+
+</TabItem>
+</Tabs>
+
+:::info Learn More
+See our full guide on [annotations](./test-annotations.mdx) to learn more.
+:::
+
+## Command Line
+
+Use the command line to run all tests, a single test, a set of tests etc. Run tests in headed browsers, against a specific project, choose a reporter, turn traces on and run in debug mode with the Playwright Inspector all from the command line.
+- Run all the tests
+
+  ```bash
+  npx playwright test
+  ```
+
+:::info Learn More
+See our full guide on [command line](./test-cli.mdx) to learn more.
+:::
+
+## Configuration
+
+Playwright provides options to configure the default `browser`, `context` and `page` fixtures. For example there are options for `headless`, `viewport` and `ignoreHTTPSErrors`. You can also record a video or a trace for the test or capture a screenshot at the end. You can specify any options globally in the configuration file, and most of them locally in a test file.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import type { PlaywrightTestConfig } from '@playwright/test';
+const config: PlaywrightTestConfig = {
+  use: {
+    headless: false,
+    viewport: { width: 1280, height: 720 },
+    ignoreHTTPSErrors: true,
+    video: 'on-first-retry',
+  },
+};
+export default config;
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// @ts-check
+
+/** @type {import('@playwright/test').PlaywrightTestConfig} */
+const config = {
+  use: {
+    headless: false,
+    viewport: { width: 1280, height: 720 },
+    ignoreHTTPSErrors: true,
+    video: 'on-first-retry',
+  },
+};
+
+module.exports = config;
+```
+
+</TabItem>
+</Tabs>
+
+:::info Learn More
+See our full guide on [configuration](./test-configuration.mdx) to learn more.
+:::
+
+## Parallelism and Sharding
+
+Playwright runs tests in parallel by running several worker processes that run at the same time. By default, **test files** are run in parallel. Tests in a single file are run in order, in the same worker process. You can configure tests to run **tests in a single file** in parallel or your **entire project** to have all tests in all files to run in parallel. You can also control the number of [parallel worker processes](#limit-workers) and [limit the number of failures](#limit-failures-and-fail-fast) in the whole test suite for efficiency.
+
+```js
+npx playwright test --workers 4
+```
+
+:::info Learn More
+See our full guide on [parallelism and sharding](./test-parallel.mdx) to learn more.
+:::
+
+## Reporters
+
+Playwright comes with a few built-in reporters such as [List](./test-reporters.mdx#list-reporter), [Line](./test-reporters.mdx#line-reporter), [Dot](./test-reporters.mdx#dot-reporter), [HTML](./test-reporters.mdx#html-reporter), [JSON](./test-reporters.mdx#json-reporter), [JUnit](./test-reporters.mdx#junit-reporter), and [GitHub](./test-reporters.mdx#github-actions-annotations) as well as the ability to create custom reporters. The easiest way to try out built-in reporters is to pass the `--reporter` [command line option](./test-cli.mdx).
+
+```bash
+npx playwright test --reporter=line
+```
+
+:::info Learn More
+See our full guide on [reporters](./test-reporters.mdx) to learn more.
+:::
+
+## Retries
+
+Playwright runs tests in worker processes. These processes are OS processes, running independently, orchestrated by the test runner. All workers have identical environments and each starts its own browser. Playwright supports **test retries**. When enabled, failing tests will be retried multiple times until they pass, or until the maximum number of retries is reached. By default failing tests are not retried.
+
+```bash
+# Give failing tests 3 retry attempts
+npx playwright test --retries=3
+```
+
+:::info Learn More
+See our full guide on [reporters](./test-retries.mdx) to learn more.
+:::
+
+## Timeouts
+
+Playwright enforces a timeout for each test, 30 seconds by default. Time spent by the test function, fixtures, `beforeEach` and `afterEach` hooks is included in the test timeout. You can set the timeout in the config or for a single test or single assertion.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+// playwright.config.ts
+import type { PlaywrightTestConfig } from '@playwright/test';
+
+const config: PlaywrightTestConfig = {
+  timeout: 5 * 60 * 1000,
+};
+export default config;
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// playwright.config.js
+// @ts-check
+
+/** @type {import('@playwright/test').PlaywrightTestConfig} */
+const config = {
+  timeout: 5 * 60 * 1000,
+};
+
+module.exports = config;
+```
+
+</TabItem>
+</Tabs>
+
+:::info Learn More
+See our full guide on [timeouts](./test-timeouts.mdx) to learn more.
+:::
+
+## Videos
+
+Playwright can record videos for all pages in a [browser context](./browser-contexts.mdx). Videos are saved upon context closure, so make sure to await [browserContext.close()](/api/class-browsercontext.mdx#browser-context-close).
+
+```js
+const context = await browser.newContext({ recordVideo: { dir: 'videos/' } });
+// Make sure to await close, so that videos are saved.
+await context.close();
+```
+
+:::info Learn More
+See our full guide on [videos](./videos.mdx) to learn more.
+:::
+
+
+[Accessibility]: /api/class-accessibility.mdx "Accessibility"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
+[APIRequest]: /api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: /test-assertions.mdx "APIResponseAssertions"
+[Browser]: /api/class-browser.mdx "Browser"
+[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: /api/class-browsertype.mdx "BrowserType"
+[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: /api/class-coverage.mdx "Coverage"
+[Dialog]: /api/class-dialog.mdx "Dialog"
+[Download]: /api/class-download.mdx "Download"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[Frame]: /api/class-frame.mdx "Frame"
+[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: /api/class-jshandle.mdx "JSHandle"
+[Keyboard]: /api/class-keyboard.mdx "Keyboard"
+[Locator]: /api/class-locator.mdx "Locator"
+[LocatorAssertions]: /test-assertions.mdx "LocatorAssertions"
+[Logger]: /api/class-logger.mdx "Logger"
+[Mouse]: /api/class-mouse.mdx "Mouse"
+[Page]: /api/class-page.mdx "Page"
+[PageAssertions]: /test-assertions.mdx "PageAssertions"
+[Playwright]: /api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: /test-assertions.mdx "PlaywrightAssertions"
+[Request]: /api/class-request.mdx "Request"
+[Response]: /api/class-response.mdx "Response"
+[Route]: /api/class-route.mdx "Route"
+[ScreenshotAssertions]: /test-assertions.mdx "ScreenshotAssertions"
+[Selectors]: /api/class-selectors.mdx "Selectors"
+[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: /api/class-tracing.mdx "Tracing"
+[Video]: /api/class-video.mdx "Video"
+[WebSocket]: /api/class-websocket.mdx "WebSocket"
+[Worker]: /api/class-worker.mdx "Worker"
+[Fixtures]: /api/class-fixtures.mdx "Fixtures"
+[Test]: /api/class-test.mdx "Test"
+[TestConfig]: /api/class-testconfig.mdx "TestConfig"
+[TestError]: /api/class-testerror.mdx "TestError"
+[TestInfo]: /api/class-testinfo.mdx "TestInfo"
+[TestOptions]: /api/class-testoptions.mdx "TestOptions"
+[TestProject]: /api/class-testproject.mdx "TestProject"
+[WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
+[Location]: /api/class-location.mdx "Location"
+[Reporter]: /api/class-reporter.mdx "Reporter"
+[Suite]: /api/class-suite.mdx "Suite"
+[TestCase]: /api/class-testcase.mdx "TestCase"
+[TestResult]: /api/class-testresult.mdx "TestResult"
+[TestStep]: /api/class-teststep.mdx "TestStep"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+
+[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.focal "Dockerfile.focal"

@@ -1,0 +1,406 @@
+---
+id: overview-writing-tests
+title: "Writing Tests Overview"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+## Actionability
+
+Playwright performs a range of [actionability checks](./actionability.mdx) on the elements before making actions to ensure these actions behave as expected. It auto-waits for all the relevant checks to pass and only then performs the requested action. If the required checks do not pass within the given timeout, the action fails with the TimeoutError.
+
+For example, for [page.click(selector[, options])](/api/class-page.mdx#page-click), Playwright will ensure that the element is [Attached](./actionability.mdx#attached) to the DOM, [Visible](./actionability.mdx#visible), [Stable](./actionability.mdx#stable), as in not animating or completed animation, [Receives Events](./actionability.mdx#receives-events), as in not obscured by other elements and is [Enabled](./actionability.mdx#enabled).
+
+:::info Learn More
+See our full guide on [actionability](./actionability.mdx) to learn more.
+:::
+
+## Assertions
+
+Playwright uses the [expect](https://jestjs.io/docs/expect) library for test [assertions](./test-assertions.mdx). This library provides a lot of matchers like `toEqual`, `toContain`, `toMatch`, `toMatchSnapshot` and many more. Playwright also extends it with convenience async matchers that will wait until the expected condition is met.
+
+```js
+await expect(page.locator('.status')).toHaveText('Submitted');
+```
+
+:::info Learn More
+See our full guide on [assertions](./test-assertions.mdx) to learn more.
+:::
+
+## Authentication
+
+Playwright can be used to automate scenarios that require [authentication](./auth.mdx). Tests written with Playwright are executed in isolated clean-slate environments called [browser contexts](./browser-contexts.mdx). This isolation model improves reproducibility and prevents cascading test failures. New browser contexts can load existing authentication state. This eliminates the need to login in every context and speeds up test execution.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+const { test } = require('@playwright/test');
+
+test.beforeEach(async ({ page }) => {
+  // Runs before each test and signs in each page.
+  await page.goto('https://github.com/login');
+  await page.locator('text=Login').click();
+  await page.locator('input[name="login"]').fill('username');
+  await page.locator('input[name="password"]').fill('password');
+  await page.locator('text=Submit').click();
+});
+
+test('first', async ({ page }) => {
+  // page is signed in.
+});
+
+test('second', async ({ page }) => {
+  // page is signed in.
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+import { test } from '@playwright/test';
+
+test.beforeEach(async ({ page }) => {
+  // Runs before each test and signs in each page.
+  await page.goto('https://github.com/login');
+  await page.locator('text=Login').click();
+  await page.locator('input[name="login"]').fill('username');
+  await page.locator('input[name="password"]').fill('password');
+  await page.locator('text=Submit').click();
+});
+
+test('first', async ({ page }) => {
+  // page is signed in.
+});
+
+test('second', async ({ page }) => {
+  // page is signed in.
+});
+```
+
+</TabItem>
+</Tabs>
+
+:::info Learn More
+See our full guide on [authentication](./auth.mdx) to learn more.
+:::
+
+## Debugging Selectors
+
+Playwright will throw a timeout exception like `locator.click: Timeout 30000ms exceeded` when an element does not exist on the page. There are multiple ways of debugging selectors:
+- [Playwright Inspector](./debug-selectors.mdx#using-playwright-inspector) to step over each Playwright API call to inspect the page.
+- [Browser DevTools](./debug-selectors.mdx#using-devtools) to inspect selectors with the DevTools element panel.
+- [Trace Viewer](./trace-viewer.mdx) to see what the page looked like during the test run.
+- [Verbose API logs](./debug-selectors.mdx#verbose-api-logs) shows [actionability checks](./actionability.mdx) when locating the element.
+
+```txt
+> playwright.$('.auth-form >> text=Log in');
+
+<button>Log in</button>
+```
+
+:::info Learn More
+See our full guide on [debugging Selectors](./debug-selectors.mdx) to learn more.
+:::
+
+## Dialogs
+
+Playwright can interact with web page [dialogs](./dialogs.mdx) such as [`alert`](https://developer.mozilla.org/en-US/docs/Web/API/Window/alert), [`confirm`](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm), [`prompt`](https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt) as well as [`beforeunload`](https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event) confirmation.
+
+```js
+page.on('dialog', dialog => dialog.accept());
+await page.locator('button').click();
+```
+
+:::info Learn More
+See our full guide on [dialogs](./dialogs.mdx) to learn more.
+:::
+
+## Downloads
+
+For every attachment downloaded by the page, [page.on('download')](/api/class-page.mdx#page-event-download) event is emitted. The attachments are downloaded into a temporary folder. You can obtain the download url, file system path and payload stream using the [Download] object from the event.
+
+```js
+const [ download ] = await Promise.all([
+  // Start waiting for the download
+  page.waitForEvent('download'),
+  // Perform the action that initiates download
+  page.locator('button#delayed-download').click(),
+]);
+// Wait for the download process to complete
+console.log(await download.path());
+// Save downloaded file somewhere
+await download.saveAs('/path/to/save/download/at.txt');
+```
+
+:::info Learn More
+See our full guide on [downloads](./downloads.mdx) to learn more.
+:::
+
+## Emulation
+
+Playwright allows overriding various parameters of the device where the browser is running such as  viewport size, device scale factor, touch support, locale, timezone, color scheme, geolocation etc. Most of these parameters are configured during the browser context construction, but some of them such as viewport size can be changed for individual pages.
+
+```js
+const { chromium, devices } = require('playwright');
+const browser = await chromium.launch();
+
+const pixel2 = devices['Pixel 2'];
+const context = await browser.newContext({
+  ...pixel2,
+});
+```
+
+:::info Learn More
+See our full guide on [emulation](./emulation.mdx) to learn more.
+:::
+
+## Evaluating
+
+Playwright scripts run in your Playwright environment. Your page scripts run in the browser page environment. Those environments don't intersect, they are running in different virtual machines in different processes and even potentially on different computers. The [page.evaluate(pageFunction[, arg])](/api/class-page.mdx#page-evaluate) API can run a JavaScript function in the context of the web page and bring results back to the Playwright environment. Browser globals like `window` and `document` can be used in `evaluate`.
+
+```js
+const href = await page.evaluate(() => document.location.href);
+```
+
+:::info Learn More
+See our full guide on [evaluating](./evaluating.mdx) to learn more.
+:::
+
+## Events
+
+Playwright allows listening to various types of [events](./events.mdx) happening in the web page, such as network requests, creation of child pages, dedicated workers etc. There are several ways to subscribe to such events.
+
+```js
+page.on('request', request => console.log(`Request sent: ${request.url()}`));
+```
+
+:::info Learn More
+See our full guide on [events](./events.mdx) to learn more.
+:::
+
+## Frames
+
+A [Page] can have one or more [Frame] objects attached to it. Each page has a main frame and page-level interactions (like `click`) are assumed to operate in the main frame. A page can have additional frames attached with the `iframe` HTML tag. These frames can be accessed for interactions inside the frame.
+
+```js
+const username = await page.frameLocator('.frame-class').locator('#username-input');
+```
+
+:::info Learn More
+See our full guide on [frames](./frames.mdx) to learn more.
+:::
+
+## Input Elements
+
+With Playwright you can test HTML input elements such as Text Inputs, Checkboxes and radio buttons, select options, mouse clicks, type characters, keys and shortcuts, upload files and focus elements.
+
+```js
+await page.locator('#name').fill('Peter');
+```
+
+:::info Learn More
+See our full guide on [Input Elements](./input.mdx) to learn more.
+:::
+
+## Isolation
+
+A [BrowserContext] is an isolated incognito-alike session within a browser instance. Browser contexts are fast and cheap to create. We recommend running each test scenario in its own new Browser context, so that the browser state is isolated between the tests. If you are using the Playwright Test Runner, this happens out of the box for each test. Otherwise, you can create browser contexts manually:
+
+```js
+const browser = await chromium.launch();
+const context = await browser.newContext();
+const page = await context.newPage();
+```
+
+:::info Learn More
+See our full guide on [Isolation](./browser-contexts.mdx) to learn more.
+:::
+
+## Locators
+
+[Locators](./locators.mdx) are the central piece of Playwright's auto-waiting and retry-ability. They represent a way to find elements on the page at any moment. A Locator can be created with the [page.locator(selector[, options])](/api/class-page.mdx#page-locator) method.
+
+```js
+const locator = page.locator('text=Submit');
+await locator.click();
+```
+
+:::info Learn More
+See our full guide on [locators](./locators.mdx) to learn more.
+:::
+
+## Pages
+
+Each [BrowserContext] can have multiple pages. A [Page] refers to a single tab or a popup window within a browser context. It should be used to navigate to URLs and interact with the page content.
+
+```js
+// Create a page.
+const page = await context.newPage();
+await page.goto('http://example.com');
+await page.locator('#search').fill('query');
+```
+
+:::info Learn More
+See our full guide on [pages](./pages.mdx) to learn more.
+:::
+
+## Parameterize
+
+Parameterized tests allow you to run the same test over and over again using different values. You can either parametrize tests on a test level or on a project level.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+// example.spec.ts
+const people = ['Alice', 'Bob'];
+for (const name of people) {
+  test(`testing with ${name}`, async () => {
+    // ...
+  });
+  // You can also do it with test.describe() or with multiple tests as long the test name is unique.
+}
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// example.spec.js
+const people = ['Alice', 'Bob'];
+for (const name of people) {
+  test(`testing with ${name}`, async () => {
+    // ...
+  });
+  // You can also do it with test.describe() or with multiple tests as long the test name is unique.
+}
+```
+
+</TabItem>
+</Tabs>
+
+:::info Learn More
+See our full guide on [parameterize](./test-parameterize.mdx) to learn more.
+:::
+
+## Selectors
+
+Selectors are strings that are used to create [Locator]s. Locators are used to perform actions on the elements by means of methods such as [locator.click([options])](/api/class-locator.mdx#locator-click), [locator.fill(value[, options])](/api/class-locator.mdx#locator-fill) and many more. Checkout the [Best Practices](./selectors.mdx#best-practices) section to learn more on writing good selectors.
+
+```js
+  await page.locator('text=Log in').click();
+```
+
+:::info Learn More
+[See our full guide on [selectors](./selectors.mdx) to learn more].
+:::
+
+
+[Accessibility]: /api/class-accessibility.mdx "Accessibility"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
+[APIRequest]: /api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: /test-assertions.mdx "APIResponseAssertions"
+[Browser]: /api/class-browser.mdx "Browser"
+[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: /api/class-browsertype.mdx "BrowserType"
+[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: /api/class-coverage.mdx "Coverage"
+[Dialog]: /api/class-dialog.mdx "Dialog"
+[Download]: /api/class-download.mdx "Download"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[Frame]: /api/class-frame.mdx "Frame"
+[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: /api/class-jshandle.mdx "JSHandle"
+[Keyboard]: /api/class-keyboard.mdx "Keyboard"
+[Locator]: /api/class-locator.mdx "Locator"
+[LocatorAssertions]: /test-assertions.mdx "LocatorAssertions"
+[Logger]: /api/class-logger.mdx "Logger"
+[Mouse]: /api/class-mouse.mdx "Mouse"
+[Page]: /api/class-page.mdx "Page"
+[PageAssertions]: /test-assertions.mdx "PageAssertions"
+[Playwright]: /api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: /test-assertions.mdx "PlaywrightAssertions"
+[Request]: /api/class-request.mdx "Request"
+[Response]: /api/class-response.mdx "Response"
+[Route]: /api/class-route.mdx "Route"
+[ScreenshotAssertions]: /test-assertions.mdx "ScreenshotAssertions"
+[Selectors]: /api/class-selectors.mdx "Selectors"
+[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: /api/class-tracing.mdx "Tracing"
+[Video]: /api/class-video.mdx "Video"
+[WebSocket]: /api/class-websocket.mdx "WebSocket"
+[Worker]: /api/class-worker.mdx "Worker"
+[Fixtures]: /api/class-fixtures.mdx "Fixtures"
+[Test]: /api/class-test.mdx "Test"
+[TestConfig]: /api/class-testconfig.mdx "TestConfig"
+[TestError]: /api/class-testerror.mdx "TestError"
+[TestInfo]: /api/class-testinfo.mdx "TestInfo"
+[TestOptions]: /api/class-testoptions.mdx "TestOptions"
+[TestProject]: /api/class-testproject.mdx "TestProject"
+[WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
+[Location]: /api/class-location.mdx "Location"
+[Reporter]: /api/class-reporter.mdx "Reporter"
+[Suite]: /api/class-suite.mdx "Suite"
+[TestCase]: /api/class-testcase.mdx "TestCase"
+[TestResult]: /api/class-testresult.mdx "TestResult"
+[TestStep]: /api/class-teststep.mdx "TestStep"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+
+[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.focal "Dockerfile.focal"
