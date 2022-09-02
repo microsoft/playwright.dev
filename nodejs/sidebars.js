@@ -4,6 +4,14 @@ module.exports = {
     {
       type: 'category',
       label: 'Getting Started',
+      link: {
+        type: 'generated-index',
+        title: 'Getting Started with Playwright',
+        description: 'Learn how to install Playwright and run the example test. Explore the example test to understand locators and selectors and web first assertions. Run tests and debug tests. Generate tests with Codegen. Open the Trace viewer. Run tests on CI with GitHub Actions',
+        slug: '/getting-started-index',
+        keywords: ['getting started'],
+        image: '/img/docusaurus.png',
+      },
       items: [
         { type: 'doc', id: 'intro' },
         { type: 'doc', id: 'writing-tests' },
@@ -22,8 +30,16 @@ module.exports = {
     {
       type: 'category',
       label: 'Writing Tests',
+      link: {
+        type: 'generated-index',
+        title: 'Writing Tests',
+        description: 'Learn how to write tests using locators, sectors and web first assertions. ',
+        slug: '/writing-tests-index',
+        keywords: ['getting started'],
+        image: '/img/docusaurus.png',
+      },
       items: [
-        { type: 'doc', id: 'overview-writing-tests', label: 'Overview'},
+        {type: 'doc', id: 'overview-writing-tests', label: 'Overview'},
         { type: 'doc', id: 'actionability', label: 'Actionability'},
         { type: 'doc', id: 'test-assertions', label: 'Assertions' },
         { type: 'doc', id: 'test-auth', label: 'Authentication'},
@@ -86,8 +102,8 @@ module.exports = {
     {
       type: 'category',
       label: 'Test Runner',
+      link: {type: 'doc', id: 'overview-test-runner'},
       items: [
-        { type: 'doc', id: 'overview-test-runner', label: 'Overview'},
         { type: 'doc', id: 'test-annotations', label: 'Annotations'},
         { type: 'doc', id: 'test-cli', label: 'Command Line'},
         { type: 'doc', id: 'test-configuration', label: 'Configuration'},
@@ -121,6 +137,14 @@ module.exports = {
     {
       type: 'category',
       label: 'Tools',
+      link: {
+        type: 'generated-index',
+        title: 'Docusaurus Guides',
+        description: 'Learn about the most important Docusaurus concepts!',
+        slug: '/tools/overview',
+        keywords: ['guides'],
+        image: '/img/docusaurus.png',
+      },
       items: [
         { type: 'doc', id: 'cli' , label: 'Command Line Tools' },
         { type: 'doc', id: 'debug' , label: 'Debugging Tests Inspector' },
