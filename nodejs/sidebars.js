@@ -23,6 +23,7 @@ module.exports = {
       type: 'category',
       label: 'Writing Tests',
       items: [
+        { type: 'doc', id: 'overview-writing-tests', label: 'Overview'},
         { type: 'doc', id: 'actionability', label: 'Actionability'},
         { type: 'doc', id: 'test-assertions', label: 'Assertions' },
         { type: 'doc', id: 'test-auth', label: 'Authentication'},
