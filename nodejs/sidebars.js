@@ -87,7 +87,8 @@ module.exports = {
       type: 'category',
       label: 'Test Runner',
       items: [
-        { type: 'doc', id: 'test-annotations', label: 'Page Object Models'},
+        { type: 'doc', id: 'overview-test-runner', label: 'Overview'},
+        { type: 'doc', id: 'test-annotations', label: 'Annotations'},
         { type: 'doc', id: 'test-cli', label: 'Command Line'},
         { type: 'doc', id: 'test-configuration', label: 'Configuration'},
         { type: 'doc', id: 'test-parallel' , label: 'Parallelism and Sharding'},
