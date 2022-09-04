@@ -43,7 +43,6 @@ export default (function () {
   if (!ExecutionEnvironment.canUseDOM) {
     return null;
   }
-  sendAnalyticsEvent();
   return {
     onRouteUpdate() {
       sendAnalyticsEvent();
