@@ -79,7 +79,7 @@ module.exports = {
         },
         {
           type: "doc",
-          docId: "overview-writing-tests",
+          docId: "actionability",
           label: "Docs",
           position: "left",
         },

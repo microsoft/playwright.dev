@@ -26,21 +26,24 @@ module.exports = {
     // { type: 'doc', id: 'canary-releases' },
   ],
   docs: [
+    
     {
       type: 'category',
       label: 'Writing Tests',
-      link: {
-        type: 'doc',
-        id: 'overview-writing-tests'
-      },
+      // link: {
+      //   type: 'doc',
+      //   id: 'overview-writing-tests'
+      // },
+      
       items: [
+
         { type: 'doc', id: 'actionability', label: 'Actionability' },
         { type: 'doc', id: 'test-assertions', label: 'Assertions' },
-        { type: 'doc', id: 'test-auth', label: 'Authentication' },
+        // { type: 'doc', id: 'test-auth', label: 'Authentication' },
         { type: 'doc', id: 'auth', label: 'Authentication' },
         { type: 'doc', id: 'debug-selectors', label: 'Debugging Selectors' },
         { type: 'doc', id: 'dialogs', label: 'Dialogs' },
-        { type: 'doc', id: 'downloads', label: 'Dowloads' },
+        { type: 'doc', id: 'downloads', label: 'Downloads' },
         { type: 'doc', id: 'emulation', label: 'Emulation' },
         { type: 'doc', id: 'evaluating', label: 'Evaluating' },
         { type: 'doc', id: 'events', label: 'Events' },
@@ -50,7 +53,7 @@ module.exports = {
         { type: 'doc', id: 'locators', label: 'Locators' },
         { type: 'doc', id: 'pages', label: 'Pages' },
         { type: 'doc', id: 'test-parameterize', label: 'Parameterize' },
-        { type: 'doc', id: 'selectors', label: 'selectors' },
+        { type: 'doc', id: 'selectors', label: 'Selectors' },
         {
           type: 'category',
           label: 'Specialized Testing',
@@ -92,14 +95,14 @@ module.exports = {
           ]
         },
 
-        { type: 'doc', id: 'test-pom', label: 'Page Object Models' },
+        // { type: 'doc', id: 'test-pom', label: 'Page Object Models' },
         { type: 'doc', id: 'pom' }
       ]
     },
     {
       type: 'category',
-      label: 'Test Runner',
-      link: { type: 'doc', id: 'overview-test-runner' },
+      label: 'Running Tests',
+      // link: { type: 'doc', id: 'overview-test-runner' },
       items: [
         { type: 'doc', id: 'test-annotations', label: 'Annotations' },
         { type: 'doc', id: 'test-cli', label: 'Command Line' },
@@ -108,6 +111,7 @@ module.exports = {
         { type: 'doc', id: 'test-reporters', label: 'Reporters' },
         { type: 'doc', id: 'test-retries', label: 'Retries' },
         { type: 'doc', id: 'test-timeouts', label: 'Timeouts' },
+        { type: 'doc', id: 'trace-viewer', label: 'Traces' },
         { type: 'doc', id: 'videos', label: 'Videos' },
         {
           type: 'category',
