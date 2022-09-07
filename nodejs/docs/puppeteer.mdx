@@ -1,0 +1,274 @@
+---
+id: puppeteer
+title: "Migrating from Puppeteer"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+- [Migration Principles](#migration-principles)
+- [Cheat Sheet](#cheat-sheet)
+- [Examples](#examples)
+- [Testing](#testing)
+- [Playwright Test Super Powers](#playwright-test-super-powers)
+- [Further Reading](#further-reading)
+
+## Migration Principles
+
+This guide describes migration to [Playwright Library](./library) and [Playwright Test](./intro.mdx) from Puppeteer. The APIs have similarities, but Playwright offers much more possibilities for web testing and cross-browser automation.
+- Most Puppeteer APIs can be used as is
+- The use of [ElementHandle] is discouraged, use [Locator] objects and web-first assertions instead.
+- Playwright is cross-browser
+- You probably don't need explicit wait
+
+## Cheat Sheet
+
+| Puppeteer                                          | Playwright Library                          |
+|----------------------------------------------------|---------------------------------------------|
+| `await puppeteer.launch()`                         | `await playwright.chromium.launch()`        |
+| `puppeteer.launch({product: 'firefox'})`           | `await playwright.firefox.launch()`         |
+|  WebKit is not supported by Puppeteer              | `await playwright.webkit.launch()`          |
+| `await browser.createIncognitoBrowserContext(...)` | `await browser.newContext(...)`             |
+| `await page.setViewport(...)`                      | `await page.setViewportSize(...)`           |
+| `await page.waitForXPath(XPathSelector)`           | `await page.waitForSelector(XPathSelector)` |
+| `await page.waitForNetworkIdle(...)`               | `await page.waitForLoadState({ state: 'networkidle' }})` |
+| `await page.$eval(...)`                            | [Assertions](./test-assertions) can often be used instead to verify text, attribute, class... |
+| `await page.$(...)`                                | Discouraged, use [Locators](./api/class-locator) instead |
+| `await page.$x(xpath_selector)`                    | Discouraged, use [Locators](./api/class-locator) instead |
+| No methods dedicated to checkbox or radio input    | `await page.locator(selector).check()`<br/>`await page.locator(selector).uncheck()` |
+| `await page.click(selector)`                       | `await page.locator(selector).click()`      |
+| `await page.focus(selector)`                       | `await page.locator(selector).focus()`      |
+| `await page.hover(selector)`                       | `await page.locator(selector).hover()`      |
+| `await page.select(selector, values)`              | `await page.locator(selector).selectOption(values)` |
+| `await page.tap(selector)`                         | `await page.locator(selector).tap()`        |
+| `await page.type(selector, ...)`                   | `await page.locator(selector).type(...)`<br/> Please also consider [locator.fill(value[, options])](/api/class-locator.mdx#locator-fill) |
+| `await page.waitForFileChooser(...)`<br/>`await elementHandle.uploadFile(...)` | `await page.locator(selector).setInputFiles(...)` |
+| `await page.cookies([...urls])`                    | `await browserContext.cookies([urls])`      |
+| `await page.deleteCookie(...cookies)`              | `await browserContext.clearCookies()`       |
+| `await page.setCookie(...cookies)`                 | `await browserContext.addCookies(cookies)`  |
+| `page.on(...)`                                     | `page.on(...)`<br/>In order to intercept and mutate requests, see [page.route(url, handler[, options])](/api/class-page.mdx#page-route) |
+
+`page.waitForNavigation` and `page.waitForSelector` remain, but in many cases will not be necessary due to [auto-waiting](./actionability).
+
+The use of [ElementHandle] is discouraged , use [Locator] objects and web-first assertions instead.
+
+Locators are the central piece of Playwright's auto-waiting and retry-ability. Locators are strict. This means that all operations on locators that imply some target DOM element will throw an exception if more than one element matches given selector.
+
+## Examples
+
+### Automation example
+
+Puppeteer:
+
+```js
+const puppeteer = require('puppeteer');
+
+(async () => {
+  const browser = await puppeteer.launch();
+  const page = await browser.newPage();
+  await page.setViewport({ width: 1280, height: 800 });
+  await page.goto('http://whatsmyuseragent.org/', {
+    waitUntil: 'networkidle2',
+  });
+  await page.screenshot({ path: 'example.png' });
+  await browser.close();
+})();
+```
+
+Line-by-line migration to Playwright:
+
+```js
+const { chromium } = require('playwright'); // 1
+
+(async () => {
+  const browser = await chromium.launch();
+  const page = await browser.newPage(); // 2
+  await page.setViewportSize({ width: 1280, height: 800 }); // 3
+  await page.goto('http://whatsmyuseragent.org/', {
+    waitUntil: 'networkidle', // 4
+  });
+  await page.screenshot({ path: 'example.png' });
+  await browser.close();
+})();
+```
+
+Migration highlights (see inline comments in the Playwright code snippet):
+1. Each Playwright Library file has explicit import of `chromium`. Other browsers `webkit` or `firefox` can be used.
+1. For browser state isolation, consider [browser contexts](./browser-contexts.mdx)
+1. `setViewport` becomes `setViewportSize`
+1. `networkidle2` becomes `networkidle`. Please note that on most cases it is not useful, thanks to auto-waiting.
+
+### Test example
+
+Puppeteer with Jest:
+
+```js
+import puppeteer from 'puppeteer';
+
+describe('Playwright homepage', () => {
+  let browser;
+  let page;
+
+  beforeAll(async () => {
+    browser = await puppeteer.launch();
+    page = await browser.newPage();
+  });
+
+  it('contains hero title', async () => {
+    await page.goto('https://playwright.dev/');
+    await page.waitForSelector('.hero__title');
+    const text = await page.$eval('.hero__title', (e) => e.textContent);
+    expect(text).toContain('Playwright enables reliable end-to-end testing'); // 5
+  });
+
+  afterAll(() => browser.close());
+});
+```
+
+Line-by-line migration to Playwright Test:
+
+```js
+import { test, expect } from '@playwright/test'; // 1
+
+test.describe('Playwright homepage', () => {
+  test('contains hero title', async ({ page }) => { // 2, 3
+    await page.goto('https://playwright.dev/');
+    const titleLocator = page.locator('.hero__title'); // 4
+    await expect(titleLocator).toContainText( // 5
+      'Playwright enables reliable end-to-end testing'
+    );
+  });
+});
+```
+
+1. Each Playwright Test file has explicit import of the `test` and `expect` functions
+1. Test function is marked with `async`
+1. Playwright Test is given a `page` as one of its parameters. This is one of the many [useful fixtures](./api/class-fixtures) in Playwright Test. Playwright Test creates an isolated [Page] object for each test. However, if you'd like to reuse a single [Page] object between multiple tests, you can create your own in [test.beforeAll(hookFunction)](/api/class-test.mdx#test-before-all) and close it in [test.afterAll(hookFunction)](/api/class-test.mdx#test-after-all).
+1. Locator creation with [page.locator(selector[, options])](/api/class-page.mdx#page-locator) is one of the few methods that is sync.
+1. Use [assertions](./test-assertions) to verify the state instead of `page.$eval()`.
+
+## Testing
+
+With a few lines of code, you can hook up Playwright to your existing JavaScript [test runner](./test-runners).
+
+To improve testing, it is adviced to use [Locators](./api/class-locator) and web-first [Assertions](./test-assertions). See [Writing Tests](./writing-tests)
+
+It is common with Puppeteer to use `page.evaluate()` or `page.$eval()` to inspect an [ElementHandle] and extract the value of text content, attribute, class... Web-first [Assertions](./test-assertions) offers several matchers for this purpose, it is more reliable and readable.
+
+[Playwright Test](./intro.mdx) is our first-party recommended test runner to be used with Playwright. It provides several features like Page Object Model, parallelism, fixtures or reporters.
+
+## Playwright Test Super Powers
+
+Once you're on Playwright Test, you get a lot!
+- Full zero-configuration TypeScript support
+- Run tests across **all web engines** (Chrome, Firefox, Safari) on **any popular operating system** (Windows, macOS, Ubuntu)
+- Full support for multiple origins, [(i)frames](./api/class-frame), [tabs and contexts](./pages)
+- Run tests in isolation in parallel across multiple browsers
+- Built-in test artifact collection: [video recording](./test-configuration#record-video), [screenshots](./test-configuration#automatic-screenshots) and [playwright traces](./test-configuration#record-test-trace)
+
+Also you get all these ✨ awesome tools ✨ that come bundled with Playwright Test:
+- [Playwright Inspector](./debug.mdx)
+- [Playwright Test Code generation](./auth#code-generation)
+- [Playwright Tracing](./trace-viewer) for post-mortem debugging
+
+## Further Reading
+
+Learn more about Playwright Test runner:
+- [Getting Started](./intro)
+- [Fixtures](./test-fixtures)
+- [Locators](./api/class-locator)
+- [Selectors](./selectors)
+- [Assertions](./test-assertions)
+- [Auto-waiting](./actionability)
+
+[Accessibility]: /api/class-accessibility.mdx "Accessibility"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
+[APIRequest]: /api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: /test-assertions.mdx "APIResponseAssertions"
+[Browser]: /api/class-browser.mdx "Browser"
+[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
+[BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
+[BrowserType]: /api/class-browsertype.mdx "BrowserType"
+[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Coverage]: /api/class-coverage.mdx "Coverage"
+[Dialog]: /api/class-dialog.mdx "Dialog"
+[Download]: /api/class-download.mdx "Download"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[Frame]: /api/class-frame.mdx "Frame"
+[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: /api/class-jshandle.mdx "JSHandle"
+[Keyboard]: /api/class-keyboard.mdx "Keyboard"
+[Locator]: /api/class-locator.mdx "Locator"
+[LocatorAssertions]: /test-assertions.mdx "LocatorAssertions"
+[Logger]: /api/class-logger.mdx "Logger"
+[Mouse]: /api/class-mouse.mdx "Mouse"
+[Page]: /api/class-page.mdx "Page"
+[PageAssertions]: /test-assertions.mdx "PageAssertions"
+[Playwright]: /api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: /test-assertions.mdx "PlaywrightAssertions"
+[Request]: /api/class-request.mdx "Request"
+[Response]: /api/class-response.mdx "Response"
+[Route]: /api/class-route.mdx "Route"
+[ScreenshotAssertions]: /test-assertions.mdx "ScreenshotAssertions"
+[Selectors]: /api/class-selectors.mdx "Selectors"
+[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: /api/class-tracing.mdx "Tracing"
+[Video]: /api/class-video.mdx "Video"
+[WebSocket]: /api/class-websocket.mdx "WebSocket"
+[Worker]: /api/class-worker.mdx "Worker"
+[Fixtures]: /api/class-fixtures.mdx "Fixtures"
+[Test]: /api/class-test.mdx "Test"
+[TestConfig]: /api/class-testconfig.mdx "TestConfig"
+[TestError]: /api/class-testerror.mdx "TestError"
+[TestInfo]: /api/class-testinfo.mdx "TestInfo"
+[TestOptions]: /api/class-testoptions.mdx "TestOptions"
+[TestProject]: /api/class-testproject.mdx "TestProject"
+[WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
+[Location]: /api/class-location.mdx "Location"
+[Reporter]: /api/class-reporter.mdx "Reporter"
+[Suite]: /api/class-suite.mdx "Suite"
+[TestCase]: /api/class-testcase.mdx "TestCase"
+[TestResult]: /api/class-testresult.mdx "TestResult"
+[TestStep]: /api/class-teststep.mdx "TestStep"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Array]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Array "Array"
+[boolean]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Boolean_type "Boolean"
+[Buffer]: https://nodejs.org/api/buffer.html#buffer_class_buffer "Buffer"
+[ChildProcess]: https://nodejs.org/api/child_process.html "ChildProcess"
+[Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
+[EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
+[function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
+[number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
+[Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
+[string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
+[void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
+[URL]: https://nodejs.org/api/url.html "URL"
+
+[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.focal "Dockerfile.focal"
