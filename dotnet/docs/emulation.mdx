@@ -5,25 +5,11 @@ title: "Emulation"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright allows overriding various parameters of the device where the browser is running:
-- viewport size, device scale factor, touch support
-- locale, timezone
-- color scheme
-- geolocation
-
-Most of these parameters are configured during the browser context construction, but some of them such as viewport size can be changed for individual pages.
-
-- [Devices](#devices)
-- [User agent](#user-agent)
-- [Viewport](#viewport)
-- [Locale & timezone](#locale--timezone)
-- [Permissions](#permissions)
-- [Geolocation](#geolocation)
-- [Color scheme and media](#color-scheme-and-media)
+With Playwright you can test your app on any browser as well as emulate a real device such as a mobile phone or tablet. Simply configure the devices you would like to emulate and Playwright will simulate the browser behavior such as `"userAgent"`, `"screenSize"`, `"viewport"` and if it `"hasTouch"` enabled. You can also emulate the `"geolocation"`, `"locale"` and `"timezone"` for all tests or for a specific test as well as set the `"permissions"` to show notifications or change the `"colorScheme"`.
 
 ## Devices
 
-Playwright comes with a registry of device parameters for selected mobile devices. It can be used to simulate browser behavior on a mobile device:
+Playwright comes with a [registry of device parameters](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json) using [Playwright.Devices](/api/class-playwright.mdx#playwright-devices) for selected desktop, tablet and mobile devices. It can be used to simulate browser behavior for a specific device such as user agent, screen size, viewport and if it has touch enabled. All tests will run with the specified device parameters. 
 
 ```csharp
 using Microsoft.Playwright;
@@ -38,36 +24,17 @@ class Program
         {
             Headless: False
         });
-        var pixel2 = playwright.Devices["Pixel 2"];
-        await using var context = await browser.NewContextAsync(pixel2);
+        var iphone12 = playwright.Devices["iPhone 12"];
+        await using var context = await browser.NewContextAsync(iphone12);
     }
 }
 ```
 
-All pages created in the context above will share the same device parameters.
-
-### API reference
-- [Playwright.Devices](/api/class-playwright.mdx#playwright-devices)
-- [Browser.NewContextAsync(options)](/api/class-browser.mdx#browser-new-context)
-
-<br/>
-
-## User agent
-
-All pages created in the context above will share the user agent specified:
-
-```csharp
-var context = await browser.NewContextAsync(new BrowserNewContextOptions { UserAgent = "My User Agent" });
-```
-
-### API reference
-- [Browser.NewContextAsync(options)](/api/class-browser.mdx#browser-new-context)
-
-<br/>
-
 ## Viewport
 
-Create a context with custom viewport size:
+The viewport is included in the device but you can override it for some tests with [Page.SetViewportSizeAsync(width, height)](/api/class-page.mdx#page-set-viewport-size).
+
+The same works inside a describe block.
 
 ```csharp
 // Create context with given viewport
@@ -87,13 +54,9 @@ await using var context = await browser.NewContextAsync(new()
 });
 ```
 
-### API reference
-- [Browser.NewContextAsync(options)](/api/class-browser.mdx#browser-new-context)
-- [Page.SetViewportSizeAsync(width, height)](/api/class-page.mdx#page-set-viewport-size)
+## Locale & Timezone
 
-<br/>
-
-## Locale & timezone
+Emulate the user Locale and Timezone which can be set globally for all tests in the config and then overridden for particular tests.
 
 ```csharp
 await using var context = await browser.NewContextAsync(new()
@@ -103,43 +66,31 @@ await using var context = await browser.NewContextAsync(new()
 });
 ```
 
-### API reference
-- [Browser.NewContextAsync(options)](/api/class-browser.mdx#browser-new-context)
-
-<br/>
-
 ## Permissions
 
-Allow all pages in the context to show system notifications:
+Allow app to show system notifications.
 
-Grant all pages in the existing context access to current location:
+Allow test to request current location.
 
 ```csharp
 await context.GrantPermissionsAsync(new[] { "geolocation" });
 ```
 
-Grant notifications access from a specific domain:
+Allow notifications for a specific domain.
 
 ```csharp
 await context.GrantPermissionsAsync(new[] { "notifications" }, origin: "https://skype.com");
 ```
 
-Revoke all permissions:
+Revoke all permissions with [BrowserContext.ClearPermissionsAsync()](/api/class-browsercontext.mdx#browser-context-clear-permissions).
 
 ```csharp
 await context.ClearPermissionsAsync();
 ```
 
-### API reference
-- [Browser.NewContextAsync(options)](/api/class-browser.mdx#browser-new-context)
-- [BrowserContext.GrantPermissionsAsync(permissions, options)](/api/class-browsercontext.mdx#browser-context-grant-permissions)
-- [BrowserContext.ClearPermissionsAsync()](/api/class-browsercontext.mdx#browser-context-clear-permissions)
-
-<br/>
-
 ## Geolocation
 
-Create a context with `"geolocation"` permissions granted:
+Create a test with `"geolocation"` permissions granted and geolocation set to a specific area.
 
 ```csharp
 await using var context = await browser.NewContextAsync(new()
@@ -157,15 +108,9 @@ await context.SetGeolocationAsync(new Geolocation() { Longitude = 48.858455f, La
 
 **Note** you can only change geolocation for all pages in the context.
 
-### API reference
-- [Browser.NewContextAsync(options)](/api/class-browser.mdx#browser-new-context)
-- [BrowserContext.SetGeolocationAsync(geolocation)](/api/class-browsercontext.mdx#browser-context-set-geolocation)
+## Color Scheme and Media
 
-<br/>
-
-## Color scheme and media
-
-Create a context with dark or light mode. Pages created in this context will follow this color scheme preference.
+Create a test that emulates the users `"colorScheme"`. Supported values are 'light', 'dark', 'no-preference'. You can also emulate the media type with [Page.EmulateMediaAsync(options)](/api/class-page.mdx#page-emulate-media).
 
 ```csharp
 // Create context with dark mode
@@ -193,9 +138,17 @@ await page.EmulateMediaAsync(new()
 });
 ```
 
-### API reference
-- [Browser.NewContextAsync(options)](/api/class-browser.mdx#browser-new-context)
-- [Page.EmulateMediaAsync(options)](/api/class-page.mdx#page-emulate-media)
+## User Agent
+
+The User Agent is included in the device and therefore you  will rarely need to change it however if you do need to test a different user agent you can override it with the `userAgent` property.
+
+```csharp
+var context = await browser.NewContextAsync(new BrowserNewContextOptions { UserAgent = "My User Agent" });
+```
+
+## JavaScript Enabled
+
+Emulate a user scenario where JavaScript is disabled.
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
