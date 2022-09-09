@@ -73,7 +73,7 @@ module.exports = {
         },
         {
           type: "doc",
-          docId: "test-annotations",
+          docId: "test-assertions",
           label: "Docs",
           position: "left",
         },
