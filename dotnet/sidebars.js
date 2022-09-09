@@ -1,22 +1,14 @@
 module.exports = {
   gettingStarted: [
-    {
-      type: 'category',
-      label: 'Getting Started',
-      items: [
-        { type: 'doc', id: 'intro' },
-        { type: 'doc', id: 'writing-tests' },
-        { type: 'doc', id: 'running-tests' },
-        { type: 'doc', id: 'codegen-intro' },
-        { type: 'doc', id: 'trace-viewer-intro' },
-        { type: 'doc', id: 'test-runners' }
-      ],
-      collapsed: false
-    },
-    { type: 'doc', id: 'library' },
+    { type: 'doc', id: 'intro' },
+    { type: 'doc', id: 'writing-tests' },
+    { type: 'doc', id: 'running-tests' },
+    { type: 'doc', id: 'codegen-intro' },
+    { type: 'doc', id: 'trace-viewer-intro' },
+    { type: 'doc', id: 'test-runners' },
+    { type: 'doc', id: 'library' }
   ],
   docs: [
-    { type: 'doc', id: 'release-notes' },
     {
       type: 'category',
       label: 'Guides',
@@ -63,7 +55,8 @@ module.exports = {
       collapsed: true
     },
     { type: 'doc', id: 'troubleshooting' },
-    { type: 'doc', id: 'languages' }
+    { type: 'doc', id: 'languages' },
+    { type: 'doc', id: 'release-notes' }
   ],
   api: [
     {
