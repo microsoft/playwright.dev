@@ -1,5 +1,5 @@
 module.exports = {
-  docs: [
+  gettingStarted: [
     {
       type: 'category',
       label: 'Getting Started',
@@ -13,8 +13,11 @@ module.exports = {
       ],
       collapsed: false
     },
+  ],
+  docs: [
+    
     { type: 'doc', id: 'library' },
-    { type: 'doc', id: 'release-notes' },
+    // { type: 'doc', id: 'release-notes' },
     {
       type: 'category',
       label: 'Guides',

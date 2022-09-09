@@ -1,5 +1,5 @@
 module.exports = {
-  docs: [
+  gettingStarted: [
     {
       type: 'category',
       label: 'Getting Started',
@@ -9,13 +9,15 @@ module.exports = {
         { type: 'doc', id: 'running-tests' },
         { type: 'doc', id: 'codegen-intro' },
         { type: 'doc', id: 'trace-viewer-intro' },
-        { type: 'doc', id: 'ci-intro' },
+        { type: 'doc', id: 'ci-intro' }
       ],
       collapsed: false
     },
-    { type: 'doc', id: 'getting-started-vscode' },
-    { type: 'doc', id: 'release-notes' },
-    { type: 'doc', id: 'canary-releases' },
+    { type: 'doc', id: 'getting-started-vscode' }
+  ],
+  docs: [
+    // { type: 'doc', id: 'release-notes' },
+    // { type: 'doc', id: 'canary-releases' },
     {
       type: 'category',
       label: 'Playwright Test',

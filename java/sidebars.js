@@ -1,17 +1,18 @@
 module.exports = {
+  gettingStarted: [{
+    type: 'category',
+    label: 'Getting Started',
+    items: [
+      { type: 'doc', id: 'intro' },
+      { type: 'doc', id: 'codegen-intro' },
+      { type: 'doc', id: 'trace-viewer-intro' },
+      { type: 'doc', id: 'test-runners' }
+    ],
+    collapsed: false
+  },
+],
   docs: [
-    {
-      type: 'category',
-      label: 'Getting Started',
-      items: [
-        { type: 'doc', id: 'intro' },
-        { type: 'doc', id: 'codegen-intro' },
-        { type: 'doc', id: 'trace-viewer-intro' },
-        { type: 'doc', id: 'test-runners' }
-      ],
-      collapsed: false
-    },
-    { type: 'doc', id: 'release-notes' },
+    // { type: 'doc', id: 'release-notes' },
     {
       type: 'category',
       label: 'Guides',

@@ -68,6 +68,12 @@ module.exports = {
         {
           type: "doc",
           docId: "intro",
+          label: "Getting Started",
+          position: "left",
+        },
+        {
+          type: "doc",
+          docId: "actionability",
           label: "Docs",
           position: "left",
         },
