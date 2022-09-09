@@ -12,7 +12,7 @@ module.exports = {
   },
 ],
   docs: [
-    // { type: 'doc', id: 'release-notes' },
+    { type: 'doc', id: 'release-notes' },
     {
       type: 'category',
       label: 'Guides',

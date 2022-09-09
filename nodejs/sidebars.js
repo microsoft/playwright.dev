@@ -16,8 +16,8 @@ module.exports = {
     { type: 'doc', id: 'getting-started-vscode' }
   ],
   docs: [
-    // { type: 'doc', id: 'release-notes' },
-    // { type: 'doc', id: 'canary-releases' },
+    { type: 'doc', id: 'release-notes' },
+    { type: 'doc', id: 'canary-releases' },
     {
       type: 'category',
       label: 'Playwright Test',
