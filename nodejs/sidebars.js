@@ -3,15 +3,15 @@ module.exports = {
     {
       type: 'category',
       label: 'Getting Started',
-      link: {
-        type: 'generated-index',
-        title: 'Getting Started with Playwright',
-        description:
-          'Learn how to install Playwright and run the example test. Explore the example test to understand locators and selectors and web first assertions. Run tests and debug tests. Generate tests with Codegen. Open the Trace viewer. Run tests on CI with GitHub Actions',
-        slug: '/getting-started-index',
-        keywords: ['getting started'],
-        image: '/img/docusaurus.png'
-      },
+      // link: {
+      //   type: 'generated-index',
+      //   title: 'Getting Started with Playwright',
+      //   description:
+      //     'Learn how to install Playwright and run the example test. Explore the example test to understand locators and selectors and web first assertions. Run tests and debug tests. Generate tests with Codegen. Open the Trace viewer. Run tests on CI with GitHub Actions',
+      //   slug: '/getting-started-index',
+      //   keywords: ['getting started'],
+      //   image: '/img/docusaurus.png'
+      // },
       items: [
         { type: 'doc', id: 'intro' },
         { type: 'doc', id: 'writing-tests' },
@@ -108,10 +108,10 @@ module.exports = {
         { type: 'doc', id: 'test-cli', label: 'Command Line' },
         { type: 'doc', id: 'test-configuration', label: 'Configuration' },
         { type: 'doc', id: 'test-parallel', label: 'Parallelism and Sharding' },
+        { type: 'doc', id: 'postmortem-debugging' },
         { type: 'doc', id: 'test-reporters', label: 'Reporters' },
         { type: 'doc', id: 'test-retries', label: 'Retries' },
         { type: 'doc', id: 'test-timeouts', label: 'Timeouts' },
-        { type: 'doc', id: 'trace-viewer', label: 'Traces' },
         { type: 'doc', id: 'videos', label: 'Videos' },
         {
           type: 'category',
@@ -134,19 +134,11 @@ module.exports = {
     {
       type: 'category',
       label: 'Tools',
-      link: {
-        type: 'generated-index',
-        title: 'Docusaurus Guides',
-        description: 'Learn about the most important Docusaurus concepts!',
-        slug: '/tools/overview',
-        keywords: ['guides'],
-        image: '/img/docusaurus.png'
-      },
       items: [
-        { type: 'doc', id: 'cli', label: 'Command Line Tools' },
-        { type: 'doc', id: 'debug', label: 'Debugging Tests Inspector' },
-        { type: 'doc', id: 'codegen', label: 'Codegen Test Generator ' },
-        { type: 'doc', id: 'trace-viewer', label: 'Trace Viewer' }
+        { type: 'doc', id: 'cli' },
+        { type: 'doc', id: 'debug'},
+        { type: 'doc', id: 'codegen'},
+        { type: 'doc', id: 'traces' }
       ]
     },
 
