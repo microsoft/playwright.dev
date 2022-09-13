@@ -19,7 +19,7 @@ This image is published on [Docker Hub].
 ### Pull the image
 
 ```bash
-docker pull mcr.microsoft.com/playwright:v1.26.0-focal
+docker pull mcr.microsoft.com/playwright:v1.27.0-focal
 ```
 
 ### Run the image
@@ -31,7 +31,7 @@ By default, the Docker image will use the `root` user to run the browsers. This 
 On trusted websites, you can avoid creating a separate user and use root for it since you trust the code which will run on the browsers.
 
 ```bash
-docker run -it --rm --ipc=host mcr.microsoft.com/playwright:v1.26.0-focal /bin/bash
+docker run -it --rm --ipc=host mcr.microsoft.com/playwright:v1.27.0-focal /bin/bash
 ```
 
 #### Crawling and scraping
@@ -39,7 +39,7 @@ docker run -it --rm --ipc=host mcr.microsoft.com/playwright:v1.26.0-focal /bin/b
 On untrusted websites, it's recommended to use a separate user for launching the browsers in combination with the seccomp profile. Inside the container or if you are using the Docker image as a base image you have to use `adduser` for it.
 
 ```bash
-docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_profile.json mcr.microsoft.com/playwright:v1.26.0-focal /bin/bash
+docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_profile.json mcr.microsoft.com/playwright:v1.27.0-focal /bin/bash
 ```
 
 [`seccomp_profile.json`](https://github.com/microsoft/playwright/blob/main/utils/docker/seccomp_profile.json) is needed to run Chromium with sandbox. This is a [default Docker seccomp profile](https://github.com/docker/engine/blob/d0d99b04cf6e00ed3fc27e81fc3d94e7eda70af3/profiles/seccomp/default.json) with extra user namespace cloning permissions:
@@ -113,16 +113,12 @@ docker run --rm -it playwright:localbuild /bin/bash
 
 ## (Experimental) Playwright Test Docker Integration
 
-Playwright Test now ships an **experimental** Docker integration. With this integration, **only** browser binaries are running inside a Docker container, while all the code is still running on the host operating system.
+Playwright Test now ships an **experimental** Docker integration. The Docker container provides a consistent environment, eliminating browser rendering differences across platforms.  With this integration, **only** browser binaries are running inside a Docker container, while all the code is still running on the host operating system.
 
-Docker container provides a consistent environment, eliminating browser rendering differences across platforms. Playwright Test will automatically proxy host network traffic into the container, so browsers can access servers running on the host.
-
-:::note
-Docker integration requires Docker installed & running on your computer. See https://docs.docker.com/get-docker/
-:::
+Playwright Test will automatically proxy host network traffic into the container, so browsers can access servers running on the host.
 
 :::note
-If you use [Docker Desktop](https://www.docker.com/products/docker-desktop/), make sure to increase default CPU and mem limit for better performance.
+Docker integration requires Docker installed & running on your computer. See https://docs.docker.com/get-docker/  If you use [Docker Desktop](https://www.docker.com/products/docker-desktop/), make sure to increase default CPU and memory limit for better performance.
 :::
 
 Docker integration usage:
@@ -146,7 +142,7 @@ npx playwright docker test
 
 Note that this command will detect running Docker container, and auto-launch it if needed.
 
-4. Finally, stop Docker container when it is no longer needed.
+4. Finally, stop background Docker container when you're done working with tests:
 
 ```bash
 npx playwright docker stop

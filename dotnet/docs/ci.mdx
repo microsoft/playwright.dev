@@ -74,7 +74,7 @@ jobs:
     - name: Install Playwright
       run: npx playwright install --with-deps
     - name: Run Playwright tests
-      run: npm run test:e2e
+      run: npx playwright test
       env:
         # This might depend on your test-runner/language binding
         PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.target_url }}
@@ -99,7 +99,7 @@ steps:
     name: 'Playwright Tests'
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:v1.26.0-focal
+      image: mcr.microsoft.com/playwright:v1.27.0-focal
     steps:
       - uses: actions/checkout@v3
       - name: Setup dotnet
@@ -126,7 +126,7 @@ jobs:
     - deployment: Run_E2E_Tests
       pool:
         vmImage: ubuntu-20.04
-      container: mcr.microsoft.com/playwright:v1.26.0-focal
+      container: mcr.microsoft.com/playwright:v1.27.0-focal
       environment: testing
       strategy:
         runOnce:
@@ -153,7 +153,7 @@ jobs:
     - deployment: Run_E2E_Tests
       pool:
         vmImage: ubuntu-20.04
-      container: mcr.microsoft.com/playwright:v1.26.0-focal
+      container: mcr.microsoft.com/playwright:v1.27.0-focal
       environment: testing
       strategy:
         runOnce:
@@ -195,7 +195,7 @@ Running Playwright on Circle CI is very similar to running on Github Actions. In
 executors:
    pw-focal-development:
      docker:
-       - image: mcr.microsoft.com/playwright:v1.26.0-focal
+       - image: mcr.microsoft.com/playwright:v1.27.0-focal
    environment:
      NODE_ENV: development # Needed if playwright is in `devDependencies`
 ```
@@ -221,7 +221,7 @@ Sharding in Circle CI is indexed with 0 which means that you will need to overri
     executor: pw-focal-development
     parallelism: 4
     steps:
-      - run: SHARD="$((${CIRCLE_NODE_INDEX}+1))"; npm run test -- --shard=${SHARD}/${CIRCLE_NODE_TOTAL}      
+      - run: SHARD="$((${CIRCLE_NODE_INDEX}+1))"; npx playwright test -- --shard=${SHARD}/${CIRCLE_NODE_TOTAL}      
 ```
 
 ### Jenkins
@@ -230,13 +230,13 @@ Jenkins supports Docker agents for pipelines. Use the [Playwright Docker image](
 
 ```groovy
 pipeline {
-   agent { docker { image 'mcr.microsoft.com/playwright:v1.26.0-focal' } }
+   agent { docker { image 'mcr.microsoft.com/playwright:v1.27.0-focal' } }
    stages {
       stage('e2e-tests') {
          steps {
             // Depends on your language / test framework
             sh 'npm install'
-            sh 'npm run test'
+            sh 'npx playwright test'
          }
       }
    }
@@ -248,7 +248,7 @@ pipeline {
 Bitbucket Pipelines can use public [Docker images as build environments](https://confluence.atlassian.com/bitbucket/use-docker-images-as-build-environments-792298897.html). To run Playwright tests on Bitbucket, use our public Docker image ([see Dockerfile](./docker.mdx)).
 
 ```yml
-image: mcr.microsoft.com/playwright:v1.26.0-focal
+image: mcr.microsoft.com/playwright:v1.27.0-focal
 ```
 
 ### GitLab CI
@@ -261,7 +261,7 @@ stages:
 
 tests:
   stage: test
-  image: mcr.microsoft.com/playwright:v1.26.0-focal
+  image: mcr.microsoft.com/playwright:v1.27.0-focal
   script:
   ...
 ```
