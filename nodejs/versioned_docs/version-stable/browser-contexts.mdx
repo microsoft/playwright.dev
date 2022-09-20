@@ -1,16 +1,60 @@
 ---
 id: browser-contexts
-title: "Browser Contexts"
+title: "Isolation"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-- [Browser context](#browser-context)
-- [Multiple contexts](#multiple-contexts)
+Tests written with Playwright execute in isolated clean-slate environments called browser contexts. This isolation model improves reproducibility and prevents cascading test failures. 
 
-## Browser context
+[BrowserContext]s are equivalent to incognito-like profiles, they are fast and cheap to create and completely isolated, even when running in a single browser. Playwright creates a context for each test, and provides a default [Page] in that context.
 
-A [BrowserContext] is an isolated incognito-alike session within a browser instance. Browser contexts are fast and cheap to create. We recommend running each test scenario in its own new Browser context, so that the browser state is isolated between the tests. If you are using [Playwright Test](./intro.mdx), this happens out of the box for each test. Otherwise, you can create browser contexts manually:
+When using Playwright as a Test Runner, this happens out of the box for each test. Otherwise, you can create browser contexts manually.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'},
+    {label: 'Library', value: 'library'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+const { test } = require('@playwright/test');
+
+test('example test', async ({ page, context }) => {
+  // "context" is an isolated BrowserContext, created for this specific test.
+  // "page" belongs to this context.
+});
+
+test('another test', async ({ page, context }) => {
+  // "context" and "page" in this second test are completely
+  // isolated from the first test.
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+import { test } from '@playwright/test';
+
+test('example test', async ({ page, context }) => {
+  // "context" is an isolated BrowserContext, created for this specific test.
+  // "page" belongs to this context.
+});
+
+test('another test', async ({ page, context }) => {
+  // "context" and "page" in this second test are completely
+  // isolated from the first test.
+});
+```
+
+</TabItem>
+<TabItem value="library">
 
 ```js
 const browser = await chromium.launch();
@@ -18,25 +62,59 @@ const context = await browser.newContext();
 const page = await context.newPage();
 ```
 
-Browser contexts can also be used to emulate multi-page scenarios involving mobile devices, permissions, locale and color scheme.
+</TabItem>
+</Tabs>
+
+Browser contexts can also be used to emulate multi-page scenarios involving mobile devices, permissions, locale and color scheme. Check out our [Emulation](./emulation.mdx) guide for more details.
+
+## Multiple contexts in a single test
+
+Playwright can create multiple browser contexts within a single scenario. This is useful when you want to test for multi-user functionality, like a chat.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'},
+    {label: 'Library', value: 'library'}
+  ]
+}>
+<TabItem value="ts">
 
 ```js
-const { devices } = require('playwright');
-const iPhone = devices['iPhone 11 Pro'];
+const { test } = require('@playwright/test');
 
-const context = await browser.newContext({
-  ...iPhone,
-  permissions: ['geolocation'],
-  geolocation: { latitude: 52.52, longitude: 13.39},
-  colorScheme: 'dark',
-  locale: 'de-DE'
+test('admin and user', async ({ browser }) => {
+  // Create two isolated browser contexts
+  const adminContext = await browser.newContext();
+  const userContext = await browser.newContext();
+  
+  // Create pages and interact with contexts independently
+  const adminPage = await adminContext.newPage();
+  const userPage = await userContext.newPage();
 });
-const page = await context.newPage();
 ```
 
-## Multiple contexts
+</TabItem>
+<TabItem value="js">
 
-[Browser contexts](./browser-contexts.mdx) are isolated environments on a single browser instance. Playwright can create multiple browser contexts within a single scenario. This is useful when you want to test for multi-user functionality, like chat.
+```js
+import { test } from '@playwright/test';
+
+test('admin and user', async ({ browser }) => {
+  // Create two isolated browser contexts
+  const adminContext = await browser.newContext();
+  const userContext = await browser.newContext();
+  
+  // Create pages and interact with contexts independently
+  const adminPage = await adminContext.newPage();
+  const userPage = await userContext.newPage();
+});
+```
+
+</TabItem>
+<TabItem value="library">
 
 ```js
 const { chromium } = require('playwright');
@@ -49,12 +127,12 @@ const userContext = await browser.newContext();
 const adminContext = await browser.newContext();
 
 // Create pages and interact with contexts independently
+const adminPage = await adminContext.newPage();
+const userPage = await userContext.newPage();
 ```
 
-### API reference
-- [BrowserContext]
-- [browser.newContext([options])](/api/class-browser.mdx#browser-new-context)
-- [browserContext.addCookies(cookies)](/api/class-browsercontext.mdx#browser-context-add-cookies)
+</TabItem>
+</Tabs>
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"

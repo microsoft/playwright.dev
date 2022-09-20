@@ -7,12 +7,9 @@ import TabItem from '@theme/TabItem';
 
 Playwright can interact with the web page dialogs such as [`alert`](https://developer.mozilla.org/en-US/docs/Web/API/Window/alert), [`confirm`](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm), [`prompt`](https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt) as well as [`beforeunload`](https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event) confirmation.
 
-- [alert(), confirm(), prompt() dialogs](#alert-confirm-prompt-dialogs)
-- [beforeunload dialog](#beforeunload-dialog)
-
 ## alert(), confirm(), prompt() dialogs
 
-By default, dialogs are auto-dismissed by Playwright, so you don't have to handle them. However, you can register a dialog handler before the action that triggers the dialog to accept or decline it.
+By default, dialogs are auto-dismissed by Playwright, so you don't have to handle them. However, you can register a dialog handler before the action that triggers the dialog to either [Dialog.AcceptAsync(promptText)](/api/class-dialog.mdx#dialog-accept) or [Dialog.DismissAsync()](/api/class-dialog.mdx#dialog-dismiss) it.
 
 ```csharp
 page.Dialog += (_, dialog) => dialog.AcceptAsync();
@@ -20,10 +17,10 @@ await page.Locator("button").ClickAsync();
 ```
 
 :::note
-[event Page.Dialog](/api/class-page.mdx#page-event-dialog) listener **must handle** the dialog. Otherwise your action will stall, be it [Page.ClickAsync(selector, options)](/api/class-page.mdx#page-click), [Page.EvaluateAsync(expression, arg)](/api/class-page.mdx#page-evaluate) or any other. That's because dialogs in Web are modal and block further page execution until they are handled.
+[event Page.Dialog](/api/class-page.mdx#page-event-dialog) listener **must handle** the dialog. Otherwise your action will stall, be it [Locator.ClickAsync(options)](/api/class-locator.mdx#locator-click) or something else. That's because dialogs in Web are modals and therefore block further page execution until they are handled.
 :::
 
-As a result, following snippet will never resolve:
+As a result, the following snippet will never resolve:
 
 :::warning
 WRONG!
@@ -38,16 +35,11 @@ await page.Locator("button").ClickAsync(); // Will hang here
 If there is no listener for [event Page.Dialog](/api/class-page.mdx#page-event-dialog), all dialogs are automatically dismissed.
 :::
 
-### API reference
-- [Dialog]
-- [Dialog.AcceptAsync(promptText)](/api/class-dialog.mdx#dialog-accept)
-- [Dialog.DismissAsync()](/api/class-dialog.mdx#dialog-dismiss)
-
 ## beforeunload dialog
 
-When [Page.CloseAsync(options)](/api/class-page.mdx#page-close) is invoked with the truthy `runBeforeUnload` value, it page runs its unload handlers. This is the only case when [Page.CloseAsync(options)](/api/class-page.mdx#page-close) does not wait for the page to actually close, because it might be that the page stays open in the end of the operation.
+When [Page.CloseAsync(options)](/api/class-page.mdx#page-close) is invoked with the truthy `runBeforeUnload` value, the page runs its unload handlers. This is the only case when [Page.CloseAsync(options)](/api/class-page.mdx#page-close) does not wait for the page to actually close, because it might be that the page stays open in the end of the operation.
 
-You can register a dialog handler to handle the beforeunload dialog yourself:
+You can register a dialog handler to handle the `beforeunload` dialog yourself:
 
 ```csharp
 page.Dialog += (_, dialog) =>
@@ -63,6 +55,7 @@ await page.CloseAsync(runBeforeUnload: true);
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: /test-assertions.mdx "APIResponseAssertions"
 [Browser]: /api/class-browser.mdx "Browser"
 [BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
 [BrowserType]: /api/class-browsertype.mdx "BrowserType"

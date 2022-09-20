@@ -1,16 +1,15 @@
 ---
 id: browser-contexts
-title: "Browser Contexts"
+title: "Isolation"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-- [Browser context](#browser-context)
-- [Multiple contexts](#multiple-contexts)
+Tests written with Playwright execute in isolated clean-slate environments called browser contexts. This isolation model improves reproducibility and prevents cascading test failures. 
 
-## Browser context
+[BrowserContext]s are equivalent to incognito-like profiles, they are fast and cheap to create and completely isolated, even when running in a single browser. Playwright creates a context for each test, and provides a default [Page] in that context.
 
-A [BrowserContext] is an isolated incognito-alike session within a browser instance. Browser contexts are fast and cheap to create. We recommend running each test scenario in its own new Browser context, so that the browser state is isolated between the tests. If you are using [Playwright Test](./intro.mdx), this happens out of the box for each test. Otherwise, you can create browser contexts manually:
+When using Playwright as a Test Runner, this happens out of the box for each test. Otherwise, you can create browser contexts manually.
 
 ```java
 Browser browser = chromium.launch();
@@ -18,35 +17,11 @@ BrowserContext context = browser.newContext();
 Page page = context.newPage();
 ```
 
-Browser contexts can also be used to emulate multi-page scenarios involving mobile devices, permissions, locale and color scheme.
+Browser contexts can also be used to emulate multi-page scenarios involving mobile devices, permissions, locale and color scheme. Check out our [Emulation](./emulation.mdx) guide for more details.
 
-```java
-// FIXME
-import com.microsoft.playwright.*;
+## Multiple contexts in a single test
 
-public class Example {
-  public static void main(String[] args) {
-    try (Playwright playwright = Playwright.create()) {
-      BrowserType devices = playwright.devices();
-      BrowserContext context = browser.newContext(new Browser.NewContextOptions()
-        .setUserAgent("Mozilla/5.0 (iPhone; CPU iPhone OS 12_2 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/13.0 Mobile/15E148 Safari/604.1")
-        .setViewportSize(375, 812)
-        .setDeviceScaleFactor(3)
-        .setIsMobile(true)
-        .setHasTouch(true)
-        .setPermissions(Arrays.asList("geolocation"))
-        .setGeolocation(52.52, 13.39)
-        .setColorScheme(ColorScheme.DARK)
-        .setLocale("de-DE"));
-      Page page = context.newPage();
-    }
-  }
-}
-```
-
-## Multiple contexts
-
-[Browser contexts](./browser-contexts.mdx) are isolated environments on a single browser instance. Playwright can create multiple browser contexts within a single scenario. This is useful when you want to test for multi-user functionality, like chat.
+Playwright can create multiple browser contexts within a single scenario. This is useful when you want to test for multi-user functionality, like a chat.
 
 ```java
 import com.microsoft.playwright.*;
@@ -66,10 +41,6 @@ public class Example {
 }
 ```
 
-### API reference
-- [BrowserContext]
-- [Browser.newContext([options])](/api/class-browser.mdx#browser-new-context)
-- [BrowserContext.addCookies(cookies)](/api/class-browsercontext.mdx#browser-context-add-cookies)
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
