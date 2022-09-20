@@ -1,16 +1,15 @@
 ---
 id: browser-contexts
-title: "Browser Contexts"
+title: "Isolation"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-- [Browser context](#browser-context)
-- [Multiple contexts](#multiple-contexts)
+Tests written with Playwright execute in isolated clean-slate environments called browser contexts. This isolation model improves reproducibility and prevents cascading test failures. 
 
-## Browser context
+[BrowserContext]s are equivalent to incognito-like profiles, they are fast and cheap to create and completely isolated, even when running in a single browser. Playwright creates a context for each test, and provides a default [Page] in that context.
 
-A [BrowserContext] is an isolated incognito-alike session within a browser instance. Browser contexts are fast and cheap to create. We recommend running each test scenario in its own new Browser context, so that the browser state is isolated between the tests. If you are using [Playwright Test](./intro.mdx), this happens out of the box for each test. Otherwise, you can create browser contexts manually:
+When using Playwright as a Test Runner, this happens out of the box for each test. Otherwise, you can create browser contexts manually.
 
 ```csharp
 await using var browser = playwright.Chromium.LaunchAsync();
@@ -18,34 +17,11 @@ var context = await browser.NewContextAsync();
 var page = await context.NewPageAsync();
 ```
 
-Browser contexts can also be used to emulate multi-page scenarios involving mobile devices, permissions, locale and color scheme.
+Browser contexts can also be used to emulate multi-page scenarios involving mobile devices, permissions, locale and color scheme. Check out our [Emulation](./emulation.mdx) guide for more details.
 
-```csharp
-using Microsoft.Playwright;
-using System.Threading.Tasks;
+## Multiple contexts in a single test
 
-class PlaywrightExample
-{
-    public static async Task Main()
-    {
-        using var playwright = await Playwright.CreateAsync();
-        await using var browser = await playwright.Webkit.LaunchAsync();
-        var options = new BrowserNewContextOptions(playwright.Devices["iPhone 11 Pro"])
-        {
-            Geolocation = new() { Longitude = 12.492507f, Latitude = 41.889938f },
-            Permissions = new[] { "geolocation" },
-            Locale = "de-DE"
-        };
-
-        await using var context = await browser.NewContextAsync(options);
-        var page = await browser.NewPageAsync();
-    }
-}
-```
-
-## Multiple contexts
-
-[Browser contexts](./browser-contexts.mdx) are isolated environments on a single browser instance. Playwright can create multiple browser contexts within a single scenario. This is useful when you want to test for multi-user functionality, like chat.
+Playwright can create multiple browser contexts within a single scenario. This is useful when you want to test for multi-user functionality, like a chat.
 
 ```csharp
 using Microsoft.Playwright;
@@ -65,15 +41,12 @@ class Program
 }
 ```
 
-### API reference
-- [BrowserContext]
-- [Browser.NewContextAsync(options)](/api/class-browser.mdx#browser-new-context)
-- [BrowserContext.AddCookiesAsync(cookies)](/api/class-browsercontext.mdx#browser-context-add-cookies)
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: /test-assertions.mdx "APIResponseAssertions"
 [Browser]: /api/class-browser.mdx "Browser"
 [BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
 [BrowserType]: /api/class-browsertype.mdx "BrowserType"

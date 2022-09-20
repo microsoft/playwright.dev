@@ -16,6 +16,7 @@ using NUnit.Framework;
 
 namespace PlaywrightTests;
 
+[TestFixture]
 public class ExampleTests : PageTest
 {
     [Test]
@@ -52,7 +53,6 @@ By default, the timeout for assertions is set to 5 seconds.
 - [Expect(Page).ToHaveTitleAsync(titleOrRegExp, options)](/test-assertions.mdx#page-assertions-to-have-title)
 - [Expect(Page).ToHaveURLAsync(urlOrRegExp, options)](/test-assertions.mdx#page-assertions-to-have-url)
 - [Expect(Page).Not](/test-assertions.mdx#page-assertions-not)
-- [Expect(ApiResponse).NotToBeOKAsync()](/test-assertions.mdx#api-response-assertions-not-to-be-ok)
 - [Expect(ApiResponse).ToBeOKAsync()](/test-assertions.mdx#api-response-assertions-to-be-ok)
 - [Expect(ApiResponse).Not](/test-assertions.mdx#api-response-assertions-not)
 
@@ -104,6 +104,7 @@ await Expect(locator).ToBeDisabledAsync();
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font>
 
 - `options` &#60;`LocatorAssertionsToBeEditableOptions?`&#62;
+  - `Editable`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-editable-option-editable"/> &#60;[bool]?&#62; <font size="2">Added in: v1.26</font><a href="#locator-assertions-to-be-editable-option-editable" class="list-anchor">#</a>
   - `Timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-editable-option-timeout"/> &#60;[double]?&#62; Time to retry the assertion for. <font size="2">Added in: v1.18</font><a href="#locator-assertions-to-be-editable-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-editable-return"/> &#60;[void]&#62;<a href="#locator-assertions-to-be-editable-return" class="list-anchor">#</a>
 
@@ -134,6 +135,7 @@ await Expect(locator).ToBeEmptyAsync();
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font>
 
 - `options` &#60;`LocatorAssertionsToBeEnabledOptions?`&#62;
+  - `Enabled`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-enabled-option-enabled"/> &#60;[bool]?&#62; <font size="2">Added in: v1.26</font><a href="#locator-assertions-to-be-enabled-option-enabled" class="list-anchor">#</a>
   - `Timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-enabled-option-timeout"/> &#60;[double]?&#62; Time to retry the assertion for. <font size="2">Added in: v1.18</font><a href="#locator-assertions-to-be-enabled-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-enabled-return"/> &#60;[void]&#62;<a href="#locator-assertions-to-be-enabled-return" class="list-anchor">#</a>
 
@@ -167,7 +169,7 @@ await Expect(locator).ToBeFocusedAsync();
   - `Timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-hidden-option-timeout"/> &#60;[double]?&#62; Time to retry the assertion for. <font size="2">Added in: v1.18</font><a href="#locator-assertions-to-be-hidden-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-hidden-return"/> &#60;[void]&#62;<a href="#locator-assertions-to-be-hidden-return" class="list-anchor">#</a>
 
-Ensures the [Locator] points to a hidden DOM node, which is the opposite of [visible](./actionability.mdx#visible).
+Ensures that [Locator] either does not resolve to any DOM node, or resolves to a [non-visible](./actionability.mdx#visible) one.
 
 ```csharp
 var locator = Page.Locator(".my-element");
@@ -180,9 +182,10 @@ await Expect(locator).ToBeHiddenAsync();
 
 - `options` &#60;`LocatorAssertionsToBeVisibleOptions?`&#62;
   - `Timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-visible-option-timeout"/> &#60;[double]?&#62; Time to retry the assertion for. <font size="2">Added in: v1.18</font><a href="#locator-assertions-to-be-visible-option-timeout" class="list-anchor">#</a>
+  - `Visible`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-visible-option-visible"/> &#60;[bool]?&#62; <font size="2">Added in: v1.26</font><a href="#locator-assertions-to-be-visible-option-visible" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-visible-return"/> &#60;[void]&#62;<a href="#locator-assertions-to-be-visible-return" class="list-anchor">#</a>
 
-Ensures the [Locator] points to a [visible](./actionability.mdx#visible) DOM node.
+Ensures that [Locator] points to an [attached](./actionability.mdx#visible) and [visible](./actionability.mdx#visible) DOM node.
 
 ```csharp
 var locator = Page.Locator(".my-element");
@@ -494,26 +497,19 @@ await Expect(page).ToHaveURL(new Regex(".*checkout"));
 
 Makes the assertion check for the opposite condition. For example, this code tests that the response status is not successful:
 
-## Expect(ApiResponse).NotToBeOKAsync() {#api-response-assertions-not-to-be-ok}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.19</font>
-
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-response-assertions-not-to-be-ok-return"/> &#60;[void]&#62;<a href="#api-response-assertions-not-to-be-ok-return" class="list-anchor">#</a>
-
-The opposite of [`method: APIResponseAssertions.toBeOK`].
-
 ## Expect(ApiResponse).ToBeOKAsync() {#api-response-assertions-to-be-ok}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.18</font>
 
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-response-assertions-to-be-ok-return"/> &#60;[void]&#62;<a href="#api-response-assertions-to-be-ok-return" class="list-anchor">#</a>
 
-Ensures the response status code is within [200..299] range.
+Ensures the response status code is within `200..299` range.
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: /test-assertions.mdx "APIResponseAssertions"
 [Browser]: /api/class-browser.mdx "Browser"
 [BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
 [BrowserType]: /api/class-browsertype.mdx "BrowserType"

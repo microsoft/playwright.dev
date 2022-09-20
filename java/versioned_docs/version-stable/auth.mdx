@@ -11,16 +11,11 @@ Tests written with Playwright execute in isolated clean-slate environments calle
 
 > Note: This guide covers cookie/token-based authentication (logging in via the app UI). For [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication) use [Browser.newContext([options])](/api/class-browser.mdx#browser-new-context).
 
-- [Automate logging in](#automate-logging-in)
-- [Reuse authentication state](#reuse-authentication-state)
-- [Session storage](#session-storage)
-- [Multi-factor authentication](#multi-factor-authentication)
-
 ## Automate logging in
 
-The Playwright API can automate interaction with a login form. See [Input guide](./input.mdx) for more details.
+The Playwright API can [automate interaction](./input.mdx) from a login form.
 
-The following example automates login on GitHub. Once these steps are executed, the browser context will be authenticated.
+The following example automates logging into GitHub. Once these steps are executed, the browser context will be authenticated.
 
 ```java
 Page page = context.newPage();
@@ -30,14 +25,16 @@ page.locator("text=Login").click();
 page.locator("input[name='login']").fill(USERNAME);
 page.locator("input[name='password']").fill(PASSWORD);
 page.locator("text=Submit").click();
-// Verify app is logged in
+// Continue with the test
 ```
 
-These steps can be executed for every browser context. However, redoing login for every test can slow down test execution. To prevent that, we will reuse existing authentication state in new browser contexts.
+Redoing login for every test can slow down test execution. To mitigate that, reuse existing authentication state instead.
 
-## Reuse authentication state
+## Reuse signed in state
 
-Web apps use cookie-based or token-based authentication, where authenticated state is stored as [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) or in [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage). Playwright provides [BrowserContext.storageState([options])](/api/class-browsercontext.mdx#browser-context-storage-state) method that can be used to retrieve storage state from authenticated contexts and then create new contexts with prepopulated state.
+Playwright provides a way to reuse the signed-in state in the tests. That way you can log in only once and then skip the log in step for all of the tests.
+
+Web apps use cookie-based or token-based authentication, where authenticated state is stored as [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) or in [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage). Playwright provides [browserContext.storageState([options])](https://playwright.dev/docs/api/class-browsercontext#browser-context-storage-state) method that can be used to retrieve storage state from authenticated contexts and then create new contexts with prepopulated state.
 
 Cookies and local storage state can be used across different browsers. They depend on your application's authentication model: some apps might require both cookies and local storage.
 
@@ -51,17 +48,6 @@ context.storageState(new BrowserContext.StorageStateOptions().setPath(Paths.get(
 BrowserContext context = browser.newContext(
   new Browser.NewContextOptions().setStorageStatePath(Paths.get("state.json")));
 ```
-
-### Code generation
-
-Logging in via the UI and then reusing authentication state can be combined to implement **login once and run multiple scenarios**. The lifecycle looks like:
-1. Run tests (for example, with `mvn test`). 2. Login via UI and retrieve authentication state. 3. In each test, load authentication state in `@beforeEach` or `@beforeAll` step.
-
-This approach will also **work in CI environments**, since it does not rely on any external state.
-
-### API reference
-- [BrowserContext.storageState([options])](/api/class-browsercontext.mdx#browser-context-storage-state)
-- [Browser.newContext([options])](/api/class-browser.mdx#browser-new-context)
 
 ## Session storage
 
@@ -83,12 +69,6 @@ context.addInitScript("(storage => {\n" +
   "  }\n" +
   "})('" + sessionStorage + "')");
 ```
-
-### API reference
-- [BrowserContext.storageState([options])](/api/class-browsercontext.mdx#browser-context-storage-state)
-- [Browser.newContext([options])](/api/class-browser.mdx#browser-new-context)
-- [Page.evaluate(expression[, arg])](/api/class-page.mdx#page-evaluate)
-- [BrowserContext.addInitScript(script)](/api/class-browsercontext.mdx#browser-context-add-init-script)
 
 ## Multi-factor authentication
 
@@ -116,14 +96,10 @@ public class Example {
 }
 ```
 
-### Lifecycle
+#### Lifecycle
 1. Create a user data directory on disk.
 1. Launch a persistent context with the user data directory and login the MFA account.
 1. Reuse user data directory to run automation scenarios.
-
-### API reference
-- [BrowserContext]
-- [BrowserType.launchPersistentContext(userDataDir[, options])](/api/class-browsertype.mdx#browser-type-launch-persistent-context)
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"

@@ -7,12 +7,9 @@ import TabItem from '@theme/TabItem';
 
 Playwright can interact with the web page dialogs such as [`alert`](https://developer.mozilla.org/en-US/docs/Web/API/Window/alert), [`confirm`](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm), [`prompt`](https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt) as well as [`beforeunload`](https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event) confirmation.
 
-- [alert(), confirm(), prompt() dialogs](#alert-confirm-prompt-dialogs)
-- [beforeunload dialog](#beforeunload-dialog)
-
 ## alert(), confirm(), prompt() dialogs
 
-By default, dialogs are auto-dismissed by Playwright, so you don't have to handle them. However, you can register a dialog handler before the action that triggers the dialog to accept or decline it.
+By default, dialogs are auto-dismissed by Playwright, so you don't have to handle them. However, you can register a dialog handler before the action that triggers the dialog to either [dialog.accept([promptText])](/api/class-dialog.mdx#dialog-accept) or [dialog.dismiss()](/api/class-dialog.mdx#dialog-dismiss) it.
 
 ```js
 page.on('dialog', dialog => dialog.accept());
@@ -20,10 +17,10 @@ await page.locator('button').click();
 ```
 
 :::note
-[page.on('dialog')](/api/class-page.mdx#page-event-dialog) listener **must handle** the dialog. Otherwise your action will stall, be it [page.click(selector[, options])](/api/class-page.mdx#page-click), [page.evaluate(pageFunction[, arg])](/api/class-page.mdx#page-evaluate) or any other. That's because dialogs in Web are modal and block further page execution until they are handled.
+[page.on('dialog')](/api/class-page.mdx#page-event-dialog) listener **must handle** the dialog. Otherwise your action will stall, be it [locator.click([options])](/api/class-locator.mdx#locator-click) or something else. That's because dialogs in Web are modals and therefore block further page execution until they are handled.
 :::
 
-As a result, following snippet will never resolve:
+As a result, the following snippet will never resolve:
 
 :::warning
 WRONG!
@@ -38,16 +35,11 @@ await page.locator('button').click(); // Will hang here
 If there is no listener for [page.on('dialog')](/api/class-page.mdx#page-event-dialog), all dialogs are automatically dismissed.
 :::
 
-### API reference
-- [Dialog]
-- [dialog.accept([promptText])](/api/class-dialog.mdx#dialog-accept)
-- [dialog.dismiss()](/api/class-dialog.mdx#dialog-dismiss)
-
 ## beforeunload dialog
 
-When [page.close([options])](/api/class-page.mdx#page-close) is invoked with the truthy `runBeforeUnload` value, it page runs its unload handlers. This is the only case when [page.close([options])](/api/class-page.mdx#page-close) does not wait for the page to actually close, because it might be that the page stays open in the end of the operation.
+When [page.close([options])](/api/class-page.mdx#page-close) is invoked with the truthy `runBeforeUnload` value, the page runs its unload handlers. This is the only case when [page.close([options])](/api/class-page.mdx#page-close) does not wait for the page to actually close, because it might be that the page stays open in the end of the operation.
 
-You can register a dialog handler to handle the beforeunload dialog yourself:
+You can register a dialog handler to handle the `beforeunload` dialog yourself:
 
 ```js
 page.on('dialog', async dialog => {

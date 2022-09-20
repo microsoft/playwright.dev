@@ -5,8 +5,59 @@ title: "Videos"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
+With Playwright you can record videos for your tests.
 
-Playwright can record videos for all pages in a [browser context](./browser-contexts.mdx). Videos are saved upon context closure, so make sure to await [browserContext.close()](/api/class-browsercontext.mdx#browser-context-close).
+## Record video
+
+Playwright Test can record videos for your tests, controlled by the `video` option in your Playwright config. By default videos are off.
+- `'off'` - Do not record video.
+- `'on'` - Record video for each test.
+- `'retain-on-failure'` - Record video for each test, but remove all videos from successful test runs.
+- `'on-first-retry'` - Record video only when retrying a test for the first time.
+
+Video files will appear in the test output directory, typically `test-results`. See [testOptions.video](/api/class-testoptions.mdx#test-options-video) for advanced video configuration.
+
+Videos are saved upon [browser context](./browser-contexts.mdx) closure at the end of a test. If you create a browser context manually, make sure to await [browserContext.close()](/api/class-browsercontext.mdx#browser-context-close).
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'},
+    {label: 'Library', value: 'library'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import type { PlaywrightTestConfig } from '@playwright/test';
+const config: PlaywrightTestConfig = {
+  use: {
+    video: 'on-first-retry',
+  },
+};
+export default config;
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// @ts-check
+
+/** @type {import('@playwright/test').PlaywrightTestConfig} */
+const config = {
+  use: {
+    video: 'on-first-retry',
+  },
+};
+
+module.exports = config;
+```
+
+</TabItem>
+<TabItem value="library">
 
 ```js
 const context = await browser.newContext({ recordVideo: { dir: 'videos/' } });
@@ -14,7 +65,56 @@ const context = await browser.newContext({ recordVideo: { dir: 'videos/' } });
 await context.close();
 ```
 
+</TabItem>
+</Tabs>
+
 You can also specify video size. The video size defaults to the viewport size scaled down to fit 800x800. The video of the viewport is placed in the top-left corner of the output video, scaled down to fit if necessary. You may need to set the viewport size to match your desired video size.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'},
+    {label: 'Library', value: 'library'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import type { PlaywrightTestConfig } from '@playwright/test';
+const config: PlaywrightTestConfig = {
+  use: {
+    video: {
+      mode: 'on-first-retry', 
+      size: { width: 640, height: 480 }
+    }
+  },
+};
+export default config;
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// @ts-check
+
+/** @type {import('@playwright/test').PlaywrightTestConfig} */
+const config = {
+  use: {
+    video: {
+      mode: 'on-first-retry', 
+      size: { width: 640, height: 480 }
+    }
+  },
+};
+
+module.exports = config;
+```
+
+</TabItem>
+<TabItem value="library">
 
 ```js
 const context = await browser.newContext({
@@ -25,21 +125,47 @@ const context = await browser.newContext({
 });
 ```
 
-Saved video files will appear in the specified folder. They all have generated unique names. For the multi-page scenarios, you can access the video file associated with the page via the [page.video()](/api/class-page.mdx#page-video).
+</TabItem>
+</Tabs>
+
+For multi-page scenarios, you can access the video file associated with the page via the [page.video()](/api/class-page.mdx#page-video).
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'},
+    {label: 'Library', value: 'library'}
+  ]
+}>
+<TabItem value="ts">
 
 ```js
 const path = await page.video().path();
 ```
 
+</TabItem>
+<TabItem value="js">
+
+```js
+const path = await page.video().path();
+```
+
+</TabItem>
+<TabItem value="library">
+
+```js
+const path = await page.video().path();
+```
+
+</TabItem>
+</Tabs>
+
 :::note
 Note that the video is only available after the page or browser context is closed.
 :::
 
-### API reference
-- [BrowserContext]
-- [browser.newContext([options])](/api/class-browser.mdx#browser-new-context)
-- [browser.newPage([options])](/api/class-browser.mdx#browser-new-page)
-- [browserContext.close()](/api/class-browsercontext.mdx#browser-context-close)
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
