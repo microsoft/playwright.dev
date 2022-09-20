@@ -26,6 +26,10 @@ if (path) {
     { from: '/docs/next/assertions', to: '/next/docs/test-assertions' },
     { from: '/docs/inspector', to: '/docs/debug' },
     { from: '/blog', to: '/community/welcome' },
+    { from: '/docs/test-auth', to: '/docs/auth' },
+    { from: '/docs/next/test-auth', to: '/docs/next/auth' },
+    { from: '/docs/test-pom', to: '/docs/pom' },
+    { from: '/docs/next/test-pom', to: '/docs/next/pom' },
     // ------------------- python ---------------------
     { from: '/python/docs/assertions', to: '/python/docs/api/class-playwrightassertions' },
     { from: '/python/next/docs/assertions', to: '/python/next/docs/api/class-playwrightassertions' },
