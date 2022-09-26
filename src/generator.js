@@ -244,6 +244,9 @@ import TabItem from '@theme/TabItem';
     spec = generateTabGroups(spec, this.lang);
 
     spec = spec.filter(c => {
+      // if it's marked as generic, its always included
+      if (c.codeLang?.includes('generic'))
+        return true;
       // No lang or common lang - Ok.
       if (!c.codeLang || commonSnippets.has(c.codeLang))
         return true;

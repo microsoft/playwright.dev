@@ -1,0 +1,238 @@
+---
+id: webview2
+title: "WebView2"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+
+The following will explain how to use Playwright with [Microsoft Edge WebView2](https://docs.microsoft.com/en-us/microsoft-edge/webview2/). WebView2 is a WinForms control, which will use Microsoft Edge under the hood to render web content. It is a part of the Microsoft Edge browser and is available on Windows 10 and Windows 11. Playwright can be used to automate WebView2 applications and can be used to test web content in WebView2. For connecting to WebView2, Playwright uses [browser_type.connect_over_cdp(endpoint_url, **kwargs)](/api/class-browsertype.mdx#browser-type-connect-over-cdp) which connects to it via the Chrome DevTools Protocol (CDP).
+
+## Overview
+
+A WebView2 control can be instructed to listen to incoming CDP connections by setting either the `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS` environment variable with `--remote-debugging-port=9222` or calling [EnsureCoreWebView2Async](https://docs.microsoft.com/en-us/dotnet/api/microsoft.web.webview2.wpf.webview2.ensurecorewebview2async?view=webview2-dotnet-1.0.1343.22) with the `--remote-debugging-port=9222` argument. This will start the WebView2 process with the Chrome DevTools Protocol enabled which allows the automation by Playwright. 9222 is an example port in this case, but any other unused port can be used as well.
+
+```csharp
+await this.webView.EnsureCoreWebView2Async(await CoreWebView2Environment.CreateAsync(null, null, new CoreWebView2EnvironmentOptions()
+{
+  AdditionalBrowserArguments = "--remote-debugging-port=9222",
+})).ConfigureAwait(false);
+```
+
+Once your application with the WebView2 control is running, you can connect to it via Playwright:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+browser = playwright.chromium.connect_over_cdp("http://localhost:9222")
+context = browser.contexts[0]
+page = context.pages[0]
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+browser = await playwright.chromium.connect_over_cdp("http://localhost:9222")
+context = browser.contexts[0]
+page = context.pages[0]
+```
+
+</TabItem>
+</Tabs>
+
+To ensure that the WebView2 control is ready, you can wait for the [`CoreWebView2InitializationCompleted`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.web.webview2.wpf.webview2.corewebview2initializationcompleted?view=webview2-dotnet-1.0.1343.22) event:
+
+```csharp
+this.webView.CoreWebView2InitializationCompleted += (_, e) =>
+{
+    if (e.IsSuccess)
+    {
+        Console.WriteLine("WebView2 initialized");
+    }
+};
+```
+
+## Writing and running tests
+
+By default, the WebView2 control will use the same user data directory for all instances. This means that if you run multiple tests in parallel, they will interfere with each other. To avoid this, you should set the `WEBVIEW2_USER_DATA_FOLDER` environment variable (or use [WebView2.EnsureCoreWebView2Async Method](https://docs.microsoft.com/en-us/dotnet/api/microsoft.web.webview2.wpf.webview2.ensurecorewebview2async?view=webview2-dotnet-1.0.1343.22)) to a different folder for each test. This will make sure that each test runs in its own user data directory.
+
+Using the following, Playwright will run your WebView2 application as a sub-process, assign a unique user data directory to it and provide the [Page] instance to your test:
+
+<!-- source code is available here to verify that the examples are working https://github.com/mxschmitt/playwright-webview2-demo -->
+
+```py
+# conftest.py
+import os
+import socket
+import tempfile
+import pytest
+from pathlib import Path
+from playwright.sync_api import Playwright, Browser, BrowserContext
+import subprocess
+
+EXECUTABLE_PATH = (
+    Path(__file__).parent
+    / ".."
+    / "webview2-app"
+    / "bin"
+    / "Debug"
+    / "net6.0-windows"
+    / "webview2.exe"
+)
+
+
+@pytest.fixture(scope="session")
+def data_dir():
+    with tempfile.TemporaryDirectory(
+        prefix="playwright-webview2-tests", ignore_cleanup_errors=True
+    ) as tmpdirname:
+        yield tmpdirname
+
+
+@pytest.fixture(scope="session")
+def webview2_process_cdp_port(data_dir: str):
+    cdp_port = _find_free_port()
+    process = subprocess.Popen(
+        [EXECUTABLE_PATH],
+        env={
+            **dict(os.environ),
+            "WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS": f"--remote-debugging-port={cdp_port}",
+            "WEBVIEW2_USER_DATA_FOLDER": data_dir,
+        },
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        universal_newlines=True,
+    )
+    while True:
+        line = process.stdout.readline()
+        if "WebView2 initialized" in line:
+            break
+    yield cdp_port
+    process.terminate()
+
+
+@pytest.fixture(scope="session")
+def browser(playwright: Playwright, webview2_process_cdp_port: int):
+    browser = playwright.chromium.connect_over_cdp(
+        f"http://127.0.0.1:{webview2_process_cdp_port}"
+    )
+    yield browser
+
+
+@pytest.fixture(scope="function")
+def context(browser: Browser):
+    context = browser.contexts[0]
+    yield context
+
+
+@pytest.fixture(scope="function")
+def page(context: BrowserContext):
+    page = context.pages[0]
+    yield page
+
+
+def _find_free_port(port=9000, max_port=65535):
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    while port <= max_port:
+        try:
+            sock.bind(("", port))
+            sock.close()
+            return port
+        except OSError:
+            port += 1
+    raise IOError("no free ports")
+```
+
+```py
+# test_webview2.py
+from playwright.sync_api import Page, expect
+
+
+def test_webview2(page: Page):
+    page.goto("https://playwright.dev")
+    get_started = page.locator("text=Get Started")
+    expect(get_started).to_be_visible()
+```
+
+## Debugging
+
+Inside your webview2 control, you can just right-click to open the context menu and select "Inspect" to open the DevTools or press <kbd>F12</kbd>. You can also use the [WebView2.OpenDevToolsWindow](https://docs.microsoft.com/en-us/dotnet/api/microsoft.web.webview2.wpf.webview2.opendevtoolswindow?view=webview2-dotnet-1.0.1343.22) method to open the DevTools programmatically.
+
+For debugging tests, see the Playwright [Debugging guide](./debug).
+
+[Accessibility]: /api/class-accessibility.mdx "Accessibility"
+[APIRequest]: /api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: /test-assertions.mdx "APIResponseAssertions"
+[Browser]: /api/class-browser.mdx "Browser"
+[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: /api/class-browsertype.mdx "BrowserType"
+[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: /api/class-dialog.mdx "Dialog"
+[Download]: /api/class-download.mdx "Download"
+[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
+[Error]: /api/class-error.mdx "Error"
+[FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[Frame]: /api/class-frame.mdx "Frame"
+[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: /api/class-jshandle.mdx "JSHandle"
+[Keyboard]: /api/class-keyboard.mdx "Keyboard"
+[Locator]: /api/class-locator.mdx "Locator"
+[LocatorAssertions]: /test-assertions.mdx "LocatorAssertions"
+[Mouse]: /api/class-mouse.mdx "Mouse"
+[Page]: /api/class-page.mdx "Page"
+[PageAssertions]: /test-assertions.mdx "PageAssertions"
+[Playwright]: /api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: /test-assertions.mdx "PlaywrightAssertions"
+[Request]: /api/class-request.mdx "Request"
+[Response]: /api/class-response.mdx "Response"
+[Route]: /api/class-route.mdx "Route"
+[Selectors]: /api/class-selectors.mdx "Selectors"
+[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: /api/class-tracing.mdx "Tracing"
+[Video]: /api/class-video.mdx "Video"
+[WebSocket]: /api/class-websocket.mdx "WebSocket"
+[Worker]: /api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
+[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[bytes]: https://docs.python.org/3/library/stdtypes.html#bytes "bytes"
+[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
+[Exception]: https://docs.python.org/3/library/exceptions.html#Exception "Exception"
+[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
+[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
+[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
+[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
+[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
+[URL]: https://en.wikipedia.org/wiki/URL "URL"
+[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
+[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
+[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"
+
+[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/python/about "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright-python "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright-python/blob/main/utils/docker/Dockerfile.focal "Dockerfile.focal"

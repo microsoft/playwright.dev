@@ -47,7 +47,8 @@ module.exports = {
         { type: 'doc', id: 'selectors' },
         { type: 'doc', id: 'codegen' },
         { type: 'doc', id: 'trace-viewer' },
-        { type: 'doc', id: 'videos' }
+        { type: 'doc', id: 'videos' },
+        { type: 'doc', id: 'webview2' },
       ],
       collapsed: false
     },
