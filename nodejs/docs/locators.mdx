@@ -8,14 +8,14 @@ import TabItem from '@theme/TabItem';
 [Locator]s are the central piece of Playwright's auto-waiting and retry-ability. In a nutshell, locators represent a way to find element(s) on the page at any moment. Locator can be created with the [page.locator(selector[, options])](/api/class-page.mdx#page-locator) method.
 
 ```js
-const locator = page.locator('text=Submit');
+const locator = page.getByText('Submit');
 await locator.click();
 ```
 
 Every time locator is used for some action, up-to-date DOM element is located in the page. So in the snippet below, underlying DOM element is going to be located twice, prior to every action. This means that if the DOM changes in between the calls due to re-render, the new element corresponding to the locator will be used.
 
 ```js
-const locator = page.locator('text=Submit');
+const locator = page.getByText('Submit');
 // ...
 await locator.hover();
 await locator.click();
@@ -27,13 +27,13 @@ Locators are strict. This means that all operations on locators that imply some 
 
 ```js
 // Throws if there are several buttons in DOM:
-await page.locator('button').click();
+await page.getByRole('button').click();
 
 // Works because we explicitly tell locator to pick the first element:
-await page.locator('button').first().click(); // ⚠️ using first disables strictness
+await page.getByRole('button').first().click(); // ⚠️ using first disables strictness
 
 // Works because count knows what to do with multiple matches:
-await page.locator('button').count();
+await page.getByRole('button').count();
 ```
 
 :::caution
@@ -49,7 +49,7 @@ Use [page.locator(selector[, options])](/api/class-page.mdx#page-locator) method
 The easiest way to find an element is to look for the text it contains.
 
 ```js
-await page.locator('text=Log in').click();
+await page.getByText('Log in').click();
 ```
 
 You can also [filter by text](#filter-by-text) when locating in some other way, for example find a particular item in the list.
@@ -65,9 +65,9 @@ await page.locator('data-test-id=product-item', { hasText: 'Playwright Book' }).
 The `role` selector reflects how users and assistive technology percieve the page, for example whether some element is a button or a checkbox. When locating by role, you should usually pass the accessible name as well, so that locator pinpoints the exact element.
 
 ```js
-await page.locator('role=button[name=/submit/i]').click();
+await page.getByRole('button', { name: /submit/i }).click();
 
-await page.locator('role=checkbox[checked][name="Check me"]').check();
+await page.getByRole('checkbox', { checked: true, name: "Check me" }).check();
 ```
 
 [Learn more about the `role` selector](./selectors.mdx#role-selector).
@@ -105,7 +105,7 @@ You can target the label with something like `text=Password` and perform the fol
 For example, to fill the input by targeting the label:
 
 ```js
-await page.locator('text=Password').fill('secret');
+await page.getByText('Password').fill('secret');
 ```
 
 However, other methods will target the label itself, for example `textContent` will return the text content of the label, not the input field.
@@ -132,7 +132,7 @@ For example, we can first find a product card that contains text "Product 2", an
 ```js
 const product = page.locator('data-test-id=product-card', { hasText: 'Product 2' });
 
-await product.locator('text=Buy').click();
+await product.getByText('Buy').click();
 ```
 
 ### Locate by CSS or XPath selector
@@ -215,7 +215,7 @@ You can locate in the same way as if the shadow root was not present at all.
 - Click `<span>Details</span>`
 
   ```js
-  await page.locator('text=Details').click();
+  await page.getByText('Details').click();
   ```
 
 - Click `<x-badge>`
@@ -283,7 +283,7 @@ await handle.click();
 With the locator, every time the locator is used, up-to-date DOM element is located in the page using the selector. So in the snippet below, underlying DOM element is going to be located twice.
 
 ```js
-const locator = page.locator('text=Submit');
+const locator = page.getByText('Submit');
 // ...
 await locator.hover();
 await locator.click();

@@ -8,14 +8,14 @@ import TabItem from '@theme/TabItem';
 [Locator]s are the central piece of Playwright's auto-waiting and retry-ability. In a nutshell, locators represent a way to find element(s) on the page at any moment. Locator can be created with the [Page.locator(selector[, options])](/api/class-page.mdx#page-locator) method.
 
 ```java
-Locator locator = page.locator("text=Submit");
+Locator locator = page.getByText("Submit");
 locator.click();
 ```
 
 Every time locator is used for some action, up-to-date DOM element is located in the page. So in the snippet below, underlying DOM element is going to be located twice, prior to every action. This means that if the DOM changes in between the calls due to re-render, the new element corresponding to the locator will be used.
 
 ```java
-Locator locator = page.locator("text=Submit");
+Locator locator = page.getByText("Submit");
 locator.hover();
 locator.click();
 ```
@@ -26,13 +26,13 @@ Locators are strict. This means that all operations on locators that imply some 
 
 ```java
 // Throws if there are several buttons in DOM:
-page.locator("button").click();
+page.getByRole("button").click();
 
 // Works because we explicitly tell locator to pick the first element:
-page.locator("button").first().click(); // ⚠️ using first disables strictness
+page.getByRole("button").first().click(); // ⚠️ using first disables strictness
 
 // Works because count knows what to do with multiple matches:
-page.locator("button").count();
+page.getByRole("button").count();
 ```
 
 :::caution
@@ -48,7 +48,7 @@ Use [Page.locator(selector[, options])](/api/class-page.mdx#page-locator) method
 The easiest way to find an element is to look for the text it contains.
 
 ```java
-page.locator("text=Log in").click();
+page.getByText("Log in").click();
 ```
 
 You can also [filter by text](#filter-by-text) when locating in some other way, for example find a particular item in the list.
@@ -64,9 +64,9 @@ page.locator("data-test-id=product-item", new Page.LocatorOptions().setHasText("
 The `role` selector reflects how users and assistive technology percieve the page, for example whether some element is a button or a checkbox. When locating by role, you should usually pass the accessible name as well, so that locator pinpoints the exact element.
 
 ```java
-page.locator("role=button[name=/submit/i]").click();
+page.getByRole("button", new Page.GetByRoleOptions().setName(Pattern.compile("(?i)submit"))).click();
 
-page.locator("role=checkbox[checked][name=\"Check me\"]").check();
+page.getByRole("checkbox", new Page.GetByRoleOptions().setChecked(true).setName("Check me"))).check();
 ```
 
 [Learn more about the `role` selector](./selectors.mdx#role-selector).
@@ -104,7 +104,7 @@ You can target the label with something like `text=Password` and perform the fol
 For example, to fill the input by targeting the label:
 
 ```java
-page.locator("text=Password").fill("secret");
+page.getByText("Password").fill("secret");
 ```
 
 However, other methods will target the label itself, for example `textContent` will return the text content of the label, not the input field.
@@ -131,7 +131,7 @@ For example, we can first find a product card that contains text "Product 2", an
 ```java
 Locator product = page.locator("data-test-id=product-card", new Page.LocatorOptions().setHasText("Product 2"));
 
-product.locator("text=Buy").click();
+product.get_by_text("Buy").click();
 ```
 
 ### Locate by CSS or XPath selector
@@ -216,7 +216,7 @@ You can locate in the same way as if the shadow root was not present at all.
 - Click `<span>Details</span>`
 
   ```java
-  page.locator("text=Details").click();
+  page.getByText("Details").click();
   ```
 
 - Click `<x-badge>`
@@ -283,7 +283,7 @@ handle.click();
 With the locator, every time the locator is used, up-to-date DOM element is located in the page using the selector. So in the snippet below, underlying DOM element is going to be located twice.
 
 ```java
-Locator locator = page.locator("text=Submit");
+Locator locator = page.getByText("Submit");
 locator.hover();
 locator.click();
 ```

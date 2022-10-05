@@ -8,14 +8,14 @@ import TabItem from '@theme/TabItem';
 [Locator]s are the central piece of Playwright's auto-waiting and retry-ability. In a nutshell, locators represent a way to find element(s) on the page at any moment. Locator can be created with the [Page.Locator(selector, options)](/api/class-page.mdx#page-locator) method.
 
 ```csharp
-var locator = page.Locator("text=Submit");
+var locator = page.GetByText("Submit");
 await locator.ClickAsync();
 ```
 
 Every time locator is used for some action, up-to-date DOM element is located in the page. So in the snippet below, underlying DOM element is going to be located twice, prior to every action. This means that if the DOM changes in between the calls due to re-render, the new element corresponding to the locator will be used.
 
 ```csharp
-var locator = page.Locator("text=Submit");
+var locator = page.GetByText("Submit");
 await locator.HoverAsync();
 await locator.ClickAsync();
 ```
@@ -26,13 +26,13 @@ Locators are strict. This means that all operations on locators that imply some 
 
 ```csharp
 // Throws if there are several buttons in DOM:
-await page.Locator("button").ClickAsync();
+await page.GetByRole("button").ClickAsync();
 
 // Works because we explicitly tell locator to pick the first element:
-await page.Locator("button").First.ClickAsync(); // ⚠️ using First disables strictness
+await page.GetByRole("button").First.ClickAsync(); // ⚠️ using First disables strictness
 
 // Works because Count knows what to do with multiple matches:
-await page.Locator("button").CountAsync();
+await page.GetByRole("button").CountAsync();
 ```
 
 :::caution
@@ -48,7 +48,7 @@ Use [Page.Locator(selector, options)](/api/class-page.mdx#page-locator) method t
 The easiest way to find an element is to look for the text it contains.
 
 ```csharp
-await page.Locator("text=Log in").ClickAsync();
+await page.GetByText("Log in").ClickAsync();
 ```
 
 You can also [filter by text](#filter-by-text) when locating in some other way, for example find a particular item in the list.
@@ -64,9 +64,9 @@ await page.Locator("data-test-id=product-item", new() { HasText = "Playwright Bo
 The `role` selector reflects how users and assistive technology percieve the page, for example whether some element is a button or a checkbox. When locating by role, you should usually pass the accessible name as well, so that locator pinpoints the exact element.
 
 ```csharp
-await page.Locator("role=button[name=/submit/i]").ClickAsync();
+await page.GetByRole("button", new() { Name = new Regex("(?i)submit") }).ClickAsync();
 
-await page.Locator("role=checkbox[checked][name=\"Check me\"]").CheckAsync();
+await page.GetByRole("checkbox", new() { Checked = true, Name = "Check me" }).CheckAsync();
 ```
 
 [Learn more about the `role` selector](./selectors.mdx#role-selector).
@@ -104,7 +104,7 @@ You can target the label with something like `text=Password` and perform the fol
 For example, to fill the input by targeting the label:
 
 ```csharp
-await page.Locator("text=Password").FillAsync("secret");
+await page.GetByText("Password").FillAsync("secret");
 ```
 
 However, other methods will target the label itself, for example `textContent` will return the text content of the label, not the input field.
@@ -131,7 +131,7 @@ For example, we can first find a product card that contains text "Product 2", an
 ```csharp
 var product = page.Locator("data-test-id=product-card", new() { HasText = "Product 2" });
 
-await product.Locator("text=Buy").clickAsync();
+await product.GetByText("Buy").clickAsync();
 ```
 
 ### Locate by CSS or XPath selector
@@ -216,7 +216,7 @@ You can locate in the same way as if the shadow root was not present at all.
 - Click `<span>Details</span>`
 
   ```csharp
-  await page.Locator("text=Details").ClickAsync();
+  await page.GetByText("Details").ClickAsync();
   ```
 
 - Click `<x-badge>`
@@ -283,7 +283,7 @@ await handle.ClickAsync();
 With the locator, every time the locator is used, up-to-date DOM element is located in the page using the selector. So in the snippet below, underlying DOM element is going to be located twice.
 
 ```csharp
-var locator = page.Locator("text=Submit");
+var locator = page.GetByText("Submit");
 await locator.HoverAsync();
 await locator.ClickAsync();
 ```
