@@ -9,41 +9,35 @@ Playwright can interact with HTML Input elements such as text inputs, checkboxes
 
 ## Text input
 
-Using [Locator.FillAsync(value, options)](/api/class-locator.mdx#locator-fill) is the easiest way to fill out the form fields. It focuses the element and triggers an `input` event with the entered text. It works for `<input>`, `<textarea>`, `[contenteditable]` and `<label>` associated with an input or textarea.
+Using [Locator.FillAsync(value, options)](/api/class-locator.mdx#locator-fill) is the easiest way to fill out the form fields. It focuses the element and triggers an `input` event with the entered text. It works for `<input>`, `<textarea>` and `[contenteditable]` elements.
 
 ```csharp
 // Text input
-await page.Locator("#name").FillAsync("Peter");
+await page.GetByRole("textbox").FillAsync("Peter");
 
 // Date input
-await page.Locator("#date").FillAsync("2020-02-02");
+await page.GetByLabel("Birth date").FillAsync("2020-02-02");
 
 // Time input
-await page.Locator("#time").FillAsync("13-15");
+await page.GetByLabel("Appointment time").FillAsync("13-15");
 
 // Local datetime input
-await page.Locator("#local").FillAsync("2020-03-02T05:15");
-
-// Input through label
-await page.Locator("text=First Name").FillAsync("Peter");
+await page.GetByLabel("Local time").FillAsync("2020-03-02T05:15");
 ```
 
 ## Checkboxes and radio buttons
 
-Using [Locator.SetCheckedAsync(checked, options)](/api/class-locator.mdx#locator-set-checked) is the easiest way to check and uncheck a checkbox or a radio button. This method can be used with `input[type=checkbox]`, `input[type=radio]`, `[role=checkbox]` or `label` associated with checkbox or radio button.
+Using [Locator.SetCheckedAsync(checked, options)](/api/class-locator.mdx#locator-set-checked) is the easiest way to check and uncheck a checkbox or a radio button. This method can be used with `input[type=checkbox]`, `input[type=radio]` and `[role=checkbox]` elements.
 
 ```csharp
 // Check the checkbox
-await page.Locator("#agree").CheckAsync();
+await page.GetByLabel("I agree to the terms above").CheckAsync();
 
 // Assert the checked state
-Assert.True(await page.Locator("#agree").IsCheckedAsync());
-
-// Uncheck by input <label>.
-await page.Locator("#subscribe-label").UncheckAsync();
+Assert.True(await page.GetByLabel("Subscribe to newsletter").IsCheckedAsync());
 
 // Select the radio button
-await page.Locator("text=XL").CheckAsync();
+await page.GetByLabel("XL").CheckAsync();
 ```
 
 ## Select options
@@ -52,13 +46,13 @@ Selects one or multiple options in the `<select>` element with [Locator.SelectOp
 
 ```csharp
 // Single selection matching the value
-await page.Locator("select#colors").SelectOptionAsync("blue");
+await page.GetByLabel("Choose a color").SelectOptionAsync("blue");
 
 // Single selection matching the label
-await page.Locator("select#colors").SelectOptionAsync(new SelectOptionValue { Label = "blue" }));
+await page.GetByLabel("Choose a color").SelectOptionAsync(new SelectOptionValue { Label = "blue" }));
 
 // Multiple selected items
-await page.Locator("select#colors").SelectOptionAsync(new[] { "blue", "green", "red" });
+await page.GetByLabel("Choose multiple colors").SelectOptionAsync(new[] { "blue", "green", "red" });
 ```
 
 ## Mouse click
@@ -67,22 +61,22 @@ Performs a simple human click.
 
 ```csharp
 // Generic click
-await page.Locator("button#submit").ClickAsync();
+await page.GetByRole("button").ClickAsync();
 
 // Double click
-await page.Locator("#item").DblClickAsync();
+await page.GetByText("Item").DblClickAsync();
 
 // Right click
-await page.Locator("#item").ClickAsync(new() { Button = MouseButton.Right });
+await page.GetByText("Item").ClickAsync(new() { Button = MouseButton.Right });
 
 // Shift + click
-await page.Locator("#item").ClickAsync(new() { Modifiers = new[] { KeyboardModifier.Shift } });
+await page.GetByText("Item").ClickAsync(new() { Modifiers = new[] { KeyboardModifier.Shift } });
 
 // Hover over element
-await page.Locator("#item").HoverAsync();
+await page.GetByText("Item").HoverAsync();
 
 // Click the top left corner
-await page.Locator("#item").ClickAsync(new() { position = new Position { X = 0, Y = 0 } });
+await page.GetByText("Item").ClickAsync(new() { position = new Position { X = 0, Y = 0 } });
 ```
 
 Under the hood, this and other pointer-related methods:
@@ -98,7 +92,7 @@ Under the hood, this and other pointer-related methods:
 Sometimes, apps use non-trivial logic where hovering the element overlays it with another element that intercepts the click. This behavior is indistinguishable from a bug where element gets covered and the click is dispatched elsewhere. If you know this is taking place, you can bypass the [actionability](./actionability.mdx) checks and force the click:
 
 ```csharp
-await page.Locator("button#submit").ClickAsync(new() { Force = true });
+await page.GetByRole("button").ClickAsync(new() { Force = true });
 ```
 
 #### Programmatic click
@@ -106,7 +100,7 @@ await page.Locator("button#submit").ClickAsync(new() { Force = true });
 If you are not interested in testing your app under the real conditions and want to simulate the click by any means possible, you can trigger the [`HTMLElement.click()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click) behavior via simply dispatching a click event on the element with [Locator.DispatchEventAsync(type, eventInit, options)](/api/class-locator.mdx#locator-dispatch-event):
 
 ```csharp
-await page.Locator("button#submit").DispatchEventAsync("click");
+await page.GetByRole("button").DispatchEventAsync("click");
 ```
 
 ## Type characters
@@ -128,13 +122,13 @@ Most of the time, [Page.FillAsync(selector, value, options)](/api/class-page.mdx
 
 ```csharp
 // Hit Enter
-await page.Locator("#submit").PressAsync("Enter");
+await page.GetByText("Submit").PressAsync("Enter");
 
 // Dispatch Control+Right
-await page.Locator("#name").PressAsync("Control+ArrowRight");
+await page.GetByRole("textbox").PressAsync("Control+ArrowRight");
 
 // Press $ sign on keyboard
-await page.Locator("#value").PressAsync("$");
+await page.GetByRole("textbox").PressAsync("$");
 ```
 
 The [Locator.PressAsync(key, options)](/api/class-locator.mdx#locator-press) method focuses the selected element and produces a single keystroke. It accepts the logical key names that are emitted in the [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) property of the keyboard events:
@@ -168,16 +162,16 @@ You can select input files for upload using the [Locator.SetInputFilesAsync(file
 
 ```csharp
 // Select one file
-await page.Locator("input#upload").SetInputFilesAsync("myfile.pdf");
+await page.GetByLabel("Upload file").SetInputFilesAsync("myfile.pdf");
 
 // Select multiple files
-await page.Locator("input#upload").SetInputFilesAsync(new[] { "file1.txt", "file12.txt" });
+await page.GetByLabel("Upload files").SetInputFilesAsync(new[] { "file1.txt", "file12.txt" });
 
 // Remove all the selected files
-await page.Locator("input#upload").SetInputFilesAsync(new[] {});
+await page.GetByLabel("Upload file").SetInputFilesAsync(new[] {});
 
 // Upload buffer from memory
-await page.Locator("input#upload").SetInputFilesAsync(new FilePayload
+await page.GetByLabel("Upload file").SetInputFilesAsync(new FilePayload
 {
     Name = "file.txt",
     MimeType = "text/plain",
@@ -200,8 +194,35 @@ await fileChooser.SetFilesAsync("myfile.pdf");
 For the dynamic pages that handle focus events, you can focus the given element with [Locator.FocusAsync(options)](/api/class-locator.mdx#locator-focus).
 
 ```csharp
-await page.Locator("input#name").FocusAsync();
+await page.GetByLabel("Password").FocusAsync();
 ```
+
+## Drag and Drop
+
+You can perform drag&drop operation with [Locator.DragToAsync(target, options)](/api/class-locator.mdx#locator-drag-to). This method will:
+- Hover the element that will be dragged.
+- Press left mouse button.
+- Move mouse to the element that will receive the drop.
+- Release left mouse button.
+
+```csharp
+await page.Locator("#item-to-be-dragged").DragToAsync(page.Locator("#item-to-drop-at"));
+```
+
+### Dragging manually
+
+If you want precise control over the drag operation, use lower-level methods like [Locator.HoverAsync(options)](/api/class-locator.mdx#locator-hover), [Mouse.DownAsync(options)](/api/class-mouse.mdx#mouse-down), [Mouse.MoveAsync(x, y, options)](/api/class-mouse.mdx#mouse-move) and [Mouse.UpAsync(options)](/api/class-mouse.mdx#mouse-up).
+
+```csharp
+await page.Locator("#item-to-be-dragged").HoverAsync();
+await page.Mouse.DownAsync();
+await page.Locator("#item-to-drop-at").HoverAsync();
+await page.Mouse.UpAsync();
+```
+
+:::note
+If your page relies on the `dragover` event being dispatched, you need at least two mouse moves to trigger it in all browsers. To reliably issue the second mouse move, repeat your [Mouse.MoveAsync(x, y, options)](/api/class-mouse.mdx#mouse-move) or [Locator.HoverAsync(options)](/api/class-locator.mdx#locator-hover) twice. The sequence of operations would be: hover the drag element, mouse down, hover the drop element, hover the drop element second time, mouse up.
+:::
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"

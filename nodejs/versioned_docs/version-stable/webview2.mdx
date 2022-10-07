@@ -1,68 +1,113 @@
 ---
-id: class-filechooser
-title: "FileChooser"
+id: webview2
+title: "WebView2"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-[FileChooser] objects are dispatched by the page in the [page.on('filechooser')](/api/class-page.mdx#page-event-file-chooser) event.
+The following will explain how to use Playwright with [Microsoft Edge WebView2](https://docs.microsoft.com/en-us/microsoft-edge/webview2/). WebView2 is a WinForms control, which will use Microsoft Edge under the hood to render web content. It is a part of the Microsoft Edge browser and is available on Windows 10 and Windows 11. Playwright can be used to automate WebView2 applications and can be used to test web content in WebView2. For connecting to WebView2, Playwright uses [browserType.connectOverCDP(endpointURL[, options])](/api/class-browsertype.mdx#browser-type-connect-over-cdp) which connects to it via the Chrome DevTools Protocol (CDP).
 
-```js
-// Note that Promise.all prevents a race condition
-// between clicking and waiting for the file chooser.
-const [fileChooser] = await Promise.all([
-  // It is important to call waitForEvent before click to set up waiting.
-  page.waitForEvent('filechooser'),
-  // Opens the file chooser.
-  page.getByText('Upload').click(),
-]);
-await fileChooser.setFiles('myfile.pdf');
+## Overview
+
+A WebView2 control can be instructed to listen to incoming CDP connections by setting either the `WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS` environment variable with `--remote-debugging-port=9222` or calling [EnsureCoreWebView2Async](https://docs.microsoft.com/en-us/dotnet/api/microsoft.web.webview2.wpf.webview2.ensurecorewebview2async?view=webview2-dotnet-1.0.1343.22) with the `--remote-debugging-port=9222` argument. This will start the WebView2 process with the Chrome DevTools Protocol enabled which allows the automation by Playwright. 9222 is an example port in this case, but any other unused port can be used as well.
+
+```csharp
+await this.webView.EnsureCoreWebView2Async(await CoreWebView2Environment.CreateAsync(null, null, new CoreWebView2EnvironmentOptions()
+{
+  AdditionalBrowserArguments = "--remote-debugging-port=9222",
+})).ConfigureAwait(false);
 ```
 
+Once your application with the WebView2 control is running, you can connect to it via Playwright:
 
-- [fileChooser.element()](/api/class-filechooser.mdx#file-chooser-element)
-- [fileChooser.isMultiple()](/api/class-filechooser.mdx#file-chooser-is-multiple)
-- [fileChooser.page()](/api/class-filechooser.mdx#file-chooser-page)
-- [fileChooser.setFiles(files[, options])](/api/class-filechooser.mdx#file-chooser-set-files)
+```js
+const browser = await playwright.chromium.connectOverCDP('http://localhost:9222');
+const context = browser.contexts()[0];
+const page = context.pages()[0];
+```
 
-## fileChooser.element() {#file-chooser-element}
+To ensure that the WebView2 control is ready, you can wait for the [`CoreWebView2InitializationCompleted`](https://learn.microsoft.com/en-us/dotnet/api/microsoft.web.webview2.wpf.webview2.corewebview2initializationcompleted?view=webview2-dotnet-1.0.1343.22) event:
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+```csharp
+this.webView.CoreWebView2InitializationCompleted += (_, e) =>
+{
+    if (e.IsSuccess)
+    {
+        Console.WriteLine("WebView2 initialized");
+    }
+};
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="file-chooser-element-return"/> &#60;[ElementHandle]&#62;<a href="#file-chooser-element-return" class="list-anchor">#</a>
+## Writing and running tests
 
-Returns input element associated with this file chooser.
+By default, the WebView2 control will use the same user data directory for all instances. This means that if you run multiple tests in parallel, they will interfere with each other. To avoid this, you should set the `WEBVIEW2_USER_DATA_FOLDER` environment variable (or use [WebView2.EnsureCoreWebView2Async Method](https://docs.microsoft.com/en-us/dotnet/api/microsoft.web.webview2.wpf.webview2.ensurecorewebview2async?view=webview2-dotnet-1.0.1343.22)) to a different folder for each test. This will make sure that each test runs in its own user data directory.
 
-## fileChooser.isMultiple() {#file-chooser-is-multiple}
+Using the following, Playwright will run your WebView2 application as a sub-process, assign a unique user data directory to it and provide the [Page] instance to your test:
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+<!-- source code is available here to verify that the examples are working https://github.com/mxschmitt/playwright-webview2-demo -->
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="file-chooser-is-multiple-return"/> &#60;[boolean]&#62;<a href="#file-chooser-is-multiple-return" class="list-anchor">#</a>
+```ts
+// webView2Test.ts
+import { test as base } from '@playwright/test';
+import fs from 'fs';
+import os from 'os';
+import path from 'path';
+import childProcess from 'child_process';
 
-Returns whether this file chooser accepts multiple files.
+const EXECUTABLE_PATH = path.join(__dirname, '../../webview2-app/bin/Debug/net6.0-windows/webview2.exe');
 
-## fileChooser.page() {#file-chooser-page}
+export const test = base.extend({
+  browser: async ({ playwright }, use, testInfo) => {
+    const cdpPort = 10000 + testInfo.workerIndex;
+    fs.accessSync(EXECUTABLE_PATH, fs.constants.X_OK); // Make sure that the executable exists and is executable
+    const userDataDir = path.join(fs.realpathSync.native(os.tmpdir()), `playwright-webview2-tests/user-data-dir-${testInfo.workerIndex}`);
+    const webView2Process = childProcess.spawn(EXECUTABLE_PATH, [], {
+      shell: true,
+      env: {
+        ...process.env,
+        WEBVIEW2_ADDITIONAL_BROWSER_ARGUMENTS: `--remote-debugging-port=${cdpPort}`,
+        WEBVIEW2_USER_DATA_FOLDER: userDataDir,
+      }
+    });
+    await new Promise<void>(resolve => webView2Process.stdout.on('data', data => {
+      if (data.toString().includes('WebView2 initialized'))
+        resolve();
+    }));
+    const browser = await playwright.chromium.connectOverCDP(`http://127.0.0.1:${cdpPort}`);
+    await use(browser);
+    await browser.close()
+    childProcess.execSync(`taskkill /pid ${webView2Process.pid} /T /F`);
+    fs.rmdirSync(userDataDir, { recursive: true });
+  },
+  context: async ({ browser }, use) => {
+    const context = browser.contexts()[0];
+    await use(context);
+  },
+  page: async ({ context }, use) => {
+    const page = context.pages()[0];
+    await use(page);
+  },
+});
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+export { expect } from '@playwright/test';
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="file-chooser-page-return"/> &#60;[Page]&#62;<a href="#file-chooser-page-return" class="list-anchor">#</a>
+```ts
+// example.spec.ts
+import { test, expect } from './webView2Test';
 
-Returns page this file chooser belongs to.
+test('test WebView2', async ({ page }) => {
+  await page.goto('https://playwright.dev');
+  const getStarted = page.getByText('Get Started');
+  await expect(getStarted).toBeVisible();
+});
+```
 
-## fileChooser.setFiles(files[, options]) {#file-chooser-set-files}
+## Debugging
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+Inside your webview2 control, you can just right-click to open the context menu and select "Inspect" to open the DevTools or press <kbd>F12</kbd>. You can also use the [WebView2.OpenDevToolsWindow](https://docs.microsoft.com/en-us/dotnet/api/microsoft.web.webview2.wpf.webview2.opendevtoolswindow?view=webview2-dotnet-1.0.1343.22) method to open the DevTools programmatically.
 
-- `files`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="file-chooser-set-files-option-files"/> &#60;[string]|[Array]<[string]>|[Object]|[Array]<[Object]>&#62;<a href="#file-chooser-set-files-option-files" class="list-anchor">#</a>
-  - `name` &#60;[string]&#62; File name
-  - `mimeType` &#60;[string]&#62; File type
-  - `buffer` &#60;[Buffer]&#62; File content
-- `options?` &#60;[Object]&#62;
-  - `noWaitAfter?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="file-chooser-set-files-option-no-wait-after"/> &#60;[boolean]&#62; Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.<a href="#file-chooser-set-files-option-no-wait-after" class="list-anchor">#</a>
-  - `timeout?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="file-chooser-set-files-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](/api/class-page.mdx#page-set-default-timeout) methods.<a href="#file-chooser-set-files-option-timeout" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="file-chooser-set-files-return"/> &#60;[Promise]<[void]>&#62;<a href="#file-chooser-set-files-return" class="list-anchor">#</a>
-
-Sets the value of the file input this chooser is associated with. If some of the `filePaths` are relative paths, then they are resolved relative to the current working directory. For empty array, clears the selected files.
+For debugging tests, see the Playwright [Debugging guide](./debug).
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"

@@ -5,22 +5,11 @@ title: "Network"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright provides APIs to **monitor** and **modify** network traffic, both HTTP and HTTPS. Any requests that page does, including [XHRs](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) requests, can be tracked, modified and handled.
-
-- [HTTP Authentication](#http-authentication)
-- [HTTP Proxy](#http-proxy)
-- [Network events](#network-events)
-- [Handle requests](#handle-requests)
-- [Modify requests](#modify-requests)
-- [Abort requests](#abort-requests)
-- [Modify responses](#modify-responses)
-- [Record and replay requests](#record-and-replay-requests)
-- [WebSockets](#websockets)
-- [Missing Network Events and Service Workers](#missing-network-events-and-service-workers)
-
-<br/>
+Playwright provides APIs to **monitor** and **modify** network traffic, both HTTP and HTTPS. Any requests that a page does, including [XHRs](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) requests, can be tracked, modified and handled.
 
 ## HTTP Authentication
+
+Perform HTTP Authentication with [Browser.NewContextAsync(options)](/api/class-browser.mdx#browser-new-context).
 
 ```csharp
 using var context = await Browser.NewContextAsync(new()
@@ -34,9 +23,6 @@ using var context = await Browser.NewContextAsync(new()
 var page = await context.NewPageAsync();
 await page.GotoAsync("https://example.com");
 ```
-
-### API reference
-- [Browser.NewContextAsync(options)](/api/class-browser.mdx#browser-new-context)
 
 ## HTTP Proxy
 
@@ -76,7 +62,7 @@ using var context = await Browser.NewContextAsync(new()
 
 ## Network events
 
-You can monitor all the requests and responses:
+You can monitor all the [Request]s and [Response]s:
 
 ```csharp
 using Microsoft.Playwright;
@@ -89,38 +75,30 @@ page.Response += (_, response) => Console.WriteLine("<< " + response.Status + " 
 await page.GotoAsync("https://example.com");
 ```
 
-Or wait for a network response after the button click:
+Or wait for a network response after the button click with [Page.RunAndWaitForResponseAsync(action, urlOrPredicate, options)](/api/class-page.mdx#page-wait-for-response):
 
 ```csharp
 // Use a glob URL pattern
 var waitForResponseTask = page.WaitForResponseAsync("**/api/fetch_data");
-await page.Locator("button#update").ClickAsync();
+await page.GetByText("Update").ClickAsync();
 var response = await waitForResponseTask;
 ```
 
 #### Variations
 
+Wait for [Response]s with [Page.RunAndWaitForResponseAsync(action, urlOrPredicate, options)](/api/class-page.mdx#page-wait-for-response)
+
 ```csharp
 // Use a regular expression
 var waitForResponseTask = page.WaitForResponseAsync(new Regex("\\.jpeg$"));
-await page.Locator("button#update").ClickAsync();
+await page.GetByText("Update").ClickAsync();
 var response = await waitForResponseTask;
 
 // Use a predicate taking a Response object
 var waitForResponseTask = page.WaitForResponseAsync(r => r.Url.Contains(token));
-await page.Locator("button#update").ClickAsync();
+await page.GetByText("Update").ClickAsync();
 var response = await waitForResponseTask;
 ```
-
-### API reference
-- [Request]
-- [Response]
-- [event Page.Request](/api/class-page.mdx#page-event-request)
-- [event Page.Response](/api/class-page.mdx#page-event-response)
-- [Page.RunAndWaitForRequestAsync(action, urlOrPredicate, options)](/api/class-page.mdx#page-wait-for-request)
-- [Page.RunAndWaitForResponseAsync(action, urlOrPredicate, options)](/api/class-page.mdx#page-wait-for-response)
-
-<br/>
 
 ## Handle requests
 
@@ -128,21 +106,14 @@ You can mock API endpoints via handling the network requests in your Playwright 
 
 #### Variations
 
+Set up route on the entire browser context with [BrowserContext.RouteAsync(url, handler, options)](/api/class-browsercontext.mdx#browser-context-route) or page with [Page.RouteAsync(url, handler, options)](/api/class-page.mdx#page-route). It will apply to popup windows and opened links.
+
 ```csharp
 await page.RouteAsync("**/api/fetch_data", async route => {
   await route.FulfillAsync(status: 200, body: testData);
 });
 await page.GotoAsync("https://example.com");
 ```
-
-### API reference
-- [BrowserContext.RouteAsync(url, handler, options)](/api/class-browsercontext.mdx#browser-context-route)
-- [BrowserContext.UnrouteAsync(url, handler)](/api/class-browsercontext.mdx#browser-context-unroute)
-- [Page.RouteAsync(url, handler, options)](/api/class-page.mdx#page-route)
-- [Page.UnrouteAsync(url, handler)](/api/class-page.mdx#page-unroute)
-- [Route]
-
-<br/>
 
 ## Modify requests
 
@@ -162,6 +133,8 @@ You can continue requests with modifications. Example above removes an HTTP head
 
 ## Abort requests
 
+You can abort requests using [Page.RouteAsync(url, handler, options)](/api/class-page.mdx#page-route) and [Route.AbortAsync(errorCode)](/api/class-route.mdx#route-abort).
+
 ```csharp
 await page.RouteAsync("**/*.{png,jpg,jpeg}", route => route.AbortAsync());
 
@@ -174,16 +147,9 @@ else
 });
 ```
 
-### API reference
-- [Page.RouteAsync(url, handler, options)](/api/class-page.mdx#page-route)
-- [BrowserContext.RouteAsync(url, handler, options)](/api/class-browsercontext.mdx#browser-context-route)
-- [Route.AbortAsync(errorCode)](/api/class-route.mdx#route-abort)
-
-<br/>
-
 ## Modify responses
 
-To modify a response use [APIRequestContext] to get original response and then pass the response to [Route.FulfillAsync(options)](/api/class-route.mdx#route-fulfill). You can override individual fields on the response via options:
+To modify a response use [APIRequestContext] to get the original response and then pass the response to [Route.FulfillAsync(options)](/api/class-route.mdx#route-fulfill). You can override individual fields on the response via options:
 
 ```csharp
 await Page.RouteAsync("**/title.html", async route =>
@@ -208,17 +174,6 @@ await Page.RouteAsync("**/title.html", async route =>
     });
 });
 ```
-
-### API reference
-- [APIRequestContext]
-- [Page.RouteAsync(url, handler, options)](/api/class-page.mdx#page-route)
-- [BrowserContext.RouteAsync(url, handler, options)](/api/class-browsercontext.mdx#browser-context-route)
-- [Playwright.APIRequest](/api/class-playwright.mdx#playwright-request)
-- [BrowserContext.APIRequest](/api/class-browsercontext.mdx#browser-context-request)
-- [Page.APIRequest](/api/class-page.mdx#page-request)
-- [Route.FulfillAsync(options)](/api/class-route.mdx#route-fulfill)
-
-<br/>
 
 ## Record and replay requests
 
@@ -266,11 +221,9 @@ HAR replay matches URL and HTTP method strictly. For POST requests, it also matc
 
 Similar to when recording, if given HAR file name ends with `.zip`, it is considered an archive containing the HAR file along with network payloads stored as separate entries. You can also extract this archive, edit payloads or HAR log manually and point to the extracted har file. All the payloads will be resolved relative to the extracted har file on the file system.
 
-<br/>
-
 ## WebSockets
 
-Playwright supports [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) inspection out of the box. Every time WebSocket is created, [event Page.WebSocket](/api/class-page.mdx#page-event-web-socket) event is fired. This event contains the [WebSocket] instance for further web socket frames inspection:
+Playwright supports [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) inspection out of the box. Every time a WebSocket is created, the [event Page.WebSocket](/api/class-page.mdx#page-event-web-socket) event is fired. This event contains the [WebSocket] instance for further web socket frames inspection:
 
 ```csharp
 page.WebSocket += (_, ws) =>
@@ -282,23 +235,12 @@ page.WebSocket += (_, ws) =>
 };
 ```
 
-### API reference
-- [WebSocket]
-- [event Page.WebSocket](/api/class-page.mdx#page-event-web-socket)
-- [event WebSocket.FrameSent](/api/class-websocket.mdx#web-socket-event-frame-sent)
-- [event WebSocket.FrameReceived](/api/class-websocket.mdx#web-socket-event-frame-received)
-- [event WebSocket.Close](/api/class-websocket.mdx#web-socket-event-close)
-
-<br/>
-
 ## Missing Network Events and Service Workers
 
 Playwright's built-in [BrowserContext.RouteAsync(url, handler, options)](/api/class-browsercontext.mdx#browser-context-route) and [Page.RouteAsync(url, handler, options)](/api/class-page.mdx#page-route) allow your tests to natively route requests and perform mocking and interception.
 1. If you're using Playwright's native [BrowserContext.RouteAsync(url, handler, options)](/api/class-browsercontext.mdx#browser-context-route) and [Page.RouteAsync(url, handler, options)](/api/class-page.mdx#page-route), and it appears network events are missing, disable Service Workers by setting `Browser.newContext.serviceWorkers` to `'block'`.
 1. It might be that you are using a mock tool such as Mock Service Worker (MSW). While this tool works out of the box for mocking responses, it adds its own Service Worker that takes over the network requests, hence making them invisible to [BrowserContext.RouteAsync(url, handler, options)](/api/class-browsercontext.mdx#browser-context-route) and [Page.RouteAsync(url, handler, options)](/api/class-page.mdx#page-route). If you are interested in both network testing and mocking, consider using built-in [BrowserContext.RouteAsync(url, handler, options)](/api/class-browsercontext.mdx#browser-context-route) and [Page.RouteAsync(url, handler, options)](/api/class-page.mdx#page-route) for [response mocking](#handle-requests).
 1. If you're interested in not solely using Service Workers for testing and network mocking, but in routing and listening for requests made by Service Workers themselves, please see [this experimental feature](https://github.com/microsoft/playwright/issues/15684).
-
-<br/>
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"

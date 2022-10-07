@@ -5,22 +5,11 @@ title: "Network"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright provides APIs to **monitor** and **modify** network traffic, both HTTP and HTTPS. Any requests that page does, including [XHRs](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) requests, can be tracked, modified and handled.
-
-- [HTTP Authentication](#http-authentication)
-- [HTTP Proxy](#http-proxy)
-- [Network events](#network-events)
-- [Handle requests](#handle-requests)
-- [Modify requests](#modify-requests)
-- [Abort requests](#abort-requests)
-- [Modify responses](#modify-responses)
-- [Record and replay requests](#record-and-replay-requests)
-- [WebSockets](#websockets)
-- [Missing Network Events and Service Workers](#missing-network-events-and-service-workers)
-
-<br/>
+Playwright provides APIs to **monitor** and **modify** network traffic, both HTTP and HTTPS. Any requests that a page does, including [XHRs](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) requests, can be tracked, modified and handled.
 
 ## HTTP Authentication
+
+Perform HTTP Authentication with [Browser.newContext([options])](/api/class-browser.mdx#browser-new-context).
 
 ```java
 BrowserContext context = browser.newContext(new Browser.NewContextOptions()
@@ -28,9 +17,6 @@ BrowserContext context = browser.newContext(new Browser.NewContextOptions()
 Page page = context.newPage();
 page.navigate("https://example.com");
 ```
-
-### API reference
-- [Browser.newContext([options])](/api/class-browser.mdx#browser-new-context)
 
 ## HTTP Proxy
 
@@ -59,7 +45,7 @@ BrowserContext context = chromium.launch(new Browser.NewContextOptions()
 
 ## Network events
 
-You can monitor all the requests and responses:
+You can monitor all the [Request]s and [Response]s:
 
 ```java
 import com.microsoft.playwright.*;
@@ -79,38 +65,30 @@ public class Example {
 }
 ```
 
-Or wait for a network response after the button click:
+Or wait for a network response after the button click with [Page.waitForResponse(urlOrPredicate[, options], callback)](/api/class-page.mdx#page-wait-for-response):
 
 ```java
 // Use a glob URL pattern
 Response response = page.waitForResponse("**/api/fetch_data", () -> {
-  page.locator("button#update").click();
+  page.getByText("Update").click();
 });
 ```
 
 #### Variations
 
+Wait for [Response]s with [Page.waitForResponse(urlOrPredicate[, options], callback)](/api/class-page.mdx#page-wait-for-response)
+
 ```java
 // Use a RegExp
 Response response = page.waitForResponse(Pattern.compile("\\.jpeg$"), () -> {
-  page.locator("button#update").click();
+  page.getByText("Update").click();
 });
 
 // Use a predicate taking a Response object
 Response response = page.waitForResponse(r -> r.url().contains(token), () -> {
-  page.locator("button#update").click();
+  page.getByText("Update").click();
 });
 ```
-
-### API reference
-- [Request]
-- [Response]
-- [Page.onRequest(handler)](/api/class-page.mdx#page-event-request)
-- [Page.onResponse(handler)](/api/class-page.mdx#page-event-response)
-- [Page.waitForRequest(urlOrPredicate[, options], callback)](/api/class-page.mdx#page-wait-for-request)
-- [Page.waitForResponse(urlOrPredicate[, options], callback)](/api/class-page.mdx#page-wait-for-response)
-
-<br/>
 
 ## Handle requests
 
@@ -125,21 +103,14 @@ You can mock API endpoints via handling the network requests in your Playwright 
 
 #### Variations
 
+Set up route on the entire browser context with [BrowserContext.route(url, handler[, options])](/api/class-browsercontext.mdx#browser-context-route) or page with [Page.route(url, handler[, options])](/api/class-page.mdx#page-route). It will apply to popup windows and opened links.
+
 ```java
 browserContext.route("**/api/login", route -> route.fulfill(new Route.FulfillOptions()
   .setStatus(200)
   .setBody("accept")));
 page.navigate("https://example.com");
 ```
-
-### API reference
-- [BrowserContext.route(url, handler[, options])](/api/class-browsercontext.mdx#browser-context-route)
-- [BrowserContext.unroute(url[, handler])](/api/class-browsercontext.mdx#browser-context-unroute)
-- [Page.route(url, handler[, options])](/api/class-page.mdx#page-route)
-- [Page.unroute(url[, handler])](/api/class-page.mdx#page-unroute)
-- [Route]
-
-<br/>
 
 ## Modify requests
 
@@ -159,6 +130,8 @@ You can continue requests with modifications. Example above removes an HTTP head
 
 ## Abort requests
 
+You can abort requests using [Page.route(url, handler[, options])](/api/class-page.mdx#page-route) and [Route.abort([errorCode])](/api/class-route.mdx#route-abort).
+
 ```java
 page.route("**/*.{png,jpg,jpeg}", route -> route.abort());
 
@@ -171,16 +144,9 @@ page.route("**/*", route -> {
 });
 ```
 
-### API reference
-- [Page.route(url, handler[, options])](/api/class-page.mdx#page-route)
-- [BrowserContext.route(url, handler[, options])](/api/class-browsercontext.mdx#browser-context-route)
-- [Route.abort([errorCode])](/api/class-route.mdx#route-abort)
-
-<br/>
-
 ## Modify responses
 
-To modify a response use [APIRequestContext] to get original response and then pass the response to [Route.fulfill([options])](/api/class-route.mdx#route-fulfill). You can override individual fields on the response via options:
+To modify a response use [APIRequestContext] to get the original response and then pass the response to [Route.fulfill([options])](/api/class-route.mdx#route-fulfill). You can override individual fields on the response via options:
 
 ```java
 page.route("**/title.html", route -> {
@@ -200,17 +166,6 @@ page.route("**/title.html", route -> {
     .setHeaders(headers));
 });
 ```
-
-### API reference
-- [APIRequestContext]
-- [Page.route(url, handler[, options])](/api/class-page.mdx#page-route)
-- [BrowserContext.route(url, handler[, options])](/api/class-browsercontext.mdx#browser-context-route)
-- [Playwright.request()](/api/class-playwright.mdx#playwright-request)
-- [BrowserContext.request()](/api/class-browsercontext.mdx#browser-context-request)
-- [Page.request()](/api/class-page.mdx#page-request)
-- [Route.fulfill([options])](/api/class-route.mdx#route-fulfill)
-
-<br/>
 
 ## Record and replay requests
 
@@ -257,11 +212,9 @@ HAR replay matches URL and HTTP method strictly. For POST requests, it also matc
 
 Similar to when recording, if given HAR file name ends with `.zip`, it is considered an archive containing the HAR file along with network payloads stored as separate entries. You can also extract this archive, edit payloads or HAR log manually and point to the extracted har file. All the payloads will be resolved relative to the extracted har file on the file system.
 
-<br/>
-
 ## WebSockets
 
-Playwright supports [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) inspection out of the box. Every time WebSocket is created, [Page.onWebSocket(handler)](/api/class-page.mdx#page-event-web-socket) event is fired. This event contains the [WebSocket] instance for further web socket frames inspection:
+Playwright supports [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) inspection out of the box. Every time a WebSocket is created, the [Page.onWebSocket(handler)](/api/class-page.mdx#page-event-web-socket) event is fired. This event contains the [WebSocket] instance for further web socket frames inspection:
 
 ```java
 page.onWebSocket(ws -> {
@@ -272,23 +225,12 @@ page.onWebSocket(ws -> {
 });
 ```
 
-### API reference
-- [WebSocket]
-- [Page.onWebSocket(handler)](/api/class-page.mdx#page-event-web-socket)
-- [WebSocket.onFrameSent(handler)](/api/class-websocket.mdx#web-socket-event-frame-sent)
-- [WebSocket.onFrameReceived(handler)](/api/class-websocket.mdx#web-socket-event-frame-received)
-- [WebSocket.onClose(handler)](/api/class-websocket.mdx#web-socket-event-close)
-
-<br/>
-
 ## Missing Network Events and Service Workers
 
 Playwright's built-in [BrowserContext.route(url, handler[, options])](/api/class-browsercontext.mdx#browser-context-route) and [Page.route(url, handler[, options])](/api/class-page.mdx#page-route) allow your tests to natively route requests and perform mocking and interception.
 1. If you're using Playwright's native [BrowserContext.route(url, handler[, options])](/api/class-browsercontext.mdx#browser-context-route) and [Page.route(url, handler[, options])](/api/class-page.mdx#page-route), and it appears network events are missing, disable Service Workers by setting `Browser.newContext.serviceWorkers` to `'block'`.
 1. It might be that you are using a mock tool such as Mock Service Worker (MSW). While this tool works out of the box for mocking responses, it adds its own Service Worker that takes over the network requests, hence making them invisible to [BrowserContext.route(url, handler[, options])](/api/class-browsercontext.mdx#browser-context-route) and [Page.route(url, handler[, options])](/api/class-page.mdx#page-route). If you are interested in both network testing and mocking, consider using built-in [BrowserContext.route(url, handler[, options])](/api/class-browsercontext.mdx#browser-context-route) and [Page.route(url, handler[, options])](/api/class-page.mdx#page-route) for [response mocking](#handle-requests).
 1. If you're interested in not solely using Service Workers for testing and network mocking, but in routing and listening for requests made by Service Workers themselves, please see [this experimental feature](https://github.com/microsoft/playwright/issues/15684).
-
-<br/>
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"

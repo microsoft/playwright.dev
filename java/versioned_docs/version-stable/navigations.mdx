@@ -7,11 +7,6 @@ import TabItem from '@theme/TabItem';
 
 Playwright can navigate to URLs and handle navigations caused by page interactions. This guide covers common scenarios to wait for page navigations and loading to complete.
 
-- [Navigation lifecycle](#navigation-lifecycle)
-- [Scenarios initiated by browser UI](#scenarios-initiated-by-browser-ui)
-- [Scenarios initiated by page interaction](#scenarios-initiated-by-page-interaction)
-- [Advanced patterns](#advanced-patterns)
-
 ## Navigation lifecycle
 
 Playwright splits the process of showing a new document in a page into **navigation** and **loading**.
@@ -59,19 +54,13 @@ In lazy-loaded pages, it can be useful to wait until an element is visible with 
 ```java
 // Navigate and wait for element
 page.navigate("https://example.com");
-page.locator("text=Example Domain").waitFor();
+page.getByText("Example Domain").waitFor();
 
 // Navigate and click element
 // Click will auto-wait for the element
 page.navigate("https://example.com");
-page.locator("text=Example Domain").click();
+page.getByText("Example Domain").click();
 ```
-
-### API reference
-- [Page.navigate(url[, options])](/api/class-page.mdx#page-goto)
-- [Page.reload([options])](/api/class-page.mdx#page-reload)
-- [Page.goBack([options])](/api/class-page.mdx#page-go-back)
-- [Page.goForward([options])](/api/class-page.mdx#page-go-forward)
 
 ## Scenarios initiated by page interaction
 
@@ -83,10 +72,10 @@ By default, [Locator.click([options])](/api/class-locator.mdx#locator-click) wil
 
 ```java
 // Click will auto-wait for navigation to complete
-page.locator("text=Login").click();
+page.getByText("Login").click();
 
 // Fill will auto-wait for element on navigated page
-page.locator("#username").fill("John Doe");
+page.getByLabel("User Name").fill("John Doe");
 ```
 
 ### Custom wait
@@ -104,14 +93,14 @@ In lazy-loaded pages, it can be useful to wait until an element is visible with 
 
 ```java
 // Click will auto-wait for the element and trigger navigation
-page.locator("text=Login").click();
+page.getByText("Login").click();
 // Wait for the element
-page.locator("#username").waitFor();
+page.getByLabel("User Name").waitFor();
 
 // Click triggers navigation
-page.locator("text=Login").click();
+page.getByText("Login").click();
 // Fill will auto-wait for element
-page.locator("#username").fill("John Doe");
+page.getByLabel("User Name").fill("John Doe");
 ```
 
 ### Asynchronous navigation
@@ -138,7 +127,7 @@ Clicking an element could trigger multiple navigations. In these cases, it is re
 // Running action in the callback of waitForNavigation prevents a race
 // condition between clicking and waiting for a navigation.
 page.waitForNavigation(new Page.WaitForNavigationOptions().setUrl("**/login"), () -> {
-  page.locator("a").click(); // Triggers a navigation with a script redirect
+  page.getByText("Click me").click(); // Triggers a navigation with a script redirect
 });
 ```
 
@@ -153,12 +142,6 @@ Page popup = page.waitForPopup(() -> {
 popup.waitForLoadState(LoadState.LOAD);
 ```
 
-### API reference
-- [Locator.click([options])](/api/class-locator.mdx#locator-click)
-- [Page.waitForLoadState([state, options])](/api/class-page.mdx#page-wait-for-load-state)
-- [Page.waitForNavigation([options], callback)](/api/class-page.mdx#page-wait-for-navigation)
-- [Page.waitForFunction(expression[, arg, options])](/api/class-page.mdx#page-wait-for-function)
-
 ## Advanced patterns
 
 For pages that have complicated loading patterns, [Page.waitForFunction(expression[, arg, options])](/api/class-page.mdx#page-wait-for-function) is a powerful and extensible approach to define a custom wait criteria.
@@ -170,8 +153,6 @@ page.waitForFunction("() => window.amILoadedYet()");
 page.screenshot();
 ```
 
-### API reference
-- [Page.waitForFunction(expression[, arg, options])](/api/class-page.mdx#page-wait-for-function)
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
