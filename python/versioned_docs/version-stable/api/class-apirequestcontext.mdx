@@ -193,30 +193,77 @@ All responses returned by [api_request_context.get(url, **kwargs)](/api/class-ap
 
 Sends HTTP(S) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
 
+JSON objects can be passed directly to the request:
+
+```py
+data = {
+    "title": "Book Title",
+    "body": "John Doe",
+}
+api_request_context.fetch("https://example.com/api/createBook", method="post", data=data)
+```
+
+The common way to send file(s) in the body of a request is to encode it as form fields with `multipart/form-data` encoding. You can achieve that with Playwright API like this:
+
+```py
+api_request_context.fetch(
+  "https://example.com/api/uploadScrip'",
+  method="post",
+  multipart={
+    "fileField": {
+      "name": "f.js",
+      "mimeType": "text/javascript",
+      "buffer": b"console.log(2022);",
+    },
+  })
+```
+
 ## api_request_context.get(url, **kwargs) {#api-request-context-get}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font>
 
 - `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-option-url"/> &#60;[str]&#62; Target URL.<a href="#api-request-context-get-option-url" class="list-anchor">#</a>
+- `data`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-option-data"/> &#60;[str]|[bytes]|[Serializable]&#62; Allows to set post data of the request. If the data parameter is an object, it will be serialized to json string and `content-type` header will be set to `application/json` if not explicitly set. Otherwise the `content-type` header will be set to `application/octet-stream` if not explicitly set. <font size="2">Added in: v1.26</font><a href="#api-request-context-get-option-data" class="list-anchor">#</a>
 - `fail_on_status_code`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-option-fail-on-status-code"/> &#60;[bool]&#62; Whether to throw on response codes other than 2xx and 3xx. By default response object is returned for all status codes.<a href="#api-request-context-get-option-fail-on-status-code" class="list-anchor">#</a>
+- `form`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-option-form"/> &#60;[Dict]\[[str], [str]|[float]|[bool]\]&#62; Provides an object that will be serialized as html form using `application/x-www-form-urlencoded` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `application/x-www-form-urlencoded` unless explicitly provided. <font size="2">Added in: v1.26</font><a href="#api-request-context-get-option-form" class="list-anchor">#</a>
 - `headers`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-option-headers"/> &#60;[Dict]\[[str], [str]\]&#62; Allows to set HTTP headers.<a href="#api-request-context-get-option-headers" class="list-anchor">#</a>
 - `ignore_https_errors`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-option-ignore-https-errors"/> &#60;[bool]&#62; Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.<a href="#api-request-context-get-option-ignore-https-errors" class="list-anchor">#</a>
 - `max_redirects`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-option-max-redirects"/> &#60;[int]&#62; Maximum number of request redirects that will be followed automatically. An error will be thrown if the number is exceeded. Defaults to `20`. Pass `0` to not follow redirects. <font size="2">Added in: v1.26</font><a href="#api-request-context-get-option-max-redirects" class="list-anchor">#</a>
+- `multipart`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-option-multipart"/> &#60;[Dict]\[[str], [str]|[float]|[bool]|[ReadStream]|[Dict]\]&#62; Provides an object that will be serialized as html form using `multipart/form-data` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `multipart/form-data` unless explicitly provided. File values can be passed either as [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream) or as file-like object containing file name, mime-type and its content. <font size="2">Added in: v1.26</font><a href="#api-request-context-get-option-multipart" class="list-anchor">#</a>
+  - `name` &#60;[str]&#62; File name
+  - `mimeType` &#60;[str]&#62; File type
+  - `buffer` &#60;[bytes]&#62; File content
 - `params`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-option-params"/> &#60;[Dict]\[[str], [str]|[float]|[bool]\]&#62; Query parameters to be sent with the URL.<a href="#api-request-context-get-option-params" class="list-anchor">#</a>
 - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-option-timeout"/> &#60;[float]&#62; Request timeout in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.<a href="#api-request-context-get-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-return"/> &#60;[APIResponse]&#62;<a href="#api-request-context-get-return" class="list-anchor">#</a>
 
 Sends HTTP(S) [GET](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
 
+Request parameters can be configured with `params` option, they will be serialized into the URL search parameters:
+
+```py
+query_params = {
+  "isbn": "1234",
+  "page": "23"
+}
+api_request_context.get("https://example.com/api/getText", params=query_params)
+```
+
 ## api_request_context.head(url, **kwargs) {#api-request-context-head}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font>
 
 - `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-option-url"/> &#60;[str]&#62; Target URL.<a href="#api-request-context-head-option-url" class="list-anchor">#</a>
+- `data`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-option-data"/> &#60;[str]|[bytes]|[Serializable]&#62; Allows to set post data of the request. If the data parameter is an object, it will be serialized to json string and `content-type` header will be set to `application/json` if not explicitly set. Otherwise the `content-type` header will be set to `application/octet-stream` if not explicitly set. <font size="2">Added in: v1.26</font><a href="#api-request-context-head-option-data" class="list-anchor">#</a>
 - `fail_on_status_code`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-option-fail-on-status-code"/> &#60;[bool]&#62; Whether to throw on response codes other than 2xx and 3xx. By default response object is returned for all status codes.<a href="#api-request-context-head-option-fail-on-status-code" class="list-anchor">#</a>
+- `form`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-option-form"/> &#60;[Dict]\[[str], [str]|[float]|[bool]\]&#62; Provides an object that will be serialized as html form using `application/x-www-form-urlencoded` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `application/x-www-form-urlencoded` unless explicitly provided. <font size="2">Added in: v1.26</font><a href="#api-request-context-head-option-form" class="list-anchor">#</a>
 - `headers`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-option-headers"/> &#60;[Dict]\[[str], [str]\]&#62; Allows to set HTTP headers.<a href="#api-request-context-head-option-headers" class="list-anchor">#</a>
 - `ignore_https_errors`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-option-ignore-https-errors"/> &#60;[bool]&#62; Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.<a href="#api-request-context-head-option-ignore-https-errors" class="list-anchor">#</a>
 - `max_redirects`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-option-max-redirects"/> &#60;[int]&#62; Maximum number of request redirects that will be followed automatically. An error will be thrown if the number is exceeded. Defaults to `20`. Pass `0` to not follow redirects. <font size="2">Added in: v1.26</font><a href="#api-request-context-head-option-max-redirects" class="list-anchor">#</a>
+- `multipart`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-option-multipart"/> &#60;[Dict]\[[str], [str]|[float]|[bool]|[ReadStream]|[Dict]\]&#62; Provides an object that will be serialized as html form using `multipart/form-data` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `multipart/form-data` unless explicitly provided. File values can be passed either as [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream) or as file-like object containing file name, mime-type and its content. <font size="2">Added in: v1.26</font><a href="#api-request-context-head-option-multipart" class="list-anchor">#</a>
+  - `name` &#60;[str]&#62; File name
+  - `mimeType` &#60;[str]&#62; File type
+  - `buffer` &#60;[bytes]&#62; File content
 - `params`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-option-params"/> &#60;[Dict]\[[str], [str]|[float]|[bool]\]&#62; Query parameters to be sent with the URL.<a href="#api-request-context-head-option-params" class="list-anchor">#</a>
 - `timeout`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-option-timeout"/> &#60;[float]&#62; Request timeout in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.<a href="#api-request-context-head-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-return"/> &#60;[APIResponse]&#62;<a href="#api-request-context-head-return" class="list-anchor">#</a>
@@ -264,6 +311,40 @@ Sends HTTP(S) [PATCH](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-post-return"/> &#60;[APIResponse]&#62;<a href="#api-request-context-post-return" class="list-anchor">#</a>
 
 Sends HTTP(S) [POST](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
+
+JSON objects can be passed directly to the request:
+
+```py
+data = {
+    "title": "Book Title",
+    "body": "John Doe",
+}
+api_request_context.post("https://example.com/api/createBook", data=data)
+```
+
+To send form data to the server use `form` option. Its value will be encoded into the request body with `application/x-www-form-urlencoded` encoding (see below how to use `multipart/form-data` form encoding to send files):
+
+```py
+formData = {
+    "title": "Book Title",
+    "body": "John Doe",
+}
+api_request_context.post("https://example.com/api/findBook", form=formData)
+```
+
+The common way to send file(s) in the body of a request is to upload them as form fields with `multipart/form-data` encoding. You can achieve that with Playwright API like this:
+
+```py
+api_request_context.post(
+  "https://example.com/api/uploadScrip'",
+  multipart={
+    "fileField": {
+      "name": "f.js",
+      "mimeType": "text/javascript",
+      "buffer": b"console.log(2022);",
+    },
+  })
+```
 
 ## api_request_context.put(url, **kwargs) {#api-request-context-put}
 

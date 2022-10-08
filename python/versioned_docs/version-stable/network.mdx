@@ -5,22 +5,11 @@ title: "Network"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright provides APIs to **monitor** and **modify** network traffic, both HTTP and HTTPS. Any requests that page does, including [XHRs](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) requests, can be tracked, modified and handled.
-
-- [HTTP Authentication](#http-authentication)
-- [HTTP Proxy](#http-proxy)
-- [Network events](#network-events)
-- [Handle requests](#handle-requests)
-- [Modify requests](#modify-requests)
-- [Abort requests](#abort-requests)
-- [Modify responses](#modify-responses)
-- [Record and replay requests](#record-and-replay-requests)
-- [WebSockets](#websockets)
-- [Missing Network Events and Service Workers](#missing-network-events-and-service-workers)
-
-<br/>
+Playwright provides APIs to **monitor** and **modify** network traffic, both HTTP and HTTPS. Any requests that a page does, including [XHRs](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) requests, can be tracked, modified and handled.
 
 ## HTTP Authentication
+
+Perform HTTP Authentication with [browser.new_context(**kwargs)](/api/class-browser.mdx#browser-new-context).
 
 <Tabs
   groupId="python-flavor"
@@ -53,9 +42,6 @@ await page.goto("https://example.com")
 
 </TabItem>
 </Tabs>
-
-### API reference
-- [browser.new_context(**kwargs)](/api/class-browser.mdx#browser-new-context)
 
 ## HTTP Proxy
 
@@ -129,7 +115,7 @@ context = await browser.new_context(proxy={"server": "http://myproxy.com:3128"})
 
 ## Network events
 
-You can monitor all the requests and responses:
+You can monitor all the [Request]s and [Response]s:
 
 <Tabs
   groupId="python-flavor"
@@ -184,7 +170,7 @@ asyncio.run(main())
 </TabItem>
 </Tabs>
 
-Or wait for a network response after the button click:
+Or wait for a network response after the button click with [page.expect_response(url_or_predicate, **kwargs)](/api/class-page.mdx#page-wait-for-response):
 
 <Tabs
   groupId="python-flavor"
@@ -199,7 +185,7 @@ Or wait for a network response after the button click:
 ```py
 # Use a glob url pattern
 with page.expect_response("**/api/fetch_data") as response_info:
-    page.locator("button#update").click()
+    page.get_by_text("Update").click()
 response = response_info.value
 ```
 
@@ -209,7 +195,7 @@ response = response_info.value
 ```py
 # Use a glob url pattern
 async with page.expect_response("**/api/fetch_data") as response_info:
-    await page.locator("button#update").click()
+    await page.get_by_text("Update").click()
 response = await response_info.value
 ```
 
@@ -217,6 +203,8 @@ response = await response_info.value
 </Tabs>
 
 #### Variations
+
+Wait for [Response]s with [page.expect_response(url_or_predicate, **kwargs)](/api/class-page.mdx#page-wait-for-response)
 
 <Tabs
   groupId="python-flavor"
@@ -231,12 +219,12 @@ response = await response_info.value
 ```py
 # Use a regular expression
 with page.expect_response(re.compile(r"\.jpeg$")) as response_info:
-    page.locator("button#update").click()
+    page.get_by_text("Update").click()
 response = response_info.value
 
 # Use a predicate taking a response object
 with page.expect_response(lambda response: token in response.url) as response_info:
-    page.locator("button#update").click()
+    page.get_by_text("Update").click()
 response = response_info.value
 ```
 
@@ -246,27 +234,17 @@ response = response_info.value
 ```py
 # Use a regular expression
 async with page.expect_response(re.compile(r"\.jpeg$")) as response_info:
-    await page.locator("button#update").click()
+    await page.get_by_text("Update").click()
 response = await response_info.value
 
 # Use a predicate taking a response object
 async with page.expect_response(lambda response: token in response.url) as response_info:
-    await page.locator("button#update").click()
+    await page.get_by_text("Update").click()
 response = await response_info.value
 ```
 
 </TabItem>
 </Tabs>
-
-### API reference
-- [Request]
-- [Response]
-- [page.on("request")](/api/class-page.mdx#page-event-request)
-- [page.on("response")](/api/class-page.mdx#page-event-response)
-- [page.expect_request(url_or_predicate, **kwargs)](/api/class-page.mdx#page-wait-for-request)
-- [page.expect_response(url_or_predicate, **kwargs)](/api/class-page.mdx#page-wait-for-response)
-
-<br/>
 
 ## Handle requests
 
@@ -304,6 +282,8 @@ You can mock API endpoints via handling the network requests in your Playwright 
 
 #### Variations
 
+Set up route on the entire browser context with [browser_context.route(url, handler, **kwargs)](/api/class-browsercontext.mdx#browser-context-route) or page with [page.route(url, handler, **kwargs)](/api/class-page.mdx#page-route). It will apply to popup windows and opened links.
+
 <Tabs
   groupId="python-flavor"
   defaultValue="sync"
@@ -315,8 +295,6 @@ You can mock API endpoints via handling the network requests in your Playwright 
 <TabItem value="sync">
 
 ```py
-# Set up route on the entire browser context.
-# It will apply to popup windows and opened links.
 context.route(
     "**/api/login",
     lambda route: route.fulfill(status=200, body="accept"))
@@ -327,8 +305,6 @@ page.goto("https://example.com")
 <TabItem value="async">
 
 ```py
-# Set up route on the entire browser context.
-# It will apply to popup windows and opened links.
 await context.route(
     "**/api/login",
     lambda route: route.fulfill(status=200, body="accept"))
@@ -337,15 +313,6 @@ await page.goto("https://example.com")
 
 </TabItem>
 </Tabs>
-
-### API reference
-- [browser_context.route(url, handler, **kwargs)](/api/class-browsercontext.mdx#browser-context-route)
-- [browser_context.unroute(url, **kwargs)](/api/class-browsercontext.mdx#browser-context-unroute)
-- [page.route(url, handler, **kwargs)](/api/class-page.mdx#page-route)
-- [page.unroute(url, **kwargs)](/api/class-page.mdx#page-unroute)
-- [Route]
-
-<br/>
 
 ## Modify requests
 
@@ -393,6 +360,8 @@ You can continue requests with modifications. Example above removes an HTTP head
 
 ## Abort requests
 
+You can abort requests using [page.route(url, handler, **kwargs)](/api/class-page.mdx#page-route) and [route.abort(**kwargs)](/api/class-route.mdx#route-abort).
+
 <Tabs
   groupId="python-flavor"
   defaultValue="sync"
@@ -423,16 +392,9 @@ await page.route("**/*", lambda route: route.abort() if route.request.resource_t
 </TabItem>
 </Tabs>
 
-### API reference
-- [page.route(url, handler, **kwargs)](/api/class-page.mdx#page-route)
-- [browser_context.route(url, handler, **kwargs)](/api/class-browsercontext.mdx#browser-context-route)
-- [route.abort(**kwargs)](/api/class-route.mdx#route-abort)
-
-<br/>
-
 ## Modify responses
 
-To modify a response use [APIRequestContext] to get original response and then pass the response to [route.fulfill(**kwargs)](/api/class-route.mdx#route-fulfill). You can override individual fields on the response via options:
+To modify a response use [APIRequestContext] to get the original response and then pass the response to [route.fulfill(**kwargs)](/api/class-route.mdx#route-fulfill). You can override individual fields on the response via options:
 
 <Tabs
   groupId="python-flavor"
@@ -487,17 +449,6 @@ await page.route("**/title.html", handle_route)
 
 </TabItem>
 </Tabs>
-
-### API reference
-- [APIRequestContext]
-- [page.route(url, handler, **kwargs)](/api/class-page.mdx#page-route)
-- [browser_context.route(url, handler, **kwargs)](/api/class-browsercontext.mdx#browser-context-route)
-- [playwright.request](/api/class-playwright.mdx#playwright-request)
-- [browser_context.request](/api/class-browsercontext.mdx#browser-context-request)
-- [page.request](/api/class-page.mdx#page-request)
-- [route.fulfill(**kwargs)](/api/class-route.mdx#route-fulfill)
-
-<br/>
 
 ## Record and replay requests
 
@@ -589,11 +540,9 @@ HAR replay matches URL and HTTP method strictly. For POST requests, it also matc
 
 Similar to when recording, if given HAR file name ends with `.zip`, it is considered an archive containing the HAR file along with network payloads stored as separate entries. You can also extract this archive, edit payloads or HAR log manually and point to the extracted har file. All the payloads will be resolved relative to the extracted har file on the file system.
 
-<br/>
-
 ## WebSockets
 
-Playwright supports [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) inspection out of the box. Every time WebSocket is created, [page.on("websocket")](/api/class-page.mdx#page-event-web-socket) event is fired. This event contains the [WebSocket] instance for further web socket frames inspection:
+Playwright supports [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) inspection out of the box. Every time a WebSocket is created, the [page.on("websocket")](/api/class-page.mdx#page-event-web-socket) event is fired. This event contains the [WebSocket] instance for further web socket frames inspection:
 
 ```py
 def on_web_socket(ws):
@@ -605,23 +554,12 @@ def on_web_socket(ws):
 page.on("websocket", on_web_socket)
 ```
 
-### API reference
-- [WebSocket]
-- [page.on("websocket")](/api/class-page.mdx#page-event-web-socket)
-- [web_socket.on("framesent")](/api/class-websocket.mdx#web-socket-event-frame-sent)
-- [web_socket.on("framereceived")](/api/class-websocket.mdx#web-socket-event-frame-received)
-- [web_socket.on("close")](/api/class-websocket.mdx#web-socket-event-close)
-
-<br/>
-
 ## Missing Network Events and Service Workers
 
 Playwright's built-in [browser_context.route(url, handler, **kwargs)](/api/class-browsercontext.mdx#browser-context-route) and [page.route(url, handler, **kwargs)](/api/class-page.mdx#page-route) allow your tests to natively route requests and perform mocking and interception.
 1. If you're using Playwright's native [browser_context.route(url, handler, **kwargs)](/api/class-browsercontext.mdx#browser-context-route) and [page.route(url, handler, **kwargs)](/api/class-page.mdx#page-route), and it appears network events are missing, disable Service Workers by setting `browser.new_context.service_workers` to `'block'`.
 1. It might be that you are using a mock tool such as Mock Service Worker (MSW). While this tool works out of the box for mocking responses, it adds its own Service Worker that takes over the network requests, hence making them invisible to [browser_context.route(url, handler, **kwargs)](/api/class-browsercontext.mdx#browser-context-route) and [page.route(url, handler, **kwargs)](/api/class-page.mdx#page-route). If you are interested in both network testing and mocking, consider using built-in [browser_context.route(url, handler, **kwargs)](/api/class-browsercontext.mdx#browser-context-route) and [page.route(url, handler, **kwargs)](/api/class-page.mdx#page-route) for [response mocking](#handle-requests).
 1. If you're interested in not solely using Service Workers for testing and network mocking, but in routing and listening for requests made by Service Workers themselves, please see [this experimental feature](https://github.com/microsoft/playwright/issues/15684).
-
-<br/>
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
