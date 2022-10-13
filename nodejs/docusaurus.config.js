@@ -29,6 +29,17 @@ let plugins = [
       sidebarPath: require.resolve('./sidebarCommunity.js'),
     }),
   ],
+  [
+    'content-docs',
+    /** @type {import('@docusaurus/plugin-content-docs').Options} */
+    ({
+      id: 'case-studies',
+      path: 'case-studies',
+      routeBasePath: 'case-studies',
+      sidebarPath: require.resolve('./sidebarCaseStudies.js'),
+    }),
+  ],
+  
   require.resolve("@docusaurus/plugin-content-pages"),
   require.resolve("./plugins/playwright-analytics-integration/lib/index.js"),
 ];
@@ -115,6 +126,12 @@ module.exports = {
           label: 'Community',
           position: 'left',
           activeBaseRegex: `/community/`,
+        },
+        {
+          to: '/case-studies/qwik',
+          label: 'Case Studies',
+          position: 'left',
+          activeBaseRegex: `/case-studies/`,
         },
       ],
     },
