@@ -119,7 +119,7 @@ export function Ambassadors(): JSX.Element {
         languages='Italian, English'
         city='Berlin'
         country='Germany'
-        imageUrl='https://media-exp1.licdn.com/dms/image/C4E03AQHNkQmEbZBVqA/profile-displayphoto-shrink_400_400/0/1517375686271?e=1664409600&v=beta&t=r7M2zqvKeA6Ogd_mHbq2-0YFZfNGGVBQtZK3b9tpFEw'
+        imageUrl='https://media-exp1.licdn.com/dms/image/C4E03AQHNkQmEbZBVqA/profile-displayphoto-shrink_400_400/0/1517375686271?e=1671667200&v=beta&t=j6CLWbYad-tvTAb0h8__WIz-_18qv-v_xtSAqhmarG4'
         twitterUrl='https://twitter.com/rag0g'
         websiteUrl='https://www.youtube.com/c/AutomateTogether'
       ></ProfileCard>
@@ -136,7 +136,7 @@ export function Ambassadors(): JSX.Element {
         languages='English'
         city='Auckland'
         country='New Zealand'
-        imageUrl='https://media-exp1.licdn.com/dms/image/C5603AQFvGgrfen7F9Q/profile-displayphoto-shrink_400_400/0/1629605742823?e=1664409600&v=beta&t=yZx1w3KMdPxznERLrH1Rg7cRlNVuomVHzklnR9cMcVU'
+        imageUrl='https://media-exp1.licdn.com/dms/image/C5603AQFvGgrfen7F9Q/profile-displayphoto-shrink_400_400/0/1629605742823?e=1671667200&v=beta&t=BJdZNbMn_cHqj8yKbn5gvMXvwFXjMiI7_vC7BWk4O_U'
         linkedInUrl='https://www.linkedin.com/in/karthikkk/'
       ></ProfileCard>
       <ProfileCard
