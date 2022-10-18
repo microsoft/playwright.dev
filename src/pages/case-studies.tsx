@@ -4,6 +4,7 @@ import {
   CaseStudiesCards,
   CaseStudiesCard
 } from '../components/CaseStudiesCard';
+import styles from "./case-studies-styles.module.css";
 
 export default function CaseStudies() {
   return (
@@ -15,7 +16,7 @@ export default function CaseStudies() {
         features are."
     >
       <div className="container">
-      <h1>Playwright Case Studies</h1>
+      <h1 className={styles.heading}>Playwright Case Studies</h1>
       <p>
         We had a chance to talk to some of the developers using Playwright
         across open source projects and enterprise companies to learn how they
