@@ -30,24 +30,7 @@ export default function CaseStudies() {
             name="Qwik"
             description="Qwik is a new kind of web framework that can deliver instant loading web applications at any size or complexity. Playwright powers the whole end to end testing of of Qwik, which is not to test an app itself but to test all the things that the framework needs to solve, the internals of all the coordinate cases of what can happen."
           />
-          <CaseStudiesCard
-            url="qwik"
-            logo="https://raw.githubusercontent.com/BuilderIO/qwik/main/.github/assets/qwik-logo.svg"
-            name="Qwik"
-            description="Qwik is a new kind of web framework that can deliver instant loading web applications at any size or complexity. Playwright powers the whole end to end testing of of Qwik, which is not to test an app itself but to test all the things that the framework needs to solve, the internals of all the coordinate cases of what can happen."
-          />
-          <CaseStudiesCard
-            url="qwik"
-            logo="https://raw.githubusercontent.com/BuilderIO/qwik/main/.github/assets/qwik-logo.svg"
-            name="Qwik"
-            description="Qwik is a new kind of web framework that can deliver instant loading web applications at any size or complexity. Playwright powers the whole end to end testing of of Qwik, which is not to test an app itself but to test all the things that the framework needs to solve, the internals of all the coordinate cases of what can happen."
-          />
-          <CaseStudiesCard
-            url="qwik"
-            logo="https://raw.githubusercontent.com/BuilderIO/qwik/main/.github/assets/qwik-logo.svg"
-            name="Qwik"
-            description="Qwik is a new kind of web framework that can deliver instant loading web applications at any size or complexity. Playwright powers the whole end to end testing of of Qwik, which is not to test an app itself but to test all the things that the framework needs to solve, the internals of all the coordinate cases of what can happen."
-          />
+          
         </CaseStudiesCards>
       </main>
       </div>

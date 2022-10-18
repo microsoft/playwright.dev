@@ -15,8 +15,14 @@ module.exports = {
     },
     {
       type: 'link',
+      label: 'Case Studies',
+      href: '/case-studies',
+    },
+    {
+      type: 'link',
       label: 'Join our Community Slack',
       href: 'https://aka.ms/playwright-slack'
-    }
+    },
+    
   ]
 };
