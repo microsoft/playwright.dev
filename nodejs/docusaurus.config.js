@@ -193,6 +193,7 @@ module.exports = {
       appId: 'K09ICMCV6X',
       apiKey: 'a5b64422711c37ab6a0ce4d86d16cdd9',
     },
+    image: 'https://repository-images.githubusercontent.com/221981891/8c5c6942-c91f-4df1-825f-4cf474056bd7',
   },
   themes: [
     [
