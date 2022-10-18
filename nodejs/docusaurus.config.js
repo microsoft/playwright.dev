@@ -128,7 +128,7 @@ module.exports = {
           activeBaseRegex: `/community/`,
         },
         {
-          to: '/case-studies/qwik',
+          to: '/case-studies',
           label: 'Case Studies',
           position: 'left',
           activeBaseRegex: `/case-studies/`,
