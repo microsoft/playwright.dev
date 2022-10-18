@@ -2,7 +2,7 @@ import React, { type ReactNode } from 'react';
 import Link from '@docusaurus/Link';
 import styles from './styles.module.css';
 
-export type ProfileProps = {
+type ProfileProps = {
   className?: string;
   logo: string;
   name: string;

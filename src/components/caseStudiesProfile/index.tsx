@@ -1,7 +1,7 @@
 import React, { type ReactNode } from 'react';
 import styles from './styles.module.css';
 
-export type ProfileLayoutProps = {
+type ProfileLayoutProps = {
   className?: string;
   children?: string;
 };
@@ -17,7 +17,7 @@ export function ProfileLayout({
 }
 
 
-export type ProfileProps = {
+type ProfileProps = {
   className?: string;
   name: string;
   githubUrl?: string;
