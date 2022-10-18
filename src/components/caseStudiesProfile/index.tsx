@@ -1,38 +1,52 @@
 import React, { type ReactNode } from 'react';
 import styles from './styles.module.css';
 
+export type ProfileLayoutProps = {
+  className?: string;
+  children?: string;
+};
+
+export function ProfileLayout({
+  children
+}: ProfileLayoutProps) {
+  return (
+      <div className="avatar margin-bottom--sm">
+          {children}
+      </div>
+  );
+}
+
+
 export type ProfileProps = {
   className?: string;
   name: string;
-  city: string;
-  country: string;
   githubUrl?: string;
   twitterUrl?: string;
-  websiteUrl?: string;
-  linkedInUrl?: string;
   imageUrl?: string;
   languages?: string;
+  description?: string;
 };
 
-export default function Profile({
+export function Profile({
   className,
   name,
   githubUrl,
   twitterUrl,
-  imageUrl
+  imageUrl,
+  description
 }: ProfileProps) {
   return (
     <div className={className}>
       <div className="avatar avatar--vertical">
         <img
           className="avatar__photo avatar__photo--md"
-          src={twitterUrl ? `${twitterUrl}.png` : imageUrl}
+          src={githubUrl ? `${githubUrl}.png` : imageUrl}
           alt={`${name}'s avatar`}
         />
+        <div className="avatar__intro"><div className="avatar__name"><a href={twitterUrl} target="_blank" rel="noopener noreferrer"><span>{name}</span></a></div><small className="avatar__subtitle" >{description}</small></div>
       </div>
-      <div className={styles.intro}>
-        <span className={styles.name}>{name}</span>
-      </div>
+      
+      
     </div>
   );
 }
