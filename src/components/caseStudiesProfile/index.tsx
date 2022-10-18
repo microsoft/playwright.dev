@@ -6,16 +6,9 @@ type ProfileLayoutProps = {
   children?: string;
 };
 
-export function ProfileLayout({
-  children
-}: ProfileLayoutProps) {
-  return (
-      <div className="avatar margin-bottom--sm">
-          {children}
-      </div>
-  );
+export function ProfileLayout({ children }: ProfileLayoutProps) {
+  return <div className="avatar margin-bottom--sm">{children}</div>;
 }
-
 
 type ProfileProps = {
   className?: string;
@@ -43,10 +36,15 @@ export function Profile({
           src={githubUrl ? `${githubUrl}.png` : imageUrl}
           alt={`${name}'s avatar`}
         />
-        <div className="avatar__intro"><div className="avatar__name"><a href={twitterUrl} target="_blank" rel="noopener noreferrer"><span>{name}</span></a></div><small className="avatar__subtitle" >{description}</small></div>
+        <div className="avatar__intro">
+          <div className="avatar__name">
+            <a href={twitterUrl} target="_blank" rel="noopener noreferrer">
+              <span>{name}</span>
+            </a>
+          </div>
+          <small className="avatar__subtitle">{description}</small>
+        </div>
       </div>
-      
-      
     </div>
   );
 }

@@ -1,8 +1,8 @@
-import React, { type ReactNode } from 'react';
+import React from 'react';
 import Link from '@docusaurus/Link';
 import styles from './styles.module.css';
 
-type ProfileProps = {
+type CaseStudiesCard = {
   className?: string;
   logo: string;
   name: string;
@@ -16,7 +16,7 @@ export function CaseStudiesCard({
   name,
   description,
   url
-}: ProfileProps) {
+}: CaseStudiesCard) {
   return (
     <Link href={`/case-studies/${url}`}>
       <article className={styles.article}>
