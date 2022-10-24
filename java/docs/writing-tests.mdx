@@ -1,27 +1,21 @@
 ---
-id: intro
-title: "Installation"
+id: writing-tests
+title: "Writing Tests"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 
-Playwright was created specifically to accommodate the needs of end-to-end testing. Playwright supports all modern rendering engines including Chromium, WebKit, and Firefox. Test on Windows, Linux, and macOS, locally or on CI, headless or headed with native mobile emulation. 
+Playwright assertions are created specifically for the dynamic web. Checks are automatically retried until the necessary conditions are met. Playwright comes with [auto-wait](./actionability.mdx) built in meaning it waits for elements to be actionable prior to performing actions. Playwright provides [assertThat](./test-assertions.mdx) overloads to write assertions.
 
-Playwright is distributed as a set of [Maven](https://maven.apache.org/what-is-maven.html) modules. The easiest way to use it is to add one dependency to your project's `pom.xml` as described below. If you're not familiar with Maven please refer to its [documentation](https://maven.apache.org/guides/getting-started/maven-in-five-minutes.html).
-
-## Usage
-
-Get started by installing Playwright and running the example file to see it in action.
-
-<Tabs defaultValue="java" values={[ {label: 'App.java', value: 'java'}, {label: 'pom.xml', value: 'pom'} ] }>
-
-<TabItem value="java">
+Take a look at the example test below to see how to write a test using web first assertions, locators and selectors.
 
 ```java
-// src/main/java/org/example/App.java
 package org.example;
 
+import java.util.regex.Pattern;
 import com.microsoft.playwright.*;
+
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
 public class App {
     public static void main(String[] args) {
@@ -29,98 +23,69 @@ public class App {
             Browser browser = playwright.chromium().launch();
             Page page = browser.newPage();
             page.navigate("http://playwright.dev");
-            System.out.println(page.title());
+
+            // Expect a title "to contain" a substring.
+            assertThat(page).hasTitle(Pattern.compile("Playwright"));
+
+            // create a locator
+            Locator getStarted = page.locator("text=Get Started");
+
+            // Expect an attribute "to be strictly equal" to the value.
+            assertThat(getStarted).hasAttribute("href", "/docs/intro");
+
+            // Click the get started link.
+            getStarted.click();
+
+            // Expects the URL to contain intro.
+            assertThat(page).hasURL(Pattern.compile(".*intro"));
         }
     }
 }
 ```
 
-</TabItem>
+### Assertions
 
-<TabItem value="pom">
-
-```xml
-<?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-  <modelVersion>4.0.0</modelVersion>
-
-  <groupId>org.example</groupId>
-  <artifactId>examples</artifactId>
-  <version>0.1-SNAPSHOT</version>
-  <name>Playwright Client Examples</name>
-  <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-  </properties>
-  <dependencies>
-    <dependency>
-      <groupId>com.microsoft.playwright</groupId>
-      <artifactId>playwright</artifactId>
-      <version>1.28.0</version>
-    </dependency>
-  </dependencies>
-  <build>
-    <plugins>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.10.1</version>
-      </plugin>
-    </plugins>
-  </build>
-</project>
-```
-
-</TabItem>
-
-</Tabs>
-
-With the Example.java and pom.xml above, compile and execute your new program as follows:
-
-```bash
-mvn compile exec:java -Dexec.mainClass="org.example.App"
-```
-
-Running it downloads the Playwright package and installs browser binaries for Chromium, Firefox and WebKit. To modify this behavior see [installation parameters](./browsers.mdx#installing-browsers).
-
-## First script
-
-In our first script, we will navigate to `whatsmyuseragent.org` and take a screenshot in WebKit.
+Playwright provides [`assertThat`](./test-assertions.mdx) overloads which will wait until the expected condition is met.
 
 ```java
-package org.example;
+import java.util.regex.Pattern;
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
 
-import com.microsoft.playwright.*;
-import java.nio.file.Paths;
-
-public class App {
-  public static void main(String[] args) {
-    try (Playwright playwright = Playwright.create()) {
-      Browser browser = playwright.webkit().launch();
-      Page page = browser.newPage();
-      page.navigate("http://whatsmyuseragent.org/");
-      page.screenshot(new Page.ScreenshotOptions().setPath(Paths.get("example.png")));
-    }
-  }
-}
+assertThat(page).hasTitle(Pattern.compile("Playwright"));
 ```
 
-By default, Playwright runs the browsers in headless mode. To see the browser UI, pass the `headless=false` flag while launching the browser. You can also use `slowMo` to slow down execution. Learn more in the debugging tools [section](./debug.mdx).
+### Locators
+
+[Locators](./locators.mdx) are the central piece of Playwright's auto-waiting and retry-ability. Locators represent a way to find element(s) on the page at any moment and are used to perform actions on elements such as `.click` `.fill` etc. Custom locators can be created with the [Page.locator(selector[, options])](/api/class-page.mdx#page-locator) method.
 
 ```java
-playwright.firefox().launch(new BrowserType.LaunchOptions().setHeadless(false).setSlowMo(50));
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+
+Locator getStarted = page.locator("text=Get Started");
+
+assertThat(getStarted).hasAttribute("href", "/docs/intro");
+getStarted.click();
 ```
 
-## Running the Example script
+[Selectors](./selectors.mdx) are strings that are used to create Locators. Playwright supports many different selectors like [Text](./selectors.mdx#text-selector), [CSS](./selectors.mdx#css-selector), [XPath](./selectors.mdx#xpath-selectors) and many more. Learn more about available selectors and how to pick one in this [in-depth guide](./selectors.mdx).
 
-```bash
-mvn compile exec:java -Dexec.mainClass="org.example.App"
+```java
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+
+assertThat(page.locator("text=Installation")).isVisible();
 ```
 
-By default browsers launched with Playwright run headless, meaning no browser UI will open up when running the script. To change that you can pass `new BrowserType.LaunchOptions().setHeadless(false)` when launching the browser.
+### Test Isolation
 
-## What's next
-- [Write tests using web first assertions, page fixtures and locators](./writing-tests.mdx)
+Playwright has the concept of a [BrowserContext] which is an in-memory isolated browser profile. It's recommended to create a new [BrowserContext] for each test to ensure they don't interfere with each other.
+
+```java
+Browser browser = playwright.chromium().launch();
+BrowserContext context = browser.newContext();
+Page page = context.newPage();
+```
+
+## What's Next
 - [Run single test, multiple tests, headed mode](./running-tests.mdx)
 - [Generate tests with Codegen](./codegen.mdx)
 - [See a trace of your tests](./trace-viewer-intro.mdx)
