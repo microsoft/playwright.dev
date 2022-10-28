@@ -172,6 +172,74 @@ Handles can be acquired using the page methods such as [page.evaluate_handle(exp
 - [page.query_selector(selector, **kwargs)](/api/class-page.mdx#page-query-selector)
 - [page.query_selector_all(selector)](/api/class-page.mdx#page-query-selector-all)
 
+## Locator vs ElementHandle
+
+:::caution
+We only recommend using [ElementHandle] in the rare cases when you need to perform extensive DOM traversal on a static page. For all user actions and assertions use locator instead.
+:::
+
+The difference between the [Locator] and [ElementHandle] is that the latter points to a particular element, while Locator captures the logic of how to retrieve that element.
+
+In the example below, handle points to a particular DOM element on page. If that element changes text or is used by React to render an entirely different component, handle is still pointing to that very stale DOM element. This can lead to unexpected behaviors.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+handle = page.query_selector("text=Submit")
+handle.hover()
+handle.click()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+handle = await page.query_selector("text=Submit")
+await handle.hover()
+await handle.click()
+```
+
+</TabItem>
+</Tabs>
+
+With the locator, every time the locator is used, up-to-date DOM element is located in the page using the selector. So in the snippet below, underlying DOM element is going to be located twice.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+locator = page.get_by_text("Submit")
+locator.hover()
+locator.click()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+locator = page.get_by_text("Submit")
+await locator.hover()
+await locator.click()
+```
+
+</TabItem>
+</Tabs>
+
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
