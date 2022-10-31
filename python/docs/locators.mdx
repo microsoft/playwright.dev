@@ -7,6 +7,17 @@ import TabItem from '@theme/TabItem';
 
 [Locator]s are the central piece of Playwright's auto-waiting and retry-ability. In a nutshell, locators represent a way to find element(s) on the page at any moment.
 
+### Quick Guide
+
+These are the recommended built in locators.
+- [page.get_by_role(role, **kwargs)](/api/class-page.mdx#page-get-by-role) to locate by explicit and implicit accessibility attributes.
+- [page.get_by_text(text, **kwargs)](/api/class-page.mdx#page-get-by-text) to locate by text content.
+- [page.get_by_label(text, **kwargs)](/api/class-page.mdx#page-get-by-label) to locate a form control by associated label's text.
+- [page.get_by_placeholder(text, **kwargs)](/api/class-page.mdx#page-get-by-placeholder) to locate an input by placeholder.
+- [page.get_by_alt_text(text, **kwargs)](/api/class-page.mdx#page-get-by-alt-text) to locate an element, usually image, by its text alternative.
+- [page.get_by_title(text, **kwargs)](/api/class-page.mdx#page-get-by-title) to locate an element by its title.
+- [page.get_by_test_id(test_id)](/api/class-page.mdx#page-get-by-test-id) to locate an element based on its `data-testid` attribute (other attribute can be configured).
+
 <Tabs
   groupId="python-flavor"
   defaultValue="sync"
@@ -18,16 +29,26 @@ import TabItem from '@theme/TabItem';
 <TabItem value="sync">
 
 ```py
-locator = page.get_by_text("Submit")
-locator.click()
+page.get_by_label("User Name").fill("John")
+
+page.get_by_label("Password").fill("secret-password")
+
+page.get_by_role("button", name="Sign in").click()
+
+expect(page.get_by_text("Welcome, John!")).to_be_visible()
 ```
 
 </TabItem>
 <TabItem value="async">
 
 ```py
-locator = page.get_by_text("Submit")
-await locator.click()
+await page.get_by_label("User Name").fill("John")
+
+await page.get_by_label("Password").fill("secret-password")
+
+await page.get_by_role("button", name="Sign in").click()
+
+await expect(page.get_by_text("Welcome, John!")).to_be_visible()
 ```
 
 </TabItem>
@@ -177,9 +198,117 @@ await locator.click()
 </TabItem>
 </Tabs>
 
-### Locate by text using [page.get_by_text(text, **kwargs)](/api/class-page.mdx#page-get-by-text)
+### Locate based on accessible attributes
 
-The easiest way to find an element is to look for the text it contains. You can match by a substring, exact string, or a regular expression.
+The [page.get_by_role(role, **kwargs)](/api/class-page.mdx#page-get-by-role) locator reflects how users and assistive technology perceive the page, for example whether some element is a button or a checkbox. When locating by role, you should usually pass the accessible name as well, so that locator pinpoints the exact element.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.get_by_role("button", name=re.compile("submit", re.IGNORECASE)).click()
+
+page.get_by_role("checkbox", checked=True, name="Check me").check()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.get_by_role("button", name=re.compile("submit", re.IGNORECASE)).click()
+
+await page.get_by_role("checkbox", checked=True, name="Check me").check()
+```
+
+</TabItem>
+</Tabs>
+
+Role locators follow W3C specifications for [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name).
+
+Note that role locators **do not replace** accessibility audits and conformance tests, but rather give early feedback about the ARIA guidelines.
+
+### Locate by label text
+
+Most form controls usually have dedicated labels that could be conveniently used to interact with the form. In this case, you can locate the control by its associated label using [page.get_by_label(text, **kwargs)](/api/class-page.mdx#page-get-by-label).
+
+For example, consider the following DOM structure.
+
+```html
+<label for="password">Password:</label><input type="password" id="password">
+```
+
+You can fill the input after locating it by the label text:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.get_by_label("Password").fill("secret")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.get_by_label("Password").fill("secret")
+```
+
+</TabItem>
+</Tabs>
+
+### Locate by placeholder text
+
+Inputs may have a placeholder attribute to hint to the user what value should be entered. You can locate such an input using [page.get_by_placeholder(text, **kwargs)](/api/class-page.mdx#page-get-by-placeholder).
+
+For example, consider the following DOM structure.
+
+```html
+ <input id="email" name="email" type="email" placeholder="name@example.com">
+```
+
+You can fill the input after locating it by the placeholder text:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.get_by_placeholder("name@example.com").fill("playwright@microsoft.com")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.get_by_placeholder("name@example.com").fill("playwright@microsoft.com")
+```
+
+</TabItem>
+</Tabs>
+
+### Locate by text
+
+The easiest way to find an element is to look for the text it contains. You can match by a substring, exact string, or a regular expression when using [page.get_by_text(text, **kwargs)](/api/class-page.mdx#page-get-by-text).
 
 <Tabs
   groupId="python-flavor"
@@ -239,9 +368,17 @@ await page.get_by_test_id("product-item").filter(has_text="Playwright Book").cli
 Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
 :::
 
-### Locate based on accessible attributes with [page.get_by_role(role, **kwargs)](/api/class-page.mdx#page-get-by-role)
+### Locate by alt text
 
-The [page.get_by_role(role, **kwargs)](/api/class-page.mdx#page-get-by-role) locator reflects how users and assistive technology percieve the page, for example whether some element is a button or a checkbox. When locating by role, you should usually pass the accessible name as well, so that locator pinpoints the exact element.
+All images should have an `alt` attribute that describes the image. You can locate an image based on the text alternative using [page.get_by_alt_text(text, **kwargs)](/api/class-page.mdx#page-get-by-alt-text).
+
+For example, consider the following DOM structure.
+
+```html
+<img alt="playwright logo" src="/playwright-logo.png" />
+```
+
+You can click on the image after locating it by the text alternative:
 
 <Tabs
   groupId="python-flavor"
@@ -254,30 +391,58 @@ The [page.get_by_role(role, **kwargs)](/api/class-page.mdx#page-get-by-role) loc
 <TabItem value="sync">
 
 ```py
-page.get_by_role("button", name=re.compile("submit", re.IGNORECASE)).click()
-
-page.get_by_role("checkbox", checked=True, name="Check me"]).check()
+page.get_by_alt_text("playwright logo").click()
 ```
 
 </TabItem>
 <TabItem value="async">
 
 ```py
-await page.get_by_role("button", name=re.compile("submit", re.IGNORECASE)).click()
-
-await page.get_by_role("checkbox", checked=True, name="Check me"]).check()
+await page.get_by_alt_text("playwright logo").click()
 ```
 
 </TabItem>
 </Tabs>
 
-Role locators follow W3C specificaitons for [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name).
+### Locate by title
 
-Note that role locators **do not replace** accessibility audits and conformance tests, but rather give early feedback about the ARIA guidelines.
+Locate an element with a matching title attribute using [page.get_by_title(text, **kwargs)](/api/class-page.mdx#page-get-by-title).
 
-### Define explicit contract and use [page.get_by_test_id(test_id)](/api/class-page.mdx#page-get-by-test-id)
+For example, consider the following DOM structure.
 
-User-facing attributes like text or accessible name can change over time. In this case it is convenient to define explicit test ids.
+```html
+<span title='Issues count'>25 issues</span>
+```
+
+You can check the issues count after locating it by the title text:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+expect(page.get_by_title("Issues count")).to_have_text("25 issues")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await expect(page.get_by_title("Issues count")).to_have_text("25 issues")
+```
+
+</TabItem>
+</Tabs>
+
+### Define explicit contract and use a data-testid attribute
+
+User-facing attributes like text or accessible name can change over time. In this case it is convenient to define explicit test ids and query them with [page.get_by_test_id(test_id)](/api/class-page.mdx#page-get-by-test-id).
 
 ```html
 <button data-testid="directions">Itinéraire</button>
@@ -294,56 +459,20 @@ User-facing attributes like text or accessible name can change over time. In thi
 <TabItem value="sync">
 
 ```py
-page.get_by_test_id('directions').click()
+page.get_by_test_id("directions").click()
 ```
 
 </TabItem>
 <TabItem value="async">
 
 ```py
-await page.get_by_test_id('directions').click()
+await page.get_by_test_id("directions").click()
 ```
 
 </TabItem>
 </Tabs>
 
-By default, [page.get_by_test_id(test_id)](/api/class-page.mdx#page-get-by-test-id) will locate elements baed on the `data-testid` attribute, but you can configure it in your test config or calling [selectors.set_test_id_attribute(attribute_name)](/api/class-selectors.mdx#selectors-set-test-id-attribute).
-
-### Locate by label text with [page.get_by_label(text, **kwargs)](/api/class-page.mdx#page-get-by-label)
-
-Most form controls usually have dedicated labels that could be conveniently used to interact with the form. In this case, you can locate the control by its associated label.
-
-For example, consider the following DOM structure.
-
-```html
-<label for="password">Password:</label><input type="password">
-```
-
-You can fill the input after locating it by the label text:
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-page.get_by_label("Password").fill("secret")
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-await page.get_by_label("Password").fill("secret")
-```
-
-</TabItem>
-</Tabs>
+By default, [page.get_by_test_id(test_id)](/api/class-page.mdx#page-get-by-test-id) will locate elements based on the `data-testid` attribute, but you can configure it in your test config or calling [selectors.set_test_id_attribute(attribute_name)](/api/class-selectors.mdx#selectors-set-test-id-attribute).
 
 ### Locate in a subtree
 
@@ -507,14 +636,14 @@ Locators support an option to only select elements that have a descendant matchi
 <TabItem value="sync">
 
 ```py
-page.get_by_role("section"), has=page.get_by_test_id("subscribe-button"))
+page.get_by_role("section").filter(has=page.get_by_test_id("subscribe-button"))
 ```
 
 </TabItem>
 <TabItem value="async">
 
 ```py
-page.get_by_role("section"), has=page.get_by_test_id("subscribe-button"))
+page.get_by_role("section").filter(has=page.get_by_test_id("subscribe-button"))
 ```
 
 </TabItem>

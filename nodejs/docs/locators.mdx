@@ -7,9 +7,25 @@ import TabItem from '@theme/TabItem';
 
 [Locator]s are the central piece of Playwright's auto-waiting and retry-ability. In a nutshell, locators represent a way to find element(s) on the page at any moment.
 
+### Quick Guide
+
+These are the recommended built in locators.
+- [page.getByRole(role[, options])](/api/class-page.mdx#page-get-by-role) to locate by explicit and implicit accessibility attributes.
+- [page.getByText(text[, options])](/api/class-page.mdx#page-get-by-text) to locate by text content.
+- [page.getByLabel(text[, options])](/api/class-page.mdx#page-get-by-label) to locate a form control by associated label's text.
+- [page.getByPlaceholder(text[, options])](/api/class-page.mdx#page-get-by-placeholder) to locate an input by placeholder.
+- [page.getByAltText(text[, options])](/api/class-page.mdx#page-get-by-alt-text) to locate an element, usually image, by its text alternative.
+- [page.getByTitle(text[, options])](/api/class-page.mdx#page-get-by-title) to locate an element by its title.
+- [page.getByTestId(testId)](/api/class-page.mdx#page-get-by-test-id) to locate an element based on its `data-testid` attribute (other attribute can be configured).
+
 ```js
-const locator = page.getByText('Submit');
-await locator.click();
+await page.getByLabel('User Name').fill('John');
+
+await page.getByLabel('Password').fill('secret-password');
+
+await page.getByRole('button', { name: 'Sign in' }).click();
+
+await expect(page.getByText('Welcome, John!')).toBeVisible();
 ```
 
 Every time locator is used for some action, up-to-date DOM element is located in the page. So in the snippet below, underlying DOM element is going to be located twice, prior to every action. This means that if the DOM changes in between the calls due to re-render, the new element corresponding to the locator will be used.
@@ -54,9 +70,55 @@ const locator = page.frameLocator('#my-frame').getByText('Submit');
 await locator.click();
 ```
 
-### Locate by text using [page.getByText(text[, options])](/api/class-page.mdx#page-get-by-text)
+### Locate based on accessible attributes
 
-The easiest way to find an element is to look for the text it contains. You can match by a substring, exact string, or a regular expression.
+The [page.getByRole(role[, options])](/api/class-page.mdx#page-get-by-role) locator reflects how users and assistive technology perceive the page, for example whether some element is a button or a checkbox. When locating by role, you should usually pass the accessible name as well, so that locator pinpoints the exact element.
+
+```js
+await page.getByRole('button', { name: /submit/i }).click();
+
+await page.getByRole('checkbox', { checked: true, name: "Check me" }).check();
+```
+
+Role locators follow W3C specifications for [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name).
+
+Note that role locators **do not replace** accessibility audits and conformance tests, but rather give early feedback about the ARIA guidelines.
+
+### Locate by label text
+
+Most form controls usually have dedicated labels that could be conveniently used to interact with the form. In this case, you can locate the control by its associated label using [page.getByLabel(text[, options])](/api/class-page.mdx#page-get-by-label).
+
+For example, consider the following DOM structure.
+
+```html
+<label for="password">Password:</label><input type="password" id="password">
+```
+
+You can fill the input after locating it by the label text:
+
+```js
+await page.getByLabel('Password').fill('secret');
+```
+
+### Locate by placeholder text
+
+Inputs may have a placeholder attribute to hint to the user what value should be entered. You can locate such an input using [page.getByPlaceholder(text[, options])](/api/class-page.mdx#page-get-by-placeholder).
+
+For example, consider the following DOM structure.
+
+```html
+ <input id="email" name="email" type="email" placeholder="name@example.com">
+```
+
+You can fill the input after locating it by the placeholder text:
+
+```js
+await page.getByPlaceholder("name@example.com").fill("playwright@microsoft.com");
+```
+
+### Locate by text
+
+The easiest way to find an element is to look for the text it contains. You can match by a substring, exact string, or a regular expression when using [page.getByText(text[, options])](/api/class-page.mdx#page-get-by-text).
 
 ```js
 await page.getByText('Log in').click();
@@ -74,23 +136,41 @@ await page.getByTestId('product-item').filter({ hasText: 'Playwright Book' }).cl
 Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
 :::
 
-### Locate based on accessible attributes with [page.getByRole(role[, options])](/api/class-page.mdx#page-get-by-role)
+### Locate by alt text
 
-The [page.getByRole(role[, options])](/api/class-page.mdx#page-get-by-role) locator reflects how users and assistive technology percieve the page, for example whether some element is a button or a checkbox. When locating by role, you should usually pass the accessible name as well, so that locator pinpoints the exact element.
+All images should have an `alt` attribute that describes the image. You can locate an image based on the text alternative using [page.getByAltText(text[, options])](/api/class-page.mdx#page-get-by-alt-text).
 
-```js
-await page.getByRole('button', { name: /submit/i }).click();
+For example, consider the following DOM structure.
 
-await page.getByRole('checkbox', { checked: true, name: "Check me" }).check();
+```html
+<img alt="playwright logo" src="/playwright-logo.png" />
 ```
 
-Role locators follow W3C specificaitons for [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name).
+You can click on the image after locating it by the text alternative:
 
-Note that role locators **do not replace** accessibility audits and conformance tests, but rather give early feedback about the ARIA guidelines.
+```js
+await page.getByAltText('playwright logo').click();
+```
 
-### Define explicit contract and use [page.getByTestId(testId)](/api/class-page.mdx#page-get-by-test-id)
+### Locate by title
 
-User-facing attributes like text or accessible name can change over time. In this case it is convenient to define explicit test ids.
+Locate an element with a matching title attribute using [page.getByTitle(text[, options])](/api/class-page.mdx#page-get-by-title).
+
+For example, consider the following DOM structure.
+
+```html
+<span title='Issues count'>25 issues</span>
+```
+
+You can check the issues count after locating it by the title text:
+
+```js
+await expect(page.getByTitle('Issues count')).toHaveText('25 issues');
+```
+
+### Define explicit contract and use a data-testid attribute
+
+User-facing attributes like text or accessible name can change over time. In this case it is convenient to define explicit test ids and query them with [page.getByTestId(testId)](/api/class-page.mdx#page-get-by-test-id).
 
 ```html
 <button data-testid="directions">Itinéraire</button>
@@ -100,23 +180,7 @@ User-facing attributes like text or accessible name can change over time. In thi
 await page.getByTestId('directions').click();
 ```
 
-By default, [page.getByTestId(testId)](/api/class-page.mdx#page-get-by-test-id) will locate elements baed on the `data-testid` attribute, but you can configure it in your test config or calling [selectors.setTestIdAttribute(attributeName)](/api/class-selectors.mdx#selectors-set-test-id-attribute).
-
-### Locate by label text with [page.getByLabel(text[, options])](/api/class-page.mdx#page-get-by-label)
-
-Most form controls usually have dedicated labels that could be conveniently used to interact with the form. In this case, you can locate the control by its associated label.
-
-For example, consider the following DOM structure.
-
-```html
-<label for="password">Password:</label><input type="password">
-```
-
-You can fill the input after locating it by the label text:
-
-```js
-await page.getByLabel('Password').fill('secret');
-```
+By default, [page.getByTestId(testId)](/api/class-page.mdx#page-get-by-test-id) will locate elements based on the `data-testid` attribute, but you can configure it in your test config or calling [selectors.setTestIdAttribute(attributeName)](/api/class-selectors.mdx#selectors-set-test-id-attribute).
 
 ### Locate in a subtree
 

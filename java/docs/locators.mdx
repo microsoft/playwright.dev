@@ -7,9 +7,25 @@ import TabItem from '@theme/TabItem';
 
 [Locator]s are the central piece of Playwright's auto-waiting and retry-ability. In a nutshell, locators represent a way to find element(s) on the page at any moment.
 
+### Quick Guide
+
+These are the recommended built in locators.
+- [Page.getByRole(role[, options])](/api/class-page.mdx#page-get-by-role) to locate by explicit and implicit accessibility attributes.
+- [Page.getByText(text[, options])](/api/class-page.mdx#page-get-by-text) to locate by text content.
+- [Page.getByLabel(text[, options])](/api/class-page.mdx#page-get-by-label) to locate a form control by associated label's text.
+- [Page.getByPlaceholder(text[, options])](/api/class-page.mdx#page-get-by-placeholder) to locate an input by placeholder.
+- [Page.getByAltText(text[, options])](/api/class-page.mdx#page-get-by-alt-text) to locate an element, usually image, by its text alternative.
+- [Page.getByTitle(text[, options])](/api/class-page.mdx#page-get-by-title) to locate an element by its title.
+- [Page.getByTestId(testId)](/api/class-page.mdx#page-get-by-test-id) to locate an element based on its `data-testid` attribute (other attribute can be configured).
+
 ```java
-Locator locator = page.getByText("Submit");
-locator.click();
+page.getByLabel("User Name").fill("John");
+
+page.getByLabel("Password").fill("secret-password");
+
+page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Sign in")).click();
+
+assertThat(page.getByText("Welcome, John!")).isVisible();
 ```
 
 Every time locator is used for some action, up-to-date DOM element is located in the page. So in the snippet below, underlying DOM element is going to be located twice, prior to every action. This means that if the DOM changes in between the calls due to re-render, the new element corresponding to the locator will be used.
@@ -53,9 +69,55 @@ Locator locator = page.frameLocator("#my-frame").getByText("Submit");
 locator.click();
 ```
 
-### Locate by text using [Page.getByText(text[, options])](/api/class-page.mdx#page-get-by-text)
+### Locate based on accessible attributes
 
-The easiest way to find an element is to look for the text it contains. You can match by a substring, exact string, or a regular expression.
+The [Page.getByRole(role[, options])](/api/class-page.mdx#page-get-by-role) locator reflects how users and assistive technology perceive the page, for example whether some element is a button or a checkbox. When locating by role, you should usually pass the accessible name as well, so that locator pinpoints the exact element.
+
+```java
+page.getByRole("button", new Page.GetByRoleOptions().setName(Pattern.compile("submit", Pattern.CASE_INSENSITIVE))).click();
+
+page.getByRole("checkbox", new Page.GetByRoleOptions().setChecked(true).setName("Check me"))).check();
+```
+
+Role locators follow W3C specifications for [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name).
+
+Note that role locators **do not replace** accessibility audits and conformance tests, but rather give early feedback about the ARIA guidelines.
+
+### Locate by label text
+
+Most form controls usually have dedicated labels that could be conveniently used to interact with the form. In this case, you can locate the control by its associated label using [Page.getByLabel(text[, options])](/api/class-page.mdx#page-get-by-label).
+
+For example, consider the following DOM structure.
+
+```html
+<label for="password">Password:</label><input type="password" id="password">
+```
+
+You can fill the input after locating it by the label text:
+
+```java
+page.getByLabel("Password").fill("secret");
+```
+
+### Locate by placeholder text
+
+Inputs may have a placeholder attribute to hint to the user what value should be entered. You can locate such an input using [Page.getByPlaceholder(text[, options])](/api/class-page.mdx#page-get-by-placeholder).
+
+For example, consider the following DOM structure.
+
+```html
+ <input id="email" name="email" type="email" placeholder="name@example.com">
+```
+
+You can fill the input after locating it by the placeholder text:
+
+```java
+page.getByPlaceholder("name@example.com").fill("playwright@microsoft.com");
+```
+
+### Locate by text
+
+The easiest way to find an element is to look for the text it contains. You can match by a substring, exact string, or a regular expression when using [Page.getByText(text[, options])](/api/class-page.mdx#page-get-by-text).
 
 ```java
 page.getByText("Log in").click();
@@ -73,23 +135,41 @@ page.getByTestId("product-item").filter(new Locator.FilterOptions().setHasText("
 Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
 :::
 
-### Locate based on accessible attributes with [Page.getByRole(role[, options])](/api/class-page.mdx#page-get-by-role)
+### Locate by alt text
 
-The [Page.getByRole(role[, options])](/api/class-page.mdx#page-get-by-role) locator reflects how users and assistive technology percieve the page, for example whether some element is a button or a checkbox. When locating by role, you should usually pass the accessible name as well, so that locator pinpoints the exact element.
+All images should have an `alt` attribute that describes the image. You can locate an image based on the text alternative using [Page.getByAltText(text[, options])](/api/class-page.mdx#page-get-by-alt-text).
 
-```java
-page.getByRole("button", new Page.GetByRoleOptions().setName(Pattern.compile("submit", Pattern.CASE_INSENSITIVE))).click();
+For example, consider the following DOM structure.
 
-page.getByRole("checkbox", new Page.GetByRoleOptions().setChecked(true).setName("Check me"))).check();
+```html
+<img alt="playwright logo" src="/playwright-logo.png" />
 ```
 
-Role locators follow W3C specificaitons for [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name).
+You can click on the image after locating it by the text alternative:
 
-Note that role locators **do not replace** accessibility audits and conformance tests, but rather give early feedback about the ARIA guidelines.
+```java
+page.getByAltText("playwright logo").click();
+```
 
-### Define explicit contract and use [Page.getByTestId(testId)](/api/class-page.mdx#page-get-by-test-id)
+### Locate by title
 
-User-facing attributes like text or accessible name can change over time. In this case it is convenient to define explicit test ids.
+Locate an element with a matching title attribute using [Page.getByTitle(text[, options])](/api/class-page.mdx#page-get-by-title).
+
+For example, consider the following DOM structure.
+
+```html
+<span title='Issues count'>25 issues</span>
+```
+
+You can check the issues count after locating it by the title text:
+
+```java
+assertThat(page.getByTitle("Issues count")).hasText("25 issues");
+```
+
+### Define explicit contract and use a data-testid attribute
+
+User-facing attributes like text or accessible name can change over time. In this case it is convenient to define explicit test ids and query them with [Page.getByTestId(testId)](/api/class-page.mdx#page-get-by-test-id).
 
 ```html
 <button data-testid="directions">Itinéraire</button>
@@ -99,23 +179,7 @@ User-facing attributes like text or accessible name can change over time. In thi
 page.getByTestId("directions").click();
 ```
 
-By default, [Page.getByTestId(testId)](/api/class-page.mdx#page-get-by-test-id) will locate elements baed on the `data-testid` attribute, but you can configure it in your test config or calling [Selectors.setTestIdAttribute(attributeName)](/api/class-selectors.mdx#selectors-set-test-id-attribute).
-
-### Locate by label text with [Page.getByLabel(text[, options])](/api/class-page.mdx#page-get-by-label)
-
-Most form controls usually have dedicated labels that could be conveniently used to interact with the form. In this case, you can locate the control by its associated label.
-
-For example, consider the following DOM structure.
-
-```html
-<label for="password">Password:</label><input type="password">
-```
-
-You can fill the input after locating it by the label text:
-
-```java
-page.getByLabel("Password").fill("secret");
-```
+By default, [Page.getByTestId(testId)](/api/class-page.mdx#page-get-by-test-id) will locate elements based on the `data-testid` attribute, but you can configure it in your test config or calling [Selectors.setTestIdAttribute(attributeName)](/api/class-selectors.mdx#selectors-set-test-id-attribute).
 
 ### Locate in a subtree
 
