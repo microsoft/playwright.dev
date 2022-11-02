@@ -89,14 +89,14 @@ class Generator {
     this.documentation.filterForLanguage(lang);
     this.documentation.filterOutExperimental();
     this.documentation.setLinkRenderer(item => {
-      const { clazz, member, param, option } = item;
+      const { clazz, member, param, option, href } = item;
       if (param)
         return `\`${formatter.formatArgumentName(param)}\``;
       if (option)
         return `\`${formatter.formatArgumentName(option)}\``;
       if (clazz)
-        return `[${clazz.name}]`;
-      return this.createMemberLink(member)[0];
+        return href ? `[${clazz.name}](${href})` : `[${clazz.name}]`;
+      return this.createMemberLink(member, href)[0];
     });
 
     this.generatedLinksSuffix = '';
@@ -375,20 +375,25 @@ import TabItem from '@theme/TabItem';`);
   /**
    * @param {string} file
    * @param {string} text
+   * @param {string} hash
+   * @param {string | undefined} href
    */
-  createLink(file, text, hash) {
+  createLink(file, text, hash, href) {
+    if (href)
+      return `[${text}](${href})`;
     return `[${text}](${file}#${hash})`;
   }
 
   /**
    * @param {Documentation.Member} member
+   * @param {string|undefined} href
    * @return {string[]}
    */
-  createMemberLink(member) {
+  createMemberLink(member, href) {
     const file = apiClassLink(member.clazz);
-    const hash = calculateHeadingHash(member)
-    this.heading2ExplicitId.set(member, hash)
-    return this.formatter.formatMember(member).map(f => this.createLink(file, f.text, hash));
+    const hash = calculateHeadingHash(member);
+    this.heading2ExplicitId.set(member, hash);
+    return this.formatter.formatMember(member).map(f => this.createLink(file, f.text, hash, href));
   }
 
   /**
@@ -618,8 +623,8 @@ function calculatePropertyHash(member, direction) {
 const fileWriteCache = new Map();
 
 /**
- * @param {string} file 
- * @param {string} content 
+ * @param {string} file
+ * @param {string} content
  * @returns {undefined}
  */
 function writeFileSyncCached(file, content) {
