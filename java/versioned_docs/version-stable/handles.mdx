@@ -87,6 +87,31 @@ Handles can be acquired using the page methods such as [Page.evaluateHandle(expr
 - [Page.querySelector(selector[, options])](/api/class-page.mdx#page-query-selector)
 - [Page.querySelectorAll(selector)](/api/class-page.mdx#page-query-selector-all)
 
+## Locator vs ElementHandle
+
+:::caution
+We only recommend using [ElementHandle] in the rare cases when you need to perform extensive DOM traversal on a static page. For all user actions and assertions use locator instead.
+:::
+
+The difference between the [Locator] and [ElementHandle] is that the latter points to a particular element, while Locator captures the logic of how to retrieve that element.
+
+In the example below, handle points to a particular DOM element on page. If that element changes text or is used by React to render an entirely different component, handle is still pointing to that very stale DOM element. This can lead to unexpected behaviors.
+
+```java
+ElementHandle handle = page.querySelector("text=Submit");
+handle.hover();
+handle.click();
+```
+
+With the locator, every time the locator is used, up-to-date DOM element is located in the page using the selector. So in the snippet below, underlying DOM element is going to be located twice.
+
+```java
+Locator locator = page.getByText("Submit");
+locator.hover();
+locator.click();
+```
+
+
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"

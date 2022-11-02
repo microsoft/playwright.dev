@@ -494,7 +494,7 @@ Returns element attribute value.
 
 - `text`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-alt-text-option-text"/> &#60;[String]|[Pattern]&#62; Text to locate the element for.<a href="#frame-get-by-alt-text-option-text" class="list-anchor">#</a>
 - `options` &#60;`Frame.GetByAltTextOptions`&#62;
-  - `setExact`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-alt-text-option-exact"/> &#60;[boolean]&#62; Whether to find an exact match: case-sensitive and whole-string. Default to false. Ignored when locating by a regular expression.<a href="#frame-get-by-alt-text-option-exact" class="list-anchor">#</a>
+  - `setExact`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-alt-text-option-exact"/> &#60;[boolean]&#62; Whether to find an exact match: case-sensitive and whole-string. Default to false. Ignored when locating by a regular expression. Note that exact match still trims whitespace.<a href="#frame-get-by-alt-text-option-exact" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-alt-text-return"/> &#60;[Locator]&#62;<a href="#frame-get-by-alt-text-return" class="list-anchor">#</a>
 
 Allows locating elements by their alt text. For example, this method will find the image by alt text "Castle":
@@ -509,7 +509,7 @@ Allows locating elements by their alt text. For example, this method will find t
 
 - `text`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-label-option-text"/> &#60;[String]|[Pattern]&#62; Text to locate the element for.<a href="#frame-get-by-label-option-text" class="list-anchor">#</a>
 - `options` &#60;`Frame.GetByLabelOptions`&#62;
-  - `setExact`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-label-option-exact"/> &#60;[boolean]&#62; Whether to find an exact match: case-sensitive and whole-string. Default to false. Ignored when locating by a regular expression.<a href="#frame-get-by-label-option-exact" class="list-anchor">#</a>
+  - `setExact`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-label-option-exact"/> &#60;[boolean]&#62; Whether to find an exact match: case-sensitive and whole-string. Default to false. Ignored when locating by a regular expression. Note that exact match still trims whitespace.<a href="#frame-get-by-label-option-exact" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-label-return"/> &#60;[Locator]&#62;<a href="#frame-get-by-label-return" class="list-anchor">#</a>
 
 Allows locating input elements by the text of the associated label. For example, this method will find the input by label text Password in the following DOM:
@@ -525,7 +525,7 @@ Allows locating input elements by the text of the associated label. For example,
 
 - `text`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-placeholder-option-text"/> &#60;[String]|[Pattern]&#62; Text to locate the element for.<a href="#frame-get-by-placeholder-option-text" class="list-anchor">#</a>
 - `options` &#60;`Frame.GetByPlaceholderOptions`&#62;
-  - `setExact`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-placeholder-option-exact"/> &#60;[boolean]&#62; Whether to find an exact match: case-sensitive and whole-string. Default to false. Ignored when locating by a regular expression.<a href="#frame-get-by-placeholder-option-exact" class="list-anchor">#</a>
+  - `setExact`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-placeholder-option-exact"/> &#60;[boolean]&#62; Whether to find an exact match: case-sensitive and whole-string. Default to false. Ignored when locating by a regular expression. Note that exact match still trims whitespace.<a href="#frame-get-by-placeholder-option-exact" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-placeholder-return"/> &#60;[Locator]&#62;<a href="#frame-get-by-placeholder-return" class="list-anchor">#</a>
 
 Allows locating input elements by the placeholder text. For example, this method will find the input by placeholder "Country":
@@ -588,10 +588,44 @@ Locate element by the test id. By default, the `data-testid` attribute is used a
 
 - `text`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-text-option-text"/> &#60;[String]|[Pattern]&#62; Text to locate the element for.<a href="#frame-get-by-text-option-text" class="list-anchor">#</a>
 - `options` &#60;`Frame.GetByTextOptions`&#62;
-  - `setExact`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-text-option-exact"/> &#60;[boolean]&#62; Whether to find an exact match: case-sensitive and whole-string. Default to false. Ignored when locating by a regular expression.<a href="#frame-get-by-text-option-exact" class="list-anchor">#</a>
+  - `setExact`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-text-option-exact"/> &#60;[boolean]&#62; Whether to find an exact match: case-sensitive and whole-string. Default to false. Ignored when locating by a regular expression. Note that exact match still trims whitespace.<a href="#frame-get-by-text-option-exact" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-text-return"/> &#60;[Locator]&#62;<a href="#frame-get-by-text-return" class="list-anchor">#</a>
 
-Allows locating elements that contain given text.
+Allows locating elements that contain given text. Consider the following DOM structure:
+
+```html
+<div>Hello <span>world</span></div>
+<div>Hello</div>
+```
+
+You can locate by text substring, exact string, or a regular expression:
+
+```java
+// Matches <span>
+page.getByText("world")
+
+// Matches first <div>
+page.getByText("Hello world")
+
+// Matches second <div>
+page.getByText("Hello", new Page.GetByTextOptions().setExact(true))
+
+// Matches both <div>s
+page.getByText(Pattern.compile("Hello"))
+
+// Matches second <div>
+page.getByText(Pattern.compile("^hello$", Pattern.CASE_INSENSITIVE))
+```
+
+See also [Locator.filter([options])](/api/class-locator.mdx#locator-filter) that allows to match by another criteria, like an accessible role, and then filter by the text content.
+
+:::note
+Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
+:::
+
+:::note
+Input elements of the type `button` and `submit` are matched by their `value` instead of the text content. For example, locating by text `"Log in"` matches `<input type=button value="Log in">`.
+:::
 
 ## Frame.getByTitle(text[, options]) {#frame-get-by-title}
 
@@ -599,7 +633,7 @@ Allows locating elements that contain given text.
 
 - `text`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-title-option-text"/> &#60;[String]|[Pattern]&#62; Text to locate the element for.<a href="#frame-get-by-title-option-text" class="list-anchor">#</a>
 - `options` &#60;`Frame.GetByTitleOptions`&#62;
-  - `setExact`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-title-option-exact"/> &#60;[boolean]&#62; Whether to find an exact match: case-sensitive and whole-string. Default to false. Ignored when locating by a regular expression.<a href="#frame-get-by-title-option-exact" class="list-anchor">#</a>
+  - `setExact`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-title-option-exact"/> &#60;[boolean]&#62; Whether to find an exact match: case-sensitive and whole-string. Default to false. Ignored when locating by a regular expression. Note that exact match still trims whitespace.<a href="#frame-get-by-title-option-exact" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-title-return"/> &#60;[Locator]&#62;<a href="#frame-get-by-title-return" class="list-anchor">#</a>
 
 Allows locating elements by their title. For example, this method will find the button by its title "Submit":
