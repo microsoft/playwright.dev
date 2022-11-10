@@ -88,7 +88,7 @@ async function syncWithWorkingDirectory (event, from) {
 
 })().catch(error => {
   console.error(error);
-  process.exit(error);
+  process.exit(1);
 });
 
 async function updateStarsButton() {
