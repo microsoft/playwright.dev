@@ -10,13 +10,13 @@ import TabItem from '@theme/TabItem';
 ### Quick Guide
 
 These are the recommended built in locators.
-- [Page.getByRole(role[, options])](#locate-based-on-accessible-attributes) to locate by explicit and implicit accessibility attributes.
+- [Page.getByRole(role[, options])](#locate-by-role) to locate by explicit and implicit accessibility attributes.
 - [Page.getByText(text[, options])](#locate-by-text) to locate by text content.
-- [Page.getByLabel(text[, options])](#locate-by-label-text) to locate a form control by associated label's text.
-- [Page.getByPlaceholder(text[, options])](#locate-by-placeholder-text) to locate an input by placeholder.
+- [Page.getByLabel(text[, options])](#locate-by-label) to locate a form control by associated label's text.
+- [Page.getByPlaceholder(text[, options])](#locate-by-placeholder) to locate an input by placeholder.
 - [Page.getByAltText(text[, options])](#locate-by-alt-text) to locate an element, usually image, by its text alternative.
-- [Page.getByTitle(text[, options])](#locate-by-title) to locate an element by its title.
-- [Page.getByTestId(testId)](#define-explicit-contract-and-use-a-data-testid-attribute) to locate an element based on its `data-testid` attribute (other attribute can be configured).
+- [Page.getByTitle(text[, options])](#locate-by-title) to locate an element by its title attribute.
+- [Page.getByTestId(testId)](#locate-by-testid) to locate an element based on its `data-testid` attribute (other attributes can be configured).
 
 ```java
 page.getByLabel("User Name").fill("John");
@@ -28,70 +28,97 @@ page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Sign in")).
 assertThat(page.getByText("Welcome, John!")).isVisible();
 ```
 
-Every time locator is used for some action, up-to-date DOM element is located in the page. So in the snippet below, underlying DOM element is going to be located twice, prior to every action. This means that if the DOM changes in between the calls due to re-render, the new element corresponding to the locator will be used.
+## Locating elements
+
+Playwright comes with multiple built-in locators. To make tests resilient, we recommend prioritizing user-facing attributes and explicit contracts such as [Page.getByRole(role[, options])](/api/class-page.mdx#page-get-by-role). 
+
+For example, consider the following DOM structure.
+
+```html
+<button>Sign in</button>
+```
+
+Locate the element by its role of `button` with name "Sign in".
 
 ```java
-Locator locator = page.getByText("Submit");
+page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Sign in"))
+    .click();
+```
+
+:::tip
+Use the [code generator](./codegen.mdx) to generate a locator, and then edit it as you'd like.
+:::
+
+Every time a locator is used for an action, an up-to-date DOM element is located in the page. In the snippet below, the underlying DOM element will be located twice, once prior to every action. This means that if the DOM changes in between the calls due to re-render, the new element corresponding to the locator will be used.
+
+```java
+Locator locator = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Sign in"))
+
 locator.hover();
 locator.click();
 ```
 
-## Strictness
-
-Locators are strict. This means that all operations on locators that imply some target DOM element will throw an exception if more than one element matches given selector. For example, the following call throws if there are several buttons in the DOM:
-
-```java
-page.getByRole("button").click();
-```
-
-On the other hand, Playwright understands when you perform a multiple-element operation, so the following call works perfectly fine when locator resolves to multiple elements.
-
-```java
-page.getByRole("button").count();
-```
-
-You can explicitly opt-out from strictness check by telling Playwright which element to use when multiple element match, through [Locator.first()](/api/class-locator.mdx#locator-first), [Locator.last()](/api/class-locator.mdx#locator-last), and [Locator.nth(index)](/api/class-locator.mdx#locator-nth). These methods are **not recommended** because when your page changes, Playwright may click on an element you did not intend. Instead, follow best practices below to create a locator that uniquely identifies the target element.
-
-## Locating elements
-
-Playwright comes with multiple built-in ways to create a locator. To make tests resilient, we recommend prioritizing user-facing attributes and explicit contracts, and provide dedicated methods for them, such as [Page.getByText(text[, options])](/api/class-page.mdx#page-get-by-text). It is often convenient to use the [code generator](./codegen.mdx) to generate a locator, and then edit it as you'd like.
-
-```java
-page.getByText("Log in").click();
-```
-
-If you absolutely must use CSS or XPath locators, you can use [Page.locator(selector[, options])](/api/class-page.mdx#page-locator) to create a locator that takes a [selector](./selectors.mdx) describing how to find an element in the page.
-
 Note that all methods that create a locator, such as [Page.getByLabel(text[, options])](/api/class-page.mdx#page-get-by-label), are also available on the [Locator] and [FrameLocator] classes, so you can chain them and iteratively narrow down your locator.
 
 ```java
-Locator locator = page.frameLocator("#my-frame").getByText("Submit");
+Locator locator = page.frameLocator("#my-frame")
+    .getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Sign in"));
+
 locator.click();
 ```
 
-### Locate based on accessible attributes
+### Locate by role
 
-The [Page.getByRole(role[, options])](/api/class-page.mdx#page-get-by-role) locator reflects how users and assistive technology perceive the page, for example whether some element is a button or a checkbox. When locating by role, you should usually pass the accessible name as well, so that locator pinpoints the exact element.
+The [Page.getByRole(role[, options])](/api/class-page.mdx#page-get-by-role) locator reflects how users and assistive technology perceive the page, for example whether some element is a button or a checkbox. When locating by role, you should usually pass the accessible name as well, so that the locator pinpoints the exact element.
 
-```java
-page.getByRole("button", new Page.GetByRoleOptions().setName(Pattern.compile("submit", Pattern.CASE_INSENSITIVE))).click();
+For example, consider the following DOM structure.
 
-page.getByRole("checkbox", new Page.GetByRoleOptions().setChecked(true).setName("Check me"))).check();
+```html
+<h1>my form<h1>
+<form>
+<label for="newsletter">newsletter</label>
+<input type="checkbox" checked id="newsletter">
+<button>Submit</button>
+<form>
 ```
 
-Role locators follow W3C specifications for [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name).
+<img width="247" alt="form with newsletter checkbox that is checked and a submit button" src="https://user-images.githubusercontent.com/13063165/201355711-20f1f45d-81b5-42b1-8932-397c935cedd8.png" />
+
+You can locate each element by it's implicit role:
+
+```java
+assertThat(page.getByRole("heading", new Page.GetByRoleOptions().setName("my form")))
+    .isVisible();
+
+page.getByRole("checkbox", new Page.GetByRoleOptions().setChecked(true).setName("newsletter"))
+    .uncheck();
+
+page.getByRole("button", new Page.GetByRoleOptions().setName(Pattern.compile("submit", Pattern.CASE_INSENSITIVE)))
+    .click();
+```
+
+<img width="239" alt="form with newsletter checkbox unchecked and submit button highlighted" src="https://user-images.githubusercontent.com/13063165/201134851-f707a433-1e10-4b83-b648-c19df2a04de0.png" />
+
+Role locators include [buttons, checkboxes, headings, links, lists, tables, and many more](https://www.w3.org/TR/html-aria/#docconformance) and follow W3C specifications for [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name).
 
 Note that role locators **do not replace** accessibility audits and conformance tests, but rather give early feedback about the ARIA guidelines.
 
-### Locate by label text
+:::tip When to use role locators
+We recommend prioritizing role locators to locate elements, as it is the closest way to how users and assistive technology perceive the page.
+:::
+
+### Locate by label
 
 Most form controls usually have dedicated labels that could be conveniently used to interact with the form. In this case, you can locate the control by its associated label using [Page.getByLabel(text[, options])](/api/class-page.mdx#page-get-by-label).
 
 For example, consider the following DOM structure.
 
 ```html
-<label for="password">Password:</label><input type="password" id="password">
+<label for="password">Password</label>
+<input type="password" id="password">
 ```
+
+<img width="220" alt="password input with label of password" src="https://user-images.githubusercontent.com/13063165/201115785-f996ede8-01ae-4aa6-bd76-a60600efa125.png" />
 
 You can fill the input after locating it by the label text:
 
@@ -99,7 +126,13 @@ You can fill the input after locating it by the label text:
 page.getByLabel("Password").fill("secret");
 ```
 
-### Locate by placeholder text
+<img width="225" alt="password input with label and password filled in with encryption" src="https://user-images.githubusercontent.com/13063165/201113928-3b383887-433c-4b2c-9516-6c17d87d1eb2.png" />
+
+:::tip When to use label locators
+Use this locator when locating form fields.
+:::
+
+### Locate by placeholder
 
 Inputs may have a placeholder attribute to hint to the user what value should be entered. You can locate such an input using [Page.getByPlaceholder(text[, options])](/api/class-page.mdx#page-get-by-placeholder).
 
@@ -109,31 +142,62 @@ For example, consider the following DOM structure.
  <input id="email" name="email" type="email" placeholder="name@example.com">
 ```
 
+<img width="155" alt="input field filled in with name@example.com" src="https://user-images.githubusercontent.com/13063165/201114537-597b157f-68f3-473e-8802-4c099d1d6e93.png" />
+
 You can fill the input after locating it by the placeholder text:
 
 ```java
-page.getByPlaceholder("name@example.com").fill("playwright@microsoft.com");
+page.getByPlaceholder("name@example.com")
+    .fill("playwright@microsoft.com");
 ```
+
+<img width="155" alt="input field filled in with playwright@microsoft.com" src="https://user-images.githubusercontent.com/13063165/201114985-c5bb9709-3680-4137-a3d9-e272056ca79e.png" />
+
+:::tip When to use placeholder locators
+Use this locator when locating form elements that do not have labels but do have placeholder texts.
+:::
 
 ### Locate by text
 
-The easiest way to find an element is to look for the text it contains. You can match by a substring, exact string, or a regular expression when using [Page.getByText(text[, options])](/api/class-page.mdx#page-get-by-text).
+Find an element by the text it contains. You can match by a substring, exact string, or a regular expression when using [Page.getByText(text[, options])](/api/class-page.mdx#page-get-by-text).
 
-```java
-page.getByText("Log in").click();
-page.getByText("Log in", new Page.GetByTextOptions().setExact(true)).click();
-page.getByText(Pattern.compile("log in$", Pattern.CASE_INSENSITIVE)).click();
+For example, consider the following DOM structure.
+
+```html
+<span>Welcome, John</span>
 ```
 
-You can also [filter by text](#filter-by-text) when locating in some other way, for example find a particular item in the list.
+<img width="218" alt="Welcome, John" src="https://user-images.githubusercontent.com/13063165/201122791-10ee8cba-871c-4fb6-a925-ce42c8500f04.png" />
+
+You can locate the element by the text it contains:
 
 ```java
-page.getByTestId("product-item").filter(new Locator.FilterOptions().setHasText("Playwright Book")).click();
+assertThat(page.getByText("Welcome, John"))
+    .isVisible();
+```
+
+Set an exact match:
+
+```java
+assertThat(page.getByText("Welcome, John", new Page.GetByTextOptions().setExact(true)))
+    .isVisible();
+```
+
+Match with a regular expression:
+
+```java
+assertThat(page.getByText(Pattern.compile("welcome, john$", Pattern.CASE_INSENSITIVE))).isVisible();
 ```
 
 :::note
 Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
 :::
+
+:::tip When to use text locators
+We recommend using text locators to find non interactive elements like `div`, `span`, `p`, etc. For interactive elements like `button`, `a`, `input`, etc. use [role locators](#locate-by-role).
+:::
+
+You can also [filter by text](#filter-by-text) which can be useful when trying to find a particular item in a list.
 
 ### Locate by alt text
 
@@ -145,11 +209,20 @@ For example, consider the following DOM structure.
 <img alt="playwright logo" src="/playwright-logo.png" />
 ```
 
+<img width="48" alt="playwright logo" src="https://user-images.githubusercontent.com/13063165/201125864-dad707d2-efbc-4fd8-ab2e-8f41e3b24416.png" />
+
 You can click on the image after locating it by the text alternative:
 
 ```java
-page.getByAltText("playwright logo").click();
+page.getByAltText("playwright logo")
+    .click();
 ```
+
+<img width="49" alt="playwright logo being clicked" src="https://user-images.githubusercontent.com/13063165/201134010-4b7af9fc-cfaf-42b5-b968-79b2e1921b57.png" />
+
+:::tip When to use alt locators
+Use this locator when your element supports alt text such as `img` and `area` elements.
+:::
 
 ### Locate by title
 
@@ -161,54 +234,70 @@ For example, consider the following DOM structure.
 <span title='Issues count'>25 issues</span>
 ```
 
+<img width="67" alt="25 issues" src="https://user-images.githubusercontent.com/13063165/201129562-2c2cb7f2-4072-4dfe-8286-e7d3a036e965.png" />
+
 You can check the issues count after locating it by the title text:
 
 ```java
-assertThat(page.getByTitle("Issues count")).hasText("25 issues");
+assertThat(page.getByTitle("Issues count"))
+    .hasText("25 issues");
 ```
 
-### Define explicit contract and use a data-testid attribute
+:::tip When to use title locators
+Use this locator when your element has the `title` attribute.
+:::
 
-User-facing attributes like text or accessible name can change over time. In this case it is convenient to define explicit test ids and query them with [Page.getByTestId(testId)](/api/class-page.mdx#page-get-by-test-id).
+### Locate by test id
+
+Testing by test ids is the most resilient way of testing as even if your text or role of the attribute changes the test will still pass. QA's and developers should define explicit test ids and query them with [Page.getByTestId(testId)](/api/class-page.mdx#page-get-by-test-id). However testing by test ids is not user facing. If the role or text value is important to you then consider using user facing locators such as [role](#locate-by-role) and [text locators](#locate-by-text).
+
+For example, consider the following DOM structure.
 
 ```html
 <button data-testid="directions">Itinéraire</button>
 ```
 
+<img width="74" alt="Screenshot 2022-11-10 at 16 07 47" src="https://user-images.githubusercontent.com/13063165/201131385-5e18c551-625c-4153-9808-e2666b90b152.png" />
+
+You can locate the element by it's test id:
+
 ```java
-page.getByTestId("directions").click();
+page.getByTestId("directions")
+    .click();
 ```
 
-By default, [Page.getByTestId(testId)](/api/class-page.mdx#page-get-by-test-id) will locate elements based on the `data-testid` attribute, but you can configure it in your test config or calling [Selectors.setTestIdAttribute(attributeName)](/api/class-selectors.mdx#selectors-set-test-id-attribute).
+<img width="72" alt="button with Itinéraire text showing click action" src="https://user-images.githubusercontent.com/13063165/201133588-789926c6-9de3-4866-abd9-8d0a7e3fa95d.png" />
 
-### Locate in a subtree
+:::tip When to use testid locators
+You can also use test ids when you choose to use the test id methodology or when you can't locate by [role](#locate-by-role) or [text](#locate-by-text).
+:::
 
-You can chain methods that create a locator, like [Page.getByText(text[, options])](/api/class-page.mdx#page-get-by-text) or [Locator.getByRole(role[, options])](/api/class-locator.mdx#locator-get-by-role), to narrow down the search to a particular part of the page.
+#### Set a custom test id attribute
 
-For example, consider the following DOM structure:
+By default, [Page.getByTestId(testId)](/api/class-page.mdx#page-get-by-test-id) will locate elements based on the `data-testid` attribute, but you can configure it in your test config or by calling [Selectors.setTestIdAttribute(attributeName)](/api/class-selectors.mdx#selectors-set-test-id-attribute).
+
+Set the test id to use a custom data attribute for your tests.
+
+```java
+playwright.selectors().setTestIdAttribute("data-pw");
+```
+
+In your html you can now use `data-pw` as your test id instead of the default `data-testid`. 
 
 ```html
-<div data-testid='product-card'>
-  <span>Product 1</span>
-  <button>Buy</button>
-</div>
-<div data-testid='product-card'>
-  <span>Product 2</span>
-  <button>Buy</button>
-</div>
+<button data-pw="directions">Itinéraire</button>
 ```
 
-For example, we can first find a product card that contains text "Product 2", and then click the button in this specific product card.
+And then locate the element as you would normally do:
 
 ```java
-Locator product = page.getByTestId("product-card").filter(new Locator.FilterOptions().setHasText("Product 2"));
-
-product.get_by_text("Buy").click();
+page.getByTestId("directions")
+    .click();
 ```
 
-### Locate by CSS or XPath selector
+### Locate by CSS or XPath
 
-Playwright supports CSS and XPath selectors, and auto-detects them if you omit `css=` or `xpath=` prefix. Use [Page.locator(selector[, options])](/api/class-page.mdx#page-locator) for this:
+If you absolutely must use CSS or XPath locators, you can use [Page.locator(selector[, options])](/api/class-page.mdx#page-locator) to create a locator that takes a [selector](./selectors.mdx) describing how to find an element in the page. Playwright supports CSS and XPath selectors, and auto-detects them if you omit `css=` or `xpath=` prefix.
 
 ```java
 page.locator("css=button").click();
@@ -226,45 +315,11 @@ page.locator("#tsf > div:nth-child(2) > div.A8SBwf > div.RNNXgb > div > div.a4bI
 page.locator("//*[@id='tsf']/div[2]/div[1]/div[1]/div/div[2]/input").click();
 ```
 
-Instead, try to come up with a locator that is close to how user perceives the page or [define an explicit testing contract](#define-explicit-contract-and-use-pagegetbytestidtestid).
+:::tip When to use this
+CSS and XPath are not recommended as the DOM can often change leading to non resilient tests. Instead, try to come up with a locator that is close to how the user perceives the page such as [role locators](#locate-by-role) or [define an explicit testing contract](#locate-by-testid) using test ids.
+:::
 
-### Locate elements that contain other elements
-
-#### Filter by text
-
-Locator can be optionally filtered by text. It will search for a particular string somewhere inside the element, possibly in a descendant element, case-insensitively. You can also pass a regular expression.
-
-```java
-page.getByTestId("product-card").filter(new Locator.FilterOptions().setHasText("Product 3")).click();
-page.getByTestId("product-card").filter(new Locator.FilterOptions().setHasText(Pattern.compile("Product 3"))).click();
-```
-
-#### Filter by another locator
-
-Locators support an option to only select elements that have a descendant matching another locator.
-
-```java
-page.getByRole("section").filter(new Locator.FilterOptions().setHas(page.getByTestId("subscribe-button")))
-```
-
-Note that inner locator is matched starting from the outer one, not from the document root.
-
-#### Augment an existing locator
-
-You can filter an existing locator by text or another one, using [Locator.filter([options])](/api/class-locator.mdx#locator-filter) method, possibly chaining it multiple times.
-
-```java
-Locator rowLocator = page.locator("tr");
-// ...
-rowLocator
-    .filter(new Locator.FilterOptions().setHasText("text in column 1"))
-    .filter(new Locator.FilterOptions().setHas(
-        page.getByRole("button", new Page.GetByRoleOptions().setName("column 2 button"))
-    ))
-    .screenshot();
-```
-
-### Locate elements in Shadow DOM
+## Locate in Shadow DOM
 
 All locators in Playwright **by default** work with elements in Shadow DOM. The exceptions are:
 - Locating by XPath does not pierce shadow roots.
@@ -280,57 +335,335 @@ Consider the following example with a custom web component:
 </x-details>
 ```
 
+<img width="101" alt="Title, shadow-root and details" src="https://user-images.githubusercontent.com/13063165/201364144-fe6ea945-505d-4650-bbe4-056439c311c8.png" />
+
 You can locate in the same way as if the shadow root was not present at all.
-- Click `<div>Details</div>`
 
-  ```java
-  page.getByText("Details").click();
-  ```
+To click `<div>Details</div>`:
 
-- Click `<x-details>`
+```java
+page.getByText("Details").click();
+```
 
-  ```java
-  page.locator("x-details", new Page.LocatorOptions().setHasText("Details")).click();
-  ```
+<img width="100" alt="Title, shadow-root and details with text details highlighted" src="https://user-images.githubusercontent.com/13063165/201364000-42820d75-053f-449e-80bf-8b38470a2a23.png" /> 
 
-- Ensure that `<x-details>` contains text "Details"
+<br /><br />
 
-  ```java
-  assertThat(page.locator("x-details")).containsText("Details");
-  ```
+To click `<x-details>`:
+
+```java
+page.locator("x-details", new Page.LocatorOptions().setHasText("Details")).click();
+```
+
+<img width="103" alt="Title, shadow-root and details highlighted" src="https://user-images.githubusercontent.com/13063165/201363856-09fd3eec-6e55-45fe-a251-7b39c3ea09d7.png" />
+
+<br /><br />
+
+To ensure that `<x-details>` contains the text "Details":
+
+```java
+assertThat(page.locator("x-details")).containsText("Details");
+```
+
+## Filtering Locators
+
+Consider the following DOM structure where we want to click on the buy button of the second product card. We have a few options in order to filter the locators to get the right one.
+
+```html
+<div data-testid='product-card'>
+  <h3>Product 1</h3>
+  <button>Buy</button>
+</div>
+
+<div data-testid='product-card'>
+  <h3>Product 2</h3>
+  <button>Buy</button>
+</div>
+```
+
+<img width="83" alt="2 product cards with text and a button" src="https://user-images.githubusercontent.com/13063165/201182468-348eb733-7cf5-4e5b-94de-604312fe5fc7.png" />
+
+### Filter by text
+
+Locators can be filtered by text with the [Locator.filter([options])](/api/class-locator.mdx#locator-filter) method. It will search for a particular string somewhere inside the element, possibly in a descendant element, case-insensitively. You can also pass a regular expression.
+
+```java
+page.getByTestId("product-card")
+    .filter(new Locator.FilterOptions().setHasText("Product 2"))
+    .getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Buy"))
+    .click();
+```
+
+Use a regular expression:
+
+```java
+page.getByTestId("product-card")
+    .filter(new Locator.FilterOptions().setHasText(Pattern.compile("Product 2")))
+    .getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Buy"))
+    .click();
+```
+
+<img width="83" alt="2 product cards with text and a button and the second one being highlighted" src="https://user-images.githubusercontent.com/13063165/201182749-253ff808-cd70-4d42-88c6-a9f07fb7eeae.png" />
+
+### Filter by another locator
+
+Locators support an option to only select elements that have a descendant matching another locator. You can therefore filter by any other locator such as a [Locator.getByRole(role[, options])](/api/class-locator.mdx#locator-get-by-role), [Locator.getByTestId(testId)](/api/class-locator.mdx#locator-get-by-test-id), [Locator.getByText(text[, options])](/api/class-locator.mdx#locator-get-by-text) etc.
+
+```java
+page.getByTestId("product-card")
+    .filter(new Locator.FilterOptions().setHas(page.GetByRole(AriaRole.HEADING, new Page.GetByRoleOptions().setName("Product 2"))))
+    .getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Buy")))
+    .click()
+```
+
+<img width="83" alt="2 product cards with text and a button and the second one being highlighted" src="https://user-images.githubusercontent.com/13063165/201182749-253ff808-cd70-4d42-88c6-a9f07fb7eeae.png" />
+
+We can also assert the product card to make sure there is only one
+
+```java
+assertThat(page.getByTestId("product-card")
+    .filter(new Locator.FilterOptions().setHas(page.getByText("Product 2")))
+    .hasCount(1);
+```
+
+Note that the inner locator is matched starting from the outer one, not from the document root.
+
+## Chaining Locators
+
+You can chain methods that create a locator, like [Page.getByText(text[, options])](/api/class-page.mdx#page-get-by-text) or [Locator.getByRole(role[, options])](/api/class-locator.mdx#locator-get-by-role), to narrow down the search to a particular part of the page.
+
+In this example we first create a locator called product by locating the test id. We then filter by text. We can use the product locator again to get by role of button and click it and then use an assertion to make sure there is only one product with the text ' Product 2'.
+
+```java
+Locator product = page.getByTestId("product-card")
+    .filter(new Locator.FilterOptions().setHasText("Product 2"));
+
+product.getByRole(AriaRole.BUTTON, new Locator.GetByRoleOptions().setName("Buy"))
+    .click();
+```
+
+<img width="83" alt="2 product cards with text and a button and the second one being highlighted" src="https://user-images.githubusercontent.com/13063165/201182749-253ff808-cd70-4d42-88c6-a9f07fb7eeae.png" />
 
 ## Lists
 
-You can also use locators to work with the element lists.
+### Count items in a list
 
-```java
-// Locate elements, this locator points to a list.
-Locator rows = page.getByRole("listitem");
+You can assert locators in order to count the items in a list.
 
-// Pattern 1: use locator methods to calculate text on the whole list.
-List<String> texts = rows.allTextContents();
+For example, consider the following DOM structure:
 
-// Pattern 2: do something with each element in the list.
-int count = rows.count()
-for (int i = 0; i < count; ++i)
-  System.out.println(rows.nth(i).textContent());
-
-// Pattern 3: resolve locator to elements on page and map them to their text content.
-// Note: the code inside evaluateAll runs in page, you can call any DOM apis there.
-Object texts = rows.evaluateAll("list => list.map(element => element.textContent)");
+```html
+<ul>
+  <li>apple</li>
+  <li>banana</li>
+  <li>orange</li>
+</ul>
 ```
 
-### Picking specific element from a list
+<img width="81" alt="list of 3 items, apple, banana and orange" src="https://user-images.githubusercontent.com/13063165/200641602-95a801ce-8a3e-4141-b4ac-926b890f4648.png" />
+
+Use the count assertion to ensure that the list has 3 items.
+
+```java
+assertThat(page.getByRole(AriaRole.LISTITEM).hasCount(3);
+```
+
+### Assert all text in a list
+
+You can assert locators in order to find all the text in a list.
+
+For example, consider the following DOM structure:
+
+```html
+<ul>
+  <li>apple</li>
+  <li>banana</li>
+  <li>orange</li>
+</ul>
+```
+
+<img width="81" alt="list of 3 items, apple, banana and orange" src="https://user-images.githubusercontent.com/13063165/200641602-95a801ce-8a3e-4141-b4ac-926b890f4648.png" />
+
+Use [assertThat(locator).hasText(expected[, options])](/test-assertions.mdx#locator-assertions-to-have-text) to ensure that the list has the text "apple", "banana" and "orange".
+
+```java
+assertThat(page.getByRole(AriaRole.LISTITEM))
+    .hasText(new String[] { "apple", "banana", "orange" });
+```
+
+### Get a specific item
+
+There are many ways to get a specific item in a list.
+
+#### Get by text
+
+Use the [Page.getByText(text[, options])](/api/class-page.mdx#page-get-by-text) method to locate an element in a list by it's text content and then click on it.
+
+For example, consider the following DOM structure:
+
+```html
+<ul>
+  <li>apple</li>
+  <li>banana</li>
+  <li>orange</li>
+</ul>
+```
+
+Locate an item by it's text content and click it.
+
+```java
+page.getByText("orange")
+    .click();
+```
+
+<img width="78" alt="list of apple, banana and orange highlighting orange" src="https://user-images.githubusercontent.com/13063165/201171918-0f689261-a48e-4660-9726-c8fcf29e9105.png" />
+
+#### Filter by text
+
+Use the [Locator.filter([options])](/api/class-locator.mdx#locator-filter) to locate a specific item in a list.
+
+For example, consider the following DOM structure:
+
+```html
+<ul>
+  <li>apple</li>
+  <li>banana</li>
+  <li>orange</li>
+</ul>
+```
+
+Locate an item by the role of "listitem" and then filter by the text of "orange" and then click it.
+
+```java
+page.getByRole(AriaRole.LISTITEM)
+    .filter(new Locator.FilterOptions().setHasText("orange"))
+    .click();
+```
+
+<img width="78" alt="list of apple, banana and orange highlighting orange" src="https://user-images.githubusercontent.com/13063165/201171918-0f689261-a48e-4660-9726-c8fcf29e9105.png" />
+
+#### Get by test id
+
+Use the [Page.getByTestId(testId)](/api/class-page.mdx#page-get-by-test-id) method to locate an element in a list. You may need to modify the html and add a test id if you don't already have a test id.
+
+For example, consider the following DOM structure:
+
+```html
+<ul>
+  <li data-testid='apple'>apple</li>
+  <li data-testid='banana'>banana</li>
+  <li data-testid='orange'>orange</li>
+</ul>
+```
+
+Locate an item by it's test id of "orange" and then click it.
+
+```java
+page.getByTestId("orange")
+    .click();
+```
+
+<img width="78" alt="list of apple, banana and orange highlighting orange" src="https://user-images.githubusercontent.com/13063165/201171918-0f689261-a48e-4660-9726-c8fcf29e9105.png" />
+
+#### Get by nth item
 
 If you have a list of identical elements, and the only way to distinguish between them is the order, you can choose a specific element from a list with [Locator.first()](/api/class-locator.mdx#locator-first), [Locator.last()](/api/class-locator.mdx#locator-last) or [Locator.nth(index)](/api/class-locator.mdx#locator-nth).
 
-For example, to click the third item in the list of products:
-
 ```java
-page.getByTestId("product-card").nth(3).click();
+Locator banana = page.getByRole(AriaRole.LISTITEM).nth(1);
 ```
 
-However, use these methods with caution. Often times, the page might change, and locator will point to a completely different element from the one you expected. Instead, try to come up with a unique locator that will pass the [strictness criteria](#strictness).
+However, use this method with caution. Often times, the page might change, and the locator will point to a completely different element from the one you expected. Instead, try to come up with a unique locator that will pass the [strictness criteria](#strictness).
+
+### Chaining filters
+
+When you have elements with various similarities, you can use the [Locator.filter([options])](/api/class-locator.mdx#locator-filter) method to select the right one. You can also chain multiple filters to narrow down the selection.
+
+For example, consider the following DOM structure:
+
+```html
+<ul>
+  <li>
+    <div>John</div>
+    <div><button>Say hello</button></div>
+  </li>
+  <li>
+    <div>Mary</div>
+    <div><button>Say hello</button></div>
+  </li>
+  <li>
+    <div>John</div>
+    <div><button>Say goodbye</button></div>
+  </li>
+  <li>
+    <div>Mary</div>
+    <div><button>Say goodbye</button></div>
+  </li>
+</ul>
+```
+
+<img width="112" alt="text John and Mary with buttons say hello and say goodbye beside their names" src="https://user-images.githubusercontent.com/13063165/201173459-4c560974-6712-48a6-8b6d-a636276f0dd3.png" />
+
+To take a screenshot of the row with "Mary" and "Say goodbye":
+
+```java
+Locator rowLocator = page.getByRole(AriaRole.LISTITEM);
+
+rowLocator.filter(new Locator.FilterOptions().setHasText("Mary"))
+    .filter(new Locator.FilterOptions().setHas(page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Say goodbye"))))
+    .screenshot(new Page.ScreenshotOptions().setPath("screenshot.png"));
+```
+
+You should now have a "screenshot.png" file in your project's root directory.
+
+<img width="153" alt="text Mary with buttons say goodbye" src="https://user-images.githubusercontent.com/13063165/201357594-7910f8ad-7626-48a4-85a2-2a3e63d67e34.png" />
+
+### Rare use cases
+
+#### Get All text contents
+
+```java
+Locator rows = page.getByRole(AriaRole.LISTITEM);
+List<String> texts = rows.allTextContents();
+```
+
+#### Do something with each element in the list
+
+```java
+Locator rows = page.getByRole(AriaRole.LISTITEM);
+int count = rows.count();
+for (int i = 0; i < count; ++i)
+  System.out.println(rows.nth(i).textContent());
+```
+
+#### Evaluate in the page
+
+The code inside [Locator.evaluateAll(expression[, arg])](/api/class-locator.mdx#locator-evaluate-all) runs in the page, you can call any DOM apis there.
+
+```java
+Locator rows = page.getByRole(AriaRole.LISTITEM);
+Object texts = rows.evaluateAll("list => list.map(element => element.textContent)");
+```
+
+## Strictness
+
+Locators are strict. This means that all operations on locators that imply some target DOM element will throw an exception if more than one element matches. For example, the following call throws if there are several buttons in the DOM:
+
+#### Throws an error if more than one
+
+```java
+page.getByRole(AriaRole.BUTTON).click();
+```
+
+On the other hand, Playwright understands when you perform a multiple-element operation, so the following call works perfectly fine when the locator resolves to multiple elements.
+
+#### Works fine with multiple elements
+
+```java
+page.getByRole("button").count();
+```
+
+You can explicitly opt-out from strictness check by telling Playwright which element to use when multiple elements match, through [Locator.first()](/api/class-locator.mdx#locator-first), [Locator.last()](/api/class-locator.mdx#locator-last), and [Locator.nth(index)](/api/class-locator.mdx#locator-nth). These methods are **not recommended** because when your page changes, Playwright may click on an element you did not intend. Instead, follow best practices above to create a locator that uniquely identifies the target element.
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
