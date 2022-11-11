@@ -30,21 +30,29 @@ if (path) {
     { from: '/docs/next/test-auth', to: '/docs/next/auth' },
     { from: '/docs/test-pom', to: '/docs/pom' },
     { from: '/docs/next/test-pom', to: '/docs/next/pom' },
+    { from: '/docs/selectors', to: '/docs/locators' },
+    { from: '/docs/next/selectors', to: '/docs/next/locators' },
     // ------------------- python ---------------------
     { from: '/python/docs/assertions', to: '/python/docs/api/class-playwrightassertions' },
     { from: '/python/next/docs/assertions', to: '/python/next/docs/api/class-playwrightassertions' },
     { from: '/python/docs/inspector', to: '/python/docs/debug' },
     { from: '/python/blog', to: '/community/welcome' },
+    { from: '/python/docs/selectors', to: '/python/docs/locators' },
+    { from: '/python/docs/next/selectors', to: '/python/docs/next/locators' },
     // ------------------- dotnet ---------------------
     { from: '/dotnet/docs/assertions', to: '/dotnet/docs/api/class-playwrightassertions' },
     { from: '/dotnet/next/docs/assertions', to: '/dotnet/next/docs/api/class-playwrightassertions' },
     { from: '/dotnet/inspector', to: '/dotnet/docs/debug' },
     { from: '/dotnet/blog', to: '/community/welcome' },
+    { from: '/dotnet/docs/selectors', to: '/dotnet/docs/locators' },
+    { from: '/dotnet/docs/next/selectors', to: '/dotnet/docs/next/locators' },
     // ------------------- java -----------------------
     { from: '/java/docs/assertions', to: '/java/docs/api/class-playwrightassertions' },
     { from: '/java/next/docs/assertions', to: '/java/next/docs/api/class-playwrightassertions' },
     { from: '/java/docs/inspector', to: '/java/docs/debug' },
     { from: '/java/blog', to: '/community/welcome' },
+    { from: '/java/docs/selectors', to: '/java/docs/locators' },
+    { from: '/java/docs/next/selectors', to: '/java/docs/next/locators' },
   ];
   const pathname = window.location.pathname;
   for (const redirect of redirects) {
