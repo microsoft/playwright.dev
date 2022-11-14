@@ -2,17 +2,27 @@ module.exports = {
   community: [
     'welcome',
     'ambassadors',
+
     {
       type: 'category',
       label: 'Videos',
       items: [
-        'conference-videos',
+        {
+          type: 'link',
+          label: 'Conference Videos',
+          href: '/community/conference-videos'
+        },
+        {
+          type: 'link',
+          label: 'Release Videos',
+          href: '/community/release-videos'
+        },
         'live-streams',
-        'feature-videos',
-        'release-videos'
+        'feature-videos'
       ],
       collapsed: false
     },
+
     {
       type: 'link',
       label: 'Join our Community Slack',
