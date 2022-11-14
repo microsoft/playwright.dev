@@ -37,8 +37,11 @@ const { chromium } = require('playwright');
 
 To have the extension loaded when running tests you can use a test fixture to set the context. You can also dynamically retrieve the extension id and use it to load and test the popup page for example.
 
+First, add fixtures that will load the extension:
+
 ```ts
-import { test as base, expect, BrowserContext } from "@playwright/test";
+// fixtures.ts
+import { test as base, expect, chromium, type BrowserContext } from "@playwright/test";
 import path from "path";
 
 export const test = base.extend<{
@@ -46,8 +49,8 @@ export const test = base.extend<{
   extensionId: string;
 }>({
   context: async ({ }, use) => {
-    const pathToExtension = path.join(__dirname, "my-extension");
-    const context = await chromium.launchPersistentContext("", {
+    const pathToExtension = path.join(__dirname, 'my-extension');
+    const context = await chromium.launchPersistentContext('', {
       headless: false,
       args: [
         `--disable-extensions-except=${pathToExtension}`,
@@ -62,18 +65,25 @@ export const test = base.extend<{
     // for manifest v2:
     let [background] = context.backgroundPages()
     if (!background)
-      background = await context.waitForEvent("backgroundpage")
+      background = await context.waitForEvent('backgroundpage')
     */
 
     // for manifest v3:
     let [background] = context.serviceWorkers();
     if (!background)
-      background = await context.waitForEvent("serviceworker");
+      background = await context.waitForEvent('serviceworker');
 
-    const extensionId = background.url().split("/")[2];
+    const extensionId = background.url().split('/')[2];
     await use(extensionId);
   },
 });
+export const expect = test.expect;
+```
+
+Then use these fixtures in a test:
+
+```ts
+import { test, expect } from "./fixtures";
 
 test("example test", async ({ page }) => {
   await page.goto("https://example.com");
