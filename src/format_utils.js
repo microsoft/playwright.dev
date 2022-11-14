@@ -26,62 +26,28 @@ const md = require('./markdown');
  * @returns {MarkdownNode[]}
  */
 function generateTabGroups(spec, language) {
-  /** @type {MarkdownNode[]} */
-  const newSpec = [];
-  for (let i = 0; i < spec.length; ++i) {
-    /** @type {{value: string, groupId: string, spec: md.MarkdownNode}[]} */
-    const tabs = [];
-    for (;i < spec.length; i++) {
-      const tabInfo = parseTabInfo(spec[i].codeLang);
-      if (!tabInfo)
-        break
+  return md.processCodeGroups(spec, language, tabs => {
+    tabs.forEach(tab => tab.groupId += '-flavor');
+    tabs.sort((t1, t2) => tabWeight(t2.value) - tabWeight(t1.value));
 
-      const codeLanguage = parseLanguage(spec[i].codeLang);
-      // Language filter
-      if (codeLanguage && codeLanguage !== language)
-        continue;
-
-      const [groupId, value] = tabInfo.split('-');
-      tabs.push({ groupId: groupId + '-flavor', value, spec: spec[i] });
-    }
-    if (tabs.length) {
-      if (tabs.length === 1)
-        throw new Error('Bad js tab group: ' + md.render(spec));
-      tabs.sort((t1, t2) => tabWeight(t2.value) - tabWeight(t1.value));
-
-      // Validate group consistency.
-      const groupId = tabs[0].groupId;
-      const values = new Set();
-      for (const tab of tabs) {
-        if (tab.groupId !== groupId)
-          throw new Error('Mixed group ids: ' + md.render(spec));
-        if (values.has(tab.value))
-          throw new Error('Dupe tabs: ' + [...values] + ' ' + tab.value + '\n' + md.render(spec));
-        values.add(tab.value);
-      }
-
-      const tokens = [];
-      tokens.push(`<Tabs
-  groupId="${groupId}"
+    const tokens = [];
+    tokens.push(`<Tabs
+  groupId="${tabs[0].groupId}"
   defaultValue="${tabs[0].value}"
   values={[`);
-      tokens.push(...tabs.map((t, i) => `    {label: '${tabLabel(groupId, t.value)}', value: '${t.value}'}${ i === tabs.length - 1 ? '' : ','}`))
-      tokens.push(`  ]
+    tokens.push(...tabs.map((t, i) => `    {label: '${tabLabel(t.groupId, t.value)}', value: '${t.value}'}${ i === tabs.length - 1 ? '' : ','}`))
+    tokens.push(`  ]
 }>`);
-      tokens.push(...tabs.map(t => `<TabItem value="${t.value}">
+    tokens.push(...tabs.map(t => `<TabItem value="${t.value}">
 ${md.render([t.spec])}
 </TabItem>`));
-      tokens.push(`</Tabs>`);
+    tokens.push(`</Tabs>`);
 
-      newSpec.push({
+    return [{
         type: 'text',
         text: tokens.join('\n')
-      });
-    }
-    if (i < spec.length)
-      newSpec.push(spec[i]);
-  }
-  return newSpec;
+    }];
+  });
 }
 
 /**
@@ -109,7 +75,7 @@ function tabLabel(groupId, value) {
 }
 
 /**
- * @param {string} type 
+ * @param {string} type
  * @returns {number}
  */
 function tabWeight(type) {
@@ -128,37 +94,6 @@ function tabWeight(type) {
   if (!weights.has(type))
     throw new Error(`Unrecognized language: ${type}`)
   return weights.get(type);
-}
-
-/**
- * @param {string} codeLang
- */
-function parseTabInfo(codeLang) {
-  if (!codeLang)
-    return '';
-  if (codeLang === 'python async')
-    return 'python-async';
-  if (codeLang === 'python sync')
-    return 'python-sync';
-  const tab = codeLang.match(/ tab=([\w\d-]+)/);
-  return tab ? tab[1] : '';
-}
-
-/**
- * @param {string} codeLang
- */
-function parseLanguage(codeLang) {
-  const lang = codeLang.match(/ lang=([\w\d]+)/);
-  if (lang)
-    return lang[1];
-  if (codeLang.startsWith('js') || codeLang.startsWith('ts'))
-    return 'js';
-  if (codeLang.startsWith('py'))
-    return 'python';
-  if (codeLang.startsWith('csharp'))
-    return 'csharp';
-  if (codeLang.startsWith('java'))
-    return 'java';
 }
 
 module.exports = {
