@@ -70,7 +70,6 @@ test('basic test', async ({ page }) => {
 - [test.fixme(callback[, description])](/api/class-test.mdx#test-fixme-4)
 - [test.info()](/api/class-test.mdx#test-info)
 - [test.only(title, testFunction)](/api/class-test.mdx#test-only)
-- [test.reset(options)](/api/class-test.mdx#test-reset)
 - [test.setTimeout(timeout)](/api/class-test.mdx#test-set-timeout)
 - [test.skip(title, testFunction)](/api/class-test.mdx#test-skip-1)
 - [test.skip()](/api/class-test.mdx#test-skip-2)
@@ -426,9 +425,9 @@ test.describe(() => {
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font>
 
 - `options?` &#60;[Object]&#62;
-  - `mode?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-configure-option-mode"/> &#60;"parallel"|"serial"&#62;<a href="#test-describe-configure-option-mode" class="list-anchor">#</a>
-  - `retries?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-configure-option-retries"/> &#60;[number]&#62; <font size="2">Added in: v1.28</font><a href="#test-describe-configure-option-retries" class="list-anchor">#</a>
-  - `timeout?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-configure-option-timeout"/> &#60;[number]&#62; <font size="2">Added in: v1.28</font><a href="#test-describe-configure-option-timeout" class="list-anchor">#</a>
+  - `mode?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-configure-option-mode"/> &#60;"parallel"|"serial"&#62; Execution mode. Learn more about the execution modes [here](../test-parallel.mdx).<a href="#test-describe-configure-option-mode" class="list-anchor">#</a>
+  - `retries?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-configure-option-retries"/> &#60;[number]&#62; The number of retries for each test. <font size="2">Added in: v1.28</font><a href="#test-describe-configure-option-retries" class="list-anchor">#</a>
+  - `timeout?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-configure-option-timeout"/> &#60;[number]&#62; Timeout for each test in milliseconds. Overrides [testProject.timeout](/api/class-testproject.mdx#test-project-timeout) and [testConfig.timeout](/api/class-testconfig.mdx#test-config-timeout). <font size="2">Added in: v1.28</font><a href="#test-describe-configure-option-timeout" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-configure-return"/> &#60;[void]&#62;<a href="#test-describe-configure-return" class="list-anchor">#</a>
 
 Configures the enclosing scope. Can be executed either on the top level or inside a describe. Configuration applies to the entire scope, regardless of whether it run before or after the test declaration.
@@ -499,7 +498,7 @@ test('runs second', async ({ page }) => {});
 </TabItem>
 </Tabs>
 
-Configuring retries and timeout:
+Configuring retries and timeout for each test:
 
 <Tabs
   groupId="js-flavor"
@@ -512,7 +511,7 @@ Configuring retries and timeout:
 <TabItem value="ts">
 
 ```js
-// All tests in the file will be retried twice and have a timeout of 20 seconds.
+// Each test in the file will be retried twice and have a timeout of 20 seconds.
 test.describe.configure({ retries: 2, timeout: 20_000 });
 test('runs first', async ({ page }) => {});
 test('runs second', async ({ page }) => {});
@@ -522,7 +521,7 @@ test('runs second', async ({ page }) => {});
 <TabItem value="js">
 
 ```js
-// All tests in the file will be retried twice and have a timeout of 20 seconds.
+// Each test in the file will be retried twice and have a timeout of 20 seconds.
 test.describe.configure({ retries: 2, timeout: 20_000 });
 test('runs first', async ({ page }) => {});
 test('runs second', async ({ page }) => {});
@@ -1396,63 +1395,6 @@ test.only('focus this test', async ({ page }) => {
 </TabItem>
 </Tabs>
 
-## test.reset(options) {#test-reset}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.28</font>
-
-- `options`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-reset-option-fixtures"/> &#60;[Object]&#62; An object with options set to either `'config'` or `'default'`.<a href="#test-reset-option-fixtures" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-reset-return"/> &#60;[void]&#62;<a href="#test-reset-return" class="list-anchor">#</a>
-
-Resets options that were set up in the configuration file or with [test.use(options)](/api/class-test.mdx#test-use) to their default or config-specified value.
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
-```js
-import { test, expect } from '@playwright/test';
-
-test.reset({
-  // Reset storage state to the default empty value.
-  storageStage: 'default',
-
-  // Reset locale to the value specified in the config file.
-  locale: 'config',
-});
-
-test('example', async ({ page }) => {
-  // ...
-});
-```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-const { test, expect } = require('@playwright/test');
-
-test.reset({
-  // Reset storage state to the default empty value.
-  storageStage: 'default',
-
-  // Reset locale to the value specified in the config file.
-  locale: 'config',
-});
-
-test('example', async ({ page }) => {
-  // ...
-});
-```
-
-</TabItem>
-</Tabs>
-
 ## test.setTimeout(timeout) {#test-set-timeout}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font>
@@ -2111,7 +2053,7 @@ test('test', async ({ page }) => {
 - `options`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-use-option-fixtures"/> &#60;[TestOptions]&#62; An object with local options.<a href="#test-use-option-fixtures" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-use-return"/> &#60;[void]&#62;<a href="#test-use-return" class="list-anchor">#</a>
 
-Specifies options or fixtures to use in a single test file or a [test.describe(title, callback)](/api/class-test.mdx#test-describe-1) group. Most useful to set an option, for example set `locale` to configure `context` fixture. `test.use` can be called either in the global scope or inside `test.describe`, it's is an error to call it within `beforeEach` or `beforeAll`.
+Specifies options or fixtures to use in a single test file or a [test.describe(title, callback)](/api/class-test.mdx#test-describe-1) group. Most useful to set an option, for example set `locale` to configure `context` fixture. `test.use` can be called either in the global scope or inside `test.describe`. It is an error to call it within `beforeEach` or `beforeAll`.
 
 <Tabs
   groupId="js-flavor"
