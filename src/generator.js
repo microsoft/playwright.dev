@@ -252,7 +252,7 @@ import TabItem from '@theme/TabItem';
         return true;
 
       // Our lang - Ok.
-      if (this.formatter.filterComment(c) || c.codeLang === md.codeLangToHighlighter(this.lang))
+      if (this.formatter.filterComment(c) || this.lang === md.parseCodeLang(c.codeLang).language)
         return true;
 
       // '* browser' - always Ok
@@ -386,7 +386,7 @@ import TabItem from '@theme/TabItem';`);
 
   /**
    * @param {Documentation.Member} member
-   * @param {string|undefined} href
+   * @param {string=} href
    * @return {string[]}
    */
   createMemberLink(member, href) {
