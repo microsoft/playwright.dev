@@ -18,7 +18,9 @@ import React from 'react';
 import Layout from '@theme/Layout';
 import VideoCards from '@site/src/components/VideoCards';
 import PageHeader from '@site/src/components/PageHeader';
+import Navigation from '@site/src/components/Navigation';
 
+import videoNav from '@site/src/data/video-nav';
 import releaseVideos from '@site/src/data/release-videos';
 
 const TITLE = 'Release Videos';
@@ -29,6 +31,7 @@ export default function Video(): JSX.Element {
     <Layout title={TITLE} description={DESCRIPTION}>
       <main className="margin-vert--lg">
         <PageHeader title={TITLE} description={DESCRIPTION} />
+        <Navigation links={videoNav} />
         <VideoCards videos={releaseVideos} />
       </main>
     </Layout>
