@@ -18,7 +18,7 @@ import React from 'react';
 
 function PageHeader({ title, description }) {
   return (
-    <section className="margin-top--lg margin-bottom--lg text--center">
+    <section className="margin-top--lg margin-bottom--lg text--center container">
       <h1>{title}</h1>
       <p>{description}</p>
     </section>

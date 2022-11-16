@@ -1,7 +1,11 @@
 module.exports = {
   community: [
     'welcome',
-    'ambassadors',
+    {
+      type: 'link',
+      label: 'Ambassadors',
+      href: '/community/ambassadors'
+    },
 
     {
       type: 'category',
@@ -17,8 +21,16 @@ module.exports = {
           label: 'Release Videos',
           href: '/community/release-videos'
         },
-        'live-streams',
-        'feature-videos'
+        {
+          type: 'link',
+          label: 'Live Streams',
+          href: '/community/live-streams'
+        },
+        {
+          type: 'link',
+          label: 'Feature Videos',
+          href: '/community/feature-videos'
+        }
       ],
       collapsed: false
     },

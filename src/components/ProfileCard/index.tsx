@@ -1,7 +1,7 @@
 import React, { type ReactNode } from 'react';
 import styles from './styles.module.css';
 
-type ProfileProps = {
+type Person = {
   className?: string;
   name: string;
   city: string;
@@ -14,46 +14,44 @@ type ProfileProps = {
   languages?: string;
 };
 
-function ProfileCard({
-  className,
-  name,
-  city,
-  country,
-  githubUrl,
-  twitterUrl,
-  websiteUrl,
-  linkedInUrl,
-  imageUrl,
-  languages
-}: ProfileProps) {
+type ProfileProps = {
+  className?: string;
+  person: Person;
+};
+
+function ProfileCard({ person, className }: ProfileProps) {
   return (
     <div className={className}>
       <div className={styles.card}>
         <div className={styles.cardBody}>
-          <div className='avatar avatar--vertical'>
+          <div className="avatar avatar--vertical">
             <img
-              className='avatar__photo avatar__photo--xl'
-              src={githubUrl ? `${githubUrl}.png` : imageUrl}
-              alt={`${name}'s avatar`}
+              className="avatar__photo avatar__photo--xl"
+              src={
+                person.githubUrl ? `${person.githubUrl}.png` : person.imageUrl
+              }
+              alt={`${person.name}'s avatar`}
             />
           </div>
           <div className={styles.intro}>
-            <span className={styles.name}>{name}</span>
-            <p className={styles.city}>{city}</p>
-            <p className={styles.country}>{country}</p>
-            <p className={styles.languages}>{languages}</p>
+            <span className={styles.name}>{person.name}</span>
+            <p className={styles.city}>{person.city}</p>
+            <p className={styles.country}>{person.country}</p>
+            <p className={styles.languages}>{person.languages}</p>
           </div>
         </div>
         <div className={styles.socialLinks}>
-          {githubUrl && <a className='header-github-link' href={githubUrl}></a>}
-          {twitterUrl && (
-            <a className={styles.twitterLink} href={twitterUrl}></a>
+          {person.githubUrl && (
+            <a className="header-github-link" href={person.githubUrl}></a>
           )}
-          {websiteUrl && (
-            <a className={styles.websiteLink} href={websiteUrl}></a>
+          {person.twitterUrl && (
+            <a className={styles.twitterLink} href={person.twitterUrl}></a>
           )}
-          {linkedInUrl && (
-            <a className={styles.linkedInLink} href={linkedInUrl}></a>
+          {person.websiteUrl && (
+            <a className={styles.websiteLink} href={person.websiteUrl}></a>
+          )}
+          {person.linkedInUrl && (
+            <a className={styles.linkedInLink} href={person.linkedInUrl}></a>
           )}
         </div>
       </div>
@@ -61,109 +59,16 @@ function ProfileCard({
   );
 }
 
-export function Team(): JSX.Element {
+export function ProfileCards({ people }): JSX.Element {
   return (
-    <div className={styles.cards}>
-      <ProfileCard
-        name="Debbie O'Brien"
-        city='Palma de Mallorca'
-        country='Spain'
-        languages='English, Spanish'
-        githubUrl='https://github.com/debs-obrien'
-        twitterUrl='https://twitter.com/debs_obrien'
-        linkedInUrl='https://www.linkedin.com/in/debbie-o-brien-1a199975/'
-      ></ProfileCard>
-      <ProfileCard
-        name='Max Schmitt'
-        languages='German, English'
-        city='Berlin'
-        country='Germany'
-        githubUrl='https://github.com/mxschmitt'
-        twitterUrl='https://twitter.com/maxibanki'
-        linkedInUrl='https://www.linkedin.com/in/max-schmitt/'
-      ></ProfileCard>
-      <ProfileCard
-        name='Ross Wollman'
-        languages='English'
-        city='San Francisco'
-        country='USA'
-        githubUrl='https://github.com/rwoll'
-        twitterUrl='https://twitter.com/rwoll_dev'
-      ></ProfileCard>
-    </div>
-  );
-}
-
-export function Ambassadors(): JSX.Element {
-  return (
-    <div className={styles.cards}>
-      <ProfileCard
-        name='Andrew Knight'
-        languages='English'
-        city='North Carolina'
-        country='USA'
-        githubUrl='https://github.com/AutomationPanda'
-        twitterUrl='https://twitter.com/AutomationPanda'
-      ></ProfileCard>
-      <ProfileCard
-        name='Carlos Gauto'
-        city='Berazategui'
-        languages='Spanish, English'
-        country='Argentina'
-        githubUrl='https://github.com/charlyautomatiza'
-        twitterUrl='https://twitter.com/char_automatiza'
-        websiteUrl='https://linktr.ee/charlyautomatiza'
-      ></ProfileCard>
-      <ProfileCard
-        name='Giovanni Rago'
-        languages='Italian, English'
-        city='Berlin'
-        country='Germany'
-        imageUrl='https://media-exp1.licdn.com/dms/image/C4E03AQHNkQmEbZBVqA/profile-displayphoto-shrink_400_400/0/1517375686271?e=1671667200&v=beta&t=j6CLWbYad-tvTAb0h8__WIz-_18qv-v_xtSAqhmarG4'
-        twitterUrl='https://twitter.com/rag0g'
-        websiteUrl='https://www.youtube.com/c/AutomateTogether'
-      ></ProfileCard>
-      <ProfileCard
-        name='John Hill'
-        languages='English'
-        city='Palo Alto'
-        country='USA'
-        githubUrl='https://github.com/unlikelyzero'
-        linkedInUrl='https://www.linkedin.com/in/linkedjohnhill'
-      ></ProfileCard>
-      <ProfileCard
-        name='Katrik K. K'
-        languages='English'
-        city='Auckland'
-        country='New Zealand'
-        imageUrl='https://media-exp1.licdn.com/dms/image/C5603AQFvGgrfen7F9Q/profile-displayphoto-shrink_400_400/0/1629605742823?e=1671667200&v=beta&t=BJdZNbMn_cHqj8yKbn5gvMXvwFXjMiI7_vC7BWk4O_U'
-        linkedInUrl='https://www.linkedin.com/in/karthikkk/'
-      ></ProfileCard>
-      <ProfileCard
-        name='Stefan Judis'
-        languages='English'
-        city='Berlin'
-        country='Germany'
-        githubUrl='https://github.com/stefanjudis'
-        twitterUrl='https://twitter.com/stefanjudis'
-        websiteUrl='https://www.stefanjudis.com'
-      ></ProfileCard>
-      <ProfileCard
-        name='Tally Barak'
-        languages='Hebrew, English'
-        city='Tel Aviv'
-        country='Israel'
-        githubUrl='https://github.com/Tallyb'
-        twitterUrl='https://twitter.com/TallyBarak'
-      ></ProfileCard>
-      <a href='#join-the-program'>
-        <ProfileCard
-          name='Are you the next Ambassador?'
-          city=''
-          country=''
-          imageUrl='https://playwright.dev/img/playwright-logo.svg'
-        ></ProfileCard>
-      </a>
-    </div>
+    <section className="margin-top--lg margin-bottom--xl">
+      <div className="container">
+        <ul className={styles.cards}>
+          {people.map((person) => (
+            <ProfileCard key={person.name} person={person} />
+          ))}
+        </ul>
+      </div>
+    </section>
   );
 }
