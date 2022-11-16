@@ -86,7 +86,7 @@ class Generator {
     this.documentation = parseApi(path.join(srcDir, 'api'))
       .mergeWith(parseApi(path.join(srcDir, 'test-api'), path.join(srcDir, 'api', 'params.md')))
       .mergeWith(parseApi(path.join(srcDir, 'test-reporter-api')));
-    this.documentation.filterForLanguage(lang);
+    this.documentation.filterForLanguage(lang, { csharpOptionOverloadsShortNotation: true });
     this.documentation.filterOutExperimental();
     this.documentation.setLinkRenderer(item => {
       const { clazz, member, param, option, href } = item;
@@ -574,7 +574,7 @@ function renderJSSignature(args) {
  * @param {{omitAsync: boolean}=} options
  */
 function toTitleCase(name, options) {
-  let result = name[0].toUpperCase() + name.substring(1);
+  let result = name.split('|').map(one => one[0].toUpperCase() + one.substring(1)).join('|');
   if (options && options.omitAsync && result.endsWith('Async'))
     result = result.slice(0, result.length - 'Async'.length);
   return result;
