@@ -55,7 +55,8 @@ module.exports = {
       respectPrefersColorScheme: true,
     },
     prism: {
-      theme: require('prism-react-renderer/themes/dracula'),
+      theme: require('./src/config/prismLight'),
+      darkTheme: require('./src/config/prismDark'),
       additionalLanguages: ['csharp', 'bash', 'batch', 'powershell'],
     },
     navbar: {

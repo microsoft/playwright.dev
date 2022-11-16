@@ -55,8 +55,9 @@ module.exports = {
       respectPrefersColorScheme: true,
     },
     prism: {
-      theme: require('prism-react-renderer/themes/dracula'),
-      additionalLanguages: ['java', 'bash', 'batch', 'powershell', 'csharp'],
+      theme: require('./src/config/prismLight'),
+      darkTheme: require('./src/config/prismDark'),
+      additionalLanguages: ['java', 'bash', 'batch', 'powershell'],
     },
     navbar: {
       title: "Playwright for Java",
