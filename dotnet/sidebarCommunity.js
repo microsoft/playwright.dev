@@ -6,13 +6,30 @@ module.exports = {
       type: 'category',
       label: 'Videos',
       items: [
-        'conference-videos',
-        'live-streams',
-        'feature-videos',
-        'release-videos'
+        {
+          type: 'link',
+          label: 'Conference Videos',
+          href: '/community/conference-videos'
+        },
+        {
+          type: 'link',
+          label: 'Release Videos',
+          href: '/community/release-videos'
+        },
+        {
+          type: 'link',
+          label: 'Live Streams',
+          href: '/community/live-streams'
+        },
+        {
+          type: 'link',
+          label: 'Feature Videos',
+          href: '/community/feature-videos'
+        }
       ],
       collapsed: false
     },
+
     {
       type: 'link',
       label: 'Join our Community Slack',

@@ -1,12 +1,7 @@
 module.exports = {
   community: [
     'welcome',
-    {
-      type: 'link',
-      label: 'Ambassadors',
-      href: '/community/ambassadors'
-    },
-
+    'ambassadors',
     {
       type: 'category',
       label: 'Videos',
