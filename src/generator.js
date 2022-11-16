@@ -23,7 +23,7 @@ const path = require('path');
 const md = require('./markdown');
 const { parseApi } = require('./api_parser');
 const Documentation = require('./documentation');
-const { generateTabGroups } = require('./format_utils');
+const { generateTabGroups, renderHTMLCard } = require('./format_utils');
 
 /** @typedef {import('./documentation').Type} Type */
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
@@ -156,6 +156,7 @@ title: "${rewriteClassTitle(clazz.name, this.lang) || clazz.name}"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
+import HTMLCard from '@site/src/components/HTMLCard';
 `});
     result.push(...this.formatComment(clazz.spec));
     result.push({
@@ -188,7 +189,7 @@ import TabItem from '@theme/TabItem';
       // Iterate members
       for (const { text, args } of this.formatter.formatMember(member)) {
         /** @type {MarkdownNode} */
-        const memberNode = { type: 'h2', children: [] };
+        const memberNode = { type: 'h2', children: [], text: '' };
         if (!this.heading2ExplicitId.has(member))
           throw new Error(`Header ${text} needs to have an explicit ID`)
         memberNode.text = `${text} {#${this.heading2ExplicitId.get(member)}}`;
@@ -242,6 +243,7 @@ import TabItem from '@theme/TabItem';
   formatComment(spec) {
     spec = this.formatter.preprocessComment(spec);
     spec = generateTabGroups(spec, this.lang);
+    spec = renderHTMLCard(spec);
 
     spec = spec.filter(c => {
       // if it's marked as generic, its always included
@@ -342,7 +344,8 @@ title: "Assertions"
 ---`, `"
 ---
 import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';`);
+import TabItem from '@theme/TabItem';
+import HTMLCard from '@site/src/components/HTMLCard';`);
   writeFileSyncCached(path.join(this.outDir, outName), this.mdxLinks(output));
   }
 

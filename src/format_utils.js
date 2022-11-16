@@ -51,6 +51,36 @@ ${md.render([t.spec])}
 }
 
 /**
+ * @param {MarkdownNode[]} spec
+ * @returns {MarkdownNode[]}
+ */
+function renderHTMLCard(spec) {
+  /** @type {MarkdownNode[]} */
+  const result = [];
+  for (const node of spec) {
+    if (node.type !== 'code' || node.codeLang !== 'html card') {
+      result.push(node);
+      continue;
+    }
+    const tokens = [];
+    tokens.push(`<HTMLCard>`);
+    tokens.push(`<div>`);
+    tokens.push(...node.lines);
+    tokens.push('</div>');
+    tokens.push('');
+    tokens.push('```html');
+    tokens.push(...node.lines);
+    tokens.push('```');
+    tokens.push('</HTMLCard>');
+    result.push({
+        type: 'text',
+        text: tokens.join('\n')
+    });
+  }
+  return result;
+}
+
+/**
  * @param {string} groupId
  * @param {string} value
  */
@@ -98,4 +128,5 @@ function tabWeight(type) {
 
 module.exports = {
   generateTabGroups,
+  renderHTMLCard,
 }
