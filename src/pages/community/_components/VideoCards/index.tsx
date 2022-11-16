@@ -37,9 +37,12 @@ function VideoCard({ video }) {
         )}
       </div>
       <div className="card__body">
-        {video.conference ? (
+        {video.conference || video.host ? (
           <div className={styles.videoCardHeader}>
-            <h4 className={styles.videoCardTitle}>{video.conference}</h4>
+            <h4 className={styles.videoCardTitle}>
+              {video.conference || video.host}
+            </h4>
+            {video.year ? <span>{video.year}</span> : null}
           </div>
         ) : null}
 
@@ -59,24 +62,34 @@ function VideoCard({ video }) {
         ) : null}
 
         {video.title ? (
-          <p className={styles.videoCardBody}>{video.title}</p>
+          <p className={styles.videoCardTitle}>{video.title}</p>
         ) : null}
-
-        {video.conference ? <ConferenceTags video={video} /> : null}
-
-        <div className={styles.videoCardHighlights}>
-          {video.highlights ? <VideoHighlights video={video} /> : null}
-        </div>
+      </div>
+      <div className="card__footer">
+        {video.speakers ? <Speakers video={video} /> : null}
+        {video.highlights ? (
+          <div className={styles.videoCardHighlights}>
+            {<VideoHighlights video={video} />}
+          </div>
+        ) : null}
       </div>
     </li>
   );
 }
 
-function ConferenceTags({ video }) {
+function Speakers({ video }) {
   return (
     <div className={styles.videoCardTags}>
-      {video.year ? <span>{video.year}</span> : null}
-      {video.language ? <span>{video.language}</span> : null}
+      <div>
+        {video.speakers
+          ? video.speakers.map((speaker) => (
+              <span className={styles.speaker}>{speaker} &nbsp;</span>
+            ))
+          : null}
+      </div>
+      {video.language ? (
+        <span className={styles.language}>{video.language}</span>
+      ) : null}
     </div>
   );
 }
@@ -86,7 +99,9 @@ function VideoHighlights({ video }) {
     <div className={styles.videoCardHighlights}>
       {video.highlights
         ? video.highlights.map((highlight) => (
-            <span key={highlight}>{highlight} &nbsp;</span>
+            <span key={highlight} className={styles.tag}>
+              {highlight} &nbsp;
+            </span>
           ))
         : null}
     </div>

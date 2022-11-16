@@ -2,17 +2,12 @@ const conferenceVideos = [
   {
     version: '1.27',
     id: 'b84eqab3kwc',
-    highlights: ['Locators', 'workers']
-  },
-  {
-    version: '1.26',
-    id: 'NFLHA57a-so',
-    highlights: ['Assertions', 'maxRedirects']
+    highlights: ['Locators', 'workers', 'html reporter']
   },
   {
     version: '1.25',
     id: 'NFLHA57a-so',
-    highlights: ['VS Code Extension', 'Test Runner']
+    highlights: ['VS Code Extension', 'Test Runner', '--trace=on']
   },
   {
     version: '1.24',
@@ -73,15 +68,18 @@ const conferenceVideos = [
   ,
   {
     version: '1.16',
-    id: 'OQKwFDmY64g'
+    id: 'OQKwFDmY64g',
+    highlights: ['API Testing', 'Response Interception', 'New HTML reporter']
   },
   {
     version: '1.15',
-    id: '6RwzsDeEj7Y'
+    id: '6RwzsDeEj7Y',
+    highlights: ['Mouse Wheel', 'New Headers API', 'test.parallel()']
   },
   {
     version: '1.14',
-    id: 'LczBDR0gOhk'
+    id: 'LczBDR0gOhk',
+    highlights: ['Locators API', 'Web-First Assertions', 'test.step']
   }
 ];
 
