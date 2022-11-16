@@ -12,8 +12,10 @@ Locators are the central piece of Playwright's auto-waiting and retry-ability. I
 
 - [locator.allInnerTexts()](/api/class-locator.mdx#locator-all-inner-texts)
 - [locator.allTextContents()](/api/class-locator.mdx#locator-all-text-contents)
+- [locator.blur([options])](/api/class-locator.mdx#locator-blur)
 - [locator.boundingBox([options])](/api/class-locator.mdx#locator-bounding-box)
 - [locator.check([options])](/api/class-locator.mdx#locator-check)
+- [locator.clear([options])](/api/class-locator.mdx#locator-clear)
 - [locator.click([options])](/api/class-locator.mdx#locator-click)
 - [locator.count()](/api/class-locator.mdx#locator-count)
 - [locator.dblclick([options])](/api/class-locator.mdx#locator-dblclick)
@@ -81,6 +83,16 @@ Returns an array of `node.innerText` values for all matching nodes.
 
 Returns an array of `node.textContent` values for all matching nodes.
 
+## locator.blur([options]) {#locator-blur}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.28</font>
+
+- `options?` &#60;[Object]&#62;
+  - `timeout?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-blur-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](/api/class-page.mdx#page-set-default-timeout) methods.<a href="#locator-blur-option-timeout" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-blur-return"/> &#60;[Promise]<[void]>&#62;<a href="#locator-blur-return" class="list-anchor">#</a>
+
+Calls [blur](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/blur) on the element.
+
 ## locator.boundingBox([options]) {#locator-bounding-box}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font>
@@ -131,6 +143,20 @@ This method checks the element by performing the following steps:
 If the element is detached from the DOM at any moment during the action, this method throws.
 
 When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
+
+## locator.clear([options]) {#locator-clear}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.28</font>
+
+- `options?` &#60;[Object]&#62;
+  - `force?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-clear-option-force"/> &#60;[boolean]&#62; Whether to bypass the [actionability](../actionability.mdx) checks. Defaults to `false`.<a href="#locator-clear-option-force" class="list-anchor">#</a>
+  - `noWaitAfter?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-clear-option-no-wait-after"/> &#60;[boolean]&#62; Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.<a href="#locator-clear-option-no-wait-after" class="list-anchor">#</a>
+  - `timeout?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-clear-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](/api/class-page.mdx#page-set-default-timeout) methods.<a href="#locator-clear-option-timeout" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-clear-return"/> &#60;[Promise]<[void]>&#62;<a href="#locator-clear-return" class="list-anchor">#</a>
+
+This method waits for [actionability](../actionability.mdx) checks, focuses the element, clears it and triggers an `input` event after clearing.
+
+If the target element is not an `<input>`, `<textarea>` or `[contenteditable]` element, this method throws an error. However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), the control will be cleared instead.
 
 ## locator.click([options]) {#locator-click}
 
@@ -452,7 +478,7 @@ Allows locating elements by their alt text. For example, this method will find t
   - `exact?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-label-option-exact"/> &#60;[boolean]&#62; Whether to find an exact match: case-sensitive and whole-string. Default to false. Ignored when locating by a regular expression. Note that exact match still trims whitespace.<a href="#locator-get-by-label-option-exact" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-label-return"/> &#60;[Locator]&#62;<a href="#locator-get-by-label-return" class="list-anchor">#</a>
 
-Allows locating input elements by the text of the associated label. For example, this method will find the input by label text Password in the following DOM:
+Allows locating input elements by the text of the associated label. For example, this method will find the input by label text "Password" in the following DOM:
 
 ```html
 <label for="password-input">Password:</label>
@@ -480,31 +506,32 @@ Allows locating input elements by the placeholder text. For example, this method
 
 - `role`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-role-option-role"/> &#60;"alert"|"alertdialog"|"application"|"article"|"banner"|"blockquote"|"button"|"caption"|"cell"|"checkbox"|"code"|"columnheader"|"combobox"|"complementary"|"contentinfo"|"definition"|"deletion"|"dialog"|"directory"|"document"|"emphasis"|"feed"|"figure"|"form"|"generic"|"grid"|"gridcell"|"group"|"heading"|"img"|"insertion"|"link"|"list"|"listbox"|"listitem"|"log"|"main"|"marquee"|"math"|"meter"|"menu"|"menubar"|"menuitem"|"menuitemcheckbox"|"menuitemradio"|"navigation"|"none"|"note"|"option"|"paragraph"|"presentation"|"progressbar"|"radio"|"radiogroup"|"region"|"row"|"rowgroup"|"rowheader"|"scrollbar"|"search"|"searchbox"|"separator"|"slider"|"spinbutton"|"status"|"strong"|"subscript"|"superscript"|"switch"|"tab"|"table"|"tablist"|"tabpanel"|"term"|"textbox"|"time"|"timer"|"toolbar"|"tooltip"|"tree"|"treegrid"|"treeitem"&#62; Required aria role.<a href="#locator-get-by-role-option-role" class="list-anchor">#</a>
 - `options?` &#60;[Object]&#62;
-  - `checked?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-role-option-checked"/> &#60;[boolean]&#62; An attribute that is usually set by `aria-checked` or native `<input type=checkbox>` controls. Available values for checked are `true`, `false` and `"mixed"`.<a href="#locator-get-by-role-option-checked" class="list-anchor">#</a>
+  - `checked?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-role-option-checked"/> &#60;[boolean]&#62; An attribute that is usually set by `aria-checked` or native `<input type=checkbox>` controls.<a href="#locator-get-by-role-option-checked" class="list-anchor">#</a>
 
     Learn more about [`aria-checked`](https://www.w3.org/TR/wai-aria-1.2/#aria-checked).
-  - `disabled?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-role-option-disabled"/> &#60;[boolean]&#62; A boolean attribute that is usually set by `aria-disabled` or `disabled`.<a href="#locator-get-by-role-option-disabled" class="list-anchor">#</a>
+  - `disabled?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-role-option-disabled"/> &#60;[boolean]&#62; An attribute that is usually set by `aria-disabled` or `disabled`.<a href="#locator-get-by-role-option-disabled" class="list-anchor">#</a>
 
     :::note
     Unlike most other attributes, `disabled` is inherited through the DOM hierarchy. Learn more about [`aria-disabled`](https://www.w3.org/TR/wai-aria-1.2/#aria-disabled).
     :::
 
-  - `expanded?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-role-option-expanded"/> &#60;[boolean]&#62; A boolean attribute that is usually set by `aria-expanded`.<a href="#locator-get-by-role-option-expanded" class="list-anchor">#</a>
+  - `exact?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-role-option-exact"/> &#60;[boolean]&#62; Whether `name` is matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when `name` is a regular expression. Note that exact match still trims whitespace. <font size="2">Added in: v1.28</font><a href="#locator-get-by-role-option-exact" class="list-anchor">#</a>
+  - `expanded?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-role-option-expanded"/> &#60;[boolean]&#62; An attribute that is usually set by `aria-expanded`.<a href="#locator-get-by-role-option-expanded" class="list-anchor">#</a>
 
     Learn more about [`aria-expanded`](https://www.w3.org/TR/wai-aria-1.2/#aria-expanded).
-  - `includeHidden?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-role-option-include-hidden"/> &#60;[boolean]&#62; A boolean attribute that controls whether hidden elements are matched. By default, only non-hidden elements, as [defined by ARIA](https://www.w3.org/TR/wai-aria-1.2/#tree_exclusion), are matched by role selector.<a href="#locator-get-by-role-option-include-hidden" class="list-anchor">#</a>
+  - `includeHidden?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-role-option-include-hidden"/> &#60;[boolean]&#62; Option that controls whether hidden elements are matched. By default, only non-hidden elements, as [defined by ARIA](https://www.w3.org/TR/wai-aria-1.2/#tree_exclusion), are matched by role selector.<a href="#locator-get-by-role-option-include-hidden" class="list-anchor">#</a>
 
     Learn more about [`aria-hidden`](https://www.w3.org/TR/wai-aria-1.2/#aria-hidden).
   - `level?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-role-option-level"/> &#60;[number]&#62; A number attribute that is usually present for roles `heading`, `listitem`, `row`, `treeitem`, with default values for `<h1>-<h6>` elements.<a href="#locator-get-by-role-option-level" class="list-anchor">#</a>
 
     Learn more about [`aria-level`](https://www.w3.org/TR/wai-aria-1.2/#aria-level).
-  - `name?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-role-option-name"/> &#60;[string]|[RegExp]&#62; A string attribute that matches [accessible name](https://w3c.github.io/accname/#dfn-accessible-name).<a href="#locator-get-by-role-option-name" class="list-anchor">#</a>
+  - `name?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-role-option-name"/> &#60;[string]|[RegExp]&#62; Option to match the [accessible name](https://w3c.github.io/accname/#dfn-accessible-name). By default, matching is case-insensitive and searches for a substring, use `exact` to control this behavior.<a href="#locator-get-by-role-option-name" class="list-anchor">#</a>
 
     Learn more about [accessible name](https://w3c.github.io/accname/#dfn-accessible-name).
-  - `pressed?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-role-option-pressed"/> &#60;[boolean]&#62; An attribute that is usually set by `aria-pressed`. Available values for pressed are `true`, `false` and `"mixed"`.<a href="#locator-get-by-role-option-pressed" class="list-anchor">#</a>
+  - `pressed?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-role-option-pressed"/> &#60;[boolean]&#62; An attribute that is usually set by `aria-pressed`.<a href="#locator-get-by-role-option-pressed" class="list-anchor">#</a>
 
     Learn more about [`aria-pressed`](https://www.w3.org/TR/wai-aria-1.2/#aria-pressed).
-  - `selected?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-role-option-selected"/> &#60;[boolean]&#62; A boolean attribute that is usually set by `aria-selected`.<a href="#locator-get-by-role-option-selected" class="list-anchor">#</a>
+  - `selected?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-role-option-selected"/> &#60;[boolean]&#62; An attribute that is usually set by `aria-selected`.<a href="#locator-get-by-role-option-selected" class="list-anchor">#</a>
 
     Learn more about [`aria-selected`](https://www.w3.org/TR/wai-aria-1.2/#aria-selected).
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-role-return"/> &#60;[Locator]&#62;<a href="#locator-get-by-role-return" class="list-anchor">#</a>
@@ -521,6 +548,13 @@ Note that many html elements have an implicitly [defined role](https://w3c.githu
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-test-id-return"/> &#60;[Locator]&#62;<a href="#locator-get-by-test-id-return" class="list-anchor">#</a>
 
 Locate element by the test id. By default, the `data-testid` attribute is used as a test id. Use [selectors.setTestIdAttribute(attributeName)](/api/class-selectors.mdx#selectors-set-test-id-attribute) to configure a different test id attribute if necessary.
+
+```js
+// Set custom test id attribute from @playwright/test config:
+use: {
+  testIdAttribute: 'data-pw'
+}
+```
 
 ## locator.getByText(text[, options]) {#locator-get-by-text}
 
@@ -576,7 +610,7 @@ Input elements of the type `button` and `submit` are matched by their `value` in
   - `exact?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-title-option-exact"/> &#60;[boolean]&#62; Whether to find an exact match: case-sensitive and whole-string. Default to false. Ignored when locating by a regular expression. Note that exact match still trims whitespace.<a href="#locator-get-by-title-option-exact" class="list-anchor">#</a>
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-title-return"/> &#60;[Locator]&#62;<a href="#locator-get-by-title-return" class="list-anchor">#</a>
 
-Allows locating elements by their title. For example, this method will find the button by its title "Submit":
+Allows locating elements by their title. For example, this method will find the button by its title "Place the order":
 
 ```html
 <button title='Place the order'>Order Now</button>
@@ -597,6 +631,7 @@ Highlight the corresponding element(s) on the screen. Useful for debugging, don'
 - `options?` &#60;[Object]&#62;
   - `force?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-hover-option-force"/> &#60;[boolean]&#62; Whether to bypass the [actionability](../actionability.mdx) checks. Defaults to `false`.<a href="#locator-hover-option-force" class="list-anchor">#</a>
   - `modifiers?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-hover-option-modifiers"/> &#60;[Array]<"Alt"|"Control"|"Meta"|"Shift">&#62; Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used.<a href="#locator-hover-option-modifiers" class="list-anchor">#</a>
+  - `noWaitAfter?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-hover-option-no-wait-after"/> &#60;[boolean]&#62; Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`. <font size="2">Added in: v1.28</font><a href="#locator-hover-option-no-wait-after" class="list-anchor">#</a>
   - `position?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-hover-option-position"/> &#60;[Object]&#62; A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.<a href="#locator-hover-option-position" class="list-anchor">#</a>
     - `x` &#60;[number]&#62;
     - `y` &#60;[number]&#62;
@@ -787,7 +822,7 @@ Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported a
   - `omitBackground?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-screenshot-option-omit-background"/> &#60;[boolean]&#62; Hides default white background and allows capturing screenshots with transparency. Not applicable to `jpeg` images. Defaults to `false`.<a href="#locator-screenshot-option-omit-background" class="list-anchor">#</a>
   - `path?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-screenshot-option-path"/> &#60;[string]&#62; The file path to save the image to. The screenshot type will be inferred from file extension. If `path` is a relative path, then it is resolved relative to the current working directory. If no path is provided, the image won't be saved to the disk.<a href="#locator-screenshot-option-path" class="list-anchor">#</a>
   - `quality?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-screenshot-option-quality"/> &#60;[number]&#62; The quality of the image, between 0-100. Not applicable to `png` images.<a href="#locator-screenshot-option-quality" class="list-anchor">#</a>
-  - `scale?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-screenshot-option-scale"/> &#60;"css"|"device"&#62; When set to `"css"`, screenshot will have a single pixel per each css pixel on the page. For high-dpi devices, this will keep screenshots small. Using `"device"` option will produce a single pixel per each device pixel, so screenhots of high-dpi devices will be twice as large or even larger.<a href="#locator-screenshot-option-scale" class="list-anchor">#</a>
+  - `scale?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-screenshot-option-scale"/> &#60;"css"|"device"&#62; When set to `"css"`, screenshot will have a single pixel per each css pixel on the page. For high-dpi devices, this will keep screenshots small. Using `"device"` option will produce a single pixel per each device pixel, so screenshots of high-dpi devices will be twice as large or even larger.<a href="#locator-screenshot-option-scale" class="list-anchor">#</a>
 
     Defaults to `"device"`.
   - `timeout?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-screenshot-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultTimeout(timeout)](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout(timeout)](/api/class-page.mdx#page-set-default-timeout) methods.<a href="#locator-screenshot-option-timeout" class="list-anchor">#</a>

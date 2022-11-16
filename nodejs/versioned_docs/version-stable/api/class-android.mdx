@@ -80,8 +80,23 @@ PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm i -D playwright
 ```
 
 
+- [android.connect(wsEndpoint[, options])](/api/class-android.mdx#android-connect)
 - [android.devices([options])](/api/class-android.mdx#android-devices)
+- [android.launchServer([options])](/api/class-android.mdx#android-launch-server)
 - [android.setDefaultTimeout(timeout)](/api/class-android.mdx#android-set-default-timeout)
+
+## android.connect(wsEndpoint[, options]) {#android-connect}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.28</font>
+
+- `wsEndpoint`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="android-connect-option-ws-endpoint"/> &#60;[string]&#62; A browser websocket endpoint to connect to.<a href="#android-connect-option-ws-endpoint" class="list-anchor">#</a>
+- `options?` &#60;[Object]&#62;
+  - `headers?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="android-connect-option-headers"/> &#60;[Object]<[string], [string]>&#62; Additional HTTP headers to be sent with web socket connect request. Optional.<a href="#android-connect-option-headers" class="list-anchor">#</a>
+  - `slowMo?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="android-connect-option-slow-mo"/> &#60;[number]&#62; Slows down Playwright operations by the specified amount of milliseconds. Useful so that you can see what is going on. Defaults to `0`.<a href="#android-connect-option-slow-mo" class="list-anchor">#</a>
+  - `timeout?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="android-connect-option-timeout"/> &#60;[number]&#62; Maximum time in milliseconds to wait for the connection to be established. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.<a href="#android-connect-option-timeout" class="list-anchor">#</a>
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="android-connect-return"/> &#60;[Promise]<[AndroidDevice]>&#62;<a href="#android-connect-return" class="list-anchor">#</a>
+
+This methods attaches Playwright to an existing Android device. Use [android.launchServer([options])](/api/class-android.mdx#android-launch-server) to launch a new Android server instance.
 
 ## android.devices([options]) {#android-devices}
 
@@ -94,6 +109,63 @@ PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1 npm i -D playwright
 - returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="android-devices-return"/> &#60;[Promise]<[Array]<[AndroidDevice]>>&#62;<a href="#android-devices-return" class="list-anchor">#</a>
 
 Returns the list of detected Android devices.
+
+## android.launchServer([options]) {#android-launch-server}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.28</font>
+
+- `options?` &#60;[Object]&#62;
+  - `adbHost?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="android-launch-server-option-adb-host"/> &#60;[string]&#62; Optional host to establish ADB server connection. Default to `127.0.0.1`.<a href="#android-launch-server-option-adb-host" class="list-anchor">#</a>
+  - `adbPort?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="android-launch-server-option-adb-port"/> &#60;[number]&#62; Optional port to establish ADB server connection. Default to `5037`.<a href="#android-launch-server-option-adb-port" class="list-anchor">#</a>
+  - `deviceSerialNumber?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="android-launch-server-option-device-serial-number"/> &#60;[string]&#62; Optional device serial number to launch the browser on. If not specified, it will throw if multiple devices are connected.<a href="#android-launch-server-option-device-serial-number" class="list-anchor">#</a>
+  - `omitDriverInstall?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="android-launch-server-option-omit-driver-install"/> &#60;[boolean]&#62; Prevents automatic playwright driver installation on attach. Assumes that the drivers have been installed already.<a href="#android-launch-server-option-omit-driver-install" class="list-anchor">#</a>
+  - `port?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="android-launch-server-option-port"/> &#60;[number]&#62; Port to use for the web socket. Defaults to 0 that picks any available port.<a href="#android-launch-server-option-port" class="list-anchor">#</a>
+  - `wsPath?`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="android-launch-server-option-ws-path"/> &#60;[string]&#62; Path at which to serve the Android Server. For security, this defaults to an unguessable string.<a href="#android-launch-server-option-ws-path" class="list-anchor">#</a>
+
+    :::warning
+    Any process or web page (including those running in Playwright) with knowledge of the `wsPath` can take control of the OS user. For this reason, you should use an unguessable token when using this option.
+    :::
+
+- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="android-launch-server-return"/> &#60;[Promise]<[BrowserServer]>&#62;<a href="#android-launch-server-return" class="list-anchor">#</a>
+
+Launches Playwright Android server that clients can connect to. See the following example:
+
+Server Side:
+
+```js
+const { _android } = require('playwright');
+
+(async () => {
+  const browserServer = await _android.launchServer({
+    // If you have multiple devices connected and want to use a specific one.
+    // deviceSerialNumber: '<deviceSerialNumber>',
+  });
+  const wsEndpoint = browserServer.wsEndpoint();
+  console.log(wsEndpoint);
+})();
+```
+
+Client Side:
+
+```js
+const { _android } = require('playwright');
+
+(async () => {
+  const device = await _android.connect('<wsEndpoint>');
+
+  console.log(device.model());
+  console.log(device.serial());
+  await device.shell('am force-stop com.android.chrome');
+  const context = await device.launchBrowser();
+
+  const page = await context.newPage();
+  await page.goto('https://webkit.org/');
+  console.log(await page.evaluate(() => window.location.href));
+  await page.screenshot({ path: 'page-chrome-1.png' });
+
+  await context.close();
+})();
+```
 
 ## android.setDefaultTimeout(timeout) {#android-set-default-timeout}
 
