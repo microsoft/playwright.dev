@@ -6,104 +6,122 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-Playwright assertions are created specifically for the dynamic web. Checks are automatically retried until the necessary conditions are met. Playwright comes with [auto-wait](./actionability.mdx) built in meaning it waits for elements to be actionable prior to performing actions. Playwright provides a [test](./api/class-test.mdx) function to declare tests and the [expect](https://jestjs.io/docs/expect) function to write assertions.
+Playwright tests are simple, they
+- **perform actions**, and
+- **assert the state** against expectations.
+
+There is no need to wait for anything prior to performing an action: Playwright automatically waits for the wide range of [actionability](./actionability.mdx) checks to pass prior to performing each action.
+
+There is also no need to deal with the race conditions when performing the checks - Playwright assertions are designed in a way that they describe the expectations that need to be eventually met.
+
+That's it! These design choices allow Playwright users to forget about flaky timeouts and racy checks in their tests altogether.
 
 **You will learn**
-- [How the example test works](/writing-tests.mdx#the-example-test)
+- [How to write the first test](/writing-tests.mdx#first-test)
+- [How to perform actions](/writing-tests.mdx#actions)
 - [How to use assertions](/writing-tests.mdx#assertions)
-- [How to use locators](/writing-tests.mdx#locators)
 - [How tests run in isolation](/writing-tests.mdx#test-isolation)
 - [How to use test hooks](/writing-tests.mdx#using-test-hooks)
 
-## The Example Test
+## First test
 
-Take a look at the example test included when installing Playwright to see how to write a test using [locators](/locators.mdx) and [web first assertions](/test-assertions.mdx).
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
+Take a look at the following example to see how to write a test.
 
 ```js
-import { test, expect } from '@playwright/test';
+import { test, expect } = require('@playwright/test');
 
-test('homepage has Playwright in title and get started link linking to the intro page', async ({ page }) => {
+test('has title', async ({ page }) => {
   await page.goto('https://playwright.dev/');
 
   // Expect a title "to contain" a substring.
   await expect(page).toHaveTitle(/Playwright/);
+});
 
-  // create a locator
-  const getStarted = page.getByRole('link', { name: 'Get started' });
-
-  // Expect an attribute "to be strictly equal" to the value.
-  await expect(getStarted).toHaveAttribute('href', '/docs/intro');
+test('get started link', async ({ page }) => {
+  await page.goto('https://playwright.dev/');
 
   // Click the get started link.
-  await getStarted.click();
+  await page.getByRole('link', { name: 'Get started' }).click();
 
   // Expects the URL to contain intro.
   await expect(page).toHaveURL(/.*intro/);
 });
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-// @ts-check
-const { test, expect } = require('@playwright/test');
-
-test('homepage has Playwright in title and get started link linking to the intro page', async ({ page }) => {
-  await page.goto('https://playwright.dev/');
-
-  // Expect a title "to contain" a substring.
-  await expect(page).toHaveTitle(/Playwright/);
-
-  // create a locator
-  const getStarted = page.getByRole('link', { name: 'Get started' });
-
-  // Expect an attribute "to be strictly equal" to the value.
-  await expect(getStarted).toHaveAttribute('href', '/docs/intro');
-
-  // Click the get started link.
-  await getStarted.click();
-
-  // Expects the URL to contain intro.
-  await expect(page).toHaveURL(/.*intro/);
-});
-```
-
-</TabItem>
-</Tabs>
 
 :::note
 Add `// @ts-check` at the start of each test file when using JavaScript in VS Code to get automatic type checking.
 :::
 
-### Assertions
+## Actions
 
-Playwright Test uses the [expect](https://jestjs.io/docs/expect) library for [test assertions](./test-assertions.mdx) which provides matchers like `toEqual`, `toContain`, `toMatch`, `toBe` and many more. Playwright also extends this library with convenience async matchers that will wait until the expected condition is met.
+### Navigation
+
+Most of the tests will start with navigating page to the URL. After that, test will be able to interact with the page elements.
+
+```js
+await page.goto('https://playwright.dev/');
+```
+
+Playwright will wait for page to reach the load state prior to moving forward. Learn more about the [page.goto(url[, options])](/api/class-page.mdx#page-goto) options.
+
+### Interactions
+
+Performing actions starts with locating the elements. Playwright uses [Locators API](./locators.mdx) for that. Locators represent a way to find element(s) on the page at any moment, learn more about the [different types](./locators.mdx) of locators available. Playwright will wait for the element to be [actionable](./actionability.mdx) prior to performing the action, so there is no need to need wait for it to become available.
+
+```js
+// Create a locator.
+const getStarted = page.getByRole('link', { name: 'Get started' });
+// Click it.
+await getStarted.click();
+```
+
+In most cases, it'll be written in one line:
+
+```js
+await page.getByRole('link', { name: 'Get started' }).click();
+```
+
+### Basic actions
+
+This is the list of the most popular Playwright actions. Note that there are many more, so make sure to check the [Locator API](./api/class-locator.mdx) section to learn more about them.
+
+| Action | Description |
+| :- | :- |
+| [locator.check([options])](/api/class-locator.mdx#locator-check) | Check the input checkbox |
+| [locator.click([options])](/api/class-locator.mdx#locator-click) | Click the element |
+| [locator.uncheck([options])](/api/class-locator.mdx#locator-uncheck) | Uncheck the input checkbox |
+| [locator.hover([options])](/api/class-locator.mdx#locator-hover) | Hover mouse over the element |
+| [locator.fill(value[, options])](/api/class-locator.mdx#locator-fill) | Fill the form field (fast) |
+| [locator.focus([options])](/api/class-locator.mdx#locator-focus) | Focus the element |
+| [locator.press(key[, options])](/api/class-locator.mdx#locator-press) | Press single key |
+| [locator.setInputFiles(files[, options])](/api/class-locator.mdx#locator-set-input-files) | Pick files to upload |
+| [locator.selectOption(values[, options])](/api/class-locator.mdx#locator-select-option) | Select option in the drop down |
+| [locator.type(text[, options])](/api/class-locator.mdx#locator-type) | Type text character by character (slow) |
+
+## Assertions
+
+Playwright Test uses the [expect](https://jestjs.io/docs/expect) library for [test assertions](./test-assertions.mdx) which provides matchers like `toEqual`, `toContain`, `toMatch`, `toBe` and many more. It also extends this library with the convenience async matchers that will wait until the expected condition is met. Using these matchers allows making the tests non-flaky and resilient. For example, this code will wait until the page gets the title containing "Playwright":
 
 ```js
 await expect(page).toHaveTitle(/Playwright/);
 ```
 
-### Locators
+Here is the list of the most popular async assertions. Note that there are [many more](./test-assertions.mdx) to get familiar with:
 
-[Locators](./locators.mdx) are the central piece of Playwright's auto-waiting and retry-ability. Locators represent a way to find element(s) on the page at any moment and are used to perform actions on elements such as `.click` `.fill` etc.
-
-```js
-const getStarted = page.getByRole('link', { name: 'Get started' });
-
-await expect(getStarted).toHaveAttribute('href', '/docs/installation');
-await getStarted.click();
-```
+| Assertion | Description |
+| :- | :- |
+| [expect(locator).toBeChecked([options])](/test-assertions.mdx#locator-assertions-to-be-checked) | Checkbox is checked |
+| [expect(locator).toBeChecked([options])](/test-assertions.mdx#locator-assertions-to-be-checked) | Checkbox is checked |
+| [expect(locator).toBeEnabled([options])](/test-assertions.mdx#locator-assertions-to-be-enabled) | Control is enabled |
+| [expect(locator).toBeVisible([options])](/test-assertions.mdx#locator-assertions-to-be-visible) | Element is visible |
+| [expect(locator).toContainText(expected[, options])](/test-assertions.mdx#locator-assertions-to-contain-text) | Element contains text |
+| [expect(locator).toHaveAttribute(name, value[, options])](/test-assertions.mdx#locator-assertions-to-have-attribute) | Element has attribute |
+| [expect(locator).toHaveCount(count[, options])](/test-assertions.mdx#locator-assertions-to-have-count) | List of elements has given length |
+| [expect(locator).toHaveText(expected[, options])](/test-assertions.mdx#locator-assertions-to-have-text) | Element matches text |
+| [expect(locator).toHaveValue(value[, options])](/test-assertions.mdx#locator-assertions-to-have-value) | Input element has value |
+| [expect(page).toHaveTitle(titleOrRegExp[, options])](/test-assertions.mdx#page-assertions-to-have-title) | Page has title |
+| [expect(page).toHaveURL(urlOrRegExp[, options])](/test-assertions.mdx#page-assertions-to-have-url) | Page has URL |
+| [expect(page).toHaveScreenshot(name[, options])](/test-assertions.mdx#page-assertions-to-have-screenshot-1) | Page has screenshot |
 
 ### Test Isolation
 
@@ -117,16 +135,6 @@ test('basic test', async ({ page }) => {
 ### Using Test Hooks
 
 You can use various [test hooks](./api/class-test.mdx) such as `test.describe` to declare a group of tests and `test.beforeEach` and `test.afterEach` which are executed before/after each test. Other hooks include the `test.beforeAll` and `test.afterAll` which are executed once per worker before/after all tests.
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
 
 ```js
 import { test, expect } from "@playwright/test";
@@ -143,29 +151,6 @@ test.describe("navigation", () => {
   });
 });
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-// @ts-check
-const { test, expect } = require("@playwright/test");
-
-test.describe("navigation", () => {
-  test.beforeEach(async ({ page }) => {
-    // Go to the starting url before each test.
-    await page.goto("https://playwright.dev/");
-  });
-
-  test("main navigation", async ({ page }) => {
-    // Assertions use the expect API.
-    await expect(page).toHaveURL("https://playwright.dev/");
-  });
-});
-```
-
-</TabItem>
-</Tabs>
 
 ## What's Next
 - [Run single test, multiple tests, headed mode](./running-tests.mdx)
@@ -219,6 +204,7 @@ test.describe("navigation", () => {
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [Worker]: /api/class-worker.mdx "Worker"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
+[Storage]: /api/class-storage.mdx "Storage"
 [Test]: /api/class-test.mdx "Test"
 [TestConfig]: /api/class-testconfig.mdx "TestConfig"
 [TestError]: /api/class-testerror.mdx "TestError"
