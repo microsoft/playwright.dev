@@ -61,9 +61,15 @@ Playwright comes with multiple built-in locators. To make tests resilient, we re
 
 For example, consider the following DOM structure.
 
+<HTMLCard>
+<div>
+<button>Sign in</button>
+</div>
+
 ```html
 <button>Sign in</button>
 ```
+</HTMLCard>
 
 Locate the element by its role of `button` with name "Sign in".
 
@@ -140,8 +146,7 @@ Note that all methods that create a locator, such as [page.get_by_label(text, **
 <TabItem value="sync">
 
 ```py
-locator = page.frame_locator("my-frame")
-    .get_by_role("button", name="Sign in")
+locator = page.frame_locator("my-frame").get_by_role("button", name="Sign in")
 
 locator.click()
 ```
@@ -150,8 +155,7 @@ locator.click()
 <TabItem value="async">
 
 ```py
-locator = page.frame_locator("#my-frame")
-    .get_by_role("button", name="Sign in")
+locator = page.frame_locator("#my-frame").get_by_role("button", name="Sign in")
 
 await locator.click()
 ```
@@ -165,15 +169,25 @@ The [page.get_by_role(role, **kwargs)](/api/class-page.mdx#page-get-by-role) loc
 
 For example, consider the following DOM structure.
 
+<HTMLCard>
+<div>
+<h3>Sign up</h3>
+<label>
+  <input type="checkbox" /> Subscribe
+</label>
+<br/>
+<button>Submit</button>
+</div>
+
 ```html
 <h3>Sign up</h3>
-<form>
-  <input type="checkbox" id="subscribe" />
-  <label for="subscribe">Subscribe</label>
-  <br>
-  <button>Submit</button>
-</form>
+<label>
+  <input type="checkbox" /> Subscribe
+</label>
+<br/>
+<button>Submit</button>
 ```
+</HTMLCard>
 
 You can locate each element by it's implicit role:
 
@@ -209,15 +223,6 @@ await page.get_by_role("button", name=re.compile("submit", re.IGNORECASE)).click
 </TabItem>
 </Tabs>
 
-```html
-<form>
-  <input type="checkbox" checked id="subscribe" />
-  <label for="subscribe">Subscribe</label>
-  <br>
-  <button>Submit</button>
-</form>
-```
-
 Role locators include [buttons, checkboxes, headings, links, lists, tables, and many more](https://www.w3.org/TR/html-aria/#docconformance) and follow W3C specifications for [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name).
 
 Note that role locators **do not replace** accessibility audits and conformance tests, but rather give early feedback about the ARIA guidelines.
@@ -232,10 +237,17 @@ Most form controls usually have dedicated labels that could be conveniently used
 
 For example, consider the following DOM structure.
 
+<HTMLCard>
+<div>
+<label>Password <input type="password" /></label>
+
+</div>
+
 ```html
-<label for="password">Password</label>
-<input type="password" id="password">
+<label>Password <input type="password" /></label>
+
 ```
+</HTMLCard>
 
 You can fill the input after locating it by the label text:
 
@@ -263,11 +275,6 @@ await page.get_by_label("Password").fill("secret")
 </TabItem>
 </Tabs>
 
-```html
-<label for="password">Password</label>
-<input type="password" id="password" value="secret" target>
-```
-
 :::tip When to use label locators
 Use this locator when locating form fields.
 :::
@@ -278,9 +285,15 @@ Inputs may have a placeholder attribute to hint to the user what value should be
 
 For example, consider the following DOM structure.
 
+<HTMLCard>
+<div>
+<input type="email" placeholder="name@example.com" />
+</div>
+
 ```html
-<input id="email" name="email" type="email" placeholder="name@example.com">
+<input type="email" placeholder="name@example.com" />
 ```
+</HTMLCard>
 
 You can fill the input after locating it by the placeholder text:
 
@@ -308,10 +321,6 @@ await page.get_by_placeholder("name@example.com").fill("playwright@microsoft.com
 </TabItem>
 </Tabs>
 
-```html
-<input id="email" name="email" type="email" placeholder="name@example.com" value="playwright@microsoft.com">
-```
-
 :::tip When to use placeholder locators
 Use this locator when locating form elements that do not have labels but do have placeholder texts.
 :::
@@ -322,9 +331,15 @@ Find an element by the text it contains. You can match by a substring, exact str
 
 For example, consider the following DOM structure.
 
+<HTMLCard>
+<div>
+<span>Welcome, John</span>
+</div>
+
 ```html
 <span>Welcome, John</span>
 ```
+</HTMLCard>
 
 You can locate the element by the text it contains:
 
@@ -391,14 +406,18 @@ Match with a regular expression:
 <TabItem value="sync">
 
 ```py
-expect(page.get_by_text(re.compile("welcome, john", re.IGNORECASE))).to_be_visible()
+expect(page
+    .get_by_text(re.compile("welcome, john", re.IGNORECASE)))
+    .to_be_visible()
 ```
 
 </TabItem>
 <TabItem value="async">
 
 ```py
-await expect(page.get_by_text(re.compile("welcome, john", re.IGNORECASE))).to_be_visible()
+await expect(page
+    .get_by_text(re.compile("welcome, john", re.IGNORECASE)))
+    .to_be_visible()
 ```
 
 </TabItem>
@@ -420,9 +439,15 @@ All images should have an `alt` attribute that describes the image. You can loca
 
 For example, consider the following DOM structure.
 
+<HTMLCard>
+<div>
+<img alt="playwright logo" src="/img/playwright-logo.svg" width="100" />
+</div>
+
 ```html
-<img alt="playwright logo" src="/playwright-logo.png" />
+<img alt="playwright logo" src="/img/playwright-logo.svg" width="100" />
 ```
+</HTMLCard>
 
 You can click on the image after locating it by the text alternative:
 
@@ -450,10 +475,6 @@ await page.get_by_alt_text("playwright logo").click()
 </TabItem>
 </Tabs>
 
-```html
-<img alt="playwright logo" src="/playwright-logo.png">
-```
-
 :::tip When to use alt locators
 Use this locator when your element supports alt text such as `img` and `area` elements.
 :::
@@ -464,9 +485,15 @@ Locate an element with a matching title attribute using [page.get_by_title(text,
 
 For example, consider the following DOM structure.
 
+<HTMLCard>
+<div>
+<span title='Issues count'>25 issues</span>
+</div>
+
 ```html
 <span title='Issues count'>25 issues</span>
 ```
+</HTMLCard>
 
 You can check the issues count after locating it by the title text:
 
@@ -504,9 +531,15 @@ Testing by test ids is the most resilient way of testing as even if your text or
 
 For example, consider the following DOM structure.
 
+<HTMLCard>
+<div>
+<button data-testid="directions">Itinéraire</button>
+</div>
+
 ```html
 <button data-testid="directions">Itinéraire</button>
 ```
+</HTMLCard>
 
 You can locate the element by it's test id:
 
@@ -533,10 +566,6 @@ await page.get_by_test_id("directions").click()
 
 </TabItem>
 </Tabs>
-
-```html
-<button data-testid="directions">Itinéraire</button>
-```
 
 :::tip When to use testid locators
 You can also use test ids when you choose to use the test id methodology or when you can't locate by [role](#locate-by-role) or [text](#locate-by-text).
@@ -574,9 +603,15 @@ playwright.selectors.set_test_id_attribute("data-pw")
 
 In your html you can now use `data-pw` as your test id instead of the default `data-testid`. 
 
+<HTMLCard>
+<div>
+<button data-pw="directions">Itinéraire</button>
+</div>
+
 ```html
 <button data-pw="directions">Itinéraire</button>
 ```
+</HTMLCard>
 
 And then locate the element as you would normally do:
 
@@ -653,18 +688,22 @@ XPath and CSS selectors can be tied to the DOM structure or implementation. Thes
 <TabItem value="sync">
 
 ```py
-page.locator("#tsf > div:nth-child(2) > div.A8SBwf > div.RNNXgb > div > div.a4bIc > input").click()
+page.locator(
+    "#tsf > div:nth-child(2) > div.A8SBwf > div.RNNXgb > div > div.a4bIc > input"
+).click()
 
-page.locator("//*[@id="tsf"]/div[2]/div[1]/div[1]/div/div[2]/input").click()
+page.locator('//*[@id="tsf"]/div[2]/div[1]/div[1]/div/div[2]/input').click()
 ```
 
 </TabItem>
 <TabItem value="async">
 
 ```py
-await page.locator("#tsf > div:nth-child(2) > div.A8SBwf > div.RNNXgb > div > div.a4bIc > input").click()
+await page.locator(
+    "#tsf > div:nth-child(2) > div.A8SBwf > div.RNNXgb > div > div.a4bIc > input"
+).click()
 
-await page.locator("//*[@id="tsf"]/div[2]/div[1]/div[1]/div/div[2]/input").click()
+await page.locator('//*[@id="tsf"]/div[2]/div[1]/div[1]/div/div[2]/input').click()
 ```
 
 </TabItem>
@@ -790,16 +829,29 @@ await expect(page.locator("x-details")).to_contain_text("Details")
 
 Consider the following DOM structure where we want to click on the buy button of the second product card. We have a few options in order to filter the locators to get the right one.
 
-```html
-<div data-testid='product-card'>
+<HTMLCard>
+<div>
+<div role="listitem">
   <h3>Product 1</h3>
   <button>Add to cart</button>
 </div>
-<div data-testid='product-card'>
+<div role="listitem">
+  <h3>Product 2</h3>
+  <button>Add to cart</button>
+</div>
+</div>
+
+```html
+<div role="listitem">
+  <h3>Product 1</h3>
+  <button>Add to cart</button>
+</div>
+<div role="listitem">
   <h3>Product 2</h3>
   <button>Add to cart</button>
 </div>
 ```
+</HTMLCard>
 
 ### Filter by text
 
@@ -816,14 +868,18 @@ Locators can be filtered by text with the [locator.filter(**kwargs)](/api/class-
 <TabItem value="sync">
 
 ```py
-page.get_by_test_id("product-card").filter(has_text="Product 2").get_by_role("button", name="Add to cart").click()
+page.get_by_role("listitem").filter(has_text="Product 2").get_by_role(
+    "button", name="Add to cart"
+).click()
 ```
 
 </TabItem>
 <TabItem value="async">
 
 ```py
-await page.get_by_test_id("product-card").filter(has_text="Product 2").get_by_role("button", name="Add to cart").click()
+await page.get_by_role("listitem").filter(has_text="Product 2").get_by_role(
+    "button", name="Add to cart"
+).click()
 ```
 
 </TabItem>
@@ -842,36 +898,50 @@ Use a regular expression:
 <TabItem value="sync">
 
 ```py
-page.get_by_test_id("product-card")
-    .filter(has_text=re.compile("Product 2"))
-    .get_by_role("button", name="Add to cart")
-    .click()
+page.get_by_role("listitem").filter(has_text=re.compile("Product 2")).get_by_role(
+    "button", name="Add to cart"
+).click()
 ```
 
 </TabItem>
 <TabItem value="async">
 
 ```py
-await page.get_by_test_id("product-card").filter(has_text=re.compile("Product 2")).get_by_role("button", name="Add to cart").click()
+await page.get_by_role("listitem").filter(has_text=re.compile("Product 2")).get_by_role(
+    "button", name="Add to cart"
+).click()
 ```
 
 </TabItem>
 </Tabs>
 
-```html
-<div data-testid='product-card'>
+### Filter by another locator
+
+Locators support an option to only select elements that have a descendant matching another locator. You can therefore filter by any other locator such as a [locator.get_by_role(role, **kwargs)](/api/class-locator.mdx#locator-get-by-role), [locator.get_by_test_id(test_id)](/api/class-locator.mdx#locator-get-by-test-id), [locator.get_by_text(text, **kwargs)](/api/class-locator.mdx#locator-get-by-text) etc.
+
+<HTMLCard>
+<div>
+<div role="listitem">
   <h3>Product 1</h3>
   <button>Add to cart</button>
 </div>
-<div data-testid='product-card'>
+<div role="listitem">
+  <h3>Product 2</h3>
+  <button>Add to cart</button>
+</div>
+</div>
+
+```html
+<div role="listitem">
+  <h3>Product 1</h3>
+  <button>Add to cart</button>
+</div>
+<div role="listitem">
   <h3>Product 2</h3>
   <button>Add to cart</button>
 </div>
 ```
-
-### Filter by another locator
-
-Locators support an option to only select elements that have a descendant matching another locator. You can therefore filter by any other locator such as a [locator.get_by_role(role, **kwargs)](/api/class-locator.mdx#locator-get-by-role), [locator.get_by_test_id(test_id)](/api/class-locator.mdx#locator-get-by-test-id), [locator.get_by_text(text, **kwargs)](/api/class-locator.mdx#locator-get-by-text) etc.
+</HTMLCard>
 
 <Tabs
   groupId="python-flavor"
@@ -884,32 +954,22 @@ Locators support an option to only select elements that have a descendant matchi
 <TabItem value="sync">
 
 ```py
-page.get_by_test_id("product-card")
-    .filter(has=page.get_by_role("heading", name="Product 2"))
-    .get_by_role("button", name="Add to cart")
-    .click()
+page.get_by_role("listitem").filter(
+    has=page.get_by_role("heading", name="Product 2")
+).get_by_role("button", name="Add to cart").click()
 ```
 
 </TabItem>
 <TabItem value="async">
 
 ```py
-await page.get_by_test_id("product-card").filter(has=page.get_by_role("heading", name="Product 2")).get_by_role("button", name="Add to cart").click()
+await page.get_by_role("listitem").filter(
+    has=page.get_by_role("heading", name="Product 2")
+).get_by_role("button", name="Add to cart").click()
 ```
 
 </TabItem>
 </Tabs>
-
-```html
-<div data-testid='product-card'>
-  <h3>Product 1</h3>
-  <button>Add to cart</button>
-</div>
-<div data-testid='product-card'>
-  <h3>Product 2</h3>
-  <button>Add to cart</button>
-</div>
-```
 
 We can also assert the product card to make sure there is only one
 
@@ -924,14 +984,22 @@ We can also assert the product card to make sure there is only one
 <TabItem value="sync">
 
 ```py
-expect(page.get_by_role("product-card").filter(has=page.get_by_role("heading", name="Product 2")).to_have_count(1)
+expect(
+    page.get_by_role("listitem").filter(
+        has=page.get_by_role("heading", name="Product 2")
+    )
+).to_have_count(1)
 ```
 
 </TabItem>
 <TabItem value="async">
 
 ```py
-await expect(page.get_by_role("product-card").filter(has=page.get_by_role("heading", name="Product 2")).to_have_count(1)
+await expect(
+    page.get_by_role("listitem").filter(
+        has=page.get_by_role("heading", name="Product 2")
+    )
+).to_have_count(1)
 ```
 
 </TabItem>
@@ -956,7 +1024,7 @@ In this example we first create a locator called product by locating the test id
 <TabItem value="sync">
 
 ```py
-product = page.get_by_test_id("product-card").filter(has_text="Product 2")
+product = page.get_by_role("listitem").filter(has_text="Product 2")
 
 product.get_by_role("button", name="Add to cart").click()
 ```
@@ -965,24 +1033,13 @@ product.get_by_role("button", name="Add to cart").click()
 <TabItem value="async">
 
 ```py
-product = page.get_by_test_id("product-card").filter(has_text="Product 2")
+product = page.get_by_role("listitem").filter(has_text="Product 2")
 
 await product.get_by_role("button", name="Add to cart").click()
 ```
 
 </TabItem>
 </Tabs>
-
-```html
-<div data-testid='product-card'>
-  <h3>Product 1</h3>
-  <button>Add to cart</button>
-</div>
-<div data-testid='product-card'>
-  <h3>Product 2</h3>
-  <button>Add to cart</button>
-</div>
-```
 
 ## Lists
 
@@ -992,6 +1049,15 @@ You can assert locators in order to count the items in a list.
 
 For example, consider the following DOM structure:
 
+<HTMLCard>
+<div>
+<ul>
+  <li>apple</li>
+  <li>banana</li>
+  <li>orange</li>
+</ul>
+</div>
+
 ```html
 <ul>
   <li>apple</li>
@@ -999,6 +1065,7 @@ For example, consider the following DOM structure:
   <li>orange</li>
 </ul>
 ```
+</HTMLCard>
 
 Use the count assertion to ensure that the list has 3 items.
 
@@ -1032,6 +1099,15 @@ You can assert locators in order to find all the text in a list.
 
 For example, consider the following DOM structure:
 
+<HTMLCard>
+<div>
+<ul>
+  <li>apple</li>
+  <li>banana</li>
+  <li>orange</li>
+</ul>
+</div>
+
 ```html
 <ul>
   <li>apple</li>
@@ -1039,6 +1115,7 @@ For example, consider the following DOM structure:
   <li>orange</li>
 </ul>
 ```
+</HTMLCard>
 
 Use [expect(locator).to_have_text(expected, **kwargs)](/test-assertions.mdx#locator-assertions-to-have-text) to ensure that the list has the text "apple", "banana" and "orange".
 
@@ -1076,6 +1153,15 @@ Use the [page.get_by_text(text, **kwargs)](/api/class-page.mdx#page-get-by-text)
 
 For example, consider the following DOM structure:
 
+<HTMLCard>
+<div>
+<ul>
+  <li>apple</li>
+  <li>banana</li>
+  <li>orange</li>
+</ul>
+</div>
+
 ```html
 <ul>
   <li>apple</li>
@@ -1083,6 +1169,7 @@ For example, consider the following DOM structure:
   <li>orange</li>
 </ul>
 ```
+</HTMLCard>
 
 Locate an item by it's text content and click it.
 
@@ -1110,6 +1197,15 @@ await page.get_by_text("orange").click()
 </TabItem>
 </Tabs>
 
+<HTMLCard>
+<div>
+<ul>
+  <li>apple</li>
+  <li>banana</li>
+  <li>orange</li>
+</ul>
+</div>
+
 ```html
 <ul>
   <li>apple</li>
@@ -1117,6 +1213,7 @@ await page.get_by_text("orange").click()
   <li>orange</li>
 </ul>
 ```
+</HTMLCard>
 
 #### Filter by text
 
@@ -1124,6 +1221,15 @@ Use the [locator.filter(**kwargs)](/api/class-locator.mdx#locator-filter) to loc
 
 For example, consider the following DOM structure:
 
+<HTMLCard>
+<div>
+<ul>
+  <li>apple</li>
+  <li>banana</li>
+  <li>orange</li>
+</ul>
+</div>
+
 ```html
 <ul>
   <li>apple</li>
@@ -1131,6 +1237,7 @@ For example, consider the following DOM structure:
   <li>orange</li>
 </ul>
 ```
+</HTMLCard>
 
 Locate an item by the role of "listitem" and then filter by the text of "orange" and then click it.
 
@@ -1158,19 +1265,20 @@ await page.get_by_role("listitem").filter(has_text="orange").click()
 </TabItem>
 </Tabs>
 
-```html
-<ul>
-  <li>apple</li>
-  <li>banana</li>
-  <li>orange</li>
-</ul>
-```
-
 #### Get by test id
 
 Use the [page.get_by_test_id(test_id)](/api/class-page.mdx#page-get-by-test-id) method to locate an element in a list. You may need to modify the html and add a test id if you don't already have a test id.
 
 For example, consider the following DOM structure:
+
+<HTMLCard>
+<div>
+<ul>
+  <li data-testid='apple'>apple</li>
+  <li data-testid='banana'>banana</li>
+  <li data-testid='orange'>orange</li>
+</ul>
+</div>
 
 ```html
 <ul>
@@ -1179,6 +1287,7 @@ For example, consider the following DOM structure:
   <li data-testid='orange'>orange</li>
 </ul>
 ```
+</HTMLCard>
 
 Locate an item by it's test id of "orange" and then click it.
 
@@ -1205,14 +1314,6 @@ await page.get_by_test_id("orange").click()
 
 </TabItem>
 </Tabs>
-
-```html
-<ul>
-  <li data-testid='apple'>apple</li>
-  <li data-testid='banana'>banana</li>
-  <li data-testid='orange'>orange</li>
-</ul>
-```
 
 #### Get by nth item
 
@@ -1250,6 +1351,28 @@ When you have elements with various similarities, you can use the [locator.filte
 
 For example, consider the following DOM structure:
 
+<HTMLCard>
+<div>
+<ul>
+  <li>
+    <div>John</div>
+    <div><button>Say hello</button></div>
+  </li>
+  <li>
+    <div>Mary</div>
+    <div><button>Say hello</button></div>
+  </li>
+  <li>
+    <div>John</div>
+    <div><button>Say goodbye</button></div>
+  </li>
+  <li>
+    <div>Mary</div>
+    <div><button>Say goodbye</button></div>
+  </li>
+</ul>
+</div>
+
 ```html
 <ul>
   <li>
@@ -1270,6 +1393,7 @@ For example, consider the following DOM structure:
   </li>
 </ul>
 ```
+</HTMLCard>
 
 To take a screenshot of the row with "Mary" and "Say goodbye":
 
@@ -1286,7 +1410,10 @@ To take a screenshot of the row with "Mary" and "Say goodbye":
 ```py
 row_locator = page.get_by_role("listitem")
 
-row_locator.filter(has_text="Mary").filter(has=page.get_by_role("button", name="Say goodbye")).screenshot(path="screenshot.png")
+row_locator
+    .filter(has_text="Mary")
+    .filter(has=page.get_by_role("button", name="Say goodbye"))
+    .screenshot(path="screenshot.png")
 ```
 
 </TabItem>
@@ -1295,18 +1422,16 @@ row_locator.filter(has_text="Mary").filter(has=page.get_by_role("button", name="
 ```py
 row_locator = page.get_by_role("listitem")
 
-await row_locator.filter(has_text="Mary").filter(has=page.get_by_role("button", name="Say goodbye")).screenshot(path="screenshot.png")
+await row_locator
+    .filter(has_text="Mary")
+    .filter(has=page.get_by_role("button", name="Say goodbye"))
+    .screenshot(path="screenshot.png")
 ```
 
 </TabItem>
 </Tabs>
 
 You should now have a "screenshot.png" file in your project's root directory.
-
-```html
-<div>Mary</div>
-<div><button>Say goodbye</button></div>
-```
 
 ### Rare use cases
 
