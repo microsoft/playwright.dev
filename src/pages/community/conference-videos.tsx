@@ -24,7 +24,7 @@ import conferenceVideos from '@site/src/data/conference-videos';
 import videoNav from '@site/src/data/video-nav';
 
 const TITLE = 'Conference Videos';
-const DESCRIPTION = 'Check out the latest conference videos about Playwright';
+const DESCRIPTION = 'Check out the latest conference talks on Playwright';
 
 export default function Video(): JSX.Element {
   return (
