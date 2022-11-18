@@ -15,6 +15,7 @@
  */
 
 import React, { type ReactNode } from 'react';
+import webView from './webView.module.css';
 import styles from './styles.module.css';
 
 type ProfileProps = {
@@ -28,18 +29,20 @@ const HTMLCard = ({ children }: ProfileProps) => {
         <span className={styles.dot} style={{ backgroundColor: 'rgb(242, 95, 88)' }}></span>
         <span className={styles.dot} style={{ backgroundColor: 'rgb(251, 190, 60)' }}></span>
         <span className={styles.dot} style={{ backgroundColor: 'rgb(88, 203, 66)' }}></span>
-        </div>
-        <div className={styles.addressBar}>http://localhost:3000</div>
-        <div style={{ marginLeft: 'auto' }}>
-          <div>
-            <span className={styles.menuBar}></span>
-            <span className={styles.menuBar}></span>
-            <span className={styles.menuBar}></span>
-          </div>
+      </div>
+      <div className={styles.addressBar}>http://localhost:3000</div>
+      <div style={{ marginLeft: 'auto' }}>
+        <div>
+          <span className={styles.menuBar}></span>
+          <span className={styles.menuBar}></span>
+          <span className={styles.menuBar}></span>
         </div>
       </div>
-    <div className='html-card-page' style={{ padding: 20, borderBottom: '1px solid var(--ifm-color-emphasis-200)' }}>{children[0]}</div>
-    <div className='html-card-code'>{children[1]}</div>
+    </div>
+    <div className={styles.body}>
+      <div className={`html-card-page ${styles.pageSide} ${webView.webView}`}>{children[0]}</div>
+      <div className={`html-card-code ${styles.codeSide}`}>{children[1]}</div>
+    </div>
   </div>;
 }
 
