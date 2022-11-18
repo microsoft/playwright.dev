@@ -12,7 +12,7 @@ const videoNav = [
     href: '/community/live-streams'
   },
   {
-    label: 'feature Videos',
+    label: 'Feature Videos',
     href: '/community/feature-videos'
   }
 ];

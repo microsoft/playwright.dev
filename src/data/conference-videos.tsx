@@ -17,6 +17,23 @@ const conferenceVideos = [
   },
   {
     title: 'Testing Web Applications with Playwright',
+    description: '',
+    id: 'Vn__rlS36yc',
+    year: '2022',
+    conference: 'React Brussels',
+    speakers: ["Debbie O'Brien"]
+  },
+  {
+    title: 'Playwright: De Cero a Continuous Testing con Low Code. ¿Es posible?',
+    description: '',
+    id: 'FOvFKdOOfXg',
+    year: '2022',
+    conference: 'Argentesting',
+    speakers: ["Carlos Gauto"],
+    language: 'Spanish'
+  },
+  {
+    title: 'Testing Web Applications with Playwright',
     id: 'xkSnDXjCEvU',
     year: '2022',
     conference: 'VueJS DE, Berlin',
