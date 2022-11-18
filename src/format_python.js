@@ -29,8 +29,11 @@ class PythonFormatter {
   constructor() {
     this.lang = 'python';
   }
+
+  /**
+   * @param {Documentation.Member} member 
+   */
   formatMember(member) {
-    let text = '';
     const args = [];
 
     let prefix = `${toSnakeCase(member.clazz.varName)}.`;
@@ -40,26 +43,30 @@ class PythonFormatter {
       const varName = member.clazz.varName.substring(0, member.clazz.varName.length - 'Assertions'.length);
       // Generate `expect(locator).` instead of `locatorAssertions.`
       prefix = `expect(${toSnakeCase(varName)}).`;
+    }  
+
+    let name = toSnakeCase(member.alias);
+    let usages = [`${prefix}${name}`];
+    let link = `${prefix}${name}`;
+
+    if (member.kind === 'event') {
+      name = `on("${member.alias.toLowerCase()}")`;
+      usages = [`${prefix}on("${member.alias.toLowerCase()}", handler)`];
+      link = `${prefix}${name}`;
     }
-
-    if (member.kind === 'property')
-      text = `${prefix}${toSnakeCase(member.alias)}`;
-
-    if (member.kind === 'event')
-      text = `${prefix}on("${member.alias.toLowerCase()}")`;
 
     if (member.kind === 'method') {
       for (const arg of member.argsArray)
         args.push(...expandPythonOptions(arg));
-      const signature = renderPythonSignature(args);
-      let isGetter = !signature && !member.async && !!member.type;
+      const signatures = renderPythonSignatures(args);
+      let isGetter = !args.length && !member.async && !!member.type;
       if (member.name.startsWith('is') || member.name.startsWith('as'))
         isGetter = false;
-      text = `${prefix}${toSnakeCase(member.alias)}`;
-      if (!isGetter)
-        text += `(${signature})`;
+      usages = signatures.map(signature => `${prefix}${name}${isGetter ? '' : '(' + signature + ')'}`);
+      link = `${prefix}${name}${isGetter ? '' : '()'}`;
     }
-    return [{ text, args }];
+
+    return [{ name, link, usages, args }];
   }
 
   formatArgumentName(name) {
@@ -119,13 +126,14 @@ class PythonFormatter {
 
 /**
  * @param {Documentation.Member[]} args
- * @return {string}
+ * @return {string[]}
  */
-function renderPythonSignature(args) {
+ function renderPythonSignatures(args) {
   const argNames = args.filter(a => a.required).map(a => toSnakeCase(a.name));
+  const signatures = [argNames.join(', ')];
   if (args.find(a => !a.required))
-    argNames.push('**kwargs');
-  return argNames.join(', ');
+    signatures.push([...argNames, '**kwargs'].join(', '));
+  return signatures;
 }
 
 /**

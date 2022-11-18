@@ -27,14 +27,14 @@ class CSharpFormatter {
   constructor() {
     this.lang = 'csharp';
   }
+
   /**
    * @param {Documentation.Member} member 
    */
   formatMember(member) {
-    let text = '';
     let args = [];
 
-    let prefix = `${toTitleCase(member.clazz.varName)}.`;
+    let prefix =`${toTitleCase(member.clazz.varName)}.`;
     if (member.clazz.varName === 'playwrightAssertions') {
       prefix = '';
     } else if (member.clazz.varName.includes('Assertions')) {
@@ -43,24 +43,46 @@ class CSharpFormatter {
       prefix = `Expect(${toTitleCase(varName)}).`;
     }
 
-    if (member.kind === 'property')
-      text = `${prefix}${toTitleCase(member.alias)}`;
-    if (member.kind === 'event')
-      text = `event ${prefix}${toTitleCase(member.alias)}`;
+    let name = toTitleCase(member.alias);
+    let usages = [`${prefix}${name}`];
+    let link = `${prefix}${name}`;
+    if (member.kind === 'event') {
+      usages = [`${prefix}${name} += async data => {};`];
+      link = `${prefix}${name}`;
+      name = `event ${name}`;
+    }
+
     if (member.kind === 'method' ) {
       args = member.argsArray.slice();
-      const signature = renderSharpSignature(args);
-
-      let isGetter = !signature && !member.async && !!member.type;
+      const signatures = renderSharpSignatures(args);
+      let isGetter = !args.length && !member.async && !!member.type;
       if (member.name.startsWith('as'))
         isGetter = false;
-      text = `${prefix}${toAsyncTitleCase(member.async, member.alias)}`;
-      if (!isGetter)
-        text += `(${signature})`;
-      if (member.alias.startsWith('RunAnd'))
-        return [{ text, args }, { text: text.replace('RunAnd', ''), args: args.slice(1) }];
+
+      name = toAsyncTitleCase(member.async, member.alias);
+      const usageBase = `${member.async ? 'await ' : ''}${prefix}${name}`;
+      usages = [usageBase];
+      link = `${prefix}${name}`;
+
+      if (!isGetter) {
+        usages = signatures.map(signature => `${usageBase}(${signature});`);
+        link += '();';
+      }
+
+      if (member.alias.startsWith('RunAnd')) {
+        return [
+          { name, link, usages, args },
+          {
+            name: name.replace('RunAnd', ''),
+            link: link.replace('RunAnd', ''),
+            usages: usages.map(usage => usage.replace('RunAnd', '')),
+            args: args.slice(1)
+          }
+        ];
+      }
     }
-    return [{ text, args }];
+
+    return [{ name, link, usages, args }];
   }
 
   formatArgumentName(name) {
@@ -183,13 +205,13 @@ function fullName(member) {
 
 /**
  * @param {Documentation.Member[]} args
- * @return {string}
+ * @return {string[]}
  */
-function renderSharpSignature(args) {
+ function renderSharpSignatures(args) {
   const copy = args.slice();
   copy.sort((a, b) => (b.required ? 1 : 0) - (a.required ? 1 : 0));
   const argNames = copy.map(a => a.name);
-  return argNames.join(', ');
+  return [argNames.join(', ')];
 }
 
 /**
