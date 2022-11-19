@@ -52,9 +52,11 @@ function rewriteContent(text) {
 }
 // -------- HACKS END --------
 
+/** @typedef {"header"|"link"|"usage"} FormatMode */
+
 /**
  * @typedef {{
- *   formatMember: function(Documentation.Member): { text: string, args: Documentation.Member[] }[],
+ *   formatMember: function(Documentation.Member): { name: string, link: string, usages: string[], args: Documentation.Member[] }[],
  *   formatArgumentName: function(string): string,
  *   formatTemplate: function(string): string,
  *   formatFunction: function(string, string, Documentation.Type): string,
@@ -168,10 +170,10 @@ import HTMLCard from '@site/src/components/HTMLCard';
       const k2 = m2.kind + toSnakeCase(m2.alias.replace(/\$\$eval/, '$$eval2'));
       return k1.localeCompare(k2);
     });
-    result.push(...this.generateClassToc(clazz));
+    this.visitClassToc(clazz);
     if (clazz.extends && !['EventEmitter', 'Error', 'RuntimeException', 'Exception'].includes(clazz.extends)) {
       const superClass = this.documentation.classes.get(clazz.extends);
-      result.push(...this.generateClassToc(superClass));
+      this.visitClassToc(superClass);
     }
     result.push(...this.formatClassMembers(clazz));
     fs.mkdirSync(path.join(this.outDir, 'api'), { recursive: true });
@@ -184,15 +186,21 @@ import HTMLCard from '@site/src/components/HTMLCard';
    * @return {MarkdownNode[]}
    */
   formatClassMembers(clazz) {
+    /** @type {MarkdownNode[]} */
     const result = [];
     for (const member of clazz.membersArray) {
       // Iterate members
-      for (const { text, args } of this.formatter.formatMember(member)) {
+      for (const { name, usages, args } of this.formatter.formatMember(member)) {
+        result.push({
+          type: 'text',
+          text: '---'
+        });
+    
         /** @type {MarkdownNode} */
         const memberNode = { type: 'h2', children: [], text: '' };
         if (!this.heading2ExplicitId.has(member))
-          throw new Error(`Header ${text} needs to have an explicit ID`)
-        memberNode.text = `${text} {#${this.heading2ExplicitId.get(member)}}`;
+          throw new Error(`Header ${name} needs to have an explicit ID`)
+        memberNode.text = `${name} {#${this.heading2ExplicitId.get(member)}}`;
 
         // Append version.
         memberNode.children.push({
@@ -200,26 +208,49 @@ import HTMLCard from '@site/src/components/HTMLCard';
           text: `<font size="2" style={{position: "relative", top: "-20px"}}>Added in: ${member.since}</font>\n`
         });
 
-        memberNode.children.push(...args.map(a => {
-          let name = this.formatter.formatArgumentName(a.alias);
-          if (this.lang === 'js' && !a.required)
-            name += '?';
-          return this.renderProperty(`\`${name}\``, a, a.spec, 'in');
-        }));
+        // Documentation.
+        memberNode.children.push(...this.formatComment(member.spec));
 
-        // Append type
+        // Usage.
+        memberNode.children.push({
+          type: 'h4',
+          text: `Usage`,
+          children: [{
+            type: 'code',
+            codeLang: this.lang,
+            lines: usages,
+          }]
+        });
+
+        // Parameters.
+        if (args.length) {
+          memberNode.children.push({
+            type: 'h4',
+            text: `Parameters`,
+            children: args.map(a => {
+              let name = this.formatter.formatArgumentName(a.alias);
+              if (this.lang === 'js' && !a.required)
+                name += '?';
+              return this.renderProperty(`\`${name}\``, a, a.spec, 'in');
+            })
+          });
+        }
+
+        // Return type.
         if (member.type && (member.type.name !== 'void' || member.kind === 'method')) {
           let name;
           switch (member.kind) {
-            case 'event': name = 'type:'; break;
-            case 'property': name = this.lang === 'java' ? 'returns:' : 'type:'; break;
-            case 'method': name = 'returns:'; break;
+            case 'event': name = 'Event data'; break;
+            case 'property': name = this.lang === 'java' ? 'Returns' : 'Type'; break;
+            case 'method': name = 'Returns'; break;
           }
-          memberNode.children.push(this.renderProperty(name, member, undefined, 'out', member.async));
-        }
 
-        // Append member doc
-        memberNode.children.push(...this.formatComment(member.spec));
+          memberNode.children.push({
+            type: 'h4',
+            text: name,
+            children: [this.renderProperty('', member, undefined, 'out', member.async)]
+          });
+        }
 
         result.push(memberNode);
       }
@@ -273,11 +304,8 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
   /**
    * @param {MarkdownNode[]} nodes
-   * @param {number} tocIndex
    */
-  insertAssertionClassesDocs(nodes, tocIndex) {
-    if (tocIndex === -1)
-      tocIndex = nodes.length - 1;
+  insertAssertionClassesDocs(nodes) {
     // Insert in this order.
     const assertionClassNames = ['LocatorAssertions', 'PageAssertions', 'APIResponseAssertions'];
     if (this.lang === 'js')
@@ -287,13 +315,11 @@ import HTMLCard from '@site/src/components/HTMLCard';
       const relatedClass = this.documentation.classes.get('PlaywrightAssertions');
       relatedClass.membersArray = relatedClass.membersArray.filter(m => !m.alias.startsWith('assertThat'));
     }
-    const extraToc = [];
     for (const name of assertionClassNames) {
       const relatedClass = this.documentation.classes.get(name);
-      extraToc.push(...this.generateClassToc(relatedClass));
+      this.visitClassToc(relatedClass);
       nodes.push(...this.formatClassMembers(relatedClass));
     }
-    nodes.splice(tocIndex + 1, 0, ...extraToc);
   }
 
   /**
@@ -331,7 +357,7 @@ title: "Assertions"
         node.text = md.generateToc(nodes, true);
     }
     if (outName.toLowerCase().includes('test-assertion'))
-      this.insertAssertionClassesDocs(nodes, tocIndex);
+      this.insertAssertionClassesDocs(nodes);
 
     nodes = this.formatComment(nodes);
     md.visitAll(nodes, node => {
@@ -396,35 +422,17 @@ import HTMLCard from '@site/src/components/HTMLCard';`);
     const file = apiClassLink(member.clazz);
     const hash = calculateHeadingHash(member);
     this.heading2ExplicitId.set(member, hash);
-    return this.formatter.formatMember(member).map(f => this.createLink(file, f.text, hash, href));
+    return this.formatter.formatMember(member).map(f => this.createLink(file, f.link, hash, href));
   }
 
   /**
    * @param {Documentation.Class} clazz
-   * @return {MarkdownNode[]}
    */
-  generateClassToc(clazz) {
-    const result = [];
-    for (const member of clazz.membersArray) {
-      for (const text of this.createMemberLink(member)) {
-        result.push(/** @type {*} */ ({
-          type: 'li',
-          liType: 'default',
-          text,
-          kind: member.kind
-        }));
-      }
-    }
-    result.sort((a, b) => {
-      const atext = a.text.replace(/\[(.*)\].*/, '$1').replace(/\(.*\)/, '');
-      const btext = b.text.replace(/\[(.*)\].*/, '$1').replace(/\(.*\)/, '');
-      // Properties and methods are sorted by name within the same group.
-      const propertyAsMethod = kind => (kind === 'property') ? 'method' : kind;
-      return propertyAsMethod(a.kind).localeCompare(propertyAsMethod(b.kind)) || atext.localeCompare(btext);
-    });
-    return result;
+  visitClassToc(clazz) {
+    for (const member of clazz.membersArray)
+      this.createMemberLink(member);
   }
-
+  
   /**
    * @param {string} name
    * @param {Documentation.Member} member
@@ -464,6 +472,7 @@ import HTMLCard from '@site/src/components/HTMLCard';`);
     let linkTag = '';
     let linkAnchor = '';
     let sinceVersion = '';
+
     if (member.enclosingMethod && member.name !== 'options') {
       const hash = calculatePropertyHash(member, direction);
       linkTag = `<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="${hash}"/>`;
@@ -476,7 +485,7 @@ import HTMLCard from '@site/src/components/HTMLCard';`);
     const result = {
       type: 'li',
       liType: 'default',
-      text: `${name}${linkTag} &#60;${typeText}&#62;${comment ? ' ' + comment : ''}${sinceVersion}${linkAnchor}`,
+      text: `${name} &#60;${typeText}&#62;${comment ? ' ' + comment : ''}${sinceVersion}${linkTag}${linkAnchor}`,
       children
     };
     return result;
@@ -545,31 +554,22 @@ function toSnakeCase(name) {
 
 /**
  * @param {Documentation.Member[]} args
- * @return {string}
+ * @return {string[]}
  */
-function renderJSSignature(args) {
+ function renderJSSignatures(args) {
   const tokens = [];
-  let lastIsOptional = false;
+  const optionalTokens = [];
   for (const arg of args) {
     const name = arg.alias;
-    const optional = !arg.required;
-    if (tokens.length) {
-      if (optional && !lastIsOptional)
-        tokens.push(`[`);
-      // In java callback goes last, after optional 'options'
-      if (!optional && lastIsOptional)
-        tokens.push(`]`);
-      tokens.push(`, `);
-    } else {
-      if (optional)
-        tokens.push(`[`);
-    }
-    tokens.push(name);
-    lastIsOptional = optional;
+    if (!arg.required)
+      optionalTokens.push(name);
+    else
+      tokens.push(name);
   }
-  if (lastIsOptional)
-    tokens.push(']');
-  return tokens.join('');
+  const result = [tokens.join(', ')];
+  if (optionalTokens.length)
+    result.push([...tokens, ...optionalTokens].join(', '));
+  return result;
 }
 
 /**
@@ -638,4 +638,4 @@ function writeFileSyncCached(file, content) {
   fs.writeFileSync(file, content);
 }
 
-module.exports = { Generator, toTitleCase, toSnakeCase, renderJSSignature };
+module.exports = { Generator, toTitleCase, toSnakeCase, renderJSSignatures };

@@ -17,9 +17,10 @@
 //@ts-check
 
 const Documentation = require('./documentation');
-const { renderJSSignature } = require('./generator');
+const { renderJSSignatures } = require('./generator');
 /** @typedef {import('./generator').GeneratorFormatter} GeneratorFormatter */
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
+/** @typedef {import('./documentation').Member} Member */
 
 /**
  * @implements {GeneratorFormatter}
@@ -28,31 +29,41 @@ class JavaScriptFormatter {
   constructor() {
     this.lang = 'js';
   }
+
+  /**
+   * @param {Documentation.Member} member 
+   */
   formatMember(member) {
-    let text = '';
     let args = [];
 
-    let prefix = `${member.clazz.varName}.`;
+    let prefix = '';
+    prefix = `${member.clazz.varName}.`;
     if (member.clazz.varName === 'playwrightAssertions') {
       prefix = '';
     } else if (member.clazz.varName.includes('Assertions')) {
       const varName = member.clazz.varName.substring(0, member.clazz.varName.length -'Assertions'.length);
       // Generate `expect(locator).` instead of `locatorAssertions.`
       prefix = `expect(${varName}).`;
+    }  
+
+    let name = member.alias;
+    let usages = [`${prefix}${name}`];
+    let link = `${prefix}${name}`;
+
+    if (member.kind === 'event') {
+      name = `on('${member.alias.toLowerCase()}')`;
+      usages = [`${prefix}on('${member.alias.toLowerCase()}', data => {});`];
+      link = `${prefix}${name}`;
     }
-
-    if (member.kind === 'property')
-      text = `${prefix}${member.alias}`;
-
-    if (member.kind === 'event')
-      text = `${prefix}on('${member.alias.toLowerCase()}')`;
 
     if (member.kind === 'method') {
       args = member.argsArray;
-      const signature = renderJSSignature(args);
-      text = `${prefix}${member.alias}(${signature})`;
+      const signatures = renderJSSignatures(args);
+      usages = signatures.map(signature => `${member.async ? 'await ' : ''}${prefix}${name}(${signature});`);
+      link = `${prefix}${name}()`;
     }
-    return [{ text, args }];
+
+    return [{ name, link, usages, args }];
   }
 
   formatArgumentName(name) {

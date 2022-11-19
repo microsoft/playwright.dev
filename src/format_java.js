@@ -17,8 +17,9 @@
 //@ts-check
 
 const Documentation = require('./documentation');
-const { toTitleCase, renderJSSignature } = require('./generator');
+const { toTitleCase, renderJSSignatures } = require('./generator');
 /** @typedef {import('./generator').GeneratorFormatter} GeneratorFormatter */
+/** @typedef {import('./generator').FormatMode} FormatMode */
 
 /**
  * @implements {GeneratorFormatter}
@@ -27,8 +28,11 @@ class JavaFormatter {
   constructor() {
     this.lang = 'java';
   }
+
+  /**
+   * @param {Documentation.Member} member 
+   */
   formatMember(member) {
-    let text = '';
     let args = [];
 
     let prefix = `${member.clazz.name}.`;
@@ -38,20 +42,25 @@ class JavaFormatter {
       const varName = member.clazz.varName.substring(0, member.clazz.varName.length -'Assertions'.length);
       // Generate `expect(locator).` instead of `locatorAssertions.`
       prefix = `assertThat(${varName}).`;
-    }
+    }  
 
+    let name = member.alias;
     if (member.kind === 'property')
-      text = `${prefix}${member.alias}()`;
-
+      name = `${name}()`;
     if (member.kind === 'event')
-      text = `${prefix}on${toTitleCase(member.alias)}(handler)`;
+      name = `on${toTitleCase(member.alias)}(handler)`;
 
+    let usages = [`${prefix}${name}`];
+    let link = `${prefix}${name}`;
+  
     if (member.kind === 'method') {
       args = member.argsArray;
-      const signature = renderJSSignature(args);
-      text = `${prefix}${member.alias}(${signature})`;
+      const signatures = renderJSSignatures(args);
+      usages = signatures.map(signature => `${prefix}${name}(${signature});`);
+      link = `${prefix}${name}()`;
     }
-    return [{ text, args }];
+
+    return [{ name, link, usages, args }];
   }
 
   formatArgumentName(name) {
