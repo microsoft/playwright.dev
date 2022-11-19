@@ -8,50 +8,59 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 This API is used for the Web API testing. You can use it to trigger API endpoints, configure micro-services, prepare environment or the service to your e2e test.
 
-Each Playwright browser context has associated with it [APIRequestContext] instance which shares cookie storage with the browser context and can be accessed via [BrowserContext.request()](/api/class-browsercontext.mdx#browser-context-request) or [Page.request()](/api/class-page.mdx#page-request). It is also possible to create a new APIRequestContext instance manually by calling [APIRequest.newContext([options])](/api/class-apirequest.mdx#api-request-new-context).
+Each Playwright browser context has associated with it [APIRequestContext] instance which shares cookie storage with the browser context and can be accessed via [BrowserContext.request()](/api/class-browsercontext.mdx#browser-context-request) or [Page.request()](/api/class-page.mdx#page-request). It is also possible to create a new APIRequestContext instance manually by calling [APIRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context).
 
 **Cookie management**
 
 [APIRequestContext] returned by [BrowserContext.request()](/api/class-browsercontext.mdx#browser-context-request) and [Page.request()](/api/class-page.mdx#page-request) shares cookie storage with the corresponding [BrowserContext]. Each API request will have `Cookie` header populated with the values from the browser context. If the API response contains `Set-Cookie` header it will automatically update [BrowserContext] cookies and requests made from the page will pick them up. This means that if you log in using this API, your e2e test will be logged in and vice versa.
 
-If you want API requests to not interfere with the browser cookies you should create a new [APIRequestContext] by calling [APIRequest.newContext([options])](/api/class-apirequest.mdx#api-request-new-context). Such `APIRequestContext` object will have its own isolated cookie storage.
+If you want API requests to not interfere with the browser cookies you should create a new [APIRequestContext] by calling [APIRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context). Such `APIRequestContext` object will have its own isolated cookie storage.
 
 
-- [APIRequestContext.delete(url[, options])](/api/class-apirequestcontext.mdx#api-request-context-delete)
-- [APIRequestContext.dispose()](/api/class-apirequestcontext.mdx#api-request-context-dispose)
-- [APIRequestContext.fetch(urlOrRequest[, options])](/api/class-apirequestcontext.mdx#api-request-context-fetch)
-- [APIRequestContext.get(url[, options])](/api/class-apirequestcontext.mdx#api-request-context-get)
-- [APIRequestContext.head(url[, options])](/api/class-apirequestcontext.mdx#api-request-context-head)
-- [APIRequestContext.patch(url[, options])](/api/class-apirequestcontext.mdx#api-request-context-patch)
-- [APIRequestContext.post(url[, options])](/api/class-apirequestcontext.mdx#api-request-context-post)
-- [APIRequestContext.put(url[, options])](/api/class-apirequestcontext.mdx#api-request-context-put)
-- [APIRequestContext.storageState([options])](/api/class-apirequestcontext.mdx#api-request-context-storage-state)
+---
 
-## APIRequestContext.delete(url[, options]) {#api-request-context-delete}
+## delete {#api-request-context-delete}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font>
-
-- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-delete-option-url"/> &#60;[String]&#62; Target URL.<a href="#api-request-context-delete-option-url" class="list-anchor">#</a>
-- `options`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-delete-option-params"/> &#60;[RequestOptions]&#62; Optional request parameters. <font size="2">Added in: v1.18</font><a href="#api-request-context-delete-option-params" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-delete-return"/> &#60;[APIResponse]&#62;<a href="#api-request-context-delete-return" class="list-anchor">#</a>
 
 Sends HTTP(S) [DELETE](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/DELETE) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
 
-## APIRequestContext.dispose() {#api-request-context-dispose}
+#### Usage
+
+```java
+APIRequestContext.delete(url);
+APIRequestContext.delete(url, options);
+```
+
+#### Parameters
+- `url` &#60;[String]&#62; Target URL.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-delete-option-url"/><a href="#api-request-context-delete-option-url" class="list-anchor">#</a>
+- `options` &#60;[RequestOptions]&#62; Optional request parameters. <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-delete-option-params"/><a href="#api-request-context-delete-option-params" class="list-anchor">#</a>
+
+#### Returns
+-  &#60;[APIResponse]&#62;<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-delete-return"/><a href="#api-request-context-delete-return" class="list-anchor">#</a>
+
+---
+
+## dispose {#api-request-context-dispose}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font>
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-dispose-return"/> &#60;[void]&#62;<a href="#api-request-context-dispose-return" class="list-anchor">#</a>
+All responses returned by [APIRequestContext.get()](/api/class-apirequestcontext.mdx#api-request-context-get) and similar methods are stored in the memory, so that you can later call [APIResponse.body()](/api/class-apiresponse.mdx#api-response-body). This method discards all stored responses, and makes [APIResponse.body()](/api/class-apiresponse.mdx#api-response-body) throw "Response disposed" error.
 
-All responses returned by [APIRequestContext.get(url[, options])](/api/class-apirequestcontext.mdx#api-request-context-get) and similar methods are stored in the memory, so that you can later call [APIResponse.body()](/api/class-apiresponse.mdx#api-response-body). This method discards all stored responses, and makes [APIResponse.body()](/api/class-apiresponse.mdx#api-response-body) throw "Response disposed" error.
+#### Usage
 
-## APIRequestContext.fetch(urlOrRequest[, options]) {#api-request-context-fetch}
+```java
+APIRequestContext.dispose();
+```
+
+#### Returns
+-  &#60;[void]&#62;<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-dispose-return"/><a href="#api-request-context-dispose-return" class="list-anchor">#</a>
+
+---
+
+## fetch {#api-request-context-fetch}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font>
-
-- `urlOrRequest`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-fetch-option-url-or-request"/> &#60;[String]|[Request]&#62; Target URL or Request to get all parameters from.<a href="#api-request-context-fetch-option-url-or-request" class="list-anchor">#</a>
-- `options`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-fetch-option-params"/> &#60;[RequestOptions]&#62; Optional request parameters. <font size="2">Added in: v1.18</font><a href="#api-request-context-fetch-option-params" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-fetch-return"/> &#60;[APIResponse]&#62;<a href="#api-request-context-fetch-return" class="list-anchor">#</a>
 
 Sends HTTP(S) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
 
@@ -81,13 +90,25 @@ APIResponse response = request.fetch("https://example.com/api/uploadTeamList",
     FormData.create().set("fileField", filePayload)));
 ```
 
-## APIRequestContext.get(url[, options]) {#api-request-context-get}
+#### Usage
+
+```java
+APIRequestContext.fetch(urlOrRequest);
+APIRequestContext.fetch(urlOrRequest, options);
+```
+
+#### Parameters
+- `urlOrRequest` &#60;[String]|[Request]&#62; Target URL or Request to get all parameters from.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-fetch-option-url-or-request"/><a href="#api-request-context-fetch-option-url-or-request" class="list-anchor">#</a>
+- `options` &#60;[RequestOptions]&#62; Optional request parameters. <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-fetch-option-params"/><a href="#api-request-context-fetch-option-params" class="list-anchor">#</a>
+
+#### Returns
+-  &#60;[APIResponse]&#62;<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-fetch-return"/><a href="#api-request-context-fetch-return" class="list-anchor">#</a>
+
+---
+
+## get {#api-request-context-get}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font>
-
-- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-option-url"/> &#60;[String]&#62; Target URL.<a href="#api-request-context-get-option-url" class="list-anchor">#</a>
-- `options`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-option-params"/> &#60;[RequestOptions]&#62; Optional request parameters. <font size="2">Added in: v1.18</font><a href="#api-request-context-get-option-params" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-return"/> &#60;[APIResponse]&#62;<a href="#api-request-context-get-return" class="list-anchor">#</a>
 
 Sends HTTP(S) [GET](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GET) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
 
@@ -99,33 +120,69 @@ request.get("https://example.com/api/getText", RequestOptions.create()
   .setQueryParam("page", 23));
 ```
 
-## APIRequestContext.head(url[, options]) {#api-request-context-head}
+#### Usage
+
+```java
+APIRequestContext.get(url);
+APIRequestContext.get(url, options);
+```
+
+#### Parameters
+- `url` &#60;[String]&#62; Target URL.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-option-url"/><a href="#api-request-context-get-option-url" class="list-anchor">#</a>
+- `options` &#60;[RequestOptions]&#62; Optional request parameters. <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-option-params"/><a href="#api-request-context-get-option-params" class="list-anchor">#</a>
+
+#### Returns
+-  &#60;[APIResponse]&#62;<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-get-return"/><a href="#api-request-context-get-return" class="list-anchor">#</a>
+
+---
+
+## head {#api-request-context-head}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font>
-
-- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-option-url"/> &#60;[String]&#62; Target URL.<a href="#api-request-context-head-option-url" class="list-anchor">#</a>
-- `options`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-option-params"/> &#60;[RequestOptions]&#62; Optional request parameters. <font size="2">Added in: v1.18</font><a href="#api-request-context-head-option-params" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-return"/> &#60;[APIResponse]&#62;<a href="#api-request-context-head-return" class="list-anchor">#</a>
 
 Sends HTTP(S) [HEAD](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/HEAD) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
 
-## APIRequestContext.patch(url[, options]) {#api-request-context-patch}
+#### Usage
+
+```java
+APIRequestContext.head(url);
+APIRequestContext.head(url, options);
+```
+
+#### Parameters
+- `url` &#60;[String]&#62; Target URL.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-option-url"/><a href="#api-request-context-head-option-url" class="list-anchor">#</a>
+- `options` &#60;[RequestOptions]&#62; Optional request parameters. <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-option-params"/><a href="#api-request-context-head-option-params" class="list-anchor">#</a>
+
+#### Returns
+-  &#60;[APIResponse]&#62;<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-head-return"/><a href="#api-request-context-head-return" class="list-anchor">#</a>
+
+---
+
+## patch {#api-request-context-patch}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font>
-
-- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-patch-option-url"/> &#60;[String]&#62; Target URL.<a href="#api-request-context-patch-option-url" class="list-anchor">#</a>
-- `options`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-patch-option-params"/> &#60;[RequestOptions]&#62; Optional request parameters. <font size="2">Added in: v1.18</font><a href="#api-request-context-patch-option-params" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-patch-return"/> &#60;[APIResponse]&#62;<a href="#api-request-context-patch-return" class="list-anchor">#</a>
 
 Sends HTTP(S) [PATCH](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PATCH) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
 
-## APIRequestContext.post(url[, options]) {#api-request-context-post}
+#### Usage
+
+```java
+APIRequestContext.patch(url);
+APIRequestContext.patch(url, options);
+```
+
+#### Parameters
+- `url` &#60;[String]&#62; Target URL.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-patch-option-url"/><a href="#api-request-context-patch-option-url" class="list-anchor">#</a>
+- `options` &#60;[RequestOptions]&#62; Optional request parameters. <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-patch-option-params"/><a href="#api-request-context-patch-option-params" class="list-anchor">#</a>
+
+#### Returns
+-  &#60;[APIResponse]&#62;<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-patch-return"/><a href="#api-request-context-patch-return" class="list-anchor">#</a>
+
+---
+
+## post {#api-request-context-post}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font>
-
-- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-post-option-url"/> &#60;[String]&#62; Target URL.<a href="#api-request-context-post-option-url" class="list-anchor">#</a>
-- `options`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-post-option-params"/> &#60;[RequestOptions]&#62; Optional request parameters. <font size="2">Added in: v1.18</font><a href="#api-request-context-post-option-params" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-post-return"/> &#60;[APIResponse]&#62;<a href="#api-request-context-post-return" class="list-anchor">#</a>
 
 Sends HTTP(S) [POST](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
 
@@ -163,25 +220,63 @@ APIResponse response = request.post("https://example.com/api/uploadTeamList",
     FormData.create().set("fileField", filePayload)));
 ```
 
-## APIRequestContext.put(url[, options]) {#api-request-context-put}
+#### Usage
+
+```java
+APIRequestContext.post(url);
+APIRequestContext.post(url, options);
+```
+
+#### Parameters
+- `url` &#60;[String]&#62; Target URL.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-post-option-url"/><a href="#api-request-context-post-option-url" class="list-anchor">#</a>
+- `options` &#60;[RequestOptions]&#62; Optional request parameters. <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-post-option-params"/><a href="#api-request-context-post-option-params" class="list-anchor">#</a>
+
+#### Returns
+-  &#60;[APIResponse]&#62;<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-post-return"/><a href="#api-request-context-post-return" class="list-anchor">#</a>
+
+---
+
+## put {#api-request-context-put}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font>
-
-- `url`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-put-option-url"/> &#60;[String]&#62; Target URL.<a href="#api-request-context-put-option-url" class="list-anchor">#</a>
-- `options`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-put-option-params"/> &#60;[RequestOptions]&#62; Optional request parameters. <font size="2">Added in: v1.18</font><a href="#api-request-context-put-option-params" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-put-return"/> &#60;[APIResponse]&#62;<a href="#api-request-context-put-return" class="list-anchor">#</a>
 
 Sends HTTP(S) [PUT](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PUT) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
 
-## APIRequestContext.storageState([options]) {#api-request-context-storage-state}
+#### Usage
+
+```java
+APIRequestContext.put(url);
+APIRequestContext.put(url, options);
+```
+
+#### Parameters
+- `url` &#60;[String]&#62; Target URL.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-put-option-url"/><a href="#api-request-context-put-option-url" class="list-anchor">#</a>
+- `options` &#60;[RequestOptions]&#62; Optional request parameters. <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-put-option-params"/><a href="#api-request-context-put-option-params" class="list-anchor">#</a>
+
+#### Returns
+-  &#60;[APIResponse]&#62;<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-put-return"/><a href="#api-request-context-put-return" class="list-anchor">#</a>
+
+---
+
+## storageState {#api-request-context-storage-state}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font>
 
-- `options` &#60;`ApiRequestContext.StorageStateOptions`&#62;
-  - `setPath`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-path"/> &#60;[Path]&#62; The file path to save the storage state to. If `path` is a relative path, then it is resolved relative to current working directory. If no path is provided, storage state is still returned, but won't be saved to the disk.<a href="#api-request-context-storage-state-option-path" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-storage-state-return"/> &#60;[String]&#62;<a href="#api-request-context-storage-state-return" class="list-anchor">#</a>
-
 Returns storage state for this request context, contains current cookies and local storage snapshot if it was passed to the constructor.
+
+#### Usage
+
+```java
+APIRequestContext.storageState();
+APIRequestContext.storageState(options);
+```
+
+#### Parameters
+- `options` &#60;`ApiRequestContext.StorageStateOptions`&#62;
+  - `setPath` &#60;[Path]&#62; The file path to save the storage state to. If `path` is a relative path, then it is resolved relative to current working directory. If no path is provided, storage state is still returned, but won't be saved to the disk.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-storage-state-option-path"/><a href="#api-request-context-storage-state-option-path" class="list-anchor">#</a>
+
+#### Returns
+-  &#60;[String]&#62;<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="api-request-context-storage-state-return"/><a href="#api-request-context-storage-state-return" class="list-anchor">#</a>
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
