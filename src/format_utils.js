@@ -17,6 +17,7 @@
 //@ts-check
 
 const md = require('./markdown');
+const documentation = require('./documentation');
 /** @typedef {import('./generator').GeneratorFormatter} GeneratorFormatter */
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
 
@@ -26,7 +27,7 @@ const md = require('./markdown');
  * @returns {MarkdownNode[]}
  */
 function generateTabGroups(spec, language) {
-  return md.processCodeGroups(spec, language, tabs => {
+  return documentation.processCodeGroups(spec, language, tabs => {
     tabs.forEach(tab => tab.groupId += '-flavor');
     tabs.sort((t1, t2) => tabWeight(t2.value) - tabWeight(t1.value));
 

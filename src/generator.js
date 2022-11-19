@@ -22,7 +22,7 @@ const crypto = require('crypto');
 const path = require('path');
 const md = require('./markdown');
 const { parseApi } = require('./api_parser');
-const Documentation = require('./documentation');
+const docs = require('./documentation');
 const { generateTabGroups, renderHTMLCard } = require('./format_utils');
 
 /** @typedef {import('./documentation').Type} Type */
@@ -56,15 +56,15 @@ function rewriteContent(text) {
 
 /**
  * @typedef {{
- *   formatMember: function(Documentation.Member): { name: string, link: string, usages: string[], args: Documentation.Member[] }[],
+ *   formatMember: function(docs.Member): { name: string, link: string, usages: string[], args: docs.Member[] }[],
  *   formatArgumentName: function(string): string,
  *   formatTemplate: function(string): string,
- *   formatFunction: function(string, string, Documentation.Type): string,
+ *   formatFunction: function(string, string, docs.Type): string,
  *   formatPromise: function(string): string,
- *   formatArrayType?: function(Documentation.Type, string, Documentation.Member): string?,
+ *   formatArrayType?: function(docs.Type, string, docs.Member): string?,
  *   preprocessComment: function(MarkdownNode[]): MarkdownNode[]
  *   filterComment: function(MarkdownNode): boolean
- *   renderType: function(Documentation.Type, string, Documentation.Member): string,
+ *   renderType: function(docs.Type, string, docs.Member): string,
  * }} GeneratorFormatter
  */
 
@@ -141,7 +141,7 @@ class Generator {
   }
 
   /**
-   * @param {Documentation.Class} clazz
+   * @param {docs.Class} clazz
    */
   generateClassDoc(clazz) {
     if (clazz.name.endsWith('Assertions')) {
@@ -182,7 +182,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
   }
 
   /**
-   * @param {Documentation.Class} clazz
+   * @param {docs.Class} clazz
    * @return {MarkdownNode[]}
    */
   formatClassMembers(clazz) {
@@ -277,20 +277,24 @@ import HTMLCard from '@site/src/components/HTMLCard';
     spec = renderHTMLCard(spec);
 
     spec = spec.filter(c => {
+      const fullCodeLang = c.codeLang;
+      const parsed = fullCodeLang ? docs.parseCodeLang(fullCodeLang) : null;
+      if (parsed)
+        c.codeLang = parsed.highlighter;
       // if it's marked as generic, its always included
-      if (c.codeLang?.includes('generic'))
+      if (fullCodeLang?.includes('generic'))
         return true;
       // No lang or common lang - Ok.
-      if (!c.codeLang || commonSnippets.has(c.codeLang))
+      if (!fullCodeLang || commonSnippets.has(fullCodeLang))
         return true;
 
       // Our lang - Ok.
-      if (this.formatter.filterComment(c) || this.lang === md.parseCodeLang(c.codeLang).language)
+      if (this.formatter.filterComment(c) || this.lang === docs.parseCodeLang(fullCodeLang).language)
         return true;
 
       // '* browser' - always Ok
       // 'sh python' - Ok for Python.
-      const tokens = c.codeLang.split(' ');
+      const tokens = fullCodeLang.split(' ');
       if (tokens[1] === 'browser' || tokens[1] === this.lang)
         return true;
 
@@ -414,7 +418,7 @@ import HTMLCard from '@site/src/components/HTMLCard';`);
   }
 
   /**
-   * @param {Documentation.Member} member
+   * @param {docs.Member} member
    * @param {string=} href
    * @return {string[]}
    */
@@ -426,7 +430,7 @@ import HTMLCard from '@site/src/components/HTMLCard';`);
   }
 
   /**
-   * @param {Documentation.Class} clazz
+   * @param {docs.Class} clazz
    */
   visitClassToc(clazz) {
     for (const member of clazz.membersArray)
@@ -435,7 +439,7 @@ import HTMLCard from '@site/src/components/HTMLCard';`);
   
   /**
    * @param {string} name
-   * @param {Documentation.Member} member
+   * @param {docs.Member} member
    * @param {MarkdownNode[]} spec
    * @param {'in'|'out'} direction
    * @param {boolean=} async
@@ -493,9 +497,9 @@ import HTMLCard from '@site/src/components/HTMLCard';`);
 
 
   /**
-   * @param {Documentation.Type} type
+   * @param {docs.Type} type
    * @param {'in'|'out'} direction
-   * @param {Documentation.Member} member
+   * @param {docs.Member} member
    */
   renderType(type, direction, member) {
     if (type.union) {
@@ -525,7 +529,7 @@ import HTMLCard from '@site/src/components/HTMLCard';`);
       return result;
     if (type.templates)
       return `${this.renderTypeName(type, direction, member)}${this.formatter.formatTemplate(type.templates.map(l => {
-        return this.renderType(l, direction, /** @type {Documentation.Member} */({ ...member, required: true }));
+        return this.renderType(l, direction, /** @type {docs.Member} */({ ...member, required: true }));
       }).join(', '))}`;
     if (type.args)
       return `${this.formatter.formatFunction(type.args.map(l => this.renderType(l, direction, member)).join(', '), type.returnType ? ':' + this.renderType(type.returnType, direction, member) : '', type)}`;
@@ -535,9 +539,9 @@ import HTMLCard from '@site/src/components/HTMLCard';`);
   }
 
   /**
-   * @param {Documentation.Type} type
+   * @param {docs.Type} type
    * @param {'in'|'out'} direction
-   * @param {Documentation.Member} member
+   * @param {docs.Member} member
    */
   renderTypeName(type, direction, member) {
     return this.formatter.renderType(type, direction, member);
@@ -553,7 +557,7 @@ function toSnakeCase(name) {
 }
 
 /**
- * @param {Documentation.Member[]} args
+ * @param {docs.Member[]} args
  * @return {string[]}
  */
  function renderJSSignatures(args) {
@@ -585,7 +589,7 @@ function toTitleCase(name, options) {
 
 
 /**
- * @param {Documentation.Class} clazz
+ * @param {docs.Class} clazz
  * @returns {string}
  */
 function apiClassLink(clazz) {
@@ -595,7 +599,7 @@ function apiClassLink(clazz) {
 }
 
 /**
- * @param {Documentation.Member} member
+ * @param {docs.Member} member
  * @returns {String}
  */
 function calculateHeadingHash(member) {
@@ -608,7 +612,7 @@ function calculateHeadingHash(member) {
 }
 
 /**
- * @param {Documentation.Member} member
+ * @param {docs.Member} member
  * @param {'in'|'out'} direction
  * @returns {String}
  */
