@@ -177,7 +177,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
     }
     result.push(...this.formatClassMembers(clazz));
     fs.mkdirSync(path.join(this.outDir, 'api'), { recursive: true });
-    const output = [md.render(result), this.generatedLinksSuffix].join('\n');
+    const output = [md.render(result, { flattenText: true }), this.generatedLinksSuffix].join('\n');
     writeFileSyncCached(path.join(this.outDir, 'api', `class-${clazz.name.toLowerCase()}.mdx`), this.mdxLinks(output));
   }
 
@@ -212,32 +212,35 @@ import HTMLCard from '@site/src/components/HTMLCard';
         memberNode.children.push(...this.formatComment(member.spec));
 
         // Usage.
-        memberNode.children.push({
-          type: 'h4',
-          text: `Usage`,
-          children: [{
+        if (!member.spec.find(n => n.text === '**Usage**')) {
+          memberNode.children.push({
+            type: 'text',
+            text: `**Usage**`,
+          });
+          memberNode.children.push({
             type: 'code',
             codeLang: this.lang,
             lines: usages,
-          }]
-        });
+          });
+        }
 
         // Parameters.
         if (args.length) {
           memberNode.children.push({
-            type: 'h4',
-            text: `Parameters`,
-            children: args.map(a => {
-              let name = this.formatter.formatArgumentName(a.alias);
-              if (this.lang === 'js' && !a.required)
-                name += '?';
-              return this.renderProperty(`\`${name}\``, a, a.spec, 'in');
-            })
+            type: 'text',
+            text: `**Parameters**`,
           });
+
+          memberNode.children.push(...args.map(a => {
+            let name = this.formatter.formatArgumentName(a.alias);
+            if (this.lang === 'js' && !a.required)
+              name += '?';
+            return this.renderProperty(`\`${name}\``, a, a.spec, 'in');
+          }));
         }
 
         // Return type.
-        if (member.type && (member.type.name !== 'void' || member.kind === 'method')) {
+        if (member.type && member.type.name !== 'void') {
           let name;
           switch (member.kind) {
             case 'event': name = 'Event data'; break;
@@ -246,10 +249,11 @@ import HTMLCard from '@site/src/components/HTMLCard';
           }
 
           memberNode.children.push({
-            type: 'h4',
-            text: name,
-            children: [this.renderProperty('', member, undefined, 'out', member.async)]
+            type: 'text',
+            text: '**' + name + '**',
           });
+
+          memberNode.children.push(this.renderProperty('', member, undefined, 'out', member.async));
         }
 
         result.push(memberNode);
@@ -369,7 +373,7 @@ title: "Assertions"
         node.children = this.formatComment(node.children);
     });
     fs.mkdirSync(this.outDir, { recursive: true });
-    let output = [md.render(nodes), this.generatedLinksSuffix].join('\n');
+    let output = [md.render(nodes, { flattenText: true }), this.generatedLinksSuffix].join('\n');
     output = output.replace(`"
 ---`, `"
 ---
@@ -489,7 +493,7 @@ import HTMLCard from '@site/src/components/HTMLCard';`);
     const result = {
       type: 'li',
       liType: 'default',
-      text: `${name} &#60;${typeText}&#62;${comment ? ' ' + comment : ''}${sinceVersion}${linkTag}${linkAnchor}`,
+      text: `${name ? name + ' ' : ''}&#60;${typeText}&#62;${comment ? ' ' + comment : ''}${sinceVersion}${linkTag}${linkAnchor}`,
       children
     };
     return result;
