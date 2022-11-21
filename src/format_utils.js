@@ -40,6 +40,7 @@ function generateTabGroups(spec, language) {
     tokens.push(`  ]
 }>`);
     tokens.push(...tabs.map(t => `<TabItem value="${t.value}">
+
 ${md.render([t.spec])}
 </TabItem>`));
     tokens.push(`</Tabs>`);
