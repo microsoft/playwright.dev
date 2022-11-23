@@ -166,8 +166,8 @@ import HTMLCard from '@site/src/components/HTMLCard';
       text: ''
     });
     clazz.membersArray.sort((m1, m2) => {
-      const k1 = m1.kind + toSnakeCase(m1.alias.replace(/\$\$eval/, '$$eval2'));
-      const k2 = m2.kind + toSnakeCase(m2.alias.replace(/\$\$eval/, '$$eval2'));
+      const k1 = (m1.deprecated || m1.discouraged ? 'z_' : '') + m1.kind + toSnakeCase(m1.alias.replace(/\$\$eval/, '$$eval2'));
+      const k2 = (m2.deprecated || m2.discouraged ? 'z_' : '') + m2.kind + toSnakeCase(m2.alias.replace(/\$\$eval/, '$$eval2'));
       return k1.localeCompare(k2);
     });
     this.visitClassToc(clazz);
@@ -188,6 +188,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
   formatClassMembers(clazz) {
     /** @type {MarkdownNode[]} */
     const result = [];
+    let section = '';
     for (const member of clazz.membersArray) {
       // Iterate members
       for (const { name, usages, args } of this.formatter.formatMember(member)) {
@@ -195,9 +196,27 @@ import HTMLCard from '@site/src/components/HTMLCard';
           type: 'text',
           text: '---'
         });
-    
+
+        const type = (member.deprecated || member.discouraged) ? 'deprecated' : member.kind;
+        if (type !== section) {
+          section = type;
+          let title = '';
+          if (member.kind === 'event')
+            title = 'Events';
+          if (member.kind === 'method')
+            title = (member.deprecated || member.discouraged) ? 'Deprecated' : 'Methods';
+          if (member.kind === 'property')
+            title = 'Properties';
+
+          result.push({
+            type: 'h2',
+            text: title,
+            children: [],
+          });
+        }
+
         /** @type {MarkdownNode} */
-        const memberNode = { type: 'h2', children: [], text: '' };
+        const memberNode = { type: 'h3', children: [], text: '' };
         if (!this.heading2ExplicitId.has(member))
           throw new Error(`Header ${name} needs to have an explicit ID`)
         memberNode.text = `${name} {#${this.heading2ExplicitId.get(member)}}`;
@@ -207,6 +226,30 @@ import HTMLCard from '@site/src/components/HTMLCard';
           type: 'text',
           text: `<font size="2" style={{position: "relative", top: "-20px"}}>Added in: ${member.since}</font>\n`
         });
+
+        if (member.deprecated) {
+          memberNode.children.push({
+            type: 'text',
+            text: `:::caution
+
+${this.documentation.renderLinksInText(member.deprecated)}
+
+:::
+`
+          });
+        }
+
+        if (member.discouraged) {
+          memberNode.children.push({
+            type: 'text',
+            text: `:::caution
+
+${this.documentation.renderLinksInText(member.discouraged)}
+
+:::
+`
+          });
+        }
 
         // Documentation.
         memberNode.children.push(...this.formatComment(member.spec));
@@ -355,7 +398,7 @@ title: "Assertions"
   }
 
   generateDocFromMd(nodes, outName) {
-    this.documentation.renderLinksInText(nodes);
+    this.documentation.renderLinksInNodes(nodes);
     const tocIndex = nodes.findIndex(node => node.text === '<!-- TOC -->' || node.text === '<!-- TOC3 -->');
     if (tocIndex !== -1) {
       const node = nodes[tocIndex];
