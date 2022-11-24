@@ -148,6 +148,16 @@ module.exports = {
         },
         {
           type: 'category',
+          label: 'Assertions',
+          items: [
+            { type: 'doc', id: 'api/class-apiresponseassertions' },
+            { type: 'doc', id: 'api/class-locatorassertions' },
+            { type: 'doc', id: 'api/class-pageassertions' }
+          ],
+          collapsed: false
+        },
+        {
+          type: 'category',
           label: 'Test Runner',
           items: [
             { type: 'doc', id: 'api/class-fixtures' },

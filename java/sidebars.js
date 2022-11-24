@@ -105,6 +105,16 @@ module.exports = {
             { type: 'doc', id: 'api/class-worker' }
           ],
           collapsed: false
+        },
+        {
+          type: 'category',
+          label: 'Assertions',
+          items: [
+            { type: 'doc', id: 'api/class-apiresponseassertions' },
+            { type: 'doc', id: 'api/class-locatorassertions' },
+            { type: 'doc', id: 'api/class-pageassertions' }
+          ],
+          collapsed: false
         }
       ],
       collapsed: false
