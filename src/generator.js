@@ -135,19 +135,12 @@ class Generator {
 
     for (const [name, outName] of guides)
       this.generateDoc(name, outName + 'x');
-
-    if (!guides.has(`test-assertions-${this.lang}.md`))
-      this.generateAsertionsDocFromClassDoc('test-assertions.mdx')
   }
 
   /**
    * @param {docs.Class} clazz
    */
   generateClassDoc(clazz) {
-    if (clazz.name.endsWith('Assertions')) {
-      // Those files are merged into PlaywrightAssertions
-      return;
-    }
     /** @type {MarkdownNode[]} */
     const result = [];
     result.push({
@@ -354,46 +347,12 @@ ${this.documentation.renderLinksInText(member.discouraged)}
   }
 
   /**
-   * @param {MarkdownNode[]} nodes
-   */
-  insertAssertionClassesDocs(nodes) {
-    // Insert in this order.
-    const assertionClassNames = ['LocatorAssertions', 'PageAssertions', 'APIResponseAssertions'];
-    if (this.lang === 'js')
-      assertionClassNames.push('ScreenshotAssertions');
-    if (this.lang === 'java') {
-      assertionClassNames.push('PlaywrightAssertions');
-      const relatedClass = this.documentation.classes.get('PlaywrightAssertions');
-      relatedClass.membersArray = relatedClass.membersArray.filter(m => !m.alias.startsWith('assertThat'));
-    }
-    for (const name of assertionClassNames) {
-      const relatedClass = this.documentation.classes.get(name);
-      this.visitClassToc(relatedClass);
-      nodes.push(...this.formatClassMembers(relatedClass));
-    }
-  }
-
-  /**
    * @param {string} name
    * @param {string} outName
    */
   generateDoc(name, outName) {
     const content = fs.readFileSync(path.join(this.srcDir, name)).toString();
     let nodes = this.filterForLanguage(md.parse(content));
-    return this.generateDocFromMd(nodes, outName);
-  }
-
-  /**
-   * @param {string} outName
-   */
-  generateAsertionsDocFromClassDoc(outName) {
-    const mainClass = this.documentation.classes.get('PlaywrightAssertions');
-    const nodes = md.parse(`---
-id: test-assertions
-title: "Assertions"
----
-`);
-    nodes.push(...this.filterForLanguage(mainClass.spec));
     return this.generateDocFromMd(nodes, outName);
   }
 
@@ -407,8 +366,6 @@ title: "Assertions"
       if (node.text === '<!-- TOC3 -->')
         node.text = md.generateToc(nodes, true);
     }
-    if (outName.toLowerCase().includes('test-assertion'))
-      this.insertAssertionClassesDocs(nodes);
 
     nodes = this.formatComment(nodes);
     md.visitAll(nodes, node => {
@@ -640,8 +597,6 @@ function toTitleCase(name, options) {
  * @returns {string}
  */
 function apiClassLink(clazz) {
-  if (clazz.name.endsWith('Assertions'))
-    return '/test-assertions.md';
   return `/api/class-${clazz.name.toLowerCase()}.md`;
 }
 

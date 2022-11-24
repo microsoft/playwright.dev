@@ -66,7 +66,7 @@ class CSharpFormatter {
 
       if (!isGetter) {
         usages = signatures.map(signature => `${usageBase}(${signature});`);
-        link += '();';
+        link += '()';
       }
 
       if (member.alias.startsWith('RunAnd')) {
