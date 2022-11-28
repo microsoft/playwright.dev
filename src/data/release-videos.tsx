@@ -1,4 +1,4 @@
-const conferenceVideos = [
+const releaseVideos = [
   {
     version: '1.28',
     id: 'tVSq-0n-TY4',
@@ -88,4 +88,4 @@ const conferenceVideos = [
   }
 ];
 
-export default conferenceVideos;
+export default releaseVideos;

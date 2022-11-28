@@ -1,4 +1,4 @@
-const liveStreams = [
+const featureVideos = [
   {
     title: 'Component Tests (preview)',
     description: '',
@@ -8,4 +8,4 @@ const liveStreams = [
   }
 ];
 
-export default liveStreams;
+export default featureVideos;
