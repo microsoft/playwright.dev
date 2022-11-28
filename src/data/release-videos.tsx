@@ -1,5 +1,10 @@
 const conferenceVideos = [
   {
+    version: '1.28',
+    id: 'tVSq-0n-TY4',
+    highlights: ['VS Code extension', 'Playwright inspector', 'snapshot path']
+  },
+  {
     version: '1.27',
     id: 'b84eqab3kwc',
     highlights: ['Locators', 'workers', 'html reporter']
