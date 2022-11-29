@@ -1,4 +1,9 @@
-const conferenceVideos = [
+const releaseVideos = [
+  {
+    version: '1.28',
+    id: 'tVSq-0n-TY4',
+    highlights: ['VS Code extension', 'Playwright inspector', 'snapshot path']
+  },
   {
     version: '1.27',
     id: 'b84eqab3kwc',
@@ -83,4 +88,4 @@ const conferenceVideos = [
   }
 ];
 
-export default conferenceVideos;
+export default releaseVideos;
