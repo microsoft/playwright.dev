@@ -152,7 +152,8 @@ module.exports = {
           items: [
             { type: 'doc', id: 'api/class-apiresponseassertions' },
             { type: 'doc', id: 'api/class-locatorassertions' },
-            { type: 'doc', id: 'api/class-pageassertions' }
+            { type: 'doc', id: 'api/class-pageassertions' },
+            { type: 'doc', id: 'api/class-snapshotassertions' }
           ],
           collapsed: false
         },
