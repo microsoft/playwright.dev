@@ -24,14 +24,14 @@ await page.GetByLabel("User Name").FillAsync("John");
 
 await page.GetByLabel("Password").FillAsync("secret-password");
 
-await page.GetByRole(AriaRole.Button, new() { NameString = "Sign in" }).ClickAsync();
+await page.GetByRole(AriaRole.Button, new() { Name = "Sign in" }).ClickAsync();
 
 await Expect(page.GetByText("Welcome, John!")).ToBeVisibleAsync();
 ```
 
 ## Locating elements
 
-Playwright comes with multiple built-in locators. To make tests resilient, we recommend prioritizing user-facing attributes and explicit contracts such as [Page.GetByRole()](/api/class-page.mdx#page-get-by-role). 
+Playwright comes with multiple built-in locators. To make tests resilient, we recommend prioritizing user-facing attributes and explicit contracts such as [Page.GetByRole()](/api/class-page.mdx#page-get-by-role).
 
 For example, consider the following DOM structure.
 
@@ -48,7 +48,7 @@ For example, consider the following DOM structure.
 Locate the element by its role of `button` with name "Sign in".
 
 ```csharp
-await page.GetByRole(AriaRole.Button, new() { NameString = "Sign in" }).ClickAsync();
+await page.GetByRole(AriaRole.Button, new() { Name = "Sign in" }).ClickAsync();
 ```
 
 :::tip
@@ -58,7 +58,7 @@ Use the [code generator](./codegen.mdx) to generate a locator, and then edit it 
 Every time a locator is used for an action, an up-to-date DOM element is located in the page. In the snippet below, the underlying DOM element will be located twice, once prior to every action. This means that if the DOM changes in between the calls due to re-render, the new element corresponding to the locator will be used.
 
 ```csharp
-var locator = page.GetByRole(AriaRole.Button, new() { NameString = "Sign in" })
+var locator = page.GetByRole(AriaRole.Button, new() { Name = "Sign in" })
 
 await locator.HoverAsync();
 await locator.ClickAsync();
@@ -69,7 +69,7 @@ Note that all methods that create a locator, such as [Page.GetByLabel()](/api/cl
 ```csharp
 var locator = page
     .FrameLocator("#my-frame")
-    .GetByRole(AriaRole.Button), new() { NameString = "Sign in" });
+    .GetByRole(AriaRole.Button), new() { Name = "Sign in" });
 
 await locator.ClickAsync();
 ```
@@ -104,11 +104,11 @@ You can locate each element by it's implicit role:
 
 ```csharp
 await Expect(page
-    .GetByRole(AriaRole.Heading, new() { NameString = "Sign up" }))
+    .GetByRole(AriaRole.Heading, new() { Name = "Sign up" }))
     .ToBeVisibleAsync();
 
 await page
-    .GetByRole(AriaRole.Checkbox, new() { NameString = "Subscribe" })
+    .GetByRole(AriaRole.Checkbox, new() { Name = "Subscribe" })
     .CheckAsync();
 
 await page
@@ -318,7 +318,7 @@ Set the test id to use a custom data attribute for your tests.
 playwright.Selectors.SetTestIdAttribute("data-pw");
 ```
 
-In your html you can now use `data-pw` as your test id instead of the default `data-testid`. 
+In your html you can now use `data-pw` as your test id instead of the default `data-testid`.
 
 <HTMLCard>
 <div>
@@ -396,7 +396,7 @@ To click `<x-details>`:
 
 ```csharp
 await page
-    .Locator("x-details", new() { HasTextString = "Details" })
+    .Locator("x-details", new() { HasText = "Details" })
     .ClickAsync();
 ```
 
@@ -449,8 +449,8 @@ Locators can be filtered by text with the [Locator.Filter()](/api/class-locator.
 ```csharp
 await page
     .GetByRole(AriaRole.Listitem)
-    .Filter(new() { HasTextString = "Product 2" })
-    .GetByRole(AriaRole.Button, new () { NameString = "Add to cart" })
+    .Filter(new() { HasText = "Product 2" })
+    .GetByRole(AriaRole.Button, new () { Name = "Add to cart" })
     .ClickAsync();
 ```
 
@@ -460,7 +460,7 @@ Use a regular expression:
 await page
     .GetByRole(AriaRole.Listitem)
     .Filter(new() { HasTextRegex = new Regex("Product 2") })
-    .GetByRole(AriaRole.Button, new () { NameString = "Add to cart" })
+    .GetByRole(AriaRole.Button, new () { Name = "Add to cart" })
     .ClickAsync();
 ```
 
@@ -497,10 +497,10 @@ await page
     .GetByRole(AriaRole.Listitem)
     .Filter(new() {
         Has = page.GetByRole(AriaRole.Heading, new () {
-            NameString = "Product 2"
+            Name = "Product 2"
         })
     })
-    .GetByRole(AriaRole.Button, new () { NameString = "Add to cart" })
+    .GetByRole(AriaRole.Button, new () { Name = "Add to cart" })
     .ClickAsync();
 ```
 
@@ -526,10 +526,10 @@ In this example we first create a locator called product by locating the test id
 ```csharp
 var product = page
     .GetByRole(AriaRole.Listitem)
-    .Filter(new() { HasTextString = "Product 2" });
+    .Filter(new() { HasText = "Product 2" });
 
 await product
-    .GetByRole(AriaRole.Button), new() { NameString = "Add to cart" })
+    .GetByRole(AriaRole.Button), new() { Name = "Add to cart" })
     .ClickAsync();
 ```
 
@@ -678,7 +678,7 @@ Locate an item by the role of "listitem" and then filter by the text of "orange"
 ```csharp
 await page
     .GetByRole(AriaRole.Listitem)
-    .Filter(new() { HasTextString = "orange" })
+    .Filter(new() { HasText = "orange" })
     .ClickAsync();
 ```
 
@@ -778,9 +778,9 @@ To take a screenshot of the row with "Mary" and "Say goodbye":
 var rowLocator = page.GetByRole(AriaRole.Listitem);
 
 await rowLocator
-    .Filter(new() { HasTextString = "Mary" })
+    .Filter(new() { HasText = "Mary" })
     .Filter(new() {
-        Has = page.GetByRole(AriaRole.Button), new() { NameString = "Say goodbye" })
+        Has = page.GetByRole(AriaRole.Button), new() { Name = "Say goodbye" })
     })
     .ScreenshotAsync(new() { Path = "screenshot.png" });
 ```
