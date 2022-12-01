@@ -1,18 +1,18 @@
 ---
-id: events
-title: "Events"
+id: mock
+title: "Mock APIs"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-Playwright allows listening to various types of events happening on the web page, such as network requests, creation of child pages, dedicated workers etc. There are several ways to subscribe to such events such as waiting for events or adding or removing event listeners.
+Web APIs are usually implemented as HTTP endpoints. Playwright provides APIs to **mock** and **modify** network traffic, both HTTP and HTTPS. Any requests that a page does, including [XHRs](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) requests, can be tracked, modified and mocked.
 
-## Waiting for event
+## Mock API requests
 
-Most of the time, scripts will need to wait for a particular event to happen. Below are some of the typical event awaiting patterns.
+Following code will intercept all the calls to `https://dog.ceo/api/breeds/list/all` and will return the test data instead. No requests to the `https://dog.ceo/api/breeds/list/all` endpoint will be made.
 
-Wait for a request with the specified url using [page.expect_request()](/api/class-page.mdx#page-wait-for-request):
+Read more about [advanced networking](./network.mdx).
 
 <Tabs
   groupId="python-flavor"
@@ -25,25 +25,32 @@ Wait for a request with the specified url using [page.expect_request()](/api/cla
 <TabItem value="sync">
 
 ```py
-with page.expect_request("**/*logo*.png") as first:
-  page.goto("https://wikipedia.org")
-print(first.value.url)
+async def handle(route):
+    json = { message: { "test_breed": [] } }
+    route.fulfill(json=json)
+
+page.route("https://dog.ceo/api/breeds/list/all", handle)
 ```
 
 </TabItem>
 <TabItem value="async">
 
 ```py
-async with page.expect_request("**/*logo*.png") as first:
-  await page.goto("https://wikipedia.org")
-first_request = await first.value
-print(first_request.url)
+async def handle(route):
+    json = { message: { "test_breed": [] } }
+    await route.fulfill(json=json)
+
+await page.route("https://dog.ceo/api/breeds/list/all", handle)
 ```
 
 </TabItem>
 </Tabs>
 
-Wait for popup window:
+## Modify API responses
+
+Sometimes, it is essential to make an API request, but response needs to be patched to allow for reproducible testing. In that case, instead of mocking the request, one can perform the request and fulfill it with the modified response.
+
+Read more about [advanced networking](./network.mdx).
 
 <Tabs
   groupId="python-flavor"
@@ -56,99 +63,30 @@ Wait for popup window:
 <TabItem value="sync">
 
 ```py
-with page.expect_popup() as popup:
-  page.get_by_text("open the popup").click()
-popup.value.goto("https://wikipedia.org")
+def handle(route):
+    response = route.fulfill()
+    json = response.json()
+    json["message"]["big_red_dog"] = []
+    # Fullfill using the original response, while patching the response body
+    # with the given JSON object.
+    route.fulfill(response=response, json=json)
+
+page.route("https://dog.ceo/api/breeds/list/all", handle)
 ```
 
 </TabItem>
 <TabItem value="async">
 
 ```py
-async with page.expect_popup() as popup:
-  await page.get_by_text("open the popup").click()
-child_page = await popup.value
-await child_page.goto("https://wikipedia.org")
-```
+async def handle(route):
+    response = await route.fulfill()
+    json = await response.json()
+    json["message"]["big_red_dog"] = []
+    # Fullfill using the original response, while patching the response body
+    # with the given JSON object.
+    await route.fulfill(response=response, json=json)
 
-</TabItem>
-</Tabs>
-
-## Adding/removing event listener
-
-Sometimes, events happen in random time and instead of waiting for them, they need to be handled. Playwright supports traditional language mechanisms for subscribing and unsubscribing from the events:
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-def print_request_sent(request):
-  print("Request sent: " + request.url)
-
-def print_request_finished(request):
-  print("Request finished: " + request.url)
-
-page.on("request", print_request_sent)
-page.on("requestfinished", print_request_finished)
-page.goto("https://wikipedia.org")
-
-page.remove_listener("requestfinished", print_request_finished)
-page.goto("https://www.openstreetmap.org/")
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-def print_request_sent(request):
-  print("Request sent: " + request.url)
-
-def print_request_finished(request):
-  print("Request finished: " + request.url)
-
-page.on("request", print_request_sent)
-page.on("requestfinished", print_request_finished)
-await page.goto("https://wikipedia.org")
-
-page.remove_listener("requestfinished", print_request_finished)
-await page.goto("https://www.openstreetmap.org/")
-```
-
-</TabItem>
-</Tabs>
-
-## Adding one-off listeners
-
-If a certain event needs to be handled once, there is a convenience API for that:
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-page.once("dialog", lambda dialog: dialog.accept("2021"))
-page.evaluate("prompt('Enter a number:')")
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-page.once("dialog", lambda dialog: dialog.accept("2021"))
-await page.evaluate("prompt('Enter a number:')")
+await page.route("https://dog.ceo/api/breeds/list/all", handle)
 ```
 
 </TabItem>

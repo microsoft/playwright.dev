@@ -445,7 +445,7 @@ The earliest moment that page is available is when it has navigated to the initi
 
 ```py
 with page.expect_event("popup") as page_info:
-    page.evaluate("window.open('https://example.com')")
+    page.get_by_text("open the popup").click()
 popup = page_info.value
 print(popup.evaluate("location.href"))
 ```
@@ -455,7 +455,7 @@ print(popup.evaluate("location.href"))
 
 ```py
 async with page.expect_event("popup") as page_info:
-    page.evaluate("window.open('https://example.com')")
+    await page.get_by_text("open the popup").click()
 popup = await page_info.value
 print(await popup.evaluate("location.href"))
 ```
@@ -1302,7 +1302,8 @@ This resolves when the page navigates to a new URL or reloads. It is useful for 
 
 ```py
 with page.expect_navigation():
-    page.click("a.delayed-navigation") # clicking the link will indirectly cause a navigation
+    # This action triggers the navigation after a timeout.
+    page.get_by_text("Navigate after timeout").click()
 # Resolves after navigation has finished
 ```
 
@@ -1311,7 +1312,8 @@ with page.expect_navigation():
 
 ```py
 async with page.expect_navigation():
-    await page.click("a.delayed-navigation") # clicking the link will indirectly cause a navigation
+    # This action triggers the navigation after a timeout.
+    await page.get_by_text("Navigate after timeout").click()
 # Resolves after navigation has finished
 ```
 
@@ -1380,12 +1382,12 @@ Waits for the matching request and returns it. See [waiting for event](../events
 
 ```py
 with page.expect_request("http://example.com/resource") as first:
-    page.click('button')
+    page.get_by_text("trigger request").click()
 first_request = first.value
 
 # or with a lambda
 with page.expect_request(lambda request: request.url == "http://example.com" and request.method == "get") as second:
-    page.click('img')
+    page.get_by_text("trigger request").click()
 second_request = second.value
 ```
 
@@ -1394,12 +1396,12 @@ second_request = second.value
 
 ```py
 async with page.expect_request("http://example.com/resource") as first:
-    await page.click('button')
+    await page.get_by_text("trigger request").click()
 first_request = await first.value
 
 # or with a lambda
 async with page.expect_request(lambda request: request.url == "http://example.com" and request.method == "get") as second:
-    await page.click('img')
+    await page.get_by_text("trigger request").click()
 second_request = await second.value
 ```
 
@@ -1459,13 +1461,13 @@ Returns the matched response. See [waiting for event](../events.mdx#waiting-for-
 
 ```py
 with page.expect_response("https://example.com/resource") as response_info:
-    page.click("input")
+    page.get_by_text("trigger response").click()
 response = response_info.value
 return response.ok
 
 # or with a lambda
 with page.expect_response(lambda response: response.url == "https://example.com" and response.status == 200) as response_info:
-    page.click("input")
+    page.get_by_text("trigger response").click()
 response = response_info.value
 return response.ok
 ```
@@ -1475,13 +1477,13 @@ return response.ok
 
 ```py
 async with page.expect_response("https://example.com/resource") as response_info:
-    await page.click("input")
+    await page.get_by_text("trigger response").click()
 response = await response_info.value
 return response.ok
 
 # or with a lambda
 async with page.expect_response(lambda response: response.url == "https://example.com" and response.status == 200) as response_info:
-    await page.click("input")
+    await page.get_by_text("trigger response").click()
 response = await response_info.value
 return response.ok
 ```
@@ -3101,7 +3103,7 @@ await page.wait_for_load_state() # the promise resolves after "load" event.
 with page.expect_popup() as page_info:
     page.get_by_role("button").click() # click triggers a popup.
 popup = page_info.value
- # Following resolves after "domcontentloaded" event.
+# Wait for the "DOMContentLoaded" event.
 popup.wait_for_load_state("domcontentloaded")
 print(popup.title()) # popup is ready to use.
 ```
@@ -3113,7 +3115,7 @@ print(popup.title()) # popup is ready to use.
 async with page.expect_popup() as page_info:
     await page.get_by_role("button").click() # click triggers a popup.
 popup = await page_info.value
- # Following resolves after "domcontentloaded" event.
+# Wait for the "DOMContentLoaded" event.
 await popup.wait_for_load_state("domcontentloaded")
 print(await popup.title()) # popup is ready to use.
 ```

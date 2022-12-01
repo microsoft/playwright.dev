@@ -86,10 +86,9 @@ The event is emitted when a new Page is created in the BrowserContext. The page 
 The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
 
 ```js
-const [newPage] = await Promise.all([
-  context.waitForEvent('page'),
-  page.locator('a[target=_blank]').click(),
-]);
+const newPagePromise = context.waitForEvent('page');
+await page.getByText('open new page').click();
+const newPage = await newPagePromise;
 console.log(await newPage.evaluate('location.href'));
 ```
 
@@ -887,10 +886,9 @@ Waits for event to fire and passes its value into the predicate function. Return
 **Usage**
 
 ```js
-const [page, _] = await Promise.all([
-  context.waitForEvent('page'),
-  page.getByRole('button').click()
-]);
+const pagePromise = context.waitForEvent('page');
+await page.getByRole('button').click();
+const page = await pagePromise;
 ```
 
 **Parameters**

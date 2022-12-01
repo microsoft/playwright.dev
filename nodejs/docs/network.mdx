@@ -78,11 +78,10 @@ const { chromium, webkit, firefox } = require('playwright');
 Or wait for a network response after the button click with [page.waitForResponse()](/api/class-page.mdx#page-wait-for-response):
 
 ```js
-// Use a glob URL pattern
-const [response] = await Promise.all([
-  page.waitForResponse('**/api/fetch_data'),
-  page.getByText('Update').click(),
-]);
+// Use a glob URL pattern. Note no await.
+const responsePromise = page.waitForResponse('**/api/fetch_data');
+await page.getByText('Update').click();
+const response = await responsePromise;
 ```
 
 #### Variations
@@ -90,17 +89,15 @@ const [response] = await Promise.all([
 Wait for [Response]s with [page.waitForResponse()](/api/class-page.mdx#page-wait-for-response)
 
 ```js
-// Use a RegExp
-const [response] = await Promise.all([
-  page.waitForResponse(/\.jpeg$/),
-  page.getByText('Update').click(),
-]);
+// Use a RegExp. Note no await.
+const responsePromise = page.waitForResponse(/\.jpeg$/);
+await page.getByText('Update').click();
+const response = await responsePromise;
 
-// Use a predicate taking a Response object
-const [response] = await Promise.all([
-  page.waitForResponse(response => response.url().includes(token)),
-  page.getByText('Update').click(),
-]);
+// Use a predicate taking a Response object. Note no await.
+const responsePromise = page.waitForResponse(response => response.url().includes(token));
+await page.getByText('Update').click();
+const response = await responsePromise;
 ```
 
 ## Handle requests

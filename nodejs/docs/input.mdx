@@ -182,13 +182,10 @@ await page.getByLabel('Upload file').setInputFiles({
 If you don't have input element in hand (it is created dynamically), you can handle the [page.on('filechooser')](/api/class-page.mdx#page-event-file-chooser) event or use a corresponding waiting method upon your action:
 
 ```js
-// Note that Promise.all prevents a race condition
-// between clicking and waiting for the file chooser.
-const [fileChooser] = await Promise.all([
-  // It is important to call waitForEvent before click to set up waiting.
-  page.waitForEvent('filechooser'),
-  page.locator('upload').click(),
-]);
+// Start waiting for file chooser before clicking. Note no await.
+const fileChooserPromise = page.waitForEvent('filechooser');
+await page.getByLabel('Upload file').click();
+const fileChooser = await fileChooserPromise;
 await fileChooser.setFiles('myfile.pdf');
 ```
 

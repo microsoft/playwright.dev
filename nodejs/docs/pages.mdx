@@ -50,11 +50,10 @@ const allPages = context.pages();
 The `page` event on browser contexts can be used to get new pages that are created in the context. This can be used to handle new pages opened by `target="_blank"` links.
 
 ```js
-// Get page after a specific action (e.g. clicking a link)
-const [newPage] = await Promise.all([
-  context.waitForEvent('page'),
-  page.locator('a[target="_blank"]').click() // Opens a new tab
-])
+// Start waiting for new page before clicking. Note no await.
+const pagePromise = context.waitForEvent('page');
+await page.getByText('open new tab').click();
+const newPage = await pagePromise;
 await newPage.waitForLoadState();
 console.log(await newPage.title());
 ```
@@ -76,14 +75,11 @@ If the page opens a pop-up (e.g. pages opened by `target="_blank"` links), you c
 This event is emitted in addition to the `browserContext.on('page')` event, but only for popups relevant to this page.
 
 ```js
-// Note that Promise.all prevents a race condition
-// between clicking and waiting for the popup.
-const [popup] = await Promise.all([
-  // It is important to call waitForEvent before click to set up waiting.
-  page.waitForEvent('popup'),
-  // Opens popup.
-  page.locator('#open').click(),
-]);
+// Start waiting for popup before clicking. Note no await.
+const popupPromise = page.waitForEvent('popup');
+await page.getByText('open the popup').click();
+const popup = await popupPromise;
+// Wait for the popup to load.
 await popup.waitForLoadState();
 console.log(await popup.title());
 ```
@@ -94,7 +90,7 @@ If the action that triggers the popup is unknown, the following pattern can be u
 // Get all popups when they open
 page.on('popup', async popup => {
   await popup.waitForLoadState();
-  await popup.title();
+  console.log(await popup.title());
 })
 ```
 
