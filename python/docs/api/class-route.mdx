@@ -77,7 +77,7 @@ def handle(route, request):
         "bar": None # remove "bar" header
     }
     route.continue_(headers=headers)
-}
+
 page.route("**/*", handle)
 ```
 
@@ -93,7 +93,7 @@ async def handle(route, request):
         "bar": None # remove "bar" header
     }
     await route.continue_(headers=headers)
-}
+
 await page.route("**/*", handle)
 ```
 
@@ -102,8 +102,8 @@ await page.route("**/*", handle)
 
 **Parameters**
 - `headers` &#60;[Dict]\[[str], [str]\]&#62; If set changes the request HTTP headers. Header values will be converted to a string.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-headers"/><a href="#route-continue-option-headers" class="list-anchor">#</a>
-- `method` &#60;[str]&#62; If set changes the request method (e.g. GET or POST)<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-method"/><a href="#route-continue-option-method" class="list-anchor">#</a>
-- `post_data` &#60;[str]|[bytes]&#62; If set changes the post data of request<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-post-data"/><a href="#route-continue-option-post-data" class="list-anchor">#</a>
+- `method` &#60;[str]&#62; If set changes the request method (e.g. GET or POST).<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-method"/><a href="#route-continue-option-method" class="list-anchor">#</a>
+- `post_data` &#60;[str]|[bytes]&#62; If set changes the post data of request.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-post-data"/><a href="#route-continue-option-post-data" class="list-anchor">#</a>
 - `url` &#60;[str]&#62; If set changes the request URL. New URL must have same protocol as original one.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-url"/><a href="#route-continue-option-url" class="list-anchor">#</a>
 
 ---
@@ -226,7 +226,7 @@ def handle(route, request):
         "bar": None # remove "bar" header
     }
     route.fallback(headers=headers)
-}
+
 page.route("**/*", handle)
 ```
 
@@ -242,7 +242,7 @@ async def handle(route, request):
         "bar": None # remove "bar" header
     }
     await route.fallback(headers=headers)
-}
+
 await page.route("**/*", handle)
 ```
 
@@ -251,9 +251,65 @@ await page.route("**/*", handle)
 
 **Parameters**
 - `headers` &#60;[Dict]\[[str], [str]\]&#62; If set changes the request HTTP headers. Header values will be converted to a string.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-headers"/><a href="#route-fallback-option-headers" class="list-anchor">#</a>
-- `method` &#60;[str]&#62; If set changes the request method (e.g. GET or POST)<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-method"/><a href="#route-fallback-option-method" class="list-anchor">#</a>
-- `post_data` &#60;[str]|[bytes]&#62; If set changes the post data of request<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-post-data"/><a href="#route-fallback-option-post-data" class="list-anchor">#</a>
+- `method` &#60;[str]&#62; If set changes the request method (e.g. GET or POST).<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-method"/><a href="#route-fallback-option-method" class="list-anchor">#</a>
+- `post_data` &#60;[str]|[bytes]&#62; If set changes the post data of request.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-post-data"/><a href="#route-fallback-option-post-data" class="list-anchor">#</a>
 - `url` &#60;[str]&#62; If set changes the request URL. New URL must have same protocol as original one. Changing the URL won't affect the route matching, all the routes are matched using the original request URL.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-url"/><a href="#route-fallback-option-url" class="list-anchor">#</a>
+
+---
+
+### fetch {#route-fetch}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.29</font>
+
+
+Performs the request and fetches result without fulfilling it, so that the response could be modified and then fulfilled.
+
+**Usage**
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+def handle(route):
+    response = route.fulfill()
+    json = response.json()
+    json["message"]["big_red_dog"] = []
+    route.fulfill(response=response, json=json)
+
+page.route("https://dog.ceo/api/breeds/list/all", handle)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+async def handle(route):
+    response = await route.fulfill()
+    json = await response.json()
+    json["message"]["big_red_dog"] = []
+    await route.fulfill(response=response, json=json)
+
+await page.route("https://dog.ceo/api/breeds/list/all", handle)
+```
+
+</TabItem>
+</Tabs>
+
+**Parameters**
+- `data` &#60;[str]|[bytes]|[Serializable]&#62; Allows to set post data of the request. If the data parameter is an object, it will be serialized to json string and `content-type` header will be set to `application/json` if not explicitly set. Otherwise the `content-type` header will be set to `application/octet-stream` if not explicitly set.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fetch-option-data"/><a href="#route-fetch-option-data" class="list-anchor">#</a>
+- `headers` &#60;[Dict]\[[str], [str]\]&#62; If set changes the request HTTP headers. Header values will be converted to a string.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fetch-option-headers"/><a href="#route-fetch-option-headers" class="list-anchor">#</a>
+- `method` &#60;[str]&#62; If set changes the request method (e.g. GET or POST).<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fetch-option-method"/><a href="#route-fetch-option-method" class="list-anchor">#</a>
+- `url` &#60;[str]&#62; If set changes the request URL. New URL must have same protocol as original one.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fetch-option-url"/><a href="#route-fetch-option-url" class="list-anchor">#</a>
+
+**Returns**
+- &#60;[APIResponse]&#62;<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fetch-return"/><a href="#route-fetch-return" class="list-anchor">#</a>
 
 ---
 
@@ -328,6 +384,35 @@ await page.route("**/xhr_endpoint", lambda route: route.fulfill(path="mock_data.
 - `body` &#60;[str]|[bytes]&#62; Response body.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-body"/><a href="#route-fulfill-option-body" class="list-anchor">#</a>
 - `content_type` &#60;[str]&#62; If set, equals to setting `Content-Type` response header.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-content-type"/><a href="#route-fulfill-option-content-type" class="list-anchor">#</a>
 - `headers` &#60;[Dict]\[[str], [str]\]&#62; Response headers. Header values will be converted to a string.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-headers"/><a href="#route-fulfill-option-headers" class="list-anchor">#</a>
+- `json` &#60;[Serializable]&#62; JSON response. This method will set the content type to `application/json` if not set. <font size="2">Added in: v1.29</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-json"/><a href="#route-fulfill-option-json" class="list-anchor">#</a>
+
+  **Usage**
+
+  ```js
+  await page.route('https://dog.ceo/api/breeds/list/all', async route => {
+    const json = {
+      message: { 'test_breed': [] }
+    };
+    await route.fulfill({ json });
+  });
+  ```
+
+  ```python async
+  async def handle(route):
+      json = { "test_breed": [] }
+      await route.fulfill(json=json)
+  
+  await page.route("https://dog.ceo/api/breeds/list/all", handle)
+  ```
+
+  ```python sync
+  async def handle(route):
+      json = { "test_breed": [] }
+      route.fulfill(json=json)
+  
+  page.route("https://dog.ceo/api/breeds/list/all", handle)
+  ```
+
 - `path` &#60;[Union]\[[str], [pathlib.Path]\]&#62; File path to respond with. The content type will be inferred from file extension. If `path` is a relative path, then it is resolved relative to the current working directory.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-path"/><a href="#route-fulfill-option-path" class="list-anchor">#</a>
 - `response` &#60;[APIResponse]&#62; [APIResponse] to fulfill route's request with. Individual fields of the response (such as headers) can be overridden using fulfill options. <font size="2">Added in: v1.15</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-response"/><a href="#route-fulfill-option-response" class="list-anchor">#</a>
 - `status` &#60;[int]&#62; Response status code, defaults to `200`.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-status"/><a href="#route-fulfill-option-status" class="list-anchor">#</a>

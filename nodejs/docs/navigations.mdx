@@ -110,15 +110,10 @@ Clicking an element could trigger asynchronous processing before initiating the 
 * Page waits for network requests before navigation
 
 ```js
-// Note that Promise.all prevents a race condition
-// between clicking and waiting for a navigation.
-await Promise.all([
-  // Waits for the next navigation.
-  // It is important to call waitForNavigation before click to set up waiting.
-  page.waitForNavigation(),
-  // Triggers a navigation after a timeout.
-  page.locator('div.delayed-navigation').click(),
-]);
+// Start waiting for navigation before clicking. Note no await.
+const navigationPromise = page.waitForNavigation();
+await page.getByText('Navigate after timeout').click();
+await navigationPromise;
 ```
 
 ### Multiple navigations
@@ -128,14 +123,11 @@ Clicking an element could trigger multiple navigations. In these cases, it is re
 * Multiple pushes to history state
 
 ```js
-// Note that Promise.all prevents a race condition
-// between clicking and waiting for a navigation.
-await Promise.all([
-  // It is important to call waitForNavigation before click to set up waiting.
-  page.waitForNavigation({ url: '**/login' }),
-  // Triggers a navigation with a script redirect.
-  page.getByText('Click me').click(),
-]);
+// Start waiting for navigation before clicking. Note no await.
+const navigationPromise = page.waitForNavigation({ url: '**/login' });
+// This action triggers the navigation with a script redirect.
+await page.getByText('Click me').click();
+await navigationPromise;
 ```
 
 ### Loading a popup
@@ -143,14 +135,11 @@ await Promise.all([
 When popup is opened, explicitly calling [page.waitForLoadState()](/api/class-page.mdx#page-wait-for-load-state) ensures that popup is loaded to the desired state.
 
 ```js
-// Note that Promise.all prevents a race condition
-// between clicking and waiting for the popup.
-const [ popup ] = await Promise.all([
-  // It is important to call waitForEvent before click to set up waiting.
-  page.waitForEvent('popup'),
-  // Opens popup.
-  page.locator('a[target="_blank"]').click(),
-]);
+// Start waiting for popup before clicking. Note no await.
+const popupPromise = page.waitForEvent('popup');
+await page.getByText('Open popup').click();
+const popup = await popupPromise;
+// Wait for the popup to load.
 await popup.waitForLoadState('load');
 ```
 

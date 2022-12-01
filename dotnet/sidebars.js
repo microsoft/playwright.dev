@@ -38,6 +38,7 @@ module.exports = {
         { type: 'doc', id: 'handles' },
         { type: 'doc', id: 'browser-contexts' },
         { type: 'doc', id: 'locators' },
+        { type: 'doc', id: 'mock' },
         { type: 'doc', id: 'navigations' },
         { type: 'doc', id: 'network' },
         { type: 'doc', id: 'pom' },

@@ -14,7 +14,7 @@ Using [Locator.FillAsync()](/api/class-locator.mdx#locator-fill) is the easiest 
 
 ```csharp
 // Text input
-await page.GetByRole("textbox").FillAsync("Peter");
+await page.GetByRole(AriaRole.Textbox).FillAsync("Peter");
 
 // Date input
 await page.GetByLabel("Birth date").FillAsync("2020-02-02");
@@ -62,7 +62,7 @@ Performs a simple human click.
 
 ```csharp
 // Generic click
-await page.GetByRole("button").ClickAsync();
+await page.GetByRole(AriaRole.Button).ClickAsync();
 
 // Double click
 await page.GetByText("Item").DblClickAsync();
@@ -93,7 +93,7 @@ Under the hood, this and other pointer-related methods:
 Sometimes, apps use non-trivial logic where hovering the element overlays it with another element that intercepts the click. This behavior is indistinguishable from a bug where element gets covered and the click is dispatched elsewhere. If you know this is taking place, you can bypass the [actionability](./actionability.mdx) checks and force the click:
 
 ```csharp
-await page.GetByRole("button").ClickAsync(new() { Force = true });
+await page.GetByRole(AriaRole.Button).ClickAsync(new() { Force = true });
 ```
 
 #### Programmatic click
@@ -101,7 +101,7 @@ await page.GetByRole("button").ClickAsync(new() { Force = true });
 If you are not interested in testing your app under the real conditions and want to simulate the click by any means possible, you can trigger the [`HTMLElement.click()`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click) behavior via simply dispatching a click event on the element with [Locator.DispatchEventAsync()](/api/class-locator.mdx#locator-dispatch-event):
 
 ```csharp
-await page.GetByRole("button").DispatchEventAsync("click");
+await page.GetByRole(AriaRole.Button).DispatchEventAsync("click");
 ```
 
 ## Type characters
@@ -126,10 +126,10 @@ Most of the time, [Page.FillAsync()](/api/class-page.mdx#page-fill) will just wo
 await page.GetByText("Submit").PressAsync("Enter");
 
 // Dispatch Control+Right
-await page.GetByRole("textbox").PressAsync("Control+ArrowRight");
+await page.GetByRole(AriaRole.Textbox).PressAsync("Control+ArrowRight");
 
 // Press $ sign on keyboard
-await page.GetByRole("textbox").PressAsync("$");
+await page.GetByRole(AriaRole.Textbox).PressAsync("$");
 ```
 
 The [Locator.PressAsync()](/api/class-locator.mdx#locator-press) method focuses the selected element and produces a single keystroke. It accepts the logical key names that are emitted in the [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) property of the keyboard events:
@@ -185,7 +185,7 @@ If you don't have input element in hand (it is created dynamically), you can han
 ```csharp
 var fileChooser = page.RunAndWaitForFileChooserAsync(async () =>
 {
-    await page.Locator("upload").ClickAsync();
+    await page.GetByLabel("Upload file").ClickAsync();
 });
 await fileChooser.SetFilesAsync("myfile.pdf");
 ```

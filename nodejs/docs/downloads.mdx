@@ -17,12 +17,10 @@ Downloaded files are deleted when the browser context that produced them is clos
 Here is the simplest way to handle the file download:
 
 ```js
-const [ download ] = await Promise.all([
-  // Start waiting for the download
-  page.waitForEvent('download'),
-  // Perform the action that initiates download
-  page.locator('button#delayed-download').click(),
-]);
+// Start waiting for download before clicking. Note no await.
+const downloadPromise = page.waitForEvent('download');
+await page.getByText('Download file').click();
+const download = await downloadPromise;
 // Wait for the download process to complete
 console.log(await download.path());
 // Save downloaded file somewhere

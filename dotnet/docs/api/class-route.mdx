@@ -69,8 +69,8 @@ await page.RouteAsync("**/*", route =>
 **Parameters**
 - `options` &#60;`RouteContinueOptions?`&#62;
   - `Headers` &#60;[IDictionary]?<[string], [string]>&#62; If set changes the request HTTP headers. Header values will be converted to a string.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-headers"/><a href="#route-continue-option-headers" class="list-anchor">#</a>
-  - `Method` &#60;[string]?&#62; If set changes the request method (e.g. GET or POST)<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-method"/><a href="#route-continue-option-method" class="list-anchor">#</a>
-  - `PostData` &#60;[byte]&#91;&#93;?&#62; If set changes the post data of request<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-post-data"/><a href="#route-continue-option-post-data" class="list-anchor">#</a>
+  - `Method` &#60;[string]?&#62; If set changes the request method (e.g. GET or POST).<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-method"/><a href="#route-continue-option-method" class="list-anchor">#</a>
+  - `PostData` &#60;[byte]&#91;&#93;?&#62; If set changes the post data of request.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-post-data"/><a href="#route-continue-option-post-data" class="list-anchor">#</a>
   - `Url` &#60;[string]?&#62; If set changes the request URL. New URL must have same protocol as original one.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-url"/><a href="#route-continue-option-url" class="list-anchor">#</a>
 
 ---
@@ -139,9 +139,41 @@ await page.RouteAsync("**/*", route =>
 **Parameters**
 - `options` &#60;`RouteFallbackOptions?`&#62;
   - `Headers` &#60;[IDictionary]?<[string], [string]>&#62; If set changes the request HTTP headers. Header values will be converted to a string.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-headers"/><a href="#route-fallback-option-headers" class="list-anchor">#</a>
-  - `Method` &#60;[string]?&#62; If set changes the request method (e.g. GET or POST)<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-method"/><a href="#route-fallback-option-method" class="list-anchor">#</a>
-  - `PostData` &#60;[byte]&#91;&#93;?&#62; If set changes the post data of request<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-post-data"/><a href="#route-fallback-option-post-data" class="list-anchor">#</a>
+  - `Method` &#60;[string]?&#62; If set changes the request method (e.g. GET or POST).<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-method"/><a href="#route-fallback-option-method" class="list-anchor">#</a>
+  - `PostData` &#60;[byte]&#91;&#93;?&#62; If set changes the post data of request.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-post-data"/><a href="#route-fallback-option-post-data" class="list-anchor">#</a>
   - `Url` &#60;[string]?&#62; If set changes the request URL. New URL must have same protocol as original one. Changing the URL won't affect the route matching, all the routes are matched using the original request URL.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-url"/><a href="#route-fallback-option-url" class="list-anchor">#</a>
+
+---
+
+### FetchAsync {#route-fetch}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.29</font>
+
+
+Performs the request and fetches result without fulfilling it, so that the response could be modified and then fulfilled.
+
+**Usage**
+
+```csharp
+await page.RouteAsync("https://dog.ceo/api/breeds/list/all", async route =>
+{
+    var response = await route.FetchAsync();
+    dynamic json = await response.JsonAsync();
+    json.message.big_red_dog = new string[] {};
+    await route.FulfillAsync(new() { Response = response, Json = json });
+});
+```
+
+**Parameters**
+- `options` &#60;`RouteFetchOptions?`&#62;
+  - `Data|DataByte|DataObject` &#60;[string]?|[byte]&#91;&#93;?|[object]?&#62; Allows to set post data of the request. If the data parameter is an object, it will be serialized to json string and `content-type` header will be set to `application/json` if not explicitly set. Otherwise the `content-type` header will be set to `application/octet-stream` if not explicitly set.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fetch-option-data-data-byte-data-object"/><a href="#route-fetch-option-data-data-byte-data-object" class="list-anchor">#</a>
+  - `Headers` &#60;[IDictionary]?<[string], [string]>&#62; If set changes the request HTTP headers. Header values will be converted to a string.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fetch-option-headers"/><a href="#route-fetch-option-headers" class="list-anchor">#</a>
+  - `Method` &#60;[string]?&#62; If set changes the request method (e.g. GET or POST).<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fetch-option-method"/><a href="#route-fetch-option-method" class="list-anchor">#</a>
+  - `PostData` &#60;[byte]&#91;&#93;?&#62; If set changes the post data of request.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fetch-option-post-data"/><a href="#route-fetch-option-post-data" class="list-anchor">#</a>
+  - `Url` &#60;[string]?&#62; If set changes the request URL. New URL must have same protocol as original one.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fetch-option-url"/><a href="#route-fetch-option-url" class="list-anchor">#</a>
+
+**Returns**
+- &#60;[APIResponse]&#62;<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fetch-return"/><a href="#route-fetch-return" class="list-anchor">#</a>
 
 ---
 
@@ -157,16 +189,18 @@ Fulfills route's request with given response.
 An example of fulfilling all requests with 404 responses:
 
 ```csharp
-await page.RouteAsync("**/*", route => route.FulfillAsync(
-    status: 404,
-    contentType: "text/plain",
-    body: "Not Found!"));
+await page.RouteAsync("**/*", route => route.FulfillAsync(new ()
+{
+    Status = 404,
+    ContentType = "text/plain",
+    Body = "Not Found!")
+});
 ```
 
 An example of serving static file:
 
 ```csharp
-await page.RouteAsync("**/xhr_endpoint", route => route.FulfillAsync(new RouteFulfillOptions { Path = "mock_data.json" }));
+await page.RouteAsync("**/xhr_endpoint", route => route.FulfillAsync(new() { Path = "mock_data.json" }));
 ```
 
 **Parameters**
@@ -175,6 +209,18 @@ await page.RouteAsync("**/xhr_endpoint", route => route.FulfillAsync(new RouteFu
   - `BodyBytes` &#60;[byte]&#91;&#93;?&#62; Optional response body as raw bytes. <font size="2">Added in: v1.9</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-body-bytes"/><a href="#route-fulfill-option-body-bytes" class="list-anchor">#</a>
   - `ContentType` &#60;[string]?&#62; If set, equals to setting `Content-Type` response header.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-content-type"/><a href="#route-fulfill-option-content-type" class="list-anchor">#</a>
   - `Headers` &#60;[IDictionary]?<[string], [string]>&#62; Response headers. Header values will be converted to a string.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-headers"/><a href="#route-fulfill-option-headers" class="list-anchor">#</a>
+  - `Json` &#60;[JsonElement]?&#62; JSON response. This method will set the content type to `application/json` if not set. <font size="2">Added in: v1.29</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-json"/><a href="#route-fulfill-option-json" class="list-anchor">#</a>
+
+    **Usage**
+
+    ```csharp
+    await page.RouteAsync("https://dog.ceo/api/breeds/list/all", async route =>
+    {
+        var json = /* JsonElement with test payload */;
+        await route.FulfillAsync(new () { Json: json });
+    });
+    ```
+
   - `Path` &#60;[string]?&#62; File path to respond with. The content type will be inferred from file extension. If `path` is a relative path, then it is resolved relative to the current working directory.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-path"/><a href="#route-fulfill-option-path" class="list-anchor">#</a>
   - `Response` &#60;[APIResponse]?&#62; [APIResponse] to fulfill route's request with. Individual fields of the response (such as headers) can be overridden using fulfill options. <font size="2">Added in: v1.15</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-response"/><a href="#route-fulfill-option-response" class="list-anchor">#</a>
   - `Status` &#60;[int]?&#62; Response status code, defaults to `200`.<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-status"/><a href="#route-fulfill-option-status" class="list-anchor">#</a>

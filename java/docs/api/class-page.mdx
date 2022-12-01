@@ -331,7 +331,7 @@ The earliest moment that page is available is when it has navigated to the initi
 
 ```java
 Page popup = page.waitForPopup(() -> {
-  page.evaluate("() => window.open('https://example.com')");
+  page.getByText("open the popup").click();
 });
 System.out.println(popup.evaluate("location.href"));
 ```
@@ -2140,14 +2140,15 @@ This resolves when the page reaches a required load state, `load` by default. Th
 **Usage**
 
 ```java
-page.getByRole("button").click(); // Click triggers navigation.
+page.getByRole(AriaRole.BUTTON).click(); // Click triggers navigation.
 page.waitForLoadState(); // The promise resolves after "load" event.
 ```
 
 ```java
 Page popup = page.waitForPopup(() -> {
-  page.getByRole("button").click(); // Click triggers a popup.
+  page.getByRole(AriaRole.BUTTON).click(); // Click triggers a popup.
 });
+// Wait for the "DOMContentLoaded" event
 popup.waitForLoadState(LoadState.DOMCONTENTLOADED);
 System.out.println(popup.title()); // Popup is ready to use.
 ```
@@ -2176,7 +2177,8 @@ This resolves when the page navigates to a new URL or reloads. It is useful for 
 ```java
 // The method returns after navigation has finished
 Response response = page.waitForNavigation(() -> {
-  page.click("a.delayed-navigation"); // Clicking the link will indirectly cause a navigation
+  // This action triggers the navigation after a timeout.
+  page.getByText("Navigate after timeout").click();
 });
 ```
 
@@ -2238,13 +2240,13 @@ Waits for the matching request and returns it. See [waiting for event](../events
 // Waits for the next request with the specified url
 Request request = page.waitForRequest("https://example.com/resource", () -> {
   // Triggers the request
-  page.click("button.triggers-request");
+  page.getByText("trigger request").click();
 });
 
 // Waits for the next request matching some conditions
 Request request = page.waitForRequest(request -> "https://example.com".equals(request.url()) && "GET".equals(request.method()), () -> {
   // Triggers the request
-  page.click("button.triggers-request");
+  page.getByText("trigger request").click();
 });
 ```
 
@@ -2297,13 +2299,13 @@ Returns the matched response. See [waiting for event](../events.mdx#waiting-for-
 // Waits for the next response with the specified url
 Response response = page.waitForResponse("https://example.com/resource", () -> {
   // Triggers the response
-  page.click("button.triggers-response");
+  page.getByText("trigger response").click();
 });
 
 // Waits for the next response matching some conditions
 Response response = page.waitForResponse(response -> "https://example.com".equals(response.url()) && response.status() == 200, () -> {
   // Triggers the response
-  page.click("button.triggers-response");
+  page.getByText("trigger response").click();
 });
 ```
 

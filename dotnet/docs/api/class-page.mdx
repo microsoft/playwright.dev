@@ -335,7 +335,7 @@ The earliest moment that page is available is when it has navigated to the initi
 ```csharp
 var popup = await page.RunAndWaitForPopupAsync(async () =>
 {
-    await page.EvaluateAsync("() => window.open('https://microsoft.com')");
+    await page.GetByText("open the popup").ClickAsync();
 });
 Console.WriteLine(await popup.EvaluateAsync<string>("location.href"));
 ```
@@ -1818,8 +1818,8 @@ This resolves when the page navigates to a new URL or reloads. It is useful for 
 ```csharp
 await page.RunAndWaitForNavigationAsync(async () =>
 {
-    // Clicking the link will indirectly cause a navigation.
-    await page.ClickAsync("a.delayed-navigation");
+    // This action triggers the navigation after a timeout.
+    await page.GetByText("Navigate after timeout").ClickAsync();
 });
 
 // The method continues after navigation has finished
@@ -1859,8 +1859,8 @@ This resolves when the page navigates to a new URL or reloads. It is useful for 
 ```csharp
 await page.RunAndWaitForNavigationAsync(async () =>
 {
-    // Clicking the link will indirectly cause a navigation.
-    await page.ClickAsync("a.delayed-navigation");
+    // This action triggers the navigation after a timeout.
+    await page.GetByText("Navigate after timeout").ClickAsync();
 });
 
 // The method continues after navigation has finished
@@ -1936,13 +1936,13 @@ Waits for the matching request and returns it. See [waiting for event](../events
 // Waits for the next request with the specified url.
 await page.RunAndWaitForRequestAsync(async () =>
 {
-    await page.ClickAsync("button");
+    await page.GetByText("trigger request").ClickAsync();
 }, "http://example.com/resource");
 
 // Alternative way with a predicate.
 await page.RunAndWaitForRequestAsync(async () =>
 {
-    await page.ClickAsync("button");
+    await page.GetByText("trigger request").ClickAsync();
 }, request => request.Url == "https://example.com" && request.Method == "GET");
 ```
 
@@ -1970,13 +1970,13 @@ Waits for the matching request and returns it. See [waiting for event](../events
 // Waits for the next request with the specified url.
 await page.RunAndWaitForRequestAsync(async () =>
 {
-    await page.ClickAsync("button");
+    await page.GetByText("trigger request").ClickAsync();
 }, "http://example.com/resource");
 
 // Alternative way with a predicate.
 await page.RunAndWaitForRequestAsync(async () =>
 {
-    await page.ClickAsync("button");
+    await page.GetByText("trigger request").ClickAsync();
 }, request => request.Url == "https://example.com" && request.Method == "GET");
 ```
 
@@ -2048,13 +2048,13 @@ Returns the matched response. See [waiting for event](../events.mdx#waiting-for-
 // Waits for the next response with the specified url.
 await page.RunAndWaitForResponseAsync(async () =>
 {
-    await page.ClickAsync("button.triggers-response");
+    await page.GetByText("trigger response").ClickAsync();
 }, "http://example.com/resource");
 
 // Alternative way with a predicate.
 await page.RunAndWaitForResponseAsync(async () =>
 {
-    await page.ClickAsync("button");
+    await page.GetByText("trigger response").ClickAsync();
 }, response => response.Url == "https://example.com" && response.Status == 200);
 ```
 
@@ -2082,13 +2082,13 @@ Returns the matched response. See [waiting for event](../events.mdx#waiting-for-
 // Waits for the next response with the specified url.
 await page.RunAndWaitForResponseAsync(async () =>
 {
-    await page.ClickAsync("button.triggers-response");
+    await page.GetByText("trigger response").ClickAsync();
 }, "http://example.com/resource");
 
 // Alternative way with a predicate.
 await page.RunAndWaitForResponseAsync(async () =>
 {
-    await page.ClickAsync("button");
+    await page.GetByText("trigger response").ClickAsync();
 }, response => response.Url == "https://example.com" && response.Status == 200);
 ```
 
@@ -2501,15 +2501,16 @@ This resolves when the page reaches a required load state, `load` by default. Th
 **Usage**
 
 ```csharp
-await page.GetByRole("button").ClickAsync(); // Click triggers navigation.
+await page.GetByRole(AriaRole.Button).ClickAsync(); // Click triggers navigation.
 await page.WaitForLoadStateAsync(); // The promise resolves after 'load' event.
 ```
 
 ```csharp
 var popup = await page.RunAndWaitForPopupAsync(async () =>
 {
-    await page.GetByRole("button").ClickAsync(); // click triggers the popup/
+    await page.GetByRole(AriaRole.Button).ClickAsync(); // click triggers the popup
 });
+// Wait for the "DOMContentLoaded" event.
 await popup.WaitForLoadStateAsync(LoadState.DOMContentLoaded);
 Console.WriteLine(await popup.TitleAsync()); // popup is ready to use.
 ```

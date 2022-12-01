@@ -1,52 +1,43 @@
 ---
-id: events
-title: "Events"
+id: mock
+title: "Mock APIs"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-Playwright allows listening to various types of events happening on the web page, such as network requests, creation of child pages, dedicated workers etc. There are several ways to subscribe to such events such as waiting for events or adding or removing event listeners.
+Web APIs are usually implemented as HTTP endpoints. Playwright provides APIs to **mock** and **modify** network traffic, both HTTP and HTTPS. Any requests that a page does, including [XHRs](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) requests, can be tracked, modified and mocked.
 
-## Waiting for event
+## Mock API requests
 
-Most of the time, scripts will need to wait for a particular event to happen. Below are some of the typical event awaiting patterns.
+Following code will intercept all the calls to `https://dog.ceo/api/breeds/list/all` and will return the test data instead. No requests to the `https://dog.ceo/api/breeds/list/all` endpoint will be made.
 
-Wait for a request with the specified url using [Page.RunAndWaitForRequestAsync()](/api/class-page.mdx#page-wait-for-request):
-
-```csharp
-var waitForRequestTask = page.WaitForRequestAsync("**/*logo*.png");
-await page.GotoAsync("https://wikipedia.org");
-var request = await waitForRequestTask;
-Console.WriteLine(request.Url);
-```
-
-Wait for popup window:
+Read more about [advanced networking](./network.mdx).
 
 ```csharp
-var popup = await page.RunAndWaitForPopupAsync(async =>
+await page.RouteAsync("https://dog.ceo/api/breeds/list/all", async route =>
 {
-    await page.GetByText("open the popup").ClickAsync();
+    var json = /* JsonElement with the test payload */;
+    await route.FulfillAsync(new () { Json: json });
 });
-await popup.GotoAsync("https://wikipedia.org");
 ```
 
-## Adding/removing event listener
+## Modify API responses
 
-Sometimes, events happen in random time and instead of waiting for them, they need to be handled. Playwright supports traditional language mechanisms for subscribing and unsubscribing from the events:
+Sometimes, it is essential to make an API request, but response needs to be patched to allow for reproducible testing. In that case, instead of mocking the request, one can perform the request and fulfill it with the modified response.
+
+Read more about [advanced networking](./network.mdx).
 
 ```csharp
-page.Request += (_, request) => Console.WriteLine("Request sent: " + request.Url);
-void listener(object sender, IRequest request)
+await page.RouteAsync("https://dog.ceo/api/breeds/list/all", async route =>
 {
-    Console.WriteLine("Request finished: " + request.Url);
-};
-page.RequestFinished += listener;
-await page.GotoAsync("https://wikipedia.org");
-
-// Remove previously added listener.
-page.RequestFinished -= listener;
-await page.GotoAsync("https://www.openstreetmap.org/");
+    var response = await route.FetchAsync();
+    dynamic json = await response.JsonAsync();
+    json.message.big_red_dog = new string[] {};
+    // Fullfill using the original response, while patching the response body
+    // with the given JSON object.
+    await route.FulfillAsync(new() { Response = response, Json = json });
+});
 ```
 
 
