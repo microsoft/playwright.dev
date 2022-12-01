@@ -112,7 +112,19 @@ document.addEventListener('keydown', (e) => {
       newPath = '/java/docs/next/intro';
     else if (window.location.pathname.startsWith('/dotnet'))
       newPath = '/dotnet/docs/next/intro';
-   
+
     window.location.href = newPath + location.hash;
   }
 });
+
+function redirectToPreviousLanguageIfNeeded() {
+  if (!('localStorage' in window))
+    return;
+  if (window.location.pathname !== '/')
+    return;
+  const previousLanguagePrefix = localStorage.getItem('previousLanguagePrefix');
+  if (previousLanguagePrefix && !window.location.pathname.startsWith(`/${previousLanguagePrefix}`))
+    window.location.href = previousLanguagePrefix;
+}
+
+redirectToPreviousLanguageIfNeeded();
