@@ -37,6 +37,16 @@ export default function NavbarItemWrapper(props) {
       propsOverrides.className += ` ${props.activeClassName}`;
     }
     propsOverrides.skipExternalLinkCheck = true;
+    propsOverrides.onClick = (e) => {
+      if ('localStorage' in window) {
+        if (languagePrefix !== '/')
+          localStorage.setItem('previousLanguagePrefix', languagePrefix);
+        else
+          localStorage.removeItem('previousLanguagePrefix');
+      }
+      if (props.onClick)
+        props.onClick(e);
+    }
   }
   return (
     <>

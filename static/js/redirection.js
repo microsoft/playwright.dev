@@ -120,15 +120,11 @@ document.addEventListener('keydown', (e) => {
 function redirectToPreviousLanguageIfNeeded() {
   if (!('localStorage' in window))
     return;
-  if (window.location.pathname !== '/') {
-    const language = languagesInSubfolders.find(lang => window.location.pathname.startsWith(`/${lang}`))
-    if (language)
-      localStorage.setItem('previousLanguage', language);
+  if (window.location.pathname !== '/')
     return;
-  }
-  const language = localStorage.getItem('previousLanguage');
-  if (language && !window.location.pathname.startsWith(`/${language}`))
-    window.location.href = `/${language}/`;
+  const previousLanguagePrefix = localStorage.getItem('previousLanguagePrefix');
+  if (previousLanguagePrefix && !window.location.pathname.startsWith(`/${previousLanguagePrefix}`))
+    window.location.href = previousLanguagePrefix;
 }
 
 redirectToPreviousLanguageIfNeeded();
