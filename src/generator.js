@@ -260,18 +260,16 @@ ${this.documentation.renderLinksInText(member.discouraged)}
           });
         }
 
-        // Parameters.
+        // Arguments.
         if (args.length) {
           memberNode.children.push({
             type: 'text',
-            text: `**Parameters**`,
+            text: `**Arguments**`,
           });
 
           memberNode.children.push(...args.map(a => {
             let name = this.formatter.formatArgumentName(a.alias);
-            if (this.lang === 'js' && !a.required)
-              name += '?';
-            return this.renderProperty(`\`${name}\``, a, a.spec, 'in');
+            return this.renderProperty(name, a, a.spec, 'in', false, !a.required);
           }));
         }
 
@@ -447,11 +445,9 @@ import HTMLCard from '@site/src/components/HTMLCard';`);
    * @param {MarkdownNode[]} spec
    * @param {'in'|'out'} direction
    * @param {boolean=} async
+   * @param {boolean=} optional
    */
-  renderProperty(name, member, spec, direction, async) {
-    let comment = '';
-    if (spec && spec.length)
-      comment = spec[0].text;
+  renderProperty(name, member, spec, direction, async, optional) {
     const type = member.type;
     const properties = type.deepProperties();
     /** @type {MarkdownNode[]} */
@@ -463,20 +459,17 @@ import HTMLCard from '@site/src/components/HTMLCard';`);
           alias = `set${toTitleCase(alias)}`;
         if (this.lang === 'csharp' && member.kind === 'property' && direction === 'in')
           alias = toTitleCase(alias);
-        if (this.lang === 'js' && !p.required)
-          alias = alias + '?';
-        return this.renderProperty(`\`${alias}\``, p, p.spec, direction, false);
+        return this.renderProperty(alias, p, p.spec, direction, false, !p.required);
       }));
-      if (spec && spec.length > 1)
-        children.push({ type: 'text', text: '<br />' });
     }
-    if (spec && spec.length > 1)
-      children.push(...spec.slice(1).map(s => md.clone(s)));
+    if (spec)
+      children.push(...spec.map(s => md.clone(s)));
 
     let typeText = this.renderType(type, direction, member);
     if (async)
       typeText = this.formatter.formatPromise(typeText);
 
+    const optionalText = optional ? ' *(optional)*' : '';
     let linkTag = '';
     let linkAnchor = '';
     let sinceVersion = '';
@@ -493,7 +486,7 @@ import HTMLCard from '@site/src/components/HTMLCard';`);
     const result = {
       type: 'li',
       liType: 'default',
-      text: `${name ? name + ' ' : ''}&#60;${typeText}&#62;${comment ? ' ' + comment : ''}${sinceVersion}${linkTag}${linkAnchor}`,
+      text: `${name ? '`' + name + '` ' : ''}${typeText}${optionalText}${sinceVersion}${linkTag}${linkAnchor}`,
       children
     };
     return result;
