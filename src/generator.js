@@ -244,8 +244,14 @@ ${this.documentation.renderLinksInText(member.discouraged)}
           });
         }
 
-        // Documentation.
-        memberNode.children.push(...this.formatComment(member.spec));
+        // Render documentation, push Details section to the end.
+        const details = member.spec.find(n => n.text === '**Details**');
+        if (details) {
+          const i = member.spec.indexOf(details);
+          memberNode.children.push(...this.formatComment(member.spec.slice(0, i)));
+        } else {
+          memberNode.children.push(...this.formatComment(member.spec));
+        }
 
         // Usage.
         if (!member.spec.find(n => n.text === '**Usage**')) {
@@ -288,6 +294,12 @@ ${this.documentation.renderLinksInText(member.discouraged)}
           });
 
           memberNode.children.push(this.renderProperty('', member, undefined, 'out', member.async));
+        }
+
+        // Details
+        if (details) {
+          const i = member.spec.indexOf(details);
+          memberNode.children.push(...this.formatComment(member.spec.slice(i)));
         }
 
         result.push(memberNode);
