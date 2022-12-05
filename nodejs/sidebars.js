@@ -69,7 +69,6 @@ module.exports = {
         { type: 'doc', id: 'pom' },
         { type: 'doc', id: 'pages' },
         { type: 'doc', id: 'screenshots' },
-        { type: 'doc', id: 'selectors' },
         { type: 'doc', id: 'codegen' },
         { type: 'doc', id: 'trace-viewer' },
         { type: 'doc', id: 'videos' },
