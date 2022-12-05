@@ -66,6 +66,7 @@ module.exports = {
         { type: 'doc', id: 'mock-browser-apis' },
         { type: 'doc', id: 'navigations' },
         { type: 'doc', id: 'network' },
+        { type: 'doc', id: 'other-locators' },
         { type: 'doc', id: 'pom' },
         { type: 'doc', id: 'pages' },
         { type: 'doc', id: 'screenshots' },

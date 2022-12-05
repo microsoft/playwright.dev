@@ -40,6 +40,7 @@ module.exports = {
         { type: 'doc', id: 'multithreading' },
         { type: 'doc', id: 'navigations' },
         { type: 'doc', id: 'network' },
+        { type: 'doc', id: 'other-locators' },
         { type: 'doc', id: 'pom' },
         { type: 'doc', id: 'screenshots' },
         { type: 'doc', id: 'pages' },
