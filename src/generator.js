@@ -214,10 +214,11 @@ import HTMLCard from '@site/src/components/HTMLCard';
           throw new Error(`Header ${name} needs to have an explicit ID`)
         memberNode.text = `${name} {#${this.heading2ExplicitId.get(member)}}`;
 
+        const expressionNameForSearch = `<span style={{visibility: 'hidden'}}>${clazz.varName}.${name}</span>`
         // Append version.
         memberNode.children.push({
           type: 'text',
-          text: `<font size="2" style={{position: "relative", top: "-20px"}}>Added in: ${member.since}</font>\n`
+          text: `<font size="2" style={{position: "relative", top: "-20px"}}>Added in: ${member.since}</font>${expressionNameForSearch}`
         });
 
         if (member.deprecated) {
