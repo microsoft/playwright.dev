@@ -214,7 +214,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
           throw new Error(`Header ${name} needs to have an explicit ID`)
         memberNode.text = `${name} {#${this.heading2ExplicitId.get(member)}}`;
 
-        const expressionNameForSearch = `<span style={{visibility: 'hidden'}}>${clazz.varName}.${name}</span>`
+        const expressionNameForSearch = `<x-search>${clazz.varName}.${name}</x-search>`
         // Append version.
         memberNode.children.push({
           type: 'text',
