@@ -19,7 +19,7 @@ Playwright tests can be executed in CI environments. We have created sample conf
 3 steps to get your tests running on CI:
 1. **Ensure CI agent can run browsers**: Use [our Docker image](./docker.mdx) in Linux agents or install your dependencies using the [CLI](./cli.mdx#install-system-dependencies).
 1. **Install Playwright**:
-
+   
    ```bash
    # Install NPM packages
    npm ci
@@ -29,13 +29,13 @@ Playwright tests can be executed in CI environments. We have created sample conf
    # Install Playwright browsers and dependencies
    npx playwright install --with-deps
    ```
-
+   
 1. **Run your tests**:
-
+   
    ```bash
    npx playwright test
    ```
-
+   
 ## CI configurations
 
 The [Command line tools](./cli.mdx#install-system-dependencies) can be used to install all operating system dependencies on GitHub Actions.
@@ -45,9 +45,9 @@ The [Command line tools](./cli.mdx#install-system-dependencies) can be used to i
 ```yml
 steps:
   - uses: actions/checkout@v3
-  - uses: actions/setup-node@v2
+  - uses: actions/setup-node@v3
     with:
-      node-version: '14'
+      node-version: '18'
   - name: Install dependencies
     run: npm ci
   - name: Install Playwright
@@ -56,7 +56,7 @@ steps:
     run: npx playwright test
   - name: Upload test results
     if: always()
-    uses: actions/upload-artifact@v2
+    uses: actions/upload-artifact@v3
     with:
       name: playwright-report
       path: playwright-report
@@ -79,9 +79,9 @@ jobs:
     if: github.event.deployment_status.state == 'success'
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/setup-node@v2
+    - uses: actions/setup-node@v3
       with:
-        node-version: '14.x'
+        node-version: '18.x'
     - name: Install dependencies
       run: npm ci
     - name: Install Playwright
@@ -112,12 +112,12 @@ steps:
     name: 'Playwright Tests'
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:v1.28.0-focal
+      image: mcr.microsoft.com/playwright:v1.29.0-focal
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: '18'
       - name: Install dependencies
         run: npm ci
       - name: Run your tests
@@ -134,7 +134,7 @@ steps:
     name: 'Playwright Tests - ${{ matrix.project }} - Shard ${{ matrix.shardIndex }} of ${{ matrix.shardTotal }}'
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:v1.28.0-focal
+      image: mcr.microsoft.com/playwright:v1.29.0-focal
     strategy:
       fail-fast: false
       matrix:
@@ -143,9 +143,9 @@ steps:
         shardTotal: [10]
     steps:
       - uses: actions/checkout@v3
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
-          node-version: '14'
+          node-version: '18'
       - name: Install dependencies
         run: npm ci
       - name: Run your tests
@@ -167,7 +167,7 @@ jobs:
     - deployment: Run_E2E_Tests
       pool:
         vmImage: ubuntu-20.04
-      container: mcr.microsoft.com/playwright:v1.28.0-focal
+      container: mcr.microsoft.com/playwright:v1.29.0-focal
       environment: testing
       strategy:
         runOnce:
@@ -187,14 +187,14 @@ jobs:
                   npx playwright test
 ```
 
-This will make the pipeline run fail if any of the playwright tests fails. If you also want to integrate the test results with Azure DevOps, use `failOnStderr:false` and the built-in `PublishTestResults` task like so:
+This will make the pipeline run fail if any of the playwright tests fails. If you also want to integrate the test results with Azure DevOps, use the task `PublishTestResults` task like so:
 
 ```yml
 jobs:
     - deployment: Run_E2E_Tests
       pool:
         vmImage: ubuntu-20.04
-      container: mcr.microsoft.com/playwright:v1.28.0-focal
+      container: mcr.microsoft.com/playwright:v1.29.0-focal
       environment: testing
       strategy:
         runOnce:
@@ -206,13 +206,12 @@ jobs:
               inputs:
                 workingDirectory: 'my-e2e-tests'
                 targetType: 'inline'
-                failOnStderr: false
+                failOnStderr: true
                 env:
                   CI: true
                 script: |
                   npm ci
                   npx playwright test
-                  exit 0
             - task: PublishTestResults@2
               displayName: 'Publish test results'
               inputs:
@@ -222,6 +221,8 @@ jobs:
                 mergeTestResults: true
                 failTaskOnFailedTests: true
                 testRunTitle: 'My End-To-End Tests'
+              condition: succeededOrFailed()
+
 ```
 
 Note: The JUnit reporter needs to be configured accordingly via
@@ -234,13 +235,13 @@ in `playwright.config.ts`.
 
 ### CircleCI
 
-Running Playwright on Circle CI is very similar to running on GitHub Actions. In order to specify the pre-built Playwright [Docker image](./docker.mdx) , simply modify the agent definition with `docker:` in your config like so:
+Running Playwright on CircleCI is very similar to running on GitHub Actions. In order to specify the pre-built Playwright [Docker image](./docker.mdx) , simply modify the agent definition with `docker:` in your config like so:
 
 ```yml
 executors:
    pw-focal-development:
      docker:
-       - image: mcr.microsoft.com/playwright:v1.28.0-focal
+       - image: mcr.microsoft.com/playwright:v1.29.0-focal
    environment:
      NODE_ENV: development # Needed if playwright is in `devDependencies`
 ```
@@ -257,9 +258,9 @@ Error: spawn ENOMEM
 
 This is likely caused by Jest autodetecting the number of processes on the entire machine (`36`) rather than the number allowed to your container (`2`). To fix this, set `jest --maxWorkers=2` in your test command.
 
-#### Sharding in Circle CI
+#### Sharding in CircleCI
 
-Sharding in Circle CI is indexed with 0 which means that you will need to override the default parallelism ENV VARS. The following example demonstrates how to run Playwright with a Circle CI Parallelism of 4 by adding 1 to the `CIRCLE_NODE_INDEX` to pass into the `--shard` cli arg.
+Sharding in CircleCI is indexed with 0 which means that you will need to override the default parallelism ENV VARS. The following example demonstrates how to run Playwright with a CircleCI Parallelism of 4 by adding 1 to the `CIRCLE_NODE_INDEX` to pass into the `--shard` cli arg.
 
 ```yml
   playwright-job-name:
@@ -275,7 +276,7 @@ Jenkins supports Docker agents for pipelines. Use the [Playwright Docker image](
 
 ```groovy
 pipeline {
-   agent { docker { image 'mcr.microsoft.com/playwright:v1.28.0-focal' } }
+   agent { docker { image 'mcr.microsoft.com/playwright:v1.29.0-focal' } }
    stages {
       stage('e2e-tests') {
          steps {
@@ -293,7 +294,7 @@ pipeline {
 Bitbucket Pipelines can use public [Docker images as build environments](https://confluence.atlassian.com/bitbucket/use-docker-images-as-build-environments-792298897.html). To run Playwright tests on Bitbucket, use our public Docker image ([see Dockerfile](./docker.mdx)).
 
 ```yml
-image: mcr.microsoft.com/playwright:v1.28.0-focal
+image: mcr.microsoft.com/playwright:v1.29.0-focal
 ```
 
 ### GitLab CI
@@ -306,7 +307,7 @@ stages:
 
 tests:
   stage: test
-  image: mcr.microsoft.com/playwright:v1.28.0-focal
+  image: mcr.microsoft.com/playwright:v1.29.0-focal
   script:
   ...
 ```
@@ -321,7 +322,7 @@ stages:
 
 tests:
   stage: test
-  image: mcr.microsoft.com/playwright:v1.28.0-focal
+  image: mcr.microsoft.com/playwright:v1.29.0-focal
   parallel: 7
   script:
     - npm ci
@@ -336,7 +337,7 @@ stages:
 
 tests:
   stage: test
-  image: mcr.microsoft.com/playwright:v1.28.0-focal
+  image: mcr.microsoft.com/playwright:v1.29.0-focal
   parallel:
     matrix:
       - PROJECT: ['chromium', 'webkit']
@@ -410,7 +411,7 @@ xvfb-run node index.js
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /test-assertions.mdx "APIResponseAssertions"
+[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
 [Browser]: /api/class-browser.mdx "Browser"
 [BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
 [BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
@@ -429,18 +430,18 @@ xvfb-run node index.js
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
 [Keyboard]: /api/class-keyboard.mdx "Keyboard"
 [Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /test-assertions.mdx "LocatorAssertions"
+[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
 [Logger]: /api/class-logger.mdx "Logger"
 [Mouse]: /api/class-mouse.mdx "Mouse"
 [Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /test-assertions.mdx "PageAssertions"
+[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
 [Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /test-assertions.mdx "PlaywrightAssertions"
+[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
-[ScreenshotAssertions]: /test-assertions.mdx "ScreenshotAssertions"
 [Selectors]: /api/class-selectors.mdx "Selectors"
+[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
@@ -485,6 +486,7 @@ xvfb-run node index.js
 [Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
 [RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
