@@ -41,26 +41,24 @@ You can use [browserContext.serviceWorkers()](/api/class-browsercontext.mdx#brow
 <TabItem value="ts">
 
 ```js
-const [ serviceworker ] = await Promise.all([
-  context.waitForEvent('serviceworker'),
-  page.goto('/example-with-a-service-worker.html'),
-]);
+const serviceWorkerPromise = context.waitForEvent('serviceworker');
+await page.goto('/example-with-a-service-worker.html');
+const serviceworker = await serviceWorkerPromise;
 ```
 
 </TabItem>
 <TabItem value="js">
 
 ```js
-const [ serviceworker ] = await Promise.all([
-  context.waitForEvent('serviceworker'),
-  page.goto('/example-with-a-service-worker.html'),
-]);
+const serviceWorkerPromise = context.waitForEvent('serviceworker');
+await page.goto('/example-with-a-service-worker.html');
+const serviceworker = await serviceWorkerPromise;
 ```
 
 </TabItem>
 </Tabs>
 
-[browserContext.on('serviceworker')](/api/class-browsercontext.mdx#browser-context-event-service-worker) is fired ***before*** the Service Worker's main script has been evaluated, so ***before*** calling service[worker.evaluate(pageFunction[, arg])](/api/class-worker.mdx#worker-evaluate) you should wait on its activation.
+[browserContext.on('serviceworker')](/api/class-browsercontext.mdx#browser-context-event-service-worker) is fired ***before*** the Service Worker's main script has been evaluated, so ***before*** calling service[worker.evaluate()](/api/class-worker.mdx#worker-evaluate) you should wait on its activation.
 
 There are more iodiomatic methods of waiting for a Service Worker to be activated, but the following is an implementation agnostic method:
 
@@ -102,14 +100,14 @@ await page.evaluate(async () => {
 
 Any network request made by the **Service Worker** will have:
 * [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) and its corresponding events ([browserContext.on('requestfinished')](/api/class-browsercontext.mdx#browser-context-event-request-finished) and [browserContext.on('response')](/api/class-browsercontext.mdx#browser-context-event-response), or [browserContext.on('requestfailed')](/api/class-browsercontext.mdx#browser-context-event-request-failed))
-* [browserContext.route(url, handler[, options])](/api/class-browsercontext.mdx#browser-context-route) will see the request
+* [browserContext.route()](/api/class-browsercontext.mdx#browser-context-route) will see the request
 * [request.serviceWorker()](/api/class-request.mdx#request-service-worker) will be set to the Service [Worker] instance, and [request.frame()](/api/class-request.mdx#request-frame) will **throw**
 * [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) will return `false`
 
 Additionally, any network request made by the **Page** (including its sub-[Frame]s) will have:
 * [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) and its corresponding events ([browserContext.on('requestfinished')](/api/class-browsercontext.mdx#browser-context-event-request-finished) and [browserContext.on('response')](/api/class-browsercontext.mdx#browser-context-event-response), or [browserContext.on('requestfailed')](/api/class-browsercontext.mdx#browser-context-event-request-failed))
 * [page.on('request')](/api/class-page.mdx#page-event-request) and its corresponding events ([page.on('requestfinished')](/api/class-page.mdx#page-event-request-finished) and [page.on('response')](/api/class-page.mdx#page-event-response), or [page.on('requestfailed')](/api/class-page.mdx#page-event-request-failed))
-* [page.route(url, handler[, options])](/api/class-page.mdx#page-route) and [page.route(url, handler[, options])](/api/class-page.mdx#page-route) will **not** see the request (if a Service Worker's fetch handler was registered)
+* [page.route()](/api/class-page.mdx#page-route) and [page.route()](/api/class-page.mdx#page-route) will **not** see the request (if a Service Worker's fetch handler was registered)
 * [request.serviceWorker()](/api/class-request.mdx#request-service-worker) will be set to `null`, and [request.frame()](/api/class-request.mdx#request-frame) will return the [Frame]
 * [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) will return `true` (if a Service Worker's fetch handler was registered)
 
@@ -119,7 +117,7 @@ Many Service Worker implementations simply execute the request from the page (po
 // filename: transparent-service-worker.js
 self.addEventListener("fetch", (event) => {
   // actually make the request
-  const responsePromise = fetch(event.request); 
+  const responsePromise = fetch(event.request);
   // send it back to the page
   event.respondWith(responsePromise);
 });
@@ -138,7 +136,7 @@ If a page registers the above Service Worker:
 </script>
 ```
 
-On the first visit to the page via [page.goto(url[, options])](/api/class-page.mdx#page-goto), the following Request/Response events would be emitted (along with the corresponding network lifecycle events):
+On the first visit to the page via [page.goto()](/api/class-page.mdx#page-goto), the following Request/Response events would be emitted (along with the corresponding network lifecycle events):
 
 | Event                             | Owner            | URL                            | Routed | [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) |
 | -                                 | -                | -                              | -      | -                                      |
@@ -151,7 +149,7 @@ On the first visit to the page via [page.goto(url[, options])](/api/class-page.m
 
 Since the example Service Worker just acts a basic transparent "proxy":
 * There's 2 [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) events for `data.json`; one [Frame]-owned, the other Service [Worker]-owned.
-* Only the Service [Worker]-owned request for the resource was routable via [browserContext.route(url, handler[, options])](/api/class-browsercontext.mdx#browser-context-route); the [Frame]-owned events for `data.json` are not routeable, as they would not have even had the possibility to hit the external network since the Service Worker has a fetch handler registered.
+* Only the Service [Worker]-owned request for the resource was routable via [browserContext.route()](/api/class-browsercontext.mdx#browser-context-route); the [Frame]-owned events for `data.json` are not routeable, as they would not have even had the possibility to hit the external network since the Service Worker has a fetch handler registered.
 
 :::caution
 It's important to note: calling [request.frame()](/api/class-request.mdx#request-frame) or [response.frame()](/api/class-response.mdx#response-frame) will **throw** an exception, if called on a [Request]/[Response] that has a non-null [request.serviceWorker()](/api/class-request.mdx#request-service-worker).
@@ -212,7 +210,7 @@ And a page that simply registers the Service Worker:
 </script>
 ```
 
-On the first visit to the page via [page.goto(url[, options])](/api/class-page.mdx#page-goto), the following Request/Response events would be emitted:
+On the first visit to the page via [page.goto()](/api/class-page.mdx#page-goto), the following Request/Response events would be emitted:
 
 | Event                             | Owner            | URL                            | Routed | [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) |
 | -                                 | -                | -                              | -      | -                                      |
@@ -326,6 +324,7 @@ await context.route('**', async route => {
 
 Requests for updated Service Worker main script code currently cannot be routed (https://github.com/microsoft/playwright/issues/14711).
 
+
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
@@ -335,7 +334,7 @@ Requests for updated Service Worker main script code currently cannot be routed 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /test-assertions.mdx "APIResponseAssertions"
+[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
 [Browser]: /api/class-browser.mdx "Browser"
 [BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
 [BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
@@ -354,18 +353,18 @@ Requests for updated Service Worker main script code currently cannot be routed 
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
 [Keyboard]: /api/class-keyboard.mdx "Keyboard"
 [Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /test-assertions.mdx "LocatorAssertions"
+[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
 [Logger]: /api/class-logger.mdx "Logger"
 [Mouse]: /api/class-mouse.mdx "Mouse"
 [Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /test-assertions.mdx "PageAssertions"
+[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
 [Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /test-assertions.mdx "PlaywrightAssertions"
+[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
-[ScreenshotAssertions]: /test-assertions.mdx "ScreenshotAssertions"
 [Selectors]: /api/class-selectors.mdx "Selectors"
+[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
@@ -410,6 +409,7 @@ Requests for updated Service Worker main script code currently cannot be routed 
 [Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
 [RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"

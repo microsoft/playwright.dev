@@ -6,22 +6,33 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-Whenever a network route is set up with [Page.route(url, handler[, options])](/api/class-page.mdx#page-route) or [BrowserContext.route(url, handler[, options])](/api/class-browsercontext.mdx#browser-context-route), the `Route` object allows to handle the route.
+
+Whenever a network route is set up with [Page.route()](/api/class-page.mdx#page-route) or [BrowserContext.route()](/api/class-browsercontext.mdx#browser-context-route), the `Route` object allows to handle the route.
 
 Learn more about [networking](../network.mdx).
 
 
-- [Route.abort([errorCode])](/api/class-route.mdx#route-abort)
-- [Route.fallback([options])](/api/class-route.mdx#route-fallback)
-- [Route.fulfill([options])](/api/class-route.mdx#route-fulfill)
-- [Route.request()](/api/class-route.mdx#route-request)
-- [Route.resume([options])](/api/class-route.mdx#route-continue)
+---
 
-## Route.abort([errorCode]) {#route-abort}
+## Methods
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+### abort {#route-abort}
 
-- `errorCode`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-abort-option-error-code"/> &#60;[String]&#62; Optional error code. Defaults to `failed`, could be one of the following:<a href="#route-abort-option-error-code" class="list-anchor">#</a>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>route.abort</span>
+
+Aborts the route's request.
+
+**Usage**
+
+```java
+Route.abort();
+Route.abort(errorCode);
+```
+
+**Arguments**
+- `errorCode` [String] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-abort-option-error-code"/><a href="#route-abort-option-error-code" class="list-anchor">#</a>
+  
+  Optional error code. Defaults to `failed`, could be one of the following:
   * `'aborted'` - An operation was aborted (due to user action)
   * `'accessdenied'` - Permission to access a resource, other than the network, was denied
   * `'addressunreachable'` - The IP address is unreachable. This usually means that there is no route to the specified host or network.
@@ -36,22 +47,16 @@ Learn more about [networking](../network.mdx).
   * `'namenotresolved'` - The host name could not be resolved.
   * `'timedout'` - An operation timed out.
   * `'failed'` - A generic failure occurred.
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-abort-return"/> &#60;[void]&#62;<a href="#route-abort-return" class="list-anchor">#</a>
 
-Aborts the route's request.
+---
 
-## Route.fallback([options]) {#route-fallback}
+### fallback {#route-fallback}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.23</font>
-
-- `options` &#60;`Route.FallbackOptions`&#62;
-  - `setHeaders`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-headers"/> &#60;[Map]<[String], [String]>&#62; If set changes the request HTTP headers. Header values will be converted to a string.<a href="#route-fallback-option-headers" class="list-anchor">#</a>
-  - `setMethod`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-method"/> &#60;[String]&#62; If set changes the request method (e.g. GET or POST)<a href="#route-fallback-option-method" class="list-anchor">#</a>
-  - `setPostData`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-post-data"/> &#60;[String]|[byte&#91;&#93;]&#62; If set changes the post data of request<a href="#route-fallback-option-post-data" class="list-anchor">#</a>
-  - `setUrl`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-url"/> &#60;[String]&#62; If set changes the request URL. New URL must have same protocol as original one. Changing the URL won't affect the route matching, all the routes are matched using the original request URL.<a href="#route-fallback-option-url" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-return"/> &#60;[void]&#62;<a href="#route-fallback-return" class="list-anchor">#</a>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.23</font><span style={{visibility: 'hidden'}}>route.fallback</span>
 
 When several routes match the given pattern, they run in the order opposite to their registration. That way the last registered route can always override all the previous ones. In the example below, request will be handled by the bottom-most handler first, then it'll fall back to the previous one and in the end will be aborted by the first registered route.
+
+**Usage**
 
 ```java
 page.route("**/*", route -> {
@@ -106,21 +111,67 @@ page.route("**/*", route -> {
 });
 ```
 
-## Route.fulfill([options]) {#route-fulfill}
+**Arguments**
+- `options` `Route.FallbackOptions` *(optional)*
+  - `setHeaders` [Map]<[String], [String]> *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-headers"/><a href="#route-fallback-option-headers" class="list-anchor">#</a>
+    
+    If set changes the request HTTP headers. Header values will be converted to a string.
+  - `setMethod` [String] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-method"/><a href="#route-fallback-option-method" class="list-anchor">#</a>
+    
+    If set changes the request method (e.g. GET or POST).
+  - `setPostData` [String]|[byte&#91;&#93;]|[Object] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-post-data"/><a href="#route-fallback-option-post-data" class="list-anchor">#</a>
+    
+    If set changes the post data of request.
+  - `setUrl` [String] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fallback-option-url"/><a href="#route-fallback-option-url" class="list-anchor">#</a>
+    
+    If set changes the request URL. New URL must have same protocol as original one. Changing the URL won't affect the route matching, all the routes are matched using the original request URL.
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+---
 
-- `options` &#60;`Route.FulfillOptions`&#62;
-  - `setBody`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-body"/> &#60;[String]&#62; Optional response body as text.<a href="#route-fulfill-option-body" class="list-anchor">#</a>
-  - `setBodyBytes`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-body-bytes"/> &#60;[byte&#91;&#93;]&#62; Optional response body as raw bytes. <font size="2">Added in: v1.9</font><a href="#route-fulfill-option-body-bytes" class="list-anchor">#</a>
-  - `setContentType`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-content-type"/> &#60;[String]&#62; If set, equals to setting `Content-Type` response header.<a href="#route-fulfill-option-content-type" class="list-anchor">#</a>
-  - `setHeaders`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-headers"/> &#60;[Map]<[String], [String]>&#62; Response headers. Header values will be converted to a string.<a href="#route-fulfill-option-headers" class="list-anchor">#</a>
-  - `setPath`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-path"/> &#60;[Path]&#62; File path to respond with. The content type will be inferred from file extension. If `path` is a relative path, then it is resolved relative to the current working directory.<a href="#route-fulfill-option-path" class="list-anchor">#</a>
-  - `setResponse`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-response"/> &#60;[APIResponse]&#62; [APIResponse] to fulfill route's request with. Individual fields of the response (such as headers) can be overridden using fulfill options. <font size="2">Added in: v1.15</font><a href="#route-fulfill-option-response" class="list-anchor">#</a>
-  - `setStatus`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-status"/> &#60;[int]&#62; Response status code, defaults to `200`.<a href="#route-fulfill-option-status" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-return"/> &#60;[void]&#62;<a href="#route-fulfill-return" class="list-anchor">#</a>
+### fetch {#route-fetch}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.29</font><span style={{visibility: 'hidden'}}>route.fetch</span>
+
+Performs the request and fetches result without fulfilling it, so that the response could be modified and then fulfilled.
+
+**Usage**
+
+```java
+page.route("https://dog.ceo/api/breeds/list/all", route -> {
+  APIResponse response = route.fetch();
+  JsonObject json = new Gson().fromJson(response.text(), JsonObject.class);
+  JsonObject message = itemObj.get("json").getAsJsonObject();
+  message.set("big_red_dog", new JsonArray());
+  route.fulfill(new Route.FulfillOptions()
+    .setResponse(response)
+    .setBody(json.toString()));
+});
+```
+
+**Arguments**
+- `options` `Route.FetchOptions` *(optional)*
+  - `setHeaders` [Map]<[String], [String]> *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fetch-option-headers"/><a href="#route-fetch-option-headers" class="list-anchor">#</a>
+    
+    If set changes the request HTTP headers. Header values will be converted to a string.
+  - `setMethod` [String] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fetch-option-method"/><a href="#route-fetch-option-method" class="list-anchor">#</a>
+    
+    If set changes the request method (e.g. GET or POST).
+  - `setUrl` [String] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fetch-option-url"/><a href="#route-fetch-option-url" class="list-anchor">#</a>
+    
+    If set changes the request URL. New URL must have same protocol as original one.
+
+**Returns**
+- [APIResponse]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fetch-return"/><a href="#route-fetch-return" class="list-anchor">#</a>
+
+---
+
+### fulfill {#route-fulfill}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>route.fulfill</span>
 
 Fulfills route's request with given response.
+
+**Usage**
 
 An example of fulfilling all requests with 404 responses:
 
@@ -140,26 +191,56 @@ page.route("**/xhr_endpoint", route -> route.fulfill(
   new Route.FulfillOptions().setPath(Paths.get("mock_data.json"))));
 ```
 
-## Route.request() {#route-request}
+**Arguments**
+- `options` `Route.FulfillOptions` *(optional)*
+  - `setBody` [String] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-body"/><a href="#route-fulfill-option-body" class="list-anchor">#</a>
+    
+    Optional response body as text.
+  - `setBodyBytes` [byte&#91;&#93;] *(optional)* <font size="2">Added in: v1.9</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-body-bytes"/><a href="#route-fulfill-option-body-bytes" class="list-anchor">#</a>
+    
+    Optional response body as raw bytes.
+  - `setContentType` [String] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-content-type"/><a href="#route-fulfill-option-content-type" class="list-anchor">#</a>
+    
+    If set, equals to setting `Content-Type` response header.
+  - `setHeaders` [Map]<[String], [String]> *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-headers"/><a href="#route-fulfill-option-headers" class="list-anchor">#</a>
+    
+    Response headers. Header values will be converted to a string.
+  - `setPath` [Path] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-path"/><a href="#route-fulfill-option-path" class="list-anchor">#</a>
+    
+    File path to respond with. The content type will be inferred from file extension. If `path` is a relative path, then it is resolved relative to the current working directory.
+  - `setResponse` [APIResponse] *(optional)* <font size="2">Added in: v1.15</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-response"/><a href="#route-fulfill-option-response" class="list-anchor">#</a>
+    
+    [APIResponse] to fulfill route's request with. Individual fields of the response (such as headers) can be overridden using fulfill options.
+  - `setStatus` [int] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fulfill-option-status"/><a href="#route-fulfill-option-status" class="list-anchor">#</a>
+    
+    Response status code, defaults to `200`.
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+---
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-request-return"/> &#60;[Request]&#62;<a href="#route-request-return" class="list-anchor">#</a>
+### request {#route-request}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>route.request</span>
 
 A request to be routed.
 
-## Route.resume([options]) {#route-continue}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+```java
+Route.request();
+```
 
-- `options` &#60;`Route.ResumeOptions`&#62;
-  - `setHeaders`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-headers"/> &#60;[Map]<[String], [String]>&#62; If set changes the request HTTP headers. Header values will be converted to a string.<a href="#route-continue-option-headers" class="list-anchor">#</a>
-  - `setMethod`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-method"/> &#60;[String]&#62; If set changes the request method (e.g. GET or POST)<a href="#route-continue-option-method" class="list-anchor">#</a>
-  - `setPostData`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-post-data"/> &#60;[String]|[byte&#91;&#93;]&#62; If set changes the post data of request<a href="#route-continue-option-post-data" class="list-anchor">#</a>
-  - `setUrl`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-url"/> &#60;[String]&#62; If set changes the request URL. New URL must have same protocol as original one.<a href="#route-continue-option-url" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-return"/> &#60;[void]&#62;<a href="#route-continue-return" class="list-anchor">#</a>
+**Returns**
+- [Request]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-request-return"/><a href="#route-request-return" class="list-anchor">#</a>
+
+---
+
+### resume {#route-continue}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>route.resume</span>
 
 Continues route's request with optional overrides.
+
+**Usage**
 
 ```java
 page.route("**/*", route -> {
@@ -171,11 +252,26 @@ page.route("**/*", route -> {
 });
 ```
 
+**Arguments**
+- `options` `Route.ResumeOptions` *(optional)*
+  - `setHeaders` [Map]<[String], [String]> *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-headers"/><a href="#route-continue-option-headers" class="list-anchor">#</a>
+    
+    If set changes the request HTTP headers. Header values will be converted to a string.
+  - `setMethod` [String] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-method"/><a href="#route-continue-option-method" class="list-anchor">#</a>
+    
+    If set changes the request method (e.g. GET or POST).
+  - `setPostData` [String]|[byte&#91;&#93;]|[Object] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-post-data"/><a href="#route-continue-option-post-data" class="list-anchor">#</a>
+    
+    If set changes the post data of request.
+  - `setUrl` [String] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-continue-option-url"/><a href="#route-continue-option-url" class="list-anchor">#</a>
+    
+    If set changes the request URL. New URL must have same protocol as original one.
+
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /test-assertions.mdx "APIResponseAssertions"
+[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
 [Browser]: /api/class-browser.mdx "Browser"
 [BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
 [BrowserType]: /api/class-browsertype.mdx "BrowserType"
@@ -190,12 +286,12 @@ page.route("**/*", route -> {
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
 [Keyboard]: /api/class-keyboard.mdx "Keyboard"
 [Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /test-assertions.mdx "LocatorAssertions"
+[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
 [Mouse]: /api/class-mouse.mdx "Mouse"
 [Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /test-assertions.mdx "PageAssertions"
+[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
 [Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /test-assertions.mdx "PlaywrightAssertions"
+[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
 [PlaywrightException]: /api/class-playwrightexception.mdx "PlaywrightException"
 [Request]: /api/class-request.mdx "Request"
 [RequestOptions]: /api/class-requestoptions.mdx "RequestOptions"

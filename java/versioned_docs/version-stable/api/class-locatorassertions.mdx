@@ -1,0 +1,623 @@
+---
+id: class-locatorassertions
+title: "LocatorAssertions"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import HTMLCard from '@site/src/components/HTMLCard';
+
+
+The [LocatorAssertions] class provides assertion methods that can be used to make assertions about the [Locator] state in the tests. A new instance of [LocatorAssertions] is created by calling [assertThat()](/api/class-playwrightassertions.mdx#playwright-assertions-expect-locator):
+
+```java
+...
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+
+public class TestLocator {
+  ...
+  @Test
+  void statusBecomesSubmitted() {
+    ...
+    page.getByRole(AriaRole.BUTTON).click();
+    assertThat(page.locator(".status")).hasText("Submitted");
+  }
+}
+```
+
+
+---
+
+## Methods
+
+### containsText {#locator-assertions-to-contain-text}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><span style={{visibility: 'hidden'}}>locatorAssertions.containsText</span>
+
+Ensures the [Locator] points to an element that contains the given text. You can use regular expressions for the value as well.
+
+**Usage**
+
+```java
+assertThat(page.locator(".title")).containsText("substring");
+```
+
+If you pass an array as an expected value, the expectations are:
+1. Locator resolves to a list of elements.
+1. Elements from a **subset** of this list contain text from the expected array, respectively.
+1. The matching subset of elements has the same order as the expected array.
+1. Each text value from the expected array is matched by some element from the list.
+
+For example, consider the following list:
+
+```html
+<ul>
+  <li>Item Text 1</li>
+  <li>Item Text 2</li>
+  <li>Item Text 3</li>
+</ul>
+```
+
+Let's see how we can use the assertion:
+
+```java
+// ✓ Contains the right items in the right order
+assertThat(page.locator("ul > li")).containsText(new String[] {"Text 1", "Text 3", "Text 4"});
+
+// ✖ Wrong order
+assertThat(page.locator("ul > li")).containsText(new String[] {"Text 3", "Text 2"});
+
+// ✖ No item contains this text
+assertThat(page.locator("ul > li")).containsText(new String[] {"Some 33"});
+
+// ✖ Locator points to the outer list element, not to the list items
+assertThat(page.locator("ul")).containsText(new String[] {"Text 3"});
+```
+
+**Arguments**
+- `expected` [String]|[Pattern]|[String]&#91;&#93;|[Pattern]&#91;&#93; <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-contain-text-option-expected"/><a href="#locator-assertions-to-contain-text-option-expected" class="list-anchor">#</a>
+  
+  Expected substring or RegExp or a list of those.
+- `options` `LocatorAssertions.ContainsTextOptions` *(optional)*
+  - `setIgnoreCase` [boolean] *(optional)* <font size="2">Added in: v1.23</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-contain-text-option-ignore-case"/><a href="#locator-assertions-to-contain-text-option-ignore-case" class="list-anchor">#</a>
+    
+    Whether to perform case-insensitive match. `ignoreCase` option takes precedence over the corresponding regular expression flag if specified.
+  - `setTimeout` [double] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-contain-text-option-timeout"/><a href="#locator-assertions-to-contain-text-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for.
+  - `setUseInnerText` [boolean] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-contain-text-option-use-inner-text"/><a href="#locator-assertions-to-contain-text-option-use-inner-text" class="list-anchor">#</a>
+    
+    Whether to use `element.innerText` instead of `element.textContent` when retrieving DOM node text.
+
+---
+
+### hasAttribute {#locator-assertions-to-have-attribute}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><span style={{visibility: 'hidden'}}>locatorAssertions.hasAttribute</span>
+
+Ensures the [Locator] points to an element with given attribute.
+
+**Usage**
+
+```java
+assertThat(page.locator("input")).hasAttribute("type", "text");
+```
+
+**Arguments**
+- `name` [String] <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-attribute-option-name"/><a href="#locator-assertions-to-have-attribute-option-name" class="list-anchor">#</a>
+  
+  Attribute name.
+- `value` [String]|[Pattern] <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-attribute-option-value"/><a href="#locator-assertions-to-have-attribute-option-value" class="list-anchor">#</a>
+  
+  Expected attribute value.
+- `options` `LocatorAssertions.HasAttributeOptions` *(optional)*
+  - `setTimeout` [double] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-attribute-option-timeout"/><a href="#locator-assertions-to-have-attribute-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for.
+
+---
+
+### hasClass {#locator-assertions-to-have-class}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><span style={{visibility: 'hidden'}}>locatorAssertions.hasClass</span>
+
+Ensures the [Locator] points to an element with given CSS classes. This needs to be a full match or using a relaxed regular expression.
+
+**Usage**
+
+```html
+<div class='selected row' id='component'></div>
+```
+
+```java
+assertThat(page.locator("#component")).hasClass(Pattern.compile("selected"));
+assertThat(page.locator("#component")).hasClass("selected row");
+```
+
+Note that if array is passed as an expected value, entire lists of elements can be asserted:
+
+```java
+assertThat(page.locator("list > .component")).hasClass(new String[] {"component", "component selected", "component"});
+```
+
+**Arguments**
+- `expected` [String]|[Pattern]|[String]&#91;&#93;|[Pattern]&#91;&#93; <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-class-option-expected"/><a href="#locator-assertions-to-have-class-option-expected" class="list-anchor">#</a>
+  
+  Expected class or RegExp or a list of those.
+- `options` `LocatorAssertions.HasClassOptions` *(optional)*
+  - `setTimeout` [double] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-class-option-timeout"/><a href="#locator-assertions-to-have-class-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for.
+
+---
+
+### hasCount {#locator-assertions-to-have-count}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><span style={{visibility: 'hidden'}}>locatorAssertions.hasCount</span>
+
+Ensures the [Locator] resolves to an exact number of DOM nodes.
+
+**Usage**
+
+```java
+assertThat(page.locator("list > .component")).hasCount(3);
+```
+
+**Arguments**
+- `count` [int] <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-count-option-count"/><a href="#locator-assertions-to-have-count-option-count" class="list-anchor">#</a>
+  
+  Expected count.
+- `options` `LocatorAssertions.HasCountOptions` *(optional)*
+  - `setTimeout` [double] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-count-option-timeout"/><a href="#locator-assertions-to-have-count-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for.
+
+---
+
+### hasCSS {#locator-assertions-to-have-css}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><span style={{visibility: 'hidden'}}>locatorAssertions.hasCSS</span>
+
+Ensures the [Locator] resolves to an element with the given computed CSS style.
+
+**Usage**
+
+```java
+assertThat(page.getByRole(AriaRole.BUTTON)).hasCSS("display", "flex");
+```
+
+**Arguments**
+- `name` [String] <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-css-option-name"/><a href="#locator-assertions-to-have-css-option-name" class="list-anchor">#</a>
+  
+  CSS property name.
+- `value` [String]|[Pattern] <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-css-option-value"/><a href="#locator-assertions-to-have-css-option-value" class="list-anchor">#</a>
+  
+  CSS property value.
+- `options` `LocatorAssertions.HasCSSOptions` *(optional)*
+  - `setTimeout` [double] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-css-option-timeout"/><a href="#locator-assertions-to-have-css-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for.
+
+---
+
+### hasId {#locator-assertions-to-have-id}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><span style={{visibility: 'hidden'}}>locatorAssertions.hasId</span>
+
+Ensures the [Locator] points to an element with the given DOM Node ID.
+
+**Usage**
+
+```java
+assertThat(page.getByRole(AriaRole.TEXTBOX)).hasId("lastname");
+```
+
+**Arguments**
+- `id` [String]|[Pattern] <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-id-option-id"/><a href="#locator-assertions-to-have-id-option-id" class="list-anchor">#</a>
+  
+  Element id.
+- `options` `LocatorAssertions.HasIdOptions` *(optional)*
+  - `setTimeout` [double] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-id-option-timeout"/><a href="#locator-assertions-to-have-id-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for.
+
+---
+
+### hasJSProperty {#locator-assertions-to-have-js-property}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><span style={{visibility: 'hidden'}}>locatorAssertions.hasJSProperty</span>
+
+Ensures the [Locator] points to an element with given JavaScript property. Note that this property can be of a primitive type as well as a plain serializable JavaScript object.
+
+**Usage**
+
+```java
+assertThat(page.locator("input")).hasJSProperty("loaded", true);
+```
+
+**Arguments**
+- `name` [String] <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-js-property-option-name"/><a href="#locator-assertions-to-have-js-property-option-name" class="list-anchor">#</a>
+  
+  Property name.
+- `value` [Object] <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-js-property-option-value"/><a href="#locator-assertions-to-have-js-property-option-value" class="list-anchor">#</a>
+  
+  Property value.
+- `options` `LocatorAssertions.HasJSPropertyOptions` *(optional)*
+  - `setTimeout` [double] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-js-property-option-timeout"/><a href="#locator-assertions-to-have-js-property-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for.
+
+---
+
+### hasText {#locator-assertions-to-have-text}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><span style={{visibility: 'hidden'}}>locatorAssertions.hasText</span>
+
+Ensures the [Locator] points to an element with the given text. You can use regular expressions for the value as well.
+
+**Usage**
+
+```java
+assertThat(page.locator(".title")).hasText("Welcome, Test User");
+assertThat(page.locator(".title")).hasText(Pattern.compile("Welcome, .*"));
+```
+
+If you pass an array as an expected value, the expectations are:
+1. Locator resolves to a list of elements.
+1. The number of elements equals the number of expected values in the array.
+1. Elements from the list have text matching expected array values, one by one, in order.
+
+For example, consider the following list:
+
+```html
+<ul>
+  <li>Text 1</li>
+  <li>Text 2</li>
+  <li>Text 3</li>
+</ul>
+```
+
+Let's see how we can use the assertion:
+
+```java
+// ✓ Has the right items in the right order
+assertThat(page.locator("ul > li")).hasText(new String[] {"Text 1", "Text 2", "Text 3"});
+
+// ✖ Wrong order
+assertThat(page.locator("ul > li")).hasText(new String[] {"Text 3", "Text 2", "Text 1"});
+
+// ✖ Last item does not match
+assertThat(page.locator("ul > li")).hasText(new String[] {"Text 1", "Text 2", "Text"});
+
+// ✖ Locator points to the outer list element, not to the list items
+assertThat(page.locator("ul")).hasText(new String[] {"Text 1", "Text 2", "Text 3"});
+```
+
+**Arguments**
+- `expected` [String]|[Pattern]|[String]&#91;&#93;|[Pattern]&#91;&#93; <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-text-option-expected"/><a href="#locator-assertions-to-have-text-option-expected" class="list-anchor">#</a>
+  
+  Expected string or RegExp or a list of those.
+- `options` `LocatorAssertions.HasTextOptions` *(optional)*
+  - `setIgnoreCase` [boolean] *(optional)* <font size="2">Added in: v1.23</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-text-option-ignore-case"/><a href="#locator-assertions-to-have-text-option-ignore-case" class="list-anchor">#</a>
+    
+    Whether to perform case-insensitive match. `ignoreCase` option takes precedence over the corresponding regular expression flag if specified.
+  - `setTimeout` [double] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-text-option-timeout"/><a href="#locator-assertions-to-have-text-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for.
+  - `setUseInnerText` [boolean] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-text-option-use-inner-text"/><a href="#locator-assertions-to-have-text-option-use-inner-text" class="list-anchor">#</a>
+    
+    Whether to use `element.innerText` instead of `element.textContent` when retrieving DOM node text.
+
+---
+
+### hasValue {#locator-assertions-to-have-value}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><span style={{visibility: 'hidden'}}>locatorAssertions.hasValue</span>
+
+Ensures the [Locator] points to an element with the given input value. You can use regular expressions for the value as well.
+
+**Usage**
+
+```java
+assertThat(page.locator("input[type=number]")).hasValue(Pattern.compile("[0-9]"));
+```
+
+**Arguments**
+- `value` [String]|[Pattern] <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-value-option-value"/><a href="#locator-assertions-to-have-value-option-value" class="list-anchor">#</a>
+  
+  Expected value.
+- `options` `LocatorAssertions.HasValueOptions` *(optional)*
+  - `setTimeout` [double] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-value-option-timeout"/><a href="#locator-assertions-to-have-value-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for.
+
+---
+
+### hasValues {#locator-assertions-to-have-values}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.23</font><span style={{visibility: 'hidden'}}>locatorAssertions.hasValues</span>
+
+Ensures the [Locator] points to multi-select/combobox (i.e. a `select` with the `multiple` attribute) and the specified values are selected.
+
+**Usage**
+
+For example, given the following element:
+
+```html
+<select id="favorite-colors" multiple>
+  <option value="R">Red</option>
+  <option value="G">Green</option>
+  <option value="B">Blue</option>
+</select>
+```
+
+```java
+page.locator("id=favorite-colors").selectOption(["R", "G"]);
+assertThat(page.locator("id=favorite-colors")).hasValues(new Pattern[] { Pattern.compile("R"), Pattern.compile("G") });
+```
+
+**Arguments**
+- `values` [String]&#91;&#93;|[Pattern]&#91;&#93;<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-values-option-values"/><a href="#locator-assertions-to-have-values-option-values" class="list-anchor">#</a>
+  
+  Expected options currently selected.
+- `options` `LocatorAssertions.HasValuesOptions` *(optional)*
+  - `setTimeout` [double] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-have-values-option-timeout"/><a href="#locator-assertions-to-have-values-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for.
+
+---
+
+### isChecked {#locator-assertions-to-be-checked}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><span style={{visibility: 'hidden'}}>locatorAssertions.isChecked</span>
+
+Ensures the [Locator] points to a checked input.
+
+**Usage**
+
+```java
+assertThat(page.getByLabel("Subscribe to newsletter")).isChecked();
+```
+
+**Arguments**
+- `options` `LocatorAssertions.IsCheckedOptions` *(optional)*
+  - `setChecked` [boolean] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-checked-option-checked"/><a href="#locator-assertions-to-be-checked-option-checked" class="list-anchor">#</a>
+  - `setTimeout` [double] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-checked-option-timeout"/><a href="#locator-assertions-to-be-checked-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for.
+
+---
+
+### isDisabled {#locator-assertions-to-be-disabled}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><span style={{visibility: 'hidden'}}>locatorAssertions.isDisabled</span>
+
+Ensures the [Locator] points to a disabled element. Element is disabled if it has "disabled" attribute or is disabled via ['aria-disabled'](https://developer.mozilla.org/en-US/docs/Web/Accessibility/ARIA/Attributes/aria-disabled). Note that only native control elements such as HTML `button`, `input`, `select`, `textarea`, `option`, `optgroup` can be disabled by setting "disabled" attribute. "disabled" attribute on other elements is ignored by the browser.
+
+**Usage**
+
+```java
+assertThat(page.locator("button.submit")).isDisabled();
+```
+
+**Arguments**
+- `options` `LocatorAssertions.IsDisabledOptions` *(optional)*
+  - `setTimeout` [double] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-disabled-option-timeout"/><a href="#locator-assertions-to-be-disabled-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for.
+
+---
+
+### isEditable {#locator-assertions-to-be-editable}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><span style={{visibility: 'hidden'}}>locatorAssertions.isEditable</span>
+
+Ensures the [Locator] points to an editable element.
+
+**Usage**
+
+```java
+assertThat(page.getByRole(AriaRole.TEXTBOX)).isEditable();
+```
+
+**Arguments**
+- `options` `LocatorAssertions.IsEditableOptions` *(optional)*
+  - `setEditable` [boolean] *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-editable-option-editable"/><a href="#locator-assertions-to-be-editable-option-editable" class="list-anchor">#</a>
+  - `setTimeout` [double] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-editable-option-timeout"/><a href="#locator-assertions-to-be-editable-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for.
+
+---
+
+### isEmpty {#locator-assertions-to-be-empty}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><span style={{visibility: 'hidden'}}>locatorAssertions.isEmpty</span>
+
+Ensures the [Locator] points to an empty editable element or to a DOM node that has no text.
+
+**Usage**
+
+```java
+assertThat(page.locator("div.warning")).isEmpty();
+```
+
+**Arguments**
+- `options` `LocatorAssertions.IsEmptyOptions` *(optional)*
+  - `setTimeout` [double] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-empty-option-timeout"/><a href="#locator-assertions-to-be-empty-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for.
+
+---
+
+### isEnabled {#locator-assertions-to-be-enabled}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><span style={{visibility: 'hidden'}}>locatorAssertions.isEnabled</span>
+
+Ensures the [Locator] points to an enabled element.
+
+**Usage**
+
+```java
+assertThat(page.locator("button.submit")).isEnabled();
+```
+
+**Arguments**
+- `options` `LocatorAssertions.IsEnabledOptions` *(optional)*
+  - `setEnabled` [boolean] *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-enabled-option-enabled"/><a href="#locator-assertions-to-be-enabled-option-enabled" class="list-anchor">#</a>
+  - `setTimeout` [double] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-enabled-option-timeout"/><a href="#locator-assertions-to-be-enabled-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for.
+
+---
+
+### isFocused {#locator-assertions-to-be-focused}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><span style={{visibility: 'hidden'}}>locatorAssertions.isFocused</span>
+
+Ensures the [Locator] points to a focused DOM node.
+
+**Usage**
+
+```java
+assertThat(page.getByRole(AriaRole.TEXTBOX)).isFocused();
+```
+
+**Arguments**
+- `options` `LocatorAssertions.IsFocusedOptions` *(optional)*
+  - `setTimeout` [double] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-focused-option-timeout"/><a href="#locator-assertions-to-be-focused-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for.
+
+---
+
+### isHidden {#locator-assertions-to-be-hidden}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><span style={{visibility: 'hidden'}}>locatorAssertions.isHidden</span>
+
+Ensures that [Locator] either does not resolve to any DOM node, or resolves to a [non-visible](../actionability.mdx#visible) one.
+
+**Usage**
+
+```java
+assertThat(page.locator(".my-element")).isHidden();
+```
+
+**Arguments**
+- `options` `LocatorAssertions.IsHiddenOptions` *(optional)*
+  - `setTimeout` [double] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-hidden-option-timeout"/><a href="#locator-assertions-to-be-hidden-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for.
+
+---
+
+### isVisible {#locator-assertions-to-be-visible}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><span style={{visibility: 'hidden'}}>locatorAssertions.isVisible</span>
+
+Ensures that [Locator] points to an [attached](../actionability.mdx#attached) and [visible](../actionability.mdx#visible) DOM node.
+
+**Usage**
+
+```java
+assertThat(page.locator(".my-element")).isVisible();
+```
+
+**Arguments**
+- `options` `LocatorAssertions.IsVisibleOptions` *(optional)*
+  - `setTimeout` [double] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-visible-option-timeout"/><a href="#locator-assertions-to-be-visible-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for.
+  - `setVisible` [boolean] *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-assertions-to-be-visible-option-visible"/><a href="#locator-assertions-to-be-visible-option-visible" class="list-anchor">#</a>
+
+---
+
+## Properties
+
+### not() {#locator-assertions-not}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><span style={{visibility: 'hidden'}}>locatorAssertions.not()</span>
+
+Makes the assertion check for the opposite condition. For example, this code tests that the Locator doesn't contain text `"error"`:
+
+```java
+assertThat(locator).not().containsText("error");
+```
+
+**Usage**
+
+```java
+assertThat(locator).not()
+```
+
+**Returns**
+- [LocatorAssertions]
+
+
+[APIRequest]: /api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
+[Browser]: /api/class-browser.mdx "Browser"
+[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: /api/class-browsertype.mdx "BrowserType"
+[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: /api/class-dialog.mdx "Dialog"
+[Download]: /api/class-download.mdx "Download"
+[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[FormData]: /api/class-formdata.mdx "FormData"
+[Frame]: /api/class-frame.mdx "Frame"
+[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: /api/class-jshandle.mdx "JSHandle"
+[Keyboard]: /api/class-keyboard.mdx "Keyboard"
+[Locator]: /api/class-locator.mdx "Locator"
+[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
+[Mouse]: /api/class-mouse.mdx "Mouse"
+[Page]: /api/class-page.mdx "Page"
+[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
+[Playwright]: /api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
+[PlaywrightException]: /api/class-playwrightexception.mdx "PlaywrightException"
+[Request]: /api/class-request.mdx "Request"
+[RequestOptions]: /api/class-requestoptions.mdx "RequestOptions"
+[Response]: /api/class-response.mdx "Response"
+[Route]: /api/class-route.mdx "Route"
+[Selectors]: /api/class-selectors.mdx "Selectors"
+[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: /api/class-tracing.mdx "Tracing"
+[Video]: /api/class-video.mdx "Video"
+[WebSocket]: /api/class-websocket.mdx "WebSocket"
+[WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
+[Worker]: /api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
+[byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
+[Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
+[double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
+[InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
+[int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"
+[Map]: https://docs.oracle.com/javase/8/docs/api/java/util/Map.html "Map"
+[null]: https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.7 "null"
+[Object]: https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html "Object"
+[Path]: https://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html "Path"
+[Pattern]: https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html "Pattern"
+[Predicate]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Predicate.html "Predicate"
+[void]: https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html "void"
+[Runnable]: https://docs.oracle.com/javase/8/docs/api/java/lang/Runnable.html "Runnable"
+[RuntimeException]: https://docs.oracle.com/javase/8/docs/api/java/lang/RuntimeException.html "RuntimeException"
+[String]: https://docs.oracle.com/javase/8/docs/api/java/lang/String.html "String"
+
+[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/java/about "all available image tags"
+[Docker Hub]: https://hub.docker.com/_/microsoft-playwright-java "Docker Hub"
+[Dockerfile.focal]: https://github.com/microsoft/playwright-java/blob/main/utils/docker/Dockerfile.focal "Dockerfile.focal"

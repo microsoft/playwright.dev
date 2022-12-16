@@ -6,12 +6,13 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-Whenever the page sends a request for a network resource the following sequence of events are emitted by [Page]:
-* [event Page.Request](/api/class-page.mdx#page-event-request) emitted when the request is issued by the page.
-* [event Page.Response](/api/class-page.mdx#page-event-response) emitted when/if the response status and headers are received for the request.
-* [event Page.RequestFinished](/api/class-page.mdx#page-event-request-finished) emitted when the response body is downloaded and the request is complete.
 
-If request fails at some point, then instead of `'requestfinished'` event (and possibly instead of 'response' event), the  [event Page.RequestFailed](/api/class-page.mdx#page-event-request-failed) event is emitted.
+Whenever the page sends a request for a network resource the following sequence of events are emitted by [Page]:
+* [Page.Request](/api/class-page.mdx#page-event-request) emitted when the request is issued by the page.
+* [Page.Response](/api/class-page.mdx#page-event-response) emitted when/if the response status and headers are received for the request.
+* [Page.RequestFinished](/api/class-page.mdx#page-event-request-finished) emitted when the response body is downloaded and the request is complete.
+
+If request fails at some point, then instead of `'requestfinished'` event (and possibly instead of 'response' event), the  [Page.RequestFailed](/api/class-page.mdx#page-event-request-failed) event is emitted.
 
 :::note
 HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with `'requestfinished'` event.
@@ -20,40 +21,34 @@ HTTP Error responses, such as 404 or 503, are still successful responses from HT
 If request gets a 'redirect' response, the request is successfully finished with the `requestfinished` event, and a new request is  issued to a redirected url.
 
 
-- [Request.AllHeadersAsync()](/api/class-request.mdx#request-all-headers)
-- [Request.Failure](/api/class-request.mdx#request-failure)
-- [Request.Frame](/api/class-request.mdx#request-frame)
-- [Request.Headers](/api/class-request.mdx#request-headers)
-- [Request.HeadersArrayAsync()](/api/class-request.mdx#request-headers-array)
-- [Request.HeaderValueAsync(name)](/api/class-request.mdx#request-header-value)
-- [Request.IsNavigationRequest](/api/class-request.mdx#request-is-navigation-request)
-- [Request.Method](/api/class-request.mdx#request-method)
-- [Request.PostData](/api/class-request.mdx#request-post-data)
-- [Request.PostDataBuffer](/api/class-request.mdx#request-post-data-buffer)
-- [Request.PostDataJSON](/api/class-request.mdx#request-post-data-json)
-- [Request.RedirectedFrom](/api/class-request.mdx#request-redirected-from)
-- [Request.RedirectedTo](/api/class-request.mdx#request-redirected-to)
-- [Request.ResourceType](/api/class-request.mdx#request-resource-type)
-- [Request.ResponseAsync()](/api/class-request.mdx#request-response)
-- [Request.SizesAsync()](/api/class-request.mdx#request-sizes)
-- [Request.Timing](/api/class-request.mdx#request-timing)
-- [Request.Url](/api/class-request.mdx#request-url)
+---
 
-## Request.AllHeadersAsync() {#request-all-headers}
+## Methods
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font>
+### AllHeadersAsync {#request-all-headers}
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-all-headers-return"/> &#60;[IDictionary]<[string], [string]>&#62;<a href="#request-all-headers-return" class="list-anchor">#</a>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><span style={{visibility: 'hidden'}}>request.AllHeadersAsync</span>
 
 An object with all the request HTTP headers associated with this request. The header names are lower-cased.
 
-## Request.Failure {#request-failure}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+```csharp
+await Request.AllHeadersAsync();
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-failure-return"/> &#60;[string]?&#62;<a href="#request-failure-return" class="list-anchor">#</a>
+**Returns**
+- [IDictionary]<[string], [string]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-all-headers-return"/><a href="#request-all-headers-return" class="list-anchor">#</a>
+
+---
+
+### Failure {#request-failure}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>request.Failure</span>
 
 The method returns `null` unless this request has failed, as reported by `requestfailed` event.
+
+**Usage**
 
 Example of logging of all the failed requests:
 
@@ -64,92 +59,186 @@ page.RequestFailed += (_, request) =>
 };
 ```
 
-## Request.Frame {#request-frame}
+**Returns**
+- [string]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-failure-return"/><a href="#request-failure-return" class="list-anchor">#</a>
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+---
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-frame-return"/> &#60;[Frame]&#62;<a href="#request-frame-return" class="list-anchor">#</a>
+### Frame {#request-frame}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>request.Frame</span>
 
 Returns the [Frame] that initiated this request.
 
-## Request.HeaderValueAsync(name) {#request-header-value}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font>
+```csharp
+Request.Frame
+```
 
-- `name`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-header-value-option-name"/> &#60;[string]&#62; Name of the header.<a href="#request-header-value-option-name" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-header-value-return"/> &#60;[string]?&#62;<a href="#request-header-value-return" class="list-anchor">#</a>
+**Returns**
+- [Frame]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-frame-return"/><a href="#request-frame-return" class="list-anchor">#</a>
+
+---
+
+### HeaderValueAsync {#request-header-value}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><span style={{visibility: 'hidden'}}>request.HeaderValueAsync</span>
 
 Returns the value of the header matching the name. The name is case insensitive.
 
-## Request.Headers {#request-headers}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+```csharp
+await Request.HeaderValueAsync(name);
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-headers-return"/> &#60;[IDictionary]<[string], [string]>&#62;<a href="#request-headers-return" class="list-anchor">#</a>
+**Arguments**
+- `name` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-header-value-option-name"/><a href="#request-header-value-option-name" class="list-anchor">#</a>
+  
+  Name of the header.
+
+**Returns**
+- [string]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-header-value-return"/><a href="#request-header-value-return" class="list-anchor">#</a>
+
+---
+
+### Headers {#request-headers}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>request.Headers</span>
 
 An object with the request HTTP headers. The header names are lower-cased. Note that this method does not return security-related headers, including cookie-related ones. You can use [Request.AllHeadersAsync()](/api/class-request.mdx#request-all-headers) for complete list of headers that include `cookie` information.
 
-## Request.HeadersArrayAsync() {#request-headers-array}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font>
+```csharp
+Request.Headers
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-headers-array-return"/> &#60;[IEnumerable]<`HttpHeader`>&#62;<a href="#request-headers-array-return" class="list-anchor">#</a>
-  - `name` &#60;[string]&#62; Name of the header.
-  - `value` &#60;[string]&#62; Value of the header.
+**Returns**
+- [IDictionary]<[string], [string]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-headers-return"/><a href="#request-headers-return" class="list-anchor">#</a>
+
+---
+
+### HeadersArrayAsync {#request-headers-array}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><span style={{visibility: 'hidden'}}>request.HeadersArrayAsync</span>
 
 An array with all the request HTTP headers associated with this request. Unlike [Request.AllHeadersAsync()](/api/class-request.mdx#request-all-headers), header names are NOT lower-cased. Headers with multiple entries, such as `Set-Cookie`, appear in the array multiple times.
 
-## Request.IsNavigationRequest {#request-is-navigation-request}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+```csharp
+await Request.HeadersArrayAsync();
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-is-navigation-request-return"/> &#60;[bool]&#62;<a href="#request-is-navigation-request-return" class="list-anchor">#</a>
+**Returns**
+- [IEnumerable]<`HttpHeader`><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-headers-array-return"/><a href="#request-headers-array-return" class="list-anchor">#</a>
+  - `name` [string]
+    
+    Name of the header.
+  - `value` [string]
+    
+    Value of the header.
+
+---
+
+### IsNavigationRequest {#request-is-navigation-request}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>request.IsNavigationRequest</span>
 
 Whether this request is driving frame's navigation.
 
-## Request.Method {#request-method}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+```csharp
+Request.IsNavigationRequest
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-method-return"/> &#60;[string]&#62;<a href="#request-method-return" class="list-anchor">#</a>
+**Returns**
+- [bool]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-is-navigation-request-return"/><a href="#request-is-navigation-request-return" class="list-anchor">#</a>
+
+---
+
+### Method {#request-method}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>request.Method</span>
 
 Request's method (GET, POST, etc.)
 
-## Request.PostData {#request-post-data}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+```csharp
+Request.Method
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-post-data-return"/> &#60;[string]?&#62;<a href="#request-post-data-return" class="list-anchor">#</a>
+**Returns**
+- [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-method-return"/><a href="#request-method-return" class="list-anchor">#</a>
+
+---
+
+### PostData {#request-post-data}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>request.PostData</span>
 
 Request's post body, if any.
 
-## Request.PostDataBuffer {#request-post-data-buffer}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+```csharp
+Request.PostData
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-post-data-buffer-return"/> &#60;[byte]&#91;&#93;?&#62;<a href="#request-post-data-buffer-return" class="list-anchor">#</a>
+**Returns**
+- [string]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-post-data-return"/><a href="#request-post-data-return" class="list-anchor">#</a>
+
+---
+
+### PostDataBuffer {#request-post-data-buffer}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>request.PostDataBuffer</span>
 
 Request's post body in a binary form, if any.
 
-## Request.PostDataJSON {#request-post-data-json}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font>
+```csharp
+Request.PostDataBuffer
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-post-data-json-return"/> &#60;[JsonElement]?&#62;<a href="#request-post-data-json-return" class="list-anchor">#</a>
+**Returns**
+- [byte]&#91;&#93;?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-post-data-buffer-return"/><a href="#request-post-data-buffer-return" class="list-anchor">#</a>
+
+---
+
+### PostDataJSON {#request-post-data-json}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><span style={{visibility: 'hidden'}}>request.PostDataJSON</span>
 
 Returns parsed request's body for `form-urlencoded` and JSON as a fallback if any.
 
 When the response is `application/x-www-form-urlencoded` then a key/value object of the values will be returned. Otherwise it will be parsed as JSON.
 
-## Request.RedirectedFrom {#request-redirected-from}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+```csharp
+Request.PostDataJSON
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-redirected-from-return"/> &#60;[Request]?&#62;<a href="#request-redirected-from-return" class="list-anchor">#</a>
+**Returns**
+- [JsonElement]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-post-data-json-return"/><a href="#request-post-data-json-return" class="list-anchor">#</a>
+
+---
+
+### RedirectedFrom {#request-redirected-from}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>request.RedirectedFrom</span>
 
 Request that was redirected by the server to this one, if any.
 
 When the server responds with a redirect, Playwright creates a new [Request] object. The two requests are connected by `redirectedFrom()` and `redirectedTo()` methods. When multiple server redirects has happened, it is possible to construct the whole redirect chain by repeatedly calling `redirectedFrom()`.
+
+**Usage**
 
 For example, if the website `http://example.com` redirects to `https://example.com`:
 
@@ -165,13 +254,18 @@ var response = await page.GotoAsync("https://www.google.com");
 Console.WriteLine(response.Request.RedirectedFrom?.Url); // null
 ```
 
-## Request.RedirectedTo {#request-redirected-to}
+**Returns**
+- [Request]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-redirected-from-return"/><a href="#request-redirected-from-return" class="list-anchor">#</a>
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+---
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-redirected-to-return"/> &#60;[Request]?&#62;<a href="#request-redirected-to-return" class="list-anchor">#</a>
+### RedirectedTo {#request-redirected-to}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>request.RedirectedTo</span>
 
 New request issued by the browser if the server responded with redirect.
+
+**Usage**
 
 This method is the opposite of [Request.RedirectedFrom](/api/class-request.mdx#request-redirected-from):
 
@@ -179,50 +273,81 @@ This method is the opposite of [Request.RedirectedFrom](/api/class-request.mdx#r
 Console.WriteLine(request.RedirectedFrom?.RedirectedTo == request); // True
 ```
 
-## Request.ResourceType {#request-resource-type}
+**Returns**
+- [Request]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-redirected-to-return"/><a href="#request-redirected-to-return" class="list-anchor">#</a>
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+---
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-resource-type-return"/> &#60;[string]&#62;<a href="#request-resource-type-return" class="list-anchor">#</a>
+### ResourceType {#request-resource-type}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>request.ResourceType</span>
 
 Contains the request's resource type as it was perceived by the rendering engine. ResourceType will be one of the following: `document`, `stylesheet`, `image`, `media`, `font`, `script`, `texttrack`, `xhr`, `fetch`, `eventsource`, `websocket`, `manifest`, `other`.
 
-## Request.ResponseAsync() {#request-response}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+```csharp
+Request.ResourceType
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-response-return"/> &#60;[Response]?&#62;<a href="#request-response-return" class="list-anchor">#</a>
+**Returns**
+- [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-resource-type-return"/><a href="#request-resource-type-return" class="list-anchor">#</a>
+
+---
+
+### ResponseAsync {#request-response}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>request.ResponseAsync</span>
 
 Returns the matching [Response] object, or `null` if the response was not received due to error.
 
-## Request.SizesAsync() {#request-sizes}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font>
+```csharp
+await Request.ResponseAsync();
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-sizes-return"/> &#60;Sizes&#62;<a href="#request-sizes-return" class="list-anchor">#</a>
-  - `requestBodySize` &#60;[int]&#62; Size of the request body (POST data payload) in bytes. Set to 0 if there was no body.
-  - `requestHeadersSize` &#60;[int]&#62; Total number of bytes from the start of the HTTP request message until (and including) the double CRLF before the body.
-  - `responseBodySize` &#60;[int]&#62; Size of the received response body (encoded) in bytes.
-  - `responseHeadersSize` &#60;[int]&#62; Total number of bytes from the start of the HTTP response message until (and including) the double CRLF before the body.
+**Returns**
+- [Response]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-response-return"/><a href="#request-response-return" class="list-anchor">#</a>
+
+---
+
+### SizesAsync {#request-sizes}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><span style={{visibility: 'hidden'}}>request.SizesAsync</span>
 
 Returns resource size information for given request.
 
-## Request.Timing {#request-timing}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+```csharp
+await Request.SizesAsync();
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-timing-return"/> &#60;Timing&#62;<a href="#request-timing-return" class="list-anchor">#</a>
-  - `startTime` &#60;[double]&#62; Request start time in milliseconds elapsed since January 1, 1970 00:00:00 UTC
-  - `domainLookupStart` &#60;[double]&#62; Time immediately before the browser starts the domain name lookup for the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
-  - `domainLookupEnd` &#60;[double]&#62; Time immediately after the browser starts the domain name lookup for the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
-  - `connectStart` &#60;[double]&#62; Time immediately before the user agent starts establishing the connection to the server to retrieve the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
-  - `secureConnectionStart` &#60;[double]&#62; Time immediately before the browser starts the handshake process to secure the current connection. The value is given in milliseconds relative to `startTime`, -1 if not available.
-  - `connectEnd` &#60;[double]&#62; Time immediately before the user agent starts establishing the connection to the server to retrieve the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
-  - `requestStart` &#60;[double]&#62; Time immediately before the browser starts requesting the resource from the server, cache, or local resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
-  - `responseStart` &#60;[double]&#62; Time immediately after the browser starts requesting the resource from the server, cache, or local resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
-  - `responseEnd` &#60;[double]&#62; Time immediately after the browser receives the last byte of the resource or immediately before the transport connection is closed, whichever comes first. The value is given in milliseconds relative to `startTime`, -1 if not available.
+**Returns**
+- Sizes<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-sizes-return"/><a href="#request-sizes-return" class="list-anchor">#</a>
+  - `requestBodySize` [int]
+    
+    Size of the request body (POST data payload) in bytes. Set to 0 if there was no body.
+  - `requestHeadersSize` [int]
+    
+    Total number of bytes from the start of the HTTP request message until (and including) the double CRLF before the body.
+  - `responseBodySize` [int]
+    
+    Size of the received response body (encoded) in bytes.
+  - `responseHeadersSize` [int]
+    
+    Total number of bytes from the start of the HTTP response message until (and including) the double CRLF before the body.
+
+---
+
+### Timing {#request-timing}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>request.Timing</span>
 
 Returns resource timing information for given request. Most of the timing values become available upon the response, `responseEnd` becomes available when request finishes. Find more information at [Resource Timing API](https://developer.mozilla.org/en-US/docs/Web/API/PerformanceResourceTiming).
+
+**Usage**
 
 ```csharp
 var request = await page.RunAndWaitForRequestFinishedAsync(async () =>
@@ -232,19 +357,59 @@ var request = await page.RunAndWaitForRequestFinishedAsync(async () =>
 Console.WriteLine(request.Timing.ResponseEnd);
 ```
 
-## Request.Url {#request-url}
+**Returns**
+- Timing<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-timing-return"/><a href="#request-timing-return" class="list-anchor">#</a>
+  - `startTime` [double]
+    
+    Request start time in milliseconds elapsed since January 1, 1970 00:00:00 UTC
+  - `domainLookupStart` [double]
+    
+    Time immediately before the browser starts the domain name lookup for the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `domainLookupEnd` [double]
+    
+    Time immediately after the browser starts the domain name lookup for the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `connectStart` [double]
+    
+    Time immediately before the user agent starts establishing the connection to the server to retrieve the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `secureConnectionStart` [double]
+    
+    Time immediately before the browser starts the handshake process to secure the current connection. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `connectEnd` [double]
+    
+    Time immediately before the user agent starts establishing the connection to the server to retrieve the resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `requestStart` [double]
+    
+    Time immediately before the browser starts requesting the resource from the server, cache, or local resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `responseStart` [double]
+    
+    Time immediately after the browser starts requesting the resource from the server, cache, or local resource. The value is given in milliseconds relative to `startTime`, -1 if not available.
+  - `responseEnd` [double]
+    
+    Time immediately after the browser receives the last byte of the resource or immediately before the transport connection is closed, whichever comes first. The value is given in milliseconds relative to `startTime`, -1 if not available.
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+---
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-url-return"/> &#60;[string]&#62;<a href="#request-url-return" class="list-anchor">#</a>
+### Url {#request-url}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>request.Url</span>
 
 URL of the request.
+
+**Usage**
+
+```csharp
+Request.Url
+```
+
+**Returns**
+- [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-url-return"/><a href="#request-url-return" class="list-anchor">#</a>
+
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /test-assertions.mdx "APIResponseAssertions"
+[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
 [Browser]: /api/class-browser.mdx "Browser"
 [BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
 [BrowserType]: /api/class-browsertype.mdx "BrowserType"
@@ -259,12 +424,12 @@ URL of the request.
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
 [Keyboard]: /api/class-keyboard.mdx "Keyboard"
 [Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /test-assertions.mdx "LocatorAssertions"
+[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
 [Mouse]: /api/class-mouse.mdx "Mouse"
 [Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /test-assertions.mdx "PageAssertions"
+[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
 [Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /test-assertions.mdx "PlaywrightAssertions"
+[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"

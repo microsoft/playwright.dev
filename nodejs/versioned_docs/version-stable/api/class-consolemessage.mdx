@@ -6,6 +6,7 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+
 [ConsoleMessage] objects are dispatched by page via the [page.on('console')](/api/class-page.mdx#page-event-console) event. For each console messages logged in the page there will be corresponding event in the Playwright context.
 
 ```js
@@ -19,13 +20,11 @@ page.on('console', msg => {
 });
 
 // Get the next console log
-const [msg] = await Promise.all([
-  page.waitForEvent('console'),
-  // Issue console.log inside the page
-  page.evaluate(() => {
-    console.log('hello', 42, { foo: 'bar' });
-  }),
-]);
+const msgPromise = page.waitForEvent('console');
+await page.evaluate(() => {
+  console.log('hello', 42, { foo: 'bar' });  // Issue console.log inside the page
+});
+const msg = await msgPromise;
 
 // Deconstruct console log arguments
 await msg.args[0].jsonValue() // hello
@@ -33,43 +32,83 @@ await msg.args[1].jsonValue() // 42
 ```
 
 
-- [consoleMessage.args()](/api/class-consolemessage.mdx#console-message-args)
-- [consoleMessage.location()](/api/class-consolemessage.mdx#console-message-location)
-- [consoleMessage.text()](/api/class-consolemessage.mdx#console-message-text)
-- [consoleMessage.type()](/api/class-consolemessage.mdx#console-message-type)
+---
 
-## consoleMessage.args() {#console-message-args}
+## Methods
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+### args {#console-message-args}
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="console-message-args-return"/> &#60;[Array]<[JSHandle]>&#62;<a href="#console-message-args-return" class="list-anchor">#</a>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>consoleMessage.args</span>
 
 List of arguments passed to a `console` function call. See also [page.on('console')](/api/class-page.mdx#page-event-console).
 
-## consoleMessage.location() {#console-message-location}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+```js
+consoleMessage.args();
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="console-message-location-return"/> &#60;[Object]&#62;<a href="#console-message-location-return" class="list-anchor">#</a>
-  - `url` &#60;[string]&#62; URL of the resource.
-  - `lineNumber` &#60;[number]&#62; 0-based line number in the resource.
-  - `columnNumber` &#60;[number]&#62; 0-based column number in the resource.
+**Returns**
+- [Array]<[JSHandle]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="console-message-args-return"/><a href="#console-message-args-return" class="list-anchor">#</a>
 
-## consoleMessage.text() {#console-message-text}
+---
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+### location {#console-message-location}
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="console-message-text-return"/> &#60;[string]&#62;<a href="#console-message-text-return" class="list-anchor">#</a>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>consoleMessage.location</span>
+
+**Usage**
+
+```js
+consoleMessage.location();
+```
+
+**Returns**
+- [Object]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="console-message-location-return"/><a href="#console-message-location-return" class="list-anchor">#</a>
+  - `url` [string]
+    
+    URL of the resource.
+  - `lineNumber` [number]
+    
+    0-based line number in the resource.
+  - `columnNumber` [number]
+    
+    0-based column number in the resource.
+
+---
+
+### text {#console-message-text}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>consoleMessage.text</span>
 
 The text of the console message.
 
-## consoleMessage.type() {#console-message-type}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+```js
+consoleMessage.text();
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="console-message-type-return"/> &#60;[string]&#62;<a href="#console-message-type-return" class="list-anchor">#</a>
+**Returns**
+- [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="console-message-text-return"/><a href="#console-message-text-return" class="list-anchor">#</a>
+
+---
+
+### type {#console-message-type}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>consoleMessage.type</span>
 
 One of the following values: `'log'`, `'debug'`, `'info'`, `'error'`, `'warning'`, `'dir'`, `'dirxml'`, `'table'`, `'trace'`, `'clear'`, `'startGroup'`, `'startGroupCollapsed'`, `'endGroup'`, `'assert'`, `'profile'`, `'profileEnd'`, `'count'`, `'timeEnd'`.
+
+**Usage**
+
+```js
+consoleMessage.type();
+```
+
+**Returns**
+- [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="console-message-type-return"/><a href="#console-message-type-return" class="list-anchor">#</a>
+
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
@@ -80,7 +119,7 @@ One of the following values: `'log'`, `'debug'`, `'info'`, `'error'`, `'warning'
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /test-assertions.mdx "APIResponseAssertions"
+[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
 [Browser]: /api/class-browser.mdx "Browser"
 [BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
 [BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
@@ -99,18 +138,18 @@ One of the following values: `'log'`, `'debug'`, `'info'`, `'error'`, `'warning'
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
 [Keyboard]: /api/class-keyboard.mdx "Keyboard"
 [Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /test-assertions.mdx "LocatorAssertions"
+[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
 [Logger]: /api/class-logger.mdx "Logger"
 [Mouse]: /api/class-mouse.mdx "Mouse"
 [Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /test-assertions.mdx "PageAssertions"
+[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
 [Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /test-assertions.mdx "PlaywrightAssertions"
+[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
-[ScreenshotAssertions]: /test-assertions.mdx "ScreenshotAssertions"
 [Selectors]: /api/class-selectors.mdx "Selectors"
+[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
@@ -155,6 +194,7 @@ One of the following values: `'log'`, `'debug'`, `'info'`, `'error'`, `'warning'
 [Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
 [RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"

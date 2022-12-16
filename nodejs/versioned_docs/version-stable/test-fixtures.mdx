@@ -27,8 +27,8 @@ import { test, expect } from '@playwright/test';
 
 test('basic test', async ({ page }) => {
   await page.goto('https://playwright.dev/');
-  const title = page.locator('.navbar__inner .navbar__title');
-  await expect(title).toHaveText('Playwright');
+
+  await expect(page).toHaveTitle(/Playwright/);
 });
 ```
 
@@ -40,8 +40,8 @@ const { test, expect } = require('@playwright/test');
 
 test('basic test', async ({ page }) => {
   await page.goto('https://playwright.dev/');
-  const title = page.locator('.navbar__inner .navbar__title');
-  await expect(title).toHaveText('Playwright');
+
+  await expect(page).toHaveTitle(/Playwright/);
 });
 ```
 
@@ -180,7 +180,7 @@ test('should remove an item', async ({ todoPage }) => {
 
 ## Creating a fixture
 
-To create your own fixture, use [test.extend(fixtures)](/api/class-test.mdx#test-extend) to create a new `test` object that will include it.
+To create your own fixture, use [test.extend()](/api/class-test.mdx#test-extend) to create a new `test` object that will include it.
 
 Below we create two fixtures `todoPage` and `settingsPage` that follow the [Page Object Model](./pom.mdx) pattern.
 
@@ -295,7 +295,7 @@ test.beforeEach(async ({ settingsPage }) => {
 
 test('basic test', async ({ todoPage, page }) => {
   await todoPage.addToDo('something nice');
-  await expect(page.locator('.todo-item')).toContainText(['something nice']);
+  await expect(page.getByTestId('todo-title')).toContainText(['something nice']);
 });
 ```
 
@@ -311,7 +311,7 @@ test.beforeEach(async ({ settingsPage }) => {
 
 test('basic test', async ({ todoPage, page }) => {
   await todoPage.addToDo('something nice');
-  await expect(page.locator('.todo-item')).toContainText(['something nice']);
+  await expect(page.getByTestId('todo-title')).toContainText(['something nice']);
 });
 ```
 
@@ -360,7 +360,7 @@ exports.test = base.test.extend({
 </TabItem>
 </Tabs>
 
-Notice that in this example, the `page` fixture is able to depend on other built-in fixtures such as [testOptions.baseURL](/api/class-testoptions.mdx#test-options-base-url). We can now configure `baseURL` in the configuration file, or locally in the test file with [test.use(options)](/api/class-test.mdx#test-use).
+Notice that in this example, the `page` fixture is able to depend on other built-in fixtures such as [testOptions.baseURL](/api/class-testoptions.mdx#test-options-base-url). We can now configure `baseURL` in the configuration file, or locally in the test file with [test.use()](/api/class-test.mdx#test-use).
 
 <Tabs
   groupId="js-flavor"
@@ -469,7 +469,7 @@ export const test = base.extend<{}, { account: Account }>({
     await page.getByLabel('Password').fill(password);
     await page.getByText('Sign up').click();
     // Make sure everything is ok.
-    await expect(page.locator('#result')).toHaveText('Success');
+    await expect(page.getByTestId('result')).toHaveText('Success');
     // Do not forget to cleanup.
     await page.close();
 
@@ -484,7 +484,7 @@ export const test = base.extend<{}, { account: Account }>({
     await page.getByLabel('User Name').fill(username);
     await page.getByLabel('Password').fill(password);
     await page.getByText('Sign in').click();
-    await expect(page.locator('#userinfo')).toHaveText(username);
+    await expect(page.getByTestId('userinfo')).toHaveText(username);
 
     // Use signed-in page in the test.
     await use(page);
@@ -528,7 +528,7 @@ exports.test = base.test.extend({
     await page.getByLabel('User Name').fill(username);
     await page.getByLabel('Password').fill(password);
     await page.getByText('Sign in').click();
-    await expect(page.locator('#userinfo')).toHaveText(username);
+    await expect(page.getByTestId('userinfo')).toHaveText(username);
 
     // Use signed-in page in the test.
     await use(page);
@@ -960,6 +960,7 @@ A few observations:
 * `workerFixture` is lazily set up before the second test, but teared down once during worker shutdown, as a worker-scoped fixture.
 * `autoWorkerFixture` is set up for `beforeAll` hook, but `autoTestFixture` is not.
 
+
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
@@ -969,7 +970,7 @@ A few observations:
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /test-assertions.mdx "APIResponseAssertions"
+[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
 [Browser]: /api/class-browser.mdx "Browser"
 [BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
 [BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
@@ -988,18 +989,18 @@ A few observations:
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
 [Keyboard]: /api/class-keyboard.mdx "Keyboard"
 [Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /test-assertions.mdx "LocatorAssertions"
+[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
 [Logger]: /api/class-logger.mdx "Logger"
 [Mouse]: /api/class-mouse.mdx "Mouse"
 [Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /test-assertions.mdx "PageAssertions"
+[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
 [Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /test-assertions.mdx "PlaywrightAssertions"
+[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
-[ScreenshotAssertions]: /test-assertions.mdx "ScreenshotAssertions"
 [Selectors]: /api/class-selectors.mdx "Selectors"
+[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
@@ -1044,6 +1045,7 @@ A few observations:
 [Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
 [RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"

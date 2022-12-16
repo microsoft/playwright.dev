@@ -6,6 +6,7 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+
 [Download] objects are dispatched by page via the [page.on('download')](/api/class-page.mdx#page-event-download) event.
 
 All the downloaded files belonging to the browser context are deleted when the browser context is closed.
@@ -13,103 +14,169 @@ All the downloaded files belonging to the browser context are deleted when the b
 Download event is emitted once the download starts. Download path becomes available once download completes:
 
 ```js
-// Note that Promise.all prevents a race condition
-// between clicking and waiting for the download.
-const [ download ] = await Promise.all([
-  // It is important to call waitForEvent before click to set up waiting.
-  page.waitForEvent('download'),
-  // Triggers the download.
-  page.getByText('Download file').click(),
-]);
-// wait for download to complete
-const path = await download.path();
+// Start waiting for download before clicking. Note no await.
+const downloadPromise = page.waitForEvent('download');
+await page.getByText('Download file').click();
+const download = await downloadPromise;
+
+// Wait for the download process to complete.
+console.log(await download.path());
 ```
 
 
-- [download.cancel()](/api/class-download.mdx#download-cancel)
-- [download.createReadStream()](/api/class-download.mdx#download-create-read-stream)
-- [download.delete()](/api/class-download.mdx#download-delete)
-- [download.failure()](/api/class-download.mdx#download-failure)
-- [download.page()](/api/class-download.mdx#download-page)
-- [download.path()](/api/class-download.mdx#download-path)
-- [download.saveAs(path)](/api/class-download.mdx#download-save-as)
-- [download.suggestedFilename()](/api/class-download.mdx#download-suggested-filename)
-- [download.url()](/api/class-download.mdx#download-url)
+---
 
-## download.cancel() {#download-cancel}
+## Methods
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.13</font>
+### cancel {#download-cancel}
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-cancel-return"/> &#60;[Promise]<[void]>&#62;<a href="#download-cancel-return" class="list-anchor">#</a>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.13</font><span style={{visibility: 'hidden'}}>download.cancel</span>
 
 Cancels a download. Will not fail if the download is already finished or canceled. Upon successful cancellations, `download.failure()` would resolve to `'canceled'`.
 
-## download.createReadStream() {#download-create-read-stream}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+```js
+await download.cancel();
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-create-read-stream-return"/> &#60;[Promise]<[null]|[Readable]>&#62;<a href="#download-create-read-stream-return" class="list-anchor">#</a>
+---
+
+### createReadStream {#download-create-read-stream}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>download.createReadStream</span>
 
 Returns readable stream for current download or `null` if download failed.
 
-## download.delete() {#download-delete}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+```js
+await download.createReadStream();
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-delete-return"/> &#60;[Promise]<[void]>&#62;<a href="#download-delete-return" class="list-anchor">#</a>
+**Returns**
+- [Promise]<[null]|[Readable]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-create-read-stream-return"/><a href="#download-create-read-stream-return" class="list-anchor">#</a>
+
+---
+
+### delete {#download-delete}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>download.delete</span>
 
 Deletes the downloaded file. Will wait for the download to finish if necessary.
 
-## download.failure() {#download-failure}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+```js
+await download.delete();
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-failure-return"/> &#60;[Promise]<[null]|[string]>&#62;<a href="#download-failure-return" class="list-anchor">#</a>
+---
+
+### failure {#download-failure}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>download.failure</span>
 
 Returns download error if any. Will wait for the download to finish if necessary.
 
-## download.page() {#download-page}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font>
+```js
+await download.failure();
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-page-return"/> &#60;[Page]&#62;<a href="#download-page-return" class="list-anchor">#</a>
+**Returns**
+- [Promise]<[null]|[string]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-failure-return"/><a href="#download-failure-return" class="list-anchor">#</a>
+
+---
+
+### page {#download-page}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><span style={{visibility: 'hidden'}}>download.page</span>
 
 Get the page that the download belongs to.
 
-## download.path() {#download-path}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+```js
+download.page();
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-path-return"/> &#60;[Promise]<[null]|[string]>&#62;<a href="#download-path-return" class="list-anchor">#</a>
+**Returns**
+- [Page]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-page-return"/><a href="#download-page-return" class="list-anchor">#</a>
+
+---
+
+### path {#download-path}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>download.path</span>
 
 Returns path to the downloaded file in case of successful download. The method will wait for the download to finish if necessary. The method throws when connected remotely.
 
 Note that the download's file name is a random GUID, use [download.suggestedFilename()](/api/class-download.mdx#download-suggested-filename) to get suggested file name.
 
-## download.saveAs(path) {#download-save-as}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+```js
+await download.path();
+```
 
-- `path`<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-save-as-option-path"/> &#60;[string]&#62; Path where the download should be copied.<a href="#download-save-as-option-path" class="list-anchor">#</a>
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-save-as-return"/> &#60;[Promise]<[void]>&#62;<a href="#download-save-as-return" class="list-anchor">#</a>
+**Returns**
+- [Promise]<[null]|[string]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-path-return"/><a href="#download-path-return" class="list-anchor">#</a>
+
+---
+
+### saveAs {#download-save-as}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>download.saveAs</span>
 
 Copy the download to a user-specified path. It is safe to call this method while the download is still in progress. Will wait for the download to finish if necessary.
 
-## download.suggestedFilename() {#download-suggested-filename}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+```js
+await download.saveAs(path);
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-suggested-filename-return"/> &#60;[string]&#62;<a href="#download-suggested-filename-return" class="list-anchor">#</a>
+**Arguments**
+- `path` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-save-as-option-path"/><a href="#download-save-as-option-path" class="list-anchor">#</a>
+  
+  Path where the download should be copied.
+
+---
+
+### suggestedFilename {#download-suggested-filename}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>download.suggestedFilename</span>
 
 Returns suggested filename for this download. It is typically computed by the browser from the [`Content-Disposition`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Content-Disposition) response header or the `download` attribute. See the spec on [whatwg](https://html.spec.whatwg.org/#downloading-resources). Different browsers can use different logic for computing it.
 
-## download.url() {#download-url}
+**Usage**
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font>
+```js
+download.suggestedFilename();
+```
 
-- returns:<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-url-return"/> &#60;[string]&#62;<a href="#download-url-return" class="list-anchor">#</a>
+**Returns**
+- [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-suggested-filename-return"/><a href="#download-suggested-filename-return" class="list-anchor">#</a>
+
+---
+
+### url {#download-url}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><span style={{visibility: 'hidden'}}>download.url</span>
 
 Returns downloaded url.
+
+**Usage**
+
+```js
+download.url();
+```
+
+**Returns**
+- [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-url-return"/><a href="#download-url-return" class="list-anchor">#</a>
+
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
@@ -120,7 +187,7 @@ Returns downloaded url.
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /test-assertions.mdx "APIResponseAssertions"
+[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
 [Browser]: /api/class-browser.mdx "Browser"
 [BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
 [BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
@@ -139,18 +206,18 @@ Returns downloaded url.
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
 [Keyboard]: /api/class-keyboard.mdx "Keyboard"
 [Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /test-assertions.mdx "LocatorAssertions"
+[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
 [Logger]: /api/class-logger.mdx "Logger"
 [Mouse]: /api/class-mouse.mdx "Mouse"
 [Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /test-assertions.mdx "PageAssertions"
+[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
 [Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /test-assertions.mdx "PlaywrightAssertions"
+[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
-[ScreenshotAssertions]: /test-assertions.mdx "ScreenshotAssertions"
 [Selectors]: /api/class-selectors.mdx "Selectors"
+[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
@@ -195,6 +262,7 @@ Returns downloaded url.
 [Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
 [RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"

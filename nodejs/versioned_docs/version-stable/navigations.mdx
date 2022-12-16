@@ -31,7 +31,7 @@ Navigations can be initiated by changing the URL bar, reloading the page or goin
 
 ### Auto-wait
 
-Navigating to a URL auto-waits for the page to fire the `load` event. If the page does a client-side redirect before `load`, [page.goto(url[, options])](/api/class-page.mdx#page-goto) will auto-wait for the redirected page to fire the `load` event.
+Navigating to a URL auto-waits for the page to fire the `load` event. If the page does a client-side redirect before `load`, [page.goto()](/api/class-page.mdx#page-goto) will auto-wait for the redirected page to fire the `load` event.
 
 ```js
 // Navigate the page
@@ -49,7 +49,7 @@ await page.goto('https://example.com', { waitUntil: 'networkidle' });
 
 ### Wait for element
 
-In lazy-loaded pages, it can be useful to wait until an element is visible with [locator.waitFor([options])](/api/class-locator.mdx#locator-wait-for). Alternatively, page interactions like [page.click(selector[, options])](/api/class-page.mdx#page-click) auto-wait for elements.
+In lazy-loaded pages, it can be useful to wait until an element is visible with [locator.waitFor()](/api/class-locator.mdx#locator-wait-for). Alternatively, page interactions like [page.click()](/api/class-page.mdx#page-click) auto-wait for elements.
 
 ```js
 // Navigate and wait for element
@@ -64,11 +64,11 @@ await page.getByText('Example Domain').click();
 
 ## Scenarios initiated by page interaction
 
-In the scenarios below, [locator.click([options])](/api/class-locator.mdx#locator-click) initiates a navigation and then waits for the navigation to complete.
+In the scenarios below, [locator.click()](/api/class-locator.mdx#locator-click) initiates a navigation and then waits for the navigation to complete.
 
 ### Auto-wait
 
-By default, [locator.click([options])](/api/class-locator.mdx#locator-click) will wait for the navigation step to complete. This can be combined with a page interaction on the navigated page which would auto-wait for an element.
+By default, [locator.click()](/api/class-locator.mdx#locator-click) will wait for the navigation step to complete. This can be combined with a page interaction on the navigated page which would auto-wait for an element.
 
 ```js
 // Click will auto-wait for navigation to complete
@@ -80,7 +80,7 @@ await page.getByLabel('User Name').fill('John Doe');
 
 ### Custom wait
 
-`locator.click` can be combined with [page.waitForLoadState([state, options])](/api/class-page.mdx#page-wait-for-load-state) to wait for a loading event.
+`locator.click` can be combined with [page.waitForLoadState()](/api/class-page.mdx#page-wait-for-load-state) to wait for a loading event.
 
 ```js
 await page.getByRole('button').click(); // Click triggers navigation
@@ -89,7 +89,7 @@ await page.waitForLoadState('networkidle'); // This resolves after 'networkidle'
 
 ### Wait for element
 
-In lazy-loaded pages, it can be useful to wait until an element is visible with [locator.waitFor([options])](/api/class-locator.mdx#locator-wait-for). Alternatively, page interactions like [locator.click([options])](/api/class-locator.mdx#locator-click) auto-wait for elements.
+In lazy-loaded pages, it can be useful to wait until an element is visible with [locator.waitFor()](/api/class-locator.mdx#locator-wait-for). Alternatively, page interactions like [locator.click()](/api/class-locator.mdx#locator-click) auto-wait for elements.
 
 ```js
 // Click will auto-wait for the element and trigger navigation
@@ -105,58 +105,47 @@ await page.getByLabel('User Name').fill('John Doe');
 
 ### Asynchronous navigation
 
-Clicking an element could trigger asynchronous processing before initiating the navigation. In these cases, it is recommended to explicitly call [page.waitForNavigation([options])](/api/class-page.mdx#page-wait-for-navigation). For example:
+Clicking an element could trigger asynchronous processing before initiating the navigation. In these cases, it is recommended to explicitly call [page.waitForNavigation()](/api/class-page.mdx#page-wait-for-navigation). For example:
 * Navigation is triggered from a `setTimeout`
 * Page waits for network requests before navigation
 
 ```js
-// Note that Promise.all prevents a race condition
-// between clicking and waiting for a navigation.
-await Promise.all([
-  // Waits for the next navigation.
-  // It is important to call waitForNavigation before click to set up waiting.
-  page.waitForNavigation(),
-  // Triggers a navigation after a timeout.
-  page.locator('div.delayed-navigation').click(),
-]);
+// Start waiting for navigation before clicking. Note no await.
+const navigationPromise = page.waitForNavigation();
+await page.getByText('Navigate after timeout').click();
+await navigationPromise;
 ```
 
 ### Multiple navigations
 
-Clicking an element could trigger multiple navigations. In these cases, it is recommended to explicitly [page.waitForNavigation([options])](/api/class-page.mdx#page-wait-for-navigation) to a specific url. For example:
+Clicking an element could trigger multiple navigations. In these cases, it is recommended to explicitly [page.waitForNavigation()](/api/class-page.mdx#page-wait-for-navigation) to a specific url. For example:
 * Client-side redirects issued after the `load` event
 * Multiple pushes to history state
 
 ```js
-// Note that Promise.all prevents a race condition
-// between clicking and waiting for a navigation.
-await Promise.all([
-  // It is important to call waitForNavigation before click to set up waiting.
-  page.waitForNavigation({ url: '**/login' }),
-  // Triggers a navigation with a script redirect.
-  page.getByText('Click me').click(),
-]);
+// Start waiting for navigation before clicking. Note no await.
+const navigationPromise = page.waitForNavigation({ url: '**/login' });
+// This action triggers the navigation with a script redirect.
+await page.getByText('Click me').click();
+await navigationPromise;
 ```
 
 ### Loading a popup
 
-When popup is opened, explicitly calling [page.waitForLoadState([state, options])](/api/class-page.mdx#page-wait-for-load-state) ensures that popup is loaded to the desired state.
+When popup is opened, explicitly calling [page.waitForLoadState()](/api/class-page.mdx#page-wait-for-load-state) ensures that popup is loaded to the desired state.
 
 ```js
-// Note that Promise.all prevents a race condition
-// between clicking and waiting for the popup.
-const [ popup ] = await Promise.all([
-  // It is important to call waitForEvent before click to set up waiting.
-  page.waitForEvent('popup'),
-  // Opens popup.
-  page.locator('a[target="_blank"]').click(),
-]);
+// Start waiting for popup before clicking. Note no await.
+const popupPromise = page.waitForEvent('popup');
+await page.getByText('Open popup').click();
+const popup = await popupPromise;
+// Wait for the popup to load.
 await popup.waitForLoadState('load');
 ```
 
 ## Advanced patterns
 
-For pages that have complicated loading patterns, [page.waitForFunction(pageFunction[, arg, options])](/api/class-page.mdx#page-wait-for-function) is a powerful and extensible approach to define a custom wait criteria.
+For pages that have complicated loading patterns, [page.waitForFunction()](/api/class-page.mdx#page-wait-for-function) is a powerful and extensible approach to define a custom wait criteria.
 
 ```js
 await page.goto('http://example.com');
@@ -175,7 +164,7 @@ await page.screenshot();
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /test-assertions.mdx "APIResponseAssertions"
+[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
 [Browser]: /api/class-browser.mdx "Browser"
 [BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
 [BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
@@ -194,18 +183,18 @@ await page.screenshot();
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
 [Keyboard]: /api/class-keyboard.mdx "Keyboard"
 [Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /test-assertions.mdx "LocatorAssertions"
+[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
 [Logger]: /api/class-logger.mdx "Logger"
 [Mouse]: /api/class-mouse.mdx "Mouse"
 [Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /test-assertions.mdx "PageAssertions"
+[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
 [Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /test-assertions.mdx "PlaywrightAssertions"
+[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
-[ScreenshotAssertions]: /test-assertions.mdx "ScreenshotAssertions"
 [Selectors]: /api/class-selectors.mdx "Selectors"
+[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
@@ -250,6 +239,7 @@ await page.screenshot();
 [Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
 [RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
