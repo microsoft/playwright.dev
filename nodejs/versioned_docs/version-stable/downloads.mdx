@@ -8,7 +8,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 For every attachment downloaded by the page, [page.on('download')](/api/class-page.mdx#page-event-download) event is emitted. All these attachments are downloaded into a temporary folder. You can obtain the download url, file system path and payload stream using the [Download] object from the event.
 
-You can specify where to persist downloaded files using the `downloadsPath` option in [browserType.launch([options])](/api/class-browsertype.mdx#browser-type-launch).
+You can specify where to persist downloaded files using the `downloadsPath` option in [browserType.launch()](/api/class-browsertype.mdx#browser-type-launch).
 
 :::note
 Downloaded files are deleted when the browser context that produced them is closed.
@@ -17,12 +17,10 @@ Downloaded files are deleted when the browser context that produced them is clos
 Here is the simplest way to handle the file download:
 
 ```js
-const [ download ] = await Promise.all([
-  // Start waiting for the download
-  page.waitForEvent('download'),
-  // Perform the action that initiates download
-  page.locator('button#delayed-download').click(),
-]);
+// Start waiting for download before clicking. Note no await.
+const downloadPromise = page.waitForEvent('download');
+await page.getByText('Download file').click();
+const download = await downloadPromise;
 // Wait for the download process to complete
 console.log(await download.path());
 // Save downloaded file somewhere
@@ -53,7 +51,7 @@ For uploading files, see the [uploading files](./input.mdx#upload-files) section
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
-[APIResponseAssertions]: /test-assertions.mdx "APIResponseAssertions"
+[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
 [Browser]: /api/class-browser.mdx "Browser"
 [BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
 [BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
@@ -72,18 +70,18 @@ For uploading files, see the [uploading files](./input.mdx#upload-files) section
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
 [Keyboard]: /api/class-keyboard.mdx "Keyboard"
 [Locator]: /api/class-locator.mdx "Locator"
-[LocatorAssertions]: /test-assertions.mdx "LocatorAssertions"
+[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
 [Logger]: /api/class-logger.mdx "Logger"
 [Mouse]: /api/class-mouse.mdx "Mouse"
 [Page]: /api/class-page.mdx "Page"
-[PageAssertions]: /test-assertions.mdx "PageAssertions"
+[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
 [Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /test-assertions.mdx "PlaywrightAssertions"
+[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
-[ScreenshotAssertions]: /test-assertions.mdx "ScreenshotAssertions"
 [Selectors]: /api/class-selectors.mdx "Selectors"
+[SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
@@ -128,6 +126,7 @@ For uploading files, see the [uploading files](./input.mdx#upload-files) section
 [Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
 [Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
 [Readable]: https://nodejs.org/api/stream.html#stream_class_stream_readable "Readable"
+[ReadStream]: https://nodejs.org/api/fs.html#class-fsreadstream "ReadStream"
 [RegExp]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/RegExp "RegExp"
 [string]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#String_type "string"
 [void]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/undefined "void"
