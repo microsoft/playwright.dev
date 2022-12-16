@@ -420,25 +420,29 @@ Consider the following DOM structure where we want to click on the buy button of
 
 <HTMLCard>
 <div>
-<div role="listitem">
-  <h3>Product 1</h3>
-  <button>Add to cart</button>
-</div>
-<div role="listitem">
-  <h3>Product 2</h3>
-  <button>Add to cart</button>
-</div>
+<ul>
+  <li>
+    <h3>Product 1</h3>
+    <button>Add to cart</button>
+  </li>
+  <li>
+    <h3>Product 2</h3>
+    <button>Add to cart</button>
+  </li>
+</ul>
 </div>
 
 ```html
-<div role="listitem">
-  <h3>Product 1</h3>
-  <button>Add to cart</button>
-</div>
-<div role="listitem">
-  <h3>Product 2</h3>
-  <button>Add to cart</button>
-</div>
+<ul>
+  <li>
+    <h3>Product 1</h3>
+    <button>Add to cart</button>
+  </li>
+  <li>
+    <h3>Product 2</h3>
+    <button>Add to cart</button>
+  </li>
+</ul>
 ```
 </HTMLCard>
 
@@ -450,7 +454,7 @@ Locators can be filtered by text with the [Locator.Filter()](/api/class-locator.
 await page
     .GetByRole(AriaRole.Listitem)
     .Filter(new() { HasText = "Product 2" })
-    .GetByRole(AriaRole.Button, new () { Name = "Add to cart" })
+    .GetByRole(AriaRole.Button, new() { Name = "Add to cart" })
     .ClickAsync();
 ```
 
@@ -460,7 +464,7 @@ Use a regular expression:
 await page
     .GetByRole(AriaRole.Listitem)
     .Filter(new() { HasTextRegex = new Regex("Product 2") })
-    .GetByRole(AriaRole.Button, new () { Name = "Add to cart" })
+    .GetByRole(AriaRole.Button, new() { Name = "Add to cart" })
     .ClickAsync();
 ```
 
@@ -470,25 +474,29 @@ Locators support an option to only select elements that have a descendant matchi
 
 <HTMLCard>
 <div>
-<div role="listitem">
-  <h3>Product 1</h3>
-  <button>Add to cart</button>
-</div>
-<div role="listitem">
-  <h3>Product 2</h3>
-  <button>Add to cart</button>
-</div>
+<ul>
+  <li>
+    <h3>Product 1</h3>
+    <button>Add to cart</button>
+  </li>
+  <li>
+    <h3>Product 2</h3>
+    <button>Add to cart</button>
+  </li>
+</ul>
 </div>
 
 ```html
-<div role="listitem">
-  <h3>Product 1</h3>
-  <button>Add to cart</button>
-</div>
-<div role="listitem">
-  <h3>Product 2</h3>
-  <button>Add to cart</button>
-</div>
+<ul>
+  <li>
+    <h3>Product 1</h3>
+    <button>Add to cart</button>
+  </li>
+  <li>
+    <h3>Product 2</h3>
+    <button>Add to cart</button>
+  </li>
+</ul>
 ```
 </HTMLCard>
 
@@ -496,11 +504,11 @@ Locators support an option to only select elements that have a descendant matchi
 await page
     .GetByRole(AriaRole.Listitem)
     .Filter(new() {
-        Has = page.GetByRole(AriaRole.Heading, new () {
+        Has = page.GetByRole(AriaRole.Heading, new() {
             Name = "Product 2"
         })
     })
-    .GetByRole(AriaRole.Button, new () { Name = "Add to cart" })
+    .GetByRole(AriaRole.Button, new() { Name = "Add to cart" })
     .ClickAsync();
 ```
 
@@ -510,7 +518,7 @@ We can also assert the product card to make sure there is only one
 await Expect(page
     .GetByRole(AriaRole.Listitem)
     .Filter(new() {
-        Has = page.GetByRole(AriaRole.Heading, new () { Name = "Product 2" })
+        Has = page.GetByRole(AriaRole.Heading, new() { Name = "Product 2" })
     })
     .toHaveCountAsync(1);
 ```
@@ -789,14 +797,16 @@ You should now have a "screenshot.png" file in your project's root directory.
 
 ### Rare use cases
 
-#### Get All text contents
+#### Do something with each element in the list
+
+Iterate elements:
 
 ```csharp
-var rows = page.GetByRole(AriaRole.Listitem);
-var texts = await rows.AllTextContentsAsync();
+foreach (var row in await page.GetByRole(AriaRole.Listitem).AllAsync())
+  Console.WriteLine(await row.TextContentAsync());
 ```
 
-#### Do something with each element in the list
+Iterate using regular for loop:
 
 ```csharp
 var rows = page.GetByRole(AriaRole.Listitem);
