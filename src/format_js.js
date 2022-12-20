@@ -56,14 +56,15 @@ class JavaScriptFormatter {
       link = `${prefix}${name}`;
     }
 
+    let signatures;
     if (member.kind === 'method') {
       args = member.argsArray;
-      const signatures = renderJSSignatures(args);
+      signatures = renderJSSignatures(args);
       usages = signatures.map(signature => `${member.async ? 'await ' : ''}${prefix}${name}(${signature});`);
       link = `${prefix}${name}()`;
     }
 
-    return [{ name, link, usages, args }];
+    return [{ name, link, usages, args, signatures }];
   }
 
   formatArgumentName(name) {

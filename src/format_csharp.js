@@ -52,9 +52,10 @@ class CSharpFormatter {
       name = `event ${name}`;
     }
 
+    let signatures;
     if (member.kind === 'method' ) {
       args = member.argsArray.slice();
-      const signatures = renderSharpSignatures(args);
+      signatures = renderSharpSignatures(args);
       let isGetter = !args.length && !member.async && !!member.type;
       if (member.name.startsWith('as'))
         isGetter = false;
@@ -82,7 +83,7 @@ class CSharpFormatter {
       }
     }
 
-    return [{ name, link, usages, args }];
+    return [{ name, link, usages, args, signatures }];
   }
 
   formatArgumentName(name) {
