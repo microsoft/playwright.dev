@@ -17,6 +17,15 @@ const ambassadors = [
     websiteUrl: 'https://linktr.ee/charlyautomatiza'
   },
   {
+    name: 'Cory House',
+    languages: 'English',
+    city: 'Kansas City',
+    country: 'USA',
+    githubUrl: 'https://github.com/coryhouse',
+    twitterUrl: 'https://twitter.com/housecor',
+    websiteUrl: 'https://www.reactjsconsulting.com/'
+  },
+  {
     name: 'Giovanni Rago',
     languages: 'Italian, English',
     city: 'Berlin',
@@ -41,6 +50,15 @@ const ambassadors = [
     country: 'New Zealand',
     imageUrl:
       'https://media-exp1.licdn.com/dms/image/D5603AQH1F3BopdVGqg/profile-displayphoto-shrink_800_800/0/1668150346704?e=1674086400&v=beta&t=6SVXlLAGbnofEwdPOMSno3RBWGnu3L5ruF686FhOopU'
+  },
+  {
+    name: 'Kent C Dodds',
+    languages: 'English',
+    city: 'Utah',
+    country: 'USA',
+    githubUrl: 'https://github.com/kentcdodds',
+    twitterUrl: 'https://twitter.com/kentcdodds',
+    websiteUrl: 'https://kentcdodds.com'
   },
   {
     name: 'Stefan Judis',

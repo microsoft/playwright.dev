@@ -16,14 +16,6 @@ const team = [
     githubUrl: 'https://github.com/mxschmitt',
     twitterUrl: 'https://twitter.com/maxibanki',
     linkedInUrl: 'https://www.linkedin.com/in/max-schmitt/'
-  },
-  {
-    name: 'Ross Wollman',
-    languages: 'English',
-    city: 'San Francisco',
-    country: 'USA',
-    githubUrl: 'https://github.com/rwoll',
-    twitterUrl: 'https://twitter.com/rwoll_dev'
   }
 ];
 
