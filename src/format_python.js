@@ -55,10 +55,11 @@ class PythonFormatter {
       link = `${prefix}${name}`;
     }
 
+    let signatures;
     if (member.kind === 'method') {
       for (const arg of member.argsArray)
         args.push(...expandPythonOptions(arg));
-      const signatures = renderPythonSignatures(args);
+      signatures = renderPythonSignatures(args);
       let isGetter = !args.length && !member.async && !!member.type;
       if (member.name.startsWith('is') || member.name.startsWith('as'))
         isGetter = false;
@@ -66,7 +67,7 @@ class PythonFormatter {
       link = `${prefix}${name}${isGetter ? '' : '()'}`;
     }
 
-    return [{ name, link, usages, args }];
+    return [{ name, link, usages, args, signatures }];
   }
 
   formatArgumentName(name) {

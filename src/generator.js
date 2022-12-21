@@ -56,7 +56,7 @@ function rewriteContent(text) {
 
 /**
  * @typedef {{
- *   formatMember: function(docs.Member): { name: string, link: string, usages: string[], args: docs.Member[] }[],
+ *   formatMember: function(docs.Member): { name: string, link: string, usages: string[], args: docs.Member[], signatures?: string[] }[],
  *   formatArgumentName: function(string): string,
  *   formatTemplate: function(string): string,
  *   formatFunction: function(string, string, docs.Type): string,
@@ -182,9 +182,27 @@ import HTMLCard from '@site/src/components/HTMLCard';
     /** @type {MarkdownNode[]} */
     const result = [];
     let section = '';
+
+    const memberNames = new Set();
+    const membersWithOverloads = new Set();
+    for (const member of clazz.membersArray) {
+      for (const { name } of this.formatter.formatMember(member)) {
+        if (memberNames.has(name))
+          membersWithOverloads.add(name);
+        memberNames.add(name);
+      }
+    }
+
     for (const member of clazz.membersArray) {
       // Iterate members
-      for (const { name, usages, args } of this.formatter.formatMember(member)) {
+      for (const { name: memberName, usages, args, signatures } of this.formatter.formatMember(member)) {
+        let name = memberName;
+        // Use test. prefix for test.* members for readability.
+        if (membersWithOverloads.has(name) && signatures)
+          name = `${name}(${signatures[0]})`;
+        if (clazz.varName === 'test')
+          name = `test.${name}`;
+
         result.push({
           type: 'text',
           text: '---'
