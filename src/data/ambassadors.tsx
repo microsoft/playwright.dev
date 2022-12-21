@@ -52,7 +52,7 @@ const ambassadors = [
       'https://media-exp1.licdn.com/dms/image/D5603AQH1F3BopdVGqg/profile-displayphoto-shrink_800_800/0/1668150346704?e=1674086400&v=beta&t=6SVXlLAGbnofEwdPOMSno3RBWGnu3L5ruF686FhOopU'
   },
   {
-    name: 'Kent C Dodds',
+    name: 'Kent C. Dodds',
     languages: 'English',
     city: 'Utah',
     country: 'USA',
