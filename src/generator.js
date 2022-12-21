@@ -149,9 +149,6 @@ class Generator {
 id: class-${clazz.name.toLowerCase()}
 title: "${rewriteClassTitle(clazz.name, this.lang) || clazz.name}"
 ---
-import Tabs from '@theme/Tabs';
-import TabItem from '@theme/TabItem';
-import HTMLCard from '@site/src/components/HTMLCard';
 `});
     result.push(...this.formatComment(clazz.spec));
     result.push({
