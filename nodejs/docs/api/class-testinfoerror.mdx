@@ -1,98 +1,67 @@
 ---
-id: class-selectors
-title: "Selectors"
+id: class-testinfoerror
+title: "TestInfoError"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
 
-Selectors can be used to install custom selector engines. See [extensibility](../extensibility.mdx) for more information.
+Information about an error thrown during test execution.
 
 
 ---
 
-## Methods
+## Properties
 
-### register {#selectors-register}
+### message {#test-info-error-message}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>selectors.register</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testInfoError.message</x-search>
+
+Error message. Set when [Error] (or its subclass) has been thrown.
 
 **Usage**
 
-An example of registering selector engine that queries elements based on a tag name:
-
 ```js
-const { selectors, firefox } = require('playwright');  // Or 'chromium' or 'webkit'.
-
-(async () => {
-  // Must be a function that evaluates to a selector engine instance.
-  const createTagNameEngine = () => ({
-    // Returns the first element matching given selector in the root's subtree.
-    query(root, selector) {
-      return root.querySelector(selector);
-    },
-
-    // Returns all elements matching given selector in the root's subtree.
-    queryAll(root, selector) {
-      return Array.from(root.querySelectorAll(selector));
-    }
-  });
-
-  // Register the engine. Selectors will be prefixed with "tag=".
-  await selectors.register('tag', createTagNameEngine);
-
-  const browser = await firefox.launch();
-  const page = await browser.newPage();
-  await page.setContent(`<div><button>Click me</button></div>`);
-
-  // Use the selector prefixed with its name.
-  const button = page.locator('tag=button');
-  // Combine it with other selector engines.
-  await page.locator('tag=div >> text="Click me"').click();
-  // Can use it in any methods supporting selectors.
-  const buttonCount = await page.locator('tag=button').count();
-
-  await browser.close();
-})();
+testInfoError.message
 ```
 
-**Arguments**
-- `name` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="selectors-register-option-name"/><a href="#selectors-register-option-name" class="list-anchor">#</a>
-  
-  Name that is used in selectors as a prefix, e.g. `{name: 'foo'}` enables `foo=myselectorbody` selectors. May only contain `[a-zA-Z0-9_]` characters.
-- `script` [function]|[string]|[Object]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="selectors-register-option-script"/><a href="#selectors-register-option-script" class="list-anchor">#</a>
-  - `path` [string] *(optional)*
-    
-    Path to the JavaScript file. If `path` is a relative path, then it is resolved relative to the current working directory. Optional.
-  - `content` [string] *(optional)*
-    
-    Raw script content. Optional.
-  
-  Script that evaluates to a selector engine instance. The script is evaluated in the page context.
-- `options` [Object] *(optional)*
-  - `contentScript` [boolean] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="selectors-register-option-content-script"/><a href="#selectors-register-option-content-script" class="list-anchor">#</a>
-    
-    Whether to run this selector engine in isolated JavaScript environment. This environment has access to the same DOM, but not any JavaScript objects from the frame's scripts. Defaults to `false`. Note that running as a content script is not guaranteed when this engine is used together with other registered engines.
+**Type**
+- [string]
 
 ---
 
-### setTestIdAttribute {#selectors-set-test-id-attribute}
+### stack {#test-info-error-stack}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>selectors.setTestIdAttribute</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testInfoError.stack</x-search>
 
-Defines custom attribute name to be used in [page.getByTestId()](/api/class-page.mdx#page-get-by-test-id). `data-testid` is used by default.
+Error stack. Set when [Error] (or its subclass) has been thrown.
 
 **Usage**
 
 ```js
-selectors.setTestIdAttribute(attributeName);
+testInfoError.stack
 ```
 
-**Arguments**
-- `attributeName` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="selectors-set-test-id-attribute-option-attribute-name"/><a href="#selectors-set-test-id-attribute-option-attribute-name" class="list-anchor">#</a>
-  
-  Test id attribute name.
+**Type**
+- [string]
+
+---
+
+### value {#test-info-error-value}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testInfoError.value</x-search>
+
+The value that was thrown. Set when anything except the [Error] (or its subclass) has been thrown.
+
+**Usage**
+
+```js
+testInfoError.value
+```
+
+**Type**
+- [string]
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
