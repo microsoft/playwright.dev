@@ -23,6 +23,7 @@ Perform HTTP Authentication.
 <TabItem value="ts">
 
 ```js
+import type { PlaywrightTestConfig } from '@playwright/test';
 const config: PlaywrightTestConfig = {
   use: {
     httpCredentials: {
@@ -30,7 +31,8 @@ const config: PlaywrightTestConfig = {
       password: 'pa55w0rd',
     }
   }
-}
+};
+export default config;
 ```
 
 </TabItem>
@@ -58,6 +60,33 @@ You can optionally specify username and password for HTTP(S) proxy, you can also
 
 Here is an example of a global proxy:
 
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'Library', value: 'library'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import type { PlaywrightTestConfig } from '@playwright/test';
+const config: PlaywrightTestConfig = {
+  use: {
+    proxy: {
+      server: 'http://myproxy.com:3128',
+      username: 'usr',
+      password: 'pwd'
+    }
+  }
+};
+export default config;
+```
+
+</TabItem>
+<TabItem value="library">
+
 ```js
 const browser = await chromium.launch({
   proxy: {
@@ -68,7 +97,39 @@ const browser = await chromium.launch({
 });
 ```
 
+</TabItem>
+</Tabs>
+
 When specifying proxy for each context individually, **Chromium on Windows** needs a hint that proxy will be set. This is done via passing a non-empty proxy server to the browser itself. Here is an example of a context-specific proxy:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'Library', value: 'library'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import type { PlaywrightTestConfig } from '@playwright/test';
+const config: PlaywrightTestConfig = {
+  use: {
+    launchOptions: {
+      // Browser proxy option is required for Chromium on Windows.
+      proxy: { server: 'per-context' }
+    },
+    proxy: {
+      server: 'http://myproxy.com:3128',
+    }
+  }
+};
+export default config;
+```
+
+</TabItem>
+<TabItem value="library">
 
 ```js
 const browser = await chromium.launch({
@@ -80,26 +141,19 @@ const context = await browser.newContext({
 })
 ```
 
+</TabItem>
+</Tabs>
+
 ## Network events
 
 You can monitor all the [Request]s and [Response]s:
 
 ```js
-const { chromium, webkit, firefox } = require('playwright');
+// Subscribe to 'request' and 'response' events.
+page.on('request', request => console.log('>>', request.method(), request.url()));
+page.on('response', response => console.log('<<', response.status(), response.url()));
 
-(async () => {
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
-
-  // Subscribe to 'request' and 'response' events.
-  page.on('request', request =>
-      console.log('>>', request.method(), request.url()));
-  page.on('response', response =>
-      console.log('<<', response.status(), response.url()));
-  await page.goto('https://example.com');
-
-  await browser.close();
-})();
+await page.goto('https://example.com');
 ```
 
 Or wait for a network response after the button click with [page.waitForResponse()](/api/class-page.mdx#page-wait-for-response):
@@ -158,11 +212,11 @@ await page.goto('https://example.com');
 await page.route('**/*', route => {
   const headers = route.request().headers();
   delete headers['X-Secret'];
-  route.continue({headers});
+  route.continue({ headers });
 });
 
 // Continue requests as POST.
-await page.route('**/*', route => route.continue({method: 'POST'}));
+await page.route('**/*', route => route.continue({ method: 'POST' }));
 ```
 
 You can continue requests with modifications. Example above removes an HTTP header from the outgoing requests.
