@@ -32,8 +32,8 @@ module.exports = {
 
     {
       type: 'link',
-      label: 'Join our Community Slack',
-      href: 'https://aka.ms/playwright-slack'
+      label: 'Join our Community Discord',
+      href: 'https://aka.ms/playwright/discord'
     }
   ]
 };

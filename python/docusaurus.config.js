@@ -143,8 +143,8 @@ module.exports = {
               href: "https://stackoverflow.com/questions/tagged/playwright",
             },
             {
-              label: "Slack",
-              href: "https://aka.ms/playwright-slack",
+              label: "Discord",
+              href: "https://aka.ms/playwright/discord",
             },
             {
               label: "Twitter",
