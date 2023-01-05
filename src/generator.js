@@ -232,15 +232,42 @@ import HTMLCard from '@site/src/components/HTMLCard';
           throw new Error(`Header ${name} needs to have an explicit ID`)
         memberNode.text = `${name} {#${this.heading2ExplicitId.get(member)}}`;
 
+        const sections = {
+          /** @type {MarkdownNode[]} */
+          version: [],
+          /** @type {MarkdownNode[]} */
+          deprecation: [],
+          /** @type {MarkdownNode[]} */
+          description: [],
+          /** @type {MarkdownNode[]} */
+          details: [],
+          /** @type {MarkdownNode[]} */
+          usage: [],
+          /** @type {MarkdownNode[]} */
+          arguments: [],
+          /** @type {MarkdownNode[]} */
+          return: [],
+        };
+        let currentSection = sections.description;
+        for (const node of member.spec) {
+          if (node.text === '**Details**')
+            currentSection = sections.details;
+          else if (node.text === '**Usage**')
+            currentSection = sections.usage;
+          currentSection.push(node);
+        }
+
+
+        // Generate version.
         const expressionNameForSearch = `<x-search>${clazz.varName}.${name}</x-search>`
-        // Append version.
-        memberNode.children.push({
+        sections.version.push({
           type: 'text',
           text: `<font size="2" style={{position: "relative", top: "-20px"}}>Added in: ${member.since}</font>${expressionNameForSearch}`
         });
 
+        // Generate deprecations.
         if (member.deprecated) {
-          memberNode.children.push({
+          sections.deprecation.push({
             type: 'text',
             text: `:::caution
 
@@ -252,7 +279,7 @@ ${this.documentation.renderLinksInText(member.deprecated)}
         }
 
         if (member.discouraged) {
-          memberNode.children.push({
+          sections.deprecation.push({
             type: 'text',
             text: `:::caution
 
@@ -263,42 +290,33 @@ ${this.documentation.renderLinksInText(member.discouraged)}
           });
         }
 
-        // Render documentation, push Details section to the end.
-        const details = member.spec.find(n => n.text === '**Details**');
-        if (details) {
-          const i = member.spec.indexOf(details);
-          memberNode.children.push(...this.formatComment(member.spec.slice(0, i)));
-        } else {
-          memberNode.children.push(...this.formatComment(member.spec));
-        }
-
-        // Usage.
-        if (!member.spec.find(n => n.text === '**Usage**')) {
-          memberNode.children.push({
+        // Generate usage.
+        if (!sections.usage.length) {
+          sections.usage.push({
             type: 'text',
             text: `**Usage**`,
           });
-          memberNode.children.push({
+          sections.usage.push({
             type: 'code',
             codeLang: this.lang,
             lines: usages,
           });
         }
 
-        // Arguments.
+        // Generate arguments.
         if (args.length) {
-          memberNode.children.push({
+          sections.arguments.push({
             type: 'text',
             text: `**Arguments**`,
           });
 
-          memberNode.children.push(...args.map(a => {
+          sections.arguments.push(...args.map(a => {
             let name = this.formatter.formatArgumentName(a.alias);
             return this.renderProperty(name, a, a.spec, 'in', false, !a.required);
           }));
         }
 
-        // Return type.
+        // Generate return type.
         if (member.type && member.type.name !== 'void') {
           let name;
           switch (member.kind) {
@@ -307,19 +325,21 @@ ${this.documentation.renderLinksInText(member.discouraged)}
             case 'method': name = 'Returns'; break;
           }
 
-          memberNode.children.push({
+          sections.return.push({
             type: 'text',
             text: '**' + name + '**',
           });
 
-          memberNode.children.push(this.renderProperty('', member, undefined, 'out', member.async));
+          sections.return.push(this.renderProperty('', member, undefined, 'out', member.async));
         }
 
-        // Details
-        if (details) {
-          const i = member.spec.indexOf(details);
-          memberNode.children.push(...this.formatComment(member.spec.slice(i)));
-        }
+        memberNode.children.push(...this.formatComment(sections.version));
+        memberNode.children.push(...this.formatComment(sections.deprecation));
+        memberNode.children.push(...this.formatComment(sections.description));
+        memberNode.children.push(...this.formatComment(sections.usage));
+        memberNode.children.push(...this.formatComment(sections.arguments));
+        memberNode.children.push(...this.formatComment(sections.return));
+        memberNode.children.push(...this.formatComment(sections.details));
 
         result.push(memberNode);
       }
@@ -469,7 +489,7 @@ import HTMLCard from '@site/src/components/HTMLCard';`);
     for (const member of clazz.membersArray)
       this.createMemberLink(member);
   }
-  
+
   /**
    * @param {string} name
    * @param {docs.Member} member
