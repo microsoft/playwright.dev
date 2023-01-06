@@ -159,8 +159,10 @@ import HTMLCard from '@site/src/components/HTMLCard';
       text: ''
     });
     clazz.membersArray.sort((m1, m2) => {
-      const k1 = (m1.deprecated || m1.discouraged ? 'z_' : '') + m1.kind + toSnakeCase(m1.alias.replace(/\$\$eval/, '$$eval2'));
-      const k2 = (m2.deprecated || m2.discouraged ? 'z_' : '') + m2.kind + toSnakeCase(m2.alias.replace(/\$\$eval/, '$$eval2'));
+      let { key: k1 } = memberSection(m1);
+      let { key: k2 } = memberSection(m2);
+      k1 += toSnakeCase(m1.alias.replace(/\$\$eval/, '$$eval2'));
+      k2 += toSnakeCase(m2.alias.replace(/\$\$eval/, '$$eval2'));
       return k1.localeCompare(k2);
     });
     this.visitClassToc(clazz);
@@ -181,7 +183,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
   formatClassMembers(clazz) {
     /** @type {MarkdownNode[]} */
     const result = [];
-    let section = '';
+    let memberSectionTitle = '';
 
     const memberNames = new Set();
     const membersWithOverloads = new Set();
@@ -208,20 +210,12 @@ import HTMLCard from '@site/src/components/HTMLCard';
           text: '---'
         });
 
-        const type = (member.deprecated || member.discouraged) ? 'deprecated' : member.kind;
-        if (type !== section) {
-          section = type;
-          let title = '';
-          if (member.kind === 'event')
-            title = 'Events';
-          if (member.kind === 'method')
-            title = (member.deprecated || member.discouraged) ? 'Deprecated' : 'Methods';
-          if (member.kind === 'property')
-            title = 'Properties';
-
+        const section = memberSection(member);
+        if (section.title !== memberSectionTitle) {
+          memberSectionTitle = section.title;
           result.push({
             type: 'h2',
-            text: title,
+            text: section.title,
             children: [],
           });
         }
@@ -686,6 +680,21 @@ function writeFileSyncCached(file, content) {
     return;
   fileWriteCache.set(file, contentHash);
   fs.writeFileSync(file, content);
+}
+
+/**
+ * @param {docs.Member} member
+ */
+function memberSection(member) {
+  if (member.deprecated || member.discouraged)
+    return { key: 'd', title: 'Deprecated' };
+  if (member.kind === 'event')
+    return { key: 'a', title: 'Events' };
+  if (member.kind === 'method')
+    return { key: 'b', title: 'Methods' };
+  if (member.kind === 'property')
+    return { key: 'c', title: 'Properties' };
+  throw new Error(`Unsupported member kind ${member.kind} for ${member.name}`);
 }
 
 module.exports = { Generator, toTitleCase, toSnakeCase, renderJSSignatures };
