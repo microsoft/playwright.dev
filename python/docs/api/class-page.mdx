@@ -830,70 +830,6 @@ page.expect_file_chooser(**kwargs)
 
 ---
 
-### expect_navigation {#page-wait-for-navigation}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.expect_navigation</x-search>
-
-Waits for the main frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
-
-**Usage**
-
-This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-with page.expect_navigation():
-    # This action triggers the navigation after a timeout.
-    page.get_by_text("Navigate after timeout").click()
-# Resolves after navigation has finished
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-async with page.expect_navigation():
-    # This action triggers the navigation after a timeout.
-    await page.get_by_text("Navigate after timeout").click()
-# Resolves after navigation has finished
-```
-
-</TabItem>
-</Tabs>
-
-:::note
-Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
-:::
-
-**Arguments**
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-timeout"/><a href="#page-wait-for-navigation-option-timeout" class="list-anchor">#</a>
-  
-  Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.set_default_navigation_timeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-- `url` [str]|[Pattern]|[Callable]\[[URL]\]:[bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-url"/><a href="#page-wait-for-navigation-option-url" class="list-anchor">#</a>
-  
-  A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
-- `wait_until` "load"|"domcontentloaded"|"networkidle"|"commit" *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-wait-until"/><a href="#page-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
-  
-  When to consider operation succeeded, defaults to `load`. Events can be either:
-  * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
-  * `'load'` - consider operation to be finished when the `load` event is fired.
-  * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
-  * `'commit'` - consider operation to be finished when network response is received and the document started loading.
-
-**Returns**
-- [EventContextManager]\[[Response]\]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-return"/><a href="#page-wait-for-navigation-return" class="list-anchor">#</a>
-
----
-
 ### expect_popup {#page-wait-for-popup}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.expect_popup</x-search>
@@ -1467,18 +1403,39 @@ page.frames
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.get_by_alt_text</x-search>
 
-Allows locating elements by their alt text. For example, this method will find the image by alt text "Castle":
-
-```html
-<img alt='Castle'>
-```
+Allows locating elements by their alt text.
 
 **Usage**
 
-```python
-page.get_by_alt_text(text)
-page.get_by_alt_text(text, **kwargs)
+For example, this method will find the image by alt text "Playwright logo":
+
+```html
+<img alt='Playwright logo'>
 ```
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.get_by_alt_text("Playwright logo").click()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.get_by_alt_text("Playwright logo").click()
+```
+
+</TabItem>
+</Tabs>
 
 **Arguments**
 - `text` [str]|[Pattern]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-alt-text-option-text"/><a href="#page-get-by-alt-text-option-text" class="list-anchor">#</a>
@@ -1497,19 +1454,40 @@ page.get_by_alt_text(text, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.get_by_label</x-search>
 
-Allows locating input elements by the text of the associated label. For example, this method will find the input by label text "Password" in the following DOM:
+Allows locating input elements by the text of the associated label.
+
+**Usage**
+
+For example, this method will find the input by label text "Password" in the following DOM:
 
 ```html
 <label for="password-input">Password:</label>
 <input id="password-input">
 ```
 
-**Usage**
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
-```python
-page.get_by_label(text)
-page.get_by_label(text, **kwargs)
+```py
+page.get_by_label("Password").fill("secret")
 ```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.get_by_label("Password").fill("secret")
+```
+
+</TabItem>
+</Tabs>
 
 **Arguments**
 - `text` [str]|[Pattern]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-label-option-text"/><a href="#page-get-by-label-option-text" class="list-anchor">#</a>
@@ -1528,18 +1506,41 @@ page.get_by_label(text, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.get_by_placeholder</x-search>
 
-Allows locating input elements by the placeholder text. For example, this method will find the input by placeholder "Country":
-
-```html
-<input placeholder="Country">
-```
+Allows locating input elements by the placeholder text.
 
 **Usage**
 
-```python
-page.get_by_placeholder(text)
-page.get_by_placeholder(text, **kwargs)
+For example, consider the following DOM structure.
+
+```html
+<input type="email" placeholder="name@example.com" />
 ```
+
+You can fill the input after locating it by the placeholder text:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.get_by_placeholder("name@example.com").fill("playwright@microsoft.com")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.get_by_placeholder("name@example.com").fill("playwright@microsoft.com")
+```
+
+</TabItem>
+</Tabs>
 
 **Arguments**
 - `text` [str]|[Pattern]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-placeholder-option-text"/><a href="#page-get-by-placeholder-option-text" class="list-anchor">#</a>
@@ -1558,16 +1559,54 @@ page.get_by_placeholder(text, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.get_by_role</x-search>
 
-Allows locating elements by their [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name). Note that role selector **does not replace** accessibility audits and conformance tests, but rather gives early feedback about the ARIA guidelines.
-
-Note that many html elements have an implicitly [defined role](https://w3c.github.io/html-aam/#html-element-role-mappings) that is recognized by the role selector. You can find all the [supported roles here](https://www.w3.org/TR/wai-aria-1.2/#role_definitions). ARIA guidelines **do not recommend** duplicating implicit roles and attributes by setting `role` and/or `aria-*` attributes to default values.
+Allows locating elements by their [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name).
 
 **Usage**
 
-```python
-page.get_by_role(role)
-page.get_by_role(role, **kwargs)
+Consider the following DOM structure.
+
+```html
+<h3>Sign up</h3>
+<label>
+  <input type="checkbox" /> Subscribe
+</label>
+<br/>
+<button>Submit</button>
 ```
+
+You can locate each element by it's implicit role:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+expect(page.get_by_role("heading", name="Sign up")).to_be_visible()
+
+page.get_by_role("checkbox", name="Subscribe").check()
+
+page.get_by_role("button", name=re.compile("submit", re.IGNORECASE)).click()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await expect(page.get_by_role("heading", name="Sign up")).to_be_visible()
+
+await page.get_by_role("checkbox", name="Subscribe").check()
+
+await page.get_by_role("button", name=re.compile("submit", re.IGNORECASE)).click()
+```
+
+</TabItem>
+</Tabs>
 
 **Arguments**
 - `role` "alert"|"alertdialog"|"application"|"article"|"banner"|"blockquote"|"button"|"caption"|"cell"|"checkbox"|"code"|"columnheader"|"combobox"|"complementary"|"contentinfo"|"definition"|"deletion"|"dialog"|"directory"|"document"|"emphasis"|"feed"|"figure"|"form"|"generic"|"grid"|"gridcell"|"group"|"heading"|"img"|"insertion"|"link"|"list"|"listbox"|"listitem"|"log"|"main"|"marquee"|"math"|"meter"|"menu"|"menubar"|"menuitem"|"menuitemcheckbox"|"menuitemradio"|"navigation"|"none"|"note"|"option"|"paragraph"|"presentation"|"progressbar"|"radio"|"radiogroup"|"region"|"row"|"rowgroup"|"rowheader"|"scrollbar"|"search"|"searchbox"|"separator"|"slider"|"spinbutton"|"status"|"strong"|"subscript"|"superscript"|"switch"|"tab"|"table"|"tablist"|"tabpanel"|"term"|"textbox"|"time"|"timer"|"toolbar"|"tooltip"|"tree"|"treegrid"|"treeitem"<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-role-option-role"/><a href="#page-get-by-role-option-role" class="list-anchor">#</a>
@@ -1623,19 +1662,53 @@ page.get_by_role(role, **kwargs)
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-role-return"/><a href="#page-get-by-role-return" class="list-anchor">#</a>
 
+**Details**
+
+Role selector **does not replace** accessibility audits and conformance tests, but rather gives early feedback about the ARIA guidelines.
+
+Many html elements have an implicitly [defined role](https://w3c.github.io/html-aam/#html-element-role-mappings) that is recognized by the role selector. You can find all the [supported roles here](https://www.w3.org/TR/wai-aria-1.2/#role_definitions). ARIA guidelines **do not recommend** duplicating implicit roles and attributes by setting `role` and/or `aria-*` attributes to default values.
+
 ---
 
 ### get_by_test_id {#page-get-by-test-id}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.get_by_test_id</x-search>
 
-Locate element by the test id. By default, the `data-testid` attribute is used as a test id. Use [selectors.set_test_id_attribute()](/api/class-selectors.mdx#selectors-set-test-id-attribute) to configure a different test id attribute if necessary.
+Locate element by the test id.
 
 **Usage**
 
-```python
-page.get_by_test_id(test_id)
+Consider the following DOM structure.
+
+```html
+<button data-testid="directions">Itinéraire</button>
 ```
+
+You can locate the element by it's test id:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.get_by_test_id("directions").click()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.get_by_test_id("directions").click()
+```
+
+</TabItem>
+</Tabs>
 
 **Arguments**
 - `test_id` [str]|[Pattern]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-test-id-option-test-id"/><a href="#page-get-by-test-id-option-test-id" class="list-anchor">#</a>
@@ -1645,13 +1718,23 @@ page.get_by_test_id(test_id)
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-test-id-return"/><a href="#page-get-by-test-id-return" class="list-anchor">#</a>
 
+**Details**
+
+By default, the `data-testid` attribute is used as a test id. Use [selectors.set_test_id_attribute()](/api/class-selectors.mdx#selectors-set-test-id-attribute) to configure a different test id attribute if necessary.
+
 ---
 
 ### get_by_text {#page-get-by-text}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.get_by_text</x-search>
 
-Allows locating elements that contain given text. Consider the following DOM structure:
+Allows locating elements that contain given text.
+
+See also [locator.filter()](/api/class-locator.mdx#locator-filter) that allows to match by another criteria, like an accessible role, and then filter by the text content.
+
+**Usage**
+
+Consider the following DOM structure:
 
 ```html
 <div>Hello <span>world</span></div>
@@ -1710,23 +1793,6 @@ page.get_by_text(re.compile("^hello$", re.IGNORECASE))
 </TabItem>
 </Tabs>
 
-See also [locator.filter()](/api/class-locator.mdx#locator-filter) that allows to match by another criteria, like an accessible role, and then filter by the text content.
-
-:::note
-Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
-:::
-
-:::note
-Input elements of the type `button` and `submit` are matched by their `value` instead of the text content. For example, locating by text `"Log in"` matches `<input type=button value="Log in">`.
-:::
-
-**Usage**
-
-```python
-page.get_by_text(text)
-page.get_by_text(text, **kwargs)
-```
-
 **Arguments**
 - `text` [str]|[Pattern]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-text-option-text"/><a href="#page-get-by-text-option-text" class="list-anchor">#</a>
   
@@ -1738,24 +1804,53 @@ page.get_by_text(text, **kwargs)
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-text-return"/><a href="#page-get-by-text-return" class="list-anchor">#</a>
 
+**Details**
+
+Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
+
+Input elements of the type `button` and `submit` are matched by their `value` instead of the text content. For example, locating by text `"Log in"` matches `<input type=button value="Log in">`.
+
 ---
 
 ### get_by_title {#page-get-by-title}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.get_by_title</x-search>
 
-Allows locating elements by their title. For example, this method will find the button by its title "Place the order":
-
-```html
-<button title='Place the order'>Order Now</button>
-```
+Allows locating elements by their title attribute.
 
 **Usage**
 
-```python
-page.get_by_title(text)
-page.get_by_title(text, **kwargs)
+Consider the following DOM structure.
+
+```html
+<span title='Issues count'>25 issues</span>
 ```
+
+You can check the issues count after locating it by the title text:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+expect(page.get_by_title("Issues count")).to_have_text("25 issues")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await expect(page.get_by_title("Issues count")).to_have_text("25 issues")
+```
+
+</TabItem>
+</Tabs>
 
 **Arguments**
 - `text` [str]|[Pattern]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-title-option-text"/><a href="#page-get-by-title-option-text" class="list-anchor">#</a>
@@ -4072,6 +4167,77 @@ div_counts = await page.eval_on_selector_all("div", "(divs, min) => divs.length 
 
 **Returns**
 - [Serializable]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-eval-on-selector-all-return"/><a href="#page-eval-on-selector-all-return" class="list-anchor">#</a>
+
+---
+
+### expect_navigation {#page-wait-for-navigation}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.expect_navigation</x-search>
+
+:::caution
+
+This method is inherently racy, please use [page.wait_for_url()](/api/class-page.mdx#page-wait-for-url) instead.
+
+:::
+
+
+Waits for the main frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
+
+**Usage**
+
+This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+with page.expect_navigation():
+    # This action triggers the navigation after a timeout.
+    page.get_by_text("Navigate after timeout").click()
+# Resolves after navigation has finished
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+async with page.expect_navigation():
+    # This action triggers the navigation after a timeout.
+    await page.get_by_text("Navigate after timeout").click()
+# Resolves after navigation has finished
+```
+
+</TabItem>
+</Tabs>
+
+:::note
+Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::
+
+**Arguments**
+- `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-timeout"/><a href="#page-wait-for-navigation-option-timeout" class="list-anchor">#</a>
+  
+  Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.set_default_navigation_timeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+- `url` [str]|[Pattern]|[Callable]\[[URL]\]:[bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-url"/><a href="#page-wait-for-navigation-option-url" class="list-anchor">#</a>
+  
+  A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
+- `wait_until` "load"|"domcontentloaded"|"networkidle"|"commit" *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-wait-until"/><a href="#page-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
+  
+  When to consider operation succeeded, defaults to `load`. Events can be either:
+  * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+  * `'load'` - consider operation to be finished when the `load` event is fired.
+  * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+  * `'commit'` - consider operation to be finished when network response is received and the document started loading.
+
+**Returns**
+- [EventContextManager]\[[Response]\]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-return"/><a href="#page-wait-for-navigation-return" class="list-anchor">#</a>
 
 ---
 
