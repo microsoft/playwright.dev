@@ -634,17 +634,18 @@ page.frames();
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.getByAltText</x-search>
 
-Allows locating elements by their alt text. For example, this method will find the image by alt text "Castle":
-
-```html
-<img alt='Castle'>
-```
+Allows locating elements by their alt text.
 
 **Usage**
 
+For example, this method will find the image by alt text "Playwright logo":
+
+```html
+<img alt='Playwright logo'>
+```
+
 ```js
-page.getByAltText(text);
-page.getByAltText(text, options);
+await page.getByAltText('Playwright logo').click();
 ```
 
 **Arguments**
@@ -665,18 +666,19 @@ page.getByAltText(text, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.getByLabel</x-search>
 
-Allows locating input elements by the text of the associated label. For example, this method will find the input by label text "Password" in the following DOM:
+Allows locating input elements by the text of the associated label.
+
+**Usage**
+
+For example, this method will find the input by label text "Password" in the following DOM:
 
 ```html
 <label for="password-input">Password:</label>
 <input id="password-input">
 ```
 
-**Usage**
-
 ```js
-page.getByLabel(text);
-page.getByLabel(text, options);
+await page.getByLabel('Password').fill('secret');
 ```
 
 **Arguments**
@@ -697,17 +699,22 @@ page.getByLabel(text, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.getByPlaceholder</x-search>
 
-Allows locating input elements by the placeholder text. For example, this method will find the input by placeholder "Country":
-
-```html
-<input placeholder="Country">
-```
+Allows locating input elements by the placeholder text.
 
 **Usage**
 
+For example, consider the following DOM structure.
+
+```html
+<input type="email" placeholder="name@example.com" />
+```
+
+You can fill the input after locating it by the placeholder text:
+
 ```js
-page.getByPlaceholder(text);
-page.getByPlaceholder(text, options);
+await page
+    .getByPlaceholder("name@example.com")
+    .fill("playwright@microsoft.com");
 ```
 
 **Arguments**
@@ -728,15 +735,29 @@ page.getByPlaceholder(text, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.getByRole</x-search>
 
-Allows locating elements by their [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name). Note that role selector **does not replace** accessibility audits and conformance tests, but rather gives early feedback about the ARIA guidelines.
-
-Note that many html elements have an implicitly [defined role](https://w3c.github.io/html-aam/#html-element-role-mappings) that is recognized by the role selector. You can find all the [supported roles here](https://www.w3.org/TR/wai-aria-1.2/#role_definitions). ARIA guidelines **do not recommend** duplicating implicit roles and attributes by setting `role` and/or `aria-*` attributes to default values.
+Allows locating elements by their [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name).
 
 **Usage**
 
+Consider the following DOM structure.
+
+```html
+<h3>Sign up</h3>
+<label>
+  <input type="checkbox" /> Subscribe
+</label>
+<br/>
+<button>Submit</button>
+```
+
+You can locate each element by it's implicit role:
+
 ```js
-page.getByRole(role);
-page.getByRole(role, options);
+await expect(page.getByRole('heading', { name: 'Sign up' })).toBeVisible();
+
+await page.getByRole('checkbox', { name: 'Subscribe' }).check();
+
+await page.getByRole('button', { name: /submit/i }).click();
 ```
 
 **Arguments**
@@ -794,25 +815,32 @@ page.getByRole(role, options);
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-role-return"/><a href="#page-get-by-role-return" class="list-anchor">#</a>
 
+**Details**
+
+Role selector **does not replace** accessibility audits and conformance tests, but rather gives early feedback about the ARIA guidelines.
+
+Many html elements have an implicitly [defined role](https://w3c.github.io/html-aam/#html-element-role-mappings) that is recognized by the role selector. You can find all the [supported roles here](https://www.w3.org/TR/wai-aria-1.2/#role_definitions). ARIA guidelines **do not recommend** duplicating implicit roles and attributes by setting `role` and/or `aria-*` attributes to default values.
+
 ---
 
 ### getByTestId {#page-get-by-test-id}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.getByTestId</x-search>
 
-Locate element by the test id. By default, the `data-testid` attribute is used as a test id. Use [selectors.setTestIdAttribute()](/api/class-selectors.mdx#selectors-set-test-id-attribute) to configure a different test id attribute if necessary.
-
-```js
-// Set custom test id attribute from @playwright/test config:
-use: {
-  testIdAttribute: 'data-pw'
-}
-```
+Locate element by the test id.
 
 **Usage**
 
+Consider the following DOM structure.
+
+```html
+<button data-testid="directions">Itinéraire</button>
+```
+
+You can locate the element by it's test id:
+
 ```js
-page.getByTestId(testId);
+await page.getByTestId('directions').click();
 ```
 
 **Arguments**
@@ -823,13 +851,30 @@ page.getByTestId(testId);
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-test-id-return"/><a href="#page-get-by-test-id-return" class="list-anchor">#</a>
 
+**Details**
+
+By default, the `data-testid` attribute is used as a test id. Use [selectors.setTestIdAttribute()](/api/class-selectors.mdx#selectors-set-test-id-attribute) to configure a different test id attribute if necessary.
+
+```js
+// Set custom test id attribute from @playwright/test config:
+use: {
+  testIdAttribute: 'data-pw'
+}
+```
+
 ---
 
 ### getByText {#page-get-by-text}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.getByText</x-search>
 
-Allows locating elements that contain given text. Consider the following DOM structure:
+Allows locating elements that contain given text.
+
+See also [locator.filter()](/api/class-locator.mdx#locator-filter) that allows to match by another criteria, like an accessible role, and then filter by the text content.
+
+**Usage**
+
+Consider the following DOM structure:
 
 ```html
 <div>Hello <span>world</span></div>
@@ -855,23 +900,6 @@ page.getByText(/Hello/)
 page.getByText(/^hello$/i)
 ```
 
-See also [locator.filter()](/api/class-locator.mdx#locator-filter) that allows to match by another criteria, like an accessible role, and then filter by the text content.
-
-:::note
-Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
-:::
-
-:::note
-Input elements of the type `button` and `submit` are matched by their `value` instead of the text content. For example, locating by text `"Log in"` matches `<input type=button value="Log in">`.
-:::
-
-**Usage**
-
-```js
-page.getByText(text);
-page.getByText(text, options);
-```
-
 **Arguments**
 - `text` [string]|[RegExp]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-text-option-text"/><a href="#page-get-by-text-option-text" class="list-anchor">#</a>
   
@@ -884,23 +912,32 @@ page.getByText(text, options);
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-text-return"/><a href="#page-get-by-text-return" class="list-anchor">#</a>
 
+**Details**
+
+Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
+
+Input elements of the type `button` and `submit` are matched by their `value` instead of the text content. For example, locating by text `"Log in"` matches `<input type=button value="Log in">`.
+
 ---
 
 ### getByTitle {#page-get-by-title}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.getByTitle</x-search>
 
-Allows locating elements by their title. For example, this method will find the button by its title "Place the order":
-
-```html
-<button title='Place the order'>Order Now</button>
-```
+Allows locating elements by their title attribute.
 
 **Usage**
 
+Consider the following DOM structure.
+
+```html
+<span title='Issues count'>25 issues</span>
+```
+
+You can check the issues count after locating it by the title text:
+
 ```js
-page.getByTitle(text);
-page.getByTitle(text, options);
+await expect(page.getByTitle('Issues count')).toHaveText('25 issues');
 ```
 
 **Arguments**
@@ -1816,48 +1853,6 @@ console.log(await popup.title()); // Popup is ready to use.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-load-state-option-timeout"/><a href="#page-wait-for-load-state-option-timeout" class="list-anchor">#</a>
     
     Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-
----
-
-### waitForNavigation {#page-wait-for-navigation}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.waitForNavigation</x-search>
-
-Waits for the main frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
-
-**Usage**
-
-This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
-
-```js
-// Start waiting for navigation before clicking. Note no await.
-const navigationPromise = page.waitForNavigation();
-await page.getByText('Navigate after timeout').click();
-await navigationPromise;
-```
-
-:::note
-Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
-:::
-
-**Arguments**
-- `options` [Object] *(optional)*
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-timeout"/><a href="#page-wait-for-navigation-option-timeout" class="list-anchor">#</a>
-    
-    Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-  - `url` [string]|[RegExp]|[function]\([URL]\):[boolean] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-url"/><a href="#page-wait-for-navigation-option-url" class="list-anchor">#</a>
-    
-    A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
-  - `waitUntil` "load"|"domcontentloaded"|"networkidle"|"commit" *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-wait-until"/><a href="#page-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
-    
-    When to consider operation succeeded, defaults to `load`. Events can be either:
-    * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
-    * `'load'` - consider operation to be finished when the `load` event is fired.
-    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
-    * `'commit'` - consider operation to be finished when network response is received and the document started loading.
-
-**Returns**
-- [Promise]<[null]|[Response]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-return"/><a href="#page-wait-for-navigation-return" class="list-anchor">#</a>
 
 ---
 
@@ -3934,6 +3929,55 @@ await page.uncheck(selector, options);
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
+---
+
+### waitForNavigation {#page-wait-for-navigation}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.waitForNavigation</x-search>
+
+:::caution
+
+This method is inherently racy, please use [page.waitForURL()](/api/class-page.mdx#page-wait-for-url) instead.
+
+:::
+
+
+Waits for the main frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
+
+**Usage**
+
+This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
+
+```js
+// Start waiting for navigation before clicking. Note no await.
+const navigationPromise = page.waitForNavigation();
+await page.getByText('Navigate after timeout').click();
+await navigationPromise;
+```
+
+:::note
+Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::
+
+**Arguments**
+- `options` [Object] *(optional)*
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-timeout"/><a href="#page-wait-for-navigation-option-timeout" class="list-anchor">#</a>
+    
+    Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  - `url` [string]|[RegExp]|[function]\([URL]\):[boolean] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-url"/><a href="#page-wait-for-navigation-option-url" class="list-anchor">#</a>
+    
+    A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
+  - `waitUntil` "load"|"domcontentloaded"|"networkidle"|"commit" *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-wait-until"/><a href="#page-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
+    
+    When to consider operation succeeded, defaults to `load`. Events can be either:
+    * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+    * `'load'` - consider operation to be finished when the `load` event is fired.
+    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+    * `'commit'` - consider operation to be finished when network response is received and the document started loading.
+
+**Returns**
+- [Promise]<[null]|[Response]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-return"/><a href="#page-wait-for-navigation-return" class="list-anchor">#</a>
+
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
@@ -3988,6 +4032,7 @@ await page.uncheck(selector, options);
 [TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
 [TestOptions]: /api/class-testoptions.mdx "TestOptions"
 [TestProject]: /api/class-testproject.mdx "TestProject"
+[TestStore]: /api/class-teststore.mdx "TestStore"
 [WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
 [Location]: /api/class-location.mdx "Location"
 [Reporter]: /api/class-reporter.mdx "Reporter"

@@ -665,16 +665,18 @@ Page.Frames
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.GetByAltText</x-search>
 
-Allows locating elements by their alt text. For example, this method will find the image by alt text "Castle":
-
-```html
-<img alt='Castle'>
-```
+Allows locating elements by their alt text.
 
 **Usage**
 
+For example, this method will find the image by alt text "Playwright logo":
+
+```html
+<img alt='Playwright logo'>
+```
+
 ```csharp
-Page.GetByAltText(text, options);
+await page.GetByAltText("Playwright logo").ClickAsync();
 ```
 
 **Arguments**
@@ -695,17 +697,19 @@ Page.GetByAltText(text, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.GetByLabel</x-search>
 
-Allows locating input elements by the text of the associated label. For example, this method will find the input by label text "Password" in the following DOM:
+Allows locating input elements by the text of the associated label.
+
+**Usage**
+
+For example, this method will find the input by label text "Password" in the following DOM:
 
 ```html
 <label for="password-input">Password:</label>
 <input id="password-input">
 ```
 
-**Usage**
-
 ```csharp
-Page.GetByLabel(text, options);
+await page.GetByLabel("Password").FillAsync("secret");
 ```
 
 **Arguments**
@@ -726,16 +730,22 @@ Page.GetByLabel(text, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.GetByPlaceholder</x-search>
 
-Allows locating input elements by the placeholder text. For example, this method will find the input by placeholder "Country":
-
-```html
-<input placeholder="Country">
-```
+Allows locating input elements by the placeholder text.
 
 **Usage**
 
+For example, consider the following DOM structure.
+
+```html
+<input type="email" placeholder="name@example.com" />
+```
+
+You can fill the input after locating it by the placeholder text:
+
 ```csharp
-Page.GetByPlaceholder(text, options);
+await page
+    .GetByPlaceholder("name@example.com")
+    .FillAsync("playwright@microsoft.com");
 ```
 
 **Arguments**
@@ -756,14 +766,37 @@ Page.GetByPlaceholder(text, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.GetByRole</x-search>
 
-Allows locating elements by their [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name). Note that role selector **does not replace** accessibility audits and conformance tests, but rather gives early feedback about the ARIA guidelines.
-
-Note that many html elements have an implicitly [defined role](https://w3c.github.io/html-aam/#html-element-role-mappings) that is recognized by the role selector. You can find all the [supported roles here](https://www.w3.org/TR/wai-aria-1.2/#role_definitions). ARIA guidelines **do not recommend** duplicating implicit roles and attributes by setting `role` and/or `aria-*` attributes to default values.
+Allows locating elements by their [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name).
 
 **Usage**
 
+Consider the following DOM structure.
+
+```html
+<h3>Sign up</h3>
+<label>
+  <input type="checkbox" /> Subscribe
+</label>
+<br/>
+<button>Submit</button>
+```
+
+You can locate each element by it's implicit role:
+
 ```csharp
-Page.GetByRole(role, options);
+await Expect(page
+    .GetByRole(AriaRole.Heading, new() { Name = "Sign up" }))
+    .ToBeVisibleAsync();
+
+await page
+    .GetByRole(AriaRole.Checkbox, new() { Name = "Subscribe" })
+    .CheckAsync();
+
+await page
+    .GetByRole(AriaRole.Button, new() {
+        NameRegex = new Regex("submit", RegexOptions.IgnoreCase)
+    })
+    .ClickAsync();
 ```
 
 **Arguments**
@@ -821,18 +854,32 @@ Page.GetByRole(role, options);
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-role-return"/><a href="#page-get-by-role-return" class="list-anchor">#</a>
 
+**Details**
+
+Role selector **does not replace** accessibility audits and conformance tests, but rather gives early feedback about the ARIA guidelines.
+
+Many html elements have an implicitly [defined role](https://w3c.github.io/html-aam/#html-element-role-mappings) that is recognized by the role selector. You can find all the [supported roles here](https://www.w3.org/TR/wai-aria-1.2/#role_definitions). ARIA guidelines **do not recommend** duplicating implicit roles and attributes by setting `role` and/or `aria-*` attributes to default values.
+
 ---
 
 ### GetByTestId {#page-get-by-test-id}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.GetByTestId</x-search>
 
-Locate element by the test id. By default, the `data-testid` attribute is used as a test id. Use [Selectors.SetTestIdAttribute()](/api/class-selectors.mdx#selectors-set-test-id-attribute) to configure a different test id attribute if necessary.
+Locate element by the test id.
 
 **Usage**
 
+Consider the following DOM structure.
+
+```html
+<button data-testid="directions">Itinéraire</button>
+```
+
+You can locate the element by it's test id:
+
 ```csharp
-Page.GetByTestId(testId);
+await page.GetByTestId("directions").ClickAsync();
 ```
 
 **Arguments**
@@ -843,13 +890,23 @@ Page.GetByTestId(testId);
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-test-id-return"/><a href="#page-get-by-test-id-return" class="list-anchor">#</a>
 
+**Details**
+
+By default, the `data-testid` attribute is used as a test id. Use [Selectors.SetTestIdAttribute()](/api/class-selectors.mdx#selectors-set-test-id-attribute) to configure a different test id attribute if necessary.
+
 ---
 
 ### GetByText {#page-get-by-text}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.GetByText</x-search>
 
-Allows locating elements that contain given text. Consider the following DOM structure:
+Allows locating elements that contain given text.
+
+See also [Locator.Filter()](/api/class-locator.mdx#locator-filter) that allows to match by another criteria, like an accessible role, and then filter by the text content.
+
+**Usage**
+
+Consider the following DOM structure:
 
 ```html
 <div>Hello <span>world</span></div>
@@ -875,22 +932,6 @@ page.GetByText(new Regex("Hello"))
 page.GetByText(new Regex("^hello$", RegexOptions.IgnoreCase))
 ```
 
-See also [Locator.Filter()](/api/class-locator.mdx#locator-filter) that allows to match by another criteria, like an accessible role, and then filter by the text content.
-
-:::note
-Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
-:::
-
-:::note
-Input elements of the type `button` and `submit` are matched by their `value` instead of the text content. For example, locating by text `"Log in"` matches `<input type=button value="Log in">`.
-:::
-
-**Usage**
-
-```csharp
-Page.GetByText(text, options);
-```
-
 **Arguments**
 - `text` [string]|[Regex]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-text-option-text"/><a href="#page-get-by-text-option-text" class="list-anchor">#</a>
   
@@ -903,22 +944,32 @@ Page.GetByText(text, options);
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-text-return"/><a href="#page-get-by-text-return" class="list-anchor">#</a>
 
+**Details**
+
+Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
+
+Input elements of the type `button` and `submit` are matched by their `value` instead of the text content. For example, locating by text `"Log in"` matches `<input type=button value="Log in">`.
+
 ---
 
 ### GetByTitle {#page-get-by-title}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.GetByTitle</x-search>
 
-Allows locating elements by their title. For example, this method will find the button by its title "Place the order":
-
-```html
-<button title='Place the order'>Order Now</button>
-```
+Allows locating elements by their title attribute.
 
 **Usage**
 
+Consider the following DOM structure.
+
+```html
+<span title='Issues count'>25 issues</span>
+```
+
+You can check the issues count after locating it by the title text:
+
 ```csharp
-Page.GetByTitle(text, options);
+await Expect(page.GetByTitle("Issues count")).toHaveText("25 issues");
 ```
 
 **Arguments**
@@ -1555,88 +1606,6 @@ await Page.WaitForFileChooserAsync(action, options);
 
 **Returns**
 - [FileChooser]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-file-chooser-return"/><a href="#page-wait-for-file-chooser-return" class="list-anchor">#</a>
-
----
-
-### RunAndWaitForNavigationAsync {#page-wait-for-navigation}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.RunAndWaitForNavigationAsync</x-search>
-
-Waits for the main frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
-
-**Usage**
-
-This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
-
-```csharp
-await page.RunAndWaitForNavigationAsync(async () =>
-{
-    // This action triggers the navigation after a timeout.
-    await page.GetByText("Navigate after timeout").ClickAsync();
-});
-
-// The method continues after navigation has finished
-```
-
-:::note
-Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
-:::
-
-**Arguments**
-- `options` `PageRunAndWaitForNavigationOptions?` *(optional)*
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-timeout"/><a href="#page-wait-for-navigation-option-timeout" class="list-anchor">#</a>
-    
-    Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [Page.SetDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-  - `Url|UrlRegex|UrlFunc` [string]?|[Regex]?|[Func]<[string]?, bool> *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-url-url-regex-url-func"/><a href="#page-wait-for-navigation-option-url-url-regex-url-func" class="list-anchor">#</a>
-    
-    A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
-  - `WaitUntil` `enum WaitUntilState { Load, Domcontentloaded, Networkidle, Commit }?` *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-wait-until"/><a href="#page-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
-    
-    When to consider operation succeeded, defaults to `load`. Events can be either:
-    * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
-    * `'load'` - consider operation to be finished when the `load` event is fired.
-    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
-    * `'commit'` - consider operation to be finished when network response is received and the document started loading.
-- `action` [Func]<[Task]> <font size="2">Added in: v1.12</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-action"/><a href="#page-wait-for-navigation-option-action" class="list-anchor">#</a>
-  
-  Action that triggers the event.
-
-**Returns**
-- [Response]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-return"/><a href="#page-wait-for-navigation-return" class="list-anchor">#</a>
-
----
-
-### WaitForNavigationAsync {#page-wait-for-navigation}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.WaitForNavigationAsync</x-search>
-
-Waits for the main frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
-
-**Usage**
-
-This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
-
-```csharp
-await page.RunAndWaitForNavigationAsync(async () =>
-{
-    // This action triggers the navigation after a timeout.
-    await page.GetByText("Navigate after timeout").ClickAsync();
-});
-
-// The method continues after navigation has finished
-```
-
-:::note
-Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
-:::
-
-**Arguments**
-- `action` [Func]<[Task]> <font size="2">Added in: v1.12</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-action"/><a href="#page-wait-for-navigation-option-action" class="list-anchor">#</a>
-  
-  Action that triggers the event.
-
-**Returns**
-- [Response]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-return"/><a href="#page-wait-for-navigation-return" class="list-anchor">#</a>
 
 ---
 
@@ -3954,6 +3923,102 @@ await Page.QuerySelectorAllAsync(selector);
 
 **Returns**
 - [IEnumerable]<[ElementHandle]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-query-selector-all-return"/><a href="#page-query-selector-all-return" class="list-anchor">#</a>
+
+---
+
+### RunAndWaitForNavigationAsync {#page-wait-for-navigation}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.RunAndWaitForNavigationAsync</x-search>
+
+:::caution
+
+This method is inherently racy, please use [Page.WaitForURLAsync()](/api/class-page.mdx#page-wait-for-url) instead.
+
+:::
+
+
+Waits for the main frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
+
+**Usage**
+
+This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
+
+```csharp
+await page.RunAndWaitForNavigationAsync(async () =>
+{
+    // This action triggers the navigation after a timeout.
+    await page.GetByText("Navigate after timeout").ClickAsync();
+});
+
+// The method continues after navigation has finished
+```
+
+:::note
+Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::
+
+**Arguments**
+- `options` `PageRunAndWaitForNavigationOptions?` *(optional)*
+  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-timeout"/><a href="#page-wait-for-navigation-option-timeout" class="list-anchor">#</a>
+    
+    Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [Page.SetDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  - `Url|UrlRegex|UrlFunc` [string]?|[Regex]?|[Func]<[string]?, bool> *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-url-url-regex-url-func"/><a href="#page-wait-for-navigation-option-url-url-regex-url-func" class="list-anchor">#</a>
+    
+    A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
+  - `WaitUntil` `enum WaitUntilState { Load, Domcontentloaded, Networkidle, Commit }?` *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-wait-until"/><a href="#page-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
+    
+    When to consider operation succeeded, defaults to `load`. Events can be either:
+    * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+    * `'load'` - consider operation to be finished when the `load` event is fired.
+    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+    * `'commit'` - consider operation to be finished when network response is received and the document started loading.
+- `action` [Func]<[Task]> <font size="2">Added in: v1.12</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-action"/><a href="#page-wait-for-navigation-option-action" class="list-anchor">#</a>
+  
+  Action that triggers the event.
+
+**Returns**
+- [Response]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-return"/><a href="#page-wait-for-navigation-return" class="list-anchor">#</a>
+
+---
+
+### WaitForNavigationAsync {#page-wait-for-navigation}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.WaitForNavigationAsync</x-search>
+
+:::caution
+
+This method is inherently racy, please use [Page.WaitForURLAsync()](/api/class-page.mdx#page-wait-for-url) instead.
+
+:::
+
+
+Waits for the main frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
+
+**Usage**
+
+This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
+
+```csharp
+await page.RunAndWaitForNavigationAsync(async () =>
+{
+    // This action triggers the navigation after a timeout.
+    await page.GetByText("Navigate after timeout").ClickAsync();
+});
+
+// The method continues after navigation has finished
+```
+
+:::note
+Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::
+
+**Arguments**
+- `action` [Func]<[Task]> <font size="2">Added in: v1.12</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-action"/><a href="#page-wait-for-navigation-option-action" class="list-anchor">#</a>
+  
+  Action that triggers the event.
+
+**Returns**
+- [Response]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-return"/><a href="#page-wait-for-navigation-return" class="list-anchor">#</a>
 
 ---
 

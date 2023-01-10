@@ -335,17 +335,18 @@ await locator.click();
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.getByAltText</x-search>
 
-Allows locating elements by their alt text. For example, this method will find the image by alt text "Castle":
-
-```html
-<img alt='Castle'>
-```
+Allows locating elements by their alt text.
 
 **Usage**
 
+For example, this method will find the image by alt text "Playwright logo":
+
+```html
+<img alt='Playwright logo'>
+```
+
 ```js
-frame.getByAltText(text);
-frame.getByAltText(text, options);
+await page.getByAltText('Playwright logo').click();
 ```
 
 **Arguments**
@@ -366,18 +367,19 @@ frame.getByAltText(text, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.getByLabel</x-search>
 
-Allows locating input elements by the text of the associated label. For example, this method will find the input by label text "Password" in the following DOM:
+Allows locating input elements by the text of the associated label.
+
+**Usage**
+
+For example, this method will find the input by label text "Password" in the following DOM:
 
 ```html
 <label for="password-input">Password:</label>
 <input id="password-input">
 ```
 
-**Usage**
-
 ```js
-frame.getByLabel(text);
-frame.getByLabel(text, options);
+await page.getByLabel('Password').fill('secret');
 ```
 
 **Arguments**
@@ -398,17 +400,22 @@ frame.getByLabel(text, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.getByPlaceholder</x-search>
 
-Allows locating input elements by the placeholder text. For example, this method will find the input by placeholder "Country":
-
-```html
-<input placeholder="Country">
-```
+Allows locating input elements by the placeholder text.
 
 **Usage**
 
+For example, consider the following DOM structure.
+
+```html
+<input type="email" placeholder="name@example.com" />
+```
+
+You can fill the input after locating it by the placeholder text:
+
 ```js
-frame.getByPlaceholder(text);
-frame.getByPlaceholder(text, options);
+await page
+    .getByPlaceholder("name@example.com")
+    .fill("playwright@microsoft.com");
 ```
 
 **Arguments**
@@ -429,15 +436,29 @@ frame.getByPlaceholder(text, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.getByRole</x-search>
 
-Allows locating elements by their [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name). Note that role selector **does not replace** accessibility audits and conformance tests, but rather gives early feedback about the ARIA guidelines.
-
-Note that many html elements have an implicitly [defined role](https://w3c.github.io/html-aam/#html-element-role-mappings) that is recognized by the role selector. You can find all the [supported roles here](https://www.w3.org/TR/wai-aria-1.2/#role_definitions). ARIA guidelines **do not recommend** duplicating implicit roles and attributes by setting `role` and/or `aria-*` attributes to default values.
+Allows locating elements by their [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name).
 
 **Usage**
 
+Consider the following DOM structure.
+
+```html
+<h3>Sign up</h3>
+<label>
+  <input type="checkbox" /> Subscribe
+</label>
+<br/>
+<button>Submit</button>
+```
+
+You can locate each element by it's implicit role:
+
 ```js
-frame.getByRole(role);
-frame.getByRole(role, options);
+await expect(page.getByRole('heading', { name: 'Sign up' })).toBeVisible();
+
+await page.getByRole('checkbox', { name: 'Subscribe' }).check();
+
+await page.getByRole('button', { name: /submit/i }).click();
 ```
 
 **Arguments**
@@ -495,25 +516,32 @@ frame.getByRole(role, options);
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-role-return"/><a href="#frame-get-by-role-return" class="list-anchor">#</a>
 
+**Details**
+
+Role selector **does not replace** accessibility audits and conformance tests, but rather gives early feedback about the ARIA guidelines.
+
+Many html elements have an implicitly [defined role](https://w3c.github.io/html-aam/#html-element-role-mappings) that is recognized by the role selector. You can find all the [supported roles here](https://www.w3.org/TR/wai-aria-1.2/#role_definitions). ARIA guidelines **do not recommend** duplicating implicit roles and attributes by setting `role` and/or `aria-*` attributes to default values.
+
 ---
 
 ### getByTestId {#frame-get-by-test-id}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.getByTestId</x-search>
 
-Locate element by the test id. By default, the `data-testid` attribute is used as a test id. Use [selectors.setTestIdAttribute()](/api/class-selectors.mdx#selectors-set-test-id-attribute) to configure a different test id attribute if necessary.
-
-```js
-// Set custom test id attribute from @playwright/test config:
-use: {
-  testIdAttribute: 'data-pw'
-}
-```
+Locate element by the test id.
 
 **Usage**
 
+Consider the following DOM structure.
+
+```html
+<button data-testid="directions">Itinéraire</button>
+```
+
+You can locate the element by it's test id:
+
 ```js
-frame.getByTestId(testId);
+await page.getByTestId('directions').click();
 ```
 
 **Arguments**
@@ -524,13 +552,30 @@ frame.getByTestId(testId);
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-test-id-return"/><a href="#frame-get-by-test-id-return" class="list-anchor">#</a>
 
+**Details**
+
+By default, the `data-testid` attribute is used as a test id. Use [selectors.setTestIdAttribute()](/api/class-selectors.mdx#selectors-set-test-id-attribute) to configure a different test id attribute if necessary.
+
+```js
+// Set custom test id attribute from @playwright/test config:
+use: {
+  testIdAttribute: 'data-pw'
+}
+```
+
 ---
 
 ### getByText {#frame-get-by-text}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.getByText</x-search>
 
-Allows locating elements that contain given text. Consider the following DOM structure:
+Allows locating elements that contain given text.
+
+See also [locator.filter()](/api/class-locator.mdx#locator-filter) that allows to match by another criteria, like an accessible role, and then filter by the text content.
+
+**Usage**
+
+Consider the following DOM structure:
 
 ```html
 <div>Hello <span>world</span></div>
@@ -556,23 +601,6 @@ page.getByText(/Hello/)
 page.getByText(/^hello$/i)
 ```
 
-See also [locator.filter()](/api/class-locator.mdx#locator-filter) that allows to match by another criteria, like an accessible role, and then filter by the text content.
-
-:::note
-Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
-:::
-
-:::note
-Input elements of the type `button` and `submit` are matched by their `value` instead of the text content. For example, locating by text `"Log in"` matches `<input type=button value="Log in">`.
-:::
-
-**Usage**
-
-```js
-frame.getByText(text);
-frame.getByText(text, options);
-```
-
 **Arguments**
 - `text` [string]|[RegExp]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-text-option-text"/><a href="#frame-get-by-text-option-text" class="list-anchor">#</a>
   
@@ -585,23 +613,32 @@ frame.getByText(text, options);
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-text-return"/><a href="#frame-get-by-text-return" class="list-anchor">#</a>
 
+**Details**
+
+Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
+
+Input elements of the type `button` and `submit` are matched by their `value` instead of the text content. For example, locating by text `"Log in"` matches `<input type=button value="Log in">`.
+
 ---
 
 ### getByTitle {#frame-get-by-title}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.getByTitle</x-search>
 
-Allows locating elements by their title. For example, this method will find the button by its title "Place the order":
-
-```html
-<button title='Place the order'>Order Now</button>
-```
+Allows locating elements by their title attribute.
 
 **Usage**
 
+Consider the following DOM structure.
+
+```html
+<span title='Issues count'>25 issues</span>
+```
+
+You can check the issues count after locating it by the title text:
+
 ```js
-frame.getByTitle(text);
-frame.getByTitle(text, options);
+await expect(page.getByTitle('Issues count')).toHaveText('25 issues');
 ```
 
 **Arguments**
@@ -2491,6 +2528,7 @@ await frame.uncheck(selector, options);
 [TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
 [TestOptions]: /api/class-testoptions.mdx "TestOptions"
 [TestProject]: /api/class-testproject.mdx "TestProject"
+[TestStore]: /api/class-teststore.mdx "TestStore"
 [WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
 [Location]: /api/class-location.mdx "Location"
 [Reporter]: /api/class-reporter.mdx "Reporter"
