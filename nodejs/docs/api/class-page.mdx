@@ -47,408 +47,6 @@ page.removeListener('request', logRequest);
 
 ---
 
-## Events
-
-### on('close') {#page-event-close}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('close')</x-search>
-
-Emitted when the page closes.
-
-**Usage**
-
-```js
-page.on('close', data => {});
-```
-
-**Event data**
-- [Page]
-
----
-
-### on('console') {#page-event-console}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('console')</x-search>
-
-Emitted when JavaScript within the page calls one of console API methods, e.g. `console.log` or `console.dir`. Also emitted if the page throws an error or a warning.
-
-The arguments passed into `console.log` appear as arguments on the event handler.
-
-An example of handling `console` event:
-
-```js
-page.on('console', async msg => {
-  const values = [];
-  for (const arg of msg.args())
-    values.push(await arg.jsonValue());
-  console.log(...values);
-});
-await page.evaluate(() => console.log('hello', 5, {foo: 'bar'}));
-```
-
-**Usage**
-
-```js
-page.on('console', data => {});
-```
-
-**Event data**
-- [ConsoleMessage]
-
----
-
-### on('crash') {#page-event-crash}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('crash')</x-search>
-
-Emitted when the page crashes. Browser pages might crash if they try to allocate too much memory. When the page crashes, ongoing and subsequent operations will throw.
-
-The most common way to deal with crashes is to catch an exception:
-
-```js
-try {
-  // Crash might happen during a click.
-  await page.click('button');
-  // Or while waiting for an event.
-  await page.waitForEvent('popup');
-} catch (e) {
-  // When the page crashes, exception message contains 'crash'.
-}
-```
-
-**Usage**
-
-```js
-page.on('crash', data => {});
-```
-
-**Event data**
-- [Page]
-
----
-
-### on('dialog') {#page-event-dialog}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('dialog')</x-search>
-
-Emitted when a JavaScript dialog appears, such as `alert`, `prompt`, `confirm` or `beforeunload`. Listener **must** either [dialog.accept()](/api/class-dialog.mdx#dialog-accept) or [dialog.dismiss()](/api/class-dialog.mdx#dialog-dismiss) the dialog - otherwise the page will [freeze](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#never_blocking) waiting for the dialog, and actions like click will never finish.
-
-```js
-page.on('dialog', dialog => {
-  dialog.accept();
-});
-```
-
-:::note
-When no [page.on('dialog')](/api/class-page.mdx#page-event-dialog) listeners are present, all dialogs are automatically dismissed.
-:::
-
-**Usage**
-
-```js
-page.on('dialog', data => {});
-```
-
-**Event data**
-- [Dialog]
-
----
-
-### on('domcontentloaded') {#page-event-dom-content-loaded}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('domcontentloaded')</x-search>
-
-Emitted when the JavaScript [`DOMContentLoaded`](https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded) event is dispatched.
-
-**Usage**
-
-```js
-page.on('domcontentloaded', data => {});
-```
-
-**Event data**
-- [Page]
-
----
-
-### on('download') {#page-event-download}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('download')</x-search>
-
-Emitted when attachment download started. User can access basic file operations on downloaded content via the passed [Download] instance.
-
-**Usage**
-
-```js
-page.on('download', data => {});
-```
-
-**Event data**
-- [Download]
-
----
-
-### on('filechooser') {#page-event-file-chooser}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('filechooser')</x-search>
-
-Emitted when a file chooser is supposed to appear, such as after clicking the  `<input type=file>`. Playwright can respond to it via setting the input files using [fileChooser.setFiles()](/api/class-filechooser.mdx#file-chooser-set-files) that can be uploaded after that.
-
-```js
-page.on('filechooser', async (fileChooser) => {
-  await fileChooser.setFiles('/tmp/myfile.pdf');
-});
-```
-
-**Usage**
-
-```js
-page.on('filechooser', data => {});
-```
-
-**Event data**
-- [FileChooser]
-
----
-
-### on('frameattached') {#page-event-frame-attached}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('frameattached')</x-search>
-
-Emitted when a frame is attached.
-
-**Usage**
-
-```js
-page.on('frameattached', data => {});
-```
-
-**Event data**
-- [Frame]
-
----
-
-### on('framedetached') {#page-event-frame-detached}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('framedetached')</x-search>
-
-Emitted when a frame is detached.
-
-**Usage**
-
-```js
-page.on('framedetached', data => {});
-```
-
-**Event data**
-- [Frame]
-
----
-
-### on('framenavigated') {#page-event-frame-navigated}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('framenavigated')</x-search>
-
-Emitted when a frame is navigated to a new url.
-
-**Usage**
-
-```js
-page.on('framenavigated', data => {});
-```
-
-**Event data**
-- [Frame]
-
----
-
-### on('load') {#page-event-load}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('load')</x-search>
-
-Emitted when the JavaScript [`load`](https://developer.mozilla.org/en-US/docs/Web/Events/load) event is dispatched.
-
-**Usage**
-
-```js
-page.on('load', data => {});
-```
-
-**Event data**
-- [Page]
-
----
-
-### on('pageerror') {#page-event-page-error}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('pageerror')</x-search>
-
-Emitted when an uncaught exception happens within the page.
-
-```js
-// Log all uncaught errors to the terminal
-page.on('pageerror', exception => {
-  console.log(`Uncaught exception: "${exception}"`);
-});
-
-// Navigate to a page with an exception.
-await page.goto('data:text/html,<script>throw new Error("Test")</script>');
-```
-
-**Usage**
-
-```js
-page.on('pageerror', data => {});
-```
-
-**Event data**
-- [Error]
-
----
-
-### on('popup') {#page-event-popup}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('popup')</x-search>
-
-Emitted when the page opens a new tab or window. This event is emitted in addition to the [browserContext.on('page')](/api/class-browsercontext.mdx#browser-context-event-page), but only for popups relevant to this page.
-
-The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
-
-```js
-// Start waiting for popup before clicking. Note no await.
-const popupPromise = page.waitForEvent('popup');
-await page.getByText('open the popup').click();
-const popup = await popupPromise;
-console.log(await popup.evaluate('location.href'));
-```
-
-:::note
-Use [page.waitForLoadState()](/api/class-page.mdx#page-wait-for-load-state) to wait until the page gets to a particular state (you should not need it in most cases).
-:::
-
-**Usage**
-
-```js
-page.on('popup', data => {});
-```
-
-**Event data**
-- [Page]
-
----
-
-### on('request') {#page-event-request}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('request')</x-search>
-
-Emitted when a page issues a request. The [request] object is read-only. In order to intercept and mutate requests, see [page.route()](/api/class-page.mdx#page-route) or [browserContext.route()](/api/class-browsercontext.mdx#browser-context-route).
-
-**Usage**
-
-```js
-page.on('request', data => {});
-```
-
-**Event data**
-- [Request]
-
----
-
-### on('requestfailed') {#page-event-request-failed}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('requestfailed')</x-search>
-
-Emitted when a request fails, for example by timing out.
-
-```js
-page.on('requestfailed', request => {
-  console.log(request.url() + ' ' + request.failure().errorText);
-});
-```
-
-:::note
-HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [page.on('requestfinished')](/api/class-page.mdx#page-event-request-finished) event and not with [page.on('requestfailed')](/api/class-page.mdx#page-event-request-failed). A request will only be considered failed when the client cannot get an HTTP response from the server, e.g. due to network error net::ERR_FAILED.
-:::
-
-**Usage**
-
-```js
-page.on('requestfailed', data => {});
-```
-
-**Event data**
-- [Request]
-
----
-
-### on('requestfinished') {#page-event-request-finished}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('requestfinished')</x-search>
-
-Emitted when a request finishes successfully after downloading the response body. For a successful response, the sequence of events is `request`, `response` and `requestfinished`.
-
-**Usage**
-
-```js
-page.on('requestfinished', data => {});
-```
-
-**Event data**
-- [Request]
-
----
-
-### on('response') {#page-event-response}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('response')</x-search>
-
-Emitted when [response] status and headers are received for a request. For a successful response, the sequence of events is `request`, `response` and `requestfinished`.
-
-**Usage**
-
-```js
-page.on('response', data => {});
-```
-
-**Event data**
-- [Response]
-
----
-
-### on('websocket') {#page-event-web-socket}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('websocket')</x-search>
-
-Emitted when [WebSocket] request is sent.
-
-**Usage**
-
-```js
-page.on('websocket', data => {});
-```
-
-**Event data**
-- [WebSocket]
-
----
-
-### on('worker') {#page-event-worker}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('worker')</x-search>
-
-Emitted when a dedicated [WebWorker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) is spawned by the page.
-
-**Usage**
-
-```js
-page.on('worker', data => {});
-```
-
-**Event data**
-- [Worker]
-
----
-
 ## Methods
 
 ### addInitScript {#page-add-init-script}
@@ -2545,6 +2143,408 @@ page.touchscreen
 
 ---
 
+## Events
+
+### on('close') {#page-event-close}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('close')</x-search>
+
+Emitted when the page closes.
+
+**Usage**
+
+```js
+page.on('close', data => {});
+```
+
+**Event data**
+- [Page]
+
+---
+
+### on('console') {#page-event-console}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('console')</x-search>
+
+Emitted when JavaScript within the page calls one of console API methods, e.g. `console.log` or `console.dir`. Also emitted if the page throws an error or a warning.
+
+The arguments passed into `console.log` appear as arguments on the event handler.
+
+An example of handling `console` event:
+
+```js
+page.on('console', async msg => {
+  const values = [];
+  for (const arg of msg.args())
+    values.push(await arg.jsonValue());
+  console.log(...values);
+});
+await page.evaluate(() => console.log('hello', 5, {foo: 'bar'}));
+```
+
+**Usage**
+
+```js
+page.on('console', data => {});
+```
+
+**Event data**
+- [ConsoleMessage]
+
+---
+
+### on('crash') {#page-event-crash}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('crash')</x-search>
+
+Emitted when the page crashes. Browser pages might crash if they try to allocate too much memory. When the page crashes, ongoing and subsequent operations will throw.
+
+The most common way to deal with crashes is to catch an exception:
+
+```js
+try {
+  // Crash might happen during a click.
+  await page.click('button');
+  // Or while waiting for an event.
+  await page.waitForEvent('popup');
+} catch (e) {
+  // When the page crashes, exception message contains 'crash'.
+}
+```
+
+**Usage**
+
+```js
+page.on('crash', data => {});
+```
+
+**Event data**
+- [Page]
+
+---
+
+### on('dialog') {#page-event-dialog}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('dialog')</x-search>
+
+Emitted when a JavaScript dialog appears, such as `alert`, `prompt`, `confirm` or `beforeunload`. Listener **must** either [dialog.accept()](/api/class-dialog.mdx#dialog-accept) or [dialog.dismiss()](/api/class-dialog.mdx#dialog-dismiss) the dialog - otherwise the page will [freeze](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#never_blocking) waiting for the dialog, and actions like click will never finish.
+
+```js
+page.on('dialog', dialog => {
+  dialog.accept();
+});
+```
+
+:::note
+When no [page.on('dialog')](/api/class-page.mdx#page-event-dialog) listeners are present, all dialogs are automatically dismissed.
+:::
+
+**Usage**
+
+```js
+page.on('dialog', data => {});
+```
+
+**Event data**
+- [Dialog]
+
+---
+
+### on('domcontentloaded') {#page-event-dom-content-loaded}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('domcontentloaded')</x-search>
+
+Emitted when the JavaScript [`DOMContentLoaded`](https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded) event is dispatched.
+
+**Usage**
+
+```js
+page.on('domcontentloaded', data => {});
+```
+
+**Event data**
+- [Page]
+
+---
+
+### on('download') {#page-event-download}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('download')</x-search>
+
+Emitted when attachment download started. User can access basic file operations on downloaded content via the passed [Download] instance.
+
+**Usage**
+
+```js
+page.on('download', data => {});
+```
+
+**Event data**
+- [Download]
+
+---
+
+### on('filechooser') {#page-event-file-chooser}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('filechooser')</x-search>
+
+Emitted when a file chooser is supposed to appear, such as after clicking the  `<input type=file>`. Playwright can respond to it via setting the input files using [fileChooser.setFiles()](/api/class-filechooser.mdx#file-chooser-set-files) that can be uploaded after that.
+
+```js
+page.on('filechooser', async (fileChooser) => {
+  await fileChooser.setFiles('/tmp/myfile.pdf');
+});
+```
+
+**Usage**
+
+```js
+page.on('filechooser', data => {});
+```
+
+**Event data**
+- [FileChooser]
+
+---
+
+### on('frameattached') {#page-event-frame-attached}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('frameattached')</x-search>
+
+Emitted when a frame is attached.
+
+**Usage**
+
+```js
+page.on('frameattached', data => {});
+```
+
+**Event data**
+- [Frame]
+
+---
+
+### on('framedetached') {#page-event-frame-detached}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('framedetached')</x-search>
+
+Emitted when a frame is detached.
+
+**Usage**
+
+```js
+page.on('framedetached', data => {});
+```
+
+**Event data**
+- [Frame]
+
+---
+
+### on('framenavigated') {#page-event-frame-navigated}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('framenavigated')</x-search>
+
+Emitted when a frame is navigated to a new url.
+
+**Usage**
+
+```js
+page.on('framenavigated', data => {});
+```
+
+**Event data**
+- [Frame]
+
+---
+
+### on('load') {#page-event-load}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('load')</x-search>
+
+Emitted when the JavaScript [`load`](https://developer.mozilla.org/en-US/docs/Web/Events/load) event is dispatched.
+
+**Usage**
+
+```js
+page.on('load', data => {});
+```
+
+**Event data**
+- [Page]
+
+---
+
+### on('pageerror') {#page-event-page-error}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('pageerror')</x-search>
+
+Emitted when an uncaught exception happens within the page.
+
+```js
+// Log all uncaught errors to the terminal
+page.on('pageerror', exception => {
+  console.log(`Uncaught exception: "${exception}"`);
+});
+
+// Navigate to a page with an exception.
+await page.goto('data:text/html,<script>throw new Error("Test")</script>');
+```
+
+**Usage**
+
+```js
+page.on('pageerror', data => {});
+```
+
+**Event data**
+- [Error]
+
+---
+
+### on('popup') {#page-event-popup}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('popup')</x-search>
+
+Emitted when the page opens a new tab or window. This event is emitted in addition to the [browserContext.on('page')](/api/class-browsercontext.mdx#browser-context-event-page), but only for popups relevant to this page.
+
+The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
+
+```js
+// Start waiting for popup before clicking. Note no await.
+const popupPromise = page.waitForEvent('popup');
+await page.getByText('open the popup').click();
+const popup = await popupPromise;
+console.log(await popup.evaluate('location.href'));
+```
+
+:::note
+Use [page.waitForLoadState()](/api/class-page.mdx#page-wait-for-load-state) to wait until the page gets to a particular state (you should not need it in most cases).
+:::
+
+**Usage**
+
+```js
+page.on('popup', data => {});
+```
+
+**Event data**
+- [Page]
+
+---
+
+### on('request') {#page-event-request}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('request')</x-search>
+
+Emitted when a page issues a request. The [request] object is read-only. In order to intercept and mutate requests, see [page.route()](/api/class-page.mdx#page-route) or [browserContext.route()](/api/class-browsercontext.mdx#browser-context-route).
+
+**Usage**
+
+```js
+page.on('request', data => {});
+```
+
+**Event data**
+- [Request]
+
+---
+
+### on('requestfailed') {#page-event-request-failed}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('requestfailed')</x-search>
+
+Emitted when a request fails, for example by timing out.
+
+```js
+page.on('requestfailed', request => {
+  console.log(request.url() + ' ' + request.failure().errorText);
+});
+```
+
+:::note
+HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [page.on('requestfinished')](/api/class-page.mdx#page-event-request-finished) event and not with [page.on('requestfailed')](/api/class-page.mdx#page-event-request-failed). A request will only be considered failed when the client cannot get an HTTP response from the server, e.g. due to network error net::ERR_FAILED.
+:::
+
+**Usage**
+
+```js
+page.on('requestfailed', data => {});
+```
+
+**Event data**
+- [Request]
+
+---
+
+### on('requestfinished') {#page-event-request-finished}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('requestfinished')</x-search>
+
+Emitted when a request finishes successfully after downloading the response body. For a successful response, the sequence of events is `request`, `response` and `requestfinished`.
+
+**Usage**
+
+```js
+page.on('requestfinished', data => {});
+```
+
+**Event data**
+- [Request]
+
+---
+
+### on('response') {#page-event-response}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('response')</x-search>
+
+Emitted when [response] status and headers are received for a request. For a successful response, the sequence of events is `request`, `response` and `requestfinished`.
+
+**Usage**
+
+```js
+page.on('response', data => {});
+```
+
+**Event data**
+- [Response]
+
+---
+
+### on('websocket') {#page-event-web-socket}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('websocket')</x-search>
+
+Emitted when [WebSocket] request is sent.
+
+**Usage**
+
+```js
+page.on('websocket', data => {});
+```
+
+**Event data**
+- [WebSocket]
+
+---
+
+### on('worker') {#page-event-worker}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('worker')</x-search>
+
+Emitted when a dedicated [WebWorker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) is spawned by the page.
+
+**Usage**
+
+```js
+page.on('worker', data => {});
+```
+
+**Event data**
+- [Worker]
+
+---
+
 ## Deprecated
 
 ### $ {#page-query-selector}
@@ -3988,7 +3988,6 @@ await page.uncheck(selector, options);
 [TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
 [TestOptions]: /api/class-testoptions.mdx "TestOptions"
 [TestProject]: /api/class-testproject.mdx "TestProject"
-[TestStore]: /api/class-teststore.mdx "TestStore"
 [WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
 [Location]: /api/class-location.mdx "Location"
 [Reporter]: /api/class-reporter.mdx "Reporter"

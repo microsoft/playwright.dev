@@ -56,8 +56,6 @@ test('basic test', async ({ page }) => {
 
 Declares a test.
 
-**Usage**
-
 <Tabs
   groupId="js-flavor"
   defaultValue="ts"
@@ -73,7 +71,8 @@ import { test, expect } from '@playwright/test';
 
 test('basic test', async ({ page }) => {
   await page.goto('https://playwright.dev/');
-  // ...
+  const name = await page.innerText('.navbar__title');
+  expect(name).toBe('Playwright');
 });
 ```
 
@@ -85,12 +84,19 @@ const { test, expect } = require('@playwright/test');
 
 test('basic test', async ({ page }) => {
   await page.goto('https://playwright.dev/');
-  // ...
+  const name = await page.innerText('.navbar__title');
+  expect(name).toBe('Playwright');
 });
 ```
 
 </TabItem>
 </Tabs>
+
+**Usage**
+
+```js
+test(title, testFunction);
+```
 
 **Arguments**
 - `title` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-call-option-title"/><a href="#test-call-option-title" class="list-anchor">#</a>
@@ -106,50 +112,20 @@ test('basic test', async ({ page }) => {
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.afterAll</x-search>
 
-Declares an `afterAll` hook that is executed once per worker after all tests.
+Declares an `afterAll` hook that is executed once per worker after all tests. When called in the scope of a test file, runs after all tests in the file. When called inside a [test.describe()](/api/class-test.mdx#test-describe-1) group, runs after all tests in the group. If multiple `afterAll` hooks are added, they will run in the order of their registration.
+
+Note that worker process is restarted on test failures, and `afterAll` hook runs again in the new worker. Learn more about [workers and failures](../test-retries.mdx).
 
 **Usage**
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
 ```js
-test.afterAll(async () => {
-  console.log('Done with tests');
-  // ...
-});
+test.afterAll(hookFunction);
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-test.afterAll(async () => {
-  console.log('Done with tests');
-  // ...
-});
-```
-
-</TabItem>
-</Tabs>
 
 **Arguments**
 - `hookFunction` [function]\([Fixtures], [TestInfo]\)<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-after-all-option-hook-function"/><a href="#test-after-all-option-hook-function" class="list-anchor">#</a>
   
   Hook function that takes one or two arguments: an object with worker fixtures and optional [TestInfo].
-
-**Details**
-
-When called in the scope of a test file, runs after all tests in the file. When called inside a [test.describe()](/api/class-test.mdx#test-describe-1) group, runs after all tests in the group. If multiple `afterAll` hooks are added, they will run in the order of their registration.
-
-Note that worker process is restarted on test failures, and `afterAll` hook runs again in the new worker. Learn more about [workers and failures](../test-retries.mdx).
 
 ---
 
@@ -157,9 +133,9 @@ Note that worker process is restarted on test failures, and `afterAll` hook runs
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.afterEach</x-search>
 
-Declares an `afterEach` hook that is executed after each test.
+Declares an `afterEach` hook that is executed after each test. When called in the scope of a test file, runs after each test in the file. When called inside a [test.describe()](/api/class-test.mdx#test-describe-1) group, runs after each test in the group. If multiple `afterEach` hooks are added, they will run in the order of their registration.
 
-**Usage**
+You can access all the same [Fixtures] as the test function itself, and also the [TestInfo] object that gives a lot of useful information. For example, you can check whether the test succeeded or failed.
 
 <Tabs
   groupId="js-flavor"
@@ -209,16 +185,16 @@ test('my test', async ({ page }) => {
 </TabItem>
 </Tabs>
 
+**Usage**
+
+```js
+test.afterEach(hookFunction);
+```
+
 **Arguments**
 - `hookFunction` [function]\([Fixtures], [TestInfo]\)<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-after-each-option-hook-function"/><a href="#test-after-each-option-hook-function" class="list-anchor">#</a>
   
   Hook function that takes one or two arguments: an object with fixtures and optional [TestInfo].
-
-**Details**
-
-When called in the scope of a test file, runs after each test in the file. When called inside a [test.describe()](/api/class-test.mdx#test-describe-1) group, runs after each test in the group. If multiple `afterEach` hooks are added, they will run in the order of their registration.
-
-You can access all the same [Fixtures] as the test function itself, and also the [TestInfo] object that gives a lot of useful information. For example, you can check whether the test succeeded or failed.
 
 ---
 
@@ -226,9 +202,7 @@ You can access all the same [Fixtures] as the test function itself, and also the
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.beforeAll</x-search>
 
-Declares a `beforeAll` hook that is executed once per worker process before all tests.
-
-**Usage**
+Declares a `beforeAll` hook that is executed once per worker process before all tests. When called in the scope of a test file, runs before all tests in the file. When called inside a [test.describe()](/api/class-test.mdx#test-describe-1) group, runs before all tests in the group. If multiple `beforeAll` hooks are added, they will run in the order of their registration.
 
 <Tabs
   groupId="js-flavor"
@@ -280,18 +254,20 @@ test('my test', async ({ page }) => {
 </TabItem>
 </Tabs>
 
+Note that worker process is restarted on test failures, and `beforeAll` hook runs again in the new worker. Learn more about [workers and failures](../test-retries.mdx).
+
+You can use [test.afterAll()](/api/class-test.mdx#test-after-all) to teardown any resources set up in `beforeAll`.
+
+**Usage**
+
+```js
+test.beforeAll(hookFunction);
+```
+
 **Arguments**
 - `hookFunction` [function]\([Fixtures], [TestInfo]\)<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-before-all-option-hook-function"/><a href="#test-before-all-option-hook-function" class="list-anchor">#</a>
   
   Hook function that takes one or two arguments: an object with worker fixtures and optional [TestInfo].
-
-**Details**
-
-When called in the scope of a test file, runs before all tests in the file. When called inside a [test.describe()](/api/class-test.mdx#test-describe-1) group, runs before all tests in the group. If multiple `beforeAll` hooks are added, they will run in the order of their registration.
-
-Note that worker process is restarted on test failures, and `beforeAll` hook runs again in the new worker. Learn more about [workers and failures](../test-retries.mdx).
-
-You can use [test.afterAll()](/api/class-test.mdx#test-after-all) to teardown any resources set up in `beforeAll`.
 
 ---
 
@@ -299,9 +275,9 @@ You can use [test.afterAll()](/api/class-test.mdx#test-after-all) to teardown an
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.beforeEach</x-search>
 
-Declares a `beforeEach` hook that is executed before each test.
+Declares a `beforeEach` hook that is executed before each test. When called in the scope of a test file, runs before each test in the file. When called inside a [test.describe()](/api/class-test.mdx#test-describe-1) group, runs before each test in the group.  If multiple `beforeEach` hooks are added, they will run in the order of their registration.
 
-**Usage**
+You can access all the same [Fixtures] as the test function itself, and also the [TestInfo] object that gives a lot of useful information. For example, you can navigate the page before starting the test.
 
 <Tabs
   groupId="js-flavor"
@@ -347,18 +323,18 @@ test('my test', async ({ page }) => {
 </TabItem>
 </Tabs>
 
+You can use [test.afterEach()](/api/class-test.mdx#test-after-each) to teardown any resources set up in `beforeEach`.
+
+**Usage**
+
+```js
+test.beforeEach(hookFunction);
+```
+
 **Arguments**
 - `hookFunction` [function]\([Fixtures], [TestInfo]\)<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-before-each-option-hook-function"/><a href="#test-before-each-option-hook-function" class="list-anchor">#</a>
   
   Hook function that takes one or two arguments: an object with fixtures and optional [TestInfo].
-
-**Details**
-
-When called in the scope of a test file, runs before each test in the file. When called inside a [test.describe()](/api/class-test.mdx#test-describe-1) group, runs before each test in the group.  If multiple `beforeEach` hooks are added, they will run in the order of their registration.
-
-You can access all the same [Fixtures] as the test function itself, and also the [TestInfo] object that gives a lot of useful information. For example, you can navigate the page before starting the test.
-
-You can use [test.afterEach()](/api/class-test.mdx#test-after-each) to teardown any resources set up in `beforeEach`.
 
 ---
 
@@ -368,8 +344,6 @@ You can use [test.afterEach()](/api/class-test.mdx#test-after-each) to teardown 
 
 Declares a group of tests.
 
-**Usage**
-
 <Tabs
   groupId="js-flavor"
   defaultValue="ts"
@@ -409,6 +383,12 @@ test.describe('two tests', () => {
 
 </TabItem>
 </Tabs>
+
+**Usage**
+
+```js
+test.describe(title, callback);
+```
 
 **Arguments**
 - `title` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-1-option-title"/><a href="#test-describe-1-option-title" class="list-anchor">#</a>
@@ -426,8 +406,6 @@ test.describe('two tests', () => {
 
 Declares an anonymous group of tests. This is convenient to give a group of tests a common option with [test.use()](/api/class-test.mdx#test-use).
 
-**Usage**
-
 <Tabs
   groupId="js-flavor"
   defaultValue="ts"
@@ -472,6 +450,12 @@ test.describe(() => {
 </TabItem>
 </Tabs>
 
+**Usage**
+
+```js
+test.describe(callback);
+```
+
 **Arguments**
 - `callback` [function]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-2-option-callback"/><a href="#test-describe-2-option-callback" class="list-anchor">#</a>
   
@@ -487,38 +471,109 @@ Configures the enclosing scope. Can be executed either on the top level or insid
 
 Learn more about the execution modes [here](../test-parallel.mdx).
 
+Running tests in parallel:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+// Run all the tests in the file concurrently using parallel workers.
+test.describe.configure({ mode: 'parallel' });
+test('runs in parallel 1', async ({ page }) => {});
+test('runs in parallel 2', async ({ page }) => {});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// Run all the tests in the file concurrently using parallel workers.
+test.describe.configure({ mode: 'parallel' });
+test('runs in parallel 1', async ({ page }) => {});
+test('runs in parallel 2', async ({ page }) => {});
+```
+
+</TabItem>
+</Tabs>
+
+Running tests sequentially:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+// Annotate tests as inter-dependent.
+test.describe.configure({ mode: 'serial' });
+test('runs first', async ({ page }) => {});
+test('runs second', async ({ page }) => {});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// Annotate tests as inter-dependent.
+test.describe.configure({ mode: 'serial' });
+test('runs first', async ({ page }) => {});
+test('runs second', async ({ page }) => {});
+```
+
+</TabItem>
+</Tabs>
+
+Configuring retries and timeout for each test:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+// Each test in the file will be retried twice and have a timeout of 20 seconds.
+test.describe.configure({ retries: 2, timeout: 20_000 });
+test('runs first', async ({ page }) => {});
+test('runs second', async ({ page }) => {});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+// Each test in the file will be retried twice and have a timeout of 20 seconds.
+test.describe.configure({ retries: 2, timeout: 20_000 });
+test('runs first', async ({ page }) => {});
+test('runs second', async ({ page }) => {});
+```
+
+</TabItem>
+</Tabs>
+
 **Usage**
-* Running tests in parallel.
-  
-  ```js
-  // Run all the tests in the file concurrently using parallel workers.
-  test.describe.configure({ mode: 'parallel' });
-  test('runs in parallel 1', async ({ page }) => {});
-  test('runs in parallel 2', async ({ page }) => {});
-  ```
-  
-* Running tests serially, retrying from the start.
-  
-  :::note
-  Running serially is not recommended. It is usually better to make your tests isolated, so they can be run independently.
-  :::
-  
-  ```js
-  // Annotate tests as inter-dependent.
-  test.describe.configure({ mode: 'serial' });
-  test('runs first', async ({ page }) => {});
-  test('runs second', async ({ page }) => {});
-  ```
-  
-* Configuring retries and timeout for each test.
-  
-  ```js
-  // Each test in the file will be retried twice and have a timeout of 20 seconds.
-  test.describe.configure({ retries: 2, timeout: 20_000 });
-  test('runs first', async ({ page }) => {});
-  test('runs second', async ({ page }) => {});
-  ```
-  
+
+```js
+test.describe.configure();
+test.describe.configure(options);
+```
+
 **Arguments**
 - `options` [Object] *(optional)*
   - `mode` "parallel"|"serial" *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-configure-option-mode"/><a href="#test-describe-configure-option-mode" class="list-anchor">#</a>
@@ -539,8 +594,6 @@ Learn more about the execution modes [here](../test-parallel.mdx).
 
 Declares a test group similarly to [test.describe()](/api/class-test.mdx#test-describe-1). Tests in this group are marked as "fixme" and will not be executed.
 
-**Usage**
-
 <Tabs
   groupId="js-flavor"
   defaultValue="ts"
@@ -572,6 +625,12 @@ test.describe.fixme('broken tests', () => {
 
 </TabItem>
 </Tabs>
+
+**Usage**
+
+```js
+test.describe.fixme(title, callback);
+```
 
 **Arguments**
 - `title` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-fixme-option-title"/><a href="#test-describe-fixme-option-title" class="list-anchor">#</a>
@@ -589,8 +648,6 @@ test.describe.fixme('broken tests', () => {
 
 Declares a focused group of tests. If there are some focused tests or suites, all of them will be run but nothing else.
 
-**Usage**
-
 <Tabs
   groupId="js-flavor"
   defaultValue="ts"
@@ -628,6 +685,12 @@ test('not in the focused group', async ({ page }) => {
 
 </TabItem>
 </Tabs>
+
+**Usage**
+
+```js
+test.describe.only(title, callback);
+```
 
 **Arguments**
 - `title` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-only-option-title"/><a href="#test-describe-only-option-title" class="list-anchor">#</a>
@@ -639,13 +702,211 @@ test('not in the focused group', async ({ page }) => {
 
 ---
 
+### test.describe.parallel {#test-describe-parallel}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.describe.parallel</x-search>
+
+Declares a group of tests that could be run in parallel. By default, tests in a single test file run one after another, but using [test.describe.parallel()](/api/class-test.mdx#test-describe-parallel) allows them to run in parallel.
+
+:::note
+See [test.describe.configure()](/api/class-test.mdx#test-describe-configure) for the preferred way of configuring the execution mode.
+:::
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+test.describe.parallel('group', () => {
+  test('runs in parallel 1', async ({ page }) => {});
+  test('runs in parallel 2', async ({ page }) => {});
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+test.describe.parallel('group', () => {
+  test('runs in parallel 1', async ({ page }) => {});
+  test('runs in parallel 2', async ({ page }) => {});
+});
+```
+
+</TabItem>
+</Tabs>
+
+Note that parallel tests are executed in separate processes and cannot share any state or global variables. Each of the parallel tests executes all relevant hooks.
+
+**Usage**
+
+```js
+test.describe.parallel(title, callback);
+```
+
+**Arguments**
+- `title` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-parallel-option-title"/><a href="#test-describe-parallel-option-title" class="list-anchor">#</a>
+  
+  Group title.
+- `callback` [function]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-parallel-option-callback"/><a href="#test-describe-parallel-option-callback" class="list-anchor">#</a>
+  
+  A callback that is run immediately when calling [test.describe.parallel()](/api/class-test.mdx#test-describe-parallel). Any tests added in this callback will belong to the group.
+
+---
+
+### test.describe.parallel.only {#test-describe-parallel-only}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.describe.parallel.only</x-search>
+
+Declares a focused group of tests that could be run in parallel. This is similar to [test.describe.parallel()](/api/class-test.mdx#test-describe-parallel), but focuses the group. If there are some focused tests or suites, all of them will be run but nothing else.
+
+**Usage**
+
+```js
+test.describe.parallel.only(title, callback);
+```
+
+**Arguments**
+- `title` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-parallel-only-option-title"/><a href="#test-describe-parallel-only-option-title" class="list-anchor">#</a>
+  
+  Group title.
+- `callback` [function]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-parallel-only-option-callback"/><a href="#test-describe-parallel-only-option-callback" class="list-anchor">#</a>
+  
+  A callback that is run immediately when calling [test.describe.parallel.only()](/api/class-test.mdx#test-describe-parallel-only). Any tests added in this callback will belong to the group.
+
+---
+
+### test.describe.serial {#test-describe-serial}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.describe.serial</x-search>
+
+Declares a group of tests that should always be run serially. If one of the tests fails, all subsequent tests are skipped. All tests in a group are retried together.
+
+:::note
+See [test.describe.configure()](/api/class-test.mdx#test-describe-configure) for the preferred way of configuring the execution mode.
+:::
+
+:::note
+Using serial is not recommended. It is usually better to make your tests isolated, so they can be run independently.
+:::
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+test.describe.serial('group', () => {
+  test('runs first', async ({ page }) => {});
+  test('runs second', async ({ page }) => {});
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+test.describe.serial('group', () => {
+  test('runs first', async ({ page }) => {});
+  test('runs second', async ({ page }) => {});
+});
+```
+
+</TabItem>
+</Tabs>
+
+**Usage**
+
+```js
+test.describe.serial(title, callback);
+```
+
+**Arguments**
+- `title` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-serial-option-title"/><a href="#test-describe-serial-option-title" class="list-anchor">#</a>
+  
+  Group title.
+- `callback` [function]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-serial-option-callback"/><a href="#test-describe-serial-option-callback" class="list-anchor">#</a>
+  
+  A callback that is run immediately when calling [test.describe.serial()](/api/class-test.mdx#test-describe-serial). Any tests added in this callback will belong to the group.
+
+---
+
+### test.describe.serial.only {#test-describe-serial-only}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.describe.serial.only</x-search>
+
+Declares a focused group of tests that should always be run serially. If one of the tests fails, all subsequent tests are skipped. All tests in a group are retried together. If there are some focused tests or suites, all of them will be run but nothing else.
+
+:::note
+Using serial is not recommended. It is usually better to make your tests isolated, so they can be run independently.
+:::
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+test.describe.serial.only('group', () => {
+  test('runs first', async ({ page }) => {
+  });
+  test('runs second', async ({ page }) => {
+  });
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+test.describe.serial.only('group', () => {
+  test('runs first', async ({ page }) => {
+  });
+  test('runs second', async ({ page }) => {
+  });
+});
+```
+
+</TabItem>
+</Tabs>
+
+**Usage**
+
+```js
+test.describe.serial.only(title, callback);
+```
+
+**Arguments**
+- `title` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-serial-only-option-title"/><a href="#test-describe-serial-only-option-title" class="list-anchor">#</a>
+  
+  Group title.
+- `callback` [function]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-serial-only-option-callback"/><a href="#test-describe-serial-only-option-callback" class="list-anchor">#</a>
+  
+  A callback that is run immediately when calling [test.describe.serial.only()](/api/class-test.mdx#test-describe-serial-only). Any tests added in this callback will belong to the group.
+
+---
+
 ### test.describe.skip {#test-describe-skip}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.describe.skip</x-search>
 
 Declares a skipped test group, similarly to [test.describe()](/api/class-test.mdx#test-describe-1). Tests in the skipped group are never run.
-
-**Usage**
 
 <Tabs
   groupId="js-flavor"
@@ -678,6 +939,12 @@ test.describe.skip('skipped group', () => {
 
 </TabItem>
 </Tabs>
+
+**Usage**
+
+```js
+test.describe.skip(title, callback);
+```
 
 **Arguments**
 - `title` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-skip-option-title"/><a href="#test-describe-skip-option-title" class="list-anchor">#</a>
@@ -694,8 +961,6 @@ test.describe.skip('skipped group', () => {
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.extend</x-search>
 
 Extends the `test` object by defining fixtures and/or options that can be used in the tests.
-
-**Usage**
 
 First define a fixture and/or an option.
 
@@ -861,6 +1126,12 @@ module.exports = config;
 
 Learn more about [fixtures](../test-fixtures.mdx) and [parametrizing tests](../test-parameterize.mdx).
 
+**Usage**
+
+```js
+test.extend(fixtures);
+```
+
 **Arguments**
 - `fixtures` [Object]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-extend-option-fixtures"/><a href="#test-extend-option-fixtures" class="list-anchor">#</a>
   
@@ -877,8 +1148,6 @@ Learn more about [fixtures](../test-fixtures.mdx) and [parametrizing tests](../t
 
 Unconditonally marks a test as "should fail". Playwright Test runs this test and ensures that it is actually failing. This is useful for documentation purposes to acknowledge that some functionality is broken until it is fixed.
 
-**Usage**
-
 <Tabs
   groupId="js-flavor"
   defaultValue="ts"
@@ -912,6 +1181,12 @@ test('not yet ready', async ({ page }) => {
 
 </TabItem>
 </Tabs>
+
+**Usage**
+
+```js
+test.fail();
+```
 
 ---
 
@@ -921,8 +1196,6 @@ test('not yet ready', async ({ page }) => {
 
 Conditionally mark a test as "should fail" with an optional description.
 
-**Usage**
-
 <Tabs
   groupId="js-flavor"
   defaultValue="ts"
@@ -956,6 +1229,13 @@ test('fail in WebKit', async ({ page, browserName }) => {
 
 </TabItem>
 </Tabs>
+
+**Usage**
+
+```js
+test.fail(condition);
+test.fail(condition, description);
+```
 
 **Arguments**
 - `condition` [boolean]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-fail-2-option-condition"/><a href="#test-fail-2-option-condition" class="list-anchor">#</a>
@@ -973,8 +1253,6 @@ test('fail in WebKit', async ({ page, browserName }) => {
 
 Conditionally mark all tests in a file or [test.describe()](/api/class-test.mdx#test-describe-1) group as "should fail".
 
-**Usage**
-
 <Tabs
   groupId="js-flavor"
   defaultValue="ts"
@@ -1016,6 +1294,13 @@ test('fail in WebKit 2', async ({ page }) => {
 
 </TabItem>
 </Tabs>
+
+**Usage**
+
+```js
+test.fail(callback);
+test.fail(callback, description);
+```
 
 **Arguments**
 - `callback` [function]\([Fixtures]\):[boolean]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-fail-3-option-condition"/><a href="#test-fail-3-option-condition" class="list-anchor">#</a>
@@ -1033,8 +1318,6 @@ test('fail in WebKit 2', async ({ page }) => {
 
 Declares a test to be fixed, similarly to [test()](/api/class-test.mdx#test-call). This test will not be run.
 
-**Usage**
-
 <Tabs
   groupId="js-flavor"
   defaultValue="ts"
@@ -1067,6 +1350,12 @@ test.fixme('test to be fixed', async ({ page }) => {
 </TabItem>
 </Tabs>
 
+**Usage**
+
+```js
+test.fixme(title, testFunction);
+```
+
 **Arguments**
 - `title` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-fixme-1-option-title"/><a href="#test-fixme-1-option-title" class="list-anchor">#</a>
   
@@ -1082,8 +1371,6 @@ test.fixme('test to be fixed', async ({ page }) => {
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.fixme()</x-search>
 
 Mark a test as "fixme", with the intention to fix it. Test is immediately aborted when you call [test.fixme()](/api/class-test.mdx#test-fixme-2).
-
-**Usage**
 
 <Tabs
   groupId="js-flavor"
@@ -1163,6 +1450,12 @@ test('test to be fixed 2', async ({ page }) => {
 </TabItem>
 </Tabs>
 
+**Usage**
+
+```js
+test.fixme();
+```
+
 ---
 
 ### test.fixme(condition) {#test-fixme-3}
@@ -1170,8 +1463,6 @@ test('test to be fixed 2', async ({ page }) => {
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.fixme(condition)</x-search>
 
 Conditionally mark a test as "fixme" with an optional description.
-
-**Usage**
 
 <Tabs
   groupId="js-flavor"
@@ -1206,6 +1497,13 @@ test('broken in WebKit', async ({ page, browserName }) => {
 
 </TabItem>
 </Tabs>
+
+**Usage**
+
+```js
+test.fixme(condition);
+test.fixme(condition, description);
+```
 
 **Arguments**
 - `condition` [boolean]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-fixme-3-option-condition"/><a href="#test-fixme-3-option-condition" class="list-anchor">#</a>
@@ -1223,8 +1521,6 @@ test('broken in WebKit', async ({ page, browserName }) => {
 
 Conditionally mark all tests in a file or [test.describe()](/api/class-test.mdx#test-describe-1) group as "fixme".
 
-**Usage**
-
 <Tabs
   groupId="js-flavor"
   defaultValue="ts"
@@ -1266,6 +1562,13 @@ test('broken in WebKit 2', async ({ page }) => {
 
 </TabItem>
 </Tabs>
+
+**Usage**
+
+```js
+test.fixme(callback);
+test.fixme(callback, description);
+```
 
 **Arguments**
 - `callback` [function]\([Fixtures]\):[boolean]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-fixme-4-option-condition"/><a href="#test-fixme-4-option-condition" class="list-anchor">#</a>
@@ -1285,35 +1588,9 @@ Returns information about the currently running test. This method can only be ca
 
 **Usage**
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
 ```js
-test('example test', async ({ page }) => {
-  // ...
-  await test.info().attach('screenshot', { body: await page.screenshot(), contentType: 'image/png' });
-});
+test.info();
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-test('example test', async ({ page }) => {
-  // ...
-  await test.info().attach('screenshot', { body: await page.screenshot(), contentType: 'image/png' });
-});
-```
-
-</TabItem>
-</Tabs>
 
 **Returns**
 - [TestInfo]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-info-return"/><a href="#test-info-return" class="list-anchor">#</a>
@@ -1326,8 +1603,6 @@ test('example test', async ({ page }) => {
 
 Declares a focused test. If there are some focused tests or suites, all of them will be run but nothing else.
 
-**Usage**
-
 <Tabs
   groupId="js-flavor"
   defaultValue="ts"
@@ -1355,6 +1630,12 @@ test.only('focus this test', async ({ page }) => {
 
 </TabItem>
 </Tabs>
+
+**Usage**
+
+```js
+test.only(title, testFunction);
+```
 
 **Arguments**
 - `title` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-only-option-title"/><a href="#test-only-option-title" class="list-anchor">#</a>
@@ -1372,49 +1653,164 @@ test.only('focus this test', async ({ page }) => {
 
 Changes the timeout for the test. Zero means no timeout. Learn more about [various timeouts](../test-timeouts.mdx).
 
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import { test, expect } from '@playwright/test';
+
+test('very slow test', async ({ page }) => {
+  test.setTimeout(120000);
+  // ...
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+const { test, expect } = require('@playwright/test');
+
+test('very slow test', async ({ page }) => {
+  test.setTimeout(120000);
+  // ...
+});
+```
+
+</TabItem>
+</Tabs>
+
+Changing timeout from a slow `beforeEach` or `afterEach` hook. Note that this affects the test timeout that is shared with `beforeEach`/`afterEach` hooks.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import { test, expect } from '@playwright/test';
+
+test.beforeEach(async ({ page }, testInfo) => {
+  // Extend timeout for all tests running this hook by 30 seconds.
+  test.setTimeout(testInfo.timeout + 30000);
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+const { test, expect } = require('@playwright/test');
+
+test.beforeEach(async ({ page }, testInfo) => {
+  // Extend timeout for all tests running this hook by 30 seconds.
+  test.setTimeout(testInfo.timeout + 30000);
+});
+```
+
+</TabItem>
+</Tabs>
+
+Changing timeout for a `beforeAll` or `afterAll` hook. Note this affects the hook's timeout, not the test timeout.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import { test, expect } from '@playwright/test';
+
+test.beforeAll(async () => {
+  // Set timeout for this hook.
+  test.setTimeout(60000);
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+const { test, expect } = require('@playwright/test');
+
+test.beforeAll(async () => {
+  // Set timeout for this hook.
+  test.setTimeout(60000);
+});
+```
+
+</TabItem>
+</Tabs>
+
+Changing timeout for all tests in a [test.describe()](/api/class-test.mdx#test-describe-1) group.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import { test, expect } from '@playwright/test';
+
+test.describe('group', () => {
+  // Applies to all tests in this group.
+  test.describe.configure({ timeout: 60000 });
+
+  test('test one', async () => { /* ... */ });
+  test('test two', async () => { /* ... */ });
+  test('test three', async () => { /* ... */ });
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+const { test, expect } = require('@playwright/test');
+
+test.describe('group', () => {
+  // Applies to all tests in this group.
+  test.describe.configure({ timeout: 60000 });
+
+  test('test one', async () => { /* ... */ });
+  test('test two', async () => { /* ... */ });
+  test('test three', async () => { /* ... */ });
+});
+```
+
+</TabItem>
+</Tabs>
+
 Timeout for the currently running test is available through [testInfo.timeout](/api/class-testinfo.mdx#test-info-timeout).
 
 **Usage**
-* Changing test timeout.
-  
-  ```js tab=js-ts
-  test('very slow test', async ({ page }) => {
-    test.setTimeout(120000);
-    // ...
-  });
-  ```
-  
-* Changing timeout from a slow `beforeEach` or `afterEach` hook. Note that this affects the test timeout that is shared with `beforeEach`/`afterEach` hooks.
-  
-  ```js tab=js-ts
-  test.beforeEach(async ({ page }, testInfo) => {
-    // Extend timeout for all tests running this hook by 30 seconds.
-    test.setTimeout(testInfo.timeout + 30000);
-  });
-  ```
-  
-* Changing timeout for a `beforeAll` or `afterAll` hook. Note this affects the hook's timeout, not the test timeout.
-  
-  ```js tab=js-ts
-  test.beforeAll(async () => {
-    // Set timeout for this hook.
-    test.setTimeout(60000);
-  });
-  ```
-  
-* Changing timeout for all tests in a [test.describe()](/api/class-test.mdx#test-describe-1) group.
-  
-  ```js tab=js-ts
-  test.describe('group', () => {
-    // Applies to all tests in this group.
-    test.describe.configure({ timeout: 60000 });
-  
-    test('test one', async () => { /* ... */ });
-    test('test two', async () => { /* ... */ });
-    test('test three', async () => { /* ... */ });
-  });
-  ```
-  
+
+```js
+test.setTimeout(timeout);
+```
+
 **Arguments**
 - `timeout` [number]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-set-timeout-option-timeout"/><a href="#test-set-timeout-option-timeout" class="list-anchor">#</a>
   
@@ -1427,8 +1823,6 @@ Timeout for the currently running test is available through [testInfo.timeout](/
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.skip(title, testFunction)</x-search>
 
 Declares a skipped test, similarly to [test()](/api/class-test.mdx#test-call). Skipped test is never run.
-
-**Usage**
 
 <Tabs
   groupId="js-flavor"
@@ -1462,6 +1856,12 @@ test.skip('broken test', async ({ page }) => {
 </TabItem>
 </Tabs>
 
+**Usage**
+
+```js
+test.skip(title, testFunction);
+```
+
 **Arguments**
 - `title` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-skip-1-option-title"/><a href="#test-skip-1-option-title" class="list-anchor">#</a>
   
@@ -1477,8 +1877,6 @@ test.skip('broken test', async ({ page }) => {
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.skip()</x-search>
 
 Unconditionally skip a test. Test is immediately aborted when you call [test.skip()](/api/class-test.mdx#test-skip-2).
-
-**Usage**
 
 <Tabs
   groupId="js-flavor"
@@ -1558,6 +1956,12 @@ test('skipped test 2', async ({ page }) => {
 </TabItem>
 </Tabs>
 
+**Usage**
+
+```js
+test.skip();
+```
+
 ---
 
 ### test.skip(condition) {#test-skip-3}
@@ -1565,8 +1969,6 @@ test('skipped test 2', async ({ page }) => {
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.skip(condition)</x-search>
 
 Conditionally skip a test with an optional description.
-
-**Usage**
 
 <Tabs
   groupId="js-flavor"
@@ -1638,6 +2040,13 @@ test.beforeEach(async ({ page }) => {
 </TabItem>
 </Tabs>
 
+**Usage**
+
+```js
+test.skip(condition);
+test.skip(condition, description);
+```
+
 **Arguments**
 - `condition` [boolean]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-skip-3-option-condition"/><a href="#test-skip-3-option-condition" class="list-anchor">#</a>
   
@@ -1653,8 +2062,6 @@ test.beforeEach(async ({ page }) => {
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.skip(callback)</x-search>
 
 Conditionally skips all tests in a file or [test.describe()](/api/class-test.mdx#test-describe-1) group.
-
-**Usage**
 
 <Tabs
   groupId="js-flavor"
@@ -1697,6 +2104,13 @@ test('skip in WebKit 2', async ({ page }) => {
 
 </TabItem>
 </Tabs>
+
+**Usage**
+
+```js
+test.skip(callback);
+test.skip(callback, description);
+```
 
 **Arguments**
 - `callback` [function]\([Fixtures]\):[boolean]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-skip-4-option-condition"/><a href="#test-skip-4-option-condition" class="list-anchor">#</a>
@@ -1714,8 +2128,6 @@ test('skip in WebKit 2', async ({ page }) => {
 
 Unconditionally marks a test as "slow". Slow test will be given triple the default timeout.
 
-**Usage**
-
 <Tabs
   groupId="js-flavor"
   defaultValue="ts"
@@ -1750,9 +2162,15 @@ test('slow test', async ({ page }) => {
 </TabItem>
 </Tabs>
 
-**Details**
-
+:::note
 [test.slow()](/api/class-test.mdx#test-slow-1) cannot be used in a `beforeAll` or `afterAll` hook. Use [test.setTimeout()](/api/class-test.mdx#test-set-timeout) instead.
+:::
+
+**Usage**
+
+```js
+test.slow();
+```
 
 ---
 
@@ -1762,8 +2180,6 @@ test('slow test', async ({ page }) => {
 
 Conditionally mark a test as "slow" with an optional description. Slow test will be given triple the default timeout.
 
-**Usage**
-
 <Tabs
   groupId="js-flavor"
   defaultValue="ts"
@@ -1797,6 +2213,13 @@ test('slow in WebKit', async ({ page, browserName }) => {
 
 </TabItem>
 </Tabs>
+
+**Usage**
+
+```js
+test.slow(condition);
+test.slow(condition, description);
+```
 
 **Arguments**
 - `condition` [boolean]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-slow-2-option-condition"/><a href="#test-slow-2-option-condition" class="list-anchor">#</a>
@@ -1813,8 +2236,6 @@ test('slow in WebKit', async ({ page, browserName }) => {
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.slow(callback)</x-search>
 
 Conditionally mark all tests in a file or [test.describe()](/api/class-test.mdx#test-describe-1) group as "slow". Slow tests will be given triple the default timeout.
-
-**Usage**
 
 <Tabs
   groupId="js-flavor"
@@ -1858,6 +2279,13 @@ test('slow in WebKit 2', async ({ page }) => {
 </TabItem>
 </Tabs>
 
+**Usage**
+
+```js
+test.slow(callback);
+test.slow(callback, description);
+```
+
 **Arguments**
 - `callback` [function]\([Fixtures]\):[boolean]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-slow-3-option-condition"/><a href="#test-slow-3-option-condition" class="list-anchor">#</a>
   
@@ -1874,8 +2302,6 @@ test('slow in WebKit 2', async ({ page }) => {
 
 Declares a test step.
 
-**Usage**
-
 <Tabs
   groupId="js-flavor"
   defaultValue="ts"
@@ -1911,6 +2337,54 @@ test('test', async ({ page }) => {
 
 </TabItem>
 </Tabs>
+
+The method returns value retuned by the step callback.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import { test, expect } from '@playwright/test';
+
+test('test', async ({ page }) => {
+  const user = await test.step('Log in', async () => {
+    // ...
+    return 'john';
+  });
+  expect(user).toBe('john');
+});
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js
+const { test, expect } = require('@playwright/test');
+
+test('test', async ({ page }) => {
+  const user = await test.step('Log in', async () => {
+    // ...
+    return 'john';
+  });
+  expect(user).toBe('john');
+});
+```
+
+</TabItem>
+</Tabs>
+
+**Usage**
+
+```js
+await test.step(title, body);
+```
 
 **Arguments**
 - `title` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-step-option-title"/><a href="#test-step-option-title" class="list-anchor">#</a>
@@ -1923,59 +2397,13 @@ test('test', async ({ page }) => {
 **Returns**
 - [Promise]<[Object]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-step-return"/><a href="#test-step-return" class="list-anchor">#</a>
 
-**Details**
-
-The method returns the value retuned by the step callback.
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
-```js
-import { test, expect } from '@playwright/test';
-
-test('test', async ({ page }) => {
-  const user = await test.step('Log in', async () => {
-    // ...
-    return 'john';
-  });
-  expect(user).toBe('john');
-});
-```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-const { test, expect } = require('@playwright/test');
-
-test('test', async ({ page }) => {
-  const user = await test.step('Log in', async () => {
-    // ...
-    return 'john';
-  });
-  expect(user).toBe('john');
-});
-```
-
-</TabItem>
-</Tabs>
-
 ---
 
 ### test.use {#test-use}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.use</x-search>
 
-Specifies options or fixtures to use in a single test file or a [test.describe()](/api/class-test.mdx#test-describe-1) group. Most useful to set an option, for example set `locale` to configure `context` fixture.
-
-**Usage**
+Specifies options or fixtures to use in a single test file or a [test.describe()](/api/class-test.mdx#test-describe-1) group. Most useful to set an option, for example set `locale` to configure `context` fixture. `test.use` can be called either in the global scope or inside `test.describe`. It is an error to call it within `beforeEach` or `beforeAll`.
 
 <Tabs
   groupId="js-flavor"
@@ -2012,15 +2440,6 @@ test('test with locale', async ({ page }) => {
 
 </TabItem>
 </Tabs>
-
-**Arguments**
-- `options` [TestOptions]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-use-option-fixtures"/><a href="#test-use-option-fixtures" class="list-anchor">#</a>
-  
-  An object with local options.
-
-**Details**
-
-`test.use` can be called either in the global scope or inside `test.describe`. It is an error to call it within `beforeEach` or `beforeAll`.
 
 It is also possible to override a fixture by providing a function.
 
@@ -2072,6 +2491,17 @@ test('test with locale', async ({ page }) => {
 </TabItem>
 </Tabs>
 
+**Usage**
+
+```js
+test.use(options);
+```
+
+**Arguments**
+- `options` [TestOptions]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-use-option-fixtures"/><a href="#test-use-option-fixtures" class="list-anchor">#</a>
+  
+  An object with local options.
+
 ---
 
 ## Properties
@@ -2080,254 +2510,16 @@ test('test with locale', async ({ page }) => {
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.expect</x-search>
 
-`expect` function can be used to create test assertions. Read more about [test assertions](../test-assertions.mdx).
+`expect` function can be used to create test assertions. Read [expect library documentation](https://jestjs.io/docs/expect) for more details.
 
 **Usage**
 
 ```js
-test('example', async ({ page }) => {
-  await test.expect(page).toHaveTitle('Title');
-});
+test.expect
 ```
 
 **Type**
 - [Object]
-
----
-
-## Deprecated
-
-### test.describe.parallel {#test-describe-parallel}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.describe.parallel</x-search>
-
-:::caution
-
-See [test.describe.configure()](/api/class-test.mdx#test-describe-configure) for the preferred way of configuring the execution mode.
-
-:::
-
-
-Declares a group of tests that could be run in parallel. By default, tests in a single test file run one after another, but using [test.describe.parallel()](/api/class-test.mdx#test-describe-parallel) allows them to run in parallel.
-
-**Usage**
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
-```js
-test.describe.parallel('group', () => {
-  test('runs in parallel 1', async ({ page }) => {});
-  test('runs in parallel 2', async ({ page }) => {});
-});
-```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-test.describe.parallel('group', () => {
-  test('runs in parallel 1', async ({ page }) => {});
-  test('runs in parallel 2', async ({ page }) => {});
-});
-```
-
-</TabItem>
-</Tabs>
-
-Note that parallel tests are executed in separate processes and cannot share any state or global variables. Each of the parallel tests executes all relevant hooks.
-
-**Arguments**
-- `title` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-parallel-option-title"/><a href="#test-describe-parallel-option-title" class="list-anchor">#</a>
-  
-  Group title.
-- `callback` [function]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-parallel-option-callback"/><a href="#test-describe-parallel-option-callback" class="list-anchor">#</a>
-  
-  A callback that is run immediately when calling [test.describe.parallel()](/api/class-test.mdx#test-describe-parallel). Any tests added in this callback will belong to the group.
-
----
-
-### test.describe.parallel.only {#test-describe-parallel-only}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.describe.parallel.only</x-search>
-
-:::caution
-
-See [test.describe.configure()](/api/class-test.mdx#test-describe-configure) for the preferred way of configuring the execution mode.
-
-:::
-
-
-Declares a focused group of tests that could be run in parallel. This is similar to [test.describe.parallel()](/api/class-test.mdx#test-describe-parallel), but focuses the group. If there are some focused tests or suites, all of them will be run but nothing else.
-
-**Usage**
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
-```js
-test.describe.parallel.only('group', () => {
-  test('runs in parallel 1', async ({ page }) => {});
-  test('runs in parallel 2', async ({ page }) => {});
-});
-```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-test.describe.parallel.only('group', () => {
-  test('runs in parallel 1', async ({ page }) => {});
-  test('runs in parallel 2', async ({ page }) => {});
-});
-```
-
-</TabItem>
-</Tabs>
-
-**Arguments**
-- `title` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-parallel-only-option-title"/><a href="#test-describe-parallel-only-option-title" class="list-anchor">#</a>
-  
-  Group title.
-- `callback` [function]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-parallel-only-option-callback"/><a href="#test-describe-parallel-only-option-callback" class="list-anchor">#</a>
-  
-  A callback that is run immediately when calling [test.describe.parallel.only()](/api/class-test.mdx#test-describe-parallel-only). Any tests added in this callback will belong to the group.
-
----
-
-### test.describe.serial {#test-describe-serial}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.describe.serial</x-search>
-
-:::caution
-
-See [test.describe.configure()](/api/class-test.mdx#test-describe-configure) for the preferred way of configuring the execution mode.
-
-:::
-
-
-Declares a group of tests that should always be run serially. If one of the tests fails, all subsequent tests are skipped. All tests in a group are retried together.
-
-:::note
-Using serial is not recommended. It is usually better to make your tests isolated, so they can be run independently.
-:::
-
-**Usage**
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
-```js
-test.describe.serial('group', () => {
-  test('runs first', async ({ page }) => {});
-  test('runs second', async ({ page }) => {});
-});
-```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-test.describe.serial('group', () => {
-  test('runs first', async ({ page }) => {});
-  test('runs second', async ({ page }) => {});
-});
-```
-
-</TabItem>
-</Tabs>
-
-**Arguments**
-- `title` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-serial-option-title"/><a href="#test-describe-serial-option-title" class="list-anchor">#</a>
-  
-  Group title.
-- `callback` [function]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-serial-option-callback"/><a href="#test-describe-serial-option-callback" class="list-anchor">#</a>
-  
-  A callback that is run immediately when calling [test.describe.serial()](/api/class-test.mdx#test-describe-serial). Any tests added in this callback will belong to the group.
-
----
-
-### test.describe.serial.only {#test-describe-serial-only}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>test.test.describe.serial.only</x-search>
-
-:::caution
-
-See [test.describe.configure()](/api/class-test.mdx#test-describe-configure) for the preferred way of configuring the execution mode.
-
-:::
-
-
-Declares a focused group of tests that should always be run serially. If one of the tests fails, all subsequent tests are skipped. All tests in a group are retried together. If there are some focused tests or suites, all of them will be run but nothing else.
-
-:::note
-Using serial is not recommended. It is usually better to make your tests isolated, so they can be run independently.
-:::
-
-**Usage**
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
-```js
-test.describe.serial.only('group', () => {
-  test('runs first', async ({ page }) => {
-  });
-  test('runs second', async ({ page }) => {
-  });
-});
-```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-test.describe.serial.only('group', () => {
-  test('runs first', async ({ page }) => {
-  });
-  test('runs second', async ({ page }) => {
-  });
-});
-```
-
-</TabItem>
-</Tabs>
-
-**Arguments**
-- `title` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-serial-only-option-title"/><a href="#test-describe-serial-only-option-title" class="list-anchor">#</a>
-  
-  Group title.
-- `callback` [function]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-describe-serial-only-option-callback"/><a href="#test-describe-serial-only-option-callback" class="list-anchor">#</a>
-  
-  A callback that is run immediately when calling [test.describe.serial.only()](/api/class-test.mdx#test-describe-serial-only). Any tests added in this callback will belong to the group.
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
@@ -2383,7 +2575,6 @@ test.describe.serial.only('group', () => {
 [TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
 [TestOptions]: /api/class-testoptions.mdx "TestOptions"
 [TestProject]: /api/class-testproject.mdx "TestProject"
-[TestStore]: /api/class-teststore.mdx "TestStore"
 [WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
 [Location]: /api/class-location.mdx "Location"
 [Reporter]: /api/class-reporter.mdx "Reporter"
