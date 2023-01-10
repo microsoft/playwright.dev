@@ -52,402 +52,6 @@ page.Load -= PageLoadHandler;
 
 ---
 
-## Events
-
-### event Close {#page-event-close}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.event Close</x-search>
-
-Emitted when the page closes.
-
-**Usage**
-
-```csharp
-Page.Close += async data => {};
-```
-
-**Event data**
-- [Page]
-
----
-
-### event Console {#page-event-console}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.event Console</x-search>
-
-Emitted when JavaScript within the page calls one of console API methods, e.g. `console.log` or `console.dir`. Also emitted if the page throws an error or a warning.
-
-The arguments passed into `console.log` appear as arguments on the event handler.
-
-An example of handling `console` event:
-
-```csharp
-page.Console += async (_, msg) =>
-{
-    foreach (var arg in msg.Args)
-        Console.WriteLine(await arg.JsonValueAsync<object>());
-};
-
-await page.EvaluateAsync("console.log('hello', 5, { foo: 'bar' })");
-```
-
-**Usage**
-
-```csharp
-Page.Console += async data => {};
-```
-
-**Event data**
-- [ConsoleMessage]
-
----
-
-### event Crash {#page-event-crash}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.event Crash</x-search>
-
-Emitted when the page crashes. Browser pages might crash if they try to allocate too much memory. When the page crashes, ongoing and subsequent operations will throw.
-
-The most common way to deal with crashes is to catch an exception:
-
-```csharp
-try {
-  // Crash might happen during a click.
-  await page.ClickAsync("button");
-  // Or while waiting for an event.
-  await page.WaitForPopup();
-} catch (PlaywrightException e) {
-  // When the page crashes, exception message contains "crash".
-}
-```
-
-**Usage**
-
-```csharp
-Page.Crash += async data => {};
-```
-
-**Event data**
-- [Page]
-
----
-
-### event Dialog {#page-event-dialog}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.event Dialog</x-search>
-
-Emitted when a JavaScript dialog appears, such as `alert`, `prompt`, `confirm` or `beforeunload`. Listener **must** either [Dialog.AcceptAsync()](/api/class-dialog.mdx#dialog-accept) or [Dialog.DismissAsync()](/api/class-dialog.mdx#dialog-dismiss) the dialog - otherwise the page will [freeze](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#never_blocking) waiting for the dialog, and actions like click will never finish.
-
-```csharp
-page.RequestFailed += (_, request) =>
-{
-    Console.WriteLine(request.Url + " " + request.Failure);
-};
-```
-
-:::note
-When no [Page.Dialog](/api/class-page.mdx#page-event-dialog) listeners are present, all dialogs are automatically dismissed.
-:::
-
-**Usage**
-
-```csharp
-Page.Dialog += async data => {};
-```
-
-**Event data**
-- [Dialog]
-
----
-
-### event DOMContentLoaded {#page-event-dom-content-loaded}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.event DOMContentLoaded</x-search>
-
-Emitted when the JavaScript [`DOMContentLoaded`](https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded) event is dispatched.
-
-**Usage**
-
-```csharp
-Page.DOMContentLoaded += async data => {};
-```
-
-**Event data**
-- [Page]
-
----
-
-### event Download {#page-event-download}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.event Download</x-search>
-
-Emitted when attachment download started. User can access basic file operations on downloaded content via the passed [Download] instance.
-
-**Usage**
-
-```csharp
-Page.Download += async data => {};
-```
-
-**Event data**
-- [Download]
-
----
-
-### event FileChooser {#page-event-file-chooser}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.event FileChooser</x-search>
-
-Emitted when a file chooser is supposed to appear, such as after clicking the  `<input type=file>`. Playwright can respond to it via setting the input files using [FileChooser.SetFilesAsync()](/api/class-filechooser.mdx#file-chooser-set-files) that can be uploaded after that.
-
-```csharp
-page.FileChooser += (_, fileChooser) =>
-{
-    fileChooser.SetFilesAsync(@"C:\temp\myfile.pdf");
-};
-```
-
-**Usage**
-
-```csharp
-Page.FileChooser += async data => {};
-```
-
-**Event data**
-- [FileChooser]
-
----
-
-### event FrameAttached {#page-event-frame-attached}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.event FrameAttached</x-search>
-
-Emitted when a frame is attached.
-
-**Usage**
-
-```csharp
-Page.FrameAttached += async data => {};
-```
-
-**Event data**
-- [Frame]
-
----
-
-### event FrameDetached {#page-event-frame-detached}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.event FrameDetached</x-search>
-
-Emitted when a frame is detached.
-
-**Usage**
-
-```csharp
-Page.FrameDetached += async data => {};
-```
-
-**Event data**
-- [Frame]
-
----
-
-### event FrameNavigated {#page-event-frame-navigated}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.event FrameNavigated</x-search>
-
-Emitted when a frame is navigated to a new url.
-
-**Usage**
-
-```csharp
-Page.FrameNavigated += async data => {};
-```
-
-**Event data**
-- [Frame]
-
----
-
-### event Load {#page-event-load}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.event Load</x-search>
-
-Emitted when the JavaScript [`load`](https://developer.mozilla.org/en-US/docs/Web/Events/load) event is dispatched.
-
-**Usage**
-
-```csharp
-Page.Load += async data => {};
-```
-
-**Event data**
-- [Page]
-
----
-
-### event PageError {#page-event-page-error}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.event PageError</x-search>
-
-Emitted when an uncaught exception happens within the page.
-
-```csharp
-// Log all uncaught errors to the terminal
-page.PageError += (_, exception) =>
-{
-  Console.WriteLine("Uncaught exception: " + exception);
-};
-```
-
-**Usage**
-
-```csharp
-Page.PageError += async data => {};
-```
-
-**Event data**
-- [string]
-
----
-
-### event Popup {#page-event-popup}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.event Popup</x-search>
-
-Emitted when the page opens a new tab or window. This event is emitted in addition to the [BrowserContext.Page](/api/class-browsercontext.mdx#browser-context-event-page), but only for popups relevant to this page.
-
-The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
-
-```csharp
-var popup = await page.RunAndWaitForPopupAsync(async () =>
-{
-    await page.GetByText("open the popup").ClickAsync();
-});
-Console.WriteLine(await popup.EvaluateAsync<string>("location.href"));
-```
-
-:::note
-Use [Page.WaitForLoadStateAsync()](/api/class-page.mdx#page-wait-for-load-state) to wait until the page gets to a particular state (you should not need it in most cases).
-:::
-
-**Usage**
-
-```csharp
-Page.Popup += async data => {};
-```
-
-**Event data**
-- [Page]
-
----
-
-### event Request {#page-event-request}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.event Request</x-search>
-
-Emitted when a page issues a request. The [request] object is read-only. In order to intercept and mutate requests, see [Page.RouteAsync()](/api/class-page.mdx#page-route) or [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route).
-
-**Usage**
-
-```csharp
-Page.Request += async data => {};
-```
-
-**Event data**
-- [Request]
-
----
-
-### event RequestFailed {#page-event-request-failed}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.event RequestFailed</x-search>
-
-Emitted when a request fails, for example by timing out.
-
-:::note
-HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [Page.RequestFinished](/api/class-page.mdx#page-event-request-finished) event and not with [Page.RequestFailed](/api/class-page.mdx#page-event-request-failed). A request will only be considered failed when the client cannot get an HTTP response from the server, e.g. due to network error net::ERR_FAILED.
-:::
-
-**Usage**
-
-```csharp
-Page.RequestFailed += async data => {};
-```
-
-**Event data**
-- [Request]
-
----
-
-### event RequestFinished {#page-event-request-finished}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.event RequestFinished</x-search>
-
-Emitted when a request finishes successfully after downloading the response body. For a successful response, the sequence of events is `request`, `response` and `requestfinished`.
-
-**Usage**
-
-```csharp
-Page.RequestFinished += async data => {};
-```
-
-**Event data**
-- [Request]
-
----
-
-### event Response {#page-event-response}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.event Response</x-search>
-
-Emitted when [response] status and headers are received for a request. For a successful response, the sequence of events is `request`, `response` and `requestfinished`.
-
-**Usage**
-
-```csharp
-Page.Response += async data => {};
-```
-
-**Event data**
-- [Response]
-
----
-
-### event WebSocket {#page-event-web-socket}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.event WebSocket</x-search>
-
-Emitted when [WebSocket] request is sent.
-
-**Usage**
-
-```csharp
-Page.WebSocket += async data => {};
-```
-
-**Event data**
-- [WebSocket]
-
----
-
-### event Worker {#page-event-worker}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.event Worker</x-search>
-
-Emitted when a dedicated [WebWorker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) is spawned by the page.
-
-**Usage**
-
-```csharp
-Page.Worker += async data => {};
-```
-
-**Event data**
-- [Worker]
-
----
-
 ## Methods
 
 ### AddInitScriptAsync {#page-add-init-script}
@@ -2972,6 +2576,402 @@ Page.Touchscreen
 
 **Type**
 - [Touchscreen]
+
+---
+
+## Events
+
+### event Close {#page-event-close}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.event Close</x-search>
+
+Emitted when the page closes.
+
+**Usage**
+
+```csharp
+Page.Close += async data => {};
+```
+
+**Event data**
+- [Page]
+
+---
+
+### event Console {#page-event-console}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.event Console</x-search>
+
+Emitted when JavaScript within the page calls one of console API methods, e.g. `console.log` or `console.dir`. Also emitted if the page throws an error or a warning.
+
+The arguments passed into `console.log` appear as arguments on the event handler.
+
+An example of handling `console` event:
+
+```csharp
+page.Console += async (_, msg) =>
+{
+    foreach (var arg in msg.Args)
+        Console.WriteLine(await arg.JsonValueAsync<object>());
+};
+
+await page.EvaluateAsync("console.log('hello', 5, { foo: 'bar' })");
+```
+
+**Usage**
+
+```csharp
+Page.Console += async data => {};
+```
+
+**Event data**
+- [ConsoleMessage]
+
+---
+
+### event Crash {#page-event-crash}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.event Crash</x-search>
+
+Emitted when the page crashes. Browser pages might crash if they try to allocate too much memory. When the page crashes, ongoing and subsequent operations will throw.
+
+The most common way to deal with crashes is to catch an exception:
+
+```csharp
+try {
+  // Crash might happen during a click.
+  await page.ClickAsync("button");
+  // Or while waiting for an event.
+  await page.WaitForPopup();
+} catch (PlaywrightException e) {
+  // When the page crashes, exception message contains "crash".
+}
+```
+
+**Usage**
+
+```csharp
+Page.Crash += async data => {};
+```
+
+**Event data**
+- [Page]
+
+---
+
+### event Dialog {#page-event-dialog}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.event Dialog</x-search>
+
+Emitted when a JavaScript dialog appears, such as `alert`, `prompt`, `confirm` or `beforeunload`. Listener **must** either [Dialog.AcceptAsync()](/api/class-dialog.mdx#dialog-accept) or [Dialog.DismissAsync()](/api/class-dialog.mdx#dialog-dismiss) the dialog - otherwise the page will [freeze](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#never_blocking) waiting for the dialog, and actions like click will never finish.
+
+```csharp
+page.RequestFailed += (_, request) =>
+{
+    Console.WriteLine(request.Url + " " + request.Failure);
+};
+```
+
+:::note
+When no [Page.Dialog](/api/class-page.mdx#page-event-dialog) listeners are present, all dialogs are automatically dismissed.
+:::
+
+**Usage**
+
+```csharp
+Page.Dialog += async data => {};
+```
+
+**Event data**
+- [Dialog]
+
+---
+
+### event DOMContentLoaded {#page-event-dom-content-loaded}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.event DOMContentLoaded</x-search>
+
+Emitted when the JavaScript [`DOMContentLoaded`](https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded) event is dispatched.
+
+**Usage**
+
+```csharp
+Page.DOMContentLoaded += async data => {};
+```
+
+**Event data**
+- [Page]
+
+---
+
+### event Download {#page-event-download}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.event Download</x-search>
+
+Emitted when attachment download started. User can access basic file operations on downloaded content via the passed [Download] instance.
+
+**Usage**
+
+```csharp
+Page.Download += async data => {};
+```
+
+**Event data**
+- [Download]
+
+---
+
+### event FileChooser {#page-event-file-chooser}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.event FileChooser</x-search>
+
+Emitted when a file chooser is supposed to appear, such as after clicking the  `<input type=file>`. Playwright can respond to it via setting the input files using [FileChooser.SetFilesAsync()](/api/class-filechooser.mdx#file-chooser-set-files) that can be uploaded after that.
+
+```csharp
+page.FileChooser += (_, fileChooser) =>
+{
+    fileChooser.SetFilesAsync(@"C:\temp\myfile.pdf");
+};
+```
+
+**Usage**
+
+```csharp
+Page.FileChooser += async data => {};
+```
+
+**Event data**
+- [FileChooser]
+
+---
+
+### event FrameAttached {#page-event-frame-attached}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.event FrameAttached</x-search>
+
+Emitted when a frame is attached.
+
+**Usage**
+
+```csharp
+Page.FrameAttached += async data => {};
+```
+
+**Event data**
+- [Frame]
+
+---
+
+### event FrameDetached {#page-event-frame-detached}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.event FrameDetached</x-search>
+
+Emitted when a frame is detached.
+
+**Usage**
+
+```csharp
+Page.FrameDetached += async data => {};
+```
+
+**Event data**
+- [Frame]
+
+---
+
+### event FrameNavigated {#page-event-frame-navigated}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.event FrameNavigated</x-search>
+
+Emitted when a frame is navigated to a new url.
+
+**Usage**
+
+```csharp
+Page.FrameNavigated += async data => {};
+```
+
+**Event data**
+- [Frame]
+
+---
+
+### event Load {#page-event-load}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.event Load</x-search>
+
+Emitted when the JavaScript [`load`](https://developer.mozilla.org/en-US/docs/Web/Events/load) event is dispatched.
+
+**Usage**
+
+```csharp
+Page.Load += async data => {};
+```
+
+**Event data**
+- [Page]
+
+---
+
+### event PageError {#page-event-page-error}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.event PageError</x-search>
+
+Emitted when an uncaught exception happens within the page.
+
+```csharp
+// Log all uncaught errors to the terminal
+page.PageError += (_, exception) =>
+{
+  Console.WriteLine("Uncaught exception: " + exception);
+};
+```
+
+**Usage**
+
+```csharp
+Page.PageError += async data => {};
+```
+
+**Event data**
+- [string]
+
+---
+
+### event Popup {#page-event-popup}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.event Popup</x-search>
+
+Emitted when the page opens a new tab or window. This event is emitted in addition to the [BrowserContext.Page](/api/class-browsercontext.mdx#browser-context-event-page), but only for popups relevant to this page.
+
+The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
+
+```csharp
+var popup = await page.RunAndWaitForPopupAsync(async () =>
+{
+    await page.GetByText("open the popup").ClickAsync();
+});
+Console.WriteLine(await popup.EvaluateAsync<string>("location.href"));
+```
+
+:::note
+Use [Page.WaitForLoadStateAsync()](/api/class-page.mdx#page-wait-for-load-state) to wait until the page gets to a particular state (you should not need it in most cases).
+:::
+
+**Usage**
+
+```csharp
+Page.Popup += async data => {};
+```
+
+**Event data**
+- [Page]
+
+---
+
+### event Request {#page-event-request}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.event Request</x-search>
+
+Emitted when a page issues a request. The [request] object is read-only. In order to intercept and mutate requests, see [Page.RouteAsync()](/api/class-page.mdx#page-route) or [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route).
+
+**Usage**
+
+```csharp
+Page.Request += async data => {};
+```
+
+**Event data**
+- [Request]
+
+---
+
+### event RequestFailed {#page-event-request-failed}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.event RequestFailed</x-search>
+
+Emitted when a request fails, for example by timing out.
+
+:::note
+HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [Page.RequestFinished](/api/class-page.mdx#page-event-request-finished) event and not with [Page.RequestFailed](/api/class-page.mdx#page-event-request-failed). A request will only be considered failed when the client cannot get an HTTP response from the server, e.g. due to network error net::ERR_FAILED.
+:::
+
+**Usage**
+
+```csharp
+Page.RequestFailed += async data => {};
+```
+
+**Event data**
+- [Request]
+
+---
+
+### event RequestFinished {#page-event-request-finished}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.event RequestFinished</x-search>
+
+Emitted when a request finishes successfully after downloading the response body. For a successful response, the sequence of events is `request`, `response` and `requestfinished`.
+
+**Usage**
+
+```csharp
+Page.RequestFinished += async data => {};
+```
+
+**Event data**
+- [Request]
+
+---
+
+### event Response {#page-event-response}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.event Response</x-search>
+
+Emitted when [response] status and headers are received for a request. For a successful response, the sequence of events is `request`, `response` and `requestfinished`.
+
+**Usage**
+
+```csharp
+Page.Response += async data => {};
+```
+
+**Event data**
+- [Response]
+
+---
+
+### event WebSocket {#page-event-web-socket}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.event WebSocket</x-search>
+
+Emitted when [WebSocket] request is sent.
+
+**Usage**
+
+```csharp
+Page.WebSocket += async data => {};
+```
+
+**Event data**
+- [WebSocket]
+
+---
+
+### event Worker {#page-event-worker}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.event Worker</x-search>
+
+Emitted when a dedicated [WebWorker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) is spawned by the page.
+
+**Usage**
+
+```csharp
+Page.Worker += async data => {};
+```
+
+**Event data**
+- [Worker]
 
 ---
 

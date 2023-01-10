@@ -689,11 +689,11 @@ function memberSection(member) {
   if (member.deprecated || member.discouraged)
     return { key: 'd', title: 'Deprecated' };
   if (member.kind === 'event')
-    return { key: 'a', title: 'Events' };
+    return { key: 'c', title: 'Events' };
   if (member.kind === 'method')
-    return { key: 'b', title: 'Methods' };
+    return { key: 'a', title: 'Methods' };
   if (member.kind === 'property')
-    return { key: 'c', title: 'Properties' };
+    return { key: 'b', title: 'Properties' };
   throw new Error(`Unsupported member kind ${member.kind} for ${member.name}`);
 }
 
