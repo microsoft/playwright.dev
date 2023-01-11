@@ -497,6 +497,26 @@ import HTMLCard from '@site/src/components/HTMLCard';`);
     const properties = type.deepProperties();
     /** @type {MarkdownNode[]} */
     let children = [];
+    // Generate deprecations.
+    if (member.deprecated && direction === 'in') {
+      children.push({
+        type: 'text',
+        text: `:::caution
+${this.documentation.renderLinksInText(member.deprecated)}
+:::
+`
+      });
+    }
+
+    if (member.discouraged && direction === 'in') {
+      children.push({
+        type: 'text',
+        text: `:::caution
+${this.documentation.renderLinksInText(member.discouraged)}
+:::
+`
+      });
+    }
     if (properties && properties.length) {
       children.push(...properties.map(p => {
         let alias = p.alias;
