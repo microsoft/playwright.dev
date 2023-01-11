@@ -263,7 +263,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
         if (member.deprecated) {
           sections.deprecation.push({
             type: 'text',
-            text: `:::caution
+            text: `:::caution Deprecated
 
 ${this.documentation.renderLinksInText(member.deprecated)}
 
@@ -275,7 +275,7 @@ ${this.documentation.renderLinksInText(member.deprecated)}
         if (member.discouraged) {
           sections.deprecation.push({
             type: 'text',
-            text: `:::caution
+            text: `:::caution Discouraged
 
 ${this.documentation.renderLinksInText(member.discouraged)}
 
@@ -501,7 +501,7 @@ import HTMLCard from '@site/src/components/HTMLCard';`);
     if (member.deprecated && direction === 'in') {
       children.push({
         type: 'text',
-        text: `:::caution
+        text: `:::caution Deprecated
 ${this.documentation.renderLinksInText(member.deprecated)}
 :::
 `
@@ -511,7 +511,7 @@ ${this.documentation.renderLinksInText(member.deprecated)}
     if (member.discouraged && direction === 'in') {
       children.push({
         type: 'text',
-        text: `:::caution
+        text: `:::caution Discouraged
 ${this.documentation.renderLinksInText(member.discouraged)}
 :::
 `
