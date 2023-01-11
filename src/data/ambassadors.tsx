@@ -31,7 +31,7 @@ const ambassadors = [
     city: 'Berlin',
     country: 'Germany',
     imageUrl:
-      'https://media-exp1.licdn.com/dms/image/C4E03AQHNkQmEbZBVqA/profile-displayphoto-shrink_400_400/0/1517375686271?e=1671667200&v=beta&t=j6CLWbYad-tvTAb0h8__WIz-_18qv-v_xtSAqhmarG4',
+      'https://media.licdn.com/dms/image/C4E03AQHNkQmEbZBVqA/profile-displayphoto-shrink_400_400/0/1517375686271?e=1678924800&v=beta&t=PKV9zm_XTp8sFtNwDfStonH87p5FulwVMZA_NwTAf94',
     twitterUrl: 'https://twitter.com/rag0g',
     websiteUrl: 'https://www.youtube.com/c/AutomateTogether'
   },
@@ -42,14 +42,6 @@ const ambassadors = [
     country: 'USA',
     githubUrl: 'https://github.com/unlikelyzero',
     linkedInUrl: 'https://www.linkedin.com/in/linkedjohnhill'
-  },
-  {
-    name: 'Katrik K. K',
-    languages: 'English',
-    city: 'Auckland',
-    country: 'New Zealand',
-    imageUrl:
-      'https://media-exp1.licdn.com/dms/image/D5603AQH1F3BopdVGqg/profile-displayphoto-shrink_800_800/0/1668150346704?e=1674086400&v=beta&t=6SVXlLAGbnofEwdPOMSno3RBWGnu3L5ruF686FhOopU'
   },
   {
     name: 'Kent C. Dodds',
