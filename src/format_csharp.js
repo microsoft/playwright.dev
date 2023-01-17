@@ -123,7 +123,7 @@ class CSharpFormatter {
     switch (text) {
       case 'any': return `[object]${optionalSuffix}`;
       case 'Array': return `[IEnumerable]${optionalSuffix}`;
-      case 'float': return `[double]${optionalSuffix}`;
+      case 'float': return `[float]${optionalSuffix}`;
       case 'function': {
         switch (fullName(member)) {
           case 'BrowserContext.exposeBinding.callback': return '[Action]<BindingSource, T, [TResult]>';
