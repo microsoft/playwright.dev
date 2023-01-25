@@ -25,9 +25,9 @@ Playwright comes with a [registry of device parameters](https://github.com/micro
 
 ```js
 // playwright.config.ts
-import { type PlaywrightTestConfig, devices } from '@playwright/test'; // import devices
+import { defineConfig, devices } from '@playwright/test'; // import devices
 
-const config: PlaywrightTestConfig = {
+export default defineConfig({
   projects: [
     {
       name: 'chromium',
@@ -42,8 +42,7 @@ const config: PlaywrightTestConfig = {
       },
     },
   ],
-};
-export default config;
+});
 ```
 
 </TabItem>
@@ -52,10 +51,9 @@ export default config;
 ```js
 // playwright.config.js
 // @ts-check
-const { devices } = require('@playwright/test'); // require devices
+const { devices, defineConfig } = require('@playwright/test'); // require devices
 
-/** @type {import('@playwright/test').PlaywrightTestConfig} */ 
-const config = {
+module.exports = defineConfig({
   projects: [
     {
       name: 'chromium',
@@ -70,9 +68,7 @@ const config = {
       },
     },
   ],
-};
-
-module.exports = config;
+});
 ```
 
 </TabItem>
@@ -276,12 +272,11 @@ Allow app to show system notifications.
 
 ```js
 import type { PlaywrightTestConfig } from '@playwright/test';
-const config: PlaywrightTestConfig = {
+export default defineConfig({
   use: {
     permissions: ['notifications'],
   },
-};
-export default config;
+});
 ```
 
 </TabItem>
@@ -290,14 +285,12 @@ export default config;
 ```js
 // @ts-check
 
-/** @type {import('@playwright/test').PlaywrightTestConfig} */
-const config = {
+const { defineConfig } = require('@playwright/test');
+module.exports = defineConfig({
   use: {
     permissions: ['notifications'],
   },
-};
-
-module.exports = config;
+});
 ```
 
 </TabItem>
@@ -326,13 +319,12 @@ Allow test to request current location.
 <TabItem value="ts">
 
 ```js
-import type { PlaywrightTestConfig } from '@playwright/test';
-const config: PlaywrightTestConfig = {
+import type { defineConfig } from '@playwright/test';
+export default defineConfig({
   use: {
     permissions: ['geolocation'],
   },
-};
-export default config;
+});
 ```
 
 </TabItem>
@@ -341,14 +333,12 @@ export default config;
 ```js
 // @ts-check
 
-/** @type {import('@playwright/test').PlaywrightTestConfig} */
-const config = {
+const { defineConfig } = require('@playwright/test');
+module.exports = defineConfig({
   use: {
     permissions: ['geolocation'],
   },
-};
-
-module.exports = config;
+});
 ```
 
 </TabItem>
@@ -375,36 +365,39 @@ Allow notifications for a specific domain.
 <TabItem value="ts">
 
 ```js
-import type { PlaywrightTestConfig } from '@playwright/test';
-const config: PlaywrightTestConfig = {
-  use: {
-    permissions: ['notifications'], {origin: 'https://skype.com'},
-  },
-};
-export default config;
+import { test } from '@playwright/test';
+
+test.beforeEach(async ({ context }) => {
+  // Runs before each test and signs in each page.
+  await context.grantPermissions(['notifications'], { origin: 'https://skype.com' });
+});
+
+test('first', async ({ page }) => {
+  // page has notifications permission for https://skype.com.
+});
 ```
 
 </TabItem>
 <TabItem value="js">
 
 ```js
-// @ts-check
+const { test } = require('@playwright/test');
 
-/** @type {import('@playwright/test').PlaywrightTestConfig} */
-const config = {
-  use: {
-    permissions: ['notifications'], {origin: 'https://skype.com'},
-  },
-};
+test.beforeEach(async ({ context }) => {
+  // Runs before each test and signs in each page.
+  await context.grantPermissions(['notifications'], { origin: 'https://skype.com' });
+});
 
-module.exports = config;
+test('first', async ({ page }) => {
+  // page has notifications permission for https://skype.com.
+});
 ```
 
 </TabItem>
 <TabItem value="library">
 
 ```js
-await context.grantPermissions(['notifications'], {origin: 'https://skype.com'} );
+await context.grantPermissions(['notifications'], { origin: 'https://skype.com' });
 ```
 
 </TabItem>
@@ -498,7 +491,7 @@ test.use({
 
 test('my test with geolocation', async ({ page, context }) => {
   // overwrite the location for this test
-  context.setGeolocation({ longitude: 29.979097, latitude: 31.134256 });
+  await context.setGeolocation({ longitude: 29.979097, latitude: 31.134256 });
 });
 ```
 
@@ -515,7 +508,7 @@ test.use({
 
 test('my test with geolocation', async ({ page, context }) => {
   // overwrite the location for this test
-  context.setGeolocation({ longitude: 29.979097, latitude: 31.134256 });
+  await context.setGeolocation({ longitude: 29.979097, latitude: 31.134256 });
 });
 ```
 
@@ -747,8 +740,8 @@ const context = await browser.newContext({
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [Test]: /api/class-test.mdx "Test"
 [TestConfig]: /api/class-testconfig.mdx "TestConfig"
-[TestError]: /api/class-testerror.mdx "TestError"
 [TestInfo]: /api/class-testinfo.mdx "TestInfo"
+[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
 [TestOptions]: /api/class-testoptions.mdx "TestOptions"
 [TestProject]: /api/class-testproject.mdx "TestProject"
 [WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
@@ -756,6 +749,7 @@ const context = await browser.newContext({
 [Reporter]: /api/class-reporter.mdx "Reporter"
 [Suite]: /api/class-suite.mdx "Suite"
 [TestCase]: /api/class-testcase.mdx "TestCase"
+[TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
