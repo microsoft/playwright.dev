@@ -47,6 +47,7 @@ module.exports = {
         { type: 'doc', id: 'input' },
         { type: 'doc', id: 'auth' },
         { type: 'doc', id: 'actionability' },
+        { type: 'doc', id: 'best-practices' },
         { type: 'doc', id: 'browsers' },
         { type: 'doc', id: 'chrome-extensions' },
         { type: 'doc', id: 'cli' },
