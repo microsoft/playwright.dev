@@ -10,7 +10,32 @@ Playwright provides APIs to **monitor** and **modify** network traffic, both HTT
 
 ## HTTP Authentication
 
-Perform HTTP Authentication with [browser.newContext()](/api/class-browser.mdx#browser-new-context).
+Perform HTTP Authentication.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'Library', value: 'library'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import { defineConfig } from '@playwright/test';
+export default defineConfig({
+  use: {
+    httpCredentials: {
+      username: 'bill',
+      password: 'pa55w0rd',
+    }
+  }
+});
+```
+
+</TabItem>
+<TabItem value="library">
 
 ```js
 const context = await browser.newContext({
@@ -23,6 +48,9 @@ const page = await context.newPage();
 await page.goto('https://example.com');
 ```
 
+</TabItem>
+</Tabs>
+
 ## HTTP Proxy
 
 You can configure pages to load over the HTTP(S) proxy or SOCKSv5. Proxy can be either set globally for the entire browser, or for each browser context individually.
@@ -30,6 +58,32 @@ You can configure pages to load over the HTTP(S) proxy or SOCKSv5. Proxy can be 
 You can optionally specify username and password for HTTP(S) proxy, you can also specify hosts to bypass proxy for.
 
 Here is an example of a global proxy:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'Library', value: 'library'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import { defineConfig } from '@playwright/test';
+export default defineConfig({
+  use: {
+    proxy: {
+      server: 'http://myproxy.com:3128',
+      username: 'usr',
+      password: 'pwd'
+    }
+  }
+});
+```
+
+</TabItem>
+<TabItem value="library">
 
 ```js
 const browser = await chromium.launch({
@@ -41,7 +95,38 @@ const browser = await chromium.launch({
 });
 ```
 
+</TabItem>
+</Tabs>
+
 When specifying proxy for each context individually, **Chromium on Windows** needs a hint that proxy will be set. This is done via passing a non-empty proxy server to the browser itself. Here is an example of a context-specific proxy:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'Library', value: 'library'}
+  ]
+}>
+<TabItem value="ts">
+
+```js
+import { defineConfig } from '@playwright/test';
+export default defineConfig({
+  use: {
+    launchOptions: {
+      // Browser proxy option is required for Chromium on Windows.
+      proxy: { server: 'per-context' }
+    },
+    proxy: {
+      server: 'http://myproxy.com:3128',
+    }
+  }
+});
+```
+
+</TabItem>
+<TabItem value="library">
 
 ```js
 const browser = await chromium.launch({
@@ -53,26 +138,19 @@ const context = await browser.newContext({
 })
 ```
 
+</TabItem>
+</Tabs>
+
 ## Network events
 
 You can monitor all the [Request]s and [Response]s:
 
 ```js
-const { chromium, webkit, firefox } = require('playwright');
+// Subscribe to 'request' and 'response' events.
+page.on('request', request => console.log('>>', request.method(), request.url()));
+page.on('response', response => console.log('<<', response.status(), response.url()));
 
-(async () => {
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
-
-  // Subscribe to 'request' and 'response' events.
-  page.on('request', request =>
-      console.log('>>', request.method(), request.url()));
-  page.on('response', response =>
-      console.log('<<', response.status(), response.url()));
-  await page.goto('https://example.com');
-
-  await browser.close();
-})();
+await page.goto('https://example.com');
 ```
 
 Or wait for a network response after the button click with [page.waitForResponse()](/api/class-page.mdx#page-wait-for-response):
@@ -131,11 +209,11 @@ await page.goto('https://example.com');
 await page.route('**/*', route => {
   const headers = route.request().headers();
   delete headers['X-Secret'];
-  route.continue({headers});
+  route.continue({ headers });
 });
 
 // Continue requests as POST.
-await page.route('**/*', route => route.continue({method: 'POST'}));
+await page.route('**/*', route => route.continue({ method: 'POST' }));
 ```
 
 You can continue requests with modifications. Example above removes an HTTP header from the outgoing requests.
@@ -161,7 +239,7 @@ To modify a response use [APIRequestContext] to get the original response and th
 ```js
 await page.route('**/title.html', async route => {
   // Fetch original response.
-  const response = await page.request.fetch(route.request());
+  const response = await route.fetch();
   // Add a prefix to the title.
   let body = await response.text();
   body = body.replace('<title>', '<title>My prefix:');
@@ -295,8 +373,8 @@ Playwright's built-in [browserContext.route()](/api/class-browsercontext.mdx#bro
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [Test]: /api/class-test.mdx "Test"
 [TestConfig]: /api/class-testconfig.mdx "TestConfig"
-[TestError]: /api/class-testerror.mdx "TestError"
 [TestInfo]: /api/class-testinfo.mdx "TestInfo"
+[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
 [TestOptions]: /api/class-testoptions.mdx "TestOptions"
 [TestProject]: /api/class-testproject.mdx "TestProject"
 [WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
@@ -304,6 +382,7 @@ Playwright's built-in [browserContext.route()](/api/class-browsercontext.mdx#bro
 [Reporter]: /api/class-reporter.mdx "Reporter"
 [Suite]: /api/class-suite.mdx "Suite"
 [TestCase]: /api/class-testcase.mdx "TestCase"
+[TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"

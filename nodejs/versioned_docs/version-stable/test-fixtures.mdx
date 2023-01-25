@@ -52,12 +52,13 @@ The `{ page }` argument tells Playwright Test to setup the `page` fixture and pr
 
 Here is a list of the pre-defined fixtures that you are likely to use most of the time:
 
-|Fixture    |Type             |Description                      |
-|:----------|:----------------|:--------------------------------|
-|page       |[Page]           |Isolated page for this test run. |
-|context    |[BrowserContext] |Isolated context for this test run. The `page` fixture belongs to this context as well. Learn how to [configure context](./test-configuration.mdx). |
-|browser    |[Browser]        |Browsers are shared across tests to optimize resources. Learn how to [configure browser](./test-configuration.mdx). |
-|browserName|[string]         |The name of the browser currently running the test. Either `chromium`, `firefox` or `webkit`.|
+|Fixture    |Type               |Description                      |
+|:----------|:------------------|:--------------------------------|
+|page       |[Page]             |Isolated page for this test run. |
+|context    |[BrowserContext]   |Isolated context for this test run. The `page` fixture belongs to this context as well. Learn how to [configure context](./test-configuration.mdx). |
+|browser    |[Browser]          |Browsers are shared across tests to optimize resources. Learn how to [configure browser](./test-configuration.mdx). |
+|browserName|[string]           |The name of the browser currently running the test. Either `chromium`, `firefox` or `webkit`.|
+|request    |[APIRequestContext]|Isolated [APIRequestContext](./api/class-apirequestcontext.mdx) instance for this test run.|
 
 ### Without fixtures
 
@@ -758,10 +759,10 @@ We can now use `todoPage` fixture as usual, and set the `defaultItem` option in 
 
 ```js
 // playwright.config.ts
-import type { PlaywrightTestConfig } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 import { MyOptions } from './my-test';
 
-const config: PlaywrightTestConfig<MyOptions> = {
+export default defineConfig({
   projects: [
     {
       name: 'shopping',
@@ -772,8 +773,7 @@ const config: PlaywrightTestConfig<MyOptions> = {
       use: { defaultItem: 'Exercise!' },
     },
   ]
-};
-export default config;
+});
 ```
 
 </TabItem>
@@ -783,8 +783,8 @@ export default config;
 // playwright.config.js
 // @ts-check
 
-/** @type {import('@playwright/test').PlaywrightTestConfig<{ defaultItem: string }>} */
-const config = {
+const { defineConfig } = require('@playwright/test');
+module.exports = defineConfig({
   projects: [
     {
       name: 'shopping',
@@ -795,9 +795,7 @@ const config = {
       use: { defaultItem: 'Exercise!' },
     },
   ]
-};
-
-module.exports = config;
+});
 ```
 
 </TabItem>
@@ -1010,8 +1008,8 @@ A few observations:
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [Test]: /api/class-test.mdx "Test"
 [TestConfig]: /api/class-testconfig.mdx "TestConfig"
-[TestError]: /api/class-testerror.mdx "TestError"
 [TestInfo]: /api/class-testinfo.mdx "TestInfo"
+[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
 [TestOptions]: /api/class-testoptions.mdx "TestOptions"
 [TestProject]: /api/class-testproject.mdx "TestProject"
 [WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
@@ -1019,6 +1017,7 @@ A few observations:
 [Reporter]: /api/class-reporter.mdx "Reporter"
 [Suite]: /api/class-suite.mdx "Suite"
 [TestCase]: /api/class-testcase.mdx "TestCase"
+[TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"

@@ -47,408 +47,6 @@ page.removeListener('request', logRequest);
 
 ---
 
-## Events
-
-### on('close') {#page-event-close}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('close')</x-search>
-
-Emitted when the page closes.
-
-**Usage**
-
-```js
-page.on('close', data => {});
-```
-
-**Event data**
-- [Page]
-
----
-
-### on('console') {#page-event-console}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('console')</x-search>
-
-Emitted when JavaScript within the page calls one of console API methods, e.g. `console.log` or `console.dir`. Also emitted if the page throws an error or a warning.
-
-The arguments passed into `console.log` appear as arguments on the event handler.
-
-An example of handling `console` event:
-
-```js
-page.on('console', async msg => {
-  const values = [];
-  for (const arg of msg.args())
-    values.push(await arg.jsonValue());
-  console.log(...values);
-});
-await page.evaluate(() => console.log('hello', 5, {foo: 'bar'}));
-```
-
-**Usage**
-
-```js
-page.on('console', data => {});
-```
-
-**Event data**
-- [ConsoleMessage]
-
----
-
-### on('crash') {#page-event-crash}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('crash')</x-search>
-
-Emitted when the page crashes. Browser pages might crash if they try to allocate too much memory. When the page crashes, ongoing and subsequent operations will throw.
-
-The most common way to deal with crashes is to catch an exception:
-
-```js
-try {
-  // Crash might happen during a click.
-  await page.click('button');
-  // Or while waiting for an event.
-  await page.waitForEvent('popup');
-} catch (e) {
-  // When the page crashes, exception message contains 'crash'.
-}
-```
-
-**Usage**
-
-```js
-page.on('crash', data => {});
-```
-
-**Event data**
-- [Page]
-
----
-
-### on('dialog') {#page-event-dialog}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('dialog')</x-search>
-
-Emitted when a JavaScript dialog appears, such as `alert`, `prompt`, `confirm` or `beforeunload`. Listener **must** either [dialog.accept()](/api/class-dialog.mdx#dialog-accept) or [dialog.dismiss()](/api/class-dialog.mdx#dialog-dismiss) the dialog - otherwise the page will [freeze](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#never_blocking) waiting for the dialog, and actions like click will never finish.
-
-```js
-page.on('dialog', dialog => {
-  dialog.accept();
-});
-```
-
-:::note
-When no [page.on('dialog')](/api/class-page.mdx#page-event-dialog) listeners are present, all dialogs are automatically dismissed.
-:::
-
-**Usage**
-
-```js
-page.on('dialog', data => {});
-```
-
-**Event data**
-- [Dialog]
-
----
-
-### on('domcontentloaded') {#page-event-dom-content-loaded}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('domcontentloaded')</x-search>
-
-Emitted when the JavaScript [`DOMContentLoaded`](https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded) event is dispatched.
-
-**Usage**
-
-```js
-page.on('domcontentloaded', data => {});
-```
-
-**Event data**
-- [Page]
-
----
-
-### on('download') {#page-event-download}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('download')</x-search>
-
-Emitted when attachment download started. User can access basic file operations on downloaded content via the passed [Download] instance.
-
-**Usage**
-
-```js
-page.on('download', data => {});
-```
-
-**Event data**
-- [Download]
-
----
-
-### on('filechooser') {#page-event-file-chooser}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('filechooser')</x-search>
-
-Emitted when a file chooser is supposed to appear, such as after clicking the  `<input type=file>`. Playwright can respond to it via setting the input files using [fileChooser.setFiles()](/api/class-filechooser.mdx#file-chooser-set-files) that can be uploaded after that.
-
-```js
-page.on('filechooser', async (fileChooser) => {
-  await fileChooser.setFiles('/tmp/myfile.pdf');
-});
-```
-
-**Usage**
-
-```js
-page.on('filechooser', data => {});
-```
-
-**Event data**
-- [FileChooser]
-
----
-
-### on('frameattached') {#page-event-frame-attached}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('frameattached')</x-search>
-
-Emitted when a frame is attached.
-
-**Usage**
-
-```js
-page.on('frameattached', data => {});
-```
-
-**Event data**
-- [Frame]
-
----
-
-### on('framedetached') {#page-event-frame-detached}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('framedetached')</x-search>
-
-Emitted when a frame is detached.
-
-**Usage**
-
-```js
-page.on('framedetached', data => {});
-```
-
-**Event data**
-- [Frame]
-
----
-
-### on('framenavigated') {#page-event-frame-navigated}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('framenavigated')</x-search>
-
-Emitted when a frame is navigated to a new url.
-
-**Usage**
-
-```js
-page.on('framenavigated', data => {});
-```
-
-**Event data**
-- [Frame]
-
----
-
-### on('load') {#page-event-load}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('load')</x-search>
-
-Emitted when the JavaScript [`load`](https://developer.mozilla.org/en-US/docs/Web/Events/load) event is dispatched.
-
-**Usage**
-
-```js
-page.on('load', data => {});
-```
-
-**Event data**
-- [Page]
-
----
-
-### on('pageerror') {#page-event-page-error}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('pageerror')</x-search>
-
-Emitted when an uncaught exception happens within the page.
-
-```js
-// Log all uncaught errors to the terminal
-page.on('pageerror', exception => {
-  console.log(`Uncaught exception: "${exception}"`);
-});
-
-// Navigate to a page with an exception.
-await page.goto('data:text/html,<script>throw new Error("Test")</script>');
-```
-
-**Usage**
-
-```js
-page.on('pageerror', data => {});
-```
-
-**Event data**
-- [Error]
-
----
-
-### on('popup') {#page-event-popup}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('popup')</x-search>
-
-Emitted when the page opens a new tab or window. This event is emitted in addition to the [browserContext.on('page')](/api/class-browsercontext.mdx#browser-context-event-page), but only for popups relevant to this page.
-
-The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
-
-```js
-// Start waiting for popup before clicking. Note no await.
-const popupPromise = page.waitForEvent('popup');
-await page.getByText('open the popup').click();
-const popup = await popupPromise;
-console.log(await popup.evaluate('location.href'));
-```
-
-:::note
-Use [page.waitForLoadState()](/api/class-page.mdx#page-wait-for-load-state) to wait until the page gets to a particular state (you should not need it in most cases).
-:::
-
-**Usage**
-
-```js
-page.on('popup', data => {});
-```
-
-**Event data**
-- [Page]
-
----
-
-### on('request') {#page-event-request}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('request')</x-search>
-
-Emitted when a page issues a request. The [request] object is read-only. In order to intercept and mutate requests, see [page.route()](/api/class-page.mdx#page-route) or [browserContext.route()](/api/class-browsercontext.mdx#browser-context-route).
-
-**Usage**
-
-```js
-page.on('request', data => {});
-```
-
-**Event data**
-- [Request]
-
----
-
-### on('requestfailed') {#page-event-request-failed}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('requestfailed')</x-search>
-
-Emitted when a request fails, for example by timing out.
-
-```js
-page.on('requestfailed', request => {
-  console.log(request.url() + ' ' + request.failure().errorText);
-});
-```
-
-:::note
-HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [page.on('requestfinished')](/api/class-page.mdx#page-event-request-finished) event and not with [page.on('requestfailed')](/api/class-page.mdx#page-event-request-failed). A request will only be considered failed when the client cannot get an HTTP response from the server, e.g. due to network error net::ERR_FAILED.
-:::
-
-**Usage**
-
-```js
-page.on('requestfailed', data => {});
-```
-
-**Event data**
-- [Request]
-
----
-
-### on('requestfinished') {#page-event-request-finished}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('requestfinished')</x-search>
-
-Emitted when a request finishes successfully after downloading the response body. For a successful response, the sequence of events is `request`, `response` and `requestfinished`.
-
-**Usage**
-
-```js
-page.on('requestfinished', data => {});
-```
-
-**Event data**
-- [Request]
-
----
-
-### on('response') {#page-event-response}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('response')</x-search>
-
-Emitted when [response] status and headers are received for a request. For a successful response, the sequence of events is `request`, `response` and `requestfinished`.
-
-**Usage**
-
-```js
-page.on('response', data => {});
-```
-
-**Event data**
-- [Response]
-
----
-
-### on('websocket') {#page-event-web-socket}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('websocket')</x-search>
-
-Emitted when [WebSocket] request is sent.
-
-**Usage**
-
-```js
-page.on('websocket', data => {});
-```
-
-**Event data**
-- [WebSocket]
-
----
-
-### on('worker') {#page-event-worker}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('worker')</x-search>
-
-Emitted when a dedicated [WebWorker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) is spawned by the page.
-
-**Usage**
-
-```js
-page.on('worker', data => {});
-```
-
-**Event data**
-- [Worker]
-
----
-
 ## Methods
 
 ### addInitScript {#page-add-init-script}
@@ -1036,17 +634,18 @@ page.frames();
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.getByAltText</x-search>
 
-Allows locating elements by their alt text. For example, this method will find the image by alt text "Castle":
-
-```html
-<img alt='Castle'>
-```
+Allows locating elements by their alt text.
 
 **Usage**
 
+For example, this method will find the image by alt text "Playwright logo":
+
+```html
+<img alt='Playwright logo'>
+```
+
 ```js
-page.getByAltText(text);
-page.getByAltText(text, options);
+await page.getByAltText('Playwright logo').click();
 ```
 
 **Arguments**
@@ -1067,18 +666,19 @@ page.getByAltText(text, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.getByLabel</x-search>
 
-Allows locating input elements by the text of the associated label. For example, this method will find the input by label text "Password" in the following DOM:
+Allows locating input elements by the text of the associated label.
+
+**Usage**
+
+For example, this method will find the input by label text "Password" in the following DOM:
 
 ```html
 <label for="password-input">Password:</label>
 <input id="password-input">
 ```
 
-**Usage**
-
 ```js
-page.getByLabel(text);
-page.getByLabel(text, options);
+await page.getByLabel('Password').fill('secret');
 ```
 
 **Arguments**
@@ -1099,17 +699,22 @@ page.getByLabel(text, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.getByPlaceholder</x-search>
 
-Allows locating input elements by the placeholder text. For example, this method will find the input by placeholder "Country":
-
-```html
-<input placeholder="Country">
-```
+Allows locating input elements by the placeholder text.
 
 **Usage**
 
+For example, consider the following DOM structure.
+
+```html
+<input type="email" placeholder="name@example.com" />
+```
+
+You can fill the input after locating it by the placeholder text:
+
 ```js
-page.getByPlaceholder(text);
-page.getByPlaceholder(text, options);
+await page
+    .getByPlaceholder("name@example.com")
+    .fill("playwright@microsoft.com");
 ```
 
 **Arguments**
@@ -1130,15 +735,29 @@ page.getByPlaceholder(text, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.getByRole</x-search>
 
-Allows locating elements by their [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name). Note that role selector **does not replace** accessibility audits and conformance tests, but rather gives early feedback about the ARIA guidelines.
-
-Note that many html elements have an implicitly [defined role](https://w3c.github.io/html-aam/#html-element-role-mappings) that is recognized by the role selector. You can find all the [supported roles here](https://www.w3.org/TR/wai-aria-1.2/#role_definitions). ARIA guidelines **do not recommend** duplicating implicit roles and attributes by setting `role` and/or `aria-*` attributes to default values.
+Allows locating elements by their [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name).
 
 **Usage**
 
+Consider the following DOM structure.
+
+```html
+<h3>Sign up</h3>
+<label>
+  <input type="checkbox" /> Subscribe
+</label>
+<br/>
+<button>Submit</button>
+```
+
+You can locate each element by it's implicit role:
+
 ```js
-page.getByRole(role);
-page.getByRole(role, options);
+await expect(page.getByRole('heading', { name: 'Sign up' })).toBeVisible();
+
+await page.getByRole('checkbox', { name: 'Subscribe' }).check();
+
+await page.getByRole('button', { name: /submit/i }).click();
 ```
 
 **Arguments**
@@ -1196,25 +815,32 @@ page.getByRole(role, options);
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-role-return"/><a href="#page-get-by-role-return" class="list-anchor">#</a>
 
+**Details**
+
+Role selector **does not replace** accessibility audits and conformance tests, but rather gives early feedback about the ARIA guidelines.
+
+Many html elements have an implicitly [defined role](https://w3c.github.io/html-aam/#html-element-role-mappings) that is recognized by the role selector. You can find all the [supported roles here](https://www.w3.org/TR/wai-aria-1.2/#role_definitions). ARIA guidelines **do not recommend** duplicating implicit roles and attributes by setting `role` and/or `aria-*` attributes to default values.
+
 ---
 
 ### getByTestId {#page-get-by-test-id}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.getByTestId</x-search>
 
-Locate element by the test id. By default, the `data-testid` attribute is used as a test id. Use [selectors.setTestIdAttribute()](/api/class-selectors.mdx#selectors-set-test-id-attribute) to configure a different test id attribute if necessary.
-
-```js
-// Set custom test id attribute from @playwright/test config:
-use: {
-  testIdAttribute: 'data-pw'
-}
-```
+Locate element by the test id.
 
 **Usage**
 
+Consider the following DOM structure.
+
+```html
+<button data-testid="directions">Itinéraire</button>
+```
+
+You can locate the element by it's test id:
+
 ```js
-page.getByTestId(testId);
+await page.getByTestId('directions').click();
 ```
 
 **Arguments**
@@ -1225,13 +851,30 @@ page.getByTestId(testId);
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-test-id-return"/><a href="#page-get-by-test-id-return" class="list-anchor">#</a>
 
+**Details**
+
+By default, the `data-testid` attribute is used as a test id. Use [selectors.setTestIdAttribute()](/api/class-selectors.mdx#selectors-set-test-id-attribute) to configure a different test id attribute if necessary.
+
+```js
+// Set custom test id attribute from @playwright/test config:
+use: {
+  testIdAttribute: 'data-pw'
+}
+```
+
 ---
 
 ### getByText {#page-get-by-text}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.getByText</x-search>
 
-Allows locating elements that contain given text. Consider the following DOM structure:
+Allows locating elements that contain given text.
+
+See also [locator.filter()](/api/class-locator.mdx#locator-filter) that allows to match by another criteria, like an accessible role, and then filter by the text content.
+
+**Usage**
+
+Consider the following DOM structure:
 
 ```html
 <div>Hello <span>world</span></div>
@@ -1257,23 +900,6 @@ page.getByText(/Hello/)
 page.getByText(/^hello$/i)
 ```
 
-See also [locator.filter()](/api/class-locator.mdx#locator-filter) that allows to match by another criteria, like an accessible role, and then filter by the text content.
-
-:::note
-Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
-:::
-
-:::note
-Input elements of the type `button` and `submit` are matched by their `value` instead of the text content. For example, locating by text `"Log in"` matches `<input type=button value="Log in">`.
-:::
-
-**Usage**
-
-```js
-page.getByText(text);
-page.getByText(text, options);
-```
-
 **Arguments**
 - `text` [string]|[RegExp]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-text-option-text"/><a href="#page-get-by-text-option-text" class="list-anchor">#</a>
   
@@ -1286,23 +912,32 @@ page.getByText(text, options);
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-text-return"/><a href="#page-get-by-text-return" class="list-anchor">#</a>
 
+**Details**
+
+Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
+
+Input elements of the type `button` and `submit` are matched by their `value` instead of the text content. For example, locating by text `"Log in"` matches `<input type=button value="Log in">`.
+
 ---
 
 ### getByTitle {#page-get-by-title}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.getByTitle</x-search>
 
-Allows locating elements by their title. For example, this method will find the button by its title "Place the order":
-
-```html
-<button title='Place the order'>Order Now</button>
-```
+Allows locating elements by their title attribute.
 
 **Usage**
 
+Consider the following DOM structure.
+
+```html
+<span title='Issues count'>25 issues</span>
+```
+
+You can check the issues count after locating it by the title text:
+
 ```js
-page.getByTitle(text);
-page.getByTitle(text, options);
+await expect(page.getByTitle('Issues count')).toHaveText('25 issues');
 ```
 
 **Arguments**
@@ -1752,7 +1387,7 @@ Enabling routing disables http cache.
 - `url` [string]|[RegExp]|[function]\([URL]\):[boolean]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-option-url"/><a href="#page-route-option-url" class="list-anchor">#</a>
   
   A glob pattern, regex pattern or predicate receiving [URL] to match while routing. When a `baseURL` via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.
-- `handler` [function]\([Route], [Request]\)<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-option-handler"/><a href="#page-route-option-handler" class="list-anchor">#</a>
+- `handler` [function]\([Route], [Request]\):[Promise]<[Object]>|[Object]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-option-handler"/><a href="#page-route-option-handler" class="list-anchor">#</a>
   
   handler function to route the request.
 - `options` [Object] *(optional)*
@@ -2037,7 +1672,7 @@ await page.unroute(url, handler);
 - `url` [string]|[RegExp]|[function]\([URL]\):[boolean]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-unroute-option-url"/><a href="#page-unroute-option-url" class="list-anchor">#</a>
   
   A glob pattern, regex pattern or predicate receiving [URL] to match while routing.
-- `handler` [function]\([Route], [Request]\) *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-unroute-option-handler"/><a href="#page-unroute-option-handler" class="list-anchor">#</a>
+- `handler` [function]\([Route], [Request]\):[Promise]<[Object]>|[Object] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-unroute-option-handler"/><a href="#page-unroute-option-handler" class="list-anchor">#</a>
   
   Optional handler function to route the request.
 
@@ -2221,48 +1856,6 @@ console.log(await popup.title()); // Popup is ready to use.
 
 ---
 
-### waitForNavigation {#page-wait-for-navigation}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.waitForNavigation</x-search>
-
-Waits for the main frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
-
-**Usage**
-
-This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
-
-```js
-// Start waiting for navigation before clicking. Note no await.
-const navigationPromise = page.waitForNavigation();
-await page.getByText('Navigate after timeout').click();
-await navigationPromise;
-```
-
-:::note
-Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
-:::
-
-**Arguments**
-- `options` [Object] *(optional)*
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-timeout"/><a href="#page-wait-for-navigation-option-timeout" class="list-anchor">#</a>
-    
-    Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-  - `url` [string]|[RegExp]|[function]\([URL]\):[boolean] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-url"/><a href="#page-wait-for-navigation-option-url" class="list-anchor">#</a>
-    
-    A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
-  - `waitUntil` "load"|"domcontentloaded"|"networkidle"|"commit" *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-wait-until"/><a href="#page-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
-    
-    When to consider operation succeeded, defaults to `load`. Events can be either:
-    * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
-    * `'load'` - consider operation to be finished when the `load` event is fired.
-    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
-    * `'commit'` - consider operation to be finished when network response is received and the document started loading.
-
-**Returns**
-- [Promise]<[null]|[Response]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-return"/><a href="#page-wait-for-navigation-return" class="list-anchor">#</a>
-
----
-
 ### waitForRequest {#page-wait-for-request}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.waitForRequest</x-search>
@@ -2307,12 +1900,12 @@ Returns the matched response. See [waiting for event](../events.mdx#waiting-for-
 
 ```js
 // Start waiting for response before clicking. Note no await.
-const responsePromise = page.waitForRequest('https://example.com/resource');
+const responsePromise = page.waitForResponse('https://example.com/resource');
 await page.getByText('trigger response').click();
 const response = await responsePromise;
 
 // Alternative way with a predicate. Note no await.
-const responsePromise = page.waitForRequest(response => response.url() === 'https://example.com' && response.status() === 200);
+const responsePromise = page.waitForResponse(response => response.url() === 'https://example.com' && response.status() === 200);
 await page.getByText('trigger response').click();
 const response = await responsePromise;
 ```
@@ -2470,7 +2063,7 @@ page.workers();
 Only available for Chromium atm.
 :::
 
-Browser-specific Coverage implementation. See [Coverage](#class-coverage) for more details.
+Browser-specific Coverage implementation. See [Coverage](./class-coverage) for more details.
 
 **Usage**
 
@@ -2545,13 +2138,415 @@ page.touchscreen
 
 ---
 
+## Events
+
+### on('close') {#page-event-close}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('close')</x-search>
+
+Emitted when the page closes.
+
+**Usage**
+
+```js
+page.on('close', data => {});
+```
+
+**Event data**
+- [Page]
+
+---
+
+### on('console') {#page-event-console}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('console')</x-search>
+
+Emitted when JavaScript within the page calls one of console API methods, e.g. `console.log` or `console.dir`. Also emitted if the page throws an error or a warning.
+
+The arguments passed into `console.log` appear as arguments on the event handler.
+
+An example of handling `console` event:
+
+```js
+page.on('console', async msg => {
+  const values = [];
+  for (const arg of msg.args())
+    values.push(await arg.jsonValue());
+  console.log(...values);
+});
+await page.evaluate(() => console.log('hello', 5, {foo: 'bar'}));
+```
+
+**Usage**
+
+```js
+page.on('console', data => {});
+```
+
+**Event data**
+- [ConsoleMessage]
+
+---
+
+### on('crash') {#page-event-crash}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('crash')</x-search>
+
+Emitted when the page crashes. Browser pages might crash if they try to allocate too much memory. When the page crashes, ongoing and subsequent operations will throw.
+
+The most common way to deal with crashes is to catch an exception:
+
+```js
+try {
+  // Crash might happen during a click.
+  await page.click('button');
+  // Or while waiting for an event.
+  await page.waitForEvent('popup');
+} catch (e) {
+  // When the page crashes, exception message contains 'crash'.
+}
+```
+
+**Usage**
+
+```js
+page.on('crash', data => {});
+```
+
+**Event data**
+- [Page]
+
+---
+
+### on('dialog') {#page-event-dialog}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('dialog')</x-search>
+
+Emitted when a JavaScript dialog appears, such as `alert`, `prompt`, `confirm` or `beforeunload`. Listener **must** either [dialog.accept()](/api/class-dialog.mdx#dialog-accept) or [dialog.dismiss()](/api/class-dialog.mdx#dialog-dismiss) the dialog - otherwise the page will [freeze](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#never_blocking) waiting for the dialog, and actions like click will never finish.
+
+```js
+page.on('dialog', dialog => {
+  dialog.accept();
+});
+```
+
+:::note
+When no [page.on('dialog')](/api/class-page.mdx#page-event-dialog) listeners are present, all dialogs are automatically dismissed.
+:::
+
+**Usage**
+
+```js
+page.on('dialog', data => {});
+```
+
+**Event data**
+- [Dialog]
+
+---
+
+### on('domcontentloaded') {#page-event-dom-content-loaded}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('domcontentloaded')</x-search>
+
+Emitted when the JavaScript [`DOMContentLoaded`](https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded) event is dispatched.
+
+**Usage**
+
+```js
+page.on('domcontentloaded', data => {});
+```
+
+**Event data**
+- [Page]
+
+---
+
+### on('download') {#page-event-download}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('download')</x-search>
+
+Emitted when attachment download started. User can access basic file operations on downloaded content via the passed [Download] instance.
+
+**Usage**
+
+```js
+page.on('download', data => {});
+```
+
+**Event data**
+- [Download]
+
+---
+
+### on('filechooser') {#page-event-file-chooser}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('filechooser')</x-search>
+
+Emitted when a file chooser is supposed to appear, such as after clicking the  `<input type=file>`. Playwright can respond to it via setting the input files using [fileChooser.setFiles()](/api/class-filechooser.mdx#file-chooser-set-files) that can be uploaded after that.
+
+```js
+page.on('filechooser', async (fileChooser) => {
+  await fileChooser.setFiles('/tmp/myfile.pdf');
+});
+```
+
+**Usage**
+
+```js
+page.on('filechooser', data => {});
+```
+
+**Event data**
+- [FileChooser]
+
+---
+
+### on('frameattached') {#page-event-frame-attached}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('frameattached')</x-search>
+
+Emitted when a frame is attached.
+
+**Usage**
+
+```js
+page.on('frameattached', data => {});
+```
+
+**Event data**
+- [Frame]
+
+---
+
+### on('framedetached') {#page-event-frame-detached}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('framedetached')</x-search>
+
+Emitted when a frame is detached.
+
+**Usage**
+
+```js
+page.on('framedetached', data => {});
+```
+
+**Event data**
+- [Frame]
+
+---
+
+### on('framenavigated') {#page-event-frame-navigated}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('framenavigated')</x-search>
+
+Emitted when a frame is navigated to a new url.
+
+**Usage**
+
+```js
+page.on('framenavigated', data => {});
+```
+
+**Event data**
+- [Frame]
+
+---
+
+### on('load') {#page-event-load}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('load')</x-search>
+
+Emitted when the JavaScript [`load`](https://developer.mozilla.org/en-US/docs/Web/Events/load) event is dispatched.
+
+**Usage**
+
+```js
+page.on('load', data => {});
+```
+
+**Event data**
+- [Page]
+
+---
+
+### on('pageerror') {#page-event-page-error}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('pageerror')</x-search>
+
+Emitted when an uncaught exception happens within the page.
+
+```js
+// Log all uncaught errors to the terminal
+page.on('pageerror', exception => {
+  console.log(`Uncaught exception: "${exception}"`);
+});
+
+// Navigate to a page with an exception.
+await page.goto('data:text/html,<script>throw new Error("Test")</script>');
+```
+
+**Usage**
+
+```js
+page.on('pageerror', data => {});
+```
+
+**Event data**
+- [Error]
+
+---
+
+### on('popup') {#page-event-popup}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('popup')</x-search>
+
+Emitted when the page opens a new tab or window. This event is emitted in addition to the [browserContext.on('page')](/api/class-browsercontext.mdx#browser-context-event-page), but only for popups relevant to this page.
+
+The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
+
+```js
+// Start waiting for popup before clicking. Note no await.
+const popupPromise = page.waitForEvent('popup');
+await page.getByText('open the popup').click();
+const popup = await popupPromise;
+console.log(await popup.evaluate('location.href'));
+```
+
+:::note
+Use [page.waitForLoadState()](/api/class-page.mdx#page-wait-for-load-state) to wait until the page gets to a particular state (you should not need it in most cases).
+:::
+
+**Usage**
+
+```js
+page.on('popup', data => {});
+```
+
+**Event data**
+- [Page]
+
+---
+
+### on('request') {#page-event-request}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('request')</x-search>
+
+Emitted when a page issues a request. The [request] object is read-only. In order to intercept and mutate requests, see [page.route()](/api/class-page.mdx#page-route) or [browserContext.route()](/api/class-browsercontext.mdx#browser-context-route).
+
+**Usage**
+
+```js
+page.on('request', data => {});
+```
+
+**Event data**
+- [Request]
+
+---
+
+### on('requestfailed') {#page-event-request-failed}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('requestfailed')</x-search>
+
+Emitted when a request fails, for example by timing out.
+
+```js
+page.on('requestfailed', request => {
+  console.log(request.url() + ' ' + request.failure().errorText);
+});
+```
+
+:::note
+HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [page.on('requestfinished')](/api/class-page.mdx#page-event-request-finished) event and not with [page.on('requestfailed')](/api/class-page.mdx#page-event-request-failed). A request will only be considered failed when the client cannot get an HTTP response from the server, e.g. due to network error net::ERR_FAILED.
+:::
+
+**Usage**
+
+```js
+page.on('requestfailed', data => {});
+```
+
+**Event data**
+- [Request]
+
+---
+
+### on('requestfinished') {#page-event-request-finished}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('requestfinished')</x-search>
+
+Emitted when a request finishes successfully after downloading the response body. For a successful response, the sequence of events is `request`, `response` and `requestfinished`.
+
+**Usage**
+
+```js
+page.on('requestfinished', data => {});
+```
+
+**Event data**
+- [Request]
+
+---
+
+### on('response') {#page-event-response}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('response')</x-search>
+
+Emitted when [response] status and headers are received for a request. For a successful response, the sequence of events is `request`, `response` and `requestfinished`.
+
+**Usage**
+
+```js
+page.on('response', data => {});
+```
+
+**Event data**
+- [Response]
+
+---
+
+### on('websocket') {#page-event-web-socket}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on('websocket')</x-search>
+
+Emitted when [WebSocket] request is sent.
+
+**Usage**
+
+```js
+page.on('websocket', data => {});
+```
+
+**Event data**
+- [WebSocket]
+
+---
+
+### on('worker') {#page-event-worker}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('worker')</x-search>
+
+Emitted when a dedicated [WebWorker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) is spawned by the page.
+
+**Usage**
+
+```js
+page.on('worker', data => {});
+```
+
+**Event data**
+- [Worker]
+
+---
+
 ## Deprecated
 
 ### $ {#page-query-selector}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.$</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [page.locator()](/api/class-page.mdx#page-locator) instead. Read more about [locators](../locators.mdx).
 
@@ -2585,7 +2580,7 @@ await page.$(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.$$</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [page.locator()](/api/class-page.mdx#page-locator) instead. Read more about [locators](../locators.mdx).
 
@@ -2614,7 +2609,7 @@ await page.$$(selector);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.$eval</x-search>
 
-:::caution
+:::caution Discouraged
 
 This method does not wait for the element to pass actionability checks and therefore can lead to the flaky tests. Use [locator.evaluate()](/api/class-locator.mdx#locator-evaluate), other [Locator] helper methods or web-first assertions instead.
 
@@ -2659,7 +2654,7 @@ const preloadHrefTS = await page.$eval('link[rel=preload]', (el: HTMLLinkElement
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.$$eval</x-search>
 
-:::caution
+:::caution Discouraged
 
 In most cases, [locator.evaluateAll()](/api/class-locator.mdx#locator-evaluate-all), other [Locator] helper methods and web-first assertions do a better job.
 
@@ -2692,11 +2687,33 @@ const divCounts = await page.$$eval('div', (divs, min) => divs.length >= min, 10
 
 ---
 
+### accessibility {#page-accessibility}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.accessibility</x-search>
+
+:::caution Deprecated
+
+This property is discouraged. Please use other libraries such as [Axe](https://www.deque.com/axe/) if you need to test page accessibility. See our Node.js [guide](https://playwright.dev/docs/accessibility-testing) for integration with Axe.
+
+:::
+
+
+**Usage**
+
+```js
+page.accessibility
+```
+
+**Type**
+- [Accessibility]
+
+---
+
 ### check {#page-check}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.check</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.check()](/api/class-locator.mdx#locator-check) instead. Read more about [locators](../locators.mdx).
 
@@ -2756,7 +2773,7 @@ await page.check(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.click</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.click()](/api/class-locator.mdx#locator-click) instead. Read more about [locators](../locators.mdx).
 
@@ -2826,7 +2843,7 @@ await page.click(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.dblclick</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.dblclick()](/api/class-locator.mdx#locator-dblclick) instead. Read more about [locators](../locators.mdx).
 
@@ -2897,7 +2914,7 @@ await page.dblclick(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.dispatchEvent</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.dispatchEvent()](/api/class-locator.mdx#locator-dispatch-event) instead. Read more about [locators](../locators.mdx).
 
@@ -2955,7 +2972,7 @@ await page.dispatchEvent('#source', 'dragstart', { dataTransfer });
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.fill</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.fill()](/api/class-locator.mdx#locator-fill) instead. Read more about [locators](../locators.mdx).
 
@@ -3002,7 +3019,7 @@ await page.fill(selector, value, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.focus</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.focus()](/api/class-locator.mdx#locator-focus) instead. Read more about [locators](../locators.mdx).
 
@@ -3036,7 +3053,7 @@ await page.focus(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.getAttribute</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.getAttribute()](/api/class-locator.mdx#locator-get-attribute) instead. Read more about [locators](../locators.mdx).
 
@@ -3076,7 +3093,7 @@ await page.getAttribute(selector, name, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.hover</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.hover()](/api/class-locator.mdx#locator-hover) instead. Read more about [locators](../locators.mdx).
 
@@ -3137,7 +3154,7 @@ await page.hover(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.innerHTML</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.innerHTML()](/api/class-locator.mdx#locator-inner-html) instead. Read more about [locators](../locators.mdx).
 
@@ -3174,7 +3191,7 @@ await page.innerHTML(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.innerText</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.innerText()](/api/class-locator.mdx#locator-inner-text) instead. Read more about [locators](../locators.mdx).
 
@@ -3211,7 +3228,7 @@ await page.innerText(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.13</font><x-search>page.inputValue</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.inputValue()](/api/class-locator.mdx#locator-input-value) instead. Read more about [locators](../locators.mdx).
 
@@ -3250,7 +3267,7 @@ await page.inputValue(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.isChecked</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.isChecked()](/api/class-locator.mdx#locator-is-checked) instead. Read more about [locators](../locators.mdx).
 
@@ -3287,7 +3304,7 @@ await page.isChecked(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.isDisabled</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.isDisabled()](/api/class-locator.mdx#locator-is-disabled) instead. Read more about [locators](../locators.mdx).
 
@@ -3324,7 +3341,7 @@ await page.isDisabled(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.isEditable</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.isEditable()](/api/class-locator.mdx#locator-is-editable) instead. Read more about [locators](../locators.mdx).
 
@@ -3361,7 +3378,7 @@ await page.isEditable(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.isEnabled</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.isEnabled()](/api/class-locator.mdx#locator-is-enabled) instead. Read more about [locators](../locators.mdx).
 
@@ -3398,7 +3415,7 @@ await page.isEnabled(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.isHidden</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.isHidden()](/api/class-locator.mdx#locator-is-hidden) instead. Read more about [locators](../locators.mdx).
 
@@ -3423,6 +3440,11 @@ await page.isHidden(selector, options);
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-is-hidden-option-timeout"/><a href="#page-is-hidden-option-timeout" class="list-anchor">#</a>
+    
+    :::caution Deprecated
+    This option is ignored. [page.isHidden()](/api/class-page.mdx#page-is-hidden) does not wait for the element to become hidden and returns immediately.
+    :::
+    
 
 **Returns**
 - [Promise]<[boolean]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-is-hidden-return"/><a href="#page-is-hidden-return" class="list-anchor">#</a>
@@ -3433,7 +3455,7 @@ await page.isHidden(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.isVisible</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.isVisible()](/api/class-locator.mdx#locator-is-visible) instead. Read more about [locators](../locators.mdx).
 
@@ -3458,6 +3480,11 @@ await page.isVisible(selector, options);
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-is-visible-option-timeout"/><a href="#page-is-visible-option-timeout" class="list-anchor">#</a>
+    
+    :::caution Deprecated
+    This option is ignored. [page.isVisible()](/api/class-page.mdx#page-is-visible) does not wait for the element to become visible and returns immediately.
+    :::
+    
 
 **Returns**
 - [Promise]<[boolean]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-is-visible-return"/><a href="#page-is-visible-return" class="list-anchor">#</a>
@@ -3468,7 +3495,7 @@ await page.isVisible(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.press</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.press()](/api/class-locator.mdx#locator-press) instead. Read more about [locators](../locators.mdx).
 
@@ -3530,7 +3557,7 @@ await browser.close();
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.selectOption</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.selectOption()](/api/class-locator.mdx#locator-select-option) instead. Read more about [locators](../locators.mdx).
 
@@ -3598,7 +3625,7 @@ page.selectOption('select#colors', ['red', 'green', 'blue']);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>page.setChecked</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.setChecked()](/api/class-locator.mdx#locator-set-checked) instead. Read more about [locators](../locators.mdx).
 
@@ -3662,7 +3689,7 @@ await page.setChecked(selector, checked, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.setInputFiles</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.setInputFiles()](/api/class-locator.mdx#locator-set-input-files) instead. Read more about [locators](../locators.mdx).
 
@@ -3711,7 +3738,7 @@ await page.setInputFiles(selector, files, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.tap</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.tap()](/api/class-locator.mdx#locator-tap) instead. Read more about [locators](../locators.mdx).
 
@@ -3776,7 +3803,7 @@ await page.tap(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.textContent</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.textContent()](/api/class-locator.mdx#locator-text-content) instead. Read more about [locators](../locators.mdx).
 
@@ -3813,7 +3840,7 @@ await page.textContent(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.type</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.type()](/api/class-locator.mdx#locator-type) instead. Read more about [locators](../locators.mdx).
 
@@ -3858,7 +3885,7 @@ await page.type('#mytextarea', 'World', {delay: 100}); // Types slower, like a u
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.uncheck</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.uncheck()](/api/class-locator.mdx#locator-uncheck) instead. Read more about [locators](../locators.mdx).
 
@@ -3914,25 +3941,52 @@ await page.uncheck(selector, options);
 
 ---
 
-### accessibility {#page-accessibility}
+### waitForNavigation {#page-wait-for-navigation}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.accessibility</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.waitForNavigation</x-search>
 
-:::caution
+:::caution Deprecated
 
-This property is discouraged. Please use other libraries such as [Axe](https://www.deque.com/axe/) if you need to test page accessibility. See our Node.js [guide](https://playwright.dev/docs/accessibility-testing) for integration with Axe.
+This method is inherently racy, please use [page.waitForURL()](/api/class-page.mdx#page-wait-for-url) instead.
 
 :::
 
 
+Waits for the main frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
+
 **Usage**
 
+This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
+
 ```js
-page.accessibility
+// Start waiting for navigation before clicking. Note no await.
+const navigationPromise = page.waitForNavigation();
+await page.getByText('Navigate after timeout').click();
+await navigationPromise;
 ```
 
-**Type**
-- [Accessibility]
+:::note
+Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::
+
+**Arguments**
+- `options` [Object] *(optional)*
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-timeout"/><a href="#page-wait-for-navigation-option-timeout" class="list-anchor">#</a>
+    
+    Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  - `url` [string]|[RegExp]|[function]\([URL]\):[boolean] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-url"/><a href="#page-wait-for-navigation-option-url" class="list-anchor">#</a>
+    
+    A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
+  - `waitUntil` "load"|"domcontentloaded"|"networkidle"|"commit" *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-wait-until"/><a href="#page-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
+    
+    When to consider operation succeeded, defaults to `load`. Events can be either:
+    * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+    * `'load'` - consider operation to be finished when the `load` event is fired.
+    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+    * `'commit'` - consider operation to be finished when network response is received and the document started loading.
+
+**Returns**
+- [Promise]<[null]|[Response]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-return"/><a href="#page-wait-for-navigation-return" class="list-anchor">#</a>
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
@@ -3984,8 +4038,8 @@ page.accessibility
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [Test]: /api/class-test.mdx "Test"
 [TestConfig]: /api/class-testconfig.mdx "TestConfig"
-[TestError]: /api/class-testerror.mdx "TestError"
 [TestInfo]: /api/class-testinfo.mdx "TestInfo"
+[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
 [TestOptions]: /api/class-testoptions.mdx "TestOptions"
 [TestProject]: /api/class-testproject.mdx "TestProject"
 [WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
@@ -3993,6 +4047,7 @@ page.accessibility
 [Reporter]: /api/class-reporter.mdx "Reporter"
 [Suite]: /api/class-suite.mdx "Suite"
 [TestCase]: /api/class-testcase.mdx "TestCase"
+[TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"

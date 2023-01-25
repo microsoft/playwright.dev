@@ -35,10 +35,9 @@ import { test } from '@playwright/test';
 test.beforeEach(async ({ page }) => {
   // Runs before each test and signs in each page.
   await page.goto('https://github.com/login');
-  await page.getByText('Login').click();
-  await page.getByLabel('User Name').fill('username');
+  await page.getByLabel('Username or email address').fill('username');
   await page.getByLabel('Password').fill('password');
-  await page.getByText('Submit').click();
+  await page.getByRole('button', { name: 'Sign in' }).click();
 });
 
 test('first', async ({ page }) => {
@@ -59,10 +58,9 @@ const { test } = require('@playwright/test');
 test.beforeEach(async ({ page }) => {
   // Runs before each test and signs in each page.
   await page.goto('https://github.com/login');
-  await page.getByText('Login').click();
-  await page.getByLabel('User name').fill('username');
+  await page.getByLabel('Username or email address').fill('username');
   await page.getByLabel('Password').fill('password');
-  await page.getByText('Submit').click();
+  await page.getByRole('button', { name: 'Sign in' }).click();
 });
 
 test('first', async ({ page }) => {
@@ -82,10 +80,9 @@ const page = await context.newPage();
 await page.goto('https://github.com/login');
 
 // Interact with login form
-await page.getByText('Login').click();
-await page.getByLabel('User Name').fill(USERNAME);
-await page.getByLabel('Password').fill(PASSWORD);
-await page.getByText('Submit').click();
+await page.getByLabel('Username or email address').fill("username");
+await page.getByLabel('Password').fill("password");
+await page.getByRole('button', { name: 'Sign in' }).click();
 // Continue with the test
 ```
 
@@ -98,7 +95,7 @@ Redoing login for every test can slow down test execution. To mitigate that, reu
 
 Playwright provides a way to reuse the signed-in state in the tests. That way you can log in only once and then skip the log in step for all of the tests.
 
-Web apps use cookie-based or token-based authentication, where authenticated state is stored as [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) or in [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage). Playwright provides [browserContext.storageState([options])](https://playwright.dev/docs/api/class-browsercontext#browser-context-storage-state) method that can be used to retrieve storage state from authenticated contexts and then create new contexts with prepopulated state.
+Web apps use cookie-based or token-based authentication, where authenticated state is stored as [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) or in [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage). Playwright provides [browserContext.storageState([options])](https://playwright.dev/docs/api/class-browsercontext#browser-context-storage-state) method that can be used to retrieve storage state from authenticated contexts and then create new contexts with pre-populated state.
 
 Cookies and local storage state can be used across different browsers. They depend on your application's authentication model: some apps might require both cookies and local storage.
 
@@ -122,9 +119,9 @@ async function globalSetup(config: FullConfig) {
   const browser = await chromium.launch();
   const page = await browser.newPage();
   await page.goto('https://github.com/login');
-  await page.getByLabel('User Name').fill('user');
+  await page.getByLabel('Username or email address').fill('username');
   await page.getByLabel('Password').fill('password');
-  await page.getByText('Sign in').click();
+  await page.getByRole('button', { name: 'Sign in' }).click();
   // Save signed-in state to 'storageState.json'.
   await page.context().storageState({ path: 'storageState.json' });
   await browser.close();
@@ -144,9 +141,9 @@ module.exports = async config => {
   const browser = await chromium.launch();
   const page = await browser.newPage();
   await page.goto('https://github.com/login');
-  await page.getByLabel('User Name').fill('user');
+  await page.getByLabel('Username or email address').fill('username');
   await page.getByLabel('Password').fill('password');
-  await page.getByText('Sign in').click();
+  await page.getByRole('button', { name: 'Sign in' }).click();
   // Save signed-in state to 'storageState.json'.
   await page.context().storageState({ path: 'storageState.json' });
   await browser.close();
@@ -170,33 +167,30 @@ Register global setup script in the Playwright configuration file:
 
 ```js
 // playwright.config.ts
-import type { PlaywrightTestConfig } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 
-const config: PlaywrightTestConfig = {
+export default defineConfig({
   globalSetup: require.resolve('./global-setup'),
   use: {
     // Tell all tests to load signed-in state from 'storageState.json'.
     storageState: 'storageState.json'
   }
-};
-export default config;
+});
 ```
 
 </TabItem>
 <TabItem value="js">
 
 ```js
-// playwright.config.js
-// @ts-check
-/** @type {import('@playwright/test').PlaywrightTestConfig} */
-const config = {
+const { defineConfig } = require('@playwright/test');
+
+module.exports = defineConfig({
   globalSetup: require.resolve('./global-setup'),
   use: {
     // Tell all tests to load signed-in state from 'storageState.json'.
     storageState: 'storageState.json'
   }
-};
-module.exports = config;
+});
 ```
 
 </TabItem>
@@ -324,9 +318,9 @@ export const test = baseTest.extend({
       const page = await browser.newPage({ storageState: undefined });
       await page.goto('https://github.com/login');
       // Create a unique username for each worker.
-      await page.getByLabel('User Name').fill(users[testInfo.parallelIndex].username);
+      await page.getByLabel('Username or email address').fill(users[testInfo.parallelIndex].username);
       await page.getByLabel('Password').fill(users[testInfo.parallelIndex].password);
-      await page.getByText('Sign in').click();
+      await page.getByRole('button', { name: 'Sign in' }).click();
       await page.context().storageState({ path: fileName });
       await page.close();
     }
@@ -686,9 +680,9 @@ test.beforeAll(async ({ browser }) => {
   // Create page once and sign in.
   page = await browser.newPage();
   await page.goto('https://github.com/login');
-  await page.getByLabel('User Name').fill('user');
+  await page.getByLabel('Username or email address').fill('user');
   await page.getByLabel('Password').fill('password');
-  await page.getByText('Sign in').click();
+  await page.getByRole('button', { name: 'Sign in' }).click();
 });
 
 test.afterAll(async () => {
@@ -722,9 +716,9 @@ test.beforeAll(async ({ browser }) => {
   // Create page yourself and sign in.
   page = await browser.newPage();
   await page.goto('https://github.com/login');
-  await page.getByLabel('User Name').fill('user');
+  await page.getByLabel('Username or email address').fill('user');
   await page.getByLabel('Password').fill('password');
-  await page.getByText('Sign in').click();
+  await page.getByRole('button', { name: 'Sign in' }).click();
 });
 
 test.afterAll(async () => {
@@ -853,8 +847,8 @@ const context = await browser.newContext({ storageState: 'state.json' });
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [Test]: /api/class-test.mdx "Test"
 [TestConfig]: /api/class-testconfig.mdx "TestConfig"
-[TestError]: /api/class-testerror.mdx "TestError"
 [TestInfo]: /api/class-testinfo.mdx "TestInfo"
+[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
 [TestOptions]: /api/class-testoptions.mdx "TestOptions"
 [TestProject]: /api/class-testproject.mdx "TestProject"
 [WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
@@ -862,6 +856,7 @@ const context = await browser.newContext({ storageState: 'state.json' });
 [Reporter]: /api/class-reporter.mdx "Reporter"
 [Suite]: /api/class-suite.mdx "Suite"
 [TestCase]: /api/class-testcase.mdx "TestCase"
+[TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"

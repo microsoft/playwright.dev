@@ -150,10 +150,10 @@ Now, we can run tests in multiple configurations by using projects.
 
 ```js
 // playwright.config.ts
-import type { PlaywrightTestConfig } from '@playwright/test';
+import type { defineConfig } from '@playwright/test';
 import { TestOptions } from './my-test';
 
-const config: PlaywrightTestConfig<TestOptions> = {
+export default defineConfig({
   projects: [
     {
       name: 'alice',
@@ -164,8 +164,7 @@ const config: PlaywrightTestConfig<TestOptions> = {
       use: { person: 'Bob' },
     },
   ]
-};
-export default config;
+});
 ```
 
 </TabItem>
@@ -175,8 +174,7 @@ export default config;
 // playwright.config.js
 // @ts-check
 
-/** @type {import('@playwright/test').PlaywrightTestConfig<{ person: string }>} */
-const config = {
+module.exports = defineConfig({
   projects: [
     {
       name: 'alice',
@@ -187,9 +185,7 @@ const config = {
       use: { person: 'Bob' },
     },
   ]
-};
-
-module.exports = config;
+});
 ```
 
 </TabItem>
@@ -355,14 +351,13 @@ Similarly, configuration file can also read environment variables passed through
 
 ```js
 // playwright.config.ts
-import type { PlaywrightTestConfig } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 
-const config: PlaywrightTestConfig = {
+export default defineConfig({
   use: {
     baseURL: process.env.STAGING === '1' ? 'http://staging.example.test/' : 'http://example.test/',
   }
-};
-export default config;
+});
 ```
 
 </TabItem>
@@ -372,14 +367,13 @@ export default config;
 // playwright.config.js
 // @ts-check
 
-/** @type {import('@playwright/test').PlaywrightTestConfig} */
-const config = {
+const { defineConfig } = require('@playwright/test');
+
+module.exports = defineConfig({
   use: {
     baseURL: process.env.STAGING === '1' ? 'http://staging.example.test/' : 'http://example.test/',
   }
-};
-
-module.exports = config;
+});
 ```
 
 </TabItem>
@@ -437,7 +431,7 @@ To make environment variables easier to manage, consider something like `.env` f
 
 ```js
 // playwright.config.ts
-import type { PlaywrightTestConfig } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 import dotenv from 'dotenv';
 import path from 'path';
 
@@ -447,12 +441,11 @@ dotenv.config();
 // Alternatively, read from "../my.env" file.
 dotenv.config({ path: path.resolve(__dirname, '..', 'my.env') });
 
-const config: PlaywrightTestConfig = {
+export default defineConfig({
   use: {
     baseURL: process.env.STAGING === '1' ? 'http://staging.example.test/' : 'http://example.test/',
   }
-};
-export default config;
+});
 ```
 
 </TabItem>
@@ -468,14 +461,13 @@ require('dotenv').config();
 // Alternatively, read from "../my.env" file.
 require('dotenv').config({ path: path.resolve(__dirname, '..', 'my.env') });
 
-/** @type {import('@playwright/test').PlaywrightTestConfig} */
-const config = {
+const { defineConfig } = require('@playwright/test');
+
+module.exports = defineConfig({
   use: {
     baseURL: process.env.STAGING === '1' ? 'http://staging.example.test/' : 'http://example.test/',
   }
-};
-
-module.exports = config;
+});
 ```
 
 </TabItem>
@@ -616,8 +608,8 @@ for (const record of records) {
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [Test]: /api/class-test.mdx "Test"
 [TestConfig]: /api/class-testconfig.mdx "TestConfig"
-[TestError]: /api/class-testerror.mdx "TestError"
 [TestInfo]: /api/class-testinfo.mdx "TestInfo"
+[TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
 [TestOptions]: /api/class-testoptions.mdx "TestOptions"
 [TestProject]: /api/class-testproject.mdx "TestProject"
 [WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
@@ -625,6 +617,7 @@ for (const record of records) {
 [Reporter]: /api/class-reporter.mdx "Reporter"
 [Suite]: /api/class-suite.mdx "Suite"
 [TestCase]: /api/class-testcase.mdx "TestCase"
+[TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
