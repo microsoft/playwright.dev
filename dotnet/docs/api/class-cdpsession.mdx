@@ -1,155 +1,92 @@
 ---
-id: class-playwright
-title: "Playwright"
+id: class-cdpsession
+title: "CDPSession"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+* extends: [EventEmitter]
 
-Playwright module provides a method to launch a browser instance. The following is a typical example of using Playwright to drive automation:
+The `CDPSession` instances are used to talk raw Chrome Devtools Protocol:
+* protocol methods can be called with `session.send` method.
+* protocol events can be subscribed to with `session.on` method.
+
+Useful links:
+* Documentation on DevTools Protocol can be found here: [DevTools Protocol Viewer](https://chromedevtools.github.io/devtools-protocol/).
+* Getting Started with DevTools Protocol: https://github.com/aslushnikov/getting-started-with-cdp/blob/master/README.md
 
 ```csharp
-using Microsoft.Playwright;
-using System.Threading.Tasks;
-
-class PlaywrightExample
-{
-    public static async Task Main()
-    {
-        using var playwright = await Playwright.CreateAsync();
-        await using var browser = await playwright.Chromium.LaunchAsync();
-        var page = await browser.NewPageAsync();
-
-        await page.GotoAsync("https://www.microsoft.com");
-        // other actions...
-    }
-}
+var client = await Page.Context.NewCDPSessionAsync(Page);
+await client.SendAsync("Runtime.enable");
+client.Event("Animation.animationCreated").OnEvent += (_, _) => Console.WriteLine("Animation created!");
+var response = await client.SendAsync("Animation.getPlaybackRate");
+var playbackRate = response.Value.GetProperty("playbackRate").GetDouble();
+Console.WriteLine("playback rate is " + playbackRate);
+await client.SendAsync("Animation.setPlaybackRate", new() { { "playbackRate", playbackRate / 2 } });
 ```
 
 
 ---
 
-## Properties
+## Methods
 
-### APIRequest {#playwright-request}
+### DetachAsync {#cdp-session-detach}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>playwright.APIRequest</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>cdpSession.DetachAsync</x-search>
 
-Exposes API that can be used for the Web API testing.
+Detaches the CDPSession from the target. Once detached, the CDPSession object won't emit any events and can't be used to send messages.
 
 **Usage**
 
 ```csharp
-Playwright.APIRequest
+await CdpSession.DetachAsync();
 ```
-
-**Type**
-- [APIRequest]
 
 ---
 
-### Chromium {#playwright-chromium}
+### Event {#cdp-session-event}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>playwright.Chromium</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v.1.30</font><x-search>cdpSession.Event</x-search>
 
-This object can be used to launch or connect to Chromium, returning instances of [Browser].
+Returns an event emitter for the given CDP event name.
 
 **Usage**
 
 ```csharp
-Playwright.Chromium
+CdpSession.Event(eventName);
 ```
 
-**Type**
-- [BrowserType]
+**Arguments**
+- `eventName` [string] <font size="2">Added in: v1.30</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="cdp-session-event-option-event-name"/><a href="#cdp-session-event-option-event-name" class="list-anchor">#</a>
+  
+  CDP event name.
+
+**Returns**
+- [CDPSessionEvent]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="cdp-session-event-return"/><a href="#cdp-session-event-return" class="list-anchor">#</a>
 
 ---
 
-### Devices {#playwright-devices}
+### SendAsync {#cdp-session-send}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>playwright.Devices</x-search>
-
-Returns a dictionary of devices to be used with [Browser.NewContextAsync()](/api/class-browser.mdx#browser-new-context) or [Browser.NewPageAsync()](/api/class-browser.mdx#browser-new-page).
-
-```csharp
-using Microsoft.Playwright;
-using System.Threading.Tasks;
-
-class PlaywrightExample
-{
-    public static async Task Main()
-    {
-        using var playwright = await Playwright.CreateAsync();
-        await using var browser = await playwright.Webkit.LaunchAsync();
-        await using var context = await browser.NewContextAsync(playwright.Devices["iPhone 6"]);
-
-        var page = await context.NewPageAsync();
-        await page.GotoAsync("https://www.theverge.com");
-        // other actions...
-    }
-}
-```
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>cdpSession.SendAsync</x-search>
 
 **Usage**
 
 ```csharp
-Playwright.Devices
+await CdpSession.SendAsync(method, params);
 ```
 
-**Type**
-- [IReadOnlyDictionary]<[string], [BrowserNewContextOptions]>
+**Arguments**
+- `method` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="cdp-session-send-option-method"/><a href="#cdp-session-send-option-method" class="list-anchor">#</a>
+  
+  Protocol method name.
+- `args` [Map]?<[string], Args> *(optional)* <font size="2">Added in: v1.30</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="cdp-session-send-option-params"/><a href="#cdp-session-send-option-params" class="list-anchor">#</a>
+  
+  Optional method parameters.
 
----
-
-### Firefox {#playwright-firefox}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>playwright.Firefox</x-search>
-
-This object can be used to launch or connect to Firefox, returning instances of [Browser].
-
-**Usage**
-
-```csharp
-Playwright.Firefox
-```
-
-**Type**
-- [BrowserType]
-
----
-
-### Selectors {#playwright-selectors}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>playwright.Selectors</x-search>
-
-Selectors can be used to install custom selector engines. See [extensibility](../extensibility.mdx) for more information.
-
-**Usage**
-
-```csharp
-Playwright.Selectors
-```
-
-**Type**
-- [Selectors]
-
----
-
-### Webkit {#playwright-webkit}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>playwright.Webkit</x-search>
-
-This object can be used to launch or connect to WebKit, returning instances of [Browser].
-
-**Usage**
-
-```csharp
-Playwright.Webkit
-```
-
-**Type**
-- [BrowserType]
+**Returns**
+- [JsonElement?]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="cdp-session-send-return"/><a href="#cdp-session-send-return" class="list-anchor">#</a>
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
