@@ -17,6 +17,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import Link from '@docusaurus/Link';
+import LiteYouTube from '@site/src/components/LiteYouTube';
 import styles from './styles.module.css';
 
 function VideoCards({ videos }) {
@@ -38,14 +39,12 @@ function VideoCard({ video }) {
     <li key={video.title} className="card shadow--md">
       <div className={styles.videoCardVideo}>
         {video.id ? (
-          <iframe
-            width="560"
-            height="315"
-            src={'https://www.youtube-nocookie.com/embed/' + video.id}
-            title="YouTube video player"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            className={styles.videoCardIframe}
-          ></iframe>
+          <LiteYouTube
+          id={video.id}
+          title={video.title}
+          thumbnail={video.thumbnail}
+      />
+          
         ) : (
           <a href={video.url} target="_blank" rel="noopener noreferrer">
             <img src={video.src} alt={video.title} />

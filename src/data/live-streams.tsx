@@ -20,7 +20,8 @@ const liveStreams = [
     id: 'VMl8aV-ddMA',
     year: '2021',
     host: 'Microsoft Developer',
-    speakers: ["Mandy Whaley", "Arjun Attam"]
+    speakers: ["Mandy Whaley", "Arjun Attam"],
+    thumbnail: 'https://i.ytimg.com/vi_webp/VMl8aV-ddMA/sddefault.webp'
   },
   
 ];

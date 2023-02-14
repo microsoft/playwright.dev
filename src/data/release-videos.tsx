@@ -1,5 +1,10 @@
 const releaseVideos = [
   {
+    version: '1.29',
+    id: "VbVlz61VtNo",
+    highlights: ['backend mocking', 'working with lists'],
+  },
+  {
     version: '1.28',
     id: 'tVSq-0n-TY4',
     highlights: ['VS Code extension', 'Playwright inspector', 'snapshot path']

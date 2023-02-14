@@ -24,12 +24,14 @@
 type ProfileProps = {
   id: string;
   title: string;
+  thumbnail?: string;
 };
 
- function LiteYouTube({ id, title }: ProfileProps) {
+ function LiteYouTube({ id, title, thumbnail }: ProfileProps) {
    return (
     <div className={styles.videoContainer}>
        <LiteYouTubeEmbed
+         thumbnail={thumbnail}
          id={id}
          params = "autoplay=1&autohide=1&showinfo=0&rel=0"
          title={title}

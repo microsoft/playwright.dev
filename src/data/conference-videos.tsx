@@ -30,7 +30,8 @@ const conferenceVideos = [
     year: '2022',
     conference: 'Argentesting',
     speakers: ["Carlos Gauto"],
-    language: 'Spanish'
+    language: 'Spanish',
+    thumbnail: 'https://i.ytimg.com/vi/FOvFKdOOfXg/sddefault.jpg'
   },
   {
     title: 'Testing Web Applications with Playwright',
@@ -109,7 +110,8 @@ const conferenceVideos = [
     id: 'PXTspGn1im0',
     year: '2021',
     conference: 'Applitools',
-    speakers: ['Andrey Lushnikov']
+    speakers: ['Andrey Lushnikov'],
+    thumbnail: 'https://i.ytimg.com/vi_webp/PXTspGn1im0/sddefault.webp'
   },
   {
     title: 'The multi-year quest for the best web test in the west',
