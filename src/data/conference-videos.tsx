@@ -2,7 +2,7 @@ const conferenceVideos = [
   {
     title: 'Testing Blazor Applications with Playwright',
     description: '',
-    id: 'gBky9_AskNQ',
+    id: 'VavFU2vLnT0',
     year: '2022',
     conference: '.NET Conf',
     speakers: ["Debbie O'Brien", 'Max Schmitt']
