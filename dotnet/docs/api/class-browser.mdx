@@ -24,27 +24,6 @@ await browser.CloseAsync();
 
 ---
 
-## Events
-
-### event Disconnected {#browser-event-disconnected}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>browser.event Disconnected</x-search>
-
-Emitted when Browser gets disconnected from the browser application. This might happen because of one of the following:
-* Browser application is closed or crashed.
-* The [Browser.CloseAsync()](/api/class-browser.mdx#browser-close) method was called.
-
-**Usage**
-
-```csharp
-Browser.Disconnected += async data => {};
-```
-
-**Event data**
-- [Browser]
-
----
-
 ## Methods
 
 ### BrowserType {#browser-browser-type}
@@ -124,6 +103,27 @@ Browser.IsConnected
 
 ---
 
+### NewBrowserCDPSessionAsync {#browser-new-browser-cdp-session}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>browser.NewBrowserCDPSessionAsync</x-search>
+
+:::note
+CDP Sessions are only supported on Chromium-based browsers.
+:::
+
+Returns the newly created browser session.
+
+**Usage**
+
+```csharp
+await Browser.NewBrowserCDPSessionAsync();
+```
+
+**Returns**
+- [CDPSession]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-browser-cdp-session-return"/><a href="#browser-new-browser-cdp-session-return" class="list-anchor">#</a>
+
+---
+
 ### NewContextAsync {#browser-new-context}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>browser.NewContextAsync</x-search>
@@ -167,7 +167,7 @@ await browser.CloseAsync();
   - `ColorScheme` `enum ColorScheme { Light, Dark, NoPreference, Null }?` *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-color-scheme"/><a href="#browser-new-context-option-color-scheme" class="list-anchor">#</a>
     
     Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [Page.EmulateMediaAsync()](/api/class-page.mdx#page-emulate-media) for more details. Passing `'null'` resets emulation to system defaults. Defaults to `'light'`.
-  - `DeviceScaleFactor` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-device-scale-factor"/><a href="#browser-new-context-option-device-scale-factor" class="list-anchor">#</a>
+  - `DeviceScaleFactor` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-device-scale-factor"/><a href="#browser-new-context-option-device-scale-factor" class="list-anchor">#</a>
     
     Specify device scale factor (can be thought of as dpr). Defaults to `1`.
   - `ExtraHTTPHeaders` [IDictionary]?<[string], [string]> *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-extra-http-headers"/><a href="#browser-new-context-option-extra-http-headers" class="list-anchor">#</a>
@@ -177,13 +177,13 @@ await browser.CloseAsync();
     
     Emulates `'forced-colors'` media feature, supported values are `'active'`, `'none'`. See [Page.EmulateMediaAsync()](/api/class-page.mdx#page-emulate-media) for more details. Passing `'null'` resets emulation to system defaults. Defaults to `'none'`.
   - `Geolocation` Geolocation? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-geolocation"/><a href="#browser-new-context-option-geolocation" class="list-anchor">#</a>
-    - `Latitude` [double]
+    - `Latitude` [float]
       
       Latitude between -90 and 90.
-    - `Longitude` [double]
+    - `Longitude` [float]
       
       Longitude between -180 and 180.
-    - `Accuracy` [double]? *(optional)*
+    - `Accuracy` [float]? *(optional)*
       
       Non-negative accuracy value. Defaults to `0`.
   - `HasTouch` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-has-touch"/><a href="#browser-new-context-option-has-touch" class="list-anchor">#</a>
@@ -300,8 +300,12 @@ await browser.CloseAsync();
       
       page height in pixels.
     
-    Emulates consistent viewport for each page. Defaults to an 1280x720 viewport. Use `ViewportSize.NoViewport` to disable the default viewport.
-
+    Emulates consistent viewport for each page. Defaults to an 1280x720 viewport. Use `ViewportSize.NoViewport` to disable the consistent viewport emulation.
+    
+    :::note
+    The `ViewportSize.NoViewport` value opts out from the default presets, makes viewport depend on the host window size defined by the operating system. It makes the execution of the tests non-deterministic.
+    :::
+    
 **Returns**
 - [BrowserContext]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-return"/><a href="#browser-new-context-return" class="list-anchor">#</a>
 
@@ -338,7 +342,7 @@ await Browser.NewPageAsync(options);
   - `ColorScheme` `enum ColorScheme { Light, Dark, NoPreference, Null }?` *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-color-scheme"/><a href="#browser-new-page-option-color-scheme" class="list-anchor">#</a>
     
     Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [Page.EmulateMediaAsync()](/api/class-page.mdx#page-emulate-media) for more details. Passing `'null'` resets emulation to system defaults. Defaults to `'light'`.
-  - `DeviceScaleFactor` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-device-scale-factor"/><a href="#browser-new-page-option-device-scale-factor" class="list-anchor">#</a>
+  - `DeviceScaleFactor` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-device-scale-factor"/><a href="#browser-new-page-option-device-scale-factor" class="list-anchor">#</a>
     
     Specify device scale factor (can be thought of as dpr). Defaults to `1`.
   - `ExtraHTTPHeaders` [IDictionary]?<[string], [string]> *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-extra-http-headers"/><a href="#browser-new-page-option-extra-http-headers" class="list-anchor">#</a>
@@ -348,13 +352,13 @@ await Browser.NewPageAsync(options);
     
     Emulates `'forced-colors'` media feature, supported values are `'active'`, `'none'`. See [Page.EmulateMediaAsync()](/api/class-page.mdx#page-emulate-media) for more details. Passing `'null'` resets emulation to system defaults. Defaults to `'none'`.
   - `Geolocation` Geolocation? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-geolocation"/><a href="#browser-new-page-option-geolocation" class="list-anchor">#</a>
-    - `Latitude` [double]
+    - `Latitude` [float]
       
       Latitude between -90 and 90.
-    - `Longitude` [double]
+    - `Longitude` [float]
       
       Longitude between -180 and 180.
-    - `Accuracy` [double]? *(optional)*
+    - `Accuracy` [float]? *(optional)*
       
       Non-negative accuracy value. Defaults to `0`.
   - `HasTouch` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-has-touch"/><a href="#browser-new-page-option-has-touch" class="list-anchor">#</a>
@@ -471,8 +475,12 @@ await Browser.NewPageAsync(options);
       
       page height in pixels.
     
-    Emulates consistent viewport for each page. Defaults to an 1280x720 viewport. Use `ViewportSize.NoViewport` to disable the default viewport.
-
+    Emulates consistent viewport for each page. Defaults to an 1280x720 viewport. Use `ViewportSize.NoViewport` to disable the consistent viewport emulation.
+    
+    :::note
+    The `ViewportSize.NoViewport` value opts out from the default presets, makes viewport depend on the host window size defined by the operating system. It makes the execution of the tests non-deterministic.
+    :::
+    
 **Returns**
 - [Page]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-return"/><a href="#browser-new-page-return" class="list-anchor">#</a>
 
@@ -493,6 +501,27 @@ Browser.Version
 **Returns**
 - [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-version-return"/><a href="#browser-version-return" class="list-anchor">#</a>
 
+---
+
+## Events
+
+### event Disconnected {#browser-event-disconnected}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>browser.event Disconnected</x-search>
+
+Emitted when Browser gets disconnected from the browser application. This might happen because of one of the following:
+* Browser application is closed or crashed.
+* The [Browser.CloseAsync()](/api/class-browser.mdx#browser-close) method was called.
+
+**Usage**
+
+```csharp
+Browser.Disconnected += async data => {};
+```
+
+**Event data**
+- [Browser]
+
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
@@ -502,6 +531,8 @@ Browser.Version
 [Browser]: /api/class-browser.mdx "Browser"
 [BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
 [BrowserType]: /api/class-browsertype.mdx "BrowserType"
+[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"

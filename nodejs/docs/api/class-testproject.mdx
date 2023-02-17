@@ -25,9 +25,9 @@ Here is an example configuration that runs every test in Chromium, Firefox and W
 
 ```js
 // playwright.config.ts
-import { type PlaywrightTestConfig, devices } from '@playwright/test';
+import { defineConfig, devices } from '@playwright/test';
 
-const config: PlaywrightTestConfig = {
+export default defineConfig({
   // Options shared for all projects.
   timeout: 30000,
   use: {
@@ -37,25 +37,16 @@ const config: PlaywrightTestConfig = {
   // Options specific to each project.
   projects: [
     {
-      name: 'Desktop Chromium',
-      use: {
-        browserName: 'chromium',
-        viewport: { width: 1280, height: 720 },
-      },
+      name: 'chromium',
+      use: devices['Desktop Chrome'],
     },
     {
-      name: 'Desktop Safari',
-      use: {
-        browserName: 'webkit',
-        viewport: { width: 1280, height: 720 },
-      }
+      name: 'firefox',
+      use: devices['Desktop Firefox'],
     },
     {
-      name: 'Desktop Firefox',
-      use: {
-        browserName: 'firefox',
-        viewport: { width: 1280, height: 720 },
-      }
+      name: 'webkit',
+      use: devices['Desktop Safari'],
     },
     {
       name: 'Mobile Chrome',
@@ -66,8 +57,7 @@ const config: PlaywrightTestConfig = {
       use: devices['iPhone 12'],
     },
   ],
-};
-export default config;
+});
 ```
 
 </TabItem>
@@ -78,8 +68,9 @@ export default config;
 // @ts-check
 const { devices } = require('@playwright/test');
 
-/** @type {import('@playwright/test').PlaywrightTestConfig} */
-const config = {
+const { defineConfig } = require('@playwright/test');
+
+module.exports = defineConfig({
   // Options shared for all projects.
   timeout: 30000,
   use: {
@@ -89,25 +80,16 @@ const config = {
   // Options specific to each project.
   projects: [
     {
-      name: 'Desktop Chromium',
-      use: {
-        browserName: 'chromium',
-        viewport: { width: 1280, height: 720 },
-      },
+      name: 'chromium',
+      use: devices['Desktop Chrome'],
     },
     {
-      name: 'Desktop Safari',
-      use: {
-        browserName: 'webkit',
-        viewport: { width: 1280, height: 720 },
-      }
+      name: 'firefox',
+      use: devices['Desktop Firefox'],
     },
     {
-      name: 'Desktop Firefox',
-      use: {
-        browserName: 'firefox',
-        viewport: { width: 1280, height: 720 },
-      }
+      name: 'webkit',
+      use: devices['Desktop Safari'],
     },
     {
       name: 'Mobile Chrome',
@@ -118,9 +100,7 @@ const config = {
       use: devices['iPhone 12'],
     },
   ],
-};
-
-module.exports = config;
+});
 ```
 
 </TabItem>
@@ -130,6 +110,56 @@ module.exports = config;
 ---
 
 ## Properties
+
+### dependencies {#test-project-dependencies}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.31</font><x-search>testProject.dependencies</x-search>
+
+List of projects that need to run before any test in this project runs. Dependencies can be useful for configuring the global setup actions in a way that every action is in a form of a test. Passing `--no-deps` argument ignores the dependencies and behaves as if they were not specified.
+
+Using dependencies allows global setup to produce traces and other artifacts, see the setup steps in the test report, etc.
+
+For example:
+
+```js
+// playwright.config.ts
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  projects: [
+    {
+      name: 'setup',
+      testMatch: /global.setup\.ts/,
+    },
+    {
+      name: 'chromium',
+      use: devices['Desktop Chrome'],
+      dependencies: ['setup'],
+    },
+    {
+      name: 'firefox',
+      use: devices['Desktop Firefox'],
+      dependencies: ['setup'],
+    },
+    {
+      name: 'webkit',
+      use: devices['Desktop Safari'],
+      dependencies: ['setup'],
+    },
+  ],
+});
+```
+
+**Usage**
+
+```js
+testProject.dependencies
+```
+
+**Type**
+- [Array]<[string]>
+
+---
 
 ### expect {#test-project-expect}
 
@@ -228,7 +258,7 @@ testProject.grep
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testProject.grepInvert</x-search>
 
-Filter to only run tests with a title **not** matching one of the patterns. This is the opposite of [testProject.grep](/api/class-testproject.mdx#test-project-grep). Also available globally and in the [command line](../test-cli.mdx) with the `--grep-invert` option. This filter and its command line counterpart also applies to the setup files. If all [testProject.setupMatch](/api/class-testproject.mdx#test-project-setup-match) tests match the filter Playwright **will** run all setup files before running the matching tests.
+Filter to only run tests with a title **not** matching one of the patterns. This is the opposite of [testProject.grep](/api/class-testproject.mdx#test-project-grep). Also available globally and in the [command line](../test-cli.mdx) with the `--grep-invert` option.
 
 `grepInvert` option is also useful for [tagging tests](../test-annotations.mdx#tag-tests).
 
@@ -376,29 +406,6 @@ testProject.retries
 
 ---
 
-### setupMatch {#test-project-setup-match}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.29</font><x-search>testProject.setupMatch</x-search>
-
-Project setup files that will be executed before all tests in the project.
-
-**Usage**
-
-```js
-testProject.setupMatch
-```
-
-**Type**
-- [string]|[RegExp]|[Array]<[string]|[RegExp]>
-
-**Details**
-
-If project setup fails the tests in this project will be skipped. All project setup files will run in every shard if the project is sharded. [testProject.grep](/api/class-testproject.mdx#test-project-grep) and [testProject.grepInvert](/api/class-testproject.mdx#test-project-grep-invert) and their command line counterparts also apply to the setup files. If such filters match only tests in the project, Playwright will run **all** setup files before running the matching tests.
-
-If there is a file that matches both [testProject.setupMatch](/api/class-testproject.mdx#test-project-setup-match) and [testProject.testMatch](/api/class-testproject.mdx#test-project-test-match) filters an error will be thrown.
-
----
-
 ### snapshotDir {#test-project-snapshot-dir}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testProject.snapshotDir</x-search>
@@ -426,6 +433,8 @@ testProject.snapshotDir
 
 This option configures a template controlling location of snapshots generated by [expect(page).toHaveScreenshot()](/api/class-pageassertions.mdx#page-assertions-to-have-screenshot-1) and [expect(snapshot).toMatchSnapshot()](/api/class-snapshotassertions.mdx#snapshot-assertions-to-match-snapshot-1).
 
+**Usage**
+
 <Tabs
   groupId="js-flavor"
   defaultValue="ts"
@@ -438,14 +447,12 @@ This option configures a template controlling location of snapshots generated by
 
 ```js
 // playwright.config.ts
-import type { PlaywrightTestConfig } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 
-const config: PlaywrightTestConfig = {
+export default defineConfig({
   testDir: './tests',
   snapshotPathTemplate: '{testDir}/__screenshots__/{testFilePath}/{arg}{ext}',
-};
-
-export default config;
+});
 ```
 
 </TabItem>
@@ -455,17 +462,21 @@ export default config;
 // playwright.config.js
 // @ts-check
 
-/** @type {import('@playwright/test').PlaywrightTestConfig} */
-const config = {
+const { defineConfig } = require('@playwright/test');
+
+module.exports = defineConfig({
   testDir: './tests',
   snapshotPathTemplate: '{testDir}/__screenshots__/{testFilePath}/{arg}{ext}',
-};
-
-module.exports = config;
+});
 ```
 
 </TabItem>
 </Tabs>
+
+**Type**
+- [string]
+
+**Details**
 
 The value might include some "tokens" that will be replaced with actual values during test execution.
 
@@ -555,17 +566,16 @@ Consider the following config:
 
 ```js
 // playwright.config.ts
-import type { PlaywrightTestConfig } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 
-const config: PlaywrightTestConfig = {
+export default defineConfig({
   snapshotPathTemplate: '__screenshots__{/projectName}/{testFilePath}/{arg}{ext}',
   testMatch: 'example.spec.ts',
   projects: [
     { use: { browserName: 'firefox' } },
     { name: 'chromium', use: { browserName: 'chromium' } },
   ],
-};
-export default config;
+});
 ```
 
 </TabItem>
@@ -575,17 +585,16 @@ export default config;
 // playwright.config.js
 // @ts-check
 
-/** @type {import('@playwright/test').PlaywrightTestConfig} */
-const config = {
+const { defineConfig } = require('@playwright/test');
+
+module.exports = defineConfig({
   snapshotPathTemplate: '__screenshots__{/projectName}/{testFilePath}/{arg}{ext}',
   testMatch: 'example.spec.ts',
   projects: [
     { use: { browserName: 'firefox' } },
     { name: 'chromium', use: { browserName: 'chromium' } },
   ],
-};
-
-module.exports = config;
+});
 ```
 
 </TabItem>
@@ -596,15 +605,6 @@ In this config:
 1. Second project **does** have a name, so its snapshots will be stored in `<configDir>/__screenshots__/chromium/example.spec.ts/..`.
 1. Since `snapshotPathTemplate` resolves to relative path, it will be resolved relative to `configDir`.
 1. Forward slashes `"/"` can be used as path separators on any platform.
-
-**Usage**
-
-```js
-testProject.snapshotPathTemplate
-```
-
-**Type**
-- [string]
 
 ---
 
@@ -628,9 +628,9 @@ Each project can use a different directory. Here is an example that runs smoke t
 
 ```js
 // playwright.config.ts
-import type { PlaywrightTestConfig } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 
-const config: PlaywrightTestConfig = {
+export default defineConfig({
   projects: [
     {
       name: 'Smoke Chromium',
@@ -662,8 +662,7 @@ const config: PlaywrightTestConfig = {
       }
     },
   ],
-};
-export default config;
+});
 ```
 
 </TabItem>
@@ -673,8 +672,9 @@ export default config;
 // playwright.config.js
 // @ts-check
 
-/** @type {import('@playwright/test').PlaywrightTestConfig} */
-const config = {
+const { defineConfig } = require('@playwright/test');
+
+module.exports = defineConfig({
   projects: [
     {
       name: 'Smoke Chromium',
@@ -706,9 +706,7 @@ const config = {
       }
     },
   ],
-};
-
-module.exports = config;
+});
 ```
 
 </TabItem>
@@ -808,9 +806,9 @@ Options for all tests in this project, for example [testOptions.browserName](/ap
 
 ```js
 // playwright.config.ts
-import type { PlaywrightTestConfig } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 
-const config: PlaywrightTestConfig = {
+export default defineConfig({
   projects: [
     {
       name: 'Chromium',
@@ -819,8 +817,7 @@ const config: PlaywrightTestConfig = {
       },
     },
   ],
-};
-export default config;
+});
 ```
 
 </TabItem>
@@ -830,8 +827,9 @@ export default config;
 // playwright.config.js
 // @ts-check
 
-/** @type {import('@playwright/test').PlaywrightTestConfig} */
-const config = {
+const { defineConfig } = require('@playwright/test');
+
+module.exports = defineConfig({
   projects: [
     {
       name: 'Chromium',
@@ -840,9 +838,7 @@ const config = {
       },
     },
   ],
-};
-
-module.exports = config;
+});
 ```
 
 </TabItem>
@@ -885,6 +881,7 @@ testProject.use
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
+[GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
 [Keyboard]: /api/class-keyboard.mdx "Keyboard"
 [Locator]: /api/class-locator.mdx "Locator"
@@ -913,7 +910,6 @@ testProject.use
 [TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
 [TestOptions]: /api/class-testoptions.mdx "TestOptions"
 [TestProject]: /api/class-testproject.mdx "TestProject"
-[TestStore]: /api/class-teststore.mdx "TestStore"
 [WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
 [Location]: /api/class-location.mdx "Location"
 [Reporter]: /api/class-reporter.mdx "Reporter"

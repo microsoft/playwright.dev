@@ -84,497 +84,6 @@ page.remove_listener("request", log_request)
 
 ---
 
-## Events
-
-### on("close") {#page-event-close}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on("close")</x-search>
-
-Emitted when the page closes.
-
-**Usage**
-
-```python
-page.on("close", handler)
-```
-
-**Event data**
-- [Page]
-
----
-
-### on("console") {#page-event-console}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on("console")</x-search>
-
-Emitted when JavaScript within the page calls one of console API methods, e.g. `console.log` or `console.dir`. Also emitted if the page throws an error or a warning.
-
-The arguments passed into `console.log` appear as arguments on the event handler.
-
-An example of handling `console` event:
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-def print_args(msg):
-    for arg in msg.args:
-        print(arg.json_value())
-
-page.on("console", print_args)
-page.evaluate("console.log('hello', 5, {foo: 'bar'})")
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-async def print_args(msg):
-    values = []
-    for arg in msg.args:
-        values.append(await arg.json_value())
-    print(values)
-
-page.on("console", print_args)
-await page.evaluate("console.log('hello', 5, {foo: 'bar'})")
-```
-
-</TabItem>
-</Tabs>
-
-**Usage**
-
-```python
-page.on("console", handler)
-```
-
-**Event data**
-- [ConsoleMessage]
-
----
-
-### on("crash") {#page-event-crash}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on("crash")</x-search>
-
-Emitted when the page crashes. Browser pages might crash if they try to allocate too much memory. When the page crashes, ongoing and subsequent operations will throw.
-
-The most common way to deal with crashes is to catch an exception:
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-try:
-    # crash might happen during a click.
-    page.click("button")
-    # or while waiting for an event.
-    page.wait_for_event("popup")
-except Error as e:
-    # when the page crashes, exception message contains "crash".
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-try:
-    # crash might happen during a click.
-    await page.click("button")
-    # or while waiting for an event.
-    await page.wait_for_event("popup")
-except Error as e:
-    # when the page crashes, exception message contains "crash".
-```
-
-</TabItem>
-</Tabs>
-
-**Usage**
-
-```python
-page.on("crash", handler)
-```
-
-**Event data**
-- [Page]
-
----
-
-### on("dialog") {#page-event-dialog}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on("dialog")</x-search>
-
-Emitted when a JavaScript dialog appears, such as `alert`, `prompt`, `confirm` or `beforeunload`. Listener **must** either [dialog.accept()](/api/class-dialog.mdx#dialog-accept) or [dialog.dismiss()](/api/class-dialog.mdx#dialog-dismiss) the dialog - otherwise the page will [freeze](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#never_blocking) waiting for the dialog, and actions like click will never finish.
-
-```python
-page.on("dialog", lambda dialog: dialog.accept())
-```
-
-:::note
-When no [page.on("dialog")](/api/class-page.mdx#page-event-dialog) listeners are present, all dialogs are automatically dismissed.
-:::
-
-**Usage**
-
-```python
-page.on("dialog", handler)
-```
-
-**Event data**
-- [Dialog]
-
----
-
-### on("domcontentloaded") {#page-event-dom-content-loaded}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on("domcontentloaded")</x-search>
-
-Emitted when the JavaScript [`DOMContentLoaded`](https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded) event is dispatched.
-
-**Usage**
-
-```python
-page.on("domcontentloaded", handler)
-```
-
-**Event data**
-- [Page]
-
----
-
-### on("download") {#page-event-download}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on("download")</x-search>
-
-Emitted when attachment download started. User can access basic file operations on downloaded content via the passed [Download] instance.
-
-**Usage**
-
-```python
-page.on("download", handler)
-```
-
-**Event data**
-- [Download]
-
----
-
-### on("filechooser") {#page-event-file-chooser}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on("filechooser")</x-search>
-
-Emitted when a file chooser is supposed to appear, such as after clicking the  `<input type=file>`. Playwright can respond to it via setting the input files using [file_chooser.set_files()](/api/class-filechooser.mdx#file-chooser-set-files) that can be uploaded after that.
-
-```py
-page.on("filechooser", lambda file_chooser: file_chooser.set_files("/tmp/myfile.pdf"))
-```
-
-**Usage**
-
-```python
-page.on("filechooser", handler)
-```
-
-**Event data**
-- [FileChooser]
-
----
-
-### on("frameattached") {#page-event-frame-attached}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on("frameattached")</x-search>
-
-Emitted when a frame is attached.
-
-**Usage**
-
-```python
-page.on("frameattached", handler)
-```
-
-**Event data**
-- [Frame]
-
----
-
-### on("framedetached") {#page-event-frame-detached}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on("framedetached")</x-search>
-
-Emitted when a frame is detached.
-
-**Usage**
-
-```python
-page.on("framedetached", handler)
-```
-
-**Event data**
-- [Frame]
-
----
-
-### on("framenavigated") {#page-event-frame-navigated}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on("framenavigated")</x-search>
-
-Emitted when a frame is navigated to a new url.
-
-**Usage**
-
-```python
-page.on("framenavigated", handler)
-```
-
-**Event data**
-- [Frame]
-
----
-
-### on("load") {#page-event-load}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on("load")</x-search>
-
-Emitted when the JavaScript [`load`](https://developer.mozilla.org/en-US/docs/Web/Events/load) event is dispatched.
-
-**Usage**
-
-```python
-page.on("load", handler)
-```
-
-**Event data**
-- [Page]
-
----
-
-### on("pageerror") {#page-event-page-error}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on("pageerror")</x-search>
-
-Emitted when an uncaught exception happens within the page.
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-# Log all uncaught errors to the terminal
-page.on("pageerror", lambda exc: print(f"uncaught exception: {exc}"))
-
-# Navigate to a page with an exception.
-page.goto("data:text/html,<script>throw new Error('test')</script>")
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-# Log all uncaught errors to the terminal
-page.on("pageerror", lambda exc: print(f"uncaught exception: {exc}"))
-
-# Navigate to a page with an exception.
-await page.goto("data:text/html,<script>throw new Error('test')</script>")
-```
-
-</TabItem>
-</Tabs>
-
-**Usage**
-
-```python
-page.on("pageerror", handler)
-```
-
-**Event data**
-- [Error]
-
----
-
-### on("popup") {#page-event-popup}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on("popup")</x-search>
-
-Emitted when the page opens a new tab or window. This event is emitted in addition to the [browser_context.on("page")](/api/class-browsercontext.mdx#browser-context-event-page), but only for popups relevant to this page.
-
-The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-with page.expect_event("popup") as page_info:
-    page.get_by_text("open the popup").click()
-popup = page_info.value
-print(popup.evaluate("location.href"))
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-async with page.expect_event("popup") as page_info:
-    await page.get_by_text("open the popup").click()
-popup = await page_info.value
-print(await popup.evaluate("location.href"))
-```
-
-</TabItem>
-</Tabs>
-
-:::note
-Use [page.wait_for_load_state()](/api/class-page.mdx#page-wait-for-load-state) to wait until the page gets to a particular state (you should not need it in most cases).
-:::
-
-**Usage**
-
-```python
-page.on("popup", handler)
-```
-
-**Event data**
-- [Page]
-
----
-
-### on("request") {#page-event-request}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on("request")</x-search>
-
-Emitted when a page issues a request. The [request] object is read-only. In order to intercept and mutate requests, see [page.route()](/api/class-page.mdx#page-route) or [browser_context.route()](/api/class-browsercontext.mdx#browser-context-route).
-
-**Usage**
-
-```python
-page.on("request", handler)
-```
-
-**Event data**
-- [Request]
-
----
-
-### on("requestfailed") {#page-event-request-failed}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on("requestfailed")</x-search>
-
-Emitted when a request fails, for example by timing out.
-
-```python
-page.on("requestfailed", lambda request: print(request.url + " " + request.failure.error_text))
-```
-
-:::note
-HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [page.on("requestfinished")](/api/class-page.mdx#page-event-request-finished) event and not with [page.on("requestfailed")](/api/class-page.mdx#page-event-request-failed). A request will only be considered failed when the client cannot get an HTTP response from the server, e.g. due to network error net::ERR_FAILED.
-:::
-
-**Usage**
-
-```python
-page.on("requestfailed", handler)
-```
-
-**Event data**
-- [Request]
-
----
-
-### on("requestfinished") {#page-event-request-finished}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on("requestfinished")</x-search>
-
-Emitted when a request finishes successfully after downloading the response body. For a successful response, the sequence of events is `request`, `response` and `requestfinished`.
-
-**Usage**
-
-```python
-page.on("requestfinished", handler)
-```
-
-**Event data**
-- [Request]
-
----
-
-### on("response") {#page-event-response}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on("response")</x-search>
-
-Emitted when [response] status and headers are received for a request. For a successful response, the sequence of events is `request`, `response` and `requestfinished`.
-
-**Usage**
-
-```python
-page.on("response", handler)
-```
-
-**Event data**
-- [Response]
-
----
-
-### on("websocket") {#page-event-web-socket}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on("websocket")</x-search>
-
-Emitted when [WebSocket] request is sent.
-
-**Usage**
-
-```python
-page.on("websocket", handler)
-```
-
-**Event data**
-- [WebSocket]
-
----
-
-### on("worker") {#page-event-worker}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on("worker")</x-search>
-
-Emitted when a dedicated [WebWorker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) is spawned by the page.
-
-**Usage**
-
-```python
-page.on("worker", handler)
-```
-
-**Event data**
-- [Worker]
-
----
-
 ## Methods
 
 ### add_init_script {#page-add-init-script}
@@ -1321,70 +830,6 @@ page.expect_file_chooser(**kwargs)
 
 ---
 
-### expect_navigation {#page-wait-for-navigation}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.expect_navigation</x-search>
-
-Waits for the main frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
-
-**Usage**
-
-This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-with page.expect_navigation():
-    # This action triggers the navigation after a timeout.
-    page.get_by_text("Navigate after timeout").click()
-# Resolves after navigation has finished
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-async with page.expect_navigation():
-    # This action triggers the navigation after a timeout.
-    await page.get_by_text("Navigate after timeout").click()
-# Resolves after navigation has finished
-```
-
-</TabItem>
-</Tabs>
-
-:::note
-Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
-:::
-
-**Arguments**
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-timeout"/><a href="#page-wait-for-navigation-option-timeout" class="list-anchor">#</a>
-  
-  Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.set_default_navigation_timeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-- `url` [str]|[Pattern]|[Callable]\[[URL]\]:[bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-url"/><a href="#page-wait-for-navigation-option-url" class="list-anchor">#</a>
-  
-  A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
-- `wait_until` "load"|"domcontentloaded"|"networkidle"|"commit" *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-wait-until"/><a href="#page-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
-  
-  When to consider operation succeeded, defaults to `load`. Events can be either:
-  * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
-  * `'load'` - consider operation to be finished when the `load` event is fired.
-  * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
-  * `'commit'` - consider operation to be finished when network response is received and the document started loading.
-
-**Returns**
-- [EventContextManager]\[[Response]\]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-return"/><a href="#page-wait-for-navigation-return" class="list-anchor">#</a>
-
----
-
 ### expect_popup {#page-wait-for-popup}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.expect_popup</x-search>
@@ -1958,18 +1403,39 @@ page.frames
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.get_by_alt_text</x-search>
 
-Allows locating elements by their alt text. For example, this method will find the image by alt text "Castle":
-
-```html
-<img alt='Castle'>
-```
+Allows locating elements by their alt text.
 
 **Usage**
 
-```python
-page.get_by_alt_text(text)
-page.get_by_alt_text(text, **kwargs)
+For example, this method will find the image by alt text "Playwright logo":
+
+```html
+<img alt='Playwright logo'>
 ```
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.get_by_alt_text("Playwright logo").click()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.get_by_alt_text("Playwright logo").click()
+```
+
+</TabItem>
+</Tabs>
 
 **Arguments**
 - `text` [str]|[Pattern]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-alt-text-option-text"/><a href="#page-get-by-alt-text-option-text" class="list-anchor">#</a>
@@ -1988,19 +1454,40 @@ page.get_by_alt_text(text, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.get_by_label</x-search>
 
-Allows locating input elements by the text of the associated label. For example, this method will find the input by label text "Password" in the following DOM:
+Allows locating input elements by the text of the associated label.
+
+**Usage**
+
+For example, this method will find the input by label text "Password" in the following DOM:
 
 ```html
 <label for="password-input">Password:</label>
 <input id="password-input">
 ```
 
-**Usage**
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
 
-```python
-page.get_by_label(text)
-page.get_by_label(text, **kwargs)
+```py
+page.get_by_label("Password").fill("secret")
 ```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.get_by_label("Password").fill("secret")
+```
+
+</TabItem>
+</Tabs>
 
 **Arguments**
 - `text` [str]|[Pattern]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-label-option-text"/><a href="#page-get-by-label-option-text" class="list-anchor">#</a>
@@ -2019,18 +1506,41 @@ page.get_by_label(text, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.get_by_placeholder</x-search>
 
-Allows locating input elements by the placeholder text. For example, this method will find the input by placeholder "Country":
-
-```html
-<input placeholder="Country">
-```
+Allows locating input elements by the placeholder text.
 
 **Usage**
 
-```python
-page.get_by_placeholder(text)
-page.get_by_placeholder(text, **kwargs)
+For example, consider the following DOM structure.
+
+```html
+<input type="email" placeholder="name@example.com" />
 ```
+
+You can fill the input after locating it by the placeholder text:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.get_by_placeholder("name@example.com").fill("playwright@microsoft.com")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.get_by_placeholder("name@example.com").fill("playwright@microsoft.com")
+```
+
+</TabItem>
+</Tabs>
 
 **Arguments**
 - `text` [str]|[Pattern]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-placeholder-option-text"/><a href="#page-get-by-placeholder-option-text" class="list-anchor">#</a>
@@ -2049,16 +1559,54 @@ page.get_by_placeholder(text, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.get_by_role</x-search>
 
-Allows locating elements by their [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name). Note that role selector **does not replace** accessibility audits and conformance tests, but rather gives early feedback about the ARIA guidelines.
-
-Note that many html elements have an implicitly [defined role](https://w3c.github.io/html-aam/#html-element-role-mappings) that is recognized by the role selector. You can find all the [supported roles here](https://www.w3.org/TR/wai-aria-1.2/#role_definitions). ARIA guidelines **do not recommend** duplicating implicit roles and attributes by setting `role` and/or `aria-*` attributes to default values.
+Allows locating elements by their [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name).
 
 **Usage**
 
-```python
-page.get_by_role(role)
-page.get_by_role(role, **kwargs)
+Consider the following DOM structure.
+
+```html
+<h3>Sign up</h3>
+<label>
+  <input type="checkbox" /> Subscribe
+</label>
+<br/>
+<button>Submit</button>
 ```
+
+You can locate each element by it's implicit role:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+expect(page.get_by_role("heading", name="Sign up")).to_be_visible()
+
+page.get_by_role("checkbox", name="Subscribe").check()
+
+page.get_by_role("button", name=re.compile("submit", re.IGNORECASE)).click()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await expect(page.get_by_role("heading", name="Sign up")).to_be_visible()
+
+await page.get_by_role("checkbox", name="Subscribe").check()
+
+await page.get_by_role("button", name=re.compile("submit", re.IGNORECASE)).click()
+```
+
+</TabItem>
+</Tabs>
 
 **Arguments**
 - `role` "alert"|"alertdialog"|"application"|"article"|"banner"|"blockquote"|"button"|"caption"|"cell"|"checkbox"|"code"|"columnheader"|"combobox"|"complementary"|"contentinfo"|"definition"|"deletion"|"dialog"|"directory"|"document"|"emphasis"|"feed"|"figure"|"form"|"generic"|"grid"|"gridcell"|"group"|"heading"|"img"|"insertion"|"link"|"list"|"listbox"|"listitem"|"log"|"main"|"marquee"|"math"|"meter"|"menu"|"menubar"|"menuitem"|"menuitemcheckbox"|"menuitemradio"|"navigation"|"none"|"note"|"option"|"paragraph"|"presentation"|"progressbar"|"radio"|"radiogroup"|"region"|"row"|"rowgroup"|"rowheader"|"scrollbar"|"search"|"searchbox"|"separator"|"slider"|"spinbutton"|"status"|"strong"|"subscript"|"superscript"|"switch"|"tab"|"table"|"tablist"|"tabpanel"|"term"|"textbox"|"time"|"timer"|"toolbar"|"tooltip"|"tree"|"treegrid"|"treeitem"<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-role-option-role"/><a href="#page-get-by-role-option-role" class="list-anchor">#</a>
@@ -2114,19 +1662,53 @@ page.get_by_role(role, **kwargs)
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-role-return"/><a href="#page-get-by-role-return" class="list-anchor">#</a>
 
+**Details**
+
+Role selector **does not replace** accessibility audits and conformance tests, but rather gives early feedback about the ARIA guidelines.
+
+Many html elements have an implicitly [defined role](https://w3c.github.io/html-aam/#html-element-role-mappings) that is recognized by the role selector. You can find all the [supported roles here](https://www.w3.org/TR/wai-aria-1.2/#role_definitions). ARIA guidelines **do not recommend** duplicating implicit roles and attributes by setting `role` and/or `aria-*` attributes to default values.
+
 ---
 
 ### get_by_test_id {#page-get-by-test-id}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.get_by_test_id</x-search>
 
-Locate element by the test id. By default, the `data-testid` attribute is used as a test id. Use [selectors.set_test_id_attribute()](/api/class-selectors.mdx#selectors-set-test-id-attribute) to configure a different test id attribute if necessary.
+Locate element by the test id.
 
 **Usage**
 
-```python
-page.get_by_test_id(test_id)
+Consider the following DOM structure.
+
+```html
+<button data-testid="directions">Itinéraire</button>
 ```
+
+You can locate the element by it's test id:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.get_by_test_id("directions").click()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.get_by_test_id("directions").click()
+```
+
+</TabItem>
+</Tabs>
 
 **Arguments**
 - `test_id` [str]|[Pattern]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-test-id-option-test-id"/><a href="#page-get-by-test-id-option-test-id" class="list-anchor">#</a>
@@ -2136,13 +1718,23 @@ page.get_by_test_id(test_id)
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-test-id-return"/><a href="#page-get-by-test-id-return" class="list-anchor">#</a>
 
+**Details**
+
+By default, the `data-testid` attribute is used as a test id. Use [selectors.set_test_id_attribute()](/api/class-selectors.mdx#selectors-set-test-id-attribute) to configure a different test id attribute if necessary.
+
 ---
 
 ### get_by_text {#page-get-by-text}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.get_by_text</x-search>
 
-Allows locating elements that contain given text. Consider the following DOM structure:
+Allows locating elements that contain given text.
+
+See also [locator.filter()](/api/class-locator.mdx#locator-filter) that allows to match by another criteria, like an accessible role, and then filter by the text content.
+
+**Usage**
+
+Consider the following DOM structure:
 
 ```html
 <div>Hello <span>world</span></div>
@@ -2201,23 +1793,6 @@ page.get_by_text(re.compile("^hello$", re.IGNORECASE))
 </TabItem>
 </Tabs>
 
-See also [locator.filter()](/api/class-locator.mdx#locator-filter) that allows to match by another criteria, like an accessible role, and then filter by the text content.
-
-:::note
-Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
-:::
-
-:::note
-Input elements of the type `button` and `submit` are matched by their `value` instead of the text content. For example, locating by text `"Log in"` matches `<input type=button value="Log in">`.
-:::
-
-**Usage**
-
-```python
-page.get_by_text(text)
-page.get_by_text(text, **kwargs)
-```
-
 **Arguments**
 - `text` [str]|[Pattern]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-text-option-text"/><a href="#page-get-by-text-option-text" class="list-anchor">#</a>
   
@@ -2229,24 +1804,53 @@ page.get_by_text(text, **kwargs)
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-text-return"/><a href="#page-get-by-text-return" class="list-anchor">#</a>
 
+**Details**
+
+Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
+
+Input elements of the type `button` and `submit` are matched by their `value` instead of the text content. For example, locating by text `"Log in"` matches `<input type=button value="Log in">`.
+
 ---
 
 ### get_by_title {#page-get-by-title}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.get_by_title</x-search>
 
-Allows locating elements by their title. For example, this method will find the button by its title "Place the order":
-
-```html
-<button title='Place the order'>Order Now</button>
-```
+Allows locating elements by their title attribute.
 
 **Usage**
 
-```python
-page.get_by_title(text)
-page.get_by_title(text, **kwargs)
+Consider the following DOM structure.
+
+```html
+<span title='Issues count'>25 issues</span>
 ```
+
+You can check the issues count after locating it by the title text:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+expect(page.get_by_title("Issues count")).to_have_text("25 issues")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await expect(page.get_by_title("Issues count")).to_have_text("25 issues")
+```
+
+</TabItem>
+</Tabs>
 
 **Arguments**
 - `text` [str]|[Pattern]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-get-by-title-option-text"/><a href="#page-get-by-title-option-text" class="list-anchor">#</a>
@@ -2781,7 +2385,7 @@ Enabling routing disables http cache.
 - `url` [str]|[Pattern]|[Callable]\[[URL]\]:[bool]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-option-url"/><a href="#page-route-option-url" class="list-anchor">#</a>
   
   A glob pattern, regex pattern or predicate receiving [URL] to match while routing. When a `base_url` via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.
-- `handler` [Callable]\[[Route], [Request]\]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-option-handler"/><a href="#page-route-option-handler" class="list-anchor">#</a>
+- `handler` [Callable]\[[Route], [Request]\]:[Promise]\[[Any]\]|[Any]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-option-handler"/><a href="#page-route-option-handler" class="list-anchor">#</a>
   
   handler function to route the request.
 - `times` [int] *(optional)* <font size="2">Added in: v1.15</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-option-times"/><a href="#page-route-option-times" class="list-anchor">#</a>
@@ -3081,7 +2685,7 @@ page.unroute(url, **kwargs)
 - `url` [str]|[Pattern]|[Callable]\[[URL]\]:[bool]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-unroute-option-url"/><a href="#page-unroute-option-url" class="list-anchor">#</a>
   
   A glob pattern, regex pattern or predicate receiving [URL] to match while routing.
-- `handler` [Callable]\[[Route], [Request]\] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-unroute-option-handler"/><a href="#page-unroute-option-handler" class="list-anchor">#</a>
+- `handler` [Callable]\[[Route], [Request]\]:[Promise]\[[Any]\]|[Any] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-unroute-option-handler"/><a href="#page-unroute-option-handler" class="list-anchor">#</a>
   
   Optional handler function to route the request.
 
@@ -3633,13 +3237,526 @@ page.touchscreen
 
 ---
 
+## Events
+
+### on("close") {#page-event-close}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on("close")</x-search>
+
+Emitted when the page closes.
+
+**Usage**
+
+```python
+page.on("close", handler)
+```
+
+**Event data**
+- [Page]
+
+---
+
+### on("console") {#page-event-console}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on("console")</x-search>
+
+Emitted when JavaScript within the page calls one of console API methods, e.g. `console.log` or `console.dir`. Also emitted if the page throws an error or a warning.
+
+The arguments passed into `console.log` appear as arguments on the event handler.
+
+An example of handling `console` event:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+def print_args(msg):
+    for arg in msg.args:
+        print(arg.json_value())
+
+page.on("console", print_args)
+page.evaluate("console.log('hello', 5, {foo: 'bar'})")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+async def print_args(msg):
+    values = []
+    for arg in msg.args:
+        values.append(await arg.json_value())
+    print(values)
+
+page.on("console", print_args)
+await page.evaluate("console.log('hello', 5, {foo: 'bar'})")
+```
+
+</TabItem>
+</Tabs>
+
+**Usage**
+
+```python
+page.on("console", handler)
+```
+
+**Event data**
+- [ConsoleMessage]
+
+---
+
+### on("crash") {#page-event-crash}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on("crash")</x-search>
+
+Emitted when the page crashes. Browser pages might crash if they try to allocate too much memory. When the page crashes, ongoing and subsequent operations will throw.
+
+The most common way to deal with crashes is to catch an exception:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+try:
+    # crash might happen during a click.
+    page.click("button")
+    # or while waiting for an event.
+    page.wait_for_event("popup")
+except Error as e:
+    # when the page crashes, exception message contains "crash".
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+try:
+    # crash might happen during a click.
+    await page.click("button")
+    # or while waiting for an event.
+    await page.wait_for_event("popup")
+except Error as e:
+    # when the page crashes, exception message contains "crash".
+```
+
+</TabItem>
+</Tabs>
+
+**Usage**
+
+```python
+page.on("crash", handler)
+```
+
+**Event data**
+- [Page]
+
+---
+
+### on("dialog") {#page-event-dialog}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on("dialog")</x-search>
+
+Emitted when a JavaScript dialog appears, such as `alert`, `prompt`, `confirm` or `beforeunload`. Listener **must** either [dialog.accept()](/api/class-dialog.mdx#dialog-accept) or [dialog.dismiss()](/api/class-dialog.mdx#dialog-dismiss) the dialog - otherwise the page will [freeze](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#never_blocking) waiting for the dialog, and actions like click will never finish.
+
+```python
+page.on("dialog", lambda dialog: dialog.accept())
+```
+
+:::note
+When no [page.on("dialog")](/api/class-page.mdx#page-event-dialog) listeners are present, all dialogs are automatically dismissed.
+:::
+
+**Usage**
+
+```python
+page.on("dialog", handler)
+```
+
+**Event data**
+- [Dialog]
+
+---
+
+### on("domcontentloaded") {#page-event-dom-content-loaded}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on("domcontentloaded")</x-search>
+
+Emitted when the JavaScript [`DOMContentLoaded`](https://developer.mozilla.org/en-US/docs/Web/Events/DOMContentLoaded) event is dispatched.
+
+**Usage**
+
+```python
+page.on("domcontentloaded", handler)
+```
+
+**Event data**
+- [Page]
+
+---
+
+### on("download") {#page-event-download}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on("download")</x-search>
+
+Emitted when attachment download started. User can access basic file operations on downloaded content via the passed [Download] instance.
+
+**Usage**
+
+```python
+page.on("download", handler)
+```
+
+**Event data**
+- [Download]
+
+---
+
+### on("filechooser") {#page-event-file-chooser}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on("filechooser")</x-search>
+
+Emitted when a file chooser is supposed to appear, such as after clicking the  `<input type=file>`. Playwright can respond to it via setting the input files using [file_chooser.set_files()](/api/class-filechooser.mdx#file-chooser-set-files) that can be uploaded after that.
+
+```py
+page.on("filechooser", lambda file_chooser: file_chooser.set_files("/tmp/myfile.pdf"))
+```
+
+**Usage**
+
+```python
+page.on("filechooser", handler)
+```
+
+**Event data**
+- [FileChooser]
+
+---
+
+### on("frameattached") {#page-event-frame-attached}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on("frameattached")</x-search>
+
+Emitted when a frame is attached.
+
+**Usage**
+
+```python
+page.on("frameattached", handler)
+```
+
+**Event data**
+- [Frame]
+
+---
+
+### on("framedetached") {#page-event-frame-detached}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on("framedetached")</x-search>
+
+Emitted when a frame is detached.
+
+**Usage**
+
+```python
+page.on("framedetached", handler)
+```
+
+**Event data**
+- [Frame]
+
+---
+
+### on("framenavigated") {#page-event-frame-navigated}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on("framenavigated")</x-search>
+
+Emitted when a frame is navigated to a new url.
+
+**Usage**
+
+```python
+page.on("framenavigated", handler)
+```
+
+**Event data**
+- [Frame]
+
+---
+
+### on("load") {#page-event-load}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on("load")</x-search>
+
+Emitted when the JavaScript [`load`](https://developer.mozilla.org/en-US/docs/Web/Events/load) event is dispatched.
+
+**Usage**
+
+```python
+page.on("load", handler)
+```
+
+**Event data**
+- [Page]
+
+---
+
+### on("pageerror") {#page-event-page-error}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on("pageerror")</x-search>
+
+Emitted when an uncaught exception happens within the page.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Log all uncaught errors to the terminal
+page.on("pageerror", lambda exc: print(f"uncaught exception: {exc}"))
+
+# Navigate to a page with an exception.
+page.goto("data:text/html,<script>throw new Error('test')</script>")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Log all uncaught errors to the terminal
+page.on("pageerror", lambda exc: print(f"uncaught exception: {exc}"))
+
+# Navigate to a page with an exception.
+await page.goto("data:text/html,<script>throw new Error('test')</script>")
+```
+
+</TabItem>
+</Tabs>
+
+**Usage**
+
+```python
+page.on("pageerror", handler)
+```
+
+**Event data**
+- [Error]
+
+---
+
+### on("popup") {#page-event-popup}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on("popup")</x-search>
+
+Emitted when the page opens a new tab or window. This event is emitted in addition to the [browser_context.on("page")](/api/class-browsercontext.mdx#browser-context-event-page), but only for popups relevant to this page.
+
+The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+with page.expect_event("popup") as page_info:
+    page.get_by_text("open the popup").click()
+popup = page_info.value
+print(popup.evaluate("location.href"))
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+async with page.expect_event("popup") as page_info:
+    await page.get_by_text("open the popup").click()
+popup = await page_info.value
+print(await popup.evaluate("location.href"))
+```
+
+</TabItem>
+</Tabs>
+
+:::note
+Use [page.wait_for_load_state()](/api/class-page.mdx#page-wait-for-load-state) to wait until the page gets to a particular state (you should not need it in most cases).
+:::
+
+**Usage**
+
+```python
+page.on("popup", handler)
+```
+
+**Event data**
+- [Page]
+
+---
+
+### on("request") {#page-event-request}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on("request")</x-search>
+
+Emitted when a page issues a request. The [request] object is read-only. In order to intercept and mutate requests, see [page.route()](/api/class-page.mdx#page-route) or [browser_context.route()](/api/class-browsercontext.mdx#browser-context-route).
+
+**Usage**
+
+```python
+page.on("request", handler)
+```
+
+**Event data**
+- [Request]
+
+---
+
+### on("requestfailed") {#page-event-request-failed}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on("requestfailed")</x-search>
+
+Emitted when a request fails, for example by timing out.
+
+```python
+page.on("requestfailed", lambda request: print(request.url + " " + request.failure.error_text))
+```
+
+:::note
+HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [page.on("requestfinished")](/api/class-page.mdx#page-event-request-finished) event and not with [page.on("requestfailed")](/api/class-page.mdx#page-event-request-failed). A request will only be considered failed when the client cannot get an HTTP response from the server, e.g. due to network error net::ERR_FAILED.
+:::
+
+**Usage**
+
+```python
+page.on("requestfailed", handler)
+```
+
+**Event data**
+- [Request]
+
+---
+
+### on("requestfinished") {#page-event-request-finished}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on("requestfinished")</x-search>
+
+Emitted when a request finishes successfully after downloading the response body. For a successful response, the sequence of events is `request`, `response` and `requestfinished`.
+
+**Usage**
+
+```python
+page.on("requestfinished", handler)
+```
+
+**Event data**
+- [Request]
+
+---
+
+### on("response") {#page-event-response}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on("response")</x-search>
+
+Emitted when [response] status and headers are received for a request. For a successful response, the sequence of events is `request`, `response` and `requestfinished`.
+
+**Usage**
+
+```python
+page.on("response", handler)
+```
+
+**Event data**
+- [Response]
+
+---
+
+### on("websocket") {#page-event-web-socket}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.on("websocket")</x-search>
+
+Emitted when [WebSocket] request is sent.
+
+**Usage**
+
+```python
+page.on("websocket", handler)
+```
+
+**Event data**
+- [WebSocket]
+
+---
+
+### on("worker") {#page-event-worker}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on("worker")</x-search>
+
+Emitted when a dedicated [WebWorker](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API) is spawned by the page.
+
+**Usage**
+
+```python
+page.on("worker", handler)
+```
+
+**Event data**
+- [Worker]
+
+---
+
 ## Deprecated
+
+### accessibility {#page-accessibility}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.accessibility</x-search>
+
+:::caution Deprecated
+
+This property is discouraged. Please use other libraries such as [Axe](https://www.deque.com/axe/) if you need to test page accessibility. See our Node.js [guide](https://playwright.dev/docs/accessibility-testing) for integration with Axe.
+
+:::
+
+
+**Usage**
+
+```python
+page.accessibility
+```
+
+**Type**
+- [Accessibility]
+
+---
 
 ### check {#page-check}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.check</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.check()](/api/class-locator.mdx#locator-check) instead. Read more about [locators](../locators.mdx).
 
@@ -3698,7 +3815,7 @@ page.check(selector, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.click</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.click()](/api/class-locator.mdx#locator-click) instead. Read more about [locators](../locators.mdx).
 
@@ -3767,7 +3884,7 @@ page.click(selector, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.dblclick</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.dblclick()](/api/class-locator.mdx#locator-dblclick) instead. Read more about [locators](../locators.mdx).
 
@@ -3837,7 +3954,7 @@ page.dblclick(selector, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.dispatch_event</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.dispatch_event()](/api/class-locator.mdx#locator-dispatch-event) instead. Read more about [locators](../locators.mdx).
 
@@ -3936,7 +4053,7 @@ await page.dispatch_event("#source", "dragstart", { "dataTransfer": data_transfe
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.eval_on_selector</x-search>
 
-:::caution
+:::caution Discouraged
 
 This method does not wait for the element to pass actionability checks and therefore can lead to the flaky tests. Use [locator.evaluate()](/api/class-locator.mdx#locator-evaluate), other [Locator] helper methods or web-first assertions instead.
 
@@ -4000,7 +4117,7 @@ html = await page.eval_on_selector(".main-container", "(e, suffix) => e.outer_ht
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.eval_on_selector_all</x-search>
 
-:::caution
+:::caution Discouraged
 
 In most cases, [locator.evaluate_all()](/api/class-locator.mdx#locator-evaluate-all), other [Locator] helper methods and web-first assertions do a better job.
 
@@ -4053,11 +4170,82 @@ div_counts = await page.eval_on_selector_all("div", "(divs, min) => divs.length 
 
 ---
 
+### expect_navigation {#page-wait-for-navigation}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.expect_navigation</x-search>
+
+:::caution Deprecated
+
+This method is inherently racy, please use [page.wait_for_url()](/api/class-page.mdx#page-wait-for-url) instead.
+
+:::
+
+
+Waits for the main frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
+
+**Usage**
+
+This resolves when the page navigates to a new URL or reloads. It is useful for when you run code which will indirectly cause the page to navigate. e.g. The click target has an `onclick` handler that triggers navigation from a `setTimeout`. Consider this example:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+with page.expect_navigation():
+    # This action triggers the navigation after a timeout.
+    page.get_by_text("Navigate after timeout").click()
+# Resolves after navigation has finished
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+async with page.expect_navigation():
+    # This action triggers the navigation after a timeout.
+    await page.get_by_text("Navigate after timeout").click()
+# Resolves after navigation has finished
+```
+
+</TabItem>
+</Tabs>
+
+:::note
+Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::
+
+**Arguments**
+- `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-timeout"/><a href="#page-wait-for-navigation-option-timeout" class="list-anchor">#</a>
+  
+  Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.set_default_navigation_timeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+- `url` [str]|[Pattern]|[Callable]\[[URL]\]:[bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-url"/><a href="#page-wait-for-navigation-option-url" class="list-anchor">#</a>
+  
+  A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
+- `wait_until` "load"|"domcontentloaded"|"networkidle"|"commit" *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-wait-until"/><a href="#page-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
+  
+  When to consider operation succeeded, defaults to `load`. Events can be either:
+  * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+  * `'load'` - consider operation to be finished when the `load` event is fired.
+  * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+  * `'commit'` - consider operation to be finished when network response is received and the document started loading.
+
+**Returns**
+- [EventContextManager]\[[Response]\]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-return"/><a href="#page-wait-for-navigation-return" class="list-anchor">#</a>
+
+---
+
 ### fill {#page-fill}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.fill</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.fill()](/api/class-locator.mdx#locator-fill) instead. Read more about [locators](../locators.mdx).
 
@@ -4103,7 +4291,7 @@ page.fill(selector, value, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.focus</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.focus()](/api/class-locator.mdx#locator-focus) instead. Read more about [locators](../locators.mdx).
 
@@ -4136,7 +4324,7 @@ page.focus(selector, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.get_attribute</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.get_attribute()](/api/class-locator.mdx#locator-get-attribute) instead. Read more about [locators](../locators.mdx).
 
@@ -4175,7 +4363,7 @@ page.get_attribute(selector, name, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.hover</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.hover()](/api/class-locator.mdx#locator-hover) instead. Read more about [locators](../locators.mdx).
 
@@ -4235,7 +4423,7 @@ page.hover(selector, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.inner_html</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.inner_html()](/api/class-locator.mdx#locator-inner-html) instead. Read more about [locators](../locators.mdx).
 
@@ -4271,7 +4459,7 @@ page.inner_html(selector, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.inner_text</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.inner_text()](/api/class-locator.mdx#locator-inner-text) instead. Read more about [locators](../locators.mdx).
 
@@ -4307,7 +4495,7 @@ page.inner_text(selector, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.13</font><x-search>page.input_value</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.input_value()](/api/class-locator.mdx#locator-input-value) instead. Read more about [locators](../locators.mdx).
 
@@ -4345,7 +4533,7 @@ page.input_value(selector, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.is_checked</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.is_checked()](/api/class-locator.mdx#locator-is-checked) instead. Read more about [locators](../locators.mdx).
 
@@ -4381,7 +4569,7 @@ page.is_checked(selector, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.is_disabled</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.is_disabled()](/api/class-locator.mdx#locator-is-disabled) instead. Read more about [locators](../locators.mdx).
 
@@ -4417,7 +4605,7 @@ page.is_disabled(selector, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.is_editable</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.is_editable()](/api/class-locator.mdx#locator-is-editable) instead. Read more about [locators](../locators.mdx).
 
@@ -4453,7 +4641,7 @@ page.is_editable(selector, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.is_enabled</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.is_enabled()](/api/class-locator.mdx#locator-is-enabled) instead. Read more about [locators](../locators.mdx).
 
@@ -4489,7 +4677,7 @@ page.is_enabled(selector, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.is_hidden</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.is_hidden()](/api/class-locator.mdx#locator-is-hidden) instead. Read more about [locators](../locators.mdx).
 
@@ -4513,6 +4701,11 @@ page.is_hidden(selector, **kwargs)
   
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-is-hidden-option-timeout"/><a href="#page-is-hidden-option-timeout" class="list-anchor">#</a>
+  
+  :::caution Deprecated
+  This option is ignored. [page.is_hidden()](/api/class-page.mdx#page-is-hidden) does not wait for the element to become hidden and returns immediately.
+  :::
+  
 
 **Returns**
 - [bool]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-is-hidden-return"/><a href="#page-is-hidden-return" class="list-anchor">#</a>
@@ -4523,7 +4716,7 @@ page.is_hidden(selector, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.is_visible</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.is_visible()](/api/class-locator.mdx#locator-is-visible) instead. Read more about [locators](../locators.mdx).
 
@@ -4547,6 +4740,11 @@ page.is_visible(selector, **kwargs)
   
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-is-visible-option-timeout"/><a href="#page-is-visible-option-timeout" class="list-anchor">#</a>
+  
+  :::caution Deprecated
+  This option is ignored. [page.is_visible()](/api/class-page.mdx#page-is-visible) does not wait for the element to become visible and returns immediately.
+  :::
+  
 
 **Returns**
 - [bool]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-is-visible-return"/><a href="#page-is-visible-return" class="list-anchor">#</a>
@@ -4557,7 +4755,7 @@ page.is_visible(selector, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.press</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.press()](/api/class-locator.mdx#locator-press) instead. Read more about [locators](../locators.mdx).
 
@@ -4646,7 +4844,7 @@ await browser.close()
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.query_selector</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [page.locator()](/api/class-page.mdx#page-locator) instead. Read more about [locators](../locators.mdx).
 
@@ -4679,7 +4877,7 @@ page.query_selector(selector, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>page.query_selector_all</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [page.locator()](/api/class-page.mdx#page-locator) instead. Read more about [locators](../locators.mdx).
 
@@ -4708,7 +4906,7 @@ page.query_selector_all(selector)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.select_option</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.select_option()](/api/class-locator.mdx#locator-select-option) instead. Read more about [locators](../locators.mdx).
 
@@ -4797,7 +4995,7 @@ await page.select_option("select#colors", value=["red", "green", "blue"])
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>page.set_checked</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.set_checked()](/api/class-locator.mdx#locator-set-checked) instead. Read more about [locators](../locators.mdx).
 
@@ -4860,7 +5058,7 @@ page.set_checked(selector, checked, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.set_input_files</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.set_input_files()](/api/class-locator.mdx#locator-set-input-files) instead. Read more about [locators](../locators.mdx).
 
@@ -4908,7 +5106,7 @@ page.set_input_files(selector, files, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.tap</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.tap()](/api/class-locator.mdx#locator-tap) instead. Read more about [locators](../locators.mdx).
 
@@ -4925,7 +5123,7 @@ This method taps an element matching `selector` by performing the following step
 When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
 
 :::note
-[page.tap()](/api/class-page.mdx#page-tap) requires that the `has_touch` option of the browser context be set to true.
+[page.tap()](/api/class-page.mdx#page-tap) the method will throw if `has_touch` option of the browser context is false.
 :::
 
 **Usage**
@@ -4972,7 +5170,7 @@ page.tap(selector, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.text_content</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.text_content()](/api/class-locator.mdx#locator-text-content) instead. Read more about [locators](../locators.mdx).
 
@@ -5008,7 +5206,7 @@ page.text_content(selector, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.type</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.type()](/api/class-locator.mdx#locator-type) instead. Read more about [locators](../locators.mdx).
 
@@ -5073,7 +5271,7 @@ await page.type("#mytextarea", "world", delay=100) # types slower, like a user
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.uncheck</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [locator.uncheck()](/api/class-locator.mdx#locator-uncheck) instead. Read more about [locators](../locators.mdx).
 
@@ -5125,28 +5323,6 @@ page.uncheck(selector, **kwargs)
 - `trial` [bool] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-uncheck-option-trial"/><a href="#page-uncheck-option-trial" class="list-anchor">#</a>
   
   When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
-
----
-
-### accessibility {#page-accessibility}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.accessibility</x-search>
-
-:::caution
-
-This property is discouraged. Please use other libraries such as [Axe](https://www.deque.com/axe/) if you need to test page accessibility. See our Node.js [guide](https://playwright.dev/docs/accessibility-testing) for integration with Axe.
-
-:::
-
-
-**Usage**
-
-```python
-page.accessibility
-```
-
-**Type**
-- [Accessibility]
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"

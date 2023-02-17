@@ -339,17 +339,18 @@ locator.click();
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.getByAltText</x-search>
 
-Allows locating elements by their alt text. For example, this method will find the image by alt text "Castle":
-
-```html
-<img alt='Castle'>
-```
+Allows locating elements by their alt text.
 
 **Usage**
 
+For example, this method will find the image by alt text "Playwright logo":
+
+```html
+<img alt='Playwright logo'>
+```
+
 ```java
-Frame.getByAltText(text);
-Frame.getByAltText(text, options);
+page.getByAltText("Playwright logo").click();
 ```
 
 **Arguments**
@@ -370,18 +371,19 @@ Frame.getByAltText(text, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.getByLabel</x-search>
 
-Allows locating input elements by the text of the associated label. For example, this method will find the input by label text "Password" in the following DOM:
+Allows locating input elements by the text of the associated label.
+
+**Usage**
+
+For example, this method will find the input by label text "Password" in the following DOM:
 
 ```html
 <label for="password-input">Password:</label>
 <input id="password-input">
 ```
 
-**Usage**
-
 ```java
-Frame.getByLabel(text);
-Frame.getByLabel(text, options);
+page.getByLabel("Password").fill("secret");
 ```
 
 **Arguments**
@@ -402,17 +404,20 @@ Frame.getByLabel(text, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.getByPlaceholder</x-search>
 
-Allows locating input elements by the placeholder text. For example, this method will find the input by placeholder "Country":
-
-```html
-<input placeholder="Country">
-```
+Allows locating input elements by the placeholder text.
 
 **Usage**
 
+For example, consider the following DOM structure.
+
+```html
+<input type="email" placeholder="name@example.com" />
+```
+
+You can fill the input after locating it by the placeholder text:
+
 ```java
-Frame.getByPlaceholder(text);
-Frame.getByPlaceholder(text, options);
+page.getByPlaceholder("name@example.com").fill("playwright@microsoft.com");
 ```
 
 **Arguments**
@@ -433,15 +438,37 @@ Frame.getByPlaceholder(text, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.getByRole</x-search>
 
-Allows locating elements by their [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name). Note that role selector **does not replace** accessibility audits and conformance tests, but rather gives early feedback about the ARIA guidelines.
-
-Note that many html elements have an implicitly [defined role](https://w3c.github.io/html-aam/#html-element-role-mappings) that is recognized by the role selector. You can find all the [supported roles here](https://www.w3.org/TR/wai-aria-1.2/#role_definitions). ARIA guidelines **do not recommend** duplicating implicit roles and attributes by setting `role` and/or `aria-*` attributes to default values.
+Allows locating elements by their [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name).
 
 **Usage**
 
+Consider the following DOM structure.
+
+```html
+<h3>Sign up</h3>
+<label>
+  <input type="checkbox" /> Subscribe
+</label>
+<br/>
+<button>Submit</button>
+```
+
+You can locate each element by it's implicit role:
+
 ```java
-Frame.getByRole(role);
-Frame.getByRole(role, options);
+assertThat(page
+    .getByRole(AriaRole.HEADING,
+               new Page.GetByRoleOptions().setName("Sign up")))
+    .isVisible();
+
+page.getByRole(AriaRole.CHECKBOX,
+               new Page.GetByRoleOptions().setName("Subscribe"))
+    .check();
+
+page.getByRole(AriaRole.BUTTON,
+               new Page.GetByRoleOptions().setName(
+                   Pattern.compile("submit", Pattern.CASE_INSENSITIVE)))
+    .click();
 ```
 
 **Arguments**
@@ -499,18 +526,32 @@ Frame.getByRole(role, options);
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-role-return"/><a href="#frame-get-by-role-return" class="list-anchor">#</a>
 
+**Details**
+
+Role selector **does not replace** accessibility audits and conformance tests, but rather gives early feedback about the ARIA guidelines.
+
+Many html elements have an implicitly [defined role](https://w3c.github.io/html-aam/#html-element-role-mappings) that is recognized by the role selector. You can find all the [supported roles here](https://www.w3.org/TR/wai-aria-1.2/#role_definitions). ARIA guidelines **do not recommend** duplicating implicit roles and attributes by setting `role` and/or `aria-*` attributes to default values.
+
 ---
 
 ### getByTestId {#frame-get-by-test-id}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.getByTestId</x-search>
 
-Locate element by the test id. By default, the `data-testid` attribute is used as a test id. Use [Selectors.setTestIdAttribute()](/api/class-selectors.mdx#selectors-set-test-id-attribute) to configure a different test id attribute if necessary.
+Locate element by the test id.
 
 **Usage**
 
+Consider the following DOM structure.
+
+```html
+<button data-testid="directions">Itinéraire</button>
+```
+
+You can locate the element by it's test id:
+
 ```java
-Frame.getByTestId(testId);
+page.getByTestId("directions").click();
 ```
 
 **Arguments**
@@ -521,13 +562,23 @@ Frame.getByTestId(testId);
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-test-id-return"/><a href="#frame-get-by-test-id-return" class="list-anchor">#</a>
 
+**Details**
+
+By default, the `data-testid` attribute is used as a test id. Use [Selectors.setTestIdAttribute()](/api/class-selectors.mdx#selectors-set-test-id-attribute) to configure a different test id attribute if necessary.
+
 ---
 
 ### getByText {#frame-get-by-text}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.getByText</x-search>
 
-Allows locating elements that contain given text. Consider the following DOM structure:
+Allows locating elements that contain given text.
+
+See also [Locator.filter()](/api/class-locator.mdx#locator-filter) that allows to match by another criteria, like an accessible role, and then filter by the text content.
+
+**Usage**
+
+Consider the following DOM structure:
 
 ```html
 <div>Hello <span>world</span></div>
@@ -553,23 +604,6 @@ page.getByText(Pattern.compile("Hello"))
 page.getByText(Pattern.compile("^hello$", Pattern.CASE_INSENSITIVE))
 ```
 
-See also [Locator.filter()](/api/class-locator.mdx#locator-filter) that allows to match by another criteria, like an accessible role, and then filter by the text content.
-
-:::note
-Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
-:::
-
-:::note
-Input elements of the type `button` and `submit` are matched by their `value` instead of the text content. For example, locating by text `"Log in"` matches `<input type=button value="Log in">`.
-:::
-
-**Usage**
-
-```java
-Frame.getByText(text);
-Frame.getByText(text, options);
-```
-
 **Arguments**
 - `text` [String]|[Pattern]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-text-option-text"/><a href="#frame-get-by-text-option-text" class="list-anchor">#</a>
   
@@ -582,23 +616,32 @@ Frame.getByText(text, options);
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-by-text-return"/><a href="#frame-get-by-text-return" class="list-anchor">#</a>
 
+**Details**
+
+Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
+
+Input elements of the type `button` and `submit` are matched by their `value` instead of the text content. For example, locating by text `"Log in"` matches `<input type=button value="Log in">`.
+
 ---
 
 ### getByTitle {#frame-get-by-title}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.getByTitle</x-search>
 
-Allows locating elements by their title. For example, this method will find the button by its title "Place the order":
-
-```html
-<button title='Place the order'>Order Now</button>
-```
+Allows locating elements by their title attribute.
 
 **Usage**
 
+Consider the following DOM structure.
+
+```html
+<span title='Issues count'>25 issues</span>
+```
+
+You can check the issues count after locating it by the title text:
+
 ```java
-Frame.getByTitle(text);
-Frame.getByTitle(text, options);
+assertThat(page.getByTitle("Issues count")).hasText("25 issues");
 ```
 
 **Arguments**
@@ -1119,7 +1162,7 @@ frame.waitForURL("**/target.html");
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.check</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.check()](/api/class-locator.mdx#locator-check) instead. Read more about [locators](../locators.mdx).
 
@@ -1179,7 +1222,7 @@ Frame.check(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.click</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.click()](/api/class-locator.mdx#locator-click) instead. Read more about [locators](../locators.mdx).
 
@@ -1249,7 +1292,7 @@ Frame.click(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.dblclick</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.dblclick()](/api/class-locator.mdx#locator-dblclick) instead. Read more about [locators](../locators.mdx).
 
@@ -1320,7 +1363,7 @@ Frame.dblclick(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.dispatchEvent</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.dispatchEvent()](/api/class-locator.mdx#locator-dispatch-event) instead. Read more about [locators](../locators.mdx).
 
@@ -1380,7 +1423,7 @@ frame.dispatchEvent("#source", "dragstart", arg);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>frame.evalOnSelector</x-search>
 
-:::caution
+:::caution Discouraged
 
 This method does not wait for the element to pass the actionability checks and therefore can lead to the flaky tests. Use [Locator.evaluate()](/api/class-locator.mdx#locator-evaluate), other [Locator] helper methods or web-first assertions instead.
 
@@ -1425,7 +1468,7 @@ String html = (String) frame.evalOnSelector(".main-container", "(e, suffix) => e
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>frame.evalOnSelectorAll</x-search>
 
-:::caution
+:::caution Discouraged
 
 In most cases, [Locator.evaluateAll()](/api/class-locator.mdx#locator-evaluate-all), other [Locator] helper methods and web-first assertions do a better job.
 
@@ -1464,7 +1507,7 @@ boolean divsCounts = (boolean) page.evalOnSelectorAll("div", "(divs, min) => div
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.fill</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.fill()](/api/class-locator.mdx#locator-fill) instead. Read more about [locators](../locators.mdx).
 
@@ -1511,7 +1554,7 @@ Frame.fill(selector, value, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.focus</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.focus()](/api/class-locator.mdx#locator-focus) instead. Read more about [locators](../locators.mdx).
 
@@ -1545,7 +1588,7 @@ Frame.focus(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.getAttribute</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.getAttribute()](/api/class-locator.mdx#locator-get-attribute) instead. Read more about [locators](../locators.mdx).
 
@@ -1585,7 +1628,7 @@ Frame.getAttribute(selector, name, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.hover</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.hover()](/api/class-locator.mdx#locator-hover) instead. Read more about [locators](../locators.mdx).
 
@@ -1646,7 +1689,7 @@ Frame.hover(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.innerHTML</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.innerHTML()](/api/class-locator.mdx#locator-inner-html) instead. Read more about [locators](../locators.mdx).
 
@@ -1683,7 +1726,7 @@ Frame.innerHTML(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.innerText</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.innerText()](/api/class-locator.mdx#locator-inner-text) instead. Read more about [locators](../locators.mdx).
 
@@ -1720,7 +1763,7 @@ Frame.innerText(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.13</font><x-search>frame.inputValue</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.inputValue()](/api/class-locator.mdx#locator-input-value) instead. Read more about [locators](../locators.mdx).
 
@@ -1759,7 +1802,7 @@ Frame.inputValue(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.isChecked</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.isChecked()](/api/class-locator.mdx#locator-is-checked) instead. Read more about [locators](../locators.mdx).
 
@@ -1796,7 +1839,7 @@ Frame.isChecked(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.isDisabled</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.isDisabled()](/api/class-locator.mdx#locator-is-disabled) instead. Read more about [locators](../locators.mdx).
 
@@ -1833,7 +1876,7 @@ Frame.isDisabled(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.isEditable</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.isEditable()](/api/class-locator.mdx#locator-is-editable) instead. Read more about [locators](../locators.mdx).
 
@@ -1870,7 +1913,7 @@ Frame.isEditable(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.isHidden</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.isHidden()](/api/class-locator.mdx#locator-is-hidden) instead. Read more about [locators](../locators.mdx).
 
@@ -1895,6 +1938,11 @@ Frame.isHidden(selector, options);
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `setTimeout` [double] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-hidden-option-timeout"/><a href="#frame-is-hidden-option-timeout" class="list-anchor">#</a>
+    
+    :::caution Deprecated
+    This option is ignored. [Frame.isHidden()](/api/class-frame.mdx#frame-is-hidden) does not wait for the element to become hidden and returns immediately.
+    :::
+    
 
 **Returns**
 - [boolean]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-hidden-return"/><a href="#frame-is-hidden-return" class="list-anchor">#</a>
@@ -1905,7 +1953,7 @@ Frame.isHidden(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.isVisible</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.isVisible()](/api/class-locator.mdx#locator-is-visible) instead. Read more about [locators](../locators.mdx).
 
@@ -1930,6 +1978,11 @@ Frame.isVisible(selector, options);
     
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `setTimeout` [double] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-visible-option-timeout"/><a href="#frame-is-visible-option-timeout" class="list-anchor">#</a>
+    
+    :::caution Deprecated
+    This option is ignored. [Frame.isVisible()](/api/class-frame.mdx#frame-is-visible) does not wait for the element to become visible and returns immediately.
+    :::
+    
 
 **Returns**
 - [boolean]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-visible-return"/><a href="#frame-is-visible-return" class="list-anchor">#</a>
@@ -1940,7 +1993,7 @@ Frame.isVisible(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.press</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.press()](/api/class-locator.mdx#locator-press) instead. Read more about [locators](../locators.mdx).
 
@@ -1993,7 +2046,7 @@ Frame.press(selector, key, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>frame.querySelector</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Frame.locator()](/api/class-frame.mdx#frame-locator) instead. Read more about [locators](../locators.mdx).
 
@@ -2033,7 +2086,7 @@ Frame.querySelector(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>frame.querySelectorAll</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Frame.locator()](/api/class-frame.mdx#frame-locator) instead. Read more about [locators](../locators.mdx).
 
@@ -2068,7 +2121,7 @@ Frame.querySelectorAll(selector);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.selectOption</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.selectOption()](/api/class-locator.mdx#locator-select-option) instead. Read more about [locators](../locators.mdx).
 
@@ -2133,7 +2186,7 @@ frame.selectOption("select#colors", new String[] {"red", "green", "blue"});
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>frame.setChecked</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.setChecked()](/api/class-locator.mdx#locator-set-checked) instead. Read more about [locators](../locators.mdx).
 
@@ -2197,7 +2250,7 @@ Frame.setChecked(selector, checked, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.setInputFiles</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.setInputFiles()](/api/class-locator.mdx#locator-set-input-files) instead. Read more about [locators](../locators.mdx).
 
@@ -2246,7 +2299,7 @@ Frame.setInputFiles(selector, files, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.tap</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.tap()](/api/class-locator.mdx#locator-tap) instead. Read more about [locators](../locators.mdx).
 
@@ -2311,7 +2364,7 @@ Frame.tap(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.textContent</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.textContent()](/api/class-locator.mdx#locator-text-content) instead. Read more about [locators](../locators.mdx).
 
@@ -2348,7 +2401,7 @@ Frame.textContent(selector, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.type</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.type()](/api/class-locator.mdx#locator-type) instead. Read more about [locators](../locators.mdx).
 
@@ -2395,7 +2448,7 @@ frame.type("#mytextarea", "World", new Frame.TypeOptions().setDelay(100));
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.uncheck</x-search>
 
-:::caution
+:::caution Discouraged
 
 Use locator-based [Locator.uncheck()](/api/class-locator.mdx#locator-uncheck) instead. Read more about [locators](../locators.mdx).
 

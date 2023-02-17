@@ -43,7 +43,7 @@ Returns an array of `node.innerText` values for all matching nodes.
 **Usage**
 
 ```csharp
-await Locator.AllInnerTextsAsync();
+var texts = await page.GetByRole(AriaRole.Link).AllInnerTextsAsync();
 ```
 
 **Returns**
@@ -60,7 +60,7 @@ Returns an array of `node.textContent` values for all matching nodes.
 **Usage**
 
 ```csharp
-await Locator.AllTextContentsAsync();
+var texts = await page.GetByRole(AriaRole.Link).AllTextContentsAsync();
 ```
 
 **Returns**
@@ -82,7 +82,7 @@ await Locator.BlurAsync(options);
 
 **Arguments**
 - `options` `LocatorBlurOptions?` *(optional)*
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-blur-option-timeout"/><a href="#locator-blur-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-blur-option-timeout"/><a href="#locator-blur-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
@@ -92,7 +92,37 @@ await Locator.BlurAsync(options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.BoundingBoxAsync</x-search>
 
-This method returns the bounding box of the element, or `null` if the element is not visible. The bounding box is calculated relative to the main frame viewport - which is usually the same as the browser window.
+This method returns the bounding box of the element matching the locator, or `null` if the element is not visible. The bounding box is calculated relative to the main frame viewport - which is usually the same as the browser window.
+
+**Usage**
+
+```csharp
+var box = await page.GetByRole(AriaRole.Button).BoundingBoxAsync();
+await page.Mouse.ClickAsync(box.X + box.Width / 2, box.Y + box.Height / 2);
+```
+
+**Arguments**
+- `options` `LocatorBoundingBoxOptions?` *(optional)*
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-bounding-box-option-timeout"/><a href="#locator-bounding-box-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Returns**
+- BoundingBox?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-bounding-box-return"/><a href="#locator-bounding-box-return" class="list-anchor">#</a>
+  - `x` [float]
+    
+    the x coordinate of the element in pixels.
+  - `y` [float]
+    
+    the y coordinate of the element in pixels.
+  - `width` [float]
+    
+    the width of the element in pixels.
+  - `height` [float]
+    
+    the height of the element in pixels.
+
+**Details**
 
 Scrolling affects the returned bounding box, similarly to [Element.getBoundingClientRect](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect). That means `x` and/or `y` may be negative.
 
@@ -100,56 +130,18 @@ Elements from child frames return the bounding box relative to the main frame, u
 
 Assuming the page is static, it is safe to use bounding box coordinates to perform input. For example, the following snippet should click the center of the element.
 
-**Usage**
-
-```csharp
-var box = await element.BoundingBoxAsync();
-await page.Mouse.ClickAsync(box.X + box.Width / 2, box.Y + box.Height / 2);
-```
-
-**Arguments**
-- `options` `LocatorBoundingBoxOptions?` *(optional)*
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-bounding-box-option-timeout"/><a href="#locator-bounding-box-option-timeout" class="list-anchor">#</a>
-    
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-
-**Returns**
-- BoundingBox?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-bounding-box-return"/><a href="#locator-bounding-box-return" class="list-anchor">#</a>
-  - `x` [double]
-    
-    the x coordinate of the element in pixels.
-  - `y` [double]
-    
-    the y coordinate of the element in pixels.
-  - `width` [double]
-    
-    the width of the element in pixels.
-  - `height` [double]
-    
-    the height of the element in pixels.
-
 ---
 
 ### CheckAsync {#locator-check}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.CheckAsync</x-search>
 
-This method checks the element by performing the following steps:
-1. Ensure that element is a checkbox or a radio input. If not, this method throws. If the element is already checked, this method returns immediately.
-1. Wait for [actionability](../actionability.mdx) checks on the element, unless `force` option is set.
-1. Scroll the element into view if needed.
-1. Use [Page.Mouse](/api/class-page.mdx#page-mouse) to click in the center of the element.
-1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
-1. Ensure that the element is now checked. If not, this method throws.
-
-If the element is detached from the DOM at any moment during the action, this method throws.
-
-When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
+Ensure that checkbox or radio element is checked.
 
 **Usage**
 
 ```csharp
-await Locator.CheckAsync(options);
+await page.GetByRole(AriaRole.Checkbox).CheckAsync();
 ```
 
 **Arguments**
@@ -161,19 +153,33 @@ await Locator.CheckAsync(options);
     
     Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
   - `Position` Position? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-check-option-position"/><a href="#locator-check-option-position" class="list-anchor">#</a>
-    - `X` [double]
+    - `X` [float]
       
       
-    - `Y` [double]
+    - `Y` [float]
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-check-option-timeout"/><a href="#locator-check-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-check-option-timeout"/><a href="#locator-check-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
   - `Trial` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-check-option-trial"/><a href="#locator-check-option-trial" class="list-anchor">#</a>
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
+
+**Details**
+
+Performs the following steps:
+1. Ensure that element is a checkbox or a radio input. If not, this method throws. If the element is already checked, this method returns immediately.
+1. Wait for [actionability](../actionability.mdx) checks on the element, unless `force` option is set.
+1. Scroll the element into view if needed.
+1. Use [Page.Mouse](/api/class-page.mdx#page-mouse) to click in the center of the element.
+1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+1. Ensure that the element is now checked. If not, this method throws.
+
+If the element is detached from the DOM at any moment during the action, this method throws.
+
+When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
 
 ---
 
@@ -181,14 +187,12 @@ await Locator.CheckAsync(options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.28</font><x-search>locator.ClearAsync</x-search>
 
-This method waits for [actionability](../actionability.mdx) checks, focuses the element, clears it and triggers an `input` event after clearing.
-
-If the target element is not an `<input>`, `<textarea>` or `[contenteditable]` element, this method throws an error. However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), the control will be cleared instead.
+Clear the input field.
 
 **Usage**
 
 ```csharp
-await Locator.ClearAsync(options);
+await page.GetByRole(AriaRole.Textbox).ClearAsync();
 ```
 
 **Arguments**
@@ -199,9 +203,15 @@ await Locator.ClearAsync(options);
   - `NoWaitAfter` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-clear-option-no-wait-after"/><a href="#locator-clear-option-no-wait-after" class="list-anchor">#</a>
     
     Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-clear-option-timeout"/><a href="#locator-clear-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-clear-option-timeout"/><a href="#locator-clear-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Details**
+
+This method waits for [actionability](../actionability.mdx) checks, focuses the element, clears it and triggers an `input` event after clearing.
+
+If the target element is not an `<input>`, `<textarea>` or `[contenteditable]` element, this method throws an error. However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), the control will be cleared instead.
 
 ---
 
@@ -213,8 +223,20 @@ Click an element.
 
 **Usage**
 
+Click a button:
+
 ```csharp
-await Locator.ClickAsync(options);
+await page.GetByRole(AriaRole.Button).ClickAsync();
+```
+
+Shift-right-click at a specific position on a canvas:
+
+```csharp
+await page.Locator("canvas").ClickAsync(new() {
+  Button = MouseButton.Right,
+  Modifiers = new[] { KeyboardModifier.Shift },
+  Position = new Position { X = 0, Y = 0 }
+});
 ```
 
 **Arguments**
@@ -225,7 +247,7 @@ await Locator.ClickAsync(options);
   - `ClickCount` [int]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-click-option-click-count"/><a href="#locator-click-option-click-count" class="list-anchor">#</a>
     
     defaults to 1. See [UIEvent.detail].
-  - `Delay` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-click-option-delay"/><a href="#locator-click-option-delay" class="list-anchor">#</a>
+  - `Delay` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-click-option-delay"/><a href="#locator-click-option-delay" class="list-anchor">#</a>
     
     Time to wait between `mousedown` and `mouseup` in milliseconds. Defaults to 0.
   - `Force` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-click-option-force"/><a href="#locator-click-option-force" class="list-anchor">#</a>
@@ -238,14 +260,14 @@ await Locator.ClickAsync(options);
     
     Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
   - `Position` Position? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-click-option-position"/><a href="#locator-click-option-position" class="list-anchor">#</a>
-    - `X` [double]
+    - `X` [float]
       
       
-    - `Y` [double]
+    - `Y` [float]
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-click-option-timeout"/><a href="#locator-click-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-click-option-timeout"/><a href="#locator-click-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
   - `Trial` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-click-option-trial"/><a href="#locator-click-option-trial" class="list-anchor">#</a>
@@ -270,12 +292,12 @@ When all steps combined have not finished during the specified `timeout`, this m
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.CountAsync</x-search>
 
-Returns the number of elements matching given selector.
+Returns the number of elements matching the locator.
 
 **Usage**
 
 ```csharp
-await Locator.CountAsync();
+int count = await page.GetByRole(AriaRole.Listitem).CountAsync();
 ```
 
 **Returns**
@@ -286,6 +308,48 @@ await Locator.CountAsync();
 ### DblClickAsync {#locator-dblclick}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.DblClickAsync</x-search>
+
+Double-click an element.
+
+**Usage**
+
+```csharp
+await Locator.DblClickAsync(options);
+```
+
+**Arguments**
+- `options` `LocatorDblClickOptions?` *(optional)*
+  - `Button` `enum MouseButton { Left, Right, Middle }?` *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-dblclick-option-button"/><a href="#locator-dblclick-option-button" class="list-anchor">#</a>
+    
+    Defaults to `left`.
+  - `Delay` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-dblclick-option-delay"/><a href="#locator-dblclick-option-delay" class="list-anchor">#</a>
+    
+    Time to wait between `mousedown` and `mouseup` in milliseconds. Defaults to 0.
+  - `Force` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-dblclick-option-force"/><a href="#locator-dblclick-option-force" class="list-anchor">#</a>
+    
+    Whether to bypass the [actionability](../actionability.mdx) checks. Defaults to `false`.
+  - `Modifiers` [IEnumerable]?<`enum KeyboardModifier { Alt, Control, Meta, Shift }`> *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-dblclick-option-modifiers"/><a href="#locator-dblclick-option-modifiers" class="list-anchor">#</a>
+    
+    Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used.
+  - `NoWaitAfter` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-dblclick-option-no-wait-after"/><a href="#locator-dblclick-option-no-wait-after" class="list-anchor">#</a>
+    
+    Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+  - `Position` Position? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-dblclick-option-position"/><a href="#locator-dblclick-option-position" class="list-anchor">#</a>
+    - `X` [float]
+      
+      
+    - `Y` [float]
+      
+      
+    A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-dblclick-option-timeout"/><a href="#locator-dblclick-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  - `Trial` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-dblclick-option-trial"/><a href="#locator-dblclick-option-trial" class="list-anchor">#</a>
+    
+    When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
+
+**Details**
 
 This method double clicks the element by performing the following steps:
 1. Wait for [actionability](../actionability.mdx) checks on the element, unless `force` option is set.
@@ -301,57 +365,35 @@ When all steps combined have not finished during the specified `timeout`, this m
 `element.dblclick()` dispatches two `click` events and a single `dblclick` event.
 :::
 
-**Usage**
-
-```csharp
-await Locator.DblClickAsync(options);
-```
-
-**Arguments**
-- `options` `LocatorDblClickOptions?` *(optional)*
-  - `Button` `enum MouseButton { Left, Right, Middle }?` *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-dblclick-option-button"/><a href="#locator-dblclick-option-button" class="list-anchor">#</a>
-    
-    Defaults to `left`.
-  - `Delay` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-dblclick-option-delay"/><a href="#locator-dblclick-option-delay" class="list-anchor">#</a>
-    
-    Time to wait between `mousedown` and `mouseup` in milliseconds. Defaults to 0.
-  - `Force` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-dblclick-option-force"/><a href="#locator-dblclick-option-force" class="list-anchor">#</a>
-    
-    Whether to bypass the [actionability](../actionability.mdx) checks. Defaults to `false`.
-  - `Modifiers` [IEnumerable]?<`enum KeyboardModifier { Alt, Control, Meta, Shift }`> *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-dblclick-option-modifiers"/><a href="#locator-dblclick-option-modifiers" class="list-anchor">#</a>
-    
-    Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used.
-  - `NoWaitAfter` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-dblclick-option-no-wait-after"/><a href="#locator-dblclick-option-no-wait-after" class="list-anchor">#</a>
-    
-    Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-  - `Position` Position? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-dblclick-option-position"/><a href="#locator-dblclick-option-position" class="list-anchor">#</a>
-    - `X` [double]
-      
-      
-    - `Y` [double]
-      
-      
-    A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-dblclick-option-timeout"/><a href="#locator-dblclick-option-timeout" class="list-anchor">#</a>
-    
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-  - `Trial` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-dblclick-option-trial"/><a href="#locator-dblclick-option-trial" class="list-anchor">#</a>
-    
-    When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
-
 ---
 
 ### DispatchEventAsync {#locator-dispatch-event}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.DispatchEventAsync</x-search>
 
-The snippet below dispatches the `click` event on the element. Regardless of the visibility state of the element, `click` is dispatched. This is equivalent to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
+Programmatically dispatch an event on the matching element.
 
 **Usage**
 
 ```csharp
-await element.DispatchEventAsync("click");
+await locator.DispatchEventAsync("click");
 ```
+
+**Arguments**
+- `type` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-dispatch-event-option-type"/><a href="#locator-dispatch-event-option-type" class="list-anchor">#</a>
+  
+  DOM event type: `"click"`, `"dragstart"`, etc.
+- `eventInit` [EvaluationArgument]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-dispatch-event-option-event-init"/><a href="#locator-dispatch-event-option-event-init" class="list-anchor">#</a>
+  
+  Optional event-specific initialization properties.
+- `options` `LocatorDispatchEventOptions?` *(optional)*
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-dispatch-event-option-timeout"/><a href="#locator-dispatch-event-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Details**
+
+The snippet above dispatches the `click` event on the element. Regardless of the visibility state of the element, `click` is dispatched. This is equivalent to calling [element.click()](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/click).
 
 Under the hood, it creates an instance of an event based on the given `type`, initializes it with `eventInit` properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
 
@@ -364,27 +406,15 @@ Since `eventInit` is event-specific, please refer to the events documentation fo
 * [TouchEvent](https://developer.mozilla.org/en-US/docs/Web/API/TouchEvent/TouchEvent)
 * [Event](https://developer.mozilla.org/en-US/docs/Web/API/Event/Event)
 
-You can also specify `JSHandle` as the property value if you want live objects to be passed into the event:
+You can also specify [JSHandle] as the property value if you want live objects to be passed into the event:
 
 ```csharp
 var dataTransfer = await page.EvaluateHandleAsync("() => new DataTransfer()");
-await element.DispatchEventAsync("dragstart", new Dictionary<string, object>
+await locator.DispatchEventAsync("dragstart", new Dictionary<string, object>
 {
     { "dataTransfer", dataTransfer }
 });
 ```
-
-**Arguments**
-- `type` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-dispatch-event-option-type"/><a href="#locator-dispatch-event-option-type" class="list-anchor">#</a>
-  
-  DOM event type: `"click"`, `"dragstart"`, etc.
-- `eventInit` [EvaluationArgument]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-dispatch-event-option-event-init"/><a href="#locator-dispatch-event-option-event-init" class="list-anchor">#</a>
-  
-  Optional event-specific initialization properties.
-- `options` `LocatorDispatchEventOptions?` *(optional)*
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-dispatch-event-option-timeout"/><a href="#locator-dispatch-event-option-timeout" class="list-anchor">#</a>
-    
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 ---
 
@@ -392,7 +422,7 @@ await element.DispatchEventAsync("dragstart", new Dictionary<string, object>
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.18</font><x-search>locator.DragToAsync</x-search>
 
-This method drags the locator to another target locator or target position. It will first move to the source element, perform a `mousedown`, then move to the target element or position and perform a `mouseup`.
+Drag the source element towards the target element and drop it.
 
 **Usage**
 
@@ -421,67 +451,31 @@ await source.DragToAsync(target, new()
     
     Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
   - `SourcePosition` SourcePosition? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-drag-to-option-source-position"/><a href="#locator-drag-to-option-source-position" class="list-anchor">#</a>
-    - `X` [double]
+    - `X` [float]
       
       
-    - `Y` [double]
+    - `Y` [float]
       
       
     Clicks on the source element at this point relative to the top-left corner of the element's padding box. If not specified, some visible point of the element is used.
   - `TargetPosition` TargetPosition? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-drag-to-option-target-position"/><a href="#locator-drag-to-option-target-position" class="list-anchor">#</a>
-    - `X` [double]
+    - `X` [float]
       
       
-    - `Y` [double]
+    - `Y` [float]
       
       
     Drops on the target element at this point relative to the top-left corner of the element's padding box. If not specified, some visible point of the element is used.
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-drag-to-option-timeout"/><a href="#locator-drag-to-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-drag-to-option-timeout"/><a href="#locator-drag-to-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
   - `Trial` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-drag-to-option-trial"/><a href="#locator-drag-to-option-trial" class="list-anchor">#</a>
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
----
+**Details**
 
-### ElementHandleAsync {#locator-element-handle}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.ElementHandleAsync</x-search>
-
-Resolves given locator to the first matching DOM element. If no elements matching the query are visible, waits for them up to a given timeout. If multiple elements match the selector, throws.
-
-**Usage**
-
-```csharp
-await Locator.ElementHandleAsync(options);
-```
-
-**Arguments**
-- `options` `LocatorElementHandleOptions?` *(optional)*
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-element-handle-option-timeout"/><a href="#locator-element-handle-option-timeout" class="list-anchor">#</a>
-    
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-
-**Returns**
-- [ElementHandle]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-element-handle-return"/><a href="#locator-element-handle-return" class="list-anchor">#</a>
-
----
-
-### ElementHandlesAsync {#locator-element-handles}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.ElementHandlesAsync</x-search>
-
-Resolves given locator to all matching DOM elements.
-
-**Usage**
-
-```csharp
-await Locator.ElementHandlesAsync();
-```
-
-**Returns**
-- [IEnumerable]<[ElementHandle]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-element-handles-return"/><a href="#locator-element-handles-return" class="list-anchor">#</a>
+This method drags the locator to another target locator or target position. It will first move to the source element, perform a `mousedown`, then move to the target element or position and perform a `mouseup`.
 
 ---
 
@@ -489,11 +483,7 @@ await Locator.ElementHandlesAsync();
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.EvaluateAsync</x-search>
 
-Returns the return value of `expression`.
-
-This method passes this handle as the first argument to `expression`.
-
-If `expression` returns a [Promise], then `handle.evaluate` would wait for the promise to resolve and return its value.
+Execute JavaScript code in the page, taking the matching element as an argument.
 
 **Usage**
 
@@ -510,12 +500,20 @@ Assert.AreEqual("10 retweets", await tweets.EvaluateAsync("node => node.innerTex
   
   Optional argument to pass to `expression`.
 - `options` `LocatorEvaluateOptions?` *(optional)*
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-evaluate-option-timeout"/><a href="#locator-evaluate-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-evaluate-option-timeout"/><a href="#locator-evaluate-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [object]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-evaluate-return"/><a href="#locator-evaluate-return" class="list-anchor">#</a>
+
+**Details**
+
+Returns the return value of `expression`, called with the matching element as a first argument, and `arg` as a second argument.
+
+If `expression` returns a [Promise], this method will wait for the promise to resolve and return its value.
+
+If `expression` throws or rejects, this method throws.
 
 ---
 
@@ -523,15 +521,13 @@ Assert.AreEqual("10 retweets", await tweets.EvaluateAsync("node => node.innerTex
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.EvaluateAllAsync</x-search>
 
-The method finds all elements matching the specified locator and passes an array of matched elements as a first argument to `expression`. Returns the result of `expression` invocation.
-
-If `expression` returns a [Promise], then [Locator.EvaluateAllAsync()](/api/class-locator.mdx#locator-evaluate-all) would wait for the promise to resolve and return its value.
+Execute JavaScript code in the page, taking all matching elements as an argument.
 
 **Usage**
 
 ```csharp
-var elements = page.Locator("div");
-var divsCount = await elements.EvaluateAllAsync<bool>("(divs, min) => divs.length >= min", 10);
+var locator = page.Locator("div");
+var moreThanTen = await locator.EvaluateAllAsync<bool>("(divs, min) => divs.length > min", 10);
 ```
 
 **Arguments**
@@ -545,21 +541,21 @@ var divsCount = await elements.EvaluateAllAsync<bool>("(divs, min) => divs.lengt
 **Returns**
 - [object]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-evaluate-all-return"/><a href="#locator-evaluate-all-return" class="list-anchor">#</a>
 
+**Details**
+
+Returns the return value of `expression`, called with an array of all matching elements as a first argument, and `arg` as a second argument.
+
+If `expression` returns a [Promise], this method will wait for the promise to resolve and return its value.
+
+If `expression` throws or rejects, this method throws.
+
 ---
 
 ### EvaluateHandleAsync {#locator-evaluate-handle}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.EvaluateHandleAsync</x-search>
 
-Returns the return value of `expression` as a [JSHandle].
-
-This method passes this handle as the first argument to `expression`.
-
-The only difference between [Locator.EvaluateAsync()](/api/class-locator.mdx#locator-evaluate) and [Locator.EvaluateHandleAsync()](/api/class-locator.mdx#locator-evaluate-handle) is that [Locator.EvaluateHandleAsync()](/api/class-locator.mdx#locator-evaluate-handle) returns [JSHandle].
-
-If the function passed to the [Locator.EvaluateHandleAsync()](/api/class-locator.mdx#locator-evaluate-handle) returns a [Promise], then [Locator.EvaluateHandleAsync()](/api/class-locator.mdx#locator-evaluate-handle) would wait for the promise to resolve and return its value.
-
-See [Page.EvaluateHandleAsync()](/api/class-page.mdx#page-evaluate-handle) for more details.
+Execute JavaScript code in the page, taking the matching element as an argument, and return a [JSHandle] with the result.
 
 **Usage**
 
@@ -575,12 +571,24 @@ await Locator.EvaluateHandleAsync(expression, arg, options);
   
   Optional argument to pass to `expression`.
 - `options` `LocatorEvaluateHandleOptions?` *(optional)*
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-evaluate-handle-option-timeout"/><a href="#locator-evaluate-handle-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-evaluate-handle-option-timeout"/><a href="#locator-evaluate-handle-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [JSHandle]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-evaluate-handle-return"/><a href="#locator-evaluate-handle-return" class="list-anchor">#</a>
+
+**Details**
+
+Returns the return value of `expression` as a[JSHandle], called with the matching element as a first argument, and `arg` as a second argument.
+
+The only difference between [Locator.EvaluateAsync()](/api/class-locator.mdx#locator-evaluate) and [Locator.EvaluateHandleAsync()](/api/class-locator.mdx#locator-evaluate-handle) is that [Locator.EvaluateHandleAsync()](/api/class-locator.mdx#locator-evaluate-handle) returns [JSHandle].
+
+If `expression` returns a [Promise], this method will wait for the promise to resolve and return its value.
+
+If `expression` throws or rejects, this method throws.
+
+See [Page.EvaluateHandleAsync()](/api/class-page.mdx#page-evaluate-handle) for more details.
 
 ---
 
@@ -588,16 +596,12 @@ await Locator.EvaluateHandleAsync(expression, arg, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.FillAsync</x-search>
 
-This method waits for [actionability](../actionability.mdx) checks, focuses the element, fills it and triggers an `input` event after filling. Note that you can pass an empty string to clear the input field.
-
-If the target element is not an `<input>`, `<textarea>` or `[contenteditable]` element, this method throws an error. However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), the control will be filled instead.
-
-To send fine-grained keyboard events, use [Locator.TypeAsync()](/api/class-locator.mdx#locator-type).
+Set a value to the input field.
 
 **Usage**
 
 ```csharp
-await Locator.FillAsync(value, options);
+await page.GetByRole(AriaRole.Textbox).FillAsync("example value");
 ```
 
 **Arguments**
@@ -611,9 +615,17 @@ await Locator.FillAsync(value, options);
   - `NoWaitAfter` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-fill-option-no-wait-after"/><a href="#locator-fill-option-no-wait-after" class="list-anchor">#</a>
     
     Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-fill-option-timeout"/><a href="#locator-fill-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-fill-option-timeout"/><a href="#locator-fill-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Details**
+
+This method waits for [actionability](../actionability.mdx) checks, focuses the element, fills it and triggers an `input` event after filling. Note that you can pass an empty string to clear the input field.
+
+If the target element is not an `<input>`, `<textarea>` or `[contenteditable]` element, this method throws an error. However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), the control will be filled instead.
+
+To send fine-grained keyboard events, use [Locator.TypeAsync()](/api/class-locator.mdx#locator-type).
 
 ---
 
@@ -673,7 +685,7 @@ Locator.First
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.FocusAsync</x-search>
 
-Calls [focus](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus) on the element.
+Calls [focus](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/focus) on the matching element.
 
 **Usage**
 
@@ -683,7 +695,7 @@ await Locator.FocusAsync(options);
 
 **Arguments**
 - `options` `LocatorFocusOptions?` *(optional)*
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-focus-option-timeout"/><a href="#locator-focus-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-focus-option-timeout"/><a href="#locator-focus-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
@@ -693,9 +705,9 @@ await Locator.FocusAsync(options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>locator.FrameLocator</x-search>
 
-**Usage**
+When working with iframes, you can create a frame locator that will enter the iframe and allow locating elements in that iframe:
 
-When working with iframes, you can create a frame locator that will enter the iframe and allow selecting elements in that iframe:
+**Usage**
 
 ```csharp
 var locator = page.FrameLocator("iframe").GetByText("Submit");
@@ -716,7 +728,7 @@ await locator.ClickAsync();
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.GetAttributeAsync</x-search>
 
-Returns element attribute value.
+Returns the matching element's attribute value.
 
 **Usage**
 
@@ -729,7 +741,7 @@ await Locator.GetAttributeAsync(name, options);
   
   Attribute name to get the value for.
 - `options` `LocatorGetAttributeOptions?` *(optional)*
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-attribute-option-timeout"/><a href="#locator-get-attribute-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-attribute-option-timeout"/><a href="#locator-get-attribute-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
@@ -742,16 +754,18 @@ await Locator.GetAttributeAsync(name, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>locator.GetByAltText</x-search>
 
-Allows locating elements by their alt text. For example, this method will find the image by alt text "Castle":
-
-```html
-<img alt='Castle'>
-```
+Allows locating elements by their alt text.
 
 **Usage**
 
+For example, this method will find the image by alt text "Playwright logo":
+
+```html
+<img alt='Playwright logo'>
+```
+
 ```csharp
-Locator.GetByAltText(text, options);
+await page.GetByAltText("Playwright logo").ClickAsync();
 ```
 
 **Arguments**
@@ -772,17 +786,19 @@ Locator.GetByAltText(text, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>locator.GetByLabel</x-search>
 
-Allows locating input elements by the text of the associated label. For example, this method will find the input by label text "Password" in the following DOM:
+Allows locating input elements by the text of the associated label.
+
+**Usage**
+
+For example, this method will find the input by label text "Password" in the following DOM:
 
 ```html
 <label for="password-input">Password:</label>
 <input id="password-input">
 ```
 
-**Usage**
-
 ```csharp
-Locator.GetByLabel(text, options);
+await page.GetByLabel("Password").FillAsync("secret");
 ```
 
 **Arguments**
@@ -803,16 +819,22 @@ Locator.GetByLabel(text, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>locator.GetByPlaceholder</x-search>
 
-Allows locating input elements by the placeholder text. For example, this method will find the input by placeholder "Country":
-
-```html
-<input placeholder="Country">
-```
+Allows locating input elements by the placeholder text.
 
 **Usage**
 
+For example, consider the following DOM structure.
+
+```html
+<input type="email" placeholder="name@example.com" />
+```
+
+You can fill the input after locating it by the placeholder text:
+
 ```csharp
-Locator.GetByPlaceholder(text, options);
+await page
+    .GetByPlaceholder("name@example.com")
+    .FillAsync("playwright@microsoft.com");
 ```
 
 **Arguments**
@@ -833,14 +855,37 @@ Locator.GetByPlaceholder(text, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>locator.GetByRole</x-search>
 
-Allows locating elements by their [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name). Note that role selector **does not replace** accessibility audits and conformance tests, but rather gives early feedback about the ARIA guidelines.
-
-Note that many html elements have an implicitly [defined role](https://w3c.github.io/html-aam/#html-element-role-mappings) that is recognized by the role selector. You can find all the [supported roles here](https://www.w3.org/TR/wai-aria-1.2/#role_definitions). ARIA guidelines **do not recommend** duplicating implicit roles and attributes by setting `role` and/or `aria-*` attributes to default values.
+Allows locating elements by their [ARIA role](https://www.w3.org/TR/wai-aria-1.2/#roles), [ARIA attributes](https://www.w3.org/TR/wai-aria-1.2/#aria-attributes) and [accessible name](https://w3c.github.io/accname/#dfn-accessible-name).
 
 **Usage**
 
+Consider the following DOM structure.
+
+```html
+<h3>Sign up</h3>
+<label>
+  <input type="checkbox" /> Subscribe
+</label>
+<br/>
+<button>Submit</button>
+```
+
+You can locate each element by it's implicit role:
+
 ```csharp
-Locator.GetByRole(role, options);
+await Expect(page
+    .GetByRole(AriaRole.Heading, new() { Name = "Sign up" }))
+    .ToBeVisibleAsync();
+
+await page
+    .GetByRole(AriaRole.Checkbox, new() { Name = "Subscribe" })
+    .CheckAsync();
+
+await page
+    .GetByRole(AriaRole.Button, new() {
+        NameRegex = new Regex("submit", RegexOptions.IgnoreCase)
+    })
+    .ClickAsync();
 ```
 
 **Arguments**
@@ -898,18 +943,32 @@ Locator.GetByRole(role, options);
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-role-return"/><a href="#locator-get-by-role-return" class="list-anchor">#</a>
 
+**Details**
+
+Role selector **does not replace** accessibility audits and conformance tests, but rather gives early feedback about the ARIA guidelines.
+
+Many html elements have an implicitly [defined role](https://w3c.github.io/html-aam/#html-element-role-mappings) that is recognized by the role selector. You can find all the [supported roles here](https://www.w3.org/TR/wai-aria-1.2/#role_definitions). ARIA guidelines **do not recommend** duplicating implicit roles and attributes by setting `role` and/or `aria-*` attributes to default values.
+
 ---
 
 ### GetByTestId {#locator-get-by-test-id}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>locator.GetByTestId</x-search>
 
-Locate element by the test id. By default, the `data-testid` attribute is used as a test id. Use [Selectors.SetTestIdAttribute()](/api/class-selectors.mdx#selectors-set-test-id-attribute) to configure a different test id attribute if necessary.
+Locate element by the test id.
 
 **Usage**
 
+Consider the following DOM structure.
+
+```html
+<button data-testid="directions">Itinéraire</button>
+```
+
+You can locate the element by it's test id:
+
 ```csharp
-Locator.GetByTestId(testId);
+await page.GetByTestId("directions").ClickAsync();
 ```
 
 **Arguments**
@@ -920,13 +979,23 @@ Locator.GetByTestId(testId);
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-test-id-return"/><a href="#locator-get-by-test-id-return" class="list-anchor">#</a>
 
+**Details**
+
+By default, the `data-testid` attribute is used as a test id. Use [Selectors.SetTestIdAttribute()](/api/class-selectors.mdx#selectors-set-test-id-attribute) to configure a different test id attribute if necessary.
+
 ---
 
 ### GetByText {#locator-get-by-text}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>locator.GetByText</x-search>
 
-Allows locating elements that contain given text. Consider the following DOM structure:
+Allows locating elements that contain given text.
+
+See also [Locator.Filter()](/api/class-locator.mdx#locator-filter) that allows to match by another criteria, like an accessible role, and then filter by the text content.
+
+**Usage**
+
+Consider the following DOM structure:
 
 ```html
 <div>Hello <span>world</span></div>
@@ -952,22 +1021,6 @@ page.GetByText(new Regex("Hello"))
 page.GetByText(new Regex("^hello$", RegexOptions.IgnoreCase))
 ```
 
-See also [Locator.Filter()](/api/class-locator.mdx#locator-filter) that allows to match by another criteria, like an accessible role, and then filter by the text content.
-
-:::note
-Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
-:::
-
-:::note
-Input elements of the type `button` and `submit` are matched by their `value` instead of the text content. For example, locating by text `"Log in"` matches `<input type=button value="Log in">`.
-:::
-
-**Usage**
-
-```csharp
-Locator.GetByText(text, options);
-```
-
 **Arguments**
 - `text` [string]|[Regex]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-text-option-text"/><a href="#locator-get-by-text-option-text" class="list-anchor">#</a>
   
@@ -980,22 +1033,32 @@ Locator.GetByText(text, options);
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-get-by-text-return"/><a href="#locator-get-by-text-return" class="list-anchor">#</a>
 
+**Details**
+
+Matching by text always normalizes whitespace, even with exact match. For example, it turns multiple spaces into one, turns line breaks into spaces and ignores leading and trailing whitespace.
+
+Input elements of the type `button` and `submit` are matched by their `value` instead of the text content. For example, locating by text `"Log in"` matches `<input type=button value="Log in">`.
+
 ---
 
 ### GetByTitle {#locator-get-by-title}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>locator.GetByTitle</x-search>
 
-Allows locating elements by their title. For example, this method will find the button by its title "Place the order":
-
-```html
-<button title='Place the order'>Order Now</button>
-```
+Allows locating elements by their title attribute.
 
 **Usage**
 
+Consider the following DOM structure.
+
+```html
+<span title='Issues count'>25 issues</span>
+```
+
+You can check the issues count after locating it by the title text:
+
 ```csharp
-Locator.GetByTitle(text, options);
+await Expect(page.GetByTitle("Issues count")).toHaveText("25 issues");
 ```
 
 **Arguments**
@@ -1030,20 +1093,12 @@ await Locator.HighlightAsync();
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.HoverAsync</x-search>
 
-This method hovers over the element by performing the following steps:
-1. Wait for [actionability](../actionability.mdx) checks on the element, unless `force` option is set.
-1. Scroll the element into view if needed.
-1. Use [Page.Mouse](/api/class-page.mdx#page-mouse) to hover over the center of the element, or the specified `position`.
-1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
-
-If the element is detached from the DOM at any moment during the action, this method throws.
-
-When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
+Hover over the matching element.
 
 **Usage**
 
 ```csharp
-await Locator.HoverAsync(options);
+await page.GetByRole(AriaRole.Link).HoverAsync();
 ```
 
 **Arguments**
@@ -1058,19 +1113,31 @@ await Locator.HoverAsync(options);
     
     Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
   - `Position` Position? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-hover-option-position"/><a href="#locator-hover-option-position" class="list-anchor">#</a>
-    - `X` [double]
+    - `X` [float]
       
       
-    - `Y` [double]
+    - `Y` [float]
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-hover-option-timeout"/><a href="#locator-hover-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-hover-option-timeout"/><a href="#locator-hover-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
   - `Trial` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-hover-option-trial"/><a href="#locator-hover-option-trial" class="list-anchor">#</a>
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
+
+**Details**
+
+This method hovers over the element by performing the following steps:
+1. Wait for [actionability](../actionability.mdx) checks on the element, unless `force` option is set.
+1. Scroll the element into view if needed.
+1. Use [Page.Mouse](/api/class-page.mdx#page-mouse) to hover over the center of the element, or the specified `position`.
+1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+
+If the element is detached from the DOM at any moment during the action, this method throws.
+
+When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
 
 ---
 
@@ -1078,7 +1145,7 @@ await Locator.HoverAsync(options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.InnerHTMLAsync</x-search>
 
-Returns the `element.innerHTML`.
+Returns the [`element.innerHTML`](https://developer.mozilla.org/en-US/docs/Web/API/Element/innerHTML).
 
 **Usage**
 
@@ -1088,7 +1155,7 @@ await Locator.InnerHTMLAsync(options);
 
 **Arguments**
 - `options` `LocatorInnerHTMLOptions?` *(optional)*
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-inner-html-option-timeout"/><a href="#locator-inner-html-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-inner-html-option-timeout"/><a href="#locator-inner-html-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
@@ -1101,7 +1168,7 @@ await Locator.InnerHTMLAsync(options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.InnerTextAsync</x-search>
 
-Returns the `element.innerText`.
+Returns the [`element.innerText`](https://developer.mozilla.org/en-US/docs/Web/API/HTMLElement/innerText).
 
 **Usage**
 
@@ -1111,7 +1178,7 @@ await Locator.InnerTextAsync(options);
 
 **Arguments**
 - `options` `LocatorInnerTextOptions?` *(optional)*
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-inner-text-option-timeout"/><a href="#locator-inner-text-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-inner-text-option-timeout"/><a href="#locator-inner-text-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
@@ -1124,24 +1191,26 @@ await Locator.InnerTextAsync(options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.InputValueAsync</x-search>
 
-Returns `input.value` for the selected `<input>` or `<textarea>` or `<select>` element.
-
-Throws for non-input elements. However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), returns the value of the control.
+Returns the value for the matching `<input>` or `<textarea>` or `<select>` element.
 
 **Usage**
 
 ```csharp
-await Locator.InputValueAsync(options);
+String value = await page.GetByRole(AriaRole.Textbox).InputValueAsync();
 ```
 
 **Arguments**
 - `options` `LocatorInputValueOptions?` *(optional)*
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-input-value-option-timeout"/><a href="#locator-input-value-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-input-value-option-timeout"/><a href="#locator-input-value-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-input-value-return"/><a href="#locator-input-value-return" class="list-anchor">#</a>
+
+**Details**
+
+Throws elements that are not an input, textarea or a select. However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), returns the value of the control.
 
 ---
 
@@ -1154,12 +1223,12 @@ Returns whether the element is checked. Throws if the element is not a checkbox 
 **Usage**
 
 ```csharp
-await Locator.IsCheckedAsync(options);
+Boolean checked = await page.GetByRole(AriaRole.Checkbox).IsCheckedAsync();
 ```
 
 **Arguments**
 - `options` `LocatorIsCheckedOptions?` *(optional)*
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-is-checked-option-timeout"/><a href="#locator-is-checked-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-is-checked-option-timeout"/><a href="#locator-is-checked-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
@@ -1177,12 +1246,12 @@ Returns whether the element is disabled, the opposite of [enabled](../actionabil
 **Usage**
 
 ```csharp
-await Locator.IsDisabledAsync(options);
+Boolean disabled = await page.GetByRole(AriaRole.Button).IsDisabledAsync();
 ```
 
 **Arguments**
 - `options` `LocatorIsDisabledOptions?` *(optional)*
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-is-disabled-option-timeout"/><a href="#locator-is-disabled-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-is-disabled-option-timeout"/><a href="#locator-is-disabled-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
@@ -1200,12 +1269,12 @@ Returns whether the element is [editable](../actionability.mdx#editable).
 **Usage**
 
 ```csharp
-await Locator.IsEditableAsync(options);
+Boolean editable = await page.GetByRole(AriaRole.Textbox).IsEditableAsync();
 ```
 
 **Arguments**
 - `options` `LocatorIsEditableOptions?` *(optional)*
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-is-editable-option-timeout"/><a href="#locator-is-editable-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-is-editable-option-timeout"/><a href="#locator-is-editable-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
@@ -1223,12 +1292,12 @@ Returns whether the element is [enabled](../actionability.mdx#enabled).
 **Usage**
 
 ```csharp
-await Locator.IsEnabledAsync(options);
+Boolean enabled = await page.GetByRole(AriaRole.Button).IsEnabledAsync();
 ```
 
 **Arguments**
 - `options` `LocatorIsEnabledOptions?` *(optional)*
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-is-enabled-option-timeout"/><a href="#locator-is-enabled-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-is-enabled-option-timeout"/><a href="#locator-is-enabled-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
@@ -1246,12 +1315,17 @@ Returns whether the element is hidden, the opposite of [visible](../actionabilit
 **Usage**
 
 ```csharp
-await Locator.IsHiddenAsync(options);
+Boolean hidden = await page.GetByRole(AriaRole.Button).IsHiddenAsync();
 ```
 
 **Arguments**
 - `options` `LocatorIsHiddenOptions?` *(optional)*
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-is-hidden-option-timeout"/><a href="#locator-is-hidden-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-is-hidden-option-timeout"/><a href="#locator-is-hidden-option-timeout" class="list-anchor">#</a>
+    
+    :::caution Deprecated
+    This option is ignored. [Locator.IsHiddenAsync()](/api/class-locator.mdx#locator-is-hidden) does not wait for the element to become hidden and returns immediately.
+    :::
+    
 
 **Returns**
 - [bool]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-is-hidden-return"/><a href="#locator-is-hidden-return" class="list-anchor">#</a>
@@ -1267,12 +1341,17 @@ Returns whether the element is [visible](../actionability.mdx#visible).
 **Usage**
 
 ```csharp
-await Locator.IsVisibleAsync(options);
+Boolean visible = await page.GetByRole(AriaRole.Button).IsVisibleAsync();
 ```
 
 **Arguments**
 - `options` `LocatorIsVisibleOptions?` *(optional)*
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-is-visible-option-timeout"/><a href="#locator-is-visible-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-is-visible-option-timeout"/><a href="#locator-is-visible-option-timeout" class="list-anchor">#</a>
+    
+    :::caution Deprecated
+    This option is ignored. [Locator.IsVisibleAsync()](/api/class-locator.mdx#locator-is-visible) does not wait for the element to become visible and returns immediately.
+    :::
+    
 
 **Returns**
 - [bool]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-is-visible-return"/><a href="#locator-is-visible-return" class="list-anchor">#</a>
@@ -1288,7 +1367,7 @@ Returns locator to the last matching element.
 **Usage**
 
 ```csharp
-Locator.Last
+var banana = await page.GetByRole(AriaRole.Listitem).Last(1);
 ```
 
 **Returns**
@@ -1338,7 +1417,7 @@ Returns locator to the n-th matching element. It's zero based, `nth(0)` selects 
 **Usage**
 
 ```csharp
-Locator.Nth(index);
+var banana = await page.GetByRole(AriaRole.Listitem).Nth(2);
 ```
 
 **Arguments**
@@ -1370,6 +1449,31 @@ Locator.Page
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.PressAsync</x-search>
 
+Focuses the matching element and presses a combination of the keys.
+
+**Usage**
+
+```csharp
+await page.GetByRole(AriaRole.Textbox).PressAsync("Backspace");
+```
+
+**Arguments**
+- `key` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-press-option-key"/><a href="#locator-press-option-key" class="list-anchor">#</a>
+  
+  Name of the key to press or a character to generate, such as `ArrowLeft` or `a`.
+- `options` `LocatorPressOptions?` *(optional)*
+  - `Delay` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-press-option-delay"/><a href="#locator-press-option-delay" class="list-anchor">#</a>
+    
+    Time to wait between `keydown` and `keyup` in milliseconds. Defaults to 0.
+  - `NoWaitAfter` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-press-option-no-wait-after"/><a href="#locator-press-option-no-wait-after" class="list-anchor">#</a>
+    
+    Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-press-option-timeout"/><a href="#locator-press-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Details**
+
 Focuses the element, and then uses [Keyboard.DownAsync()](/api/class-keyboard.mdx#keyboard-down) and [Keyboard.UpAsync()](/api/class-keyboard.mdx#keyboard-up).
 
 `key` can specify the intended [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) value or a single character to generate the text for. A superset of the `key` values can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values). Examples of the keys are:
@@ -1384,43 +1488,27 @@ If `key` is a single character, it is case-sensitive, so the values `a` and `A` 
 
 Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
 
-**Usage**
-
-```csharp
-await Locator.PressAsync(key, options);
-```
-
-**Arguments**
-- `key` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-press-option-key"/><a href="#locator-press-option-key" class="list-anchor">#</a>
-  
-  Name of the key to press or a character to generate, such as `ArrowLeft` or `a`.
-- `options` `LocatorPressOptions?` *(optional)*
-  - `Delay` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-press-option-delay"/><a href="#locator-press-option-delay" class="list-anchor">#</a>
-    
-    Time to wait between `keydown` and `keyup` in milliseconds. Defaults to 0.
-  - `NoWaitAfter` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-press-option-no-wait-after"/><a href="#locator-press-option-no-wait-after" class="list-anchor">#</a>
-    
-    Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-press-option-timeout"/><a href="#locator-press-option-timeout" class="list-anchor">#</a>
-    
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-
 ---
 
 ### ScreenshotAsync {#locator-screenshot}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.ScreenshotAsync</x-search>
 
-This method captures a screenshot of the page, clipped to the size and position of a particular element matching the locator. If the element is covered by other elements, it will not be actually visible on the screenshot. If the element is a scrollable container, only the currently scrolled content will be visible on the screenshot.
-
-This method waits for the [actionability](../actionability.mdx) checks, then scrolls element into view before taking a screenshot. If the element is detached from DOM, the method throws an error.
-
-Returns the buffer with the captured screenshot.
+Take a screenshot of the element matching the locator.
 
 **Usage**
 
 ```csharp
-await Locator.ScreenshotAsync(options);
+await page.GetByRole(AriaRole.Link).ScreenshotAsync();
+```
+
+Disable animations and save screenshot to a file:
+
+```csharp
+await page.GetByRole(AriaRole.Link).ScreenshotAsync(new() {
+  Animations = ScreenshotAnimations.Disabled,
+  Path = "link.png"
+});
 ```
 
 **Arguments**
@@ -1452,7 +1540,7 @@ await Locator.ScreenshotAsync(options);
     When set to `"css"`, screenshot will have a single pixel per each css pixel on the page. For high-dpi devices, this will keep screenshots small. Using `"device"` option will produce a single pixel per each device pixel, so screenshots of high-dpi devices will be twice as large or even larger.
     
     Defaults to `"device"`.
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-screenshot-option-timeout"/><a href="#locator-screenshot-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-screenshot-option-timeout"/><a href="#locator-screenshot-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
   - `Type` `enum ScreenshotType { Png, Jpeg }?` *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-screenshot-option-type"/><a href="#locator-screenshot-option-type" class="list-anchor">#</a>
@@ -1461,6 +1549,14 @@ await Locator.ScreenshotAsync(options);
 
 **Returns**
 - [byte]&#91;&#93;<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-screenshot-return"/><a href="#locator-screenshot-return" class="list-anchor">#</a>
+
+**Details**
+
+This method captures a screenshot of the page, clipped to the size and position of a particular element matching the locator. If the element is covered by other elements, it will not be actually visible on the screenshot. If the element is a scrollable container, only the currently scrolled content will be visible on the screenshot.
+
+This method waits for the [actionability](../actionability.mdx) checks, then scrolls element into view before taking a screenshot. If the element is detached from DOM, the method throws an error.
+
+Returns the buffer with the captured screenshot.
 
 ---
 
@@ -1478,7 +1574,7 @@ await Locator.ScrollIntoViewIfNeededAsync(options);
 
 **Arguments**
 - `options` `LocatorScrollIntoViewIfNeededOptions?` *(optional)*
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-scroll-into-view-if-needed-option-timeout"/><a href="#locator-scroll-into-view-if-needed-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-scroll-into-view-if-needed-option-timeout"/><a href="#locator-scroll-into-view-if-needed-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
@@ -1489,6 +1585,25 @@ await Locator.ScrollIntoViewIfNeededAsync(options);
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.SelectOptionAsync</x-search>
 
 Selects option or options in `<select>`.
+
+**Usage**
+
+```html
+<select multiple>
+  <option value="red">Red</div>
+  <option value="green">Green</div>
+  <option value="blue">Blue</div>
+</select>
+```
+
+```csharp
+// single selection matching the value or label
+await element.SelectOptionAsync(new[] { "blue" });
+// single selection matching the label
+await element.SelectOptionAsync(new[] { new SelectOptionValue() { Label = "blue" } });
+// multiple selection for blue, red and second option
+await element.SelectOptionAsync(new[] { "red", "green", "blue" });
+```
 
 **Arguments**
 - `values` [string]?|[ElementHandle]?|[IEnumerable]?<[string]>|`SelectOption`|[IEnumerable]?<[ElementHandle]>|[IEnumerable]?<`SelectOption`><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-select-option-option-values"/><a href="#locator-select-option-option-values" class="list-anchor">#</a>
@@ -1510,7 +1625,7 @@ Selects option or options in `<select>`.
   - `NoWaitAfter` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-select-option-option-no-wait-after"/><a href="#locator-select-option-option-no-wait-after" class="list-anchor">#</a>
     
     Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-select-option-option-timeout"/><a href="#locator-select-option-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-select-option-option-timeout"/><a href="#locator-select-option-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
@@ -1526,25 +1641,6 @@ If the target element is not a `<select>` element, this method throws an error. 
 Returns the array of option values that have been successfully selected.
 
 Triggers a `change` and `input` event once all the provided options have been selected.
-
-**Usage**
-
-```html
-<select multiple>
-  <option value="red">Red</div>
-  <option value="green">Green</div>
-  <option value="blue">Blue</div>
-</select>
-```
-
-```csharp
-// single selection matching the value or label
-await element.SelectOptionAsync(new[] { "blue" });
-// single selection matching the label
-await element.SelectOptionAsync(new[] { new SelectOptionValue() { Label = "blue" } });
-// multiple selection for blue, red and second option
-await element.SelectOptionAsync(new[] { "red", "green", "blue" });
-```
 
 ---
 
@@ -1567,7 +1663,7 @@ await Locator.SelectTextAsync(options);
   - `Force` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-select-text-option-force"/><a href="#locator-select-text-option-force" class="list-anchor">#</a>
     
     Whether to bypass the [actionability](../actionability.mdx) checks. Defaults to `false`.
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-select-text-option-timeout"/><a href="#locator-select-text-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-select-text-option-timeout"/><a href="#locator-select-text-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
@@ -1577,21 +1673,12 @@ await Locator.SelectTextAsync(options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.15</font><x-search>locator.SetCheckedAsync</x-search>
 
-This method checks or unchecks an element by performing the following steps:
-1. Ensure that matched element is a checkbox or a radio input. If not, this method throws.
-1. If the element already has the right checked state, this method returns immediately.
-1. Wait for [actionability](../actionability.mdx) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
-1. Scroll the element into view if needed.
-1. Use [Page.Mouse](/api/class-page.mdx#page-mouse) to click in the center of the element.
-1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
-1. Ensure that the element is now checked or unchecked. If not, this method throws.
-
-When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
+Set the state of a checkbox or a radio element.
 
 **Usage**
 
 ```csharp
-await Locator.SetCheckedAsync(checked, options);
+await page.GetByRole(AriaRole.Checkbox).SetCheckedAsync(true);
 ```
 
 **Arguments**
@@ -1606,19 +1693,32 @@ await Locator.SetCheckedAsync(checked, options);
     
     Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
   - `Position` Position? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-set-checked-option-position"/><a href="#locator-set-checked-option-position" class="list-anchor">#</a>
-    - `X` [double]
+    - `X` [float]
       
       
-    - `Y` [double]
+    - `Y` [float]
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-set-checked-option-timeout"/><a href="#locator-set-checked-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-set-checked-option-timeout"/><a href="#locator-set-checked-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
   - `Trial` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-set-checked-option-trial"/><a href="#locator-set-checked-option-trial" class="list-anchor">#</a>
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
+
+**Details**
+
+This method checks or unchecks an element by performing the following steps:
+1. Ensure that matched element is a checkbox or a radio input. If not, this method throws.
+1. If the element already has the right checked state, this method returns immediately.
+1. Wait for [actionability](../actionability.mdx) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
+1. Scroll the element into view if needed.
+1. Use [Page.Mouse](/api/class-page.mdx#page-mouse) to click in the center of the element.
+1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+1. Ensure that the element is now checked or unchecked. If not, this method throws.
+
+When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
 
 ---
 
@@ -1626,14 +1726,27 @@ await Locator.SetCheckedAsync(checked, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.SetInputFilesAsync</x-search>
 
-Sets the value of the file input to these file paths or files. If some of the `filePaths` are relative paths, then they are resolved relative to the current working directory. For empty array, clears the selected files.
-
-This method expects [Locator] to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input). However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), targets the control instead.
+Upload file or multiple files into `<input type=file>`.
 
 **Usage**
 
 ```csharp
-await Locator.SetInputFilesAsync(files, options);
+// Select one file
+await page.GetByLabel("Upload file").SetInputFilesAsync("myfile.pdf");
+
+// Select multiple files
+await page.GetByLabel("Upload files").SetInputFilesAsync(new[] { "file1.txt", "file12.txt" });
+
+// Remove all the selected files
+await page.GetByLabel("Upload file").SetInputFilesAsync(new[] {});
+
+// Upload buffer from memory
+await page.GetByLabel("Upload file").SetInputFilesAsync(new FilePayload
+{
+    Name = "file.txt",
+    MimeType = "text/plain",
+    Buffer = System.Text.Encoding.UTF8.GetBytes("this is a test"),
+});
 ```
 
 **Arguments**
@@ -1651,9 +1764,15 @@ await Locator.SetInputFilesAsync(files, options);
   - `NoWaitAfter` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-set-input-files-option-no-wait-after"/><a href="#locator-set-input-files-option-no-wait-after" class="list-anchor">#</a>
     
     Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-set-input-files-option-timeout"/><a href="#locator-set-input-files-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-set-input-files-option-timeout"/><a href="#locator-set-input-files-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Details**
+
+Sets the value of the file input to these file paths or files. If some of the `filePaths` are relative paths, then they are resolved relative to the current working directory. For empty array, clears the selected files.
+
+This method expects [Locator] to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input). However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), targets the control instead.
 
 ---
 
@@ -1661,19 +1780,7 @@ await Locator.SetInputFilesAsync(files, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.TapAsync</x-search>
 
-This method taps the element by performing the following steps:
-1. Wait for [actionability](../actionability.mdx) checks on the element, unless `force` option is set.
-1. Scroll the element into view if needed.
-1. Use [Page.Touchscreen](/api/class-page.mdx#page-touchscreen) to tap the center of the element, or the specified `position`.
-1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
-
-If the element is detached from the DOM at any moment during the action, this method throws.
-
-When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
-
-:::note
-`element.tap()` requires that the `hasTouch` option of the browser context be set to true.
-:::
+Perform a tap gesture on the element matching the locator.
 
 **Usage**
 
@@ -1693,19 +1800,35 @@ await Locator.TapAsync(options);
     
     Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
   - `Position` Position? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-tap-option-position"/><a href="#locator-tap-option-position" class="list-anchor">#</a>
-    - `X` [double]
+    - `X` [float]
       
       
-    - `Y` [double]
+    - `Y` [float]
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-tap-option-timeout"/><a href="#locator-tap-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-tap-option-timeout"/><a href="#locator-tap-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
   - `Trial` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-tap-option-trial"/><a href="#locator-tap-option-trial" class="list-anchor">#</a>
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
+
+**Details**
+
+This method taps the element by performing the following steps:
+1. Wait for [actionability](../actionability.mdx) checks on the element, unless `force` option is set.
+1. Scroll the element into view if needed.
+1. Use [Page.Touchscreen](/api/class-page.mdx#page-touchscreen) to tap the center of the element, or the specified `position`.
+1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+
+If the element is detached from the DOM at any moment during the action, this method throws.
+
+When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
+
+:::note
+`element.tap()` requires that the `hasTouch` option of the browser context be set to true.
+:::
 
 ---
 
@@ -1713,7 +1836,7 @@ await Locator.TapAsync(options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.TextContentAsync</x-search>
 
-Returns the `node.textContent`.
+Returns the [`node.textContent`](https://developer.mozilla.org/en-US/docs/Web/API/Node/textContent).
 
 **Usage**
 
@@ -1723,7 +1846,7 @@ await Locator.TextContentAsync(options);
 
 **Arguments**
 - `options` `LocatorTextContentOptions?` *(optional)*
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-text-content-option-timeout"/><a href="#locator-text-content-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-text-content-option-timeout"/><a href="#locator-text-content-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
@@ -1760,13 +1883,13 @@ await element.PressAsync("Enter");
   
   A text to type into a focused element.
 - `options` `LocatorTypeOptions?` *(optional)*
-  - `Delay` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-type-option-delay"/><a href="#locator-type-option-delay" class="list-anchor">#</a>
+  - `Delay` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-type-option-delay"/><a href="#locator-type-option-delay" class="list-anchor">#</a>
     
     Time to wait between key presses in milliseconds. Defaults to 0.
   - `NoWaitAfter` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-type-option-no-wait-after"/><a href="#locator-type-option-no-wait-after" class="list-anchor">#</a>
     
     Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-type-option-timeout"/><a href="#locator-type-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-type-option-timeout"/><a href="#locator-type-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
@@ -1776,22 +1899,12 @@ await element.PressAsync("Enter");
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.UncheckAsync</x-search>
 
-This method checks the element by performing the following steps:
-1. Ensure that element is a checkbox or a radio input. If not, this method throws. If the element is already unchecked, this method returns immediately.
-1. Wait for [actionability](../actionability.mdx) checks on the element, unless `force` option is set.
-1. Scroll the element into view if needed.
-1. Use [Page.Mouse](/api/class-page.mdx#page-mouse) to click in the center of the element.
-1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
-1. Ensure that the element is now unchecked. If not, this method throws.
-
-If the element is detached from the DOM at any moment during the action, this method throws.
-
-When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
+Ensure that checkbox or radio element is unchecked.
 
 **Usage**
 
 ```csharp
-await Locator.UncheckAsync(options);
+await page.GetByRole(AriaRole.Checkbox).UncheckAsync();
 ```
 
 **Arguments**
@@ -1803,19 +1916,33 @@ await Locator.UncheckAsync(options);
     
     Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
   - `Position` Position? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-uncheck-option-position"/><a href="#locator-uncheck-option-position" class="list-anchor">#</a>
-    - `X` [double]
+    - `X` [float]
       
       
-    - `Y` [double]
+    - `Y` [float]
       
       
     A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-uncheck-option-timeout"/><a href="#locator-uncheck-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-uncheck-option-timeout"/><a href="#locator-uncheck-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
   - `Trial` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-uncheck-option-trial"/><a href="#locator-uncheck-option-trial" class="list-anchor">#</a>
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
+
+**Details**
+
+This method unchecks the element by performing the following steps:
+1. Ensure that element is a checkbox or a radio input. If not, this method throws. If the element is already unchecked, this method returns immediately.
+1. Wait for [actionability](../actionability.mdx) checks on the element, unless `force` option is set.
+1. Scroll the element into view if needed.
+1. Use [Page.Mouse](/api/class-page.mdx#page-mouse) to click in the center of the element.
+1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+1. Ensure that the element is now unchecked. If not, this method throws.
+
+If the element is detached from the DOM at any moment during the action, this method throws.
+
+When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
 
 ---
 
@@ -1843,9 +1970,65 @@ orderSent.WaitForAsync();
     * `'detached'` - wait for element to not be present in DOM.
     * `'visible'` - wait for element to have non-empty bounding box and no `visibility:hidden`. Note that element without any content or with `display:none` has an empty bounding box and is not considered visible.
     * `'hidden'` - wait for element to be either detached from DOM, or have an empty bounding box or `visibility:hidden`. This is opposite to the `'visible'` option.
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-wait-for-option-timeout"/><a href="#locator-wait-for-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-wait-for-option-timeout"/><a href="#locator-wait-for-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+---
+
+## Deprecated
+
+### ElementHandleAsync {#locator-element-handle}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.ElementHandleAsync</x-search>
+
+:::caution Discouraged
+
+Always prefer using [Locator]s and web assertions over [ElementHandle]s because latter are inherently racy.
+
+:::
+
+
+Resolves given locator to the first matching DOM element. If there are no matching elements, waits for one. If multiple elements match the locator, throws.
+
+**Usage**
+
+```csharp
+await Locator.ElementHandleAsync(options);
+```
+
+**Arguments**
+- `options` `LocatorElementHandleOptions?` *(optional)*
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-element-handle-option-timeout"/><a href="#locator-element-handle-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Returns**
+- [ElementHandle]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-element-handle-return"/><a href="#locator-element-handle-return" class="list-anchor">#</a>
+
+---
+
+### ElementHandlesAsync {#locator-element-handles}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.ElementHandlesAsync</x-search>
+
+:::caution Discouraged
+
+Always prefer using [Locator]s and web assertions over [ElementHandle]s because latter are inherently racy.
+
+:::
+
+
+Resolves given locator to all matching DOM elements. If there are no matching elements, returns an empty list.
+
+**Usage**
+
+```csharp
+await Locator.ElementHandlesAsync();
+```
+
+**Returns**
+- [IEnumerable]<[ElementHandle]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-element-handles-return"/><a href="#locator-element-handles-return" class="list-anchor">#</a>
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
@@ -1856,6 +2039,8 @@ orderSent.WaitForAsync();
 [Browser]: /api/class-browser.mdx "Browser"
 [BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
 [BrowserType]: /api/class-browsertype.mdx "BrowserType"
+[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"

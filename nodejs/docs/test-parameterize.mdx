@@ -1,12 +1,12 @@
 ---
 id: test-parameterize
-title: "Parametrize tests"
+title: "Parameterize tests"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-You can either parametrize tests on a test level or on a project level.
+You can either parameterize tests on a test level or on a project level.
 
 ## Parameterized Tests
 
@@ -150,10 +150,10 @@ Now, we can run tests in multiple configurations by using projects.
 
 ```js
 // playwright.config.ts
-import type { PlaywrightTestConfig } from '@playwright/test';
+import type { defineConfig } from '@playwright/test';
 import { TestOptions } from './my-test';
 
-const config: PlaywrightTestConfig<TestOptions> = {
+export default defineConfig({
   projects: [
     {
       name: 'alice',
@@ -164,8 +164,7 @@ const config: PlaywrightTestConfig<TestOptions> = {
       use: { person: 'Bob' },
     },
   ]
-};
-export default config;
+});
 ```
 
 </TabItem>
@@ -175,8 +174,7 @@ export default config;
 // playwright.config.js
 // @ts-check
 
-/** @type {import('@playwright/test').PlaywrightTestConfig<{ person: string }>} */
-const config = {
+module.exports = defineConfig({
   projects: [
     {
       name: 'alice',
@@ -187,9 +185,7 @@ const config = {
       use: { person: 'Bob' },
     },
   ]
-};
-
-module.exports = config;
+});
 ```
 
 </TabItem>
@@ -260,7 +256,7 @@ exports.test = base.test.extend({
 </Tabs>
 
 :::note
-Parametrized projects behavior has changed in version 1.18. [Learn more](./release-notes#breaking-change-custom-config-options).
+Parameterized projects behavior has changed in version 1.18. [Learn more](./release-notes#breaking-change-custom-config-options).
 :::
 
 ## Passing Environment Variables
@@ -303,7 +299,7 @@ test(`example test`, async ({ page }) => {
 </TabItem>
 </Tabs>
 
-You can run this test with your secrect username and password set in the command line.
+You can run this test with your secret username and password set in the command line.
 
 <Tabs
   groupId="bash-flavor"
@@ -355,14 +351,13 @@ Similarly, configuration file can also read environment variables passed through
 
 ```js
 // playwright.config.ts
-import type { PlaywrightTestConfig } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 
-const config: PlaywrightTestConfig = {
+export default defineConfig({
   use: {
     baseURL: process.env.STAGING === '1' ? 'http://staging.example.test/' : 'http://example.test/',
   }
-};
-export default config;
+});
 ```
 
 </TabItem>
@@ -372,14 +367,13 @@ export default config;
 // playwright.config.js
 // @ts-check
 
-/** @type {import('@playwright/test').PlaywrightTestConfig} */
-const config = {
+const { defineConfig } = require('@playwright/test');
+
+module.exports = defineConfig({
   use: {
     baseURL: process.env.STAGING === '1' ? 'http://staging.example.test/' : 'http://example.test/',
   }
-};
-
-module.exports = config;
+});
 ```
 
 </TabItem>
@@ -437,7 +431,7 @@ To make environment variables easier to manage, consider something like `.env` f
 
 ```js
 // playwright.config.ts
-import type { PlaywrightTestConfig } from '@playwright/test';
+import { defineConfig } from '@playwright/test';
 import dotenv from 'dotenv';
 import path from 'path';
 
@@ -447,12 +441,11 @@ dotenv.config();
 // Alternatively, read from "../my.env" file.
 dotenv.config({ path: path.resolve(__dirname, '..', 'my.env') });
 
-const config: PlaywrightTestConfig = {
+export default defineConfig({
   use: {
     baseURL: process.env.STAGING === '1' ? 'http://staging.example.test/' : 'http://example.test/',
   }
-};
-export default config;
+});
 ```
 
 </TabItem>
@@ -468,14 +461,13 @@ require('dotenv').config();
 // Alternatively, read from "../my.env" file.
 require('dotenv').config({ path: path.resolve(__dirname, '..', 'my.env') });
 
-/** @type {import('@playwright/test').PlaywrightTestConfig} */
-const config = {
+const { defineConfig } = require('@playwright/test');
+
+module.exports = defineConfig({
   use: {
     baseURL: process.env.STAGING === '1' ? 'http://staging.example.test/' : 'http://example.test/',
   }
-};
-
-module.exports = config;
+});
 ```
 
 </TabItem>
@@ -592,6 +584,7 @@ for (const record of records) {
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
+[GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
 [Keyboard]: /api/class-keyboard.mdx "Keyboard"
 [Locator]: /api/class-locator.mdx "Locator"
@@ -620,7 +613,6 @@ for (const record of records) {
 [TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
 [TestOptions]: /api/class-testoptions.mdx "TestOptions"
 [TestProject]: /api/class-testproject.mdx "TestProject"
-[TestStore]: /api/class-teststore.mdx "TestStore"
 [WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
 [Location]: /api/class-location.mdx "Location"
 [Reporter]: /api/class-reporter.mdx "Reporter"

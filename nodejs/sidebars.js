@@ -47,6 +47,7 @@ module.exports = {
         { type: 'doc', id: 'input' },
         { type: 'doc', id: 'auth' },
         { type: 'doc', id: 'actionability' },
+        { type: 'doc', id: 'best-practices' },
         { type: 'doc', id: 'browsers' },
         { type: 'doc', id: 'chrome-extensions' },
         { type: 'doc', id: 'cli' },
@@ -93,7 +94,6 @@ module.exports = {
       items: [
         { type: 'doc', id: 'docker' },
         { type: 'doc', id: 'ci' },
-        { type: 'doc', id: 'test-runners' },
         { type: 'doc', id: 'selenium-grid' }
       ],
       collapsed: true

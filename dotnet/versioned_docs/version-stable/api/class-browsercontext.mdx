@@ -29,133 +29,6 @@ await context.CloseAsync();
 
 ---
 
-## Events
-
-### event Close {#browser-context-event-close}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>browserContext.event Close</x-search>
-
-Emitted when Browser context gets closed. This might happen because of one of the following:
-* Browser context is closed.
-* Browser application is closed or crashed.
-* The [Browser.CloseAsync()](/api/class-browser.mdx#browser-close) method was called.
-
-**Usage**
-
-```csharp
-BrowserContext.Close += async data => {};
-```
-
-**Event data**
-- [BrowserContext]
-
----
-
-### event Page {#browser-context-event-page}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>browserContext.event Page</x-search>
-
-The event is emitted when a new Page is created in the BrowserContext. The page may still be loading. The event will also fire for popup pages. See also [Page.Popup](/api/class-page.mdx#page-event-popup) to receive events about popups relevant to a specific page.
-
-The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
-
-```csharp
-var popup = await context.RunAndWaitForPageAsync(async =>
-{
-    await page.GetByText("open new page").ClickAsync();
-});
-Console.WriteLine(await popup.EvaluateAsync<string>("location.href"));
-```
-
-:::note
-Use [Page.WaitForLoadStateAsync()](/api/class-page.mdx#page-wait-for-load-state) to wait until the page gets to a particular state (you should not need it in most cases).
-:::
-
-**Usage**
-
-```csharp
-BrowserContext.Page += async data => {};
-```
-
-**Event data**
-- [Page]
-
----
-
-### event Request {#browser-context-event-request}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>browserContext.event Request</x-search>
-
-Emitted when a request is issued from any pages created through this context. The [request] object is read-only. To only listen for requests from a particular page, use [Page.Request](/api/class-page.mdx#page-event-request).
-
-In order to intercept and mutate requests, see [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route) or [Page.RouteAsync()](/api/class-page.mdx#page-route).
-
-**Usage**
-
-```csharp
-BrowserContext.Request += async data => {};
-```
-
-**Event data**
-- [Request]
-
----
-
-### event RequestFailed {#browser-context-event-request-failed}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>browserContext.event RequestFailed</x-search>
-
-Emitted when a request fails, for example by timing out. To only listen for failed requests from a particular page, use [Page.RequestFailed](/api/class-page.mdx#page-event-request-failed).
-
-:::note
-HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [BrowserContext.RequestFinished](/api/class-browsercontext.mdx#browser-context-event-request-finished) event and not with [BrowserContext.RequestFailed](/api/class-browsercontext.mdx#browser-context-event-request-failed).
-:::
-
-**Usage**
-
-```csharp
-BrowserContext.RequestFailed += async data => {};
-```
-
-**Event data**
-- [Request]
-
----
-
-### event RequestFinished {#browser-context-event-request-finished}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>browserContext.event RequestFinished</x-search>
-
-Emitted when a request finishes successfully after downloading the response body. For a successful response, the sequence of events is `request`, `response` and `requestfinished`. To listen for successful requests from a particular page, use [Page.RequestFinished](/api/class-page.mdx#page-event-request-finished).
-
-**Usage**
-
-```csharp
-BrowserContext.RequestFinished += async data => {};
-```
-
-**Event data**
-- [Request]
-
----
-
-### event Response {#browser-context-event-response}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>browserContext.event Response</x-search>
-
-Emitted when [response] status and headers are received for a request. For a successful response, the sequence of events is `request`, `response` and `requestfinished`. To listen for response events from a particular page, use [Page.Response](/api/class-page.mdx#page-event-response).
-
-**Usage**
-
-```csharp
-BrowserContext.Response += async data => {};
-```
-
-**Event data**
-- [Response]
-
----
-
 ## Methods
 
 ### AddCookiesAsync {#browser-context-add-cookies}
@@ -187,7 +60,7 @@ await context.AddCookiesAsync(new[] { cookie1, cookie2 });
   - `Path` [string]? *(optional)*
     
     either url or domain / path are required Optional.
-  - `Expires` [double]? *(optional)*
+  - `Expires` [float]? *(optional)*
     
     Unix time in seconds. Optional.
   - `HttpOnly` [bool]? *(optional)*
@@ -335,7 +208,7 @@ await BrowserContext.CookiesAsync(urls);
   - `path` [string]
     
     
-  - `expires` [double]
+  - `expires` [float]
     
     Unix time in seconds.
   - `httpOnly` [bool]
@@ -665,7 +538,7 @@ await BrowserContext.RunAndWaitForPageAsync(action, options);
   - `Predicate` [Func]<[Page]?, bool> *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-wait-for-page-option-predicate"/><a href="#browser-context-wait-for-page-option-predicate" class="list-anchor">#</a>
     
     Receives the [Page] object and resolves to truthy value when the waiting should resolve.
-  - `Timeout` [double]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-wait-for-page-option-timeout"/><a href="#browser-context-wait-for-page-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-wait-for-page-option-timeout"/><a href="#browser-context-wait-for-page-option-timeout" class="list-anchor">#</a>
     
     Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
 - `action` [Func]<[Task]> <font size="2">Added in: v1.12</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-wait-for-page-option-action"/><a href="#browser-context-wait-for-page-option-action" class="list-anchor">#</a>
@@ -722,7 +595,7 @@ BrowserContext.SetDefaultNavigationTimeout(timeout);
 ```
 
 **Arguments**
-- `timeout` [double]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-set-default-navigation-timeout-option-timeout"/><a href="#browser-context-set-default-navigation-timeout-option-timeout" class="list-anchor">#</a>
+- `timeout` [float]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-set-default-navigation-timeout-option-timeout"/><a href="#browser-context-set-default-navigation-timeout-option-timeout" class="list-anchor">#</a>
   
   Maximum navigation time in milliseconds
 
@@ -745,7 +618,7 @@ BrowserContext.SetDefaultTimeout(timeout);
 ```
 
 **Arguments**
-- `timeout` [double]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-set-default-timeout-option-timeout"/><a href="#browser-context-set-default-timeout-option-timeout" class="list-anchor">#</a>
+- `timeout` [float]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-set-default-timeout-option-timeout"/><a href="#browser-context-set-default-timeout-option-timeout" class="list-anchor">#</a>
   
   Maximum time in milliseconds
 
@@ -796,13 +669,13 @@ Consider using [BrowserContext.GrantPermissionsAsync()](/api/class-browsercontex
 
 **Arguments**
 - `geolocation` Geolocation?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-set-geolocation-option-geolocation"/><a href="#browser-context-set-geolocation-option-geolocation" class="list-anchor">#</a>
-  - `Latitude` [double]
+  - `Latitude` [float]
     
     Latitude between -90 and 90.
-  - `Longitude` [double]
+  - `Longitude` [float]
     
     Longitude between -180 and 180.
-  - `Accuracy` [double]? *(optional)*
+  - `Accuracy` [float]? *(optional)*
     
     Non-negative accuracy value. Defaults to `0`.
 
@@ -901,6 +774,133 @@ BrowserContext.Tracing
 
 **Type**
 - [Tracing]
+
+---
+
+## Events
+
+### event Close {#browser-context-event-close}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>browserContext.event Close</x-search>
+
+Emitted when Browser context gets closed. This might happen because of one of the following:
+* Browser context is closed.
+* Browser application is closed or crashed.
+* The [Browser.CloseAsync()](/api/class-browser.mdx#browser-close) method was called.
+
+**Usage**
+
+```csharp
+BrowserContext.Close += async data => {};
+```
+
+**Event data**
+- [BrowserContext]
+
+---
+
+### event Page {#browser-context-event-page}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>browserContext.event Page</x-search>
+
+The event is emitted when a new Page is created in the BrowserContext. The page may still be loading. The event will also fire for popup pages. See also [Page.Popup](/api/class-page.mdx#page-event-popup) to receive events about popups relevant to a specific page.
+
+The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
+
+```csharp
+var popup = await context.RunAndWaitForPageAsync(async =>
+{
+    await page.GetByText("open new page").ClickAsync();
+});
+Console.WriteLine(await popup.EvaluateAsync<string>("location.href"));
+```
+
+:::note
+Use [Page.WaitForLoadStateAsync()](/api/class-page.mdx#page-wait-for-load-state) to wait until the page gets to a particular state (you should not need it in most cases).
+:::
+
+**Usage**
+
+```csharp
+BrowserContext.Page += async data => {};
+```
+
+**Event data**
+- [Page]
+
+---
+
+### event Request {#browser-context-event-request}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>browserContext.event Request</x-search>
+
+Emitted when a request is issued from any pages created through this context. The [request] object is read-only. To only listen for requests from a particular page, use [Page.Request](/api/class-page.mdx#page-event-request).
+
+In order to intercept and mutate requests, see [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route) or [Page.RouteAsync()](/api/class-page.mdx#page-route).
+
+**Usage**
+
+```csharp
+BrowserContext.Request += async data => {};
+```
+
+**Event data**
+- [Request]
+
+---
+
+### event RequestFailed {#browser-context-event-request-failed}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>browserContext.event RequestFailed</x-search>
+
+Emitted when a request fails, for example by timing out. To only listen for failed requests from a particular page, use [Page.RequestFailed](/api/class-page.mdx#page-event-request-failed).
+
+:::note
+HTTP Error responses, such as 404 or 503, are still successful responses from HTTP standpoint, so request will complete with [BrowserContext.RequestFinished](/api/class-browsercontext.mdx#browser-context-event-request-finished) event and not with [BrowserContext.RequestFailed](/api/class-browsercontext.mdx#browser-context-event-request-failed).
+:::
+
+**Usage**
+
+```csharp
+BrowserContext.RequestFailed += async data => {};
+```
+
+**Event data**
+- [Request]
+
+---
+
+### event RequestFinished {#browser-context-event-request-finished}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>browserContext.event RequestFinished</x-search>
+
+Emitted when a request finishes successfully after downloading the response body. For a successful response, the sequence of events is `request`, `response` and `requestfinished`. To listen for successful requests from a particular page, use [Page.RequestFinished](/api/class-page.mdx#page-event-request-finished).
+
+**Usage**
+
+```csharp
+BrowserContext.RequestFinished += async data => {};
+```
+
+**Event data**
+- [Request]
+
+---
+
+### event Response {#browser-context-event-response}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>browserContext.event Response</x-search>
+
+Emitted when [response] status and headers are received for a request. For a successful response, the sequence of events is `request`, `response` and `requestfinished`. To listen for response events from a particular page, use [Page.Response](/api/class-page.mdx#page-event-response).
+
+**Usage**
+
+```csharp
+BrowserContext.Response += async data => {};
+```
+
+**Event data**
+- [Response]
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
