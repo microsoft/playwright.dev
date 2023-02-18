@@ -1,26 +1,25 @@
 ---
-id: class-logger
-title: "Logger"
+id: class-teststore
+title: "TestStore"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
 
-Playwright generates a lot of logs and they are accessible via the pluggable logger sink.
+Playwright Test provides a global `store` object that can be used to read/write values on the filesystem. Each value is stored in its own file inside './playwright' directory, configurable with [testConfig.storeDir](/api/class-testconfig.mdx#test-config-store-dir).
 
-```js
-const { chromium } = require('playwright');  // Or 'firefox' or 'webkit'.
+```ts
+import { test, store } from '@playwright/test';
 
-(async () => {
-  const browser = await chromium.launch({
-    logger: {
-      isEnabled: (name, severity) => name === 'browser',
-      log: (name, severity, message, args) => console.log(`${name} ${message}`)
-    }
-  });
-  ...
-})();
+test('get user name', async ({ page, context }) => {
+  await page.goto('/');
+  // Return mock user info from the store.
+  await page.route('**/info/user', route => route.fulfill({ path: store.path('mocks/user.json')}))
+  await page.getByText('My Profile');
+  // Check that the name matches mock data.
+  await expect(page.getByLabel('Name')).toHaveText('John');
+});
 ```
 
 
@@ -28,56 +27,105 @@ const { chromium } = require('playwright');  // Or 'firefox' or 'webkit'.
 
 ## Methods
 
-### isEnabled {#logger-is-enabled}
+### delete {#test-store-delete}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>logger.isEnabled</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.32</font><x-search>testStore.delete</x-search>
 
-Determines whether sink is interested in the logger with the given name and severity.
+Delete named item from the store. Does nothing if the path is not in the store.
 
 **Usage**
 
 ```js
-logger.isEnabled(name, severity);
+await testStore.delete(path);
 ```
 
 **Arguments**
-- `name` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="logger-is-enabled-option-name"/><a href="#logger-is-enabled-option-name" class="list-anchor">#</a>
+- `path` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-store-delete-option-path"/><a href="#test-store-delete-option-path" class="list-anchor">#</a>
   
-  logger name
-- `severity` "verbose"|"info"|"warning"|"error"<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="logger-is-enabled-option-severity"/><a href="#logger-is-enabled-option-severity" class="list-anchor">#</a>
-
-**Returns**
-- [boolean]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="logger-is-enabled-return"/><a href="#logger-is-enabled-return" class="list-anchor">#</a>
+  Item path.
 
 ---
 
-### log {#logger-log}
+### get {#test-store-get}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>logger.log</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.32</font><x-search>testStore.get</x-search>
+
+Get named item from the store. Returns undefined if there is no value with given path.
 
 **Usage**
 
 ```js
-logger.log(name, severity, message, args, hints);
+await testStore.get(path);
 ```
 
 **Arguments**
-- `name` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="logger-log-option-name"/><a href="#logger-log-option-name" class="list-anchor">#</a>
+- `path` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-store-get-option-path"/><a href="#test-store-get-option-path" class="list-anchor">#</a>
   
-  logger name
-- `severity` "verbose"|"info"|"warning"|"error"<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="logger-log-option-severity"/><a href="#logger-log-option-severity" class="list-anchor">#</a>
-- `message` [string]|[Error]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="logger-log-option-message"/><a href="#logger-log-option-message" class="list-anchor">#</a>
+  Item path.
+
+**Returns**
+- [Promise]<[Object]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-store-get-return"/><a href="#test-store-get-return" class="list-anchor">#</a>
+
+---
+
+### path {#test-store-path}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.32</font><x-search>testStore.path</x-search>
+
+Returns absolute path of the corresponding store entry on the file system.
+
+**Usage**
+
+```js
+testStore.path(path);
+```
+
+**Arguments**
+- `path` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-store-path-option-path"/><a href="#test-store-path-option-path" class="list-anchor">#</a>
   
-  log message format
-- `args` [Array]<[Object]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="logger-log-option-args"/><a href="#logger-log-option-args" class="list-anchor">#</a>
+  Path of the item in the store.
+
+**Returns**
+- [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-store-path-return"/><a href="#test-store-path-return" class="list-anchor">#</a>
+
+---
+
+### root {#test-store-root}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.32</font><x-search>testStore.root</x-search>
+
+Returns absolute path of the store root directory.
+
+**Usage**
+
+```js
+testStore.root();
+```
+
+**Returns**
+- [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-store-root-return"/><a href="#test-store-root-return" class="list-anchor">#</a>
+
+---
+
+### set {#test-store-set}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.32</font><x-search>testStore.set</x-search>
+
+Set value to the store.
+
+**Usage**
+
+```js
+await testStore.set(path, value);
+```
+
+**Arguments**
+- `path` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-store-set-option-path"/><a href="#test-store-set-option-path" class="list-anchor">#</a>
   
-  message arguments
-- `hints` [Object]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="logger-log-option-hints"/><a href="#logger-log-option-hints" class="list-anchor">#</a>
-  - `color` [string] *(optional)*
-    
-    Optional preferred logger color.
+  Item path.
+- `value` [Object]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="test-store-set-option-value"/><a href="#test-store-set-option-value" class="list-anchor">#</a>
   
-  optional formatting hints
+  Item value. The value must be serializable to JSON. Passing `undefined` deletes the entry with given path.
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
