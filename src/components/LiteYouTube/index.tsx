@@ -14,12 +14,10 @@
  * limitations under the License.
  */
 
- import React from 'react';
- import LiteYouTubeEmbed from 'react-lite-youtube-embed';
- import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
- import styles from './styles.module.css';
- 
-
+import React from 'react';
+import LiteYouTubeEmbed from 'react-lite-youtube-embed';
+import 'react-lite-youtube-embed/dist/LiteYouTubeEmbed.css';
+import styles from './styles.module.css';
 
 type ProfileProps = {
   id: string;
@@ -27,20 +25,19 @@ type ProfileProps = {
   thumbnail?: string;
 };
 
- function LiteYouTube({ id, title, thumbnail }: ProfileProps) {
-   return (
+function LiteYouTube({ id, title, thumbnail }: ProfileProps) {
+  return (
     <div className={styles.videoContainer}>
-       <LiteYouTubeEmbed
-         thumbnail={thumbnail}
-         id={id}
-         params = "autoplay=1&autohide=1&showinfo=0&rel=0"
-         title={title}
-         poster = "maxresdefault"
-         webp
-       />
-     </div>
-   );
- }
- 
- 
- export default LiteYouTube;
+      <LiteYouTubeEmbed
+        thumbnail={thumbnail}
+        id={id}
+        params="autoplay=1&autohide=1&showinfo=0&rel=0"
+        title={title}
+        poster="maxresdefault"
+        webp
+      />
+    </div>
+  );
+}
+
+export default LiteYouTube;
