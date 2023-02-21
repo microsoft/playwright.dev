@@ -139,6 +139,7 @@ module.exports = {
             { type: 'doc', id: 'api/class-response' },
             { type: 'doc', id: 'api/class-route' },
             { type: 'doc', id: 'api/class-selectors' },
+            { type: 'doc', id: 'api/class-timeouterror' },
             { type: 'doc', id: 'api/class-touchscreen' },
             { type: 'doc', id: 'api/class-tracing' },
             { type: 'doc', id: 'api/class-video' },
@@ -152,6 +153,7 @@ module.exports = {
           label: 'Assertions',
           items: [
             { type: 'doc', id: 'api/class-apiresponseassertions' },
+            { type: 'doc', id: 'api/class-genericassertions' },
             { type: 'doc', id: 'api/class-locatorassertions' },
             { type: 'doc', id: 'api/class-pageassertions' },
             { type: 'doc', id: 'api/class-snapshotassertions' }
@@ -165,11 +167,11 @@ module.exports = {
             { type: 'doc', id: 'api/class-fixtures' },
             { type: 'doc', id: 'api/class-test' },
             { type: 'doc', id: 'api/class-testconfig' },
-            { type: 'doc', id: 'api/class-testerror' },
             { type: 'doc', id: 'api/class-testinfo' },
+            { type: 'doc', id: 'api/class-testinfoerror' },
             { type: 'doc', id: 'api/class-testoptions' },
             { type: 'doc', id: 'api/class-testproject' },
-            { type: 'doc', id: 'api/class-timeouterror' }
+            { type: 'doc', id: 'api/class-workerinfo' }
           ],
           collapsed: false
         },
@@ -181,6 +183,7 @@ module.exports = {
             { type: 'doc', id: 'api/class-reporter' },
             { type: 'doc', id: 'api/class-suite' },
             { type: 'doc', id: 'api/class-testcase' },
+            { type: 'doc', id: 'api/class-testerror' },
             { type: 'doc', id: 'api/class-testresult' },
             { type: 'doc', id: 'api/class-teststep' }
           ],
