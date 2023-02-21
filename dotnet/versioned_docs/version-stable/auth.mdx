@@ -6,17 +6,55 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-Playwright can be used to automate scenarios that require authentication.
+Playwright executes tests in isolated environments called [browser contexts](./browser-contexts.mdx). This isolation model improves reproducibility and prevents cascading test failures. Tests can load existing authenticated state. This eliminates the need to authenticate in every test and speeds up test execution.
 
-Tests written with Playwright execute in isolated clean-slate environments called [browser contexts](./browser-contexts.mdx). This isolation model improves reproducibility and prevents cascading test failures. New browser contexts can load existing authentication state. This eliminates the need to login in every context and speeds up test execution.
+## Core concepts
 
-> Note: This guide covers cookie/token-based authentication (logging in via the app UI). For [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication) use [Browser.NewContextAsync()](/api/class-browser.mdx#browser-new-context).
+Regardless of the authentication strategy you choose, you are likely to store authenticated browser state on the file system.
 
-## Automate logging in
+We recommend to create `playwright/.auth` directory and add it to your `.gitignore`. Your authentication routine will produce authenticated browser state and save it to a file in this `playwright/.auth` directory. Later on, tests will reuse this state and start already authenticated.
 
-The Playwright API can [automate interaction](./input.mdx) from a login form.
+<Tabs
+  groupId="bash-flavor"
+  defaultValue="bash"
+  values={[
+    {label: 'Bash', value: 'bash'},
+    {label: 'PowerShell', value: 'powershell'},
+    {label: 'Batch', value: 'batch'}
+  ]
+}>
+<TabItem value="bash">
 
-The following example automates logging into GitHub. Once these steps are executed, the browser context will be authenticated.
+```bash
+mkdir -p playwright/.auth
+echo "\nplaywright/.auth" >> .gitignore
+```
+
+</TabItem>
+<TabItem value="powershell">
+
+```powershell
+New-Item -ItemType Directory -Force -Path playwright\.auth
+Add-Content -path .gitignore "`r`nplaywright/.auth"
+```
+
+</TabItem>
+<TabItem value="batch">
+
+```batch
+md playwright\.auth
+echo. >> .gitignore
+echo "playwright/.auth" >> .gitignore
+```
+
+</TabItem>
+</Tabs>
+
+## Signing in before each test
+
+The Playwright API can [automate interaction](./input.mdx) with a login form.
+
+The following example logs into GitHub. Once these steps are executed, the browser context will be authenticated.
 
 ```csharp
 var page = await context.NewPageAsync();
@@ -30,7 +68,7 @@ await page.GetByRole(AriaRole.Button, new() { Name = "Sign in" }).ClickAsync();
 
 Redoing login for every test can slow down test execution. To mitigate that, reuse existing authentication state instead.
 
-## Reuse signed in state
+## Reusing signed in state
 
 Playwright provides a way to reuse the signed-in state in the tests. That way you can log in only once and then skip the log in step for all of the tests.
 
@@ -54,9 +92,11 @@ var context = await browser.NewContextAsync(new()
 });
 ```
 
-## Session storage
+## Advanced scenarios
 
-Rarely, [session storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage) is used for storing information associated with the logged-in state. Session storage is specific to a particular domain and is not persisted across page loads. Playwright does not provide API to persist session storage, but the following snippet can be used to save/load session storage.
+### Session storage
+
+Reusing authenticated state covers [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) and [local storage](https://developer.mozilla.org/en-US/docs/Web/API/Storage) based authentication. Rarely, [session storage](https://developer.mozilla.org/en-US/docs/Web/API/Window/sessionStorage) is used for storing information associated with the signed-in state. Session storage is specific to a particular domain and is not persisted across page loads. Playwright does not provide API to persist session storage, but the following snippet can be used to save/load session storage.
 
 ```csharp
 // Get session storage and store as env variable
@@ -75,38 +115,6 @@ await context.AddInitScriptAsync(@"(storage => {
   })('" + loadedSessionStorage + "')");
 ```
 
-## Multi-factor authentication
-
-Accounts with multi-factor authentication (MFA) cannot be fully automated, and need manual intervention. Persistent authentication can be used to partially automate MFA scenarios.
-
-### Persistent authentication
-
-Note that persistent authentication is not suited for CI environments since it relies on a disk location. User data directories are specific to browser types and cannot be shared across browser types.
-
-User data directories can be used with the [BrowserType.LaunchPersistentContextAsync()](/api/class-browsertype.mdx#browser-type-launch-persistent-context) API.
-
-```csharp
-using Microsoft.Playwright;
-
-class Program
-{
-    public static async Task Main()
-    {
-        using var playwright = await Playwright.CreateAsync();
-        var chromium = playwright.Chromium;
-        var context = chromium.LaunchPersistentContextAsync(@"C:\path\to\directory\", new()
-        {
-            Headless = false
-        });
-    }
-}
-```
-
-#### Lifecycle
-1. Create a user data directory on disk.
-1. Launch a persistent context with the user data directory and login the MFA account.
-1. Reuse user data directory to run automation scenarios.
-
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
@@ -116,6 +124,8 @@ class Program
 [Browser]: /api/class-browser.mdx "Browser"
 [BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
 [BrowserType]: /api/class-browsertype.mdx "BrowserType"
+[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
