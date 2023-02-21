@@ -81,6 +81,10 @@ await page.RouteAsync("**/*", route =>
     
     If set changes the request URL. New URL must have same protocol as original one.
 
+**Details**
+
+Note that any overrides such as `url` or `headers` only apply to the request being routed. If this request results in a redirect, overrides will not be applied to the new redirected request. If you want to propagate a header through redirects, use the combination of [Route.FetchAsync()](/api/class-route.mdx#route-fetch) and [Route.FulfillAsync()](/api/class-route.mdx#route-fulfill) instead.
+
 ---
 
 ### FallbackAsync {#route-fallback}
@@ -183,6 +187,9 @@ await page.RouteAsync("https://dog.ceo/api/breeds/list/all", async route =>
   - `Headers` [IDictionary]?<[string], [string]> *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fetch-option-headers"/><a href="#route-fetch-option-headers" class="list-anchor">#</a>
     
     If set changes the request HTTP headers. Header values will be converted to a string.
+  - `MaxRedirects` [int]? *(optional)* <font size="2">Added in: v1.31</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fetch-option-max-redirects"/><a href="#route-fetch-option-max-redirects" class="list-anchor">#</a>
+    
+    Maximum number of request redirects that will be followed automatically. An error will be thrown if the number is exceeded. Defaults to `20`. Pass `0` to not follow redirects.
   - `Method` [string]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fetch-option-method"/><a href="#route-fetch-option-method" class="list-anchor">#</a>
     
     If set changes the request method (e.g. GET or POST).
@@ -195,6 +202,10 @@ await page.RouteAsync("https://dog.ceo/api/breeds/list/all", async route =>
 
 **Returns**
 - [APIResponse]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="route-fetch-return"/><a href="#route-fetch-return" class="list-anchor">#</a>
+
+**Details**
+
+Note that `headers` option will apply to the fetched request as well as any redirects initiated by it. If you want to only apply `headers` to the original request, but not to redirects, look into [Route.ContinueAsync()](/api/class-route.mdx#route-continue) instead.
 
 ---
 
@@ -276,6 +287,8 @@ Route.Request
 [Browser]: /api/class-browser.mdx "Browser"
 [BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
 [BrowserType]: /api/class-browsertype.mdx "BrowserType"
+[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"

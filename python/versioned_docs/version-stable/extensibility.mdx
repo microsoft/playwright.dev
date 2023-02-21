@@ -19,6 +19,8 @@ Selector engine should have the following properties:
 
 By default the engine is run directly in the frame's JavaScript context and, for example, can call an application-defined function. To isolate the engine from any JavaScript in the frame, but leave access to the DOM, register the engine with `{contentScript: true}` option. Content script engine is safer because it is protected from any tampering with the global objects, for example altering `Node.prototype` methods. All built-in selector engines run as content scripts. Note that running as a content script is not guaranteed when the engine is used together with other custom engines.
 
+Selectors must be registered before creating the page.
+
 An example of registering selector engine that queries elements based on a tag name:
 
 <Tabs
@@ -53,8 +55,8 @@ playwright.selectors.register("tag", tag_selector)
 button = page.locator("tag=button")
 button.click()
 
-# we can combine it with other selector engines using `>>` combinator.
-page.locator("tag=div >> span >> \"click me\"").click()
+# we can combine it with built-in locators.
+page.locator("tag=div").get_by_text("click me").click()
 
 # we can use it in any methods supporting selectors.
 button_count = page.locator("tag=button").count()
@@ -85,8 +87,8 @@ await playwright.selectors.register("tag", tag_selector)
 button = page.locator("tag=button")
 await button.click()
 
-# we can combine it with other selector engines using `>>` combinator.
-await page.locator("tag=div >> span >> \"click me\"").click()
+# we can combine it with built-in locators.
+await page.locator("tag=div").get_by_text("click me").click()
 
 # we can use it in any methods supporting selectors.
 button_count = await page.locator("tag=button").count()
@@ -121,7 +123,6 @@ button_count = await page.locator("tag=button").count()
 [Page]: /api/class-page.mdx "Page"
 [PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
 [Playwright]: /api/class-playwright.mdx "Playwright"
-[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
