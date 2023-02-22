@@ -17,5 +17,5 @@
 [Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"
 
 [all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/python/about "all available image tags"
-[Docker Hub]: https://hub.docker.com/_/microsoft-playwright-python "Docker Hub"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/python/about "Microsoft Artifact Registry"
 [Dockerfile.focal]: https://github.com/microsoft/playwright-python/blob/main/utils/docker/Dockerfile.focal "Dockerfile.focal"
