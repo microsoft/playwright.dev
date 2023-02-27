@@ -576,10 +576,17 @@ ${this.documentation.renderLinksInText(member.discouraged)}
           member.required = false;
         }
         if (type.union.some(v => v.name.startsWith('"'))) {
+          // Keep in sync with microsoft/playwright's utils/doclint/generateDotnetApi.js
+          const enumValueOverrides = new Map([
+            ['domcontentloaded', 'DOMContentLoaded'],
+            ['networkidle', 'NetworkIdle'],
+          ]);
           // strip out the quotes
           const sanitizeLiteral = (literal) => {
-            // toTitleCase(l.name.replace(/[\"-]/g, ''))
-            return literal.split('-').map(l => toTitleCase(l.replace(/[\"]/g, ''))).join('');
+            return literal.split('-').map(l => {
+              const enumValue = l.replace(/[\"]/g, '');
+              return enumValueOverrides.get(enumValue) || toTitleCase(enumValue)
+            }).join('');
           }
           return `\`enum ${type.name} { ${union.map(l => sanitizeLiteral(l.name)).join(', ')} }${member.required ? '' : '?'}\``;
         }
