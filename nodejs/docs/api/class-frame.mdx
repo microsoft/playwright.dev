@@ -991,48 +991,6 @@ await frame.waitForLoadState(); // Waits for 'load' state by default.
 
 ---
 
-### waitForNavigation {#frame-wait-for-navigation}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.waitForNavigation</x-search>
-
-Waits for the frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
-
-**Usage**
-
-This method waits for the frame to navigate to a new URL. It is useful for when you run code which will indirectly cause the frame to navigate. Consider this example:
-
-```js
-// Start waiting for navigation before clicking. Note no await.
-const navigationPromise = page.waitForNavigation();
-await page.getByText('Navigate after timeout').click();
-await navigationPromise;
-```
-
-:::note
-Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
-:::
-
-**Arguments**
-- `options` [Object] *(optional)*
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-timeout"/><a href="#frame-wait-for-navigation-option-timeout" class="list-anchor">#</a>
-    
-    Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-  - `url` [string]|[RegExp]|[function]\([URL]\):[boolean] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-url"/><a href="#frame-wait-for-navigation-option-url" class="list-anchor">#</a>
-    
-    A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
-  - `waitUntil` "load"|"domcontentloaded"|"networkidle"|"commit" *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-wait-until"/><a href="#frame-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
-    
-    When to consider operation succeeded, defaults to `load`. Events can be either:
-    * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
-    * `'load'` - consider operation to be finished when the `load` event is fired.
-    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
-    * `'commit'` - consider operation to be finished when network response is received and the document started loading.
-
-**Returns**
-- [Promise]<[null]|[Response]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-return"/><a href="#frame-wait-for-navigation-return" class="list-anchor">#</a>
-
----
-
 ### waitForSelector {#frame-wait-for-selector}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.waitForSelector</x-search>
@@ -2483,6 +2441,55 @@ await frame.uncheck(selector, options);
   - `trial` [boolean] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-uncheck-option-trial"/><a href="#frame-uncheck-option-trial" class="list-anchor">#</a>
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
+
+---
+
+### waitForNavigation {#frame-wait-for-navigation}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.waitForNavigation</x-search>
+
+:::caution Deprecated
+
+This method is inherently racy, please use [frame.waitForURL()](/api/class-frame.mdx#frame-wait-for-url) instead.
+
+:::
+
+
+Waits for the frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
+
+**Usage**
+
+This method waits for the frame to navigate to a new URL. It is useful for when you run code which will indirectly cause the frame to navigate. Consider this example:
+
+```js
+// Start waiting for navigation before clicking. Note no await.
+const navigationPromise = page.waitForNavigation();
+await page.getByText('Navigate after timeout').click();
+await navigationPromise;
+```
+
+:::note
+Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::
+
+**Arguments**
+- `options` [Object] *(optional)*
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-timeout"/><a href="#frame-wait-for-navigation-option-timeout" class="list-anchor">#</a>
+    
+    Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browserContext.setDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  - `url` [string]|[RegExp]|[function]\([URL]\):[boolean] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-url"/><a href="#frame-wait-for-navigation-option-url" class="list-anchor">#</a>
+    
+    A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
+  - `waitUntil` "load"|"domcontentloaded"|"networkidle"|"commit" *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-wait-until"/><a href="#frame-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
+    
+    When to consider operation succeeded, defaults to `load`. Events can be either:
+    * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+    * `'load'` - consider operation to be finished when the `load` event is fired.
+    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+    * `'commit'` - consider operation to be finished when network response is received and the document started loading.
+
+**Returns**
+- [Promise]<[null]|[Response]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-return"/><a href="#frame-wait-for-navigation-return" class="list-anchor">#</a>
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
