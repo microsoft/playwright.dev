@@ -449,68 +449,6 @@ await result_handle.dispose()
 
 ---
 
-### expect_navigation {#frame-wait-for-navigation}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.expect_navigation</x-search>
-
-Waits for the frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
-
-**Usage**
-
-This method waits for the frame to navigate to a new URL. It is useful for when you run code which will indirectly cause the frame to navigate. Consider this example:
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-with frame.expect_navigation():
-    frame.click("a.delayed-navigation") # clicking the link will indirectly cause a navigation
-# Resolves after navigation has finished
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-async with frame.expect_navigation():
-    await frame.click("a.delayed-navigation") # clicking the link will indirectly cause a navigation
-# Resolves after navigation has finished
-```
-
-</TabItem>
-</Tabs>
-
-:::note
-Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
-:::
-
-**Arguments**
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-timeout"/><a href="#frame-wait-for-navigation-option-timeout" class="list-anchor">#</a>
-  
-  Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.set_default_navigation_timeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-- `url` [str]|[Pattern]|[Callable]\[[URL]\]:[bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-url"/><a href="#frame-wait-for-navigation-option-url" class="list-anchor">#</a>
-  
-  A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
-- `wait_until` "load"|"domcontentloaded"|"networkidle"|"commit" *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-wait-until"/><a href="#frame-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
-  
-  When to consider operation succeeded, defaults to `load`. Events can be either:
-  * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
-  * `'load'` - consider operation to be finished when the `load` event is fired.
-  * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
-  * `'commit'` - consider operation to be finished when network response is received and the document started loading.
-
-**Returns**
-- [EventContextManager]\[[Response]\]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-return"/><a href="#frame-wait-for-navigation-return" class="list-anchor">#</a>
-
----
-
 ### frame_element {#frame-frame-element}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.frame_element</x-search>
@@ -2061,6 +1999,75 @@ divs_counts = await frame.eval_on_selector_all("div", "(divs, min) => divs.lengt
 
 **Returns**
 - [Serializable]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-eval-on-selector-all-return"/><a href="#frame-eval-on-selector-all-return" class="list-anchor">#</a>
+
+---
+
+### expect_navigation {#frame-wait-for-navigation}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.expect_navigation</x-search>
+
+:::caution Deprecated
+
+This method is inherently racy, please use [frame.wait_for_url()](/api/class-frame.mdx#frame-wait-for-url) instead.
+
+:::
+
+
+Waits for the frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
+
+**Usage**
+
+This method waits for the frame to navigate to a new URL. It is useful for when you run code which will indirectly cause the frame to navigate. Consider this example:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+with frame.expect_navigation():
+    frame.click("a.delayed-navigation") # clicking the link will indirectly cause a navigation
+# Resolves after navigation has finished
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+async with frame.expect_navigation():
+    await frame.click("a.delayed-navigation") # clicking the link will indirectly cause a navigation
+# Resolves after navigation has finished
+```
+
+</TabItem>
+</Tabs>
+
+:::note
+Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::
+
+**Arguments**
+- `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-timeout"/><a href="#frame-wait-for-navigation-option-timeout" class="list-anchor">#</a>
+  
+  Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.set_default_navigation_timeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+- `url` [str]|[Pattern]|[Callable]\[[URL]\]:[bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-url"/><a href="#frame-wait-for-navigation-option-url" class="list-anchor">#</a>
+  
+  A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
+- `wait_until` "load"|"domcontentloaded"|"networkidle"|"commit" *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-wait-until"/><a href="#frame-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
+  
+  When to consider operation succeeded, defaults to `load`. Events can be either:
+  * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+  * `'load'` - consider operation to be finished when the `load` event is fired.
+  * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+  * `'commit'` - consider operation to be finished when network response is received and the document started loading.
+
+**Returns**
+- [EventContextManager]\[[Response]\]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-return"/><a href="#frame-wait-for-navigation-return" class="list-anchor">#</a>
 
 ---
 
