@@ -8,6 +8,15 @@ const ambassadors = [
     twitterUrl: 'https://twitter.com/AutomationPanda'
   },
   {
+    name: 'Butch Mayhew',
+    city: 'Birmingham',
+    languages: 'English',
+    country: 'England',
+    imageUrl: 'https://pbs.twimg.com/profile_images/1287788058746720256/TI0zkGqB_400x400.jpg',
+    twitterUrl: 'https://twitter.com/butchmayhew',
+    websiteUrl: 'https://playwrightsolutions.com/'
+  },
+  {
     name: 'Carlos Gauto',
     city: 'Berazategui',
     languages: 'Spanish, English',
@@ -24,6 +33,15 @@ const ambassadors = [
     githubUrl: 'https://github.com/coryhouse',
     twitterUrl: 'https://twitter.com/housecor',
     websiteUrl: 'https://www.reactjsconsulting.com/'
+  },
+  {
+    name: 'Jean-François Greffier',
+    city: 'Rennes',
+    languages: 'French, English',
+    country: 'France',
+    githubUrl: 'https://github.com/jfgreffier',
+    twitterUrl: 'https://twitter.com/jfgreffier',
+    websiteUrl: 'https://medium.com/@jfgreffier'
   },
   {
     name: 'Giovanni Rago',
