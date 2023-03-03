@@ -11,7 +11,7 @@ const ambassadors = [
     name: 'Butch Mayhew',
     city: 'Birmingham',
     languages: 'English',
-    country: 'England',
+    country: 'USA',
     imageUrl: 'https://pbs.twimg.com/profile_images/1287788058746720256/TI0zkGqB_400x400.jpg',
     twitterUrl: 'https://twitter.com/butchmayhew',
     websiteUrl: 'https://playwrightsolutions.com/'
