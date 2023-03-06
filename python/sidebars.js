@@ -26,8 +26,6 @@ module.exports = {
         { type: 'doc', id: 'auth' },
         { type: 'doc', id: 'browsers' },
         { type: 'doc', id: 'chrome-extensions' },
-        { type: 'doc', id: 'cli' },
-        { type: 'doc', id: 'debug-selectors' },
         { type: 'doc', id: 'debug' },
         { type: 'doc', id: 'dialogs' },
         { type: 'doc', id: 'downloads' },
