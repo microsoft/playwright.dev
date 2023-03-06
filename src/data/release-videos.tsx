@@ -1,5 +1,10 @@
 const releaseVideos = [
   {
+    version: '1.31',
+    id: "PI50YAPTAs4",
+    highlights: ['project dependencies', 'viewport assertion'],
+  },
+  {
     version: '1.29',
     id: "VbVlz61VtNo",
     highlights: ['backend mocking', 'working with lists'],
