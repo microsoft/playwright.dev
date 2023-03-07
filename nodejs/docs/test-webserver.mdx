@@ -1,107 +1,120 @@
 ---
-id: running-tests
-title: "Running tests"
+id: test-webserver
+title: "Web server"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-You can run a single test, a set of tests or all tests. Tests can be run on one browser or multiple browsers. By default tests are run in a headless manner meaning no browser window will be opened while running the tests and results will be seen in the terminal.
+Playwright comes with a `webserver` option in the config file which gives you the ability to launch a local dev server before running your tests. This is ideal for when writing your tests during development and when you don't have a staging or production url to test against.
 
-**You will learn**
-- [How to run tests from the command line](/running-tests.mdx#command-line)
-- [How to debug tests](/running-tests.mdx#debugging-tests)
-- [How to open the HTML test reporter](/running-tests.mdx#test-reports)
+## Configuring a web server
 
-:::note
-For a better debugging experience check out the [VS Code Extension](./getting-started-vscode.mdx) for Playwright where you can run tests, add breakpoints and debug your tests right from the VS Code editor.
-:::
+Use the `webserver` property in your Playwright config to launch a development web server during the tests.
 
-## Command Line
-- Running all tests
-  
-  ```bash
-  npx playwright test
-  ```
-  
-- Running a single test file
-  
-  ```bash
-  npx playwright test landing-page.spec.ts
-  ```
-  
-- Run a set of test files
-  
-  ```bash
-  npx playwright test tests/todo-page/ tests/landing-page/
-  ```
-  
-- Run files that have `landing` or `login` in the file name
-  
-  ```bash
-  npx playwright test landing login
-  ```
-  
-- Run the test with the title
-  
-  ```bash
-  npx playwright test -g "add a todo item"
-  ```
-  
-- Running tests in headed mode
-  
-  ```bash
-  npx playwright test landing-page.spec.ts --headed
-  ```
-  
-- Running tests on a specific project
-  
-  ```bash
-  npx playwright test landing-page.ts --project=chromium
-  ```
-  
-## Debugging Tests
+```js
+import { defineConfig } from '@playwright/test';
 
-Since Playwright runs in Node.js, you can debug it with your debugger of choice e.g. using `console.log` or inside your IDE or directly in VS Code with the [VS Code Extension](./getting-started-vscode.mdx). Playwright comes with the [Playwright Inspector](./debug.mdx#playwright-inspector) which allows you to step through Playwright API calls, see their debug logs and explore [locators](./locators.mdx).
-- Debugging all tests:
-  
-  ```bash
-  npx playwright test --debug
-  ```
-  
-- Debugging one test file:
-  
-  ```bash
-  npx playwright test example.spec.ts --debug
-  ```
-  
-- Debugging a test from the line number where the `test(..` is defined:
-  
-  ```bash
-  npx playwright test example.spec.ts:10 --debug
-  ```
-  
-<img width="1340" alt="Debugging Tests with the Playwright inspector" src="https://user-images.githubusercontent.com/13063165/212936618-84b87acc-bc2e-46ed-994b-32b2ef742e60.png" />
-
-Check out our [debugging guide](./debug.mdx) to learn more about the [Playwright Inspector](./debug.mdx#playwright-inspector) as well as debugging with [Browser Developer tools](./debug.mdx#browser-developer-tools).
-
-## Test Reports
-
-The [HTML Reporter](././test-reporters.mdx#html-reporter) shows you a full report of your tests allowing you to filter the report by browsers, passed tests, failed tests, skipped tests and flaky tests. By default, the HTML report is opened automatically if some of the tests failed.
-
-```bash
-npx playwright show-report
+export default defineConfig({
+  // Run your local dev server before starting the tests
+  webServer: {
+    command: 'npm run start',
+    url: 'http://127.0.0.1:3000',
+    reuseExistingServer: !process.env.CI,
+  },
+});
 ```
 
-<img width="1424" alt="HTML Report > Test Reports view" src="https://user-images.githubusercontent.com/13063165/221930419-49543647-9130-4429-a857-6851c2005e48.png" />
+| Property | Description |
+| :- | :- |
+| [testConfig.webServer](/api/class-testconfig.mdx#test-config-web-server) | Launch a development web server (or multiple) during the tests. |
+| `command`| Shell command to start the local dev server of your app. |
+| `url`| URL of your http server that is expected to return a 2xx, 3xx, 400, 401, 402, or 403 status code when the server is ready to accept connections. |
+| `reuseExistingServer`| If `true`, it will re-use an existing server on the url when available. If no server is running on that url, it will run the command to start a new server. If `false`, it will throw if an existing process is listening on the url. To see the stdout, you can set the `DEBUG=pw:webserver` environment variable. |
 
-You can click on each test and explore the tests errors as well as each step of the test.
+## Adding a server timeout
 
-<img width="1440" alt="HTML Reporter > Test Reports detailed view" src="https://user-images.githubusercontent.com/13063165/221930640-c1ccda28-7906-44c7-a198-acd9acb40bbe.png" />
+Webservers can sometimes take longer to boot up. In this case, you can increase the timeout to wait for the server to start.
 
-## What's Next
-- [Generate tests with Codegen](./codegen-intro.mdx)
-- [See a trace of your tests](./trace-viewer-intro.mdx)
+```js
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  // Rest of your config...
+
+  // Run your local dev server before starting the tests
+  webServer: {
+    command: 'npm run start',
+    url: 'http://127.0.0.1:3000',
+    reuseExistingServer: !process.env.CI,
+    timeout: 120 * 1000,
+  },
+});
+```
+
+## Adding a baseURL
+
+It is also recommended to specify the `baseURL` in the `use: {}` section of your config, so that tests can use relative urls and you don't have to specify the full URL over and over again. 
+
+When using [page.goto()](/api/class-page.mdx#page-goto), [page.route()](/api/class-page.mdx#page-route), [page.waitForURL()](/api/class-page.mdx#page-wait-for-url), [page.waitForRequest()](/api/class-page.mdx#page-wait-for-request), or [page.waitForResponse()](/api/class-page.mdx#page-wait-for-response) it takes the base URL in consideration by using the [`URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor for building the corresponding URL. For Example, by setting the baseURL to `http://127.0.0.1:3000` and navigating to `/login` in your tests, Playwright will run the test using `http://127.0.0.1:3000/login`.
+
+```js
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  // Rest of your config...
+
+  // Run your local dev server before starting the tests
+  webServer: {
+    command: 'npm run start',
+    url: 'http://127.0.0.1:3000',
+    reuseExistingServer: !process.env.CI,
+  },
+  use: {
+    baseURL: 'http://127.0.0.1:3000',
+  },
+});
+```
+
+Now you can use a relative path when navigating the page:
+
+```js
+// test.spec.js
+const { test } = require('@playwright/test');
+
+test('test', async ({ page }) => {
+  // This will navigate to http://127.0.0.1:3000/login
+  await page.goto('./login');
+});
+```
+
+## Multiple web servers
+
+Multiple web servers (or background processes) can be launched simultaneously by providing an array of `webServer` configurations. See [testConfig.webServer](/api/class-testconfig.mdx#test-config-web-server) for more info.
+
+```js
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  webServer: [
+    {
+      command: 'npm run start',
+      url: 'http://127.0.0.1:3000',
+      timeout: 120 * 1000,
+      reuseExistingServer: !process.env.CI,
+    },
+    {
+      command: 'npm run backend',
+      url: 'http://127.0.0.1:3333',
+      timeout: 120 * 1000,
+      reuseExistingServer: !process.env.CI,
+    }
+  ],
+  use: {
+    baseURL: 'http://127.0.0.1:3000',
+  },
+});
+```
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
