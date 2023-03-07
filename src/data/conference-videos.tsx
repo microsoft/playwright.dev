@@ -1,5 +1,13 @@
 const conferenceVideos = [
   {
+    title: 'Playing your tests wright',
+    description: '',
+    id: 'n-ooHE-rNnw',
+    year: '2023',
+    conference: 'Vue Amsterdam',
+    speakers: ["Debbie O'Brien"]
+  },
+  {
     title: 'Testing Blazor Applications with Playwright',
     description: '',
     id: 'VavFU2vLnT0',
