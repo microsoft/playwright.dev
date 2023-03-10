@@ -4,7 +4,12 @@ const featureVideos = [
     description: '',
     id: 'y3YxX4sFJbM',
     year: '2022',
-    speakers: ['Andrey Lushnikov', 'Ross Wollman']
+  },
+  {
+    title: 'Viewing Playwright Traces',
+    description: '',
+    id: 'lfxjs--9ZQs',
+    year: '2023',
   }
 ];
 
