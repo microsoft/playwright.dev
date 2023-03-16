@@ -7,17 +7,7 @@ import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
 
-`TestInfo` contains information about currently running test. It is available to any test function, [test.beforeEach()](/api/class-test.mdx#test-before-each) and [test.afterEach()](/api/class-test.mdx#test-after-each) hooks and test-scoped fixtures. `TestInfo` provides utilities to control test execution: attach files, update test timeout, determine which test is currently running and whether it was retried, etc.
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
+`TestInfo` contains information about currently running test. It is available to test functions, [test.beforeEach()](/api/class-test.mdx#test-before-each), [test.afterEach()](/api/class-test.mdx#test-after-each), [test.beforeAll()](/api/class-test.mdx#test-before-all) and [test.afterAll()](/api/class-test.mdx#test-after-all) hooks, and test-scoped fixtures. `TestInfo` provides utilities to control test execution: attach files, update test timeout, determine which test is currently running and whether it was retried, etc.
 
 ```js
 import { test, expect } from '@playwright/test';
@@ -27,21 +17,6 @@ test('basic test', async ({ page }, testInfo) => {
   await page.screenshot(testInfo.outputPath('screenshot.png'));
 });
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-const { test, expect } = require('@playwright/test');
-
-test('basic test', async ({ page }, testInfo) => {
-  expect(testInfo.title).toBe('basic test');
-  await page.screenshot(testInfo.outputPath('screenshot.png'));
-});
-```
-
-</TabItem>
-</Tabs>
 
 
 ---
@@ -56,16 +31,6 @@ Attach a value or a file from disk to the current test. Some reporters show test
 
 For example, you can attach a screenshot to the test:
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
 ```js
 import { test, expect } from '@playwright/test';
 
@@ -75,60 +40,18 @@ test('basic test', async ({ page }, testInfo) => {
   await testInfo.attach('screenshot', { body: screenshot, contentType: 'image/png' });
 });
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-const { test, expect } = require('@playwright/test');
-
-test('basic test', async ({ page }, testInfo) => {
-  await page.goto('https://playwright.dev');
-  const screenshot = await page.screenshot();
-  await testInfo.attach('screenshot', { body: screenshot, contentType: 'image/png' });
-});
-```
-
-</TabItem>
-</Tabs>
 
 Or you can attach files returned by your APIs:
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
 ```js
 import { test, expect } from '@playwright/test';
+import { download } from './my-custom-helpers';
 
 test('basic test', async ({}, testInfo) => {
-  const { download } = require('./my-custom-helpers');
   const tmpPath = await download('a');
   await testInfo.attach('downloaded', { path: tmpPath });
 });
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-const { test, expect } = require('@playwright/test');
-
-test('basic test', async ({}, testInfo) => {
-  const { download } = require('./my-custom-helpers');
-  const tmpPath = await download('a');
-  await testInfo.attach('downloaded', { path: tmpPath });
-});
-```
-
-</TabItem>
-</Tabs>
 
 :::note
 [testInfo.attach()](/api/class-testinfo.mdx#test-info-attach) automatically takes care of copying attached files to a location that is accessible to reporters. You can safely remove the attachment after awaiting the attach call.
@@ -238,16 +161,6 @@ testInfo.fixme(condition, description);
 
 Returns a path inside the [testInfo.outputDir](/api/class-testinfo.mdx#test-info-output-dir) where the test can safely put a temporary file. Guarantees that tests running in parallel will not interfere with each other.
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
 ```js
 import { test, expect } from '@playwright/test';
 import fs from 'fs';
@@ -257,22 +170,6 @@ test('example test', async ({}, testInfo) => {
   await fs.promises.writeFile(file, 'Put some data to the dir/temporary-file.txt', 'utf8');
 });
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-const { test, expect } = require('@playwright/test');
-const fs = require('fs');
-
-test('example test', async ({}, testInfo) => {
-  const file = testInfo.outputPath('dir', 'temporary-file.txt');
-  await fs.promises.writeFile(file, 'Put some data to the dir/temporary-file.txt', 'utf8');
-});
-```
-
-</TabItem>
-</Tabs>
 
 > Note that `pathSegments` accepts path segments to the test output directory such as `testInfo.outputPath('relative', 'path', 'to', 'output')`.
 > However, this path must stay within the [testInfo.outputDir](/api/class-testinfo.mdx#test-info-output-dir) directory for each test (i.e. `test-results/a-test-title`), otherwise it will throw.
@@ -301,16 +198,6 @@ Changes the timeout for the currently running test. Zero means no timeout. Learn
 
 Timeout is usually specified in the [configuration file](../test-configuration.mdx), but it could be useful to change the timeout in certain scenarios:
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
 ```js
 import { test, expect } from '@playwright/test';
 
@@ -319,21 +206,6 @@ test.beforeEach(async ({ page }, testInfo) => {
   testInfo.setTimeout(testInfo.timeout + 30000);
 });
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-const { test, expect } = require('@playwright/test');
-
-test.beforeEach(async ({ page }, testInfo) => {
-  // Extend timeout for all tests running this hook by 30 seconds.
-  testInfo.setTimeout(testInfo.timeout + 30000);
-});
-```
-
-</TabItem>
-</Tabs>
 
 **Usage**
 
@@ -600,16 +472,6 @@ Expected status for the currently running test. This is usually `'passed'`, exce
 
 Expected status is usually compared with the actual [testInfo.status](/api/class-testinfo.mdx#test-info-status):
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
 ```js
 import { test, expect } from '@playwright/test';
 
@@ -618,21 +480,6 @@ test.afterEach(async ({}, testInfo) => {
     console.log(`${testInfo.title} did not run as expected!`);
 });
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-const { test, expect } = require('@playwright/test');
-
-test.afterEach(async ({}, testInfo) => {
-  if (testInfo.status !== testInfo.expectedStatus)
-    console.log(`${testInfo.title} did not run as expected!`);
-});
-```
-
-</TabItem>
-</Tabs>
 
 **Usage**
 
@@ -772,16 +619,6 @@ testInfo.repeatEachIndex
 
 Specifies the retry number when the test is retried after a failure. The first test run has [testInfo.retry](/api/class-testinfo.mdx#test-info-retry) equal to zero, the first retry has it equal to one, and so on. Learn more about [retries](../test-retries.mdx#retries).
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
 ```js
 import { test, expect } from '@playwright/test';
 
@@ -798,29 +635,6 @@ test('my test', async ({ page }, testInfo) => {
   // ...
 });
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-const { test, expect } = require('@playwright/test');
-
-test.beforeEach(async ({}, testInfo) => {
-  // You can access testInfo.retry in any hook or fixture.
-  if (testInfo.retry > 0)
-    console.log(`Retrying!`);
-});
-
-test('my test', async ({ page }, testInfo) => {
-  // Here we clear some server-side state when retrying.
-  if (testInfo.retry)
-    await cleanSomeCachesOnTheServer();
-  // ...
-});
-```
-
-</TabItem>
-</Tabs>
 
 **Usage**
 
@@ -881,16 +695,6 @@ Actual status for the currently running test. Available after the test has finis
 
 Status is usually compared with the [testInfo.expectedStatus](/api/class-testinfo.mdx#test-info-expected-status):
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
 ```js
 import { test, expect } from '@playwright/test';
 
@@ -899,21 +703,6 @@ test.afterEach(async ({}, testInfo) => {
     console.log(`${testInfo.title} did not run as expected!`);
 });
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-const { test, expect } = require('@playwright/test');
-
-test.afterEach(async ({}, testInfo) => {
-  if (testInfo.status !== testInfo.expectedStatus)
-    console.log(`${testInfo.title} did not run as expected!`);
-});
-```
-
-</TabItem>
-</Tabs>
 
 **Usage**
 
@@ -985,16 +774,6 @@ Timeout in milliseconds for the currently running test. Zero means no timeout. L
 
 Timeout is usually specified in the [configuration file](../test-configuration.mdx)
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
 ```js
 import { test, expect } from '@playwright/test';
 
@@ -1003,21 +782,6 @@ test.beforeEach(async ({ page }, testInfo) => {
   testInfo.setTimeout(testInfo.timeout + 30000);
 });
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-const { test, expect } = require('@playwright/test');
-
-test.beforeEach(async ({ page }, testInfo) => {
-  // Extend timeout for all tests running this hook by 30 seconds.
-  testInfo.setTimeout(testInfo.timeout + 30000);
-});
-```
-
-</TabItem>
-</Tabs>
 
 **Usage**
 
