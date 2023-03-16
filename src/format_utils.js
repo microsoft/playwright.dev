@@ -91,6 +91,8 @@ function tabLabel(groupId, value) {
     return 'Sync';
   if (groupId === 'python-flavor' && value === 'async')
     return 'Async';
+  if (value === 'test')
+    return 'Test';
   if (value === 'ts')
     return 'TypeScript';
   if (value === 'js')
@@ -112,6 +114,7 @@ function tabLabel(groupId, value) {
  */
 function tabWeight(type) {
   const weights = new Map([
+    ['test', 3],
     ['ts', 2],
     ['js', 1],
     ['library', 0],
