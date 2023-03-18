@@ -1454,13 +1454,14 @@ await page.get_by_alt_text("Playwright logo").click()
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.get_by_label</x-search>
 
-Allows locating input elements by the text of the associated label.
+Allows locating input elements by the text of the associated `<label>` or `aria-labelledby` element, or by the `aria-label` attribute.
 
 **Usage**
 
-For example, this method will find the input by label text "Password" in the following DOM:
+For example, this method will find inputs by label "Username" and "Password" in the following DOM:
 
 ```html
+<input aria-label="Username">
 <label for="password-input">Password:</label>
 <input id="password-input">
 ```
@@ -1476,6 +1477,7 @@ For example, this method will find the input by label text "Password" in the fol
 <TabItem value="sync">
 
 ```py
+page.get_by_label("Username").fill("john")
 page.get_by_label("Password").fill("secret")
 ```
 
@@ -1483,6 +1485,7 @@ page.get_by_label("Password").fill("secret")
 <TabItem value="async">
 
 ```py
+await page.get_by_label("Username").fill("john")
 await page.get_by_label("Password").fill("secret")
 ```
 
@@ -2413,8 +2416,6 @@ page.route_from_har(har, **kwargs)
 - `har` [Union]\[[str], [pathlib.Path]\]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-har"/><a href="#page-route-from-har-option-har" class="list-anchor">#</a>
   
   Path to a [HAR](http://www.softwareishard.com/blog/har-12-spec) file with prerecorded network data. If `path` is a relative path, then it is resolved relative to the current working directory.
-- `content` "omit"|"embed"|"attach" *(optional)* <font size="2">Added in: v1.32</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-content"/><a href="#page-route-from-har-option-content" class="list-anchor">#</a>
-- `mode` "full"|"minimal" *(optional)* <font size="2">Added in: v1.32</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-mode"/><a href="#page-route-from-har-option-mode" class="list-anchor">#</a>
 - `not_found` "abort"|"fallback" *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-not-found"/><a href="#page-route-from-har-option-not-found" class="list-anchor">#</a>
   * If set to 'abort' any request not found in the HAR file will be aborted.
   * If set to 'fallback' missing requests will be sent to the network.
@@ -2423,6 +2424,12 @@ page.route_from_har(har, **kwargs)
 - `update` [bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-update"/><a href="#page-route-from-har-option-update" class="list-anchor">#</a>
   
   If specified, updates the given HAR with the actual network information instead of serving from file. The file is written to disk when [browser_context.close()](/api/class-browsercontext.mdx#browser-context-close) is called.
+- `update_content` "embed"|"attach" *(optional)* <font size="2">Added in: v1.32</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-update-content"/><a href="#page-route-from-har-option-update-content" class="list-anchor">#</a>
+  
+  Optional setting to control resource content management. If `attach` is specified, resources are persisted as separate files or entries in the ZIP archive. If `embed` is specified, content is stored inline the HAR file.
+- `update_mode` "full"|"minimal" *(optional)* <font size="2">Added in: v1.32</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-update-mode"/><a href="#page-route-from-har-option-update-mode" class="list-anchor">#</a>
+  
+  When set to `minimal`, only record information necessary for routing from HAR. This omits sizes, timing, page, cookies, security and other types of HAR information that are not used when replaying from HAR. Defaults to `full`.
 - `url` [str]|[Pattern] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-url"/><a href="#page-route-from-har-option-url" class="list-anchor">#</a>
   
   A glob pattern, regular expression or predicate to match the request URL. Only requests with URL matching the pattern will be served from the HAR file. If not specified, all requests are served from the HAR file.
