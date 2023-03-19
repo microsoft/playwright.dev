@@ -694,18 +694,20 @@ page.getByAltText("Playwright logo").click();
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>page.getByLabel</x-search>
 
-Allows locating input elements by the text of the associated label.
+Allows locating input elements by the text of the associated `<label>` or `aria-labelledby` element, or by the `aria-label` attribute.
 
 **Usage**
 
-For example, this method will find the input by label text "Password" in the following DOM:
+For example, this method will find inputs by label "Username" and "Password" in the following DOM:
 
 ```html
+<input aria-label="Username">
 <label for="password-input">Password:</label>
 <input id="password-input">
 ```
 
 ```java
+page.getByLabel("Username").fill("john");
 page.getByLabel("Password").fill("secret");
 ```
 
@@ -1494,8 +1496,6 @@ Page.routeFromHAR(har, options);
   
   Path to a [HAR](http://www.softwareishard.com/blog/har-12-spec) file with prerecorded network data. If `path` is a relative path, then it is resolved relative to the current working directory.
 - `options` `Page.RouteFromHAROptions` *(optional)*
-  - `setContent` `enum HarContentPolicy { OMIT, EMBED, ATTACH }` *(optional)* <font size="2">Added in: v1.32</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-content"/><a href="#page-route-from-har-option-content" class="list-anchor">#</a>
-  - `setMode` `enum HarMode { FULL, MINIMAL }` *(optional)* <font size="2">Added in: v1.32</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-mode"/><a href="#page-route-from-har-option-mode" class="list-anchor">#</a>
   - `setNotFound` `enum HarNotFound { ABORT, FALLBACK }` *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-not-found"/><a href="#page-route-from-har-option-not-found" class="list-anchor">#</a>
     * If set to 'abort' any request not found in the HAR file will be aborted.
     * If set to 'fallback' missing requests will be sent to the network.
@@ -1504,6 +1504,12 @@ Page.routeFromHAR(har, options);
   - `setUpdate` [boolean] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-update"/><a href="#page-route-from-har-option-update" class="list-anchor">#</a>
     
     If specified, updates the given HAR with the actual network information instead of serving from file. The file is written to disk when [BrowserContext.close()](/api/class-browsercontext.mdx#browser-context-close) is called.
+  - `setUpdateContent` `enum RouteFromHarUpdateContentPolicy { EMBED, ATTACH }` *(optional)* <font size="2">Added in: v1.32</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-update-content"/><a href="#page-route-from-har-option-update-content" class="list-anchor">#</a>
+    
+    Optional setting to control resource content management. If `attach` is specified, resources are persisted as separate files or entries in the ZIP archive. If `embed` is specified, content is stored inline the HAR file.
+  - `setUpdateMode` `enum HarMode { FULL, MINIMAL }` *(optional)* <font size="2">Added in: v1.32</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-update-mode"/><a href="#page-route-from-har-option-update-mode" class="list-anchor">#</a>
+    
+    When set to `minimal`, only record information necessary for routing from HAR. This omits sizes, timing, page, cookies, security and other types of HAR information that are not used when replaying from HAR. Defaults to `full`.
   - `setUrl` [String]|[Pattern] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-route-from-har-option-url"/><a href="#page-route-from-har-option-url" class="list-anchor">#</a>
     
     A glob pattern, regular expression or predicate to match the request URL. Only requests with URL matching the pattern will be served from the HAR file. If not specified, all requests are served from the HAR file.
@@ -1826,6 +1832,34 @@ Page.waitForClose(callback, options);
 
 **Returns**
 - [Page]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-close-return"/><a href="#page-wait-for-close-return" class="list-anchor">#</a>
+
+---
+
+### waitForCondition {#page-wait-for-condition}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.32</font><x-search>page.waitForCondition</x-search>
+
+The method will block until the codition returns true. All Playwright events will be dispatched while the method is waiting for the codition.
+
+**Usage**
+
+Use the method to wait for a condition that depends on page events:
+
+```java
+List<String> messages = new ArrayList<>();
+page.onConsoleMessage(m -> messages.add(m.text()));
+page.getByText("Submit button").click();
+page.waitForCondition(() -> messages.size() > 3);
+```
+
+**Arguments**
+- `condition` [BooleanSupplier]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-condition-option-condition"/><a href="#page-wait-for-condition-option-condition" class="list-anchor">#</a>
+  
+  Codition to wait for.
+- `options` `Page.WaitForConditionOptions` *(optional)*
+  - `setTimeout` [double] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-condition-option-timeout"/><a href="#page-wait-for-condition-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 ---
 
