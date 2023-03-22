@@ -26,6 +26,10 @@ You can create a custom reporter by implementing a class with some of the report
 import { Reporter, FullConfig, Suite, TestCase, TestResult, FullResult } from '@playwright/test/reporter';
 
 class MyReporter implements Reporter {
+  constructor(options: { customOption?: string } = {}) {
+    console.log(`my-awesome-reporter setup with customOption set to ${options.customOption}`);
+  }
+
   onBegin(config: FullConfig, suite: Suite) {
     console.log(`Starting the run with ${suite.allTests().length} tests`);
   }
@@ -54,6 +58,10 @@ export default MyReporter;
 
 /** @implements {import('@playwright/test/reporter').Reporter} */
 class MyReporter {
+  constructor(options) {
+    console.log(`my-awesome-reporter setup with customOption set to ${options.customOption}`);
+  }
+
   onBegin(config, suite) {
     console.log(`Starting the run with ${suite.allTests().length} tests`);
   }
@@ -79,41 +87,14 @@ module.exports = MyReporter;
 
 Now use this reporter with [testConfig.reporter](/api/class-testconfig.mdx#test-config-reporter). Learn more about [using reporters](../test-reporters.mdx).
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
 ```js
 // playwright.config.ts
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-  reporter: './my-awesome-reporter.ts',
+  reporter: ['./my-awesome-reporter.ts', { customOption: 'some value' }],
 });
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-// playwright.config.js
-// @ts-check
-
-const { defineConfig } = require('@playwright/test');
-
-module.exports = defineConfig({
-  reporter: './my-awesome-reporter.js',
-});
-```
-
-</TabItem>
-</Tabs>
 
 Here is a typical order of reporter calls:
 * [reporter.onBegin()](/api/class-reporter.mdx#reporter-on-begin) is called once with a root suite that contains all other suites and tests. Learn more about [suites hierarchy][Suite].
@@ -450,5 +431,5 @@ reporter.printsToStdio();
 [URL]: https://nodejs.org/api/url.html "URL"
 
 [all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
 [Dockerfile.focal]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.focal "Dockerfile.focal"

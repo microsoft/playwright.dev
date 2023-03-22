@@ -1,28 +1,50 @@
 ---
 id: codegen
-title: "Test Generator"
+title: "Test generator"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-Playwright comes with the ability to generate tests out of the box and is a great way to quickly get started with testing. It will open two windows, a browser window where you interact with the website you wish to test and the Playwright Inspector window where you can record your tests, copy the tests, clear your tests as well as change the language of your tests.
+import LiteYouTube from '@site/src/components/LiteYouTube';
 
-## Running Codegen
+Playwright comes with the ability to generate tests for you as you perform actions in the browser and is a great way to quickly get started with testing. Playwright will look at your page and figure out the best locator, prioritizing [role, text and test id locators](./locators.mdx). If the generator finds multiple elements matching the locator, it will improve the locator to make it resilient that uniquely identify the target element.
+
+## Generate tests with the Playwright Inspector
+
+When running the `codegen` command two windows will be opened, a browser window where you interact with the website you wish to test and the Playwright Inspector window where you can record your tests and then copy them into your editor. 
+
+### Running Codegen
+
+Use the `codegen` command to run the test generator followed by the URL of the website you want to generate tests for. The URL is optional and you can always run the command without it and then add the URL directly into the browser window instead.
 
 ```bash
 mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="codegen demo.playwright.dev/todomvc"
 ```
 
-Run `codegen` and perform actions in the browser. Playwright will generate the code for the user interactions. `Codegen` will attempt to generate resilient text-based selectors.
+### Recording a test
 
-<video width="100%" height="100%" controls muted>
+Run the `codegen` command and perform actions in the browser window. Playwright will generate the code for the user interactions which you can see in the Playwright Inspector window. Once you have finished recording your test stop the recording and press the **copy** button to copy your generated test into your editor.
 
-<source src="https://user-images.githubusercontent.com/13063165/197979804-c4fa3347-8fab-4526-a728-c1b2fbd079b4.mp4" type="video/mp4" /> Your browser does not support the video tag.
+###### 
+<img width="1365" alt="Recording a test" src="https://user-images.githubusercontent.com/13063165/212754804-0d9f9d52-0a48-45c8-970d-e672d4a91221.png" />
 
-</video>
+### Generating locators
 
-## Emulate viewport size
+You can generate [locators](/locators.mdx) with the test generator. 
+* Press the `'Record'` button to stop the recording and the `'Pick Locator'` button will appear.
+* Click on the `'Pick Locator'` button and then hover over elements in the browser window to see the locator highlighted underneath each element. 
+* To choose a locator click on the element you would like to locate and the code for that locator will appear in the field next to the Pick Locator button.
+* You can then edit the locator in this field to fine tune it or use the copy button to copy it and paste it into your code.
+
+###### 
+<img width="1321" alt="Picking a locator" src="https://user-images.githubusercontent.com/13063165/212753446-456484a8-8c37-4104-8db5-4525b74c8cf1.png" />
+
+## Emulation
+
+You can use the test generator to generate tests using emulation so as to generate a test for a specific viewport, device, color scheme, as well as emulate the geolocation, language or timezone. The test generator can also generate a test while preserving authenticated state.
+
+### Emulate viewport size
 
 Playwright opens a browser window with it's viewport set to a specific width and height and is not responsive as tests need to be run under the same conditions. Use the `--viewport` option to generate tests with a different viewport size.
 
@@ -30,19 +52,21 @@ Playwright opens a browser window with it's viewport set to a specific width and
 mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="codegen --viewport-size=800,600 playwright.dev"
 ```
 
-<img width="1409" alt="Codegen generating code for tests for playwright.dev website with a specific viewport" src="https://user-images.githubusercontent.com/13063165/182360039-6db79ad6-fe82-4fd6-900a-b5e25f7f720f.png" />
+###### 
+<img width="870" alt="Codegen generating code for tests for playwright.dev website with a specific viewport java" src="https://user-images.githubusercontent.com/13063165/220402748-12a856c2-b3ff-4155-b82d-64dad9c46886.png" />
 
-## Emulate devices
+### Emulate devices
 
 Record scripts and tests while emulating a mobile device using the `--device` option which sets the viewport size and user agent among others.
 
 ```bash
-mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args='codegen --device="iPhone 11" playwright.dev'
+mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args='codegen --device="iPhone 13" playwright.dev'
 ```
 
-<img width="1254" alt="Codegen generating code for tests for playwright.dev website emulated for iPhone 11" src="https://user-images.githubusercontent.com/13063165/197976789-ee25ed24-69af-4684-b6a4-098673cfb035.png" />
+###### 
+<img width="1300" alt="Codegen generating code for tests for playwright.dev website emulated for iPhone 13 java" src="https://user-images.githubusercontent.com/13063165/220922591-241e6a59-a920-4cb1-97a2-d46c33ea17c5.png" />
 
-## Emulate color scheme
+### Emulate color scheme
 
 Record scripts and tests while emulating the color scheme with the `--color-scheme` option.
 
@@ -50,43 +74,51 @@ Record scripts and tests while emulating the color scheme with the `--color-sche
 mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="codegen --color-scheme=dark playwright.dev"
 ```
 
-<img width="1258" alt="Codegen generating code for tests for playwright.dev website in dark mode" src="https://user-images.githubusercontent.com/13063165/182359371-0bb4a7a2-abbb-4f73-8550-d67e0101f0ad.png" />
+###### 
+<img width="1394" alt="Codegen generating code for tests for playwright.dev website in dark mode java" src="https://user-images.githubusercontent.com/13063165/220930514-3b105fab-c87e-4f58-affa-d11d570122a8.png" />
 
-## Emulate geolocation, language and timezone
+### Emulate geolocation, language and timezone
 
-Record scripts and tests while emulating timezone, language & location using the `--timezone`, `--geolocation` and `--lang` options. Once page opens, click the "show your location" icon at them bottom right corner of the map to see geolocation in action.
-
-```bash
-mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args='codegen --timezone="Europe/Rome" --geolocation="41.890221,12.492348" --lang="it-IT" maps.google.com'
-```
-
-<img width="1276" alt="Codegen generating code for tests for google maps showing timezone, geolocation as Rome, Italy and in Italian language" src="https://user-images.githubusercontent.com/13063165/182394434-73e1c2a8-767e-411a-94e4-0912c1c50ecc.png" />
-
-## Preserve authenticated state
-
-Run `codegen` with `--save-storage` to save [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) and [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) at the end of the session. This is useful to separately record an authentication step and reuse it later in the tests.
-
-After performing authentication and closing the browser, `auth.json` will contain the storage state.
+Record scripts and tests while emulating timezone, language & location using the `--timezone`, `--geolocation` and `--lang` options. Once the page opens:
+1. Accept the cookies
+1. On the top right click on the locate me button to see geolocation in action.
 
 ```bash
-mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="codegen  --save-storage=auth.json"
+mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args='codegen --timezone="Europe/Rome" --geolocation="41.890221,12.492348" --lang="it-IT" bing.com/maps'
 ```
 
-<img width="1264" alt="Screenshot 2022-08-03 at 13 28 02" src="https://user-images.githubusercontent.com/13063165/182599605-df2fbd05-622b-4cd7-8a32-0abdfea7d38d.png" />
+###### 
+<img width="1394" alt="Codegen generating code for tests for bing maps showing timezone, geolocation as Rome, Italy and in Italian language java" src="https://user-images.githubusercontent.com/13063165/220932268-9012163f-7673-4072-aa91-13b3c8f57799.png" />
 
-Run with `--load-storage` to consume previously loaded storage. This way, all [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) and [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) will be restored, bringing most web apps to the authenticated state without the need to login again.
+### Preserve authenticated state
+
+Run `codegen` with `--save-storage` to save [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) and [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) at the end of the session. This is useful to separately record an authentication step and reuse it later when recording more tests. 
+
+```bash
+mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="codegen github.com/microsoft/playwright  --save-storage=auth.json"
+```
+
+###### 
+<img width="1394" alt="github page before logging in java" src="https://user-images.githubusercontent.com/13063165/220929236-08129e16-82a9-46a3-9f1c-3e59619c6289.png" />
+
+#### Login
+
+After performing authentication and closing the browser, `auth.json` will contain the storage state which you can then reuse in your tests. 
+
+<img width="1394" alt="login to Github screen" src="https://user-images.githubusercontent.com/13063165/220561688-04b2b984-4ba6-4446-8b0a-8058876e2a02.png" />
+
+Make sure you only use the `auth.json` locally as it contains sensative information. Add it to your `.gitignore` or delete it once you have finished generating your tests.
+
+#### Load authenticated state
+
+Run with `--load-storage` to consume the previously loaded storage from the `auth.json`. This way, all [cookies](https://developer.mozilla.org/en-US/docs/Web/HTTP/Cookies) and [localStorage](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage) will be restored, bringing most web apps to the authenticated state without the need to login again. This means you can can continue generating tests from the logged in state.
 
 ```bash
 mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="codegen --load-storage=auth.json github.com/microsoft/playwright"
 ```
 
-<img width="1261" alt="Screenshot 2022-08-03 at 13 33 40" src="https://user-images.githubusercontent.com/13063165/182599680-05297b4e-c258-4416-8daa-b8637c1db120.png" />
-
-Use the `open` command with `--load-storage` to open the saved `auth.json`.
-
-```bash
-mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="open --load-storage=auth.json github.com/microsoft/playwright"
-```
+###### 
+<img width="1394" alt="github signed in showing use of load storage java" src="https://user-images.githubusercontent.com/13063165/220928075-1e38347b-9d0d-4d9e-9a67-506c717893df.png" />
 
 ## Record using custom setup
 
@@ -180,5 +212,5 @@ public class Example {
 [String]: https://docs.oracle.com/javase/8/docs/api/java/lang/String.html "String"
 
 [all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/java/about "all available image tags"
-[Docker Hub]: https://hub.docker.com/_/microsoft-playwright-java "Docker Hub"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/java/about "Microsoft Artifact Registry"
 [Dockerfile.focal]: https://github.com/microsoft/playwright-java/blob/main/utils/docker/Dockerfile.focal "Dockerfile.focal"
