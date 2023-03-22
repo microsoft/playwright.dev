@@ -6,9 +6,8 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-Playwright Test runs tests in parallel. In order to achieve that, it runs several worker processes that run at the same time.
-- By default, **test files** are run in parallel. Tests in a single file are run in order, in the same worker process.
-- Configure tests using [`test.describe.configure`](#parallelize-tests-in-a-single-file) to run **tests in a single file** in parallel.
+Playwright Test runs tests in parallel. In order to achieve that, it runs several worker processes that run at the same time. By default, **test files** are run in parallel. Tests in a single file are run in order, in the same worker process.
+- You can configure tests using [`test.describe.configure`](#parallelize-tests-in-a-single-file) to run **tests in a single file** in parallel.
 - You can configure **entire project** to have all tests in all files to run in parallel using [testProject.fullyParallel](/api/class-testproject.mdx#test-project-fully-parallel) or [testConfig.fullyParallel](/api/class-testconfig.mdx#test-config-fully-parallel).
 - To **disable** parallelism limit the number of [workers to one](#disable-parallelism).
 
@@ -34,18 +33,7 @@ npx playwright test --workers 4
 
 In the configuration file:
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
 ```js
-// playwright.config.ts
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
@@ -53,24 +41,6 @@ export default defineConfig({
   workers: process.env.CI ? 2 : undefined,
 });
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-// playwright.config.js
-// @ts-check
-
-const { defineConfig } = require('@playwright/test');
-
-module.exports = defineConfig({
-  // Limit the number of workers on CI, use default locally
-  workers: process.env.CI ? 2 : undefined,
-});
-```
-
-</TabItem>
-</Tabs>
 
 ## Disable parallelism
 
@@ -86,16 +56,6 @@ By default, tests in a single file are run in order. If you have many independen
 
 Note that parallel tests are executed in separate worker processes and cannot share any state or global variables. Each test executes all relevant hooks just for itself, including `beforeAll` and `afterAll`.
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
 ```js
 import { test } from '@playwright/test';
 
@@ -105,35 +65,9 @@ test('runs in parallel 1', async ({ page }) => { /* ... */ });
 test('runs in parallel 2', async ({ page }) => { /* ... */ });
 ```
 
-</TabItem>
-<TabItem value="js">
+Alternatively, you can opt-in all tests into this fully-parallel mode in the configuration file:
 
 ```js
-const { test } = require('@playwright/test');
-
-test.describe.configure({ mode: 'parallel' });
-
-test('runs in parallel 1', async ({ page }) => { /* ... */ });
-test('runs in parallel 2', async ({ page }) => { /* ... */ });
-```
-
-</TabItem>
-</Tabs>
-
-Alternatively, you can opt-in all tests (or just a few projects) into this fully-parallel mode in the configuration file:
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
-```js
-// playwright.config.ts
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
@@ -141,22 +75,22 @@ export default defineConfig({
 });
 ```
 
-</TabItem>
-<TabItem value="js">
+You can also opt in for fully-parallel mode for just a few projects:
 
 ```js
-// playwright.config.js
-// @ts-check
+import { defineConfig } from '@playwright/test';
 
-const { defineConfig } = require('@playwright/test');
-
-module.exports = defineConfig({
-  fullyParallel: true,
+export default defineConfig({
+  // runs all tests in all files of a specific project in parallel
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+      fullyParallel: true,
+    },
+  ]
 });
 ```
-
-</TabItem>
-</Tabs>
 
 ## Serial mode
 
@@ -166,19 +100,7 @@ You can annotate inter-dependent tests as serial. If one of the serial tests fai
 Using serial is not recommended. It is usually better to make your tests isolated, so they can be run independently.
 :::
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
 ```js
-// example.spec.ts
-
 import { test, Page } from '@playwright/test';
 
 // Annotate entire file as serial.
@@ -202,39 +124,6 @@ test('runs second', async () => {
   await page.getByText('Get Started').click();
 });
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-// @ts-check
-
-const { test } = require('@playwright/test');
-
-test.describe.configure({ mode: 'serial' });
-
-/** @type {import('@playwright/test').Page} */
-let page;
-
-test.beforeAll(async ({ browser }) => {
-  page = await browser.newPage();
-});
-
-test.afterAll(async () => {
-  await page.close();
-});
-
-test('runs first', async () => {
-  await page.goto('https://playwright.dev/');
-});
-
-test('runs second', async () => {
-  await page.getByText('Get Started').click();
-});
-```
-
-</TabItem>
-</Tabs>
 
 ## Shard tests between multiple machines
 
@@ -262,18 +151,7 @@ npx playwright test --max-failures=10
 
 Setting in the configuration file:
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
 ```js
-// playwright.config.ts
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
@@ -281,24 +159,6 @@ export default defineConfig({
   maxFailures: process.env.CI ? 10 : undefined,
 });
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-// playwright.config.js
-// @ts-check
-
-const { defineConfig } = require('@playwright/test');
-
-module.exports = defineConfig({
-  // Limit the number of failures on CI to save resources
-  maxFailures: process.env.CI ? 10 : undefined,
-});
-```
-
-</TabItem>
-</Tabs>
 
 ## Worker index and parallel index
 
@@ -319,16 +179,6 @@ When you **disable parallel test execution**, Playwright Test runs test files in
 ### Use a "test list" file
 
 You can put your tests in helper functions in multiple files. Consider the following example where tests are not defined directly in the file, but rather in a wrapper function.
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
 
 ```js
 // feature-a.spec.ts
@@ -352,46 +202,7 @@ export default function createTests() {
 }
 ```
 
-</TabItem>
-<TabItem value="js">
-
-```js
-// feature-a.spec.js
-const { test, expect } = require('@playwright/test');
-
-module.exports = function createTests() {
-  test('feature-a example test', async ({ page }) => {
-    // ... test goes here
-  });
-};
-
-
-// feature-b.spec.js
-const { test, expect } = require('@playwright/test');
-
-module.exports = function createTests() {
-  test.use({ viewport: { width: 500, height: 500 } });
-
-  test('feature-b example test', async ({ page }) => {
-    // ... test goes here
-  });
-};
-```
-
-</TabItem>
-</Tabs>
-
 You can create a test list file that will control the order of tests - first run `feature-b` tests, then `feature-a` tests. Note how each test file is wrapped in a `test.describe()` block that calls the function where tests are defined. This way `test.use()` calls only affect tests from a single file.
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
 
 ```js
 // test.list.ts
@@ -403,31 +214,7 @@ test.describe(featureBTests);
 test.describe(featureATests);
 ```
 
-</TabItem>
-<TabItem value="js">
-
-```js
-// test.list.js
-const { test } = require('@playwright/test');
-
-test.describe(require('./feature-b.spec.js'));
-test.describe(require('./feature-a.spec.js'));
-```
-
-</TabItem>
-</Tabs>
-
 Now **disable parallel execution** by setting workers to one, and specify your test list file.
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
 
 ```js
 // playwright.config.ts
@@ -438,24 +225,6 @@ export default defineConfig({
   testMatch: 'test.list.ts',
 });
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-// playwright.config.js
-// @ts-check
-
-const { defineConfig } = require('@playwright/test');
-
-module.exports = defineConfig({
-  workers: 1,
-  testMatch: 'test.list.js',
-});
-```
-
-</TabItem>
-</Tabs>
 
 :::note
 Do not define your tests directly in a helper file. This could lead to unexpected results because your tests are now dependent on the order of `import`/`require` statements. Instead, wrap tests in a function that will be explicitly called by a test list file, as in the example above.
@@ -555,5 +324,5 @@ Do not define your tests directly in a helper file. This could lead to unexpecte
 [URL]: https://nodejs.org/api/url.html "URL"
 
 [all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
 [Dockerfile.focal]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.focal "Dockerfile.focal"

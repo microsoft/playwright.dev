@@ -222,7 +222,7 @@ frame.drag_and_drop(source, target, **kwargs)
   Drops on the target element at this point relative to the top-left corner of the element's padding box. If not specified, some visible point of the element is used.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-drag-and-drop-option-timeout"/><a href="#frame-drag-and-drop-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 - `trial` [bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-drag-and-drop-option-trial"/><a href="#frame-drag-and-drop-option-trial" class="list-anchor">#</a>
   
   When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
@@ -449,68 +449,6 @@ await result_handle.dispose()
 
 ---
 
-### expect_navigation {#frame-wait-for-navigation}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.expect_navigation</x-search>
-
-Waits for the frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
-
-**Usage**
-
-This method waits for the frame to navigate to a new URL. It is useful for when you run code which will indirectly cause the frame to navigate. Consider this example:
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-with frame.expect_navigation():
-    frame.click("a.delayed-navigation") # clicking the link will indirectly cause a navigation
-# Resolves after navigation has finished
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-async with frame.expect_navigation():
-    await frame.click("a.delayed-navigation") # clicking the link will indirectly cause a navigation
-# Resolves after navigation has finished
-```
-
-</TabItem>
-</Tabs>
-
-:::note
-Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
-:::
-
-**Arguments**
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-timeout"/><a href="#frame-wait-for-navigation-option-timeout" class="list-anchor">#</a>
-  
-  Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.set_default_navigation_timeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-- `url` [str]|[Pattern]|[Callable]\[[URL]\]:[bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-url"/><a href="#frame-wait-for-navigation-option-url" class="list-anchor">#</a>
-  
-  A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
-- `wait_until` "load"|"domcontentloaded"|"networkidle"|"commit" *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-wait-until"/><a href="#frame-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
-  
-  When to consider operation succeeded, defaults to `load`. Events can be either:
-  * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
-  * `'load'` - consider operation to be finished when the `load` event is fired.
-  * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
-  * `'commit'` - consider operation to be finished when network response is received and the document started loading.
-
-**Returns**
-- [EventContextManager]\[[Response]\]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-return"/><a href="#frame-wait-for-navigation-return" class="list-anchor">#</a>
-
----
-
 ### frame_element {#frame-frame-element}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.frame_element</x-search>
@@ -657,13 +595,14 @@ await page.get_by_alt_text("Playwright logo").click()
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.get_by_label</x-search>
 
-Allows locating input elements by the text of the associated label.
+Allows locating input elements by the text of the associated `<label>` or `aria-labelledby` element, or by the `aria-label` attribute.
 
 **Usage**
 
-For example, this method will find the input by label text "Password" in the following DOM:
+For example, this method will find inputs by label "Username" and "Password" in the following DOM:
 
 ```html
+<input aria-label="Username">
 <label for="password-input">Password:</label>
 <input id="password-input">
 ```
@@ -679,6 +618,7 @@ For example, this method will find the input by label text "Password" in the fol
 <TabItem value="sync">
 
 ```py
+page.get_by_label("Username").fill("john")
 page.get_by_label("Password").fill("secret")
 ```
 
@@ -686,6 +626,7 @@ page.get_by_label("Password").fill("secret")
 <TabItem value="async">
 
 ```py
+await page.get_by_label("Username").fill("john")
 await page.get_by_label("Password").fill("secret")
 ```
 
@@ -1160,7 +1101,7 @@ frame.is_enabled(selector, **kwargs)
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-enabled-option-timeout"/><a href="#frame-is-enabled-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [bool]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-enabled-return"/><a href="#frame-is-enabled-return" class="list-anchor">#</a>
@@ -1420,7 +1361,7 @@ await frame.wait_for_function("selector => !!document.querySelector(selector)", 
   If `polling` is `'raf'`, then `expression` is constantly executed in `requestAnimationFrame` callback. If `polling` is a number, then it is treated as an interval in milliseconds at which the function would be executed. Defaults to `raf`.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-function-option-timeout"/><a href="#frame-wait-for-function-option-timeout" class="list-anchor">#</a>
   
-  maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
+  Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [JSHandle]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-function-return"/><a href="#frame-wait-for-function-return" class="list-anchor">#</a>
@@ -1561,7 +1502,7 @@ asyncio.run(main())
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-selector-option-timeout"/><a href="#frame-wait-for-selector-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [NoneType]|[ElementHandle]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-selector-return"/><a href="#frame-wait-for-selector-return" class="list-anchor">#</a>
@@ -1694,7 +1635,7 @@ frame.check(selector, **kwargs)
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-check-option-timeout"/><a href="#frame-check-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 - `trial` [bool] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-check-option-trial"/><a href="#frame-check-option-trial" class="list-anchor">#</a>
   
   When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
@@ -1763,7 +1704,7 @@ frame.click(selector, **kwargs)
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-click-option-timeout"/><a href="#frame-click-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 - `trial` [bool] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-click-option-trial"/><a href="#frame-click-option-trial" class="list-anchor">#</a>
   
   When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
@@ -1833,7 +1774,7 @@ frame.dblclick(selector, **kwargs)
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-dblclick-option-timeout"/><a href="#frame-dblclick-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 - `trial` [bool] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-dblclick-option-trial"/><a href="#frame-dblclick-option-trial" class="list-anchor">#</a>
   
   When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
@@ -1935,7 +1876,7 @@ await frame.dispatch_event("#source", "dragstart", { "dataTransfer": data_transf
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-dispatch-event-option-timeout"/><a href="#frame-dispatch-event-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 ---
 
@@ -2064,6 +2005,75 @@ divs_counts = await frame.eval_on_selector_all("div", "(divs, min) => divs.lengt
 
 ---
 
+### expect_navigation {#frame-wait-for-navigation}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.expect_navigation</x-search>
+
+:::caution Deprecated
+
+This method is inherently racy, please use [frame.wait_for_url()](/api/class-frame.mdx#frame-wait-for-url) instead.
+
+:::
+
+
+Waits for the frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
+
+**Usage**
+
+This method waits for the frame to navigate to a new URL. It is useful for when you run code which will indirectly cause the frame to navigate. Consider this example:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+with frame.expect_navigation():
+    frame.click("a.delayed-navigation") # clicking the link will indirectly cause a navigation
+# Resolves after navigation has finished
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+async with frame.expect_navigation():
+    await frame.click("a.delayed-navigation") # clicking the link will indirectly cause a navigation
+# Resolves after navigation has finished
+```
+
+</TabItem>
+</Tabs>
+
+:::note
+Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::
+
+**Arguments**
+- `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-timeout"/><a href="#frame-wait-for-navigation-option-timeout" class="list-anchor">#</a>
+  
+  Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_navigation_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.set_default_navigation_timeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+- `url` [str]|[Pattern]|[Callable]\[[URL]\]:[bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-url"/><a href="#frame-wait-for-navigation-option-url" class="list-anchor">#</a>
+  
+  A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
+- `wait_until` "load"|"domcontentloaded"|"networkidle"|"commit" *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-wait-until"/><a href="#frame-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
+  
+  When to consider operation succeeded, defaults to `load`. Events can be either:
+  * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+  * `'load'` - consider operation to be finished when the `load` event is fired.
+  * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+  * `'commit'` - consider operation to be finished when network response is received and the document started loading.
+
+**Returns**
+- [EventContextManager]\[[Response]\]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-return"/><a href="#frame-wait-for-navigation-return" class="list-anchor">#</a>
+
+---
+
 ### fill {#frame-fill}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.fill</x-search>
@@ -2106,7 +2116,7 @@ frame.fill(selector, value, **kwargs)
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-fill-option-timeout"/><a href="#frame-fill-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 ---
 
@@ -2139,7 +2149,7 @@ frame.focus(selector, **kwargs)
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-focus-option-timeout"/><a href="#frame-focus-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 ---
 
@@ -2175,7 +2185,7 @@ frame.get_attribute(selector, name, **kwargs)
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-attribute-option-timeout"/><a href="#frame-get-attribute-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [NoneType]|[str]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-attribute-return"/><a href="#frame-get-attribute-return" class="list-anchor">#</a>
@@ -2235,7 +2245,7 @@ frame.hover(selector, **kwargs)
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-hover-option-timeout"/><a href="#frame-hover-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 - `trial` [bool] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-hover-option-trial"/><a href="#frame-hover-option-trial" class="list-anchor">#</a>
   
   When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
@@ -2271,7 +2281,7 @@ frame.inner_html(selector, **kwargs)
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-inner-html-option-timeout"/><a href="#frame-inner-html-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [str]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-inner-html-return"/><a href="#frame-inner-html-return" class="list-anchor">#</a>
@@ -2307,7 +2317,7 @@ frame.inner_text(selector, **kwargs)
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-inner-text-option-timeout"/><a href="#frame-inner-text-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [str]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-inner-text-return"/><a href="#frame-inner-text-return" class="list-anchor">#</a>
@@ -2345,7 +2355,7 @@ frame.input_value(selector, **kwargs)
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-input-value-option-timeout"/><a href="#frame-input-value-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [str]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-input-value-return"/><a href="#frame-input-value-return" class="list-anchor">#</a>
@@ -2381,7 +2391,7 @@ frame.is_checked(selector, **kwargs)
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-checked-option-timeout"/><a href="#frame-is-checked-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [bool]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-checked-return"/><a href="#frame-is-checked-return" class="list-anchor">#</a>
@@ -2417,7 +2427,7 @@ frame.is_disabled(selector, **kwargs)
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-disabled-option-timeout"/><a href="#frame-is-disabled-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [bool]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-disabled-return"/><a href="#frame-is-disabled-return" class="list-anchor">#</a>
@@ -2453,7 +2463,7 @@ frame.is_editable(selector, **kwargs)
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-editable-option-timeout"/><a href="#frame-is-editable-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [bool]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-editable-return"/><a href="#frame-is-editable-return" class="list-anchor">#</a>
@@ -2586,7 +2596,7 @@ frame.press(selector, key, **kwargs)
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-press-option-timeout"/><a href="#frame-press-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 ---
 
@@ -2734,7 +2744,7 @@ await frame.select_option("select#colors", value=["red", "green", "blue"])
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-select-option-option-timeout"/><a href="#frame-select-option-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 - `element` [ElementHandle]|[List]\[[ElementHandle]\] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-select-option-option-element"/><a href="#frame-select-option-option-element" class="list-anchor">#</a>
   
   Option elements to select. Optional.
@@ -2809,7 +2819,7 @@ frame.set_checked(selector, checked, **kwargs)
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-checked-option-timeout"/><a href="#frame-set-checked-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 - `trial` [bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-checked-option-trial"/><a href="#frame-set-checked-option-trial" class="list-anchor">#</a>
   
   When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
@@ -2860,7 +2870,7 @@ frame.set_input_files(selector, files, **kwargs)
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-input-files-option-timeout"/><a href="#frame-set-input-files-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 ---
 
@@ -2921,7 +2931,7 @@ frame.tap(selector, **kwargs)
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-tap-option-timeout"/><a href="#frame-tap-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 - `trial` [bool] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-tap-option-trial"/><a href="#frame-tap-option-trial" class="list-anchor">#</a>
   
   When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
@@ -2957,7 +2967,7 @@ frame.text_content(selector, **kwargs)
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-text-content-option-timeout"/><a href="#frame-text-content-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [NoneType]|[str]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-text-content-return"/><a href="#frame-text-content-return" class="list-anchor">#</a>
@@ -3025,7 +3035,7 @@ await frame.type("#mytextarea", "world", delay=100) # types slower, like a user
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-type-option-timeout"/><a href="#frame-type-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 ---
 
@@ -3081,7 +3091,7 @@ frame.uncheck(selector, **kwargs)
   When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
 - `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-uncheck-option-timeout"/><a href="#frame-uncheck-option-timeout" class="list-anchor">#</a>
   
-  Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 - `trial` [bool] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-uncheck-option-trial"/><a href="#frame-uncheck-option-trial" class="list-anchor">#</a>
   
   When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
@@ -3152,5 +3162,5 @@ frame.uncheck(selector, **kwargs)
 [Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"
 
 [all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/python/about "all available image tags"
-[Docker Hub]: https://hub.docker.com/_/microsoft-playwright-python "Docker Hub"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/python/about "Microsoft Artifact Registry"
 [Dockerfile.focal]: https://github.com/microsoft/playwright-python/blob/main/utils/docker/Dockerfile.focal "Dockerfile.focal"

@@ -16,7 +16,7 @@ Playwright allows creating "incognito" browser contexts with [Browser.NewContext
 
 ```csharp
 using var playwright = await Playwright.CreateAsync();
-var browser = await playwright.Firefox.LaunchAsync(new BrowserTypeLaunchOptions { Headless = false });
+var browser = await playwright.Firefox.LaunchAsync(new() { Headless = false });
 // Create a new incognito browser context
 var context = await browser.NewContextAsync();
 // Create a new page inside context.
@@ -95,7 +95,7 @@ Math.random = () => 42;
 ```
 
 ```csharp
-await context.AddInitScriptAsync(new BrowserContextAddInitScriptOptions { ScriptPath = "preload.js" });
+await context.AddInitScriptAsync(scriptPath: "preload.js");
 ```
 
 :::note
@@ -240,7 +240,7 @@ An example of exposing page URL to all frames in all pages in the context:
 using Microsoft.Playwright;
 
 using var playwright = await Playwright.CreateAsync();
-var browser = await playwright.Webkit.LaunchAsync(new BrowserTypeLaunchOptions { Headless = false });
+var browser = await playwright.Webkit.LaunchAsync(new() { Headless = false });
 var context = await browser.NewContextAsync();
 
 await context.ExposeBindingAsync("pageURL", source => source.Page.Url);
@@ -316,7 +316,7 @@ class BrowserContextExamples
     public static async Task Main()
     {
         using var playwright = await Playwright.CreateAsync();
-        var browser = await playwright.Webkit.LaunchAsync(new BrowserTypeLaunchOptions { Headless = false });
+        var browser = await playwright.Webkit.LaunchAsync(new() { Headless = false });
         var context = await browser.NewContextAsync();
 
         await context.ExposeFunctionAsync("sha256", (string input) =>
@@ -541,6 +541,12 @@ await BrowserContext.RouteFromHARAsync(har, options);
   - `Update` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-update"/><a href="#browser-context-route-from-har-option-update" class="list-anchor">#</a>
     
     If specified, updates the given HAR with the actual network information instead of serving from file. The file is written to disk when [BrowserContext.CloseAsync()](/api/class-browsercontext.mdx#browser-context-close) is called.
+  - `UpdateContent` `enum RouteFromHarUpdateContentPolicy { Embed, Attach }?` *(optional)* <font size="2">Added in: v1.32</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-update-content"/><a href="#browser-context-route-from-har-option-update-content" class="list-anchor">#</a>
+    
+    Optional setting to control resource content management. If `attach` is specified, resources are persisted as separate files or entries in the ZIP archive. If `embed` is specified, content is stored inline the HAR file.
+  - `UpdateMode` `enum HarMode { Full, Minimal }?` *(optional)* <font size="2">Added in: v1.32</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-update-mode"/><a href="#browser-context-route-from-har-option-update-mode" class="list-anchor">#</a>
+    
+    When set to `minimal`, only record information necessary for routing from HAR. This omits sizes, timing, page, cookies, security and other types of HAR information that are not used when replaying from HAR. Defaults to `minimal`.
   - `Url|UrlRegex` [string]?|[Regex]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-url-url-regex"/><a href="#browser-context-route-from-har-option-url-url-regex" class="list-anchor">#</a>
     
     A glob pattern, regular expression or predicate to match the request URL. Only requests with URL matching the pattern will be served from the HAR file. If not specified, all requests are served from the HAR file.
@@ -1000,5 +1006,5 @@ BrowserContext.Response += async data => {};
 [JsonElement]: https://docs.microsoft.com/en-us/dotnet/api/system.text.json.jsonelement "JsonElement"
 
 [all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/dotnet/about "all available image tags"
-[Docker Hub]: https://hub.docker.com/_/microsoft-playwright-dotnet "Docker Hub"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/dotnet/about "Microsoft Artifact Registry"
 [Dockerfile.focal]: https://github.com/microsoft/playwright-dotnet/blob/main/utils/docker/Dockerfile.focal "Dockerfile.focal"
