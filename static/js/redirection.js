@@ -32,6 +32,7 @@ if (path) {
     { from: '/docs/next/test-pom', to: '/docs/next/pom' },
     { from: '/docs/debug-selectors', to: '/docs/debug' },
     { from: '/docs/next/debug-selectors', to: '/docs/next/debug' },
+    { from: '/docs/cli', to: '/docs/browsers' },
     { from: '/docs/next/cli', to: '/docs/next/browsers' },
     { from: '/docs/test-advanced', to: '/docs/test-configuration' },
     { from: '/docs/next/test-advanced', to: '/docs/next/test-configuration' },
@@ -42,6 +43,7 @@ if (path) {
     { from: '/python/blog', to: '/community/welcome' },
     { from: '/python/docs/debug-selectors', to: '/python/docs/debug' },
     { from: '/python/docs/next/debug-selectors', to: '/python/docs/next/debug' },
+    { from: '/python/docs/cli', to: '/python/docs/browsers' },
     { from: '/python/docs/next/cli', to: '/python/docs/next/browsers' },
     // ------------------- dotnet ---------------------
     { from: '/dotnet/docs/assertions', to: '/dotnet/docs/api/class-playwrightassertions' },
@@ -50,6 +52,7 @@ if (path) {
     { from: '/dotnet/blog', to: '/community/welcome' },
     { from: '/dotnet/docs/debug-selectors', to: '/dotnet/docs/debug' },
     { from: '/dotnet/docs/next/debug-selectors', to: '/dotnet/docs/next/debug' },
+    { from: '/dotnet/docs/cli', to: '/dotnet/docs/browsers' },
     { from: '/dotnet/docs/next/cli', to: '/dotnet/docs/next/browsers' },
     // ------------------- java -----------------------
     { from: '/java/docs/assertions', to: '/java/docs/api/class-playwrightassertions' },
@@ -58,6 +61,7 @@ if (path) {
     { from: '/java/blog', to: '/community/welcome' },
     { from: '/java/docs/debug-selectors', to: '/docs/debug' },
     { from: '/java/docs/next/debug-selectors', to: '/docs/next/debug' },
+    { from: '/java/docs/cli', to: '/java/docs/browsers' },
     { from: '/java/docs/next/cli', to: '/java/docs/next/browsers' },
   ];
   const pathname = window.location.pathname;
