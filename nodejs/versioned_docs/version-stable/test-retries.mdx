@@ -1,6 +1,6 @@
 ---
 id: test-retries
-title: "Test retry"
+title: "Retries"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -14,16 +14,6 @@ Playwright Test runs tests in worker processes. These processes are OS processes
 
 Consider the following snippet:
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
 ```js
 import { test } from '@playwright/test';
 
@@ -34,23 +24,6 @@ test.describe('suite', () => {
   test('third good', async ({ page }) => { /* ... */ });
 });
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-const { test } = require('@playwright/test');
-
-test.describe('suite', () => {
-  test.beforeAll(async () => { /* ... */ });
-  test('first good', async ({ page }) => { /* ... */ });
-  test('second flaky', async ({ page }) => { /* ... */ });
-  test('third good', async ({ page }) => { /* ... */ });
-});
-```
-
-</TabItem>
-</Tabs>
 
 When **all tests pass**, they will run in order in the same worker process.
 * Worker process starts
@@ -82,25 +55,16 @@ This scheme works perfectly for independent tests and guarantees that failing te
 
 ## Retries
 
-Playwright Test supports **test retries**. When enabled, failing tests will be retried multiple times until they pass, or until the maximum number of retries is reached. By default failing tests are not retried.
+Playwright supports **test retries**. When enabled, failing tests will be retried multiple times until they pass, or until the maximum number of retries is reached. By default failing tests are not retried.
 
 ```bash
 # Give failing tests 3 retry attempts
 npx playwright test --retries=3
 ```
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
+You can configure retries in the configuration file:
 
 ```js
-// playwright.config.ts
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
@@ -108,24 +72,6 @@ export default defineConfig({
   retries: 3,
 });
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-// playwright.config.js
-// @ts-check
-
-const { defineConfig } = require('@playwright/test');
-
-module.exports = defineConfig({
-  // Give failing tests 3 retry attempts
-  retries: 3,
-});
-```
-
-</TabItem>
-</Tabs>
 
 Playwright Test will categorize tests as follows:
 - "passed" - tests that passed on the first run;
@@ -147,16 +93,6 @@ Running 3 tests using 1 worker
 
 You can detect retries at runtime with [testInfo.retry](/api/class-testinfo.mdx#test-info-retry), which is accessible to any test, hook or fixture. Here is an example that clears some server-side state before a retry.
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
 ```js
 import { test, expect } from '@playwright/test';
 
@@ -166,35 +102,9 @@ test('my test', async ({ page }, testInfo) => {
   // ...
 });
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-const { test, expect } = require('@playwright/test');
-
-test('my test', async ({ page }, testInfo) => {
-  if (testInfo.retry)
-    await cleanSomeCachesOnTheServer();
-  // ...
-});
-```
-
-</TabItem>
-</Tabs>
 
 You can specify retries for a specific group of tests or a single file with [test.describe.configure()](/api/class-test.mdx#test-describe-configure).
 
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
-
 ```js
 import { test, expect } from '@playwright/test';
 
@@ -211,45 +121,12 @@ test.describe(() => {
   });
 });
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-const { test, expect } = require('@playwright/test');
-
-test.describe(() => {
-  // All tests in this describe group will get 2 retry attempts.
-  test.describe.configure({ retries: 2 });
-
-  test('test 1', async ({ page }) => {
-    // ...
-  });
-
-  test('test 2', async ({ page }) => {
-    // ...
-  });
-});
-```
-
-</TabItem>
-</Tabs>
 
 ## Serial mode
 
 Use [test.describe.serial()](/api/class-test.mdx#test-describe-serial) to group dependent tests to ensure they will always run together and in order. If one of the tests fails, all subsequent tests are skipped. All tests in the group are retried together.
 
 Consider the following snippet that uses `test.describe.serial`:
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="ts"
-  values={[
-    {label: 'TypeScript', value: 'ts'},
-    {label: 'JavaScript', value: 'js'}
-  ]
-}>
-<TabItem value="ts">
 
 ```js
 import { test } from '@playwright/test';
@@ -261,23 +138,6 @@ test('first good', async ({ page }) => { /* ... */ });
 test('second flaky', async ({ page }) => { /* ... */ });
 test('third good', async ({ page }) => { /* ... */ });
 ```
-
-</TabItem>
-<TabItem value="js">
-
-```js
-const { test } = require('@playwright/test');
-
-test.describe.configure({ mode: 'serial' });
-
-test.beforeAll(async () => { /* ... */ });
-test('first good', async ({ page }) => { /* ... */ });
-test('second flaky', async ({ page }) => { /* ... */ });
-test('third good', async ({ page }) => { /* ... */ });
-```
-
-</TabItem>
-</Tabs>
 
 When running without [retries](#retries), all tests after the failure are skipped:
 * Worker process #1:
@@ -337,7 +197,7 @@ test('runs first', async () => {
   await page.goto('https://playwright.dev/');
 });
 
-test('runs second', async () => {
+test('runs second', async () => { 
   await page.getByText('Get Started').click();
 });
 ```
@@ -470,5 +330,5 @@ test('runs second', async () => {
 [URL]: https://nodejs.org/api/url.html "URL"
 
 [all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/about "all available image tags"
-[Docker Hub]: https://hub.docker.com/_/microsoft-playwright "Docker Hub"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/about "Microsoft Artifact Registry"
 [Dockerfile.focal]: https://github.com/microsoft/playwright/blob/main/utils/docker/Dockerfile.focal "Dockerfile.focal"

@@ -25,17 +25,21 @@ class Program
         {
             Headless: False
         });
-        var iphone12 = playwright.Devices["iPhone 12"];
-        await using var context = await browser.NewContextAsync(iphone12);
+        var iphone13 = playwright.Devices["iPhone 13"];
+        await using var context = await browser.NewContextAsync(iphone13);
     }
 }
 ```
+
+<img width="458" alt="playwright.dev website emulated for iPhone 13" src="https://user-images.githubusercontent.com/13063165/220411073-76fe59f9-9a2d-463d-8e30-c19a7deca133.png" />
 
 ## Viewport
 
 The viewport is included in the device but you can override it for some tests with [Page.SetViewportSizeAsync()](/api/class-page.mdx#page-set-viewport-size).
 
-The same works inside a describe block.
+Test file:
+
+The same works inside a test file.
 
 ```csharp
 // Create context with given viewport
@@ -55,6 +59,8 @@ await using var context = await browser.NewContextAsync(new()
 });
 ```
 
+<img width="1714" alt="website with set viewport" src="https://user-images.githubusercontent.com/13063165/220405141-a7446ee5-aa1e-42af-b8fc-7a281f901dc2.png" />
+
 ## Locale & Timezone
 
 Emulate the user Locale and Timezone which can be set globally for all tests in the config and then overridden for particular tests.
@@ -67,15 +73,11 @@ await using var context = await browser.NewContextAsync(new()
 });
 ```
 
+<img width="1394" alt="Bing in german lang and timezone" src="https://user-images.githubusercontent.com/13063165/220416571-ccc96ab1-44bb-4579-8430-64502fc24a15.png" />
+
 ## Permissions
 
 Allow app to show system notifications.
-
-Allow test to request current location.
-
-```csharp
-await context.GrantPermissionsAsync(new[] { "geolocation" });
-```
 
 Allow notifications for a specific domain.
 
@@ -91,27 +93,29 @@ await context.ClearPermissionsAsync();
 
 ## Geolocation
 
-Create a test with `"geolocation"` permissions granted and geolocation set to a specific area.
+Grant `"geolocation"` permissions and set geolocation to a specific area.
 
 ```csharp
 await using var context = await browser.NewContextAsync(new()
 {
     Permissions = new[] { "geolocation" },
-    Geolocation = new Geolocation() { Longitude = 48.858455f, Latitude = 2.294474f }
+    Geolocation = new Geolocation() { Longitude = 41.890221, Latitude = 12.492348 }
 });
 ```
+
+<img width="1394" alt="geolocation for italy on bing maps" src="https://user-images.githubusercontent.com/13063165/220417670-bb22d815-f5cd-47c4-8562-0b88165eac27.png" />
 
 Change the location later:
 
 ```csharp
-await context.SetGeolocationAsync(new Geolocation() { Longitude = 48.858455f, Latitude = 2.294474f });
+await context.SetGeolocationAsync(new Geolocation() { Longitude = 48.858455, Latitude = 2.294474 });
 ```
 
 **Note** you can only change geolocation for all pages in the context.
 
 ## Color Scheme and Media
 
-Create a test that emulates the users `"colorScheme"`. Supported values are 'light', 'dark', 'no-preference'. You can also emulate the media type with [Page.EmulateMediaAsync()](/api/class-page.mdx#page-emulate-media).
+Emulate the users `"colorScheme"`. Supported values are 'light', 'dark', 'no-preference'. You can also emulate the media type with [Page.EmulateMediaAsync()](/api/class-page.mdx#page-emulate-media).
 
 ```csharp
 // Create context with dark mode
@@ -139,12 +143,14 @@ await page.EmulateMediaAsync(new()
 });
 ```
 
+<img width="1394" alt="playwright web in dark mode" src="https://user-images.githubusercontent.com/13063165/220411638-55d2b051-4678-4da7-9f0b-ed22f5a3c47c.png" />
+
 ## User Agent
 
 The User Agent is included in the device and therefore you  will rarely need to change it however if you do need to test a different user agent you can override it with the `userAgent` property.
 
 ```csharp
-var context = await browser.NewContextAsync(new BrowserNewContextOptions { UserAgent = "My User Agent" });
+var context = await browser.NewContextAsync(new() { UserAgent = "My User Agent" });
 ```
 
 ## JavaScript Enabled
@@ -219,5 +225,5 @@ Emulate a user scenario where JavaScript is disabled.
 [JsonElement]: https://docs.microsoft.com/en-us/dotnet/api/system.text.json.jsonelement "JsonElement"
 
 [all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/dotnet/about "all available image tags"
-[Docker Hub]: https://hub.docker.com/_/microsoft-playwright-dotnet "Docker Hub"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/dotnet/about "Microsoft Artifact Registry"
 [Dockerfile.focal]: https://github.com/microsoft/playwright-dotnet/blob/main/utils/docker/Dockerfile.focal "Dockerfile.focal"

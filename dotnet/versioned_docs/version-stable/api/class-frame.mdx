@@ -189,7 +189,7 @@ await Frame.DragAndDropAsync(source, target, options);
     Drops on the target element at this point relative to the top-left corner of the element's padding box. If not specified, some visible point of the element is used.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-drag-and-drop-option-timeout"/><a href="#frame-drag-and-drop-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
   - `Trial` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-drag-and-drop-option-trial"/><a href="#frame-drag-and-drop-option-trial" class="list-anchor">#</a>
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
@@ -369,18 +369,20 @@ await page.GetByAltText("Playwright logo").ClickAsync();
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>frame.GetByLabel</x-search>
 
-Allows locating input elements by the text of the associated label.
+Allows locating input elements by the text of the associated `<label>` or `aria-labelledby` element, or by the `aria-label` attribute.
 
 **Usage**
 
-For example, this method will find the input by label text "Password" in the following DOM:
+For example, this method will find inputs by label "Username" and "Password" in the following DOM:
 
 ```html
+<input aria-label="Username">
 <label for="password-input">Password:</label>
 <input id="password-input">
 ```
 
 ```csharp
+await page.GetByLabel("Username").FillAsync("john");
 await page.GetByLabel("Password").FillAsync("secret");
 ```
 
@@ -698,7 +700,7 @@ await Frame.GotoAsync(url, options);
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-goto-option-timeout"/><a href="#frame-goto-option-timeout" class="list-anchor">#</a>
     
     Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [Page.SetDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-  - `WaitUntil` `enum WaitUntilState { Load, Domcontentloaded, Networkidle, Commit }?` *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-goto-option-wait-until"/><a href="#frame-goto-option-wait-until" class="list-anchor">#</a>
+  - `WaitUntil` `enum WaitUntilState { Load, DOMContentLoaded, NetworkIdle, Commit }?` *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-goto-option-wait-until"/><a href="#frame-goto-option-wait-until" class="list-anchor">#</a>
     
     When to consider operation succeeded, defaults to `load`. Events can be either:
     * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
@@ -750,7 +752,7 @@ await Frame.IsEnabledAsync(selector, options);
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-enabled-option-timeout"/><a href="#frame-is-enabled-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [bool]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-enabled-return"/><a href="#frame-is-enabled-return" class="list-anchor">#</a>
@@ -849,99 +851,6 @@ Frame.ParentFrame
 
 ---
 
-### RunAndWaitForNavigationAsync {#frame-wait-for-navigation}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.RunAndWaitForNavigationAsync</x-search>
-
-Waits for the frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
-
-**Usage**
-
-This method waits for the frame to navigate to a new URL. It is useful for when you run code which will indirectly cause the frame to navigate. Consider this example:
-
-```csharp
-await frame.RunAndWaitForNavigationAsync(async () =>
-{
-    // Clicking the link will indirectly cause a navigation.
-    await frame.ClickAsync("a.delayed-navigation");
-});
-
-// Resolves after navigation has finished
-```
-
-:::note
-Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
-:::
-
-**Arguments**
-- `action` [Func]<[Task]> <font size="2">Added in: v1.12</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-action"/><a href="#frame-wait-for-navigation-option-action" class="list-anchor">#</a>
-  
-  Action that triggers the event.
-- `options` `FrameRunAndWaitForNavigationOptions?` *(optional)*
-  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-timeout"/><a href="#frame-wait-for-navigation-option-timeout" class="list-anchor">#</a>
-    
-    Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [Page.SetDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-  - `Url|UrlRegex|UrlFunc` [string]?|[Regex]?|[Func]<[string]?, bool> *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-url-url-regex-url-func"/><a href="#frame-wait-for-navigation-option-url-url-regex-url-func" class="list-anchor">#</a>
-    
-    A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
-  - `WaitUntil` `enum WaitUntilState { Load, Domcontentloaded, Networkidle, Commit }?` *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-wait-until"/><a href="#frame-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
-    
-    When to consider operation succeeded, defaults to `load`. Events can be either:
-    * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
-    * `'load'` - consider operation to be finished when the `load` event is fired.
-    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
-    * `'commit'` - consider operation to be finished when network response is received and the document started loading.
-
-**Returns**
-- [Response]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-return"/><a href="#frame-wait-for-navigation-return" class="list-anchor">#</a>
-
----
-
-### WaitForNavigationAsync {#frame-wait-for-navigation}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.WaitForNavigationAsync</x-search>
-
-Waits for the frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
-
-**Usage**
-
-This method waits for the frame to navigate to a new URL. It is useful for when you run code which will indirectly cause the frame to navigate. Consider this example:
-
-```csharp
-await frame.RunAndWaitForNavigationAsync(async () =>
-{
-    // Clicking the link will indirectly cause a navigation.
-    await frame.ClickAsync("a.delayed-navigation");
-});
-
-// Resolves after navigation has finished
-```
-
-:::note
-Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
-:::
-
-**Arguments**
-- `options` `FrameRunAndWaitForNavigationOptions?` *(optional)*
-  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-timeout"/><a href="#frame-wait-for-navigation-option-timeout" class="list-anchor">#</a>
-    
-    Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [Page.SetDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-  - `Url|UrlRegex|UrlFunc` [string]?|[Regex]?|[Func]<[string]?, bool> *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-url-url-regex-url-func"/><a href="#frame-wait-for-navigation-option-url-url-regex-url-func" class="list-anchor">#</a>
-    
-    A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
-  - `WaitUntil` `enum WaitUntilState { Load, Domcontentloaded, Networkidle, Commit }?` *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-wait-until"/><a href="#frame-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
-    
-    When to consider operation succeeded, defaults to `load`. Events can be either:
-    * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
-    * `'load'` - consider operation to be finished when the `load` event is fired.
-    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
-    * `'commit'` - consider operation to be finished when network response is received and the document started loading.
-
-**Returns**
-- [Response]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-return"/><a href="#frame-wait-for-navigation-return" class="list-anchor">#</a>
-
----
-
 ### SetContentAsync {#frame-set-content}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.SetContentAsync</x-search>
@@ -960,7 +869,7 @@ await Frame.SetContentAsync(html, options);
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-content-option-timeout"/><a href="#frame-set-content-option-timeout" class="list-anchor">#</a>
     
     Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [Page.SetDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-  - `WaitUntil` `enum WaitUntilState { Load, Domcontentloaded, Networkidle, Commit }?` *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-content-option-wait-until"/><a href="#frame-set-content-option-wait-until" class="list-anchor">#</a>
+  - `WaitUntil` `enum WaitUntilState { Load, DOMContentLoaded, NetworkIdle, Commit }?` *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-content-option-wait-until"/><a href="#frame-set-content-option-wait-until" class="list-anchor">#</a>
     
     When to consider operation succeeded, defaults to `load`. Events can be either:
     * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
@@ -1051,7 +960,7 @@ await page.MainFrame.WaitForFunctionAsync("selector => !!document.querySelector(
     If specified, then it is treated as an interval in milliseconds at which the function would be executed. By default if the option is not specified `expression` is executed in `requestAnimationFrame` callback.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-function-option-timeout"/><a href="#frame-wait-for-function-option-timeout" class="list-anchor">#</a>
     
-    maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
+    Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [JSHandle]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-function-return"/><a href="#frame-wait-for-function-return" class="list-anchor">#</a>
@@ -1074,7 +983,7 @@ await frame.WaitForLoadStateAsync(); // Defaults to LoadState.Load
 ```
 
 **Arguments**
-- `state` `enum LoadState { Load, Domcontentloaded, Networkidle }?` *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-load-state-option-state"/><a href="#frame-wait-for-load-state-option-state" class="list-anchor">#</a>
+- `state` `enum LoadState { Load, DOMContentLoaded, NetworkIdle }?` *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-load-state-option-state"/><a href="#frame-wait-for-load-state-option-state" class="list-anchor">#</a>
   
   Optional load state to wait for, defaults to `load`. If the state has been already reached while loading current document, the method resolves immediately. Can be one of:
   * `'load'` - wait for the `load` event to be fired.
@@ -1143,7 +1052,7 @@ class FrameExamples
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-selector-option-timeout"/><a href="#frame-wait-for-selector-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [ElementHandle]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-selector-return"/><a href="#frame-wait-for-selector-return" class="list-anchor">#</a>
@@ -1192,7 +1101,7 @@ await frame.WaitForURLAsync("**/target.html");
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-url-option-timeout"/><a href="#frame-wait-for-url-option-timeout" class="list-anchor">#</a>
     
     Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [Page.SetDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-  - `WaitUntil` `enum WaitUntilState { Load, Domcontentloaded, Networkidle, Commit }?` *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-url-option-wait-until"/><a href="#frame-wait-for-url-option-wait-until" class="list-anchor">#</a>
+  - `WaitUntil` `enum WaitUntilState { Load, DOMContentLoaded, NetworkIdle, Commit }?` *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-url-option-wait-until"/><a href="#frame-wait-for-url-option-wait-until" class="list-anchor">#</a>
     
     When to consider operation succeeded, defaults to `load`. Events can be either:
     * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
@@ -1256,7 +1165,7 @@ await Frame.CheckAsync(selector, options);
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-check-option-timeout"/><a href="#frame-check-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
   - `Trial` [bool]? *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-check-option-trial"/><a href="#frame-check-option-trial" class="list-anchor">#</a>
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
@@ -1325,7 +1234,7 @@ await Frame.ClickAsync(selector, options);
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-click-option-timeout"/><a href="#frame-click-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
   - `Trial` [bool]? *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-click-option-trial"/><a href="#frame-click-option-trial" class="list-anchor">#</a>
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
@@ -1395,7 +1304,7 @@ await Frame.DblClickAsync(selector, options);
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-dblclick-option-timeout"/><a href="#frame-dblclick-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
   - `Trial` [bool]? *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-dblclick-option-trial"/><a href="#frame-dblclick-option-trial" class="list-anchor">#</a>
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
@@ -1456,7 +1365,7 @@ await frame.DispatchEventAsync("#source", "dragstart", new { dataTransfer });
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-dispatch-event-option-timeout"/><a href="#frame-dispatch-event-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 ---
 
@@ -1586,7 +1495,7 @@ await Frame.FillAsync(selector, value, options);
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-fill-option-timeout"/><a href="#frame-fill-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 ---
 
@@ -1619,7 +1528,7 @@ await Frame.FocusAsync(selector, options);
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-focus-option-timeout"/><a href="#frame-focus-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 ---
 
@@ -1655,7 +1564,7 @@ await Frame.GetAttributeAsync(selector, name, options);
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-attribute-option-timeout"/><a href="#frame-get-attribute-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [string]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-get-attribute-return"/><a href="#frame-get-attribute-return" class="list-anchor">#</a>
@@ -1715,7 +1624,7 @@ await Frame.HoverAsync(selector, options);
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-hover-option-timeout"/><a href="#frame-hover-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
   - `Trial` [bool]? *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-hover-option-trial"/><a href="#frame-hover-option-trial" class="list-anchor">#</a>
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
@@ -1751,7 +1660,7 @@ await Frame.InnerHTMLAsync(selector, options);
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-inner-html-option-timeout"/><a href="#frame-inner-html-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-inner-html-return"/><a href="#frame-inner-html-return" class="list-anchor">#</a>
@@ -1787,7 +1696,7 @@ await Frame.InnerTextAsync(selector, options);
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-inner-text-option-timeout"/><a href="#frame-inner-text-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-inner-text-return"/><a href="#frame-inner-text-return" class="list-anchor">#</a>
@@ -1825,7 +1734,7 @@ await Frame.InputValueAsync(selector, options);
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-input-value-option-timeout"/><a href="#frame-input-value-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-input-value-return"/><a href="#frame-input-value-return" class="list-anchor">#</a>
@@ -1861,7 +1770,7 @@ await Frame.IsCheckedAsync(selector, options);
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-checked-option-timeout"/><a href="#frame-is-checked-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [bool]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-checked-return"/><a href="#frame-is-checked-return" class="list-anchor">#</a>
@@ -1897,7 +1806,7 @@ await Frame.IsDisabledAsync(selector, options);
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-disabled-option-timeout"/><a href="#frame-is-disabled-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [bool]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-disabled-return"/><a href="#frame-is-disabled-return" class="list-anchor">#</a>
@@ -1933,7 +1842,7 @@ await Frame.IsEditableAsync(selector, options);
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-editable-option-timeout"/><a href="#frame-is-editable-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [bool]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-is-editable-return"/><a href="#frame-is-editable-return" class="list-anchor">#</a>
@@ -2066,7 +1975,7 @@ await Frame.PressAsync(selector, key, options);
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-press-option-timeout"/><a href="#frame-press-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 ---
 
@@ -2144,6 +2053,113 @@ await Frame.QuerySelectorAllAsync(selector);
 
 ---
 
+### RunAndWaitForNavigationAsync {#frame-wait-for-navigation}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.RunAndWaitForNavigationAsync</x-search>
+
+:::caution Deprecated
+
+This method is inherently racy, please use [Frame.WaitForURLAsync()](/api/class-frame.mdx#frame-wait-for-url) instead.
+
+:::
+
+
+Waits for the frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
+
+**Usage**
+
+This method waits for the frame to navigate to a new URL. It is useful for when you run code which will indirectly cause the frame to navigate. Consider this example:
+
+```csharp
+await frame.RunAndWaitForNavigationAsync(async () =>
+{
+    // Clicking the link will indirectly cause a navigation.
+    await frame.ClickAsync("a.delayed-navigation");
+});
+
+// Resolves after navigation has finished
+```
+
+:::note
+Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::
+
+**Arguments**
+- `action` [Func]<[Task]> <font size="2">Added in: v1.12</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-action"/><a href="#frame-wait-for-navigation-option-action" class="list-anchor">#</a>
+  
+  Action that triggers the event.
+- `options` `FrameRunAndWaitForNavigationOptions?` *(optional)*
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-timeout"/><a href="#frame-wait-for-navigation-option-timeout" class="list-anchor">#</a>
+    
+    Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [Page.SetDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  - `Url|UrlRegex|UrlFunc` [string]?|[Regex]?|[Func]<[string]?, bool> *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-url-url-regex-url-func"/><a href="#frame-wait-for-navigation-option-url-url-regex-url-func" class="list-anchor">#</a>
+    
+    A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
+  - `WaitUntil` `enum WaitUntilState { Load, DOMContentLoaded, NetworkIdle, Commit }?` *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-wait-until"/><a href="#frame-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
+    
+    When to consider operation succeeded, defaults to `load`. Events can be either:
+    * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+    * `'load'` - consider operation to be finished when the `load` event is fired.
+    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+    * `'commit'` - consider operation to be finished when network response is received and the document started loading.
+
+**Returns**
+- [Response]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-return"/><a href="#frame-wait-for-navigation-return" class="list-anchor">#</a>
+
+---
+
+### WaitForNavigationAsync {#frame-wait-for-navigation}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.WaitForNavigationAsync</x-search>
+
+:::caution Deprecated
+
+This method is inherently racy, please use [Frame.WaitForURLAsync()](/api/class-frame.mdx#frame-wait-for-url) instead.
+
+:::
+
+
+Waits for the frame navigation and returns the main resource response. In case of multiple redirects, the navigation will resolve with the response of the last redirect. In case of navigation to a different anchor or navigation due to History API usage, the navigation will resolve with `null`.
+
+**Usage**
+
+This method waits for the frame to navigate to a new URL. It is useful for when you run code which will indirectly cause the frame to navigate. Consider this example:
+
+```csharp
+await frame.RunAndWaitForNavigationAsync(async () =>
+{
+    // Clicking the link will indirectly cause a navigation.
+    await frame.ClickAsync("a.delayed-navigation");
+});
+
+// Resolves after navigation has finished
+```
+
+:::note
+Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/History_API) to change the URL is considered a navigation.
+:::
+
+**Arguments**
+- `options` `FrameRunAndWaitForNavigationOptions?` *(optional)*
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-timeout"/><a href="#frame-wait-for-navigation-option-timeout" class="list-anchor">#</a>
+    
+    Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [Page.SetDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  - `Url|UrlRegex|UrlFunc` [string]?|[Regex]?|[Func]<[string]?, bool> *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-url-url-regex-url-func"/><a href="#frame-wait-for-navigation-option-url-url-regex-url-func" class="list-anchor">#</a>
+    
+    A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
+  - `WaitUntil` `enum WaitUntilState { Load, DOMContentLoaded, NetworkIdle, Commit }?` *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-option-wait-until"/><a href="#frame-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
+    
+    When to consider operation succeeded, defaults to `load`. Events can be either:
+    * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
+    * `'load'` - consider operation to be finished when the `load` event is fired.
+    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+    * `'commit'` - consider operation to be finished when network response is received and the document started loading.
+
+**Returns**
+- [Response]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-wait-for-navigation-return"/><a href="#frame-wait-for-navigation-return" class="list-anchor">#</a>
+
+---
+
 ### SelectOptionAsync {#frame-select-option}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>frame.SelectOptionAsync</x-search>
@@ -2202,7 +2218,7 @@ await frame.SelectOptionAsync("select#colors", new[] { "red", "green", "blue" })
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-select-option-option-timeout"/><a href="#frame-select-option-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [IEnumerable]<[string]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-select-option-return"/><a href="#frame-select-option-return" class="list-anchor">#</a>
@@ -2265,7 +2281,7 @@ await Frame.SetCheckedAsync(selector, checked, options);
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-checked-option-timeout"/><a href="#frame-set-checked-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
   - `Trial` [bool]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-checked-option-trial"/><a href="#frame-set-checked-option-trial" class="list-anchor">#</a>
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
@@ -2316,7 +2332,7 @@ await Frame.SetInputFilesAsync(selector, files, options);
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-set-input-files-option-timeout"/><a href="#frame-set-input-files-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 ---
 
@@ -2377,7 +2393,7 @@ await Frame.TapAsync(selector, options);
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-tap-option-timeout"/><a href="#frame-tap-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
   - `Trial` [bool]? *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-tap-option-trial"/><a href="#frame-tap-option-trial" class="list-anchor">#</a>
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
@@ -2413,7 +2429,7 @@ await Frame.TextContentAsync(selector, options);
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-text-content-option-timeout"/><a href="#frame-text-content-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
 - [string]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-text-content-return"/><a href="#frame-text-content-return" class="list-anchor">#</a>
@@ -2461,7 +2477,7 @@ await frame.TypeAsync("#mytextarea", "world", new() { Delay = 100 }); // types s
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-type-option-timeout"/><a href="#frame-type-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 ---
 
@@ -2517,7 +2533,7 @@ await Frame.UncheckAsync(selector, options);
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-uncheck-option-timeout"/><a href="#frame-uncheck-option-timeout" class="list-anchor">#</a>
     
-    Maximum time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
   - `Trial` [bool]? *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="frame-uncheck-option-trial"/><a href="#frame-uncheck-option-trial" class="list-anchor">#</a>
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
@@ -2590,5 +2606,5 @@ await Frame.UncheckAsync(selector, options);
 [JsonElement]: https://docs.microsoft.com/en-us/dotnet/api/system.text.json.jsonelement "JsonElement"
 
 [all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/dotnet/about "all available image tags"
-[Docker Hub]: https://hub.docker.com/_/microsoft-playwright-dotnet "Docker Hub"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/dotnet/about "Microsoft Artifact Registry"
 [Dockerfile.focal]: https://github.com/microsoft/playwright-dotnet/blob/main/utils/docker/Dockerfile.focal "Dockerfile.focal"
