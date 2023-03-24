@@ -163,8 +163,8 @@ module.exports = {
               href: "https://www.youtube.com/channel/UC46Zj8pDH5tDosqm1gd7WTg",
             },
             {
-              label: "Conference videos",
-              href: "/community/conference-videos",
+              label: "Blog",
+              href: "https://dev.to/playwright",
             },
           ],
         },

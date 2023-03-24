@@ -29,6 +29,11 @@ module.exports = {
       ],
       collapsed: false
     },
+    {
+      type: 'link',
+      label: "Blog",
+      href: "https://dev.to/playwright",
+    },
 
     {
       type: 'link',
