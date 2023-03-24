@@ -79,7 +79,7 @@ module.exports = {
           position: "left",
         },
         {
-          href: "https://github.com/microsoft/playwright",
+          href: "https://github.com/microsoft/playwright-dotnet",
           position: "right",
           className: "header-github-link",
           "aria-label": "GitHub repository",
@@ -169,8 +169,8 @@ module.exports = {
               href: "https://www.youtube.com/channel/UC46Zj8pDH5tDosqm1gd7WTg",
             },
             {
-              label: "Blog",
-              href: "https://dev.to/playwright",
+              label: "Conference videos",
+              href: "/community/conference-videos",
             },
           ],
         },
