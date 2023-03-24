@@ -78,12 +78,17 @@ module.exports = {
           label: "API",
           position: "left",
         },
-
         {
           href: "https://github.com/microsoft/playwright",
           position: "right",
           className: "header-github-link",
           "aria-label": "GitHub repository",
+        },
+        {
+          href: "https://aka.ms/playwright/discord",
+          position: "right",
+          className: "header-discord-link",
+          "aria-label": "Discord server",
         },
         {
           label: 'Node.js',
