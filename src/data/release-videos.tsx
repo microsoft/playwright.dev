@@ -1,8 +1,13 @@
 const releaseVideos = [
   {
+    version: '1.32',
+    id: "jF0yA-JLQW0",
+    highlights: ['ui mode', 'watch mode', 'time travel debugging', 'live trace viewer'],
+  },
+  {
     version: '1.31',
     id: "PI50YAPTAs4",
-    highlights: ['project dependencies', 'viewport assertion'],
+    highlights: ['project dependencies', 'global setup', 'auth', 'viewport assertion'],
   },
   {
     version: '1.29',
