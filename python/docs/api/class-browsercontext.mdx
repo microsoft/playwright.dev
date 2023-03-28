@@ -1315,6 +1315,57 @@ browser_context.on("close", handler)
 
 ---
 
+### on("console") {#browser-context-event-console}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.33</font><x-search>browserContext.on("console")</x-search>
+
+Emitted when JavaScript within the page calls one of console API methods, e.g. `console.log` or `console.dir`. Also emitted if the page throws an error or a warning.
+
+The arguments passed into `console.log` and the page are available on the [ConsoleMessage] event handler argument.
+
+**Usage**
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+def print_args(msg):
+    for arg in msg.args:
+        print(arg.json_value())
+
+context.on("console", print_args)
+page.evaluate("console.log('hello', 5, { foo: 'bar' })")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+async def print_args(msg):
+    values = []
+    for arg in msg.args:
+        values.append(await arg.json_value())
+    print(values)
+
+context.on("console", print_args)
+await page.evaluate("console.log('hello', 5, { foo: 'bar' })")
+```
+
+</TabItem>
+</Tabs>
+
+**Event data**
+- [ConsoleMessage]
+
+---
+
 ### on("page") {#browser-context-event-page}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>browserContext.on("page")</x-search>
