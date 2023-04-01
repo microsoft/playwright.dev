@@ -2381,93 +2381,6 @@ Console.WriteLine(await popup.TitleAsync()); // popup is ready to use.
 
 ---
 
-### WaitForSelectorAsync {#page-wait-for-selector}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.WaitForSelectorAsync</x-search>
-
-Returns when element specified by selector satisfies `state` option. Returns `null` if waiting for `hidden` or `detached`.
-
-:::note
-Playwright automatically waits for element to be ready before performing an action. Using [Locator] objects and web-first assertions makes the code wait-for-selector-free.
-:::
-
-Wait for the `selector` to satisfy `state` option (either appear/disappear from dom, or become visible/hidden). If at the moment of calling the method `selector` already satisfies the condition, the method will return immediately. If the selector doesn't satisfy the condition for the `timeout` milliseconds, the function will throw.
-
-**Usage**
-
-This method works across navigations:
-
-```csharp
-using Microsoft.Playwright;
-using System;
-using System.Threading.Tasks;
-
-class FrameExamples
-{
-  public static async Task Images()
-  {
-      using var playwright = await Playwright.CreateAsync();
-      await using var browser = await playwright.Chromium.LaunchAsync();
-      var page = await browser.NewPageAsync();
-
-      foreach (var currentUrl in new[] { "https://www.google.com", "https://bbc.com" })
-      {
-          await page.GotoAsync(currentUrl);
-          var element = await page.WaitForSelectorAsync("img");
-          Console.WriteLine($"Loaded image: {await element.GetAttributeAsync("src")}");
-      }
-
-      await browser.CloseAsync();
-  }
-}
-```
-
-**Arguments**
-- `selector` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-selector-option-selector"/><a href="#page-wait-for-selector-option-selector" class="list-anchor">#</a>
-  
-  A selector to query for.
-- `options` `PageWaitForSelectorOptions?` *(optional)*
-  - `State` `enum WaitForSelectorState { Attached, Detached, Visible, Hidden }?` *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-selector-option-state"/><a href="#page-wait-for-selector-option-state" class="list-anchor">#</a>
-    
-    Defaults to `'visible'`. Can be either:
-    * `'attached'` - wait for element to be present in DOM.
-    * `'detached'` - wait for element to not be present in DOM.
-    * `'visible'` - wait for element to have non-empty bounding box and no `visibility:hidden`. Note that element without any content or with `display:none` has an empty bounding box and is not considered visible.
-    * `'hidden'` - wait for element to be either detached from DOM, or have an empty bounding box or `visibility:hidden`. This is opposite to the `'visible'` option.
-  - `Strict` [bool]? *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-selector-option-strict"/><a href="#page-wait-for-selector-option-strict" class="list-anchor">#</a>
-    
-    When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
-  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-selector-option-timeout"/><a href="#page-wait-for-selector-option-timeout" class="list-anchor">#</a>
-    
-    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-
-**Returns**
-- [ElementHandle]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-selector-return"/><a href="#page-wait-for-selector-return" class="list-anchor">#</a>
-
----
-
-### WaitForTimeoutAsync {#page-wait-for-timeout}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.WaitForTimeoutAsync</x-search>
-
-Waits for the given `timeout` in milliseconds.
-
-Note that `page.waitForTimeout()` should only be used for debugging. Tests using the timer in production are going to be flaky. Use signals such as network events, selectors becoming visible and others instead.
-
-**Usage**
-
-```csharp
-// Wait for 1 second
-await page.WaitForTimeoutAsync(1000);
-```
-
-**Arguments**
-- `timeout` [float]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-timeout-option-timeout"/><a href="#page-wait-for-timeout-option-timeout" class="list-anchor">#</a>
-  
-  A timeout to wait for
-
----
-
 ### WaitForURLAsync {#page-wait-for-url}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>page.WaitForURLAsync</x-search>
@@ -4446,6 +4359,107 @@ await Page.UncheckAsync(selector, options);
   - `Trial` [bool]? *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-uncheck-option-trial"/><a href="#page-uncheck-option-trial" class="list-anchor">#</a>
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
+
+---
+
+### WaitForSelectorAsync {#page-wait-for-selector}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.WaitForSelectorAsync</x-search>
+
+:::caution Discouraged
+
+Use web assertions that assert visibility or a locator-based [Locator.WaitForAsync()](/api/class-locator.mdx#locator-wait-for) instead. Read more about [locators](../locators.mdx).
+
+:::
+
+
+Returns when element specified by selector satisfies `state` option. Returns `null` if waiting for `hidden` or `detached`.
+
+:::note
+Playwright automatically waits for element to be ready before performing an action. Using [Locator] objects and web-first assertions makes the code wait-for-selector-free.
+:::
+
+Wait for the `selector` to satisfy `state` option (either appear/disappear from dom, or become visible/hidden). If at the moment of calling the method `selector` already satisfies the condition, the method will return immediately. If the selector doesn't satisfy the condition for the `timeout` milliseconds, the function will throw.
+
+**Usage**
+
+This method works across navigations:
+
+```csharp
+using Microsoft.Playwright;
+using System;
+using System.Threading.Tasks;
+
+class FrameExamples
+{
+  public static async Task Images()
+  {
+      using var playwright = await Playwright.CreateAsync();
+      await using var browser = await playwright.Chromium.LaunchAsync();
+      var page = await browser.NewPageAsync();
+
+      foreach (var currentUrl in new[] { "https://www.google.com", "https://bbc.com" })
+      {
+          await page.GotoAsync(currentUrl);
+          var element = await page.WaitForSelectorAsync("img");
+          Console.WriteLine($"Loaded image: {await element.GetAttributeAsync("src")}");
+      }
+
+      await browser.CloseAsync();
+  }
+}
+```
+
+**Arguments**
+- `selector` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-selector-option-selector"/><a href="#page-wait-for-selector-option-selector" class="list-anchor">#</a>
+  
+  A selector to query for.
+- `options` `PageWaitForSelectorOptions?` *(optional)*
+  - `State` `enum WaitForSelectorState { Attached, Detached, Visible, Hidden }?` *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-selector-option-state"/><a href="#page-wait-for-selector-option-state" class="list-anchor">#</a>
+    
+    Defaults to `'visible'`. Can be either:
+    * `'attached'` - wait for element to be present in DOM.
+    * `'detached'` - wait for element to not be present in DOM.
+    * `'visible'` - wait for element to have non-empty bounding box and no `visibility:hidden`. Note that element without any content or with `display:none` has an empty bounding box and is not considered visible.
+    * `'hidden'` - wait for element to be either detached from DOM, or have an empty bounding box or `visibility:hidden`. This is opposite to the `'visible'` option.
+  - `Strict` [bool]? *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-selector-option-strict"/><a href="#page-wait-for-selector-option-strict" class="list-anchor">#</a>
+    
+    When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-selector-option-timeout"/><a href="#page-wait-for-selector-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Returns**
+- [ElementHandle]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-selector-return"/><a href="#page-wait-for-selector-return" class="list-anchor">#</a>
+
+---
+
+### WaitForTimeoutAsync {#page-wait-for-timeout}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.WaitForTimeoutAsync</x-search>
+
+:::caution Discouraged
+
+Never wait for timeout in production. Tests that wait for time are inherently flaky. Use [Locator] actions and web assertions that wait automatically.
+
+:::
+
+
+Waits for the given `timeout` in milliseconds.
+
+Note that `page.waitForTimeout()` should only be used for debugging. Tests using the timer in production are going to be flaky. Use signals such as network events, selectors becoming visible and others instead.
+
+**Usage**
+
+```csharp
+// Wait for 1 second
+await page.WaitForTimeoutAsync(1000);
+```
+
+**Arguments**
+- `timeout` [float]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-timeout-option-timeout"/><a href="#page-wait-for-timeout-option-timeout" class="list-anchor">#</a>
+  
+  A timeout to wait for
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
