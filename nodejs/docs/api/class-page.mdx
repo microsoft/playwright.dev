@@ -2094,9 +2094,9 @@ page.on('close', data => {});
 
 Emitted when JavaScript within the page calls one of console API methods, e.g. `console.log` or `console.dir`. Also emitted if the page throws an error or a warning.
 
-The arguments passed into `console.log` are available on the [ConsoleMessage] event handler argument.
+The arguments passed into `console.log` appear as arguments on the event handler.
 
-**Usage**
+An example of handling `console` event:
 
 ```js
 page.on('console', async msg => {
@@ -2105,7 +2105,13 @@ page.on('console', async msg => {
     values.push(await arg.jsonValue());
   console.log(...values);
 });
-await page.evaluate(() => console.log('hello', 5, { foo: 'bar' }));
+await page.evaluate(() => console.log('hello', 5, {foo: 'bar'}));
+```
+
+**Usage**
+
+```js
+page.on('console', data => {});
 ```
 
 **Event data**
@@ -2149,8 +2155,6 @@ page.on('crash', data => {});
 
 Emitted when a JavaScript dialog appears, such as `alert`, `prompt`, `confirm` or `beforeunload`. Listener **must** either [dialog.accept()](/api/class-dialog.mdx#dialog-accept) or [dialog.dismiss()](/api/class-dialog.mdx#dialog-dismiss) the dialog - otherwise the page will [freeze](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#never_blocking) waiting for the dialog, and actions like click will never finish.
 
-**Usage**
-
 ```js
 page.on('dialog', dialog => {
   dialog.accept();
@@ -2158,8 +2162,14 @@ page.on('dialog', dialog => {
 ```
 
 :::note
-When no [page.on('dialog')](/api/class-page.mdx#page-event-dialog) or [browserContext.on('dialog')](/api/class-browsercontext.mdx#browser-context-event-dialog) listeners are present, all dialogs are automatically dismissed.
+When no [page.on('dialog')](/api/class-page.mdx#page-event-dialog) listeners are present, all dialogs are automatically dismissed.
 :::
+
+**Usage**
+
+```js
+page.on('dialog', data => {});
+```
 
 **Event data**
 - [Dialog]
