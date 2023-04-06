@@ -471,9 +471,18 @@ page.getByRole(AriaRole.LISTITEM)
     .click();
 ```
 
+Alternatively, filter by **not having** text:
+
+```java
+// 5 in-stock items
+assertThat(page.getByRole(AriaRole.LISTITEM)
+    .filter(new Locator.FilterOptions().setHasNotText("Out of stock")))
+    .hasCount(5);
+```
+
 ### Filter by child/descendant
 
-Locators support an option to only select elements that have a descendant matching another locator. You can therefore filter by any other locator such as a [Locator.getByRole()](/api/class-locator.mdx#locator-get-by-role), [Locator.getByTestId()](/api/class-locator.mdx#locator-get-by-test-id), [Locator.getByText()](/api/class-locator.mdx#locator-get-by-text) etc.
+Locators support an option to only select elements that have or have not a descendant matching another locator. You can therefore filter by any other locator such as a [Locator.getByRole()](/api/class-locator.mdx#locator-get-by-role), [Locator.getByTestId()](/api/class-locator.mdx#locator-get-by-test-id), [Locator.getByText()](/api/class-locator.mdx#locator-get-by-text) etc.
 
 <HTMLCard>
 <div>
@@ -522,23 +531,16 @@ assertThat(page
     .hasCount(1);
 ```
 
+We can also filter by **not having** a matching element inside
+
+```java
+assertThat(page
+    .getByRole(AriaRole.LISTITEM)
+    .filter(new Locator.FilterOptions().setHasNot(page.getByText("Product 2")))
+    .hasCount(1);
+```
+
 Note that the inner locator is matched starting from the outer one, not from the document root.
-
-### Filter by matching an additional locator
-
-Method [Locator.and()](/api/class-locator.mdx#locator-and) narrows down an existing locator by matching an additional locator. For example, you can combine [Page.getByRole()](/api/class-page.mdx#page-get-by-role) and [Page.getByTitle()](/api/class-page.mdx#page-get-by-title) to match by both role and title.
-
-```java
-Locator button = page.getByRole(AriaRole.BUTTON).and(page.getByTitle("Subscribe"));
-```
-
-### Filter by **not** matching an additional locator
-
-Method [Locator.not()](/api/class-locator.mdx#locator-not) narrows down an existing locator by ensuring that target element **does not match** an additional locator. For example, you can combine [Page.getByRole()](/api/class-page.mdx#page-get-by-role) and [Page.getByTitle()](/api/class-page.mdx#page-get-by-title) to match by role and ensure that title does not match.
-
-```java
-Locator button = page.getByRole(AriaRole.BUTTON).not(page.getByTitle("Subscribe"));
-```
 
 ## Chaining Locators
 

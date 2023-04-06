@@ -468,9 +468,17 @@ await page
     .ClickAsync();
 ```
 
+Alternatively, filter by **not having** text:
+
+```csharp
+// 5 in-stock items
+await Expect(page.getByRole(AriaRole.Listitem).Filter(new() { HasNotText = "Out of stock" }))
+    .ToHaveCountAsync(5);
+```
+
 ### Filter by child/descendant
 
-Locators support an option to only select elements that have a descendant matching another locator. You can therefore filter by any other locator such as a [Locator.GetByRole()](/api/class-locator.mdx#locator-get-by-role), [Locator.GetByTestId()](/api/class-locator.mdx#locator-get-by-test-id), [Locator.GetByText()](/api/class-locator.mdx#locator-get-by-text) etc.
+Locators support an option to only select elements that have or have not a descendant matching another locator. You can therefore filter by any other locator such as a [Locator.GetByRole()](/api/class-locator.mdx#locator-get-by-role), [Locator.GetByTestId()](/api/class-locator.mdx#locator-get-by-test-id), [Locator.GetByText()](/api/class-locator.mdx#locator-get-by-text) etc.
 
 <HTMLCard>
 <div>
@@ -523,23 +531,18 @@ await Expect(page
     .toHaveCountAsync(1);
 ```
 
+We can also filter by **not having** a matching element inside
+
+```csharp
+await Expect(page
+    .GetByRole(AriaRole.Listitem)
+    .Filter(new() {
+        HasNot = page.GetByRole(AriaRole.Heading, new() { Name = "Product 2" })
+    })
+    .toHaveCountAsync(1);
+```
+
 Note that the inner locator is matched starting from the outer one, not from the document root.
-
-### Filter by matching an additional locator
-
-Method [Locator.And()](/api/class-locator.mdx#locator-and) narrows down an existing locator by matching an additional locator. For example, you can combine [Page.GetByRole()](/api/class-page.mdx#page-get-by-role) and [Page.GetByTitle()](/api/class-page.mdx#page-get-by-title) to match by both role and title.
-
-```csharp
-var button = page.GetByRole(AriaRole.Button).And(page.GetByTitle("Subscribe"));
-```
-
-### Filter by **not** matching an additional locator
-
-Method [Locator.Not()](/api/class-locator.mdx#locator-not) narrows down an existing locator by ensuring that target element **does not match** an additional locator. For example, you can combine [Page.GetByRole()](/api/class-page.mdx#page-get-by-role) and [Page.GetByTitle()](/api/class-page.mdx#page-get-by-title) to match by role and ensure that title does not match.
-
-```csharp
-var button = page.GetByRole(AriaRole.Button).Not(page.GetByTitle("Subscribe"));
-```
 
 ## Chaining Locators
 
