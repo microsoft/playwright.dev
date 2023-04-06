@@ -465,9 +465,16 @@ await page
     .click();
 ```
 
+Alternatively, filter by **not having** text:
+
+```js
+// 5 in-stock items
+await expect(page.getByRole('listitem').filter({ hasNotText: 'Out of stock' })).toHaveCount(5);
+```
+
 ### Filter by child/descendant
 
-Locators support an option to only select elements that have a descendant matching another locator. You can therefore filter by any other locator such as a [locator.getByRole()](/api/class-locator.mdx#locator-get-by-role), [locator.getByTestId()](/api/class-locator.mdx#locator-get-by-test-id), [locator.getByText()](/api/class-locator.mdx#locator-get-by-text) etc.
+Locators support an option to only select elements that have or have not a descendant matching another locator. You can therefore filter by any other locator such as a [locator.getByRole()](/api/class-locator.mdx#locator-get-by-role), [locator.getByTestId()](/api/class-locator.mdx#locator-get-by-test-id), [locator.getByText()](/api/class-locator.mdx#locator-get-by-text) etc.
 
 <HTMLCard>
 <div>
@@ -514,23 +521,16 @@ await expect(page
     .toHaveCount(1);
 ```
 
+We can also filter by **not having** a matching element inside
+
+```js
+await expect(page
+    .getByRole('listitem')
+    .filter({ hasNot: page.getByText('Product 2') }))
+    .toHaveCount(1);
+```
+
 Note that the inner locator is matched starting from the outer one, not from the document root.
-
-### Filter by matching an additional locator
-
-Method [locator.and()](/api/class-locator.mdx#locator-and) narrows down an existing locator by matching an additional locator. For example, you can combine [page.getByRole()](/api/class-page.mdx#page-get-by-role) and [page.getByTitle()](/api/class-page.mdx#page-get-by-title) to match by both role and title.
-
-```js
-const button = page.getByRole('button').and(page.getByTitle('Subscribe'));
-```
-
-### Filter by **not** matching an additional locator
-
-Method [locator.not()](/api/class-locator.mdx#locator-not) narrows down an existing locator by ensuring that target element **does not match** an additional locator. For example, you can combine [page.getByRole()](/api/class-page.mdx#page-get-by-role) and [page.getByTitle()](/api/class-page.mdx#page-get-by-title) to match by role and ensure that title does not match.
-
-```js
-const button = page.getByRole('button').not(page.getByTitle('Subscribe'));
-```
 
 ## Chaining Locators
 

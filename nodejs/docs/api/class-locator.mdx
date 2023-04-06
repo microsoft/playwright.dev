@@ -70,30 +70,6 @@ const texts = await page.getByRole('link').allTextContents();
 
 ---
 
-### and {#locator-and}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.33</font><x-search>locator.and</x-search>
-
-Creates a locator that matches both this locator and the argument locator.
-
-**Usage**
-
-The following example finds a button with a specific title.
-
-```js
-const button = page.getByRole('button').and(page.getByTitle('Subscribe'));
-```
-
-**Arguments**
-- `locator` [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-and-option-locator"/><a href="#locator-and-option-locator" class="list-anchor">#</a>
-  
-  Additional locator to match.
-
-**Returns**
-- [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-and-return"/><a href="#locator-and-return" class="list-anchor">#</a>
-
----
-
 ### blur {#locator-blur}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.28</font><x-search>locator.blur</x-search>
@@ -679,6 +655,14 @@ await rowLocator
     Matches elements containing an element that matches an inner locator. Inner locator is queried against the outer one. For example, `article` that has `text=Playwright` matches `<article><div>Playwright</div></article>`.
     
     Note that outer and inner locators must belong to the same frame. Inner locator must not contain [FrameLocator]s.
+  - `hasNot` [Locator] *(optional)* <font size="2">Added in: v1.33</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-filter-option-has-not"/><a href="#locator-filter-option-has-not" class="list-anchor">#</a>
+    
+    Matches elements that do not contain an element that matches an inner locator. Inner locator is queried against the outer one. For example, `article` that does not have `div` matches `<article><span>Playwright</span></article>`.
+    
+    Note that outer and inner locators must belong to the same frame. Inner locator must not contain [FrameLocator]s.
+  - `hasNotText` [string]|[RegExp] *(optional)* <font size="2">Added in: v1.33</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-filter-option-has-not-text"/><a href="#locator-filter-option-has-not-text" class="list-anchor">#</a>
+    
+    Matches elements that do not contain specified text somewhere inside, possibly in a child or a descendant element. When passed a [string], matching is case-insensitive and searches for a substring.
   - `hasText` [string]|[RegExp] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-filter-option-has-text"/><a href="#locator-filter-option-has-text" class="list-anchor">#</a>
     
     Matches elements containing specified text somewhere inside, possibly in a child or a descendant element. When passed a [string], matching is case-insensitive and searches for a substring. For example, `"Playwright"` matches `<article><div>Playwright</div></article>`.
@@ -1429,36 +1413,20 @@ locator.locator(selectorOrLocator, options);
     Matches elements containing an element that matches an inner locator. Inner locator is queried against the outer one. For example, `article` that has `text=Playwright` matches `<article><div>Playwright</div></article>`.
     
     Note that outer and inner locators must belong to the same frame. Inner locator must not contain [FrameLocator]s.
+  - `hasNot` [Locator] *(optional)* <font size="2">Added in: v1.33</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-locator-option-has-not"/><a href="#locator-locator-option-has-not" class="list-anchor">#</a>
+    
+    Matches elements that do not contain an element that matches an inner locator. Inner locator is queried against the outer one. For example, `article` that does not have `div` matches `<article><span>Playwright</span></article>`.
+    
+    Note that outer and inner locators must belong to the same frame. Inner locator must not contain [FrameLocator]s.
+  - `hasNotText` [string]|[RegExp] *(optional)* <font size="2">Added in: v1.33</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-locator-option-has-not-text"/><a href="#locator-locator-option-has-not-text" class="list-anchor">#</a>
+    
+    Matches elements that do not contain specified text somewhere inside, possibly in a child or a descendant element. When passed a [string], matching is case-insensitive and searches for a substring.
   - `hasText` [string]|[RegExp] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-locator-option-has-text"/><a href="#locator-locator-option-has-text" class="list-anchor">#</a>
     
     Matches elements containing specified text somewhere inside, possibly in a child or a descendant element. When passed a [string], matching is case-insensitive and searches for a substring. For example, `"Playwright"` matches `<article><div>Playwright</div></article>`.
 
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-locator-return"/><a href="#locator-locator-return" class="list-anchor">#</a>
-
----
-
-### not {#locator-not}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.33</font><x-search>locator.not</x-search>
-
-Creates a locator that **matches this** locator, but **not the argument** locator.
-
-**Usage**
-
-The following example finds a button that does not have title `"Subscribe"`.
-
-```js
-const button = page.getByRole('button').not(page.getByTitle('Subscribe'));
-```
-
-**Arguments**
-- `locator` [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-not-option-locator"/><a href="#locator-not-option-locator" class="list-anchor">#</a>
-  
-  Locator that must not match.
-
-**Returns**
-- [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-not-return"/><a href="#locator-not-return" class="list-anchor">#</a>
 
 ---
 
@@ -1490,11 +1458,15 @@ Creates a locator that matches either of the two locators.
 
 **Usage**
 
-If your page shows a username input that is labelled either `Username` or `Login`, depending on some external factors you do not control, you can match both.
+Consider a scenario where you'd like to click on a "New email" button, but sometimes a security settings dialog shows up instead. In this case, you can wait for either a "New email" button, or a dialog and act accordingly.
 
 ```js
-const input = page.getByLabel('Username').or(page.getByLabel('Login'));
-await input.fill('John');
+const newEmail = page.getByRole('button', { name: 'New' });
+const dialog = page.getByText('Confirm security settings');
+await expect(newEmail.or(dialog)).toBeVisible();
+if (await dialog.isVisible())
+  await page.getByRole('button', { name: 'Dismiss' }).click();
+await newEmail.click();
 ```
 
 **Arguments**
