@@ -77,11 +77,12 @@ jobs:
     name: Auto Merge
     runs-on: ubuntu-latest
     needs: [build_and_deploy_job, test]
-    if: github.event_name == 'push' && github.repository == 'microsoft/playwright.dev' && startsWith(github.ref, 'refs/heads/roll/')
+    if: github.repository == 'microsoft/playwright.dev' && startsWith(github.head_ref, 'roll/')
     steps:
       - name: Merge pull request
         uses: actions/github-script@v6
         with:
+          github-token: ${{ secrets.GH_SERVICE_ACCOUNT_TOKEN }}
           script: |
             await github.rest.pulls.merge({
               owner: context.repo.owner,
