@@ -36,6 +36,8 @@ if (path) {
     { from: '/docs/next/cli', to: '/docs/next/browsers' },
     { from: '/docs/test-advanced', to: '/docs/test-configuration' },
     { from: '/docs/next/test-advanced', to: '/docs/next/test-configuration' },
+    { from: '/docs/test-api-testing', to: '/docs/api-testing' },
+    { from: '/docs/next/test-api-testing', to: '/docs/next/api-testing' },
     // ------------------- python ---------------------
     { from: '/python/docs/assertions', to: '/python/docs/api/class-playwrightassertions' },
     { from: '/python/next/docs/assertions', to: '/python/next/docs/api/class-playwrightassertions' },
