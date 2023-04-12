@@ -46,7 +46,7 @@ module.exports = {
         { type: 'doc', id: 'accessibility-testing' },
         { type: 'doc', id: 'input' },
         { type: 'doc', id: 'test-assertions' },
-        { type: 'doc', id: 'test-api-testing' },
+        { type: 'doc', id: 'api-testing' },
         { type: 'doc', id: 'auth' },
         { type: 'doc', id: 'actionability' },
         { type: 'doc', id: 'best-practices' },
