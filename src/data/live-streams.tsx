@@ -1,5 +1,13 @@
 const liveStreams = [
   {
+    title: 'Introduction to Playwright for End-to-End Testing',
+    description: '',
+    id: 'lCb9JoZFpHI',
+    year: '2023',
+    host: 'This Dot Media',
+    speakers: ["Debbie O'Brien"]
+  },
+  {
     title: 'Playwright cross browser automated testing',
     description: '',
     id: 'jorsD4lInwA',
