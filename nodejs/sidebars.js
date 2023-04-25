@@ -9,6 +9,7 @@ module.exports = {
         { type: 'doc', id: 'running-tests' },
         { type: 'doc', id: 'codegen-intro' },
         { type: 'doc', id: 'trace-viewer-intro' },
+        { type: 'doc', id: 'test-ui-mode' },
         { type: 'doc', id: 'ci-intro' },
       ],
       collapsed: false
@@ -34,6 +35,7 @@ module.exports = {
         { type: 'doc', id: 'test-retries' },
         { type: 'doc', id: 'test-timeouts' },
         { type: 'doc', id: 'test-typescript' },
+        { type: 'doc', id: 'test-ui-mode' },
         { type: 'doc', id: 'test-webserver' },
       ],
       collapsed: false
