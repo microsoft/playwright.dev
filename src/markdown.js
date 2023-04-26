@@ -81,13 +81,14 @@ function flattenWrappedLines(content) {
     const trimmedLine = line.trim();
     const singleLineExpression = line.startsWith('#');
     const codeBlockBoundary = trimmedLine.startsWith('```') || trimmedLine.startsWith('---') || trimmedLine.startsWith(':::');
+    const trimCharacters = ['1.', '<', '>', '|', '-', '*'];
+    const checkCharacters = ( charArray, charValue ) =>{
+      return charArray.some(function (arrayValue) {
+        return charValue === arrayValue;
+      });
+    };
     let flushLastParagraph = !trimmedLine
-      || trimmedLine.startsWith('1.')
-      || trimmedLine.startsWith('<')
-      || trimmedLine.startsWith('>')
-      || trimmedLine.startsWith('|')
-      || trimmedLine.startsWith('-')
-      || trimmedLine.startsWith('*')
+      || checkCharacters( trimCharacters, trimmedLine )
       || line.match(/\[[^\]]+\]:.*/)
       || singleLineExpression;
     if (codeBlockBoundary) {
