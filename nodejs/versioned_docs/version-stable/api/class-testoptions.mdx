@@ -46,13 +46,19 @@ test('my portrait test', async ({ page }) => {
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.acceptDownloads</x-search>
 
-Whether to automatically download all the attachments. Defaults to `true` where all the downloads are accepted.
-
 **Usage**
 
 ```js
-testOptions.acceptDownloads
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    acceptDownloads: false,
+  },
+});
 ```
+
+Whether to automatically download all the attachments. Defaults to `true` where all the downloads are accepted.
 
 **Type**
 - [boolean]
@@ -67,13 +73,20 @@ Default timeout for each Playwright action in milliseconds, defaults to 0 (no ti
 
 This is a default timeout for all Playwright actions, same as configured via [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
 
-Learn more about [various timeouts](../test-timeouts.mdx).
-
 **Usage**
 
 ```js
-testOptions.actionTimeout
+import { defineConfig, devices } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    /* Maximum time each action such as `click()` can take. Defaults to 0 (no limit). */
+    actionTimeout: 0,
+  },
+});
 ```
+
+Learn more about [various timeouts](../test-timeouts.mdx).
 
 **Type**
 - [number]
@@ -84,16 +97,23 @@ testOptions.actionTimeout
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.baseURL</x-search>
 
+**Usage**
+
+```js
+import { defineConfig, devices } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    /* Base URL to use in actions like `await page.goto('/')`. */
+    baseURL: 'http://localhost:3000',
+  },
+});
+```
+
 When using [page.goto()](/api/class-page.mdx#page-goto), [page.route()](/api/class-page.mdx#page-route), [page.waitForURL()](/api/class-page.mdx#page-wait-for-url), [page.waitForRequest()](/api/class-page.mdx#page-wait-for-request), or [page.waitForResponse()](/api/class-page.mdx#page-wait-for-response) it takes the base URL in consideration by using the [`URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor for building the corresponding URL. Examples:
 * baseURL: `http://localhost:3000` and navigating to `/bar.html` results in `http://localhost:3000/bar.html`
 * baseURL: `http://localhost:3000/foo/` and navigating to `./bar.html` results in `http://localhost:3000/foo/bar.html`
 * baseURL: `http://localhost:3000/foo` (without trailing slash) and navigating to `./bar.html` results in `http://localhost:3000/bar.html`
-
-**Usage**
-
-```js
-testOptions.baseURL
-```
 
 **Type**
 - [string]
@@ -106,6 +126,8 @@ testOptions.baseURL
 
 Name of the browser that runs tests. Defaults to `'chromium'`. Most of the time you should set `browserName` in your [TestConfig]:
 
+**Usage**
+
 ```js
 // playwright.config.ts
 import { defineConfig, devices } from '@playwright/test';
@@ -117,12 +139,6 @@ export default defineConfig({
 });
 ```
 
-**Usage**
-
-```js
-testOptions.browserName
-```
-
 **Type**
 - "chromium"|"firefox"|"webkit"
 
@@ -132,13 +148,19 @@ testOptions.browserName
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.bypassCSP</x-search>
 
-Toggles bypassing page's Content-Security-Policy.
-
 **Usage**
 
 ```js
-testOptions.bypassCSP
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    bypassCSP: true,
+  }
+});
 ```
+
+Toggles bypassing page's Content-Security-Policy.
 
 **Type**
 - [boolean]
@@ -149,13 +171,25 @@ testOptions.bypassCSP
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.channel</x-search>
 
-Browser distribution channel.  Supported values are "chrome", "chrome-beta", "chrome-dev", "chrome-canary", "msedge", "msedge-beta", "msedge-dev", "msedge-canary". Read more about using [Google Chrome and Microsoft Edge](../browsers.mdx#google-chrome--microsoft-edge).
-
 **Usage**
 
 ```js
-testOptions.channel
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  projects: [
+    {
+      name: 'Microsoft Edge',
+      use: { 
+        ...devices['Desktop Edge'], 
+        channel: 'msedge' 
+      },
+    },
+  ]
+});
 ```
+
+Browser distribution channel.  Supported values are "chrome", "chrome-beta", "chrome-dev", "chrome-canary", "msedge", "msedge-beta", "msedge-dev", "msedge-canary". Read more about using [Google Chrome and Microsoft Edge](../browsers.mdx#google-chrome--microsoft-edge).
 
 **Type**
 - [string]
@@ -166,13 +200,19 @@ testOptions.channel
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.colorScheme</x-search>
 
-Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [page.emulateMedia()](/api/class-page.mdx#page-emulate-media) for more details. Passing `null` resets emulation to system defaults. Defaults to `'light'`.
-
 **Usage**
 
 ```js
-testOptions.colorScheme
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    colorScheme: 'dark',
+  },
+});
 ```
+
+Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [page.emulateMedia()](/api/class-page.mdx#page-emulate-media) for more details. Passing `null` resets emulation to system defaults. Defaults to `'light'`.
 
 **Type**
 - [null]|"light"|"dark"|"no-preference"
@@ -183,13 +223,21 @@ testOptions.colorScheme
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.connectOptions</x-search>
 
-When connect options are specified, default [fixtures.browser](/api/class-fixtures.mdx#fixtures-browser), [fixtures.context](/api/class-fixtures.mdx#fixtures-context) and [fixtures.page](/api/class-fixtures.mdx#fixtures-page) use the remote browser instead of launching a browser locally, and any launch options like [testOptions.headless](/api/class-testoptions.mdx#test-options-headless) or [testOptions.channel](/api/class-testoptions.mdx#test-options-channel) are ignored.
-
 **Usage**
 
 ```js
-testOptions.connectOptions
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    connectOptions: {
+      wsEndpoint: 'ws://localhost:5678',
+    },
+  },
+});
 ```
+
+When connect options are specified, default [fixtures.browser](/api/class-fixtures.mdx#fixtures-browser), [fixtures.context](/api/class-fixtures.mdx#fixtures-context) and [fixtures.page](/api/class-fixtures.mdx#fixtures-page) use the remote browser instead of launching a browser locally, and any launch options like [testOptions.headless](/api/class-testoptions.mdx#test-options-headless) or [testOptions.channel](/api/class-testoptions.mdx#test-options-channel) are ignored.
 
 **Type**
 - [void]|[Object]
@@ -214,7 +262,15 @@ Options used to create the context, as passed to [browser.newContext()](/api/cla
 **Usage**
 
 ```js
-testOptions.contextOptions
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    contextOptions: {
+      reducedMotion: 'reduce',
+    },
+  },
+});
 ```
 
 **Type**
@@ -226,13 +282,20 @@ testOptions.contextOptions
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.deviceScaleFactor</x-search>
 
-Specify device scale factor (can be thought of as dpr). Defaults to `1`.
-
 **Usage**
 
 ```js
-testOptions.deviceScaleFactor
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    viewport: { width: 2560, height: 1440 },
+    deviceScaleFactor: 2,
+  },
+});
 ```
+
+Specify device scale factor (can be thought of as dpr). Defaults to `1`. Learn more about [emulating devices with device scale factor](../emulation.mdx#devices).
 
 **Type**
 - [number]
@@ -243,13 +306,21 @@ testOptions.deviceScaleFactor
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.extraHTTPHeaders</x-search>
 
-An object containing additional HTTP headers to be sent with every request.
-
 **Usage**
 
 ```js
-testOptions.extraHTTPHeaders
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    extraHTTPHeaders: {
+      'X-My-Header': 'value',
+    },
+  },
+});
 ```
+
+An object containing additional HTTP headers to be sent with every request.
 
 **Type**
 - [Object]<[string], [string]>
@@ -263,8 +334,16 @@ testOptions.extraHTTPHeaders
 **Usage**
 
 ```js
-testOptions.geolocation
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    geolocation: { longitude: 12.492507, latitude: 41.889938 },
+  },
+});
 ```
+
+Learn more about [geolocation](../emulation.mdx#color-scheme-and-media).
 
 **Type**
 - [Object]
@@ -284,13 +363,19 @@ testOptions.geolocation
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.hasTouch</x-search>
 
-Specifies if viewport supports touch events. Defaults to false.
-
 **Usage**
 
 ```js
-testOptions.hasTouch
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    hasTouch: true
+  },
+});
 ```
+
+Specifies if viewport supports touch events. Defaults to false. Learn more about [mobile emulation](../emulation.mdx#devices).
 
 **Type**
 - [boolean]
@@ -301,13 +386,19 @@ testOptions.hasTouch
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.headless</x-search>
 
-Whether to run browser in headless mode. More details for [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) and [Firefox](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode). Defaults to `true` unless the `devtools` option is `true`.
-
 **Usage**
 
 ```js
-testOptions.headless
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    headless: false
+  },
+});
 ```
+
+Whether to run browser in headless mode. More details for [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) and [Firefox](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode). Defaults to `true` unless the `devtools` option is `true`.
 
 **Type**
 - [boolean]
@@ -318,13 +409,22 @@ testOptions.headless
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.httpCredentials</x-search>
 
-Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).
-
 **Usage**
 
 ```js
-testOptions.httpCredentials
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    httpCredentials: {
+      username: 'user',
+      password: 'pass',
+    },
+  },
+});
 ```
+
+Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). If no origin is specified, the username and password are sent to any servers upon unauthorized responses.
 
 **Type**
 - [Object]
@@ -334,19 +434,29 @@ testOptions.httpCredentials
   - `password` [string]
     
     
+  - `origin` [string] *(optional)*
+    
+    Restrain sending http credentials on specific origin (scheme://host:port).
+
 ---
 
 ### ignoreHTTPSErrors {#test-options-ignore-https-errors}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.ignoreHTTPSErrors</x-search>
 
-Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.
-
 **Usage**
 
 ```js
-testOptions.ignoreHTTPSErrors
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    ignoreHTTPSErrors: true,
+  },
+});
 ```
+
+Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.
 
 **Type**
 - [boolean]
@@ -357,13 +467,19 @@ testOptions.ignoreHTTPSErrors
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.isMobile</x-search>
 
-Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.
-
 **Usage**
 
 ```js
-testOptions.isMobile
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    isMobile: false,
+  },
+});
 ```
+
+Whether the `meta viewport` tag is taken into account and touch events are enabled. isMobile is a part of device, so you don't actually need to set it manually. Defaults to `false` and is not supported in Firefox. Learn more about [mobile emulation](../emulation.mdx#isMobile).
 
 **Type**
 - [boolean]
@@ -374,13 +490,19 @@ testOptions.isMobile
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.javaScriptEnabled</x-search>
 
-Whether or not to enable JavaScript in the context. Defaults to `true`.
-
 **Usage**
 
 ```js
-testOptions.javaScriptEnabled
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    javaScriptEnabled: false,
+  },
+});
 ```
+
+Whether or not to enable JavaScript in the context. Defaults to `true`. Learn more about [disabling JavaScript](../emulation.mdx#javascript-enabled).
 
 **Type**
 - [boolean]
@@ -396,7 +518,19 @@ Options used to launch the browser, as passed to [browserType.launch()](/api/cla
 **Usage**
 
 ```js
-testOptions.launchOptions
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  projects: [
+    {
+      name: 'chromium',
+      use: { ...devices['Desktop Chrome'] },
+      launchOptions: {
+        args: ['--start-maximized'],
+    },
+    }
+  ]
+});
 ```
 
 **Type**
@@ -408,13 +542,19 @@ testOptions.launchOptions
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.locale</x-search>
 
-Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
-
 **Usage**
 
 ```js
-testOptions.locale
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    locale: 'it-IT',
+  },
+});
 ```
+
+Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules. Learn more about emulation in our [emulation guide](../emulation.mdx#locale--timezone).
 
 **Type**
 - [string]
@@ -429,13 +569,19 @@ Timeout for each navigation action in milliseconds. Defaults to 0 (no timeout).
 
 This is a default navigation timeout, same as configured via [page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout).
 
-Learn more about [various timeouts](../test-timeouts.mdx).
-
 **Usage**
 
 ```js
-testOptions.navigationTimeout
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    navigationTimeout: 3000,
+  },
+});
 ```
+
+Learn more about [various timeouts](../test-timeouts.mdx).
 
 **Type**
 - [number]
@@ -446,13 +592,19 @@ testOptions.navigationTimeout
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.offline</x-search>
 
-Whether to emulate network being offline. Defaults to `false`.
-
 **Usage**
 
 ```js
-testOptions.offline
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    offline: true
+  },
+});
 ```
+
+Whether to emulate network being offline. Defaults to `false`. Learn more about [network emulation](../emulation.mdx#offline).
 
 **Type**
 - [boolean]
@@ -463,13 +615,19 @@ testOptions.offline
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.permissions</x-search>
 
-A list of permissions to grant to all pages in this context. See [browserContext.grantPermissions()](/api/class-browsercontext.mdx#browser-context-grant-permissions) for more details.
-
 **Usage**
 
 ```js
-testOptions.permissions
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    permissions: ['notifications'],
+  },
+});
 ```
+
+A list of permissions to grant to all pages in this context. See [browserContext.grantPermissions()](/api/class-browsercontext.mdx#browser-context-grant-permissions) for more details.
 
 **Type**
 - [Array]<[string]>
@@ -480,13 +638,22 @@ testOptions.permissions
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.proxy</x-search>
 
-Network proxy settings.
-
 **Usage**
 
 ```js
-testOptions.proxy
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    proxy: {
+      server: 'http://myproxy.com:3128',
+      bypass: 'localhost',
+    },
+  },
+});
 ```
+
+Network proxy settings.
 
 **Type**
 - [Object]
@@ -514,13 +681,19 @@ Whether to automatically capture a screenshot after each test. Defaults to `'off
 * `'on'`: Capture screenshot after each test.
 * `'only-on-failure'`: Capture screenshot after each test failure.
 
-Learn more about [automatic screenshots](../test-configuration.mdx#automatic-screenshots).
-
 **Usage**
 
 ```js
-testOptions.screenshot
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    screenshot: 'only-on-failure',
+  },
+});
 ```
+
+Learn more about [automatic screenshots](../test-configuration.mdx#automatic-screenshots).
 
 **Type**
 - [Object]|"off"|"on"|"only-on-failure"
@@ -540,15 +713,21 @@ testOptions.screenshot
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.serviceWorkers</x-search>
 
-Whether to allow sites to register Service workers. Defaults to `'allow'`.
-* `'allow'`: [Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) can be registered.
-* `'block'`: Playwright will block all registration of Service Workers.
-
 **Usage**
 
 ```js
-testOptions.serviceWorkers
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    serviceWorkers: 'allow'
+  },
+});
 ```
+
+Whether to allow sites to register Service workers. Defaults to `'allow'`.
+* `'allow'`: [Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) can be registered.
+* `'block'`: Playwright will block all registration of Service Workers.
 
 **Type**
 - "allow"|"block"
@@ -559,13 +738,21 @@ testOptions.serviceWorkers
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.storageState</x-search>
 
-Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [browserContext.storageState()](/api/class-browsercontext.mdx#browser-context-storage-state). Either a path to the file with saved storage, or an object with the following fields:
-
 **Usage**
 
 ```js
-testOptions.storageState
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    storageState: 'storage-state.json',
+  },
+});
 ```
+
+Learn more about [storage state and auth](../auth.mdx).
+
+Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [browserContext.storageState()](/api/class-browsercontext.mdx#browser-context-storage-state). Either a path to the file with saved storage, or an object with the following fields:
 
 **Type**
 - [string]|[Object]
@@ -621,7 +808,13 @@ Custom attribute to be used in [page.getByTestId()](/api/class-page.mdx#page-get
 **Usage**
 
 ```js
-testOptions.testIdAttribute
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    testIdAttribute: 'pw-test-id',
+  },
+});
 ```
 
 ---
@@ -630,13 +823,19 @@ testOptions.testIdAttribute
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.timezoneId</x-search>
 
-Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.
-
 **Usage**
 
 ```js
-testOptions.timezoneId
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    timezoneId: 'Europe/Rome',
+  },
+});
 ```
+
+Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs.
 
 **Type**
 - [string]
@@ -652,20 +851,27 @@ Whether to record trace for each test. Defaults to `'off'`.
 * `'on'`: Record trace for each test.
 * `'retain-on-failure'`: Record trace for each test, but remove all traces from successful test runs.
 * `'on-first-retry'`: Record trace only when retrying a test for the first time.
+* `'on-all-retries'`: Record traces only when retrying for all retries.
 
 For more control, pass an object that specifies `mode` and trace features to enable.
-
-Learn more about [recording trace](../test-configuration.mdx#record-test-trace).
 
 **Usage**
 
 ```js
-testOptions.trace
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    trace: 'on-first-retry'
+  },
+});
 ```
+
+Learn more about [recording trace](../test-configuration.mdx#record-test-trace).
 
 **Type**
 - [Object]|"off"|"on"|"retain-on-failure"|"on-first-retry"
-  - `mode` "off"|"on"|"retain-on-failure"|"on-first-retry"
+  - `mode` "off"|"on"|"retain-on-failure"|"on-first-retry"|"on-all-retries"
     
     Trace recording mode.
   - `screenshots` [boolean] *(optional)*
@@ -684,13 +890,19 @@ testOptions.trace
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.userAgent</x-search>
 
-Specific user agent to use in this context.
-
 **Usage**
 
 ```js
-testOptions.userAgent
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    userAgent: 'some custom ua',
+  },
+});
 ```
+
+Specific user agent to use in this context.
 
 **Type**
 - [string]
@@ -709,13 +921,19 @@ Whether to record video for each test. Defaults to `'off'`.
 
 To control video size, pass an object with `mode` and `size` properties. If video size is not specified, it will be equal to [testOptions.viewport](/api/class-testoptions.mdx#test-options-viewport) scaled down to fit into 800x800. If `viewport` is not configured explicitly the video size defaults to 800x450. Actual picture of each page will be scaled down if necessary to fit the specified size.
 
-Learn more about [recording video](../test-configuration.mdx#record-video).
-
 **Usage**
 
 ```js
-testOptions.video
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    video: 'on-first-retry',
+  },
+});
 ```
+
+Learn more about [recording video](../test-configuration.mdx#record-video).
 
 **Type**
 - [Object]|"off"|"on"|"retain-on-failure"|"on-first-retry"
@@ -737,17 +955,23 @@ testOptions.video
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.viewport</x-search>
 
-Emulates consistent viewport for each page. Defaults to an 1280x720 viewport. Use `null` to disable the consistent viewport emulation.
+**Usage**
+
+```js
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    viewport: { width: 100, height: 100 },
+  },
+});
+```
+
+Emulates consistent viewport for each page. Defaults to an 1280x720 viewport.  Use `null` to disable the consistent viewport emulation. Learn more about [viewport emulation](../emulation#viewport).
 
 :::note
 The `null` value opts out from the default presets, makes viewport depend on the host window size defined by the operating system. It makes the execution of the tests non-deterministic.
 :::
-
-**Usage**
-
-```js
-testOptions.viewport
-```
 
 **Type**
 - [null]|[Object]

@@ -22,7 +22,9 @@ Locators are the central piece of Playwright's auto-waiting and retry-ability. I
 
 When locator points to a list of elements, returns array of locators, pointing to respective elements.
 
-Note that [Locator.all()](/api/class-locator.mdx#locator-all) does not wait for elements to match the locator, and instead immediately returns whatever is present in the page. To avoid flakiness when elements are loaded dynamically, wait for the loading to finish before calling [Locator.all()](/api/class-locator.mdx#locator-all).
+:::note
+[Locator.all()](/api/class-locator.mdx#locator-all) does not wait for elements to match the locator, and instead immediately returns whatever is present in the page.  When the list of elements changes dynamically, [Locator.all()](/api/class-locator.mdx#locator-all) will produce unpredictable and flaky results.  When the list of elements is stable, but loaded dynamically, wait for the full list to finish loading before calling [Locator.all()](/api/class-locator.mdx#locator-all).
+:::
 
 **Usage**
 
@@ -656,6 +658,14 @@ rowLocator
     Matches elements containing an element that matches an inner locator. Inner locator is queried against the outer one. For example, `article` that has `text=Playwright` matches `<article><div>Playwright</div></article>`.
     
     Note that outer and inner locators must belong to the same frame. Inner locator must not contain [FrameLocator]s.
+  - `setHasNot` [Locator] *(optional)* <font size="2">Added in: v1.33</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-filter-option-has-not"/><a href="#locator-filter-option-has-not" class="list-anchor">#</a>
+    
+    Matches elements that do not contain an element that matches an inner locator. Inner locator is queried against the outer one. For example, `article` that does not have `div` matches `<article><span>Playwright</span></article>`.
+    
+    Note that outer and inner locators must belong to the same frame. Inner locator must not contain [FrameLocator]s.
+  - `setHasNotText` [String]|[Pattern] *(optional)* <font size="2">Added in: v1.33</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-filter-option-has-not-text"/><a href="#locator-filter-option-has-not-text" class="list-anchor">#</a>
+    
+    Matches elements that do not contain specified text somewhere inside, possibly in a child or a descendant element. When passed a [string], matching is case-insensitive and searches for a substring.
   - `setHasText` [String]|[Pattern] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-filter-option-has-text"/><a href="#locator-filter-option-has-text" class="list-anchor">#</a>
     
     Matches elements containing specified text somewhere inside, possibly in a child or a descendant element. When passed a [string], matching is case-insensitive and searches for a substring. For example, `"Playwright"` matches `<article><div>Playwright</div></article>`.
@@ -1405,6 +1415,14 @@ Locator.locator(selectorOrLocator, options);
     Matches elements containing an element that matches an inner locator. Inner locator is queried against the outer one. For example, `article` that has `text=Playwright` matches `<article><div>Playwright</div></article>`.
     
     Note that outer and inner locators must belong to the same frame. Inner locator must not contain [FrameLocator]s.
+  - `setHasNot` [Locator] *(optional)* <font size="2">Added in: v1.33</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-locator-option-has-not"/><a href="#locator-locator-option-has-not" class="list-anchor">#</a>
+    
+    Matches elements that do not contain an element that matches an inner locator. Inner locator is queried against the outer one. For example, `article` that does not have `div` matches `<article><span>Playwright</span></article>`.
+    
+    Note that outer and inner locators must belong to the same frame. Inner locator must not contain [FrameLocator]s.
+  - `setHasNotText` [String]|[Pattern] *(optional)* <font size="2">Added in: v1.33</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-locator-option-has-not-text"/><a href="#locator-locator-option-has-not-text" class="list-anchor">#</a>
+    
+    Matches elements that do not contain specified text somewhere inside, possibly in a child or a descendant element. When passed a [string], matching is case-insensitive and searches for a substring.
   - `setHasText` [String]|[Pattern] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-locator-option-has-text"/><a href="#locator-locator-option-has-text" class="list-anchor">#</a>
     
     Matches elements containing specified text somewhere inside, possibly in a child or a descendant element. When passed a [string], matching is case-insensitive and searches for a substring. For example, `"Playwright"` matches `<article><div>Playwright</div></article>`.
@@ -1431,6 +1449,35 @@ Locator banana = page.getByRole(AriaRole.LISTITEM).nth(2);
 
 **Returns**
 - [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-nth-return"/><a href="#locator-nth-return" class="list-anchor">#</a>
+
+---
+
+### or {#locator-or}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.33</font><x-search>locator.or</x-search>
+
+Creates a locator that matches either of the two locators.
+
+**Usage**
+
+Consider a scenario where you'd like to click on a "New email" button, but sometimes a security settings dialog shows up instead. In this case, you can wait for either a "New email" button, or a dialog and act accordingly.
+
+```java
+Locator newEmail = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("New"));
+Locator dialog = page.getByText("Confirm security settings");
+assertThat(newEmail.or(dialog)).isVisible();
+if (dialog.isVisible())
+  page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Dismiss")).click();
+newEmail.click();
+```
+
+**Arguments**
+- `locator` [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-or-option-locator"/><a href="#locator-or-option-locator" class="list-anchor">#</a>
+  
+  Alternative locator to match.
+
+**Returns**
+- [Locator]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-or-return"/><a href="#locator-or-return" class="list-anchor">#</a>
 
 ---
 

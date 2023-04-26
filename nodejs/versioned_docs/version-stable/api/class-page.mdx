@@ -981,7 +981,7 @@ await page.goBack(options);
     When to consider operation succeeded, defaults to `load`. Events can be either:
     * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
     * `'load'` - consider operation to be finished when the `load` event is fired.
-    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+    * `'networkidle'` - **DISCOURAGED** consider operation to be finished when there are no network connections for at least `500` ms. Don't use this method for testing, rely on web assertions to assess readiness instead.
     * `'commit'` - consider operation to be finished when network response is received and the document started loading.
 
 **Returns**
@@ -1014,7 +1014,7 @@ await page.goForward(options);
     When to consider operation succeeded, defaults to `load`. Events can be either:
     * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
     * `'load'` - consider operation to be finished when the `load` event is fired.
-    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+    * `'networkidle'` - **DISCOURAGED** consider operation to be finished when there are no network connections for at least `500` ms. Don't use this method for testing, rely on web assertions to assess readiness instead.
     * `'commit'` - consider operation to be finished when network response is received and the document started loading.
 
 **Returns**
@@ -1068,7 +1068,7 @@ await page.goto(url, options);
     When to consider operation succeeded, defaults to `load`. Events can be either:
     * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
     * `'load'` - consider operation to be finished when the `load` event is fired.
-    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+    * `'networkidle'` - **DISCOURAGED** consider operation to be finished when there are no network connections for at least `500` ms. Don't use this method for testing, rely on web assertions to assess readiness instead.
     * `'commit'` - consider operation to be finished when network response is received and the document started loading.
 
 **Returns**
@@ -1118,6 +1118,14 @@ page.locator(selector, options);
     Matches elements containing an element that matches an inner locator. Inner locator is queried against the outer one. For example, `article` that has `text=Playwright` matches `<article><div>Playwright</div></article>`.
     
     Note that outer and inner locators must belong to the same frame. Inner locator must not contain [FrameLocator]s.
+  - `hasNot` [Locator] *(optional)* <font size="2">Added in: v1.33</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-locator-option-has-not"/><a href="#page-locator-option-has-not" class="list-anchor">#</a>
+    
+    Matches elements that do not contain an element that matches an inner locator. Inner locator is queried against the outer one. For example, `article` that does not have `div` matches `<article><span>Playwright</span></article>`.
+    
+    Note that outer and inner locators must belong to the same frame. Inner locator must not contain [FrameLocator]s.
+  - `hasNotText` [string]|[RegExp] *(optional)* <font size="2">Added in: v1.33</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-locator-option-has-not-text"/><a href="#page-locator-option-has-not-text" class="list-anchor">#</a>
+    
+    Matches elements that do not contain specified text somewhere inside, possibly in a child or a descendant element. When passed a [string], matching is case-insensitive and searches for a substring.
   - `hasText` [string]|[RegExp] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-locator-option-has-text"/><a href="#page-locator-option-has-text" class="list-anchor">#</a>
     
     Matches elements containing specified text somewhere inside, possibly in a child or a descendant element. When passed a [string], matching is case-insensitive and searches for a substring. For example, `"Playwright"` matches `<article><div>Playwright</div></article>`.
@@ -1322,7 +1330,7 @@ await page.reload(options);
     When to consider operation succeeded, defaults to `load`. Events can be either:
     * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
     * `'load'` - consider operation to be finished when the `load` event is fired.
-    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+    * `'networkidle'` - **DISCOURAGED** consider operation to be finished when there are no network connections for at least `500` ms. Don't use this method for testing, rely on web assertions to assess readiness instead.
     * `'commit'` - consider operation to be finished when network response is received and the document started loading.
 
 **Returns**
@@ -1535,7 +1543,7 @@ await page.setContent(html, options);
     When to consider operation succeeded, defaults to `load`. Events can be either:
     * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
     * `'load'` - consider operation to be finished when the `load` event is fired.
-    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+    * `'networkidle'` - **DISCOURAGED** consider operation to be finished when there are no network connections for at least `500` ms. Don't use this method for testing, rely on web assertions to assess readiness instead.
     * `'commit'` - consider operation to be finished when network response is received and the document started loading.
 
 ---
@@ -1856,7 +1864,7 @@ console.log(await popup.title()); // Popup is ready to use.
   Optional load state to wait for, defaults to `load`. If the state has been already reached while loading current document, the method resolves immediately. Can be one of:
   * `'load'` - wait for the `load` event to be fired.
   * `'domcontentloaded'` - wait for the `DOMContentLoaded` event to be fired.
-  * `'networkidle'` - wait until there are no network connections for at least `500` ms.
+  * `'networkidle'` - **DISCOURAGED** wait until there are no network connections for at least `500` ms. Don't use this method for testing, rely on web assertions to assess readiness instead.
 - `options` [Object] *(optional)*
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-load-state-option-timeout"/><a href="#page-wait-for-load-state-option-timeout" class="list-anchor">#</a>
     
@@ -1932,83 +1940,6 @@ const response = await responsePromise;
 
 ---
 
-### waitForSelector {#page-wait-for-selector}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.waitForSelector</x-search>
-
-Returns when element specified by selector satisfies `state` option. Returns `null` if waiting for `hidden` or `detached`.
-
-:::note
-Playwright automatically waits for element to be ready before performing an action. Using [Locator] objects and web-first assertions makes the code wait-for-selector-free.
-:::
-
-Wait for the `selector` to satisfy `state` option (either appear/disappear from dom, or become visible/hidden). If at the moment of calling the method `selector` already satisfies the condition, the method will return immediately. If the selector doesn't satisfy the condition for the `timeout` milliseconds, the function will throw.
-
-**Usage**
-
-This method works across navigations:
-
-```js
-const { chromium } = require('playwright');  // Or 'firefox' or 'webkit'.
-
-(async () => {
-  const browser = await chromium.launch();
-  const page = await browser.newPage();
-  for (let currentURL of ['https://google.com', 'https://bbc.com']) {
-    await page.goto(currentURL);
-    const element = await page.waitForSelector('img');
-    console.log('Loaded image: ' + await element.getAttribute('src'));
-  }
-  await browser.close();
-})();
-```
-
-**Arguments**
-- `selector` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-selector-option-selector"/><a href="#page-wait-for-selector-option-selector" class="list-anchor">#</a>
-  
-  A selector to query for.
-- `options` [Object] *(optional)*
-  - `state` "attached"|"detached"|"visible"|"hidden" *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-selector-option-state"/><a href="#page-wait-for-selector-option-state" class="list-anchor">#</a>
-    
-    Defaults to `'visible'`. Can be either:
-    * `'attached'` - wait for element to be present in DOM.
-    * `'detached'` - wait for element to not be present in DOM.
-    * `'visible'` - wait for element to have non-empty bounding box and no `visibility:hidden`. Note that element without any content or with `display:none` has an empty bounding box and is not considered visible.
-    * `'hidden'` - wait for element to be either detached from DOM, or have an empty bounding box or `visibility:hidden`. This is opposite to the `'visible'` option.
-  - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-selector-option-strict"/><a href="#page-wait-for-selector-option-strict" class="list-anchor">#</a>
-    
-    When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-selector-option-timeout"/><a href="#page-wait-for-selector-option-timeout" class="list-anchor">#</a>
-    
-    Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-
-**Returns**
-- [Promise]<[null]|[ElementHandle]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-selector-return"/><a href="#page-wait-for-selector-return" class="list-anchor">#</a>
-
----
-
-### waitForTimeout {#page-wait-for-timeout}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.waitForTimeout</x-search>
-
-Waits for the given `timeout` in milliseconds.
-
-Note that `page.waitForTimeout()` should only be used for debugging. Tests using the timer in production are going to be flaky. Use signals such as network events, selectors becoming visible and others instead.
-
-**Usage**
-
-```js
-// wait for 1 second
-await page.waitForTimeout(1000);
-```
-
-**Arguments**
-- `timeout` [number]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-timeout-option-timeout"/><a href="#page-wait-for-timeout-option-timeout" class="list-anchor">#</a>
-  
-  A timeout to wait for
-
----
-
 ### waitForURL {#page-wait-for-url}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.11</font><x-search>page.waitForURL</x-search>
@@ -2035,7 +1966,7 @@ await page.waitForURL('**/target.html');
     When to consider operation succeeded, defaults to `load`. Events can be either:
     * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
     * `'load'` - consider operation to be finished when the `load` event is fired.
-    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+    * `'networkidle'` - **DISCOURAGED** consider operation to be finished when there are no network connections for at least `500` ms. Don't use this method for testing, rely on web assertions to assess readiness instead.
     * `'commit'` - consider operation to be finished when network response is received and the document started loading.
 
 ---
@@ -3990,11 +3921,102 @@ Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/Hist
     When to consider operation succeeded, defaults to `load`. Events can be either:
     * `'domcontentloaded'` - consider operation to be finished when the `DOMContentLoaded` event is fired.
     * `'load'` - consider operation to be finished when the `load` event is fired.
-    * `'networkidle'` - consider operation to be finished when there are no network connections for at least `500` ms.
+    * `'networkidle'` - **DISCOURAGED** consider operation to be finished when there are no network connections for at least `500` ms. Don't use this method for testing, rely on web assertions to assess readiness instead.
     * `'commit'` - consider operation to be finished when network response is received and the document started loading.
 
 **Returns**
 - [Promise]<[null]|[Response]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-navigation-return"/><a href="#page-wait-for-navigation-return" class="list-anchor">#</a>
+
+---
+
+### waitForSelector {#page-wait-for-selector}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.waitForSelector</x-search>
+
+:::caution Discouraged
+
+Use web assertions that assert visibility or a locator-based [locator.waitFor()](/api/class-locator.mdx#locator-wait-for) instead. Read more about [locators](../locators.mdx).
+
+:::
+
+
+Returns when element specified by selector satisfies `state` option. Returns `null` if waiting for `hidden` or `detached`.
+
+:::note
+Playwright automatically waits for element to be ready before performing an action. Using [Locator] objects and web-first assertions makes the code wait-for-selector-free.
+:::
+
+Wait for the `selector` to satisfy `state` option (either appear/disappear from dom, or become visible/hidden). If at the moment of calling the method `selector` already satisfies the condition, the method will return immediately. If the selector doesn't satisfy the condition for the `timeout` milliseconds, the function will throw.
+
+**Usage**
+
+This method works across navigations:
+
+```js
+const { chromium } = require('playwright');  // Or 'firefox' or 'webkit'.
+
+(async () => {
+  const browser = await chromium.launch();
+  const page = await browser.newPage();
+  for (let currentURL of ['https://google.com', 'https://bbc.com']) {
+    await page.goto(currentURL);
+    const element = await page.waitForSelector('img');
+    console.log('Loaded image: ' + await element.getAttribute('src'));
+  }
+  await browser.close();
+})();
+```
+
+**Arguments**
+- `selector` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-selector-option-selector"/><a href="#page-wait-for-selector-option-selector" class="list-anchor">#</a>
+  
+  A selector to query for.
+- `options` [Object] *(optional)*
+  - `state` "attached"|"detached"|"visible"|"hidden" *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-selector-option-state"/><a href="#page-wait-for-selector-option-state" class="list-anchor">#</a>
+    
+    Defaults to `'visible'`. Can be either:
+    * `'attached'` - wait for element to be present in DOM.
+    * `'detached'` - wait for element to not be present in DOM.
+    * `'visible'` - wait for element to have non-empty bounding box and no `visibility:hidden`. Note that element without any content or with `display:none` has an empty bounding box and is not considered visible.
+    * `'hidden'` - wait for element to be either detached from DOM, or have an empty bounding box or `visibility:hidden`. This is opposite to the `'visible'` option.
+  - `strict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-selector-option-strict"/><a href="#page-wait-for-selector-option-strict" class="list-anchor">#</a>
+    
+    When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-selector-option-timeout"/><a href="#page-wait-for-selector-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Returns**
+- [Promise]<[null]|[ElementHandle]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-selector-return"/><a href="#page-wait-for-selector-return" class="list-anchor">#</a>
+
+---
+
+### waitForTimeout {#page-wait-for-timeout}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.waitForTimeout</x-search>
+
+:::caution Discouraged
+
+Never wait for timeout in production. Tests that wait for time are inherently flaky. Use [Locator] actions and web assertions that wait automatically.
+
+:::
+
+
+Waits for the given `timeout` in milliseconds.
+
+Note that `page.waitForTimeout()` should only be used for debugging. Tests using the timer in production are going to be flaky. Use signals such as network events, selectors becoming visible and others instead.
+
+**Usage**
+
+```js
+// wait for 1 second
+await page.waitForTimeout(1000);
+```
+
+**Arguments**
+- `timeout` [number]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="page-wait-for-timeout-option-timeout"/><a href="#page-wait-for-timeout-option-timeout" class="list-anchor">#</a>
+  
+  A timeout to wait for
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"

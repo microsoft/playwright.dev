@@ -465,9 +465,16 @@ await page
     .click();
 ```
 
-### Filter by another locator
+Alternatively, filter by **not having** text:
 
-Locators support an option to only select elements that have a descendant matching another locator. You can therefore filter by any other locator such as a [locator.getByRole()](/api/class-locator.mdx#locator-get-by-role), [locator.getByTestId()](/api/class-locator.mdx#locator-get-by-test-id), [locator.getByText()](/api/class-locator.mdx#locator-get-by-text) etc.
+```js
+// 5 in-stock items
+await expect(page.getByRole('listitem').filter({ hasNotText: 'Out of stock' })).toHaveCount(5);
+```
+
+### Filter by child/descendant
+
+Locators support an option to only select elements that have or have not a descendant matching another locator. You can therefore filter by any other locator such as a [locator.getByRole()](/api/class-locator.mdx#locator-get-by-role), [locator.getByTestId()](/api/class-locator.mdx#locator-get-by-test-id), [locator.getByText()](/api/class-locator.mdx#locator-get-by-text) etc.
 
 <HTMLCard>
 <div>
@@ -514,13 +521,22 @@ await expect(page
     .toHaveCount(1);
 ```
 
+We can also filter by **not having** a matching element inside
+
+```js
+await expect(page
+    .getByRole('listitem')
+    .filter({ hasNot: page.getByText('Product 2') }))
+    .toHaveCount(1);
+```
+
 Note that the inner locator is matched starting from the outer one, not from the document root.
 
 ## Chaining Locators
 
 You can chain methods that create a locator, like [page.getByText()](/api/class-page.mdx#page-get-by-text) or [locator.getByRole()](/api/class-locator.mdx#locator-get-by-role), to narrow down the search to a particular part of the page.
 
-In this example we first create a locator called product by locating the test id. We then filter by text. We can use the product locator again to get by role of button and click it and then use an assertion to make sure there is only one product with the text "Product 2".
+In this example we first create a locator called product by locating its role of `listitem`. We then filter by text. We can use the product locator again to get by role of button and click it and then use an assertion to make sure there is only one product with the text "Product 2".
 
 ```js
 const product = page.getByRole('listitem').filter({ hasText: 'Product 2' });

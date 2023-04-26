@@ -193,15 +193,42 @@ await page.locator('button').locator('nth=-1').click();
 
 ## Parent element locator
 
-The parent element could be selected with `..`, which is a short form for `xpath=..`.
+When you need to target a parent element of some other element, most of the time you should [locator.filter()](/api/class-locator.mdx#locator-filter) by the child locator. For example, consider the following DOM structure:
 
-For example:
-
-```js
-const parentLocator = page.getByRole('button').locator('..');
+```html
+<li><label>Hello</label></li>
+<li><label>World</label></li>
 ```
 
-### Locating only visible elements
+If you'd like to target the parent `<li>` of a label with text `"Hello"`, using [locator.filter()](/api/class-locator.mdx#locator-filter) works best:
+
+```js
+const child = page.getByText('Hello');
+const parent = page.getByRole('listitem').filter({ has: child });
+```
+
+Alternatively, if you cannot find a suitable locator for the parent element, use `xpath=..`. Note that this method is not as reliable, because any changes to the DOM structure will break your tests. Prefer [locator.filter()](/api/class-locator.mdx#locator-filter) when possible.
+
+```js
+const parent = page.getByText('Hello').locator('xpath=..');
+```
+
+## Combining two alternative locators
+
+If you'd like to target one of the two or more elements, and you don't know which one it will be, use [locator.or()](/api/class-locator.mdx#locator-or) to create a locator that matches any of the alternatives.
+
+For example, consider a scenario where you'd like to click on a "New email" button, but sometimes a security settings dialog shows up instead. In this case, you can wait for either a "New email" button, or a dialog and act accordingly.
+
+```js
+const newEmail = page.getByRole('button', { name: 'New' });
+const dialog = page.getByText('Confirm security settings');
+await expect(newEmail.or(dialog)).toBeVisible();
+if (await dialog.isVisible())
+  await page.getByRole('button', { name: 'Dismiss' }).click();
+await newEmail.click();
+```
+
+## Locating only visible elements
 
 :::note
 It's usually better to find a [more reliable way](./locators.mdx#quick-guide) to uniquely identify the element instead of checking the visibility.
@@ -461,7 +488,7 @@ If a selector needs to include `>>` in the body, it should be escaped inside a s
 ### Intermediate matches
 
 :::warning
-We recommend [filtering by another locator](./locators.mdx#filter-by-another-locator) to locate elements that contain other elements.
+We recommend [filtering by another locator](./locators.mdx#filter-by-childdescendant) to locate elements that contain other elements.
 :::
 
 By default, chained selectors resolve to an element queried by the last selector. A selector can be prefixed with `*` to capture elements that are queried by an intermediate selector.

@@ -17,7 +17,7 @@ Playwright tests can be executed in CI environments. We have created sample conf
 ## Introduction
 
 3 steps to get your tests running on CI:
-1. **Ensure CI agent can run browsers**: Use [our Docker image](./docker.mdx) in Linux agents or install your dependencies using the [CLI](./cli.mdx#install-system-dependencies).
+1. **Ensure CI agent can run browsers**: Use [our Docker image](./docker.mdx) in Linux agents or install your dependencies using the [CLI](./browsers#install-system-dependencies).
 1. **Install Playwright**:
    
    ```bash
@@ -33,7 +33,7 @@ Playwright tests can be executed in CI environments. We have created sample conf
    
 ## CI configurations
 
-The [Command line tools](./cli.mdx#install-system-dependencies) can be used to install all operating system dependencies on GitHub Actions.
+The [Command line tools](./browsers#install-system-dependencies) can be used to install all operating system dependencies on GitHub Actions.
 
 ### GitHub Actions
 
@@ -105,7 +105,7 @@ jobs:
     name: 'Playwright Tests'
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:v1.32.0-focal
+      image: mcr.microsoft.com/playwright:v1.33.0-jammy
     steps:
       - uses: actions/checkout@v3
       - name: Set up Python
@@ -127,7 +127,7 @@ jobs:
 
 For Windows or macOS agents, no additional configuration required, just install Playwright and run your tests.
 
-For Linux agents, you can use [our Docker container](./docker.mdx) with Azure Pipelines support [running containerized jobs](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/container-phases?view=azure-devops). Alternatively, you can use [Command line tools](./cli.mdx#install-system-dependencies) to install all necessary dependencies.
+For Linux agents, you can use [our Docker container](./docker.mdx) with Azure Pipelines support [running containerized jobs](https://docs.microsoft.com/en-us/azure/devops/pipelines/process/container-phases?view=azure-devops). Alternatively, you can use [Command line tools](./browsers#install-system-dependencies) to install all necessary dependencies.
 
 For running the Playwright tests use this pipeline task:
 
@@ -136,7 +136,7 @@ jobs:
     - deployment: Run_E2E_Tests
       pool:
         vmImage: ubuntu-20.04
-      container: mcr.microsoft.com/playwright:v1.32.0-focal
+      container: mcr.microsoft.com/playwright:v1.33.0-jammy
       environment: testing
       strategy:
         runOnce:
@@ -163,7 +163,7 @@ jobs:
     - deployment: Run_E2E_Tests
       pool:
         vmImage: ubuntu-20.04
-      container: mcr.microsoft.com/playwright:v1.32.0-focal
+      container: mcr.microsoft.com/playwright:v1.33.0-jammy
       environment: testing
       strategy:
         runOnce:
@@ -204,9 +204,9 @@ Running Playwright on CircleCI is very similar to running on GitHub Actions. In 
 
 ```yml
 executors:
-   pw-focal-development:
+   pw-jammy-development:
      docker:
-       - image: mcr.microsoft.com/playwright:v1.32.0-focal
+       - image: mcr.microsoft.com/playwright:v1.33.0-jammy
 ```
 
 Note: When using the docker agent definition, you are specifying the resource class of where playwright runs to the 'medium' tier [here](https://circleci.com/docs/configuration-reference?#docker-execution-environment). The default behavior of Playwright is to set the number of workers to the detected core count (2 in the case of the medium tier). Overriding the number of workers to greater than this number will cause unnecessary timeouts and failures.
@@ -227,7 +227,7 @@ Sharding in CircleCI is indexed with 0 which means that you will need to overrid
 
 ```yml
   playwright-job-name:
-    executor: pw-focal-development
+    executor: pw-jammy-development
     parallelism: 4
     steps:
       - run: SHARD="$((${CIRCLE_NODE_INDEX}+1))"; npx playwright test -- --shard=${SHARD}/${CIRCLE_NODE_TOTAL}      
@@ -239,7 +239,7 @@ Jenkins supports Docker agents for pipelines. Use the [Playwright Docker image](
 
 ```groovy
 pipeline {
-   agent { docker { image 'mcr.microsoft.com/playwright:v1.32.0-focal' } }
+   agent { docker { image 'mcr.microsoft.com/playwright:v1.33.0-jammy' } }
    stages {
       stage('e2e-tests') {
          steps {
@@ -257,7 +257,7 @@ pipeline {
 Bitbucket Pipelines can use public [Docker images as build environments](https://confluence.atlassian.com/bitbucket/use-docker-images-as-build-environments-792298897.html). To run Playwright tests on Bitbucket, use our public Docker image ([see Dockerfile](./docker.mdx)).
 
 ```yml
-image: mcr.microsoft.com/playwright:v1.32.0-focal
+image: mcr.microsoft.com/playwright:v1.33.0-jammy
 ```
 
 ### GitLab CI
@@ -270,7 +270,7 @@ stages:
 
 tests:
   stage: test
-  image: mcr.microsoft.com/playwright:v1.32.0-focal
+  image: mcr.microsoft.com/playwright:v1.33.0-jammy
   script:
   ...
 ```

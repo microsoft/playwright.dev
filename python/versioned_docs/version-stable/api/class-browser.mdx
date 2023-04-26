@@ -254,7 +254,7 @@ await browser.close()
   Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [page.emulate_media()](/api/class-page.mdx#page-emulate-media) for more details. Passing `'null'` resets emulation to system defaults. Defaults to `'light'`.
 - `device_scale_factor` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-device-scale-factor"/><a href="#browser-new-context-option-device-scale-factor" class="list-anchor">#</a>
   
-  Specify device scale factor (can be thought of as dpr). Defaults to `1`.
+  Specify device scale factor (can be thought of as dpr). Defaults to `1`. Learn more about [emulating devices with device scale factor](../emulation.mdx#devices).
 - `extra_http_headers` [Dict]\[[str], [str]\] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-extra-http-headers"/><a href="#browser-new-context-option-extra-http-headers" class="list-anchor">#</a>
   
   An object containing additional HTTP headers to be sent with every request.
@@ -273,7 +273,7 @@ await browser.close()
     Non-negative accuracy value. Defaults to `0`.
 - `has_touch` [bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-has-touch"/><a href="#browser-new-context-option-has-touch" class="list-anchor">#</a>
   
-  Specifies if viewport supports touch events. Defaults to false.
+  Specifies if viewport supports touch events. Defaults to false. Learn more about [mobile emulation](../emulation.mdx#devices).
 - `http_credentials` [Dict] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-http-credentials"/><a href="#browser-new-context-option-http-credentials" class="list-anchor">#</a>
   - `username` [str]
     
@@ -281,25 +281,29 @@ await browser.close()
   - `password` [str]
     
     
-  Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).
+  - `origin` [str] *(optional)*
+    
+    Restrain sending http credentials on specific origin (scheme://host:port).
+  
+  Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). If no origin is specified, the username and password are sent to any servers upon unauthorized responses.
 - `ignore_https_errors` [bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-ignore-https-errors"/><a href="#browser-new-context-option-ignore-https-errors" class="list-anchor">#</a>
   
   Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.
 - `is_mobile` [bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-is-mobile"/><a href="#browser-new-context-option-is-mobile" class="list-anchor">#</a>
   
-  Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.
+  Whether the `meta viewport` tag is taken into account and touch events are enabled. isMobile is a part of device, so you don't actually need to set it manually. Defaults to `false` and is not supported in Firefox. Learn more about [mobile emulation](../emulation.mdx#isMobile).
 - `java_script_enabled` [bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-java-script-enabled"/><a href="#browser-new-context-option-java-script-enabled" class="list-anchor">#</a>
   
-  Whether or not to enable JavaScript in the context. Defaults to `true`.
+  Whether or not to enable JavaScript in the context. Defaults to `true`. Learn more about [disabling JavaScript](../emulation.mdx#javascript-enabled).
 - `locale` [str] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-locale"/><a href="#browser-new-context-option-locale" class="list-anchor">#</a>
   
-  Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
+  Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules. Learn more about emulation in our [emulation guide](../emulation.mdx#locale--timezone).
 - `no_viewport` [bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-no-viewport"/><a href="#browser-new-context-option-no-viewport" class="list-anchor">#</a>
   
   Does not enforce fixed viewport, allows resizing window in the headed mode.
 - `offline` [bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-offline"/><a href="#browser-new-context-option-offline" class="list-anchor">#</a>
   
-  Whether to emulate network being offline. Defaults to `false`.
+  Whether to emulate network being offline. Defaults to `false`. Learn more about [network emulation](../emulation.mdx#offline).
 - `permissions` [List]\[[str]\] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-permissions"/><a href="#browser-new-context-option-permissions" class="list-anchor">#</a>
   
   A list of permissions to grant to all pages in this context. See [browser_context.grant_permissions()](/api/class-browsercontext.mdx#browser-context-grant-permissions) for more details.
@@ -407,6 +411,8 @@ await browser.close()
       
     localStorage to set for context
   
+  Learn more about [storage state and auth](../auth.mdx).
+  
   Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [browser_context.storage_state()](/api/class-browsercontext.mdx#browser-context-storage-state). Either a path to the file with saved storage, or an object with the following fields:
 - `strict_selectors` [bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-option-strict-selectors"/><a href="#browser-new-context-option-strict-selectors" class="list-anchor">#</a>
   
@@ -425,7 +431,7 @@ await browser.close()
     
     page height in pixels.
   
-  Sets a consistent viewport for each page. Defaults to an 1280x720 viewport. `no_viewport` disables the fixed viewport.
+  Sets a consistent viewport for each page. Defaults to an 1280x720 viewport. `no_viewport` disables the fixed viewport. Learn more about [viewport emulation](../emulation.mdx#viewport).
 
 **Returns**
 - [BrowserContext]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-context-return"/><a href="#browser-new-context-return" class="list-anchor">#</a>
@@ -465,7 +471,7 @@ browser.new_page(**kwargs)
   Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [page.emulate_media()](/api/class-page.mdx#page-emulate-media) for more details. Passing `'null'` resets emulation to system defaults. Defaults to `'light'`.
 - `device_scale_factor` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-device-scale-factor"/><a href="#browser-new-page-option-device-scale-factor" class="list-anchor">#</a>
   
-  Specify device scale factor (can be thought of as dpr). Defaults to `1`.
+  Specify device scale factor (can be thought of as dpr). Defaults to `1`. Learn more about [emulating devices with device scale factor](../emulation.mdx#devices).
 - `extra_http_headers` [Dict]\[[str], [str]\] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-extra-http-headers"/><a href="#browser-new-page-option-extra-http-headers" class="list-anchor">#</a>
   
   An object containing additional HTTP headers to be sent with every request.
@@ -484,7 +490,7 @@ browser.new_page(**kwargs)
     Non-negative accuracy value. Defaults to `0`.
 - `has_touch` [bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-has-touch"/><a href="#browser-new-page-option-has-touch" class="list-anchor">#</a>
   
-  Specifies if viewport supports touch events. Defaults to false.
+  Specifies if viewport supports touch events. Defaults to false. Learn more about [mobile emulation](../emulation.mdx#devices).
 - `http_credentials` [Dict] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-http-credentials"/><a href="#browser-new-page-option-http-credentials" class="list-anchor">#</a>
   - `username` [str]
     
@@ -492,25 +498,29 @@ browser.new_page(**kwargs)
   - `password` [str]
     
     
-  Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication).
+  - `origin` [str] *(optional)*
+    
+    Restrain sending http credentials on specific origin (scheme://host:port).
+  
+  Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). If no origin is specified, the username and password are sent to any servers upon unauthorized responses.
 - `ignore_https_errors` [bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-ignore-https-errors"/><a href="#browser-new-page-option-ignore-https-errors" class="list-anchor">#</a>
   
   Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.
 - `is_mobile` [bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-is-mobile"/><a href="#browser-new-page-option-is-mobile" class="list-anchor">#</a>
   
-  Whether the `meta viewport` tag is taken into account and touch events are enabled. Defaults to `false`. Not supported in Firefox.
+  Whether the `meta viewport` tag is taken into account and touch events are enabled. isMobile is a part of device, so you don't actually need to set it manually. Defaults to `false` and is not supported in Firefox. Learn more about [mobile emulation](../emulation.mdx#isMobile).
 - `java_script_enabled` [bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-java-script-enabled"/><a href="#browser-new-page-option-java-script-enabled" class="list-anchor">#</a>
   
-  Whether or not to enable JavaScript in the context. Defaults to `true`.
+  Whether or not to enable JavaScript in the context. Defaults to `true`. Learn more about [disabling JavaScript](../emulation.mdx#javascript-enabled).
 - `locale` [str] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-locale"/><a href="#browser-new-page-option-locale" class="list-anchor">#</a>
   
-  Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules.
+  Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules. Learn more about emulation in our [emulation guide](../emulation.mdx#locale--timezone).
 - `no_viewport` [bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-no-viewport"/><a href="#browser-new-page-option-no-viewport" class="list-anchor">#</a>
   
   Does not enforce fixed viewport, allows resizing window in the headed mode.
 - `offline` [bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-offline"/><a href="#browser-new-page-option-offline" class="list-anchor">#</a>
   
-  Whether to emulate network being offline. Defaults to `false`.
+  Whether to emulate network being offline. Defaults to `false`. Learn more about [network emulation](../emulation.mdx#offline).
 - `permissions` [List]\[[str]\] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-permissions"/><a href="#browser-new-page-option-permissions" class="list-anchor">#</a>
   
   A list of permissions to grant to all pages in this context. See [browser_context.grant_permissions()](/api/class-browsercontext.mdx#browser-context-grant-permissions) for more details.
@@ -618,6 +628,8 @@ browser.new_page(**kwargs)
       
     localStorage to set for context
   
+  Learn more about [storage state and auth](../auth.mdx).
+  
   Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [browser_context.storage_state()](/api/class-browsercontext.mdx#browser-context-storage-state). Either a path to the file with saved storage, or an object with the following fields:
 - `strict_selectors` [bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-option-strict-selectors"/><a href="#browser-new-page-option-strict-selectors" class="list-anchor">#</a>
   
@@ -636,7 +648,7 @@ browser.new_page(**kwargs)
     
     page height in pixels.
   
-  Sets a consistent viewport for each page. Defaults to an 1280x720 viewport. `no_viewport` disables the fixed viewport.
+  Sets a consistent viewport for each page. Defaults to an 1280x720 viewport. `no_viewport` disables the fixed viewport. Learn more about [viewport emulation](../emulation.mdx#viewport).
 
 **Returns**
 - [Page]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-new-page-return"/><a href="#browser-new-page-return" class="list-anchor">#</a>
