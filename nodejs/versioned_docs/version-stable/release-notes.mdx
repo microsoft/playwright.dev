@@ -6,11 +6,57 @@ toc_max_heading_level: 2
 
 import LiteYouTube from '@site/src/components/LiteYouTube';
 
+## Version 1.33
+
+### Locators Update
+* Use [locator.or()](/api/class-locator.mdx#locator-or) to create a locator that matches either of the two locators. Consider a scenario where   you'd like to click on a "New email" button, but sometimes a security settings dialog shows up instead. In this case, you can wait for either a "New email" button, or a dialog and act accordingly:
+  
+  ```js
+  const newEmail = page.getByRole('button', { name: 'New' });
+  const dialog = page.getByText('Confirm security settings');
+  await expect(newEmail.or(dialog)).toBeVisible();
+  if (await dialog.isVisible())
+    await page.getByRole('button', { name: 'Dismiss' }).click();
+  await newEmail.click();
+  ```
+  
+* Use new options `hasNot` and `hasNotText` in [locator.filter()](/api/class-locator.mdx#locator-filter) to find elements that **do not match** certain conditions.
+  
+  ```js
+  const rowLocator = page.locator('tr');
+  await rowLocator
+      .filter({ hasNotText: 'text in column 1' })
+      .filter({ hasNot: page.getByRole('button', { name: 'column 2 button' }) })
+      .screenshot();
+  ```
+  
+* Use new web-first assertion [expect(locator).toBeAttached()](/api/class-locatorassertions.mdx#locator-assertions-to-be-attached) to ensure that the element is present in the page's DOM. Do not confuse with the [expect(locator).toBeVisible()](/api/class-locatorassertions.mdx#locator-assertions-to-be-visible) that ensures that element is both attached & visible.
+
+### New APIs
+- [locator.or()](/api/class-locator.mdx#locator-or)
+- New option `hasNot` in [locator.filter()](/api/class-locator.mdx#locator-filter)
+- New option `hasNotText` in [locator.filter()](/api/class-locator.mdx#locator-filter)
+- [expect(locator).toBeAttached()](/api/class-locatorassertions.mdx#locator-assertions-to-be-attached)
+- New option `timeout` in [route.fetch()](/api/class-route.mdx#route-fetch)
+- [reporter.onExit()](/api/class-reporter.mdx#reporter-on-exit)
+
+### ⚠️ Breaking change
+* The `mcr.microsoft.com/playwright:v1.34.0` now serves a Playwright image based on Ubuntu Jammy. To use the focal-based image, please use `mcr.microsoft.com/playwright:v1.34.0-focal` instead.
+
+### Browser Versions
+* Chromium 113.0.5672.53
+* Mozilla Firefox 112.0
+* WebKit 16.4
+
+This version was also tested against the following stable channels:
+* Google Chrome 112
+* Microsoft Edge 112
+
 ## Version 1.32
 
 ### Introducing UI Mode (preview)
 
-New UI Mode lets you explore, run and debug tests. Comes with a built-in watch mode.
+New [UI Mode](./test-ui-mode.mdx) lets you explore, run and debug tests. Comes with a built-in watch mode.
 
 ![Playwright UI Mode](https://user-images.githubusercontent.com/746130/227004851-3901a691-4f8e-43d6-8d6b-cbfeafaeb999.png)
 
@@ -33,7 +79,7 @@ Note: **component tests only**, does not affect end-to-end tests.
 * If you're running component tests with React 16 or 17, please replace `@playwright/experimental-ct-react` with `@playwright/experimental-ct-react17`.
 
 ### Browser Versions
-* Chromium 112.0.5615.29	
+* Chromium 112.0.5615.29
 * Mozilla Firefox 111.0
 * WebKit 16.4
 
@@ -411,7 +457,7 @@ This version was also tested against the following stable channels:
 * Enable tracing via CLI flag: `npx playwright test --trace=on`.
 
 ### Announcements
-* 🎁 We now ship Ubuntu 22.04 Jammy Jellyfish docker image: `mcr.microsoft.com/playwright:v1.32.0-jammy`.
+* 🎁 We now ship Ubuntu 22.04 Jammy Jellyfish docker image: `mcr.microsoft.com/playwright:v1.33.0-jammy`.
 * 🪦 This is the last release with macOS 10.15 support (deprecated as of 1.21).
 * 🪦 This is the last release with Node.js 12 support, we recommend upgrading to Node.js LTS (16).
 * ⚠️ Ubuntu 18 is now deprecated and will not be supported as of Dec 2022.
@@ -440,13 +486,13 @@ export default defineConfig({
   webServer: [
     {
       command: 'npm run start',
-      port: 3000,
+      url: 'http://127.0.0.1:3000',
       timeout: 120 * 1000,
       reuseExistingServer: !process.env.CI,
     },
     {
       command: 'npm run backend',
-      port: 3333,
+      url: 'http://127.0.0.1:3333',
       timeout: 120 * 1000,
       reuseExistingServer: !process.env.CI,
     }
@@ -651,11 +697,11 @@ Read more about [component testing with Playwright](./test-components).
   });
   ```
   
-* Playwright now runs on Ubuntu 22 amd64 and Ubuntu 22 arm64. We also publish new docker image `mcr.microsoft.com/playwright:v1.32.0-jammy`.
+* Playwright now runs on Ubuntu 22 amd64 and Ubuntu 22 arm64. We also publish new docker image `mcr.microsoft.com/playwright:v1.33.0-jammy`.
 
 ### ⚠️ Breaking Changes ⚠️
 
-WebServer is now considered "ready" if request to the specified port has any of the following HTTP status codes:
+WebServer is now considered "ready" if request to the specified url has any of the following HTTP status codes:
 * `200-299`
 * `300-399` (new)
 * `400`, `401`, `402`, `403` (new)
@@ -809,7 +855,7 @@ This version was also tested against the following stable channels:
   };
   ```
   
-- [Trace Viewer](./trace-viewer) now shows [API testing requests](./test-api-testing).
+- [Trace Viewer](./trace-viewer) now shows [API testing requests](./api-testing).
 - [locator.highlight()](/api/class-locator.mdx#locator-highlight) visually reveals element(s) for easier debugging.
 
 ### Announcements
@@ -1093,11 +1139,11 @@ test('context fetch', async ({ request }) => {
 });
 ```
 
-Read more about it in our [API testing guide](./test-api-testing).
+Read more about it in our [API testing guide](./api-testing).
 
 #### Response Interception
 
-It is now possible to do response interception by combining [API Testing](./test-api-testing) with [request interception](./network#modify-requests).
+It is now possible to do response interception by combining [API Testing](./api-testing) with [request interception](./network#modify-requests).
 
 For example, we can blur all the images on the page:
 
@@ -1363,7 +1409,7 @@ Step information is exposed in reporters API.
 
 #### 🌎 Launch web server before running tests
 
-To launch a server during the tests, use the [`webServer`](./test-advanced#launching-a-development-web-server-during-the-tests) option in the configuration file. The server will wait for a given port to be available before running the tests, and the port will be passed over to Playwright as a [`baseURL`](./api/class-fixtures#fixtures-base-url) when creating a context.
+To launch a server during the tests, use the [`webServer`](./test-webserver) option in the configuration file. The server will wait for a given url to be available before running the tests, and the url will be passed over to Playwright as a [`baseURL`](./api/class-fixtures#fixtures-base-url) when creating a context.
 
 ```ts
 // playwright.config.ts
@@ -1371,14 +1417,14 @@ import { defineConfig } from '@playwright/test';
 export default defineConfig({
   webServer: {
     command: 'npm run start', // command to launch
-    port: 3000, // port to await for
+    url: 'http://127.0.0.1:3000', // url to await for
     timeout: 120 * 1000,
     reuseExistingServer: !process.env.CI,
   },
 });
 ```
 
-Learn more in the [documentation](./test-advanced#launching-a-development-web-server-during-the-tests).
+Learn more in the [documentation](./test-webserver).
 
 ### Browser Versions
 - Chromium 94.0.4595.0
@@ -1574,7 +1620,7 @@ This version of Playwright was also tested against the following stable channels
 
 ## Version 1.8
 - [Selecting elements based on layout](./other-locators.mdx#css-matching-elements-based-on-layout) with `:left-of()`, `:right-of()`, `:above()` and `:below()`.
-- Playwright now includes [command line interface](./cli.mdx), former playwright-cli.
+- Playwright now includes [command line interface](./test-cli.mdx), former playwright-cli.
   
   ```bash
   npx playwright --help
