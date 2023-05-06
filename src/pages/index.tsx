@@ -103,10 +103,10 @@ const features = [
     description: (
       <>
         <p>
-          <b><a href="/docs/codegen">Codegen.</a></b> Generate tests by recording your actions. Save them into any language.
+          <b><a href="docs/codegen">Codegen.</a></b> Generate tests by recording your actions. Save them into any language.
         </p>
         <p>
-          <b><a href="/docs/debug#playwright-inspector">Playwright inspector.</a></b> Inspect page, generate selectors, step through the test execution, see click points, explore execution logs.
+          <b><a href="docs/debug#playwright-inspector">Playwright inspector.</a></b> Inspect page, generate selectors, step through the test execution, see click points, explore execution logs.
         </p>
         <p>
           <b><a href="https://trace.playwright.dev/">Trace Viewer.</a></b> Capture all the information to investigate the test failure. Playwright trace
