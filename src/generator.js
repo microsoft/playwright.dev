@@ -172,7 +172,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
     }
     result.push(...this.formatClassMembers(clazz));
     fs.mkdirSync(path.join(this.outDir, 'api'), { recursive: true });
-    const output = [md.render(result, { flattenText: true, renderCodeBlockTitles: true }), this.generatedLinksSuffix].join('\n');
+    const output = [md.render(result, { flattenText: true, renderCodeBlockTitlesInHeader: true }), this.generatedLinksSuffix].join('\n');
     writeFileSyncCached(path.join(this.outDir, 'api', `class-${clazz.name.toLowerCase()}.mdx`), this.mdxLinks(output));
   }
 
@@ -416,7 +416,7 @@ ${this.documentation.renderLinksInText(member.discouraged)}
         node.children = this.formatComment(node.children);
     });
     fs.mkdirSync(this.outDir, { recursive: true });
-    let output = [md.render(nodes, { flattenText: true, renderCodeBlockTitles: true }), this.generatedLinksSuffix].join('\n');
+    let output = [md.render(nodes, { flattenText: true, renderCodeBlockTitlesInHeader: true }), this.generatedLinksSuffix].join('\n');
     output = output.replace(`"
 ---`, `"
 ---
