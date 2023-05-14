@@ -1,5 +1,13 @@
 const conferenceVideos = [
   {
+    title: "Playwright : l'outil qui va révolutionner les tests end-to-end",
+    id: 'CeLkUDmTRkE',
+    year: '2023',
+    conference: 'Devoxx France',
+    language: 'French',
+    speakers: ['Jean-François Greffier']
+  },
+  {
     title: 'Playing your tests wright',
     description: '',
     id: 'n-ooHE-rNnw',
