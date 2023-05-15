@@ -1,5 +1,21 @@
 const conferenceVideos = [
   {
+    title: "Playwright at PYCon US",
+    id: '5Wykd5OWSDQ',
+    year: '2023',
+    conference: 'PYCon US',
+    language: 'English',
+    speakers: ['Andrew Knight']
+  },
+  {
+    title: "Playing your tests wright in VS Code",
+    id: 'ECkMUATC1aA',
+    year: '2023',
+    conference: 'VS Code Live',
+    language: 'English',
+    speakers: ['Debbie O\'Brien']
+  },
+  {
     title: "Playwright : l'outil qui va révolutionner les tests end-to-end",
     id: 'CeLkUDmTRkE',
     year: '2023',

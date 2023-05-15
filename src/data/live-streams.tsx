@@ -1,5 +1,13 @@
 const liveStreams = [
   {
+    title: 'End to End testing with Playwright',
+    description: '',
+    id: 'sKUVyVd-nJg',
+    year: '2023',
+    host: 'Uniform',
+    speakers: ["Debbie O'Brien, Tim Benniks"]
+  },
+  {
     title: 'Introduction to Playwright for End-to-End Testing',
     description: '',
     id: 'lCb9JoZFpHI',

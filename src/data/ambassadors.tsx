@@ -49,7 +49,7 @@ const ambassadors = [
     city: 'Berlin',
     country: 'Germany',
     imageUrl:
-      'https://media.licdn.com/dms/image/C4E03AQHNkQmEbZBVqA/profile-displayphoto-shrink_400_400/0/1517375686271?e=1678924800&v=beta&t=PKV9zm_XTp8sFtNwDfStonH87p5FulwVMZA_NwTAf94',
+      'https://pbs.twimg.com/profile_images/1419977078552813568/XVrltX2h_400x400.png',
     twitterUrl: 'https://twitter.com/rag0g',
     websiteUrl: 'https://www.youtube.com/c/AutomateTogether'
   },
