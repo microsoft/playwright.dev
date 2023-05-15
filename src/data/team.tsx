@@ -14,7 +14,7 @@ const team = [
     city: 'Berlin',
     country: 'Germany',
     githubUrl: 'https://github.com/mxschmitt',
-    twitterUrl: 'https://twitter.com/maxibanki',
+    twitterUrl: 'https://twitter.com/mx_schmitt',
     linkedInUrl: 'https://www.linkedin.com/in/max-schmitt/'
   }
 ];
