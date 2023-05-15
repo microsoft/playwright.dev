@@ -16,6 +16,14 @@ const liveStreams = [
     speakers: ["Debbie O'Brien"]
   },
   {
+    title: 'Let\s test with Playwright',
+    description: '',
+    id: 'vEwCyggZzhI',
+    year: '2023',
+    host: 'Filip Hric',
+    speakers: ["Debbie O'Brien"]
+  },
+  {
     title: 'Playwright cross browser automated testing',
     description: '',
     id: 'jorsD4lInwA',

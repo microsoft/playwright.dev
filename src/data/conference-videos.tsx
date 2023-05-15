@@ -24,6 +24,14 @@ const conferenceVideos = [
     speakers: ['Jean-François Greffier']
   },
   {
+    title: "Playing your tests wright",
+    id: '4K6YR5FbjM0',
+    year: '2023',
+    conference: 'Angular Tiny Conf',
+    language: 'English',
+    speakers: ['Debbie O\'Brien']
+  },
+  {
     title: 'Playing your tests wright',
     description: '',
     id: 'n-ooHE-rNnw',
