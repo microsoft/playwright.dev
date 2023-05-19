@@ -38,10 +38,112 @@ Here is a list of the pre-defined fixtures that you are likely to use most of th
 
 Here is how typical test environment setup differs between traditional test style and the fixture-based one.
 
-We assume a `TodoPage` class that helps interacting with a "todo list" page of the web app, following the [Page Object Model](./pom.mdx) pattern. It uses Playwright's `page` internally.
+`TodoPage` is a class that helps interacting with a "todo list" page of the web app, following the [Page Object Model](./pom.mdx) pattern. It uses Playwright's `page` internally.
 
-```js
-// todo.spec.js
+<details>
+
+<summary>Click to expand the code for the <code>TodoPage</code></summary>
+
+<div>
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js title="todo-page.ts"
+import { Page, Locator } from '@playwright/test';
+
+export class TodoPage {
+  private readonly inputBox: Locator;
+  private readonly todoItems: Locator;
+
+  constructor(public readonly page: Page) {
+    this.inputBox = this.page.locator('input.new-todo');
+    this.todoItems = this.page.getByTestId('todo-item');
+  }
+
+  async goto() {
+    await this.page.goto('https://demo.playwright.dev/todomvc/');
+  }
+
+  async addToDo(text: string) {
+    await this.inputBox.fill(text);
+    await this.inputBox.press('Enter');
+  }
+
+  async remove(text: string) {
+    const todo = this.todoItems.filter({ hasText: text });
+    await todo.hover();
+    await todo.getByLabel('Delete').click();
+  }
+
+  async removeAll() {
+    while ((await this.todoItems.count()) > 0) {
+      await this.todoItems.first().hover();
+      await this.todoItems.getByLabel('Delete').first().click();
+    }
+  }
+}
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js title="todo-page.js"
+export class TodoPage {
+  /**
+   * @param {import('@playwright/test').Page} page
+   */
+  constructor(page) {
+    this.page = page;
+    this.inputBox = this.page.locator('input.new-todo');
+    this.todoItems = this.page.getByTestId('todo-item');
+  }
+
+  async goto() {
+    await this.page.goto('https://demo.playwright.dev/todomvc/');
+  }
+
+  /**
+   * @param {string} text 
+   */
+  async addToDo(text) {
+    await this.inputBox.fill(text);
+    await this.inputBox.press('Enter');
+  }
+
+  /**
+   * @param {string} text 
+   */
+  async remove(text) {
+    const todo = this.todoItems.filter({ hasText: text });
+    await todo.hover();
+    await todo.getByLabel('Delete').click();
+  }
+
+  async removeAll() {
+    while ((await this.todoItems.count()) > 0) {
+      await this.todoItems.first().hover();
+      await this.todoItems.getByLabel('Delete').first().click();
+    }
+  }
+}
+```
+
+</TabItem>
+</Tabs>
+
+</div>
+
+</details>
+
+```js title="todo.spec.ts"
 const { test } = require('@playwright/test');
 const { TodoPage } = require('./todo-page');
 
@@ -81,6 +183,12 @@ Fixtures have a number of advantages over before/after hooks:
 - Fixtures are **flexible**. Tests can use any combinations of the fixtures to tailor precise environment they need, without affecting other tests.
 - Fixtures simplify **grouping**. You no longer need to wrap tests in `describe`s that set up environment, and are free to group your tests by their meaning instead.
 
+<details>
+
+<summary>Click to expand the code for the <code>TodoPage</code></summary>
+
+<div>
+
 <Tabs
   groupId="js-flavor"
   defaultValue="ts"
@@ -91,8 +199,104 @@ Fixtures have a number of advantages over before/after hooks:
 }>
 <TabItem value="ts">
 
-```js
-// example.spec.ts
+```js title="todo-page.ts"
+import { Page, Locator } from '@playwright/test';
+
+export class TodoPage {
+  private readonly inputBox: Locator;
+  private readonly todoItems: Locator;
+
+  constructor(public readonly page: Page) {
+    this.inputBox = this.page.locator('input.new-todo');
+    this.todoItems = this.page.getByTestId('todo-item');
+  }
+
+  async goto() {
+    await this.page.goto('https://demo.playwright.dev/todomvc/');
+  }
+
+  async addToDo(text: string) {
+    await this.inputBox.fill(text);
+    await this.inputBox.press('Enter');
+  }
+
+  async remove(text: string) {
+    const todo = this.todoItems.filter({ hasText: text });
+    await todo.hover();
+    await todo.getByLabel('Delete').click();
+  }
+
+  async removeAll() {
+    while ((await this.todoItems.count()) > 0) {
+      await this.todoItems.first().hover();
+      await this.todoItems.getByLabel('Delete').first().click();
+    }
+  }
+}
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js title="todo-page.js"
+export class TodoPage {
+  /**
+   * @param {import('@playwright/test').Page} page
+   */
+  constructor(page) {
+    this.page = page;
+    this.inputBox = this.page.locator('input.new-todo');
+    this.todoItems = this.page.getByTestId('todo-item');
+  }
+
+  async goto() {
+    await this.page.goto('https://demo.playwright.dev/todomvc/');
+  }
+
+  /**
+   * @param {string} text 
+   */
+  async addToDo(text) {
+    await this.inputBox.fill(text);
+    await this.inputBox.press('Enter');
+  }
+
+  /**
+   * @param {string} text 
+   */
+  async remove(text) {
+    const todo = this.todoItems.filter({ hasText: text });
+    await todo.hover();
+    await todo.getByLabel('Delete').click();
+  }
+
+  async removeAll() {
+    while ((await this.todoItems.count()) > 0) {
+      await this.todoItems.first().hover();
+      await this.todoItems.getByLabel('Delete').first().click();
+    }
+  }
+}
+```
+
+</TabItem>
+</Tabs>
+
+</div>
+
+</details>
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js title="example.spec.ts"
 import { test as base } from '@playwright/test';
 import { TodoPage } from './todo-page';
 
@@ -122,8 +326,7 @@ test('should remove an item', async ({ todoPage }) => {
 </TabItem>
 <TabItem value="js">
 
-```js
-// todo.spec.js
+```js title="todo.spec.js"
 const base = require('@playwright/test');
 const { TodoPage } = require('./todo-page');
 
@@ -159,6 +362,12 @@ To create your own fixture, use [test.extend()](/api/class-test.mdx#test-extend)
 
 Below we create two fixtures `todoPage` and `settingsPage` that follow the [Page Object Model](./pom.mdx) pattern.
 
+<details>
+
+<summary>Click to expand the code for the <code>TodoPage</code> and <code>SettingsPage</code></summary>
+
+<div>
+
 <Tabs
   groupId="js-flavor"
   defaultValue="ts"
@@ -169,8 +378,150 @@ Below we create two fixtures `todoPage` and `settingsPage` that follow the [Page
 }>
 <TabItem value="ts">
 
-```js
-// my-test.ts
+```js title="todo-page.ts"
+import { Page, Locator } from '@playwright/test';
+
+export class TodoPage {
+  private readonly inputBox: Locator;
+  private readonly todoItems: Locator;
+
+  constructor(public readonly page: Page) {
+    this.inputBox = this.page.locator('input.new-todo');
+    this.todoItems = this.page.getByTestId('todo-item');
+  }
+
+  async goto() {
+    await this.page.goto('https://demo.playwright.dev/todomvc/');
+  }
+
+  async addToDo(text: string) {
+    await this.inputBox.fill(text);
+    await this.inputBox.press('Enter');
+  }
+
+  async remove(text: string) {
+    const todo = this.todoItems.filter({ hasText: text });
+    await todo.hover();
+    await todo.getByLabel('Delete').click();
+  }
+
+  async removeAll() {
+    while ((await this.todoItems.count()) > 0) {
+      await this.todoItems.first().hover();
+      await this.todoItems.getByLabel('Delete').first().click();
+    }
+  }
+}
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js title="todo-page.js"
+export class TodoPage {
+  /**
+   * @param {import('@playwright/test').Page} page
+   */
+  constructor(page) {
+    this.page = page;
+    this.inputBox = this.page.locator('input.new-todo');
+    this.todoItems = this.page.getByTestId('todo-item');
+  }
+
+  async goto() {
+    await this.page.goto('https://demo.playwright.dev/todomvc/');
+  }
+
+  /**
+   * @param {string} text 
+   */
+  async addToDo(text) {
+    await this.inputBox.fill(text);
+    await this.inputBox.press('Enter');
+  }
+
+  /**
+   * @param {string} text 
+   */
+  async remove(text) {
+    const todo = this.todoItems.filter({ hasText: text });
+    await todo.hover();
+    await todo.getByLabel('Delete').click();
+  }
+
+  async removeAll() {
+    while ((await this.todoItems.count()) > 0) {
+      await this.todoItems.first().hover();
+      await this.todoItems.getByLabel('Delete').first().click();
+    }
+  }
+}
+```
+
+</TabItem>
+</Tabs>
+
+SettingsPage is similar:
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js title="settings-page.ts"
+import { Page } from '@playwright/test';
+
+export class SettingsPage {
+  constructor(public readonly page: Page) {
+  }
+
+  async switchToDarkMode() {
+    // ...
+  }
+}
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js title="settings-page.js"
+export class SettingsPage {
+  /**
+   * @param {import('@playwright/test').Page} page
+   */
+  constructor(page) {
+    this.page = page;
+  }
+
+  async switchToDarkMode() {
+    // ...
+  }
+}
+```
+
+</TabItem>
+</Tabs>
+
+</div>
+
+</details>
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js title="my-test.ts"
 import { test as base } from '@playwright/test';
 import { TodoPage } from './todo-page';
 import { SettingsPage } from './settings-page';
@@ -208,8 +559,7 @@ export { expect } from '@playwright/test';
 </TabItem>
 <TabItem value="js">
 
-```js
-// my-test.js
+```js title="my-test.js"
 const base = require('@playwright/test');
 const { TodoPage } = require('./todo-page');
 const { SettingsPage } = require('./settings-page');
@@ -310,8 +660,7 @@ export const test = base.extend({
 
 Notice that in this example, the `page` fixture is able to depend on other built-in fixtures such as [testOptions.baseURL](/api/class-testoptions.mdx#test-options-base-url). We can now configure `baseURL` in the configuration file, or locally in the test file with [test.use()](/api/class-test.mdx#test-use).
 
-```js
-// example.spec.ts
+```js title="example.spec.ts"
 
 test.use({ baseURL: 'https://playwright.dev' });
 ```
@@ -345,8 +694,7 @@ Below we'll create an `account` fixture that will be shared by all tests in the 
 }>
 <TabItem value="ts">
 
-```js
-// my-test.ts
+```js title="my-test.ts"
 import { test as base } from '@playwright/test';
 
 type Account = {
@@ -395,8 +743,7 @@ export { expect } from '@playwright/test';
 </TabItem>
 <TabItem value="js">
 
-```js
-// my-test.js
+```js title="my-test.js"
 const base = require('@playwright/test');
 
 exports.test = base.test.extend({
@@ -455,8 +802,7 @@ Here is an example fixture that automatically attaches debug logs when the test 
 }>
 <TabItem value="ts">
 
-```js
-// my-test.ts
+```js title="my-test.ts"
 import * as debug from 'debug';
 import * as fs from 'fs';
 import { test as base } from '@playwright/test';
@@ -485,8 +831,7 @@ export { expect } from '@playwright/test';
 </TabItem>
 <TabItem value="js">
 
-```js
-// my-test.js
+```js title="my-test.js"
 const debug = require('debug');
 const fs = require('fs');
 const base = require('@playwright/test');
@@ -574,6 +919,12 @@ Playwright Test supports running multiple test projects that can be separately c
 
 Below we'll create a `defaultItem` option in addition to the `todoPage` fixture from other examples. This option will be set in configuration file. Note the tuple syntax and `{ option: true }` argument.
 
+<details>
+
+<summary>Click to expand the code for the <code>TodoPage</code></summary>
+
+<div>
+
 <Tabs
   groupId="js-flavor"
   defaultValue="ts"
@@ -584,8 +935,104 @@ Below we'll create a `defaultItem` option in addition to the `todoPage` fixture 
 }>
 <TabItem value="ts">
 
-```js
-// my-test.ts
+```js title="todo-page.ts"
+import { Page, Locator } from '@playwright/test';
+
+export class TodoPage {
+  private readonly inputBox: Locator;
+  private readonly todoItems: Locator;
+
+  constructor(public readonly page: Page) {
+    this.inputBox = this.page.locator('input.new-todo');
+    this.todoItems = this.page.getByTestId('todo-item');
+  }
+
+  async goto() {
+    await this.page.goto('https://demo.playwright.dev/todomvc/');
+  }
+
+  async addToDo(text: string) {
+    await this.inputBox.fill(text);
+    await this.inputBox.press('Enter');
+  }
+
+  async remove(text: string) {
+    const todo = this.todoItems.filter({ hasText: text });
+    await todo.hover();
+    await todo.getByLabel('Delete').click();
+  }
+
+  async removeAll() {
+    while ((await this.todoItems.count()) > 0) {
+      await this.todoItems.first().hover();
+      await this.todoItems.getByLabel('Delete').first().click();
+    }
+  }
+}
+```
+
+</TabItem>
+<TabItem value="js">
+
+```js title="todo-page.js"
+export class TodoPage {
+  /**
+   * @param {import('@playwright/test').Page} page
+   */
+  constructor(page) {
+    this.page = page;
+    this.inputBox = this.page.locator('input.new-todo');
+    this.todoItems = this.page.getByTestId('todo-item');
+  }
+
+  async goto() {
+    await this.page.goto('https://demo.playwright.dev/todomvc/');
+  }
+
+  /**
+   * @param {string} text 
+   */
+  async addToDo(text) {
+    await this.inputBox.fill(text);
+    await this.inputBox.press('Enter');
+  }
+
+  /**
+   * @param {string} text 
+   */
+  async remove(text) {
+    const todo = this.todoItems.filter({ hasText: text });
+    await todo.hover();
+    await todo.getByLabel('Delete').click();
+  }
+
+  async removeAll() {
+    while ((await this.todoItems.count()) > 0) {
+      await this.todoItems.first().hover();
+      await this.todoItems.getByLabel('Delete').first().click();
+    }
+  }
+}
+```
+
+</TabItem>
+</Tabs>
+
+</div>
+
+</details>
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="ts"
+  values={[
+    {label: 'TypeScript', value: 'ts'},
+    {label: 'JavaScript', value: 'js'}
+  ]
+}>
+<TabItem value="ts">
+
+```js title="my-test.ts"
 import { test as base } from '@playwright/test';
 import { TodoPage } from './todo-page';
 
@@ -618,8 +1065,7 @@ export { expect } from '@playwright/test';
 </TabItem>
 <TabItem value="js">
 
-```js
-// my-test.js
+```js title="my-test.js"
 const base = require('@playwright/test');
 const { TodoPage } = require('./todo-page');
 
@@ -655,8 +1101,7 @@ We can now use `todoPage` fixture as usual, and set the `defaultItem` option in 
 }>
 <TabItem value="ts">
 
-```js
-// playwright.config.ts
+```js title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
 import { MyOptions } from './my-test';
 
@@ -677,8 +1122,7 @@ export default defineConfig<MyOptions>({
 </TabItem>
 <TabItem value="js">
 
-```js
-// playwright.config.js
+```js title="playwright.config.ts"
 // @ts-check
 
 const { defineConfig } = require('@playwright/test');
