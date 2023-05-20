@@ -72,6 +72,10 @@ await context.AddCookiesAsync(new[] { cookie1, cookie2 });
   - `SameSite` `enum SameSiteAttribute { Strict, Lax, None }?` *(optional)*
     
     Optional.
+  
+  Adds cookies to the browser context.
+  
+  For the cookie to apply to all subdomains as well, prefix domain with a dot, like this: ".example.com".
 
 ---
 
@@ -553,6 +557,61 @@ await BrowserContext.RouteFromHARAsync(har, options);
 
 ---
 
+### RunAndWaitForConsoleMessageAsync {#browser-context-wait-for-console-message}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.34</font><x-search>browserContext.RunAndWaitForConsoleMessageAsync</x-search>
+
+Performs action and waits for a [ConsoleMessage] to be logged by in the pages in the context. If predicate is provided, it passes [ConsoleMessage] value into the `predicate` function and waits for `predicate(message)` to return a truthy value. Will throw an error if the page is closed before the [BrowserContext.Console](/api/class-browsercontext.mdx#browser-context-event-console) event is fired.
+
+**Usage**
+
+```csharp
+await BrowserContext.RunAndWaitForConsoleMessageAsync(action, options);
+```
+
+**Arguments**
+- `action` [Func]<[Task]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-option-action"/><a href="#browser-context-wait-for-console-message-option-action" class="list-anchor">#</a>
+  
+  Action that triggers the event.
+- `options` `BrowserContextRunAndWaitForConsoleMessageOptions?` *(optional)*
+  - `Predicate` [Func]<[ConsoleMessage]?, bool> *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-option-predicate"/><a href="#browser-context-wait-for-console-message-option-predicate" class="list-anchor">#</a>
+    
+    Receives the [ConsoleMessage] object and resolves to truthy value when the waiting should resolve.
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-option-timeout"/><a href="#browser-context-wait-for-console-message-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
+
+**Returns**
+- [ConsoleMessage]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-return"/><a href="#browser-context-wait-for-console-message-return" class="list-anchor">#</a>
+
+---
+
+### WaitForConsoleMessageAsync {#browser-context-wait-for-console-message}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.34</font><x-search>browserContext.WaitForConsoleMessageAsync</x-search>
+
+Performs action and waits for a [ConsoleMessage] to be logged by in the pages in the context. If predicate is provided, it passes [ConsoleMessage] value into the `predicate` function and waits for `predicate(message)` to return a truthy value. Will throw an error if the page is closed before the [BrowserContext.Console](/api/class-browsercontext.mdx#browser-context-event-console) event is fired.
+
+**Usage**
+
+```csharp
+await BrowserContext.WaitForConsoleMessageAsync(action, options);
+```
+
+**Arguments**
+- `options` `BrowserContextRunAndWaitForConsoleMessageOptions?` *(optional)*
+  - `Predicate` [Func]<[ConsoleMessage]?, bool> *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-option-predicate"/><a href="#browser-context-wait-for-console-message-option-predicate" class="list-anchor">#</a>
+    
+    Receives the [ConsoleMessage] object and resolves to truthy value when the waiting should resolve.
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-option-timeout"/><a href="#browser-context-wait-for-console-message-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
+
+**Returns**
+- [ConsoleMessage]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="browser-context-wait-for-console-message-return"/><a href="#browser-context-wait-for-console-message-return" class="list-anchor">#</a>
+
+---
+
 ### RunAndWaitForPageAsync {#browser-context-wait-for-page}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>browserContext.RunAndWaitForPageAsync</x-search>
@@ -832,6 +891,52 @@ BrowserContext.Close += async data => {};
 
 **Event data**
 - [BrowserContext]
+
+---
+
+### event Console {#browser-context-event-console}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.33</font><x-search>browserContext.event Console</x-search>
+
+Emitted when JavaScript within the page calls one of console API methods, e.g. `console.log` or `console.dir`. Also emitted if the page throws an error or a warning.
+
+The arguments passed into `console.log` and the page are available on the [ConsoleMessage] event handler argument.
+
+**Usage**
+
+```csharp
+context.Console += async (_, msg) =>
+{
+    foreach (var arg in msg.Args)
+        Console.WriteLine(await arg.JsonValueAsync<object>());
+};
+
+await page.EvaluateAsync("console.log('hello', 5, { foo: 'bar' })");
+```
+
+**Event data**
+- [ConsoleMessage]
+
+---
+
+### event Dialog {#browser-context-event-dialog}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.33</font><x-search>browserContext.event Dialog</x-search>
+
+Emitted when a JavaScript dialog appears, such as `alert`, `prompt`, `confirm` or `beforeunload`. Listener **must** either [Dialog.AcceptAsync()](/api/class-dialog.mdx#dialog-accept) or [Dialog.DismissAsync()](/api/class-dialog.mdx#dialog-dismiss) the dialog - otherwise the page will [freeze](https://developer.mozilla.org/en-US/docs/Web/JavaScript/EventLoop#never_blocking) waiting for the dialog, and actions like click will never finish.
+
+**Usage**
+
+```csharp
+context.Dialog += (_, dialog) => dialog.AcceptAsync();
+```
+
+:::note
+When no [Page.Dialog](/api/class-page.mdx#page-event-dialog) or [BrowserContext.Dialog](/api/class-browsercontext.mdx#browser-context-event-dialog) listeners are present, all dialogs are automatically dismissed.
+:::
+
+**Event data**
+- [Dialog]
 
 ---
 
