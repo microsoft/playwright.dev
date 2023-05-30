@@ -1,5 +1,13 @@
 const liveStreams = [
   {
+    title: 'Playwright Q&A',
+    description: '',
+    id: 'YSSKlt4i34Q',
+    year: '2023',
+    host: 'Playwright',
+    speakers: ["Debbie O'Brien, Max Schmitt, Andrey Lushnikov"]
+  },
+  {
     title: 'End to End testing with Playwright',
     description: '',
     id: 'sKUVyVd-nJg',

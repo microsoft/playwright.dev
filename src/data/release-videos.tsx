@@ -1,5 +1,10 @@
 const releaseVideos = [
   {
+    version: '1.33 & 1.34',
+    id: "JeFD6rqDbBo",
+    highlights: ['ui mode improvements', 'tear down', 'and, or, hasnot locators', 'expect configure'],
+  },
+  {
     version: '1.32',
     id: "jF0yA-JLQW0",
     highlights: ['ui mode', 'watch mode', 'time travel debugging', 'live trace viewer'],
