@@ -73,12 +73,14 @@ class Generator {
 
   /**
    * @param {string} lang
+   * @param {string} version
    * @param {string} srcDir
    * @param {string} outDir
    * @param {GeneratorFormatter} formatter
    */
-  constructor(lang, srcDir, outDir, formatter) {
+  constructor(lang, version, srcDir, outDir, formatter) {
     this.lang = lang;
+    this.version = version;
     this.outDir = outDir;
     this.srcDir = srcDir;
     /** @type {Set<string>} */
@@ -423,7 +425,15 @@ ${this.documentation.renderLinksInText(member.discouraged)}
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';`);
-  writeFileSyncCached(path.join(this.outDir, outName), this.mdxLinks(output));
+  writeFileSyncCached(path.join(this.outDir, outName), this.rewriteVersion(this.mdxLinks(output)));
+  }
+
+  /**
+   * @param {string} content 
+   * @returns {string}
+   */
+  rewriteVersion(content) {
+    return content.replace(/%%VERSION%%/g, this.version);
   }
 
   /**

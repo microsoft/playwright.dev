@@ -38,11 +38,56 @@ const lang2Folder = {
   'csharp': 'dotnet',
 }
 
+/**
+ * @param {string} lang
+ * @returns {Promise<string>}
+ */
+async function getVersionForLanguageBinding(lang) {
+  switch (lang) {
+    case 'js':
+      const npmResponse = await fetch('https://registry.npmjs.org/playwright');
+      const npmData = await npmResponse.json();
+      return npmData['dist-tags'].latest;
+
+    case 'java':
+      const mavenResponse = await fetch('https://search.maven.org/solrsearch/select?q=g:com.microsoft.playwright+AND+a:playwright&rows=1&wt=json');
+      const mavenData = await mavenResponse.json();
+      return mavenData.response.docs[0].latestVersion;
+
+    case 'python':
+      const pypiResponse = await fetch('https://pypi.org/pypi/playwright/json');
+      const pypiData = await pypiResponse.json();
+      return pypiData.info.version;
+
+    case 'csharp':
+      const nugetResponse = await fetch('https://api.nuget.org/v3-flatcontainer/microsoft.playwright/index.json');
+      const nugetData = await nugetResponse.json();
+      return nugetData.versions.pop();
+
+    default:
+      throw new Error(`Unknown language binding ${lang}`);
+  }
+}
+
+const versionCache = new Map();
+
+/**
+ * @param {string} lang
+ * @returns {Promise<string>}
+ */
+async function getVersionForLanguageBindingCached(lang) {
+  if (!versionCache.has(lang)) {
+    const version = await getVersionForLanguageBinding(lang);
+    versionCache.set(lang, version);
+  }
+  return versionCache.get(lang);
+}
+
 async function generateDocsForLanguages () {
-  new Generator('js', srcDir, path.join(__dirname, '..', 'nodejs', 'docs'), new JavaScriptFormatter());
-  new Generator('python', srcDir, path.join(__dirname, '..', 'python', 'docs'), new PythonFormatter());
-  new Generator('java', srcDir, path.join(__dirname, '..', 'java', 'docs'), new JavaFormatter());
-  new Generator('csharp', srcDir, path.join(__dirname, '..', 'dotnet', 'docs'), new CSharpFormatter());
+  new Generator('js', await getVersionForLanguageBindingCached('js'), srcDir, path.join(__dirname, '..', 'nodejs', 'docs'), new JavaScriptFormatter());
+  new Generator('python', await getVersionForLanguageBindingCached('python'), srcDir, path.join(__dirname, '..', 'python', 'docs'), new PythonFormatter());
+  new Generator('java', await getVersionForLanguageBindingCached('java'), srcDir, path.join(__dirname, '..', 'java', 'docs'), new JavaFormatter());
+  new Generator('csharp', await getVersionForLanguageBindingCached('csharp'), srcDir, path.join(__dirname, '..', 'dotnet', 'docs'), new CSharpFormatter());
 };
 
 /**
