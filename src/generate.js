@@ -37,7 +37,6 @@ const lang2Folder = {
   'java': 'java',
   'csharp': 'dotnet',
 }
-const versionCache = new Map();
 
 /**
  * @param {string} lang
@@ -69,6 +68,8 @@ async function getVersionForLanguageBinding(lang) {
       throw new Error(`Unknown language binding ${lang}`);
   }
 }
+
+const versionCache = new Map();
 
 /**
  * @param {string} lang
