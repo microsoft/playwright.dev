@@ -464,6 +464,8 @@ await page
     .click();
 ```
 
+### Filter by not having text
+
 Alternatively, filter by **not having** text:
 
 ```js
@@ -520,7 +522,9 @@ await expect(page
     .toHaveCount(1);
 ```
 
-We can also filter by **not having** a matching element inside
+### Filter by not having child/descendant
+
+We can also filter by **not having** a matching element inside.
 
 ```js
 await expect(page
@@ -531,15 +535,9 @@ await expect(page
 
 Note that the inner locator is matched starting from the outer one, not from the document root.
 
-### Filter by matching an additional locator
+## Locator operators
 
-Method [locator.and()](/api/class-locator.mdx#locator-and) narrows down an existing locator by matching an additional locator. For example, you can combine [page.getByRole()](/api/class-page.mdx#page-get-by-role) and [page.getByTitle()](/api/class-page.mdx#page-get-by-title) to match by both role and title.
-
-```js
-const button = page.getByRole('button').and(page.getByTitle('Subscribe'));
-```
-
-## Chaining Locators
+### Matching inside a locator
 
 You can chain methods that create a locator, like [page.getByText()](/api/class-page.mdx#page-get-by-text) or [locator.getByRole()](/api/class-locator.mdx#locator-get-by-role), to narrow down the search to a particular part of the page.
 
@@ -562,6 +560,54 @@ const dialog = page.getByTestId('settings-dialog');
 await dialog.locator(saveButton).click();
 ```
 
+### Matching two locators simultaneously
+
+Method [locator.and()](/api/class-locator.mdx#locator-and) narrows down an existing locator by matching an additional locator. For example, you can combine [page.getByRole()](/api/class-page.mdx#page-get-by-role) and [page.getByTitle()](/api/class-page.mdx#page-get-by-title) to match by both role and title.
+
+```js
+const button = page.getByRole('button').and(page.getByTitle('Subscribe'));
+```
+
+### Matching one of the two alternative locators
+
+If you'd like to target one of the two or more elements, and you don't know which one it will be, use [locator.or()](/api/class-locator.mdx#locator-or) to create a locator that matches any of the alternatives.
+
+For example, consider a scenario where you'd like to click on a "New email" button, but sometimes a security settings dialog shows up instead. In this case, you can wait for either a "New email" button, or a dialog and act accordingly.
+
+```js
+const newEmail = page.getByRole('button', { name: 'New' });
+const dialog = page.getByText('Confirm security settings');
+await expect(newEmail.or(dialog)).toBeVisible();
+if (await dialog.isVisible())
+  await page.getByRole('button', { name: 'Dismiss' }).click();
+await newEmail.click();
+```
+
+### Matching only visible elements
+
+:::note
+It's usually better to find a [more reliable way](./locators.mdx#quick-guide) to uniquely identify the element instead of checking the visibility.
+:::
+
+Consider a page with two buttons, first invisible and second [visible](./actionability.mdx#visible).
+
+```html
+<button style='display: none'>Invisible</button>
+<button>Visible</button>
+```
+
+* This will find both buttons and throw a [strictness](./locators.mdx#strictness) violation error:
+  
+  ```js
+  await page.locator('button').click();
+  ```
+  
+* This will only find a second button, because it is visible, and then click it.
+  
+  ```js
+  await page.locator('button').locator('visible=true').click();
+  ```
+  
 ## Lists
 
 ### Count items in a list
