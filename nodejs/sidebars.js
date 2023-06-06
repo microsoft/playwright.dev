@@ -101,7 +101,6 @@ module.exports = {
       ],
       collapsed: true
     },
-    { type: 'doc', id: 'troubleshooting' },
     { type: 'doc', id: 'languages' }
   ],
   api: [
