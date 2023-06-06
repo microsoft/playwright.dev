@@ -2,7 +2,7 @@ const releaseVideos = [
   {
     version: '1.33 & 1.34',
     id: "JeFD6rqDbBo",
-    highlights: ['ui mode improvements', 'tear down', 'and, or, hasnot locators', 'expect configure'],
+    highlights: ['ui mode', 'tear down', 'locators', 'expect'],
   },
   {
     version: '1.32',
