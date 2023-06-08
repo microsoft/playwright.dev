@@ -52,7 +52,7 @@ jobs:
         dotnet-version: 6.0.x
     - run: dotnet build
     - name: Ensure browsers are installed
-      run: pwsh bin/Debug/netX/playwright.ps1 install --with-deps
+      run: pwsh bin/Debug/net6.0/playwright.ps1 install --with-deps
     - name: Run your tests
       run: dotnet test
 ```
@@ -73,7 +73,7 @@ jobs:
     name: 'Playwright Tests'
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright/dotnet:v1.34.3-jammy
+      image: mcr.microsoft.com/playwright/dotnet:v1.34.0-jammy
     steps:
       - uses: actions/checkout@v3
       - name: Setup dotnet
@@ -100,17 +100,17 @@ jobs:
     if: github.event.deployment_status.state == 'success'
     steps:
     - uses: actions/checkout@v3
-    - uses: actions/setup-node@v3
+    - name: Setup dotnet
+      uses: actions/setup-dotnet@v3
       with:
-        node-version: 18
-    - name: Install dependencies
-      run: npm ci
-    - name: Install Playwright
-      run: npx playwright install --with-deps
-    - name: Run Playwright tests
-      run: npx playwright test
+        dotnet-version: 6.0.x
+    - run: dotnet build
+    - name: Ensure browsers are installed
+      run: pwsh bin/Debug/net6.0/playwright.ps1 install --with-deps
+    - name: Run tests
+      run: dotnet test
       env:
-        # This might depend on your test-runner/language binding
+        # This might depend on your test-runner
         PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.target_url }}
 ```
 
@@ -132,71 +132,48 @@ For Linux agents, you can use [our Docker container](./docker.mdx) with Azure Pi
 For running the Playwright tests use this pipeline task:
 
 ```yml
-jobs:
-    - deployment: Run_E2E_Tests
-      pool:
-        vmImage: ubuntu-22.04
-      container: mcr.microsoft.com/playwright:v1.34.3-jammy
-      environment: testing
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-            - checkout: self
-            - task: Bash@3
-              displayName: 'Run Playwright tests'
-              inputs:
-                workingDirectory: 'my-e2e-tests'
-                targetType: 'inline'
-                failOnStderr: true
-                env:
-                  CI: true
-                script: |
-                  npm ci
-                  npx playwright test
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: sdk
+    version: '6.0.x'
+  displayName: 'Use .NET SDK'
+- script: dotnet build --configuration Release
+  displayName: 'Build'
+- script: pwsh bin/Debug/net6.0/playwright.ps1 install --with-deps
+  displayName: 'Install Playwright browsers'
+- script: dotnet test --configuration Release
+  displayName: 'Run tests'
 ```
 
-This will make the pipeline run fail if any of the playwright tests fails. If you also want to integrate the test results with Azure DevOps, use the task `PublishTestResults` task like so:
+#### Azure Pipelines (containerized)
 
 ```yml
-jobs:
-    - deployment: Run_E2E_Tests
-      pool:
-        vmImage: ubuntu-22.04
-      container: mcr.microsoft.com/playwright:v1.34.3-jammy
-      environment: testing
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-            - checkout: self
-            - task: Bash@3
-              displayName: 'Run Playwright tests'
-              inputs:
-                workingDirectory: 'my-e2e-tests'
-                targetType: 'inline'
-                failOnStderr: true
-                env:
-                  CI: true
-                script: |
-                  npm ci
-                  npx playwright test
-            - task: PublishTestResults@2
-              displayName: 'Publish test results'
-              inputs:
-                searchFolder: 'my-e2e-tests/test-results'
-                testResultsFormat: 'JUnit'
-                testResultsFiles: 'e2e-junit-results.xml'
-                mergeTestResults: true
-                failTaskOnFailedTests: true
-                testRunTitle: 'My End-To-End Tests'
-              condition: succeededOrFailed()
+trigger:
+- main
 
+pool:
+  vmImage: ubuntu-latest
+container: mcr.microsoft.com/playwright/dotnet:v1.34.0-jammy
+
+steps:
+- task: UseDotNet@2
+  inputs:
+    packageType: sdk
+    version: '6.0.x'
+  displayName: 'Use .NET SDK'
+
+- script: dotnet build --configuration Release
+  displayName: 'Build'
+- script: dotnet test --configuration Release
+  displayName: 'Run tests'
 ```
-
-Note: The JUnit reporter needs to be configured accordingly via
-
-in `playwright.config.ts`.
 
 ### CircleCI
 
@@ -204,9 +181,9 @@ Running Playwright on CircleCI is very similar to running on GitHub Actions. In 
 
 ```yml
 executors:
-   pw-jammy-development:
-     docker:
-       - image: mcr.microsoft.com/playwright:v1.34.3-jammy
+  pw-jammy-development:
+    docker:
+      - image: mcr.microsoft.com/playwright/dotnet:v1.34.0-jammy
 ```
 
 Note: When using the docker agent definition, you are specifying the resource class of where playwright runs to the 'medium' tier [here](https://circleci.com/docs/configuration-reference?#docker-execution-environment). The default behavior of Playwright is to set the number of workers to the detected core count (2 in the case of the medium tier). Overriding the number of workers to greater than this number will cause unnecessary timeouts and failures.
@@ -229,13 +206,12 @@ Jenkins supports Docker agents for pipelines. Use the [Playwright Docker image](
 
 ```groovy
 pipeline {
-   agent { docker { image 'mcr.microsoft.com/playwright:v1.34.3-jammy' } }
+   agent { docker { image 'mcr.microsoft.com/playwright/dotnet:v1.34.0-jammy' } }
    stages {
       stage('e2e-tests') {
          steps {
-            // Depends on your language / test framework
-            sh 'npm install'
-            sh 'npx playwright test'
+            sh 'dotnet build'
+            sh 'dotnet test'
          }
       }
    }
@@ -247,23 +223,12 @@ pipeline {
 Bitbucket Pipelines can use public [Docker images as build environments](https://confluence.atlassian.com/bitbucket/use-docker-images-as-build-environments-792298897.html). To run Playwright tests on Bitbucket, use our public Docker image ([see Dockerfile](./docker.mdx)).
 
 ```yml
-image: mcr.microsoft.com/playwright:v1.34.3-jammy
+image: mcr.microsoft.com/playwright/dotnet:v1.34.0-jammy
 ```
 
 ### GitLab CI
 
 To run Playwright tests on GitLab, use our public Docker image ([see Dockerfile](./docker.mdx)).
-
-```yml
-stages:
-  - test
-
-tests:
-  stage: test
-  image: mcr.microsoft.com/playwright:v1.34.3-jammy
-  script:
-  ...
-```
 
 ## Caching browsers
 
@@ -276,10 +241,10 @@ To cache the browser downloads between CI runs, cache this location in your CI c
 
 ## Debugging browser launches
 
-Playwright supports the `DEBUG` environment variable to output debug logs during execution. Setting it to `pw:browser*` is helpful while debugging `Error: Failed to launch browser` errors.
+Playwright supports the `DEBUG` environment variable to output debug logs during execution. Setting it to `pw:browser` is helpful while debugging `Error: Failed to launch browser` errors.
 
 ```bash
-DEBUG=pw:browser* dotnet test
+DEBUG=pw:browser dotnet test
 ```
 
 ## Running headed
