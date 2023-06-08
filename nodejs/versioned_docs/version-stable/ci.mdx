@@ -17,8 +17,6 @@ Playwright tests can be executed in CI environments. We have created sample conf
    ```bash
    # Install NPM packages
    npm ci
-   # or
-   npm install
    
    # Install Playwright browsers and dependencies
    npx playwright install --with-deps
@@ -204,7 +202,6 @@ jobs:
     - name: Run Playwright tests
       run: npx playwright test
       env:
-        # This might depend on your test-runner/language binding
         PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.target_url }}
 ```
 
@@ -226,65 +223,64 @@ For Linux agents, you can use [our Docker container](./docker.mdx) with Azure Pi
 For running the Playwright tests use this pipeline task:
 
 ```yml
-jobs:
-    - deployment: Run_E2E_Tests
-      pool:
-        vmImage: ubuntu-22.04
-      container: mcr.microsoft.com/playwright:v1.34.3-jammy
-      environment: testing
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-            - checkout: self
-            - task: Bash@3
-              displayName: 'Run Playwright tests'
-              inputs:
-                workingDirectory: 'my-e2e-tests'
-                targetType: 'inline'
-                failOnStderr: true
-                env:
-                  CI: true
-                script: |
-                  npm ci
-                  npx playwright test
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '18'
+  displayName: 'Install Node.js'
+- script: npm ci
+  displayName: 'npm ci'
+- script: npx playwright install --with-deps
+  displayName: 'Install Playwright browsers'
+- script: npx playwright test
+  displayName: 'Run Playwright tests'
 ```
+
+#### Uploading playwright-report folder with Azure Pipelines
 
 This will make the pipeline run fail if any of the playwright tests fails. If you also want to integrate the test results with Azure DevOps, use the task `PublishTestResults` task like so:
 
 ```yml
-jobs:
-    - deployment: Run_E2E_Tests
-      pool:
-        vmImage: ubuntu-22.04
-      container: mcr.microsoft.com/playwright:v1.34.3-jammy
-      environment: testing
-      strategy:
-        runOnce:
-          deploy:
-            steps:
-            - checkout: self
-            - task: Bash@3
-              displayName: 'Run Playwright tests'
-              inputs:
-                workingDirectory: 'my-e2e-tests'
-                targetType: 'inline'
-                failOnStderr: true
-                env:
-                  CI: true
-                script: |
-                  npm ci
-                  npx playwright test
-            - task: PublishTestResults@2
-              displayName: 'Publish test results'
-              inputs:
-                searchFolder: 'my-e2e-tests/test-results'
-                testResultsFormat: 'JUnit'
-                testResultsFiles: 'e2e-junit-results.xml'
-                mergeTestResults: true
-                failTaskOnFailedTests: true
-                testRunTitle: 'My End-To-End Tests'
-              condition: succeededOrFailed()
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '18'
+  displayName: 'Install Node.js'
+
+- script: npm ci
+  displayName: 'npm ci'
+- script: npx playwright install --with-deps
+  displayName: 'Install Playwright browsers'
+- script: npx playwright test
+  displayName: 'Run Playwright tests'
+- task: PublishTestResults@2
+  displayName: 'Publish test results'
+  inputs:
+    searchFolder: 'test-results'
+    testResultsFormat: 'JUnit'
+    testResultsFiles: 'e2e-junit-results.xml'
+    mergeTestResults: true
+    failTaskOnFailedTests: true
+    testRunTitle: 'My End-To-End Tests'
+  condition: succeededOrFailed()
+- task: PublishPipelineArtifact@1
+  inputs:
+    targetPath: playwright-report
+    artifact: playwright-report
+    publishLocation: 'pipeline'
+  condition: succeededOrFailed()
 
 ```
 
@@ -296,15 +292,98 @@ Note: The JUnit reporter needs to be configured accordingly via
 
 in `playwright.config.ts`.
 
+#### Azure Pipelines (sharded)
+
+```yaml
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+
+strategy:
+  matrix:
+    chromium-1:
+      project: chromium
+      shardIndex: 1
+      shardTotal: 3
+    chromium-2:
+      project: chromium
+      shardIndex: 2
+      shardTotal: 3
+    chromium-3:
+      project: chromium
+      shardIndex: 3
+      shardTotal: 3
+    firefox-1:
+      project: firefox
+      shardIndex: 1
+      shardTotal: 3
+    firefox-2:
+      project: firefox
+      shardIndex: 2
+      shardTotal: 3
+    firefox-3:
+      project: firefox
+      shardIndex: 3
+      shardTotal: 3
+    webkit-1:
+      project: webkit
+      shardIndex: 1
+      shardTotal: 3
+    webkit-2:
+      project: webkit
+      shardIndex: 2
+      shardTotal: 3
+    webkit-3:
+      project: webkit
+      shardIndex: 3
+      shardTotal: 3
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '18'
+  displayName: 'Install Node.js'
+
+- script: npm ci
+  displayName: 'npm ci'
+- script: npx playwright install --with-deps
+  displayName: 'Install Playwright browsers'
+- script: npx playwright test --project=$(project) --shard=$(shardIndex)/$(shardTotal)
+  displayName: 'Run Playwright tests'
+```
+
+#### Azure Pipelines (containerized)
+
+```yml
+trigger:
+- main
+
+pool:
+  vmImage: ubuntu-latest
+container: mcr.microsoft.com/playwright:v1.34.3-jammy
+
+steps:
+- task: NodeTool@0
+  inputs:
+    versionSpec: '18'
+  displayName: 'Install Node.js'
+
+- script: npm ci
+  displayName: 'npm ci'
+- script: npx playwright test
+  displayName: 'Run Playwright tests'
+```
+
 ### CircleCI
 
 Running Playwright on CircleCI is very similar to running on GitHub Actions. In order to specify the pre-built Playwright [Docker image](./docker.mdx), simply modify the agent definition with `docker:` in your config like so:
 
 ```yml
 executors:
-   pw-jammy-development:
-     docker:
-       - image: mcr.microsoft.com/playwright:v1.34.3-jammy
+  pw-jammy-development:
+    docker:
+      - image: mcr.microsoft.com/playwright:v1.34.3-jammy
 ```
 
 Note: When using the docker agent definition, you are specifying the resource class of where playwright runs to the 'medium' tier [here](https://circleci.com/docs/configuration-reference?#docker-execution-environment). The default behavior of Playwright is to set the number of workers to the detected core count (2 in the case of the medium tier). Overriding the number of workers to greater than this number will cause unnecessary timeouts and failures.
@@ -331,8 +410,7 @@ pipeline {
    stages {
       stage('e2e-tests') {
          steps {
-            // Depends on your language / test framework
-            sh 'npm install'
+            sh 'ci'
             sh 'npx playwright test'
          }
       }
@@ -410,10 +488,10 @@ To cache the browser downloads between CI runs, cache this location in your CI c
 
 ## Debugging browser launches
 
-Playwright supports the `DEBUG` environment variable to output debug logs during execution. Setting it to `pw:browser*` is helpful while debugging `Error: Failed to launch browser` errors.
+Playwright supports the `DEBUG` environment variable to output debug logs during execution. Setting it to `pw:browser` is helpful while debugging `Error: Failed to launch browser` errors.
 
 ```bash
-DEBUG=pw:browser* npx playwright test
+DEBUG=pw:browser npx playwright test
 ```
 
 ## Running headed
