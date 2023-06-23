@@ -1,5 +1,10 @@
 const releaseVideos = [
   {
+    version: '1.35',
+    id: "pJiirfyJwcA",
+    highlights: ['View traces from VS Code', 'mask color', 'intercept routes', 'ui mode in a tab', 'uninstall'],
+  },
+  {
     version: '1.33 & 1.34',
     id: "JeFD6rqDbBo",
     highlights: ['ui mode', 'tear down', 'locators', 'expect'],
