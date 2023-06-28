@@ -101,23 +101,23 @@ However, it might come handy in some edge cases. Here's how to polyfill `waitFor
    
    ```js
    async function waitForAngular(page) {
-     ​const clientSideScripts = require('protractor/built/clientsidescripts.js');
+     const clientSideScripts = require('protractor/built/clientsidescripts.js');
    
-     ​async function executeScriptAsync(page, script, ...scriptArgs) {
-       ​await page.evaluate(`
-         ​new Promise((resolve, reject) => {
-           ​const callback = (errMessage) => {
-             ​if (errMessage)
-               ​reject(new Error(errMessage));
-             ​else
-               ​resolve();
-           ​};
-           ​(function() {${script}}).apply(null, [...${JSON.stringify(scriptArgs)}, callback]);
-         ​})
-       ​`);
-     ​}
+     async function executeScriptAsync(page, script, ...scriptArgs) {
+       await page.evaluate(`
+         new Promise((resolve, reject) => {
+           const callback = (errMessage) => {
+             if (errMessage)
+               reject(new Error(errMessage));
+             else
+               resolve();
+           };
+           (function() {${script}}).apply(null, [...${JSON.stringify(scriptArgs)}, callback]);
+         })
+       `);
+     }
    
-     ​await executeScriptAsync(page, clientSideScripts.waitForAngular, '');
+     await executeScriptAsync(page, clientSideScripts.waitForAngular, '');
    }
    ```
    
@@ -135,8 +135,8 @@ However, it might come handy in some edge cases. Here's how to polyfill `waitFor
            return new Promise(res => testability.whenStable(res));
          }
        }
-      });
-    }
+     });
+   }
    ```
    
 1. Polyfill usage
