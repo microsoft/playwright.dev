@@ -62,7 +62,8 @@ async function getVersionForLanguageBinding(lang) {
     case 'csharp':
       const nugetResponse = await fetch('https://api.nuget.org/v3-flatcontainer/microsoft.playwright/index.json');
       const nugetData = await nugetResponse.json();
-      return nugetData.versions.pop();
+      const stableVersions = nugetData.versions.filter(version => !version.includes('-'));
+      return stableVersions.pop();
 
     default:
       throw new Error(`Unknown language binding ${lang}`);
