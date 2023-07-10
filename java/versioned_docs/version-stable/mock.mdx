@@ -6,40 +6,148 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-Web APIs are usually implemented as HTTP endpoints. Playwright provides APIs to **mock** and **modify** network traffic, both HTTP and HTTPS. Any requests that a page does, including [XHRs](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) requests, can be tracked, modified and mocked.
+## Introduction
+
+Web APIs are usually implemented as HTTP endpoints. Playwright provides APIs to **mock** and **modify** network traffic, both HTTP and HTTPS. Any requests that a page does, including [XHRs](https://developer.mozilla.org/en-US/docs/Web/API/XMLHttpRequest) and [fetch](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) requests, can be tracked, modified and mocked. With Playwright you can also mock using HAR files that contain multiple network requests made by the page.
 
 ## Mock API requests
 
-Following code will intercept all the calls to `https://dog.ceo/api/breeds/list/all` and will return the test data instead. No requests to the `https://dog.ceo/api/breeds/list/all` endpoint will be made.
-
-Read more about [advanced networking](./network.mdx).
+The following code will intercept all the calls to `*/**/api/v1/fruits` and will return a custom response instead. No requests to the API will be made. The test goes to the URL that uses the mocked route and asserts that mock data is present on the page.
 
 ```java
-page.route("https://dog.ceo/api/breeds/list/all", route -> {
-  route.fulfill(new Route.FulfillOptions()
-    .setBody("{\"message\":{\"test_breed\":[]}}"));
+// Intercept the route to the fruit API
+page.route("https://fruit.ceo/api/breeds/image/random", route -> {
+    List<Dictionary<String, Object>> data = new ArrayList<Dictionary<String, Object>>();
+    Hashtable<String, Object> dict = new Hashtable<String, Object>();
+    dict.put("name", "Strawberry");
+    dict.put("id", 21);
+    data.add(dict);
+  // fulfill the route with the mock data
+  route.fulfill(RequestOptions.create().setData(data));
 });
+
+// Go to the page
+page.navigate("https://demo.playwright.dev/api-mocking");
+
+// Assert that the Strawberry fruit is visible
+assertThat(page.getByText("Strawberry")).isVisible();
 ```
+
+You can see from the trace of the example test that the API was never called, it was however fulfilled with the mock data. ![api mocking trace](https://github.com/microsoft/playwright/assets/13063165/3dc14cbf-c100-4efc-ac21-d7b52d698b53)
+
+Read more about [advanced networking](./network.mdx).
 
 ## Modify API responses
 
-Sometimes, it is essential to make an API request, but response needs to be patched to allow for reproducible testing. In that case, instead of mocking the request, one can perform the request and fulfill it with the modified response.
+Sometimes, it is essential to make an API request, but the response needs to be patched to allow for reproducible testing. In that case, instead of mocking the request, one can perform the request and fulfill it with the modified response.
+
+In the example below we intercept the call to the fruit API and add a new fruit called 'playwright', to the data. We then go to the url and assert that this data is there:
+
+```java
+page.route("*/**/api/v1/fruits", route -> {
+  Response response = route.fetch();
+  byte[] json = response.body();
+  parsed = new Gson().fromJson(json, JsonObject.class)
+  parsed.add(new JsonObject().add("name", "Playwright").add("id", 100));
+  // Fulfill using the original response, while patching the response body
+  // with the given JSON object.
+  route.fulfill(new Route.FulfillOptions().setResponse(response).setBody(json.toString()));
+});
+
+// Go to the page
+page.goto("https://demo.playwright.dev/api-mocking");
+
+// Assert that the Strawberry fruit is visible
+assertThat(page.getByText("Playwright", new Page.GetByTextOptions().setExact(true))).isVisible();
+```
+
+In the trace of our test we can see that the API was called and the response was modified. ![trace of test showing api being called and fulfilled](https://github.com/microsoft/playwright/assets/13063165/8b8dd82d-1b3e-428e-871b-840581fed439)
+
+By inspecting the response we can see that our new fruit was added to the list. ![trace of test showing the mock response](https://github.com/microsoft/playwright/assets/13063165/03e6c87c-4ecc-47e8-9ca0-30fface25e9d)
 
 Read more about [advanced networking](./network.mdx).
 
+## Mocking with HAR files
+
+A HAR file is an [HTTP Archive](http://www.softwareishard.com/blog/har-12-spec/) file that contains a record of all the network requests that are made when a page is loaded. It contains information about the request and response headers, cookies, content, timings, and more. You can use HAR files to mock network requests in your tests. You'll need to:
+1. Record a HAR file.
+1. Commit the HAR file alongside the tests.
+1. Route requests using the saved HAR files in the tests.
+
+### Recording a HAR file
+
+To record a HAR file we use [Page.routeFromHAR()](/api/class-page.mdx#page-route-from-har) or [BrowserContext.routeFromHAR()](/api/class-browsercontext.mdx#browser-context-route-from-har) method. This method takes in the path to the HAR file and an optional object of options. The options object can contain the URL so that only requests with the URL matching the specified glob pattern will be served from the HAR File. If not specified, all requests will be served from the HAR file.
+
+Setting `update` option to true will create or update the HAR file with the actual network information instead of serving the requests from the HAR file. Use it when creating a test to populate the HAR with real data.
+
 ```java
-page.route("https://dog.ceo/api/breeds/list/all", route -> {
-  APIResponse response = route.fetch();
-  JsonObject json = new Gson().fromJson(response.text(), JsonObject.class);
-  JsonObject message = json.get("message").getAsJsonObject();
-  message.set("big_red_dog", new JsonArray());
-  // Fulfill using the original response, while patching the response body
-  // with the given JSON object.
-  route.fulfill(new Route.FulfillOptions()
-    .setResponse(response)
-    .setBody(json.toString()));
-});
+// Get the response from the HAR file
+page.routeFromHAR("./hars/fruit.har", new RouteFromHAROptions()
+  .setUrl("*/**/api/v1/fruits")
+  .setUpdate(true)
+);
+
+// Go to the page
+page.goto("https://demo.playwright.dev/api-mocking");
+
+// Assert that the fruit is visible
+assertThat(page.getByText("Strawberry")).isVisible();
 ```
+
+### Modifying a HAR file
+
+Once you have recorded a HAR file you can modify it by opening the hashed .txt file inside your 'hars' folder and editing the JSON. This file should be committed to your source control. Anytime you run this test with `update: true` it will update your HAR file with the request from the API.
+
+```json
+[
+  {
+    "name": "Playwright",
+    "id": 100
+  },
+  // ... other fruits
+]
+```
+
+### Replaying from HAR
+
+Now that you have the HAR file recorded and modified the mock data, it can be used to serve matching responses in the test. For this, just turn off or simply remove the `update` option. This will run the test against the HAR file instead of hitting the API.
+
+```java
+// Replay API requests from HAR.
+// Either use a matching response from the HAR,
+// or abort the request if nothing matches.
+page.routeFromHAR("./hars/fruit.har", new RouteFromHAROptions()
+  .setUrl("*/**/api/v1/fruits")
+  .setUpdate(false)
+);
+
+// Go to the page
+page.goto("https://demo.playwright.dev/api-mocking");
+
+// Assert that the Playwright fruit is visible
+assertThat(page.getByText("Playwright", new Page.GetByTextOptions().setExact(true))).isVisible();
+```
+
+In the trace of our test we can see that the route was fulfilled from the HAR file and the API was not called. ![trace showing the HAR file being used](https://github.com/microsoft/playwright/assets/13063165/1bd7ab66-ea4f-43c2-a4e5-ca17d4837ff1)
+
+If we inspect the response we can see our new fruit was added to the JSON, which was done by manually updating the hashed `.txt` file inside the `hars` folder. ![trace showing response from HAR file](https://github.com/microsoft/playwright/assets/13063165/db3117fc-7b02-4973-9a51-29e213261a6a)
+
+HAR replay matches URL and HTTP method strictly. For POST requests, it also matches POST payloads strictly. If multiple recordings match a request, the one with the most matching headers is picked. An entry resulting in a redirect will be followed automatically.
+
+Similar to when recording, if given HAR file name ends with `.zip`, it is considered an archive containing the HAR file along with network payloads stored as separate entries. You can also extract this archive, edit payloads or HAR log manually and point to the extracted har file. All the payloads will be resolved relative to the extracted har file on the file system.
+
+#### Recording HAR with CLI
+
+We recommend the `update` option to record HAR file for your test. However, you can also record the HAR with Playwright CLI.
+
+Open the browser with Playwright CLI and pass `--save-har` option to produce a HAR file. Optionally, use `--save-har-glob` to only save requests you are interested in, for example API endpoints. If the har file name ends with `.zip`, artifacts are written as separate files and are all compressed into a single `zip`.
+
+```bash
+# Save API requests from example.com as "example.har" archive.
+mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="open --save-har=example.har --save-har-glob='**/api/**' https://example.com"
+```
+
+Read more about [advanced networking](./network.mdx).
 
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
