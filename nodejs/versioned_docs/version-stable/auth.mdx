@@ -63,10 +63,10 @@ This is the **recommended** approach for tests **without server-side state**. Au
 
 **Details**
 
-Create `auth.setup.ts` that will prepare authenticated browser state for all other tests.
+Create `tests/auth.setup.ts` that will prepare authenticated browser state for all other tests.
 
-```js title="auth.setup.ts"
-import { test as setup } from '@playwright/test';
+```js title="tests/auth.setup.ts"
+import { test as setup, expect } from '@playwright/test';
 
 const authFile = 'playwright/.auth/user.json';
 
@@ -150,7 +150,7 @@ We will authenticate once per [worker process](./test-parallel.mdx#worker-proces
 Create `playwright/fixtures.ts` file that will [override `storageState` fixture](./test-fixtures.mdx#overriding-fixtures) to authenticate once per worker. Use [testInfo.parallelIndex](/api/class-testinfo.mdx#test-info-parallel-index) to differentiate between workers.
 
 ```js title="playwright/fixtures.ts"
-import { test as baseTest } from '@playwright/test';
+import { test as baseTest, expect } from '@playwright/test';
 import fs from 'fs';
 import path from 'path';
 
@@ -226,7 +226,7 @@ We will send the API request with [APIRequestContext] and then save authenticate
 
 In the [setup project](#basic-shared-account-in-all-tests):
 
-```js title="auth.setup.ts"
+```js title="tests/auth.setup.ts"
 import { test as setup } from '@playwright/test';
 
 const authFile = 'playwright/.auth/user.json';
@@ -300,8 +300,8 @@ export const test = baseTest.extend<{}, { workerStorageState: string }>({
 
 We will authenticate multiple times in the setup project.
 
-```js title="auth.setup.ts"
-import { test as setup } from '@playwright/test';
+```js title="tests/auth.setup.ts"
+import { test as setup, expect } from '@playwright/test';
 
 const adminFile = 'playwright/.auth/admin.json';
 
@@ -406,7 +406,7 @@ You can introduce fixtures that will provide a page authenticated as each role.
 Below is an example that [creates fixtures](./test-fixtures.mdx#creating-a-fixture) for two [Page Object Models](./pom.mdx) - admin POM and user POM. It assumes `adminStorageState.json` and `userStorageState.json` files were created in the global setup.
 
 ```js title="playwright/fixtures.ts"
-import { test as base, Page, Locator } from '@playwright/test';
+import { test as base, type Page, type Locator } from '@playwright/test';
 
 // Page Object Model for the "admin" page.
 // Here you can add locators and helper methods specific to the admin page.
@@ -487,9 +487,8 @@ fs.writeFileSync('playwright/.auth/session.json', JSON.stringify(sessionStorage)
 const sessionStorage = JSON.parse(fs.readFileSync('playwright/.auth/session.json', 'utf-8'));
 await context.addInitScript(storage => {
   if (window.location.hostname === 'example.com') {
-    for (const [key, value] of Object.entries(storage)) {
+    for (const [key, value] of Object.entries(storage))
       window.sessionStorage.setItem(key, value);
-    }
   }
 }, sessionStorage);
 ```
