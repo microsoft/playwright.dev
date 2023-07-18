@@ -1,35 +1,119 @@
 ---
-id: frames
-title: "Frames"
+id: class-cdpsession
+title: "CDPSession"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-A [Page] can have one or more [Frame] objects attached to it. Each page has a main frame and page-level interactions (like `click`) are assumed to operate in the main frame.
 
-A page can have additional frames attached with the `iframe` HTML tag. These frames can be accessed for interactions inside the frame.
+The `CDPSession` instances are used to talk raw Chrome Devtools Protocol:
+* protocol methods can be called with `session.send` method.
+* protocol events can be subscribed to with `session.on` method.
 
-```java
-// Locate element inside frame
-Locator username = page.frameLocator(".frame-class").getByLabel("User Name");
-username.fill("John");
-```
-
-## Frame objects
-
-One can access frame objects using the [Page.frame()](/api/class-page.mdx#page-frame) API:
+Useful links:
+* Documentation on DevTools Protocol can be found here: [DevTools Protocol Viewer](https://chromedevtools.github.io/devtools-protocol/).
+* Getting Started with DevTools Protocol: https://github.com/aslushnikov/getting-started-with-cdp/blob/master/README.md
 
 ```java
-// Get frame using the frame"s name attribute
-Frame frame = page.frame("frame-login");
+CDPSession client = page.context().newCDPSession(page);
+client.send("Runtime.enable");
 
-// Get frame using frame"s URL
-Frame frame = page.frameByUrl(Pattern.compile(".*domain.*"));
+client.on("Animation.animationCreated", (event) -> System.out.println("Animation created!"));
 
-// Interact with the frame
-frame.fill("#username-input", "John");
+JsonObject response = client.send("Animation.getPlaybackRate");
+double playbackRate = response.get("playbackRate").getAsDouble();
+System.out.println("playback rate is " + playbackRate);
+
+JsonObject params = new JsonObject();
+params.addProperty("playbackRate", playbackRate / 2);
+client.send("Animation.setPlaybackRate", params);
 ```
+
+
+---
+
+## Methods
+
+### detach {#cdp-session-detach}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>cdpSession.detach</x-search>
+
+Detaches the CDPSession from the target. Once detached, the CDPSession object won't emit any events and can't be used to send messages.
+
+**Usage**
+
+```java
+CDPSession.detach();
+```
+
+---
+
+### off {#cdp-session-off}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.37</font><x-search>cdpSession.off</x-search>
+
+Unregister an event handler for events with the specified event name. The given handler will not be called anymore for events with the given name.
+
+**Usage**
+
+```java
+CDPSession.off(eventName, handler);
+```
+
+**Arguments**
+- `eventName` [String]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="cdp-session-off-option-event-name"/><a href="#cdp-session-off-option-event-name" class="list-anchor">#</a>
+  
+  CDP event name.
+- `handler` [Consumer]<[JsonObject]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="cdp-session-off-option-handler"/><a href="#cdp-session-off-option-handler" class="list-anchor">#</a>
+  
+  Event handler.
+
+---
+
+### on {#cdp-session-on}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.37</font><x-search>cdpSession.on</x-search>
+
+Register an event handler for events with the specified event name. The given handler will be called for every event with the given name.
+
+**Usage**
+
+```java
+CDPSession.on(eventName, handler);
+```
+
+**Arguments**
+- `eventName` [String]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="cdp-session-on-option-event-name"/><a href="#cdp-session-on-option-event-name" class="list-anchor">#</a>
+  
+  CDP event name.
+- `handler` [Consumer]<[JsonObject]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="cdp-session-on-option-handler"/><a href="#cdp-session-on-option-handler" class="list-anchor">#</a>
+  
+  Event handler.
+
+---
+
+### send {#cdp-session-send}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>cdpSession.send</x-search>
+
+**Usage**
+
+```java
+CDPSession.send(method);
+CDPSession.send(method, args);
+```
+
+**Arguments**
+- `method` [String]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="cdp-session-send-option-method"/><a href="#cdp-session-send-option-method" class="list-anchor">#</a>
+  
+  Protocol method name.
+- `args` [JsonObject] *(optional)* <font size="2">Added in: v1.37</font><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="cdp-session-send-option-params"/><a href="#cdp-session-send-option-params" class="list-anchor">#</a>
+  
+  Optional method parameters.
+
+**Returns**
+- [JsonObject]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="cdp-session-send-return"/><a href="#cdp-session-send-return" class="list-anchor">#</a>
 
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
