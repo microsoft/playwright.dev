@@ -17,7 +17,7 @@
 //@ts-check
 
 const Documentation = require('./documentation');
-const { renderJSSignatures } = require('./generator');
+const { renderJSSignatures, assertionArgument } = require('./generator');
 /** @typedef {import('./generator').GeneratorFormatter} GeneratorFormatter */
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
 /** @typedef {import('./documentation').Member} Member */
@@ -31,7 +31,7 @@ class JavaScriptFormatter {
   }
 
   /**
-   * @param {Documentation.Member} member 
+   * @param {Documentation.Member} member
    */
   formatMember(member) {
     let args = [];
@@ -41,10 +41,8 @@ class JavaScriptFormatter {
     if (member.clazz.varName === 'playwrightAssertions') {
       prefix = '';
     } else if (member.clazz.varName.includes('Assertions')) {
-      const varName = member.clazz.varName.substring(0, member.clazz.varName.length -'Assertions'.length);
-      // Generate `expect(locator).` instead of `locatorAssertions.`
-      prefix = `expect(${varName}).`;
-    }  
+      prefix = `expect(${assertionArgument(member.clazz)}).`;
+    }
 
     let name = member.alias;
     let usages = [`${prefix}${name}`];
@@ -106,7 +104,7 @@ class JavaScriptFormatter {
   }
 
   /**
-   * @param {MarkdownNode} spec 
+   * @param {MarkdownNode} spec
    * @returns boolean
    */
   filterComment(spec) {

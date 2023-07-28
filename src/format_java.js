@@ -17,7 +17,7 @@
 //@ts-check
 
 const Documentation = require('./documentation');
-const { toTitleCase, renderJSSignatures } = require('./generator');
+const { toTitleCase, renderJSSignatures, assertionArgument } = require('./generator');
 /** @typedef {import('./generator').GeneratorFormatter} GeneratorFormatter */
 /** @typedef {import('./generator').FormatMode} FormatMode */
 
@@ -30,7 +30,7 @@ class JavaFormatter {
   }
 
   /**
-   * @param {Documentation.Member} member 
+   * @param {Documentation.Member} member
    */
   formatMember(member) {
     let args = [];
@@ -39,10 +39,8 @@ class JavaFormatter {
     if (member.clazz.varName === 'playwrightAssertions') {
       prefix = '';
     } else if (member.clazz.varName.includes('Assertions')) {
-      const varName = member.clazz.varName.substring(0, member.clazz.varName.length -'Assertions'.length);
-      // Generate `expect(locator).` instead of `locatorAssertions.`
-      prefix = `assertThat(${varName}).`;
-    }  
+      prefix = `assertThat(${assertionArgument(member.clazz)}).`;
+    }
 
     let name = member.alias;
     if (member.kind === 'property')
@@ -52,7 +50,7 @@ class JavaFormatter {
 
     let usages = [`${prefix}${name}`];
     let link = `${prefix}${name}`;
-  
+
     let signatures;
     if (member.kind === 'method') {
       args = member.argsArray;
@@ -109,7 +107,7 @@ class JavaFormatter {
   }
 
   /**
-   * @param {Documentation.Type} type 
+   * @param {Documentation.Type} type
    * @param {string} direction
    * @param {Documentation.Member} member
    */
@@ -176,7 +174,7 @@ class JavaFormatter {
   }
 
   /**
-   * @param {import('./markdown').MarkdownNode} spec 
+   * @param {import('./markdown').MarkdownNode} spec
    * @returns boolean
    */
    filterComment(spec) {
