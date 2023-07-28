@@ -18,7 +18,7 @@
 
 const md = require('./markdown');
 const Documentation = require('./documentation');
-const { toSnakeCase } = require('./generator');
+const { toSnakeCase, assertionArgument } = require('./generator');
 /** @typedef {import('./generator').GeneratorFormatter} GeneratorFormatter */
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
 
@@ -31,7 +31,7 @@ class PythonFormatter {
   }
 
   /**
-   * @param {Documentation.Member} member 
+   * @param {Documentation.Member} member
    */
   formatMember(member) {
     const args = [];
@@ -40,10 +40,8 @@ class PythonFormatter {
     if (member.clazz.varName === 'playwrightAssertions') {
       prefix = '';
     } else if (member.clazz.varName.includes('Assertions')) {
-      const varName = member.clazz.varName.substring(0, member.clazz.varName.length - 'Assertions'.length);
-      // Generate `expect(locator).` instead of `locatorAssertions.`
-      prefix = `expect(${toSnakeCase(varName)}).`;
-    }  
+      prefix = `expect(${toSnakeCase(assertionArgument(member.clazz))}).`;
+    }
 
     let name = toSnakeCase(member.alias);
     let usages = [`${prefix}${name}`];
@@ -87,7 +85,7 @@ class PythonFormatter {
   }
 
   /**
-   * @param {Documentation.Type} type 
+   * @param {Documentation.Type} type
    * @param {string} direction
    */
   renderType(type, direction) {
@@ -117,7 +115,7 @@ class PythonFormatter {
   }
 
   /**
-   * @param {MarkdownNode} spec 
+   * @param {MarkdownNode} spec
    * @returns boolean
    */
   filterComment(spec) {

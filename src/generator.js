@@ -429,7 +429,7 @@ import HTMLCard from '@site/src/components/HTMLCard';`);
   }
 
   /**
-   * @param {string} content 
+   * @param {string} content
    * @returns {string}
    */
   rewriteVersion(content) {
@@ -734,4 +734,18 @@ function memberSection(member) {
   throw new Error(`Unsupported member kind ${member.kind} for ${member.name}`);
 }
 
-module.exports = { Generator, toTitleCase, toSnakeCase, renderJSSignatures };
+/**
+ * @param {docs.Class} clazz
+ */
+function assertionArgument(clazz) {
+  switch (clazz.name.toLowerCase()) {
+    case 'locatorassertions': return 'locator';
+    case 'pageassertions': return 'page';
+    case 'genericassertions': return 'value';
+    case 'snapshotassertions': return 'value';
+    case 'apiresponseassertions': return 'response';
+  }
+  throw new Error('Unexpected assertion class ' + clazz.name);
+}
+
+module.exports = { Generator, toTitleCase, toSnakeCase, renderJSSignatures, assertionArgument };
