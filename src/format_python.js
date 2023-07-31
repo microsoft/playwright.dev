@@ -121,21 +121,6 @@ class PythonFormatter {
   filterComment(spec) {
     return spec.codeLang === this.lang;
   }
-
-  /**
-   * @param {Documentation.Member} member
-   */
-  memberSection(member) {
-    if (member.deprecated || member.discouraged)
-      return { key: 'd', title: 'Deprecated' };
-    if (member.kind === 'event')
-      return { key: 'c', title: 'Events' };
-    if (member.kind === 'property' || (member.kind === 'method' && !member.async && member.argsArray.length === 0))
-      return { key: 'b', title: 'Properties' };
-    if (member.kind === 'method')
-      return { key: 'a', title: 'Methods' };
-    throw new Error(`Unsupported member kind ${member.kind} for ${member.name}`);
-  }
 }
 
 /**

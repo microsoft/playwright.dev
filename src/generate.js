@@ -85,10 +85,35 @@ async function getVersionForLanguageBindingCached(lang) {
 }
 
 async function generateDocsForLanguages () {
-  new Generator('js', await getVersionForLanguageBindingCached('js'), srcDir, path.join(__dirname, '..', 'nodejs', 'docs'), new JavaScriptFormatter());
-  new Generator('python', await getVersionForLanguageBindingCached('python'), srcDir, path.join(__dirname, '..', 'python', 'docs'), new PythonFormatter());
-  new Generator('java', await getVersionForLanguageBindingCached('java'), srcDir, path.join(__dirname, '..', 'java', 'docs'), new JavaFormatter());
-  new Generator('csharp', await getVersionForLanguageBindingCached('csharp'), srcDir, path.join(__dirname, '..', 'dotnet', 'docs'), new CSharpFormatter());
+  new Generator({
+    lang: 'js',
+    version: await getVersionForLanguageBindingCached('js'),
+    srcDir,
+    outDir: path.join(__dirname, '..', 'nodejs', 'docs'),
+    formatter: new JavaScriptFormatter(),
+  });
+  new Generator({
+    lang: 'python',
+    version: await getVersionForLanguageBindingCached('python'),
+    srcDir,
+    outDir: path.join(__dirname, '..', 'python', 'docs'),
+    formatter: new PythonFormatter(),
+    renderSyncNoArgsMethodAsProperty: true,
+  });
+  new Generator({
+    lang: 'java',
+    version: await getVersionForLanguageBindingCached('java'),
+    srcDir,
+    outDir: path.join(__dirname, '..', 'java', 'docs'),
+    formatter: new JavaFormatter(),
+  });
+  new Generator({
+    lang: 'csharp',
+    version: await getVersionForLanguageBindingCached('csharp'),
+    srcDir,
+    outDir: path.join(__dirname, '..', 'dotnet', 'docs'),
+    formatter: new CSharpFormatter(),
+  });
 };
 
 /**

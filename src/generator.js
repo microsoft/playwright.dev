@@ -65,7 +65,6 @@ function rewriteContent(text) {
  *   preprocessComment: function(MarkdownNode[]): MarkdownNode[]
  *   filterComment: function(MarkdownNode): boolean
  *   renderType: function(docs.Type, string, docs.Member): string,
- *   memberSection?: function(docs.Member): { key: string, title: string },
  * }} GeneratorFormatter
  */
 
@@ -73,17 +72,21 @@ class Generator {
   heading2ExplicitId = new Map();
 
   /**
-   * @param {string} lang
-   * @param {string} version
-   * @param {string} srcDir
-   * @param {string} outDir
-   * @param {GeneratorFormatter} formatter
+   * @param {{
+   * lang: string,
+   * version: string,
+   * srcDir: string,
+   * outDir: string,
+   * formatter: GeneratorFormatter,
+   * renderSyncNoArgsMethodAsProperty?: boolean,
+   * }} options
    */
-  constructor(lang, version, srcDir, outDir, formatter) {
+  constructor({ lang, version, srcDir, outDir, formatter, renderSyncNoArgsMethodAsProperty }) {
     this.lang = lang;
     this.version = version;
     this.outDir = outDir;
     this.srcDir = srcDir;
+    this.renderSyncNoArgsMethodAsProperty = renderSyncNoArgsMethodAsProperty;
     /** @type {Set<string>} */
     this.generatedFiles = new Set();
     this.formatter = formatter;
@@ -348,20 +351,12 @@ ${this.documentation.renderLinksInText(member.discouraged)}
    * @param {docs.Member} member
    */
   memberSection(member) {
-    if (this.formatter.memberSection)
-      return this.formatter.memberSection(member);
-    return this._defaultMemberSection(member);
-  }
-
-  /**
-   * @param {docs.Member} member
-   */
-  _defaultMemberSection(member) {
     if (member.deprecated || member.discouraged)
       return { key: 'd', title: 'Deprecated' };
     if (member.kind === 'event')
       return { key: 'c', title: 'Events' };
-    if (member.kind === 'property')
+    const treatAsProperty = (this.renderSyncNoArgsMethodAsProperty && member.kind === 'method' && !member.async && member.argsArray.length === 0)
+    if (member.kind === 'property' || treatAsProperty)
       return { key: 'b', title: 'Properties' };
     if (member.kind === 'method')
       return { key: 'a', title: 'Methods' };
