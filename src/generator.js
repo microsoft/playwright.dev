@@ -65,6 +65,7 @@ function rewriteContent(text) {
  *   preprocessComment: function(MarkdownNode[]): MarkdownNode[]
  *   filterComment: function(MarkdownNode): boolean
  *   renderType: function(docs.Type, string, docs.Member): string,
+ *   memberSection?: function(docs.Member): { key: string, title: string },
  * }} GeneratorFormatter
  */
 
@@ -161,8 +162,8 @@ import HTMLCard from '@site/src/components/HTMLCard';
       text: ''
     });
     clazz.membersArray.sort((m1, m2) => {
-      let { key: k1 } = memberSection(m1);
-      let { key: k2 } = memberSection(m2);
+      let { key: k1 } = this.memberSection(m1);
+      let { key: k2 } = this.memberSection(m2);
       k1 += toSnakeCase(m1.alias.replace(/\$\$eval/, '$$eval2'));
       k2 += toSnakeCase(m2.alias.replace(/\$\$eval/, '$$eval2'));
       return k1.localeCompare(k2);
@@ -212,7 +213,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
           text: '---'
         });
 
-        const section = memberSection(member);
+        const section = this.memberSection(member);
         if (section.title !== memberSectionTitle) {
           memberSectionTitle = section.title;
           result.push({
@@ -341,6 +342,30 @@ ${this.documentation.renderLinksInText(member.discouraged)}
       }
     }
     return result;
+  }
+
+  /**
+   * @param {docs.Member} member
+   */
+  memberSection(member) {
+    if (this.formatter.memberSection)
+      return this.formatter.memberSection(member);
+    return this._defaultMemberSection(member);
+  }
+
+  /**
+   * @param {docs.Member} member
+   */
+  _defaultMemberSection(member) {
+    if (member.deprecated || member.discouraged)
+      return { key: 'd', title: 'Deprecated' };
+    if (member.kind === 'event')
+      return { key: 'c', title: 'Events' };
+    if (member.kind === 'property')
+      return { key: 'b', title: 'Properties' };
+    if (member.kind === 'method')
+      return { key: 'a', title: 'Methods' };
+    throw new Error(`Unsupported member kind ${member.kind} for ${member.name}`);
   }
 
   /**
@@ -717,21 +742,6 @@ function writeFileSyncCached(file, content) {
     return;
   fileWriteCache.set(file, contentHash);
   fs.writeFileSync(file, content);
-}
-
-/**
- * @param {docs.Member} member
- */
-function memberSection(member) {
-  if (member.deprecated || member.discouraged)
-    return { key: 'd', title: 'Deprecated' };
-  if (member.kind === 'event')
-    return { key: 'c', title: 'Events' };
-  if (member.kind === 'method')
-    return { key: 'a', title: 'Methods' };
-  if (member.kind === 'property')
-    return { key: 'b', title: 'Properties' };
-  throw new Error(`Unsupported member kind ${member.kind} for ${member.name}`);
 }
 
 /**
