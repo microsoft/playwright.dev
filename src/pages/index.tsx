@@ -109,7 +109,7 @@ const features = [
           <b><a href="docs/debug#playwright-inspector">Playwright inspector.</a></b> Inspect page, generate selectors, step through the test execution, see click points, explore execution logs.
         </p>
         <p>
-          <b><a href="https://trace.playwright.dev/">Trace Viewer.</a></b> Capture all the information to investigate the test failure. Playwright trace
+          <b><a href="docs/trace-viewer-intro">Trace Viewer.</a></b> Capture all the information to investigate the test failure. Playwright trace
           contains test execution screencast, live DOM snapshots, action explorer, test source, and many more.
         </p>
       </>
