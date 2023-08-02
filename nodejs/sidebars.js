@@ -33,6 +33,7 @@ module.exports = {
         { type: 'doc', id: 'test-projects' },
         { type: 'doc', id: 'test-reporters' },
         { type: 'doc', id: 'test-retries' },
+        { type: 'doc', id: 'test-sharding' },
         { type: 'doc', id: 'test-timeouts' },
         { type: 'doc', id: 'test-typescript' },
         { type: 'doc', id: 'test-ui-mode' },
