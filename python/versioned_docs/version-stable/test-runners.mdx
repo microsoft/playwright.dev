@@ -18,6 +18,13 @@ pytest --browser webkit --headed
 
 If you want to add the CLI arguments automatically without specifying them, you can use the [pytest.ini](https://docs.pytest.org/en/stable/reference.html#ini-options-ref) file:
 
+```ini
+# content of pytest.ini
+[pytest]
+# Run firefox with UI
+addopts = --headed --browser firefox
+```
+
 ## CLI arguments
 - `--headed`: Run tests in headed mode (default: headless).
 - `--browser`: Run tests in a different browser `chromium`, `firefox`, or `webkit`. It can be specified multiple times (default: `chromium`).
@@ -28,6 +35,7 @@ If you want to add the CLI arguments automatically without specifying them, you 
 - `--tracing` Whether to record a [trace](./trace-viewer.mdx) for each test. `on`, `off`, or `retain-on-failure` (default: `off`).
 - `--video` Whether to record video for each test. `on`, `off`, or `retain-on-failure` (default: `off`).
 - `--screenshot` Whether to automatically capture a screenshot after each test. `on`, `off`, or `only-on-failure` (default: `off`).
+- `--full-page-screenshot` Whether to take a full page screenshot on failure. By default, only the viewport is captured. Requires `--screenshot` to be enabled (default: `off`).
 
 ## Fixtures
 
@@ -55,6 +63,17 @@ def test_my_app_is_working(fixture_name):
 **Customizing fixture options**: For `browser` and `context` fixtures, use the following fixtures to define custom launch options.
 - `browser_type_launch_args`: Override launch arguments for [browser_type.launch()](/api/class-browsertype.mdx#browser-type-launch). It should return a Dict.
 - `browser_context_args`: Override the options for [browser.new_context()](/api/class-browser.mdx#browser-new-context). It should return a Dict.
+
+Its also possible to override the context options ([browser.new_context()](/api/class-browser.mdx#browser-new-context)) for a single test by using the `browser_context_args` marker:
+
+```python
+import pytest
+
+@pytest.mark.browser_context_args(timezone_id="Europe/Berlin", locale="en-GB")
+def test_browser_context_args(page):
+    assert page.evaluate("window.navigator.userAgent") == "Europe/Berlin"
+    assert page.evaluate("window.navigator.languages") == ["de-DE"]
+```
 
 ## Parallelism: Running Multiple Tests at Once
 
