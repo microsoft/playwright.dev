@@ -1,5 +1,10 @@
 const releaseVideos = [
   {
+    version: '1.36 & 1.37',
+    id: "cEd4SH_Xf5U",
+    highlights: ['merge HTML Report', 'horizontal scaling', 'UI Mode updates', 'Debian 12 support'],
+  },
+  {
     version: '1.35',
     id: "pJiirfyJwcA",
     highlights: ['View traces from VS Code', 'mask color', 'intercept routes', 'ui mode in a tab', 'uninstall'],
