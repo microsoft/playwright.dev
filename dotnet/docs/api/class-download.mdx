@@ -11,14 +11,16 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 All the downloaded files belonging to the browser context are deleted when the browser context is closed.
 
-Download event is emitted once the download starts. Download path becomes available once download completes:
+Download event is emitted once the download starts. Download path becomes available once download completes.
 
 ```csharp
-var download = await page.RunAndWaitForDownloadAsync(async () =>
-{
-    await page.GetByText("Download file").ClickAsync();
-});
-Console.WriteLine(await download.PathAsync());
+// Start the task of waiting for the download before clicking
+var waitForDownloadTask = page.WaitForDownloadAsync();
+await page.GetByText("Download file").ClickAsync();
+var download = await waitForDownloadTask;
+
+// Wait for the download process to complete and save the downloaded file somewhere
+await download.SaveAsAsync("/path/to/save/at/" + download.SuggestedFilename);
 ```
 
 
@@ -133,7 +135,7 @@ Copy the download to a user-specified path. It is safe to call this method while
 **Usage**
 
 ```csharp
-await Download.SaveAsAsync(path);
+await download.SaveAsAsync("/path/to/save/at/" + download.SuggestedFilename);
 ```
 
 **Arguments**
