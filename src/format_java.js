@@ -36,7 +36,7 @@ class JavaFormatter {
     let args = [];
 
     let prefix = `${member.clazz.name}.`;
-    if (member.clazz.varName === 'playwrightAssertions') {
+    if (member.clazz.varName === 'playwrightAssertions' || member.clazz.varName === 'softAssertions') {
       prefix = '';
     } else if (member.clazz.varName.includes('Assertions')) {
       prefix = `assertThat(${assertionArgument(member.clazz)}).`;
