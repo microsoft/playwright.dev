@@ -72,11 +72,19 @@ Returns the [Frame] that initiated this request.
 **Usage**
 
 ```java
-Request.frame();
+String frameUrl = request.frame().url();
 ```
 
 **Returns**
 - [Frame]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-frame-return"/><a href="#request-frame-return" class="list-anchor">#</a>
+
+**Details**
+
+Note that in some cases the frame is not available, and this method will throw.
+* When request originates in the Service Worker. You can use `request.serviceWorker()` to check that.
+* When navigation request is issued before the corresponding frame is created. You can use [Request.isNavigationRequest()](/api/class-request.mdx#request-is-navigation-request) to check that.
+
+Here is an example that handles all the cases:
 
 ---
 
@@ -147,6 +155,8 @@ Request.headersArray();
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>request.isNavigationRequest</x-search>
 
 Whether this request is driving frame's navigation.
+
+Some navigation requests are issued before the corresponding frame is created, and therefore do not have [Request.frame()](/api/class-request.mdx#request-frame) available.
 
 **Usage**
 
