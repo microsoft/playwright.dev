@@ -134,7 +134,7 @@ const Feature: React.FC<FeatureProps> = ({ imageUrl, title, description, link })
         </div>
       )}
       <h3>{title}</h3>
-      <p>{description}</p>
+      <div>{description}</div>
     </div>
   );
 }
