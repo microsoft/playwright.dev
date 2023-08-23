@@ -259,7 +259,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 
         // Generate version.
-        const expressionNameForSearch = `<x-search>${clazz.varName}.${name}</x-search>`
+        const expressionNameForSearch = member.deprecated ? `` : `<x-search>${clazz.varName}.${name}</x-search>`;
         sections.version.push({
           type: 'text',
           text: `<font size="2" style={{position: "relative", top: "-20px"}}>Added in: ${member.since}</font>${expressionNameForSearch}`
@@ -571,7 +571,7 @@ ${this.documentation.renderLinksInText(member.discouraged)}
 
     if (member.enclosingMethod && member.name !== 'options') {
       const hash = calculatePropertyHash(member, direction);
-      linkTag = `<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="${hash}"/>`;
+      linkTag = `<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="${hash}"/>`;
       if (member.enclosingMethod.since !== member.since)
         sinceVersion = ` <font size="2">Added in: ${member.since}</font>`;
       linkAnchor = `<a href="#${hash}" class="list-anchor">#</a>`;
