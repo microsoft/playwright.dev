@@ -978,7 +978,7 @@ This method waits for [actionability](../actionability.mdx) checks, focuses the 
 
 If the target element is not an `<input>`, `<textarea>` or `[contenteditable]` element, this method throws an error. However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), the control will be filled instead.
 
-To send fine-grained keyboard events, use [locator.type()](/api/class-locator.mdx#locator-type).
+To send fine-grained keyboard events, use [locator.press_sequentially()](/api/class-locator.mdx#locator-press-sequentially).
 
 ---
 
@@ -2239,6 +2239,92 @@ Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported a
 
 ---
 
+### press_sequentially {#locator-press-sequentially}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.38</font><x-search>locator.press_sequentially</x-search>
+
+:::tip
+In most cases, you should use [locator.fill()](/api/class-locator.mdx#locator-fill) instead. You only need to press keys one by one if there is special keyboard handling on the page.
+:::
+
+Focuses the element, and then sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in the text.
+
+To press a special key, like `Control` or `ArrowDown`, use [locator.press()](/api/class-locator.mdx#locator-press).
+
+**Usage**
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+locator.press_sequentially("hello") # types instantly
+locator.press_sequentially("world", delay=100) # types slower, like a user
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await locator.press_sequentially("hello") # types instantly
+await locator.press_sequentially("world", delay=100) # types slower, like a user
+```
+
+</TabItem>
+</Tabs>
+
+An example of typing into a text field and then submitting the form:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+locator = page.get_by_label("Password")
+locator.press_sequentially("my password")
+locator.press("Enter")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+locator = page.get_by_label("Password")
+await locator.press_sequentially("my password")
+await locator.press("Enter")
+```
+
+</TabItem>
+</Tabs>
+
+**Arguments**
+- `text` [str]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-press-sequentially-option-text"/><a href="#locator-press-sequentially-option-text" class="list-anchor">#</a>
+  
+  String of characters to sequentially press into a focused element.
+- `delay` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-press-sequentially-option-delay"/><a href="#locator-press-sequentially-option-delay" class="list-anchor">#</a>
+  
+  Time to wait between key presses in milliseconds. Defaults to 0.
+- `no_wait_after` [bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-press-sequentially-option-no-wait-after"/><a href="#locator-press-sequentially-option-no-wait-after" class="list-anchor">#</a>
+  
+  Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+- `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-press-sequentially-option-timeout"/><a href="#locator-press-sequentially-option-timeout" class="list-anchor">#</a>
+  
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+---
+
 ### screenshot {#locator-screenshot}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.screenshot</x-search>
@@ -2718,92 +2804,6 @@ locator.text_content(**kwargs)
 
 ---
 
-### type {#locator-type}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.type</x-search>
-
-:::tip
-In most cases, you should use [locator.fill()](/api/class-locator.mdx#locator-fill) instead. You only need to type characters if there is special keyboard handling on the page.
-:::
-
-Focuses the element, and then sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in the text.
-
-To press a special key, like `Control` or `ArrowDown`, use [locator.press()](/api/class-locator.mdx#locator-press).
-
-**Usage**
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-element.type("hello") # types instantly
-element.type("world", delay=100) # types slower, like a user
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-await element.type("hello") # types instantly
-await element.type("world", delay=100) # types slower, like a user
-```
-
-</TabItem>
-</Tabs>
-
-An example of typing into a text field and then submitting the form:
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-element = page.get_by_label("Password")
-element.type("my password")
-element.press("Enter")
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-element = page.get_by_label("Password")
-await element.type("my password")
-await element.press("Enter")
-```
-
-</TabItem>
-</Tabs>
-
-**Arguments**
-- `text` [str]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-type-option-text"/><a href="#locator-type-option-text" class="list-anchor">#</a>
-  
-  A text to type into a focused element.
-- `delay` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-type-option-delay"/><a href="#locator-type-option-delay" class="list-anchor">#</a>
-  
-  Time to wait between key presses in milliseconds. Defaults to 0.
-- `no_wait_after` [bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-type-option-no-wait-after"/><a href="#locator-type-option-no-wait-after" class="list-anchor">#</a>
-  
-  Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-type-option-timeout"/><a href="#locator-type-option-timeout" class="list-anchor">#</a>
-  
-  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-
----
-
 ### uncheck {#locator-uncheck}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.uncheck</x-search>
@@ -3050,6 +3050,39 @@ locator.element_handles()
 
 **Returns**
 - [List]\[[ElementHandle]\]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-element-handles-return"/><a href="#locator-element-handles-return" class="list-anchor">#</a>
+
+---
+
+### type {#locator-type}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.type</x-search>
+
+:::caution Deprecated
+
+In most cases, you should use [locator.fill()](/api/class-locator.mdx#locator-fill) instead. You only need to press keys one by one if there is special keyboard handling on the page - in this case use [locator.press_sequentially()](/api/class-locator.mdx#locator-press-sequentially).
+
+:::
+
+
+Focuses the element, and then sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in the text.
+
+To press a special key, like `Control` or `ArrowDown`, use [locator.press()](/api/class-locator.mdx#locator-press).
+
+**Usage**
+
+**Arguments**
+- `text` [str]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-type-option-text"/><a href="#locator-type-option-text" class="list-anchor">#</a>
+  
+  A text to type into a focused element.
+- `delay` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-type-option-delay"/><a href="#locator-type-option-delay" class="list-anchor">#</a>
+  
+  Time to wait between key presses in milliseconds. Defaults to 0.
+- `no_wait_after` [bool] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-type-option-no-wait-after"/><a href="#locator-type-option-no-wait-after" class="list-anchor">#</a>
+  
+  Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+- `timeout` [float] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-type-option-timeout"/><a href="#locator-type-option-timeout" class="list-anchor">#</a>
+  
+  Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"

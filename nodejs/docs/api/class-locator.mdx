@@ -653,7 +653,7 @@ This method waits for [actionability](../actionability.mdx) checks, focuses the 
 
 If the target element is not an `<input>`, `<textarea>` or `[contenteditable]` element, this method throws an error. However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), the control will be filled instead.
 
-To send fine-grained keyboard events, use [locator.type()](/api/class-locator.mdx#locator-type).
+To send fine-grained keyboard events, use [locator.pressSequentially()](/api/class-locator.mdx#locator-press-sequentially).
 
 ---
 
@@ -1571,6 +1571,50 @@ Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported a
 
 ---
 
+### pressSequentially {#locator-press-sequentially}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.38</font><x-search>locator.pressSequentially</x-search>
+
+:::tip
+In most cases, you should use [locator.fill()](/api/class-locator.mdx#locator-fill) instead. You only need to press keys one by one if there is special keyboard handling on the page.
+:::
+
+Focuses the element, and then sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in the text.
+
+To press a special key, like `Control` or `ArrowDown`, use [locator.press()](/api/class-locator.mdx#locator-press).
+
+**Usage**
+
+```js
+await locator.pressSequentially('Hello'); // Types instantly
+await locator.pressSequentially('World', { delay: 100 }); // Types slower, like a user
+```
+
+An example of typing into a text field and then submitting the form:
+
+```js
+const locator = page.getByLabel('Password');
+await locator.pressSequentially('my password');
+await locator.press('Enter');
+```
+
+**Arguments**
+- `text` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-press-sequentially-option-text"/><a href="#locator-press-sequentially-option-text" class="list-anchor">#</a>
+  
+  String of characters to sequentially press into a focused element.
+- `options` [Object] *(optional)*
+  - `delay` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-press-sequentially-option-delay"/><a href="#locator-press-sequentially-option-delay" class="list-anchor">#</a>
+    
+    Time to wait between key presses in milliseconds. Defaults to 0.
+  - `noWaitAfter` [boolean] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-press-sequentially-option-no-wait-after"/><a href="#locator-press-sequentially-option-no-wait-after" class="list-anchor">#</a>
+    
+    Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-press-sequentially-option-timeout"/><a href="#locator-press-sequentially-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+---
+
 ### screenshot {#locator-screenshot}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.screenshot</x-search>
@@ -1817,10 +1861,13 @@ Upload file or multiple files into `<input type=file>`.
 
 ```js
 // Select one file
-await page.getByLabel('Upload file').setInputFiles('myfile.pdf');
+await page.getByLabel('Upload file').setInputFiles(path.join(__dirname, 'myfile.pdf'));
 
 // Select multiple files
-await page.getByLabel('Upload files').setInputFiles(['file1.txt', 'file2.txt']);
+await page.getByLabel('Upload files').setInputFiles([
+  path.join(__dirname, 'file1.txt'),
+  path.join(__dirname, 'file2.txt'),
+]);
 
 // Remove all the selected files
 await page.getByLabel('Upload file').setInputFiles([]);
@@ -1938,50 +1985,6 @@ await locator.textContent(options);
 
 **Returns**
 - [Promise]<[null]|[string]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-text-content-return"/><a href="#locator-text-content-return" class="list-anchor">#</a>
-
----
-
-### type {#locator-type}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.type</x-search>
-
-:::tip
-In most cases, you should use [locator.fill()](/api/class-locator.mdx#locator-fill) instead. You only need to type characters if there is special keyboard handling on the page.
-:::
-
-Focuses the element, and then sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in the text.
-
-To press a special key, like `Control` or `ArrowDown`, use [locator.press()](/api/class-locator.mdx#locator-press).
-
-**Usage**
-
-```js
-await element.type('Hello'); // Types instantly
-await element.type('World', { delay: 100 }); // Types slower, like a user
-```
-
-An example of typing into a text field and then submitting the form:
-
-```js
-const element = page.getByLabel('Password');
-await element.type('my password');
-await element.press('Enter');
-```
-
-**Arguments**
-- `text` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-type-option-text"/><a href="#locator-type-option-text" class="list-anchor">#</a>
-  
-  A text to type into a focused element.
-- `options` [Object] *(optional)*
-  - `delay` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-type-option-delay"/><a href="#locator-type-option-delay" class="list-anchor">#</a>
-    
-    Time to wait between key presses in milliseconds. Defaults to 0.
-  - `noWaitAfter` [boolean] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-type-option-no-wait-after"/><a href="#locator-type-option-no-wait-after" class="list-anchor">#</a>
-    
-    Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-type-option-timeout"/><a href="#locator-type-option-timeout" class="list-anchor">#</a>
-    
-    Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 ---
 
@@ -2120,6 +2123,40 @@ await locator.elementHandles();
 
 **Returns**
 - [Promise]<[Array]<[ElementHandle]>><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-element-handles-return"/><a href="#locator-element-handles-return" class="list-anchor">#</a>
+
+---
+
+### type {#locator-type}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.type</x-search>
+
+:::caution Deprecated
+
+In most cases, you should use [locator.fill()](/api/class-locator.mdx#locator-fill) instead. You only need to press keys one by one if there is special keyboard handling on the page - in this case use [locator.pressSequentially()](/api/class-locator.mdx#locator-press-sequentially).
+
+:::
+
+
+Focuses the element, and then sends a `keydown`, `keypress`/`input`, and `keyup` event for each character in the text.
+
+To press a special key, like `Control` or `ArrowDown`, use [locator.press()](/api/class-locator.mdx#locator-press).
+
+**Usage**
+
+**Arguments**
+- `text` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-type-option-text"/><a href="#locator-type-option-text" class="list-anchor">#</a>
+  
+  A text to type into a focused element.
+- `options` [Object] *(optional)*
+  - `delay` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-type-option-delay"/><a href="#locator-type-option-delay" class="list-anchor">#</a>
+    
+    Time to wait between key presses in milliseconds. Defaults to 0.
+  - `noWaitAfter` [boolean] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-type-option-no-wait-after"/><a href="#locator-type-option-no-wait-after" class="list-anchor">#</a>
+    
+    Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="locator-type-option-timeout"/><a href="#locator-type-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
