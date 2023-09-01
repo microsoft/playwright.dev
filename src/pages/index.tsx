@@ -119,12 +119,11 @@ const features = [
 
 type FeatureProps = {
   imageUrl?: string
-  title: string
-  description: React.ReactElement
-  link: string
+  title?: string
+  description?: React.ReactElement
 }
 
-const Feature: React.FC<FeatureProps> = ({ imageUrl, title, description, link }) => {
+const Feature: React.FC<FeatureProps> = ({ imageUrl, title, description }) => {
   const imgUrl = useBaseUrl(imageUrl);
   return (
     <div className={clsx("col col--6", styles.feature)} style={{ marginTop: 40 }}>
@@ -182,32 +181,36 @@ const FeatureRow: React.FC<FeatureRowProps> = ({ title, description, videoUrl, i
 }
 
 const logos = [
-  { imageUrl: "img/logos/VSCode.png", href: "https://code.visualstudio.com" },
-  { imageUrl: "img/logos/Bing.png", href: "https://bing.com" },
-  { imageUrl: "img/logos/Outlook.png", href: "https://outlook.com" },
-  { imageUrl: "img/logos/DHotstar.jpg", href: "https://www.hotstar.com/" },
+  { imageUrl: "img/logos/VSCode.png", href: "https://code.visualstudio.com", alt: "VS Code" },
+  { imageUrl: "img/logos/Bing.png", href: "https://bing.com", alt: "Bing" },
+  { imageUrl: "img/logos/Outlook.png", href: "https://outlook.com", alt: "Outlook" },
+  { imageUrl: "img/logos/DHotstar.jpg", href: "https://www.hotstar.com/", alt: "Disney+ Hotstar" },
   {
     imageUrl: "img/logos/MUI.png",
     href: "https://github.com/mui-org/material-ui",
+    alt: "Material UI",
   },
-  { imageUrl: "img/logos/ING.png", href: "https://github.com/ing-bank/lion" },
+  { imageUrl: "img/logos/ING.png", href: "https://github.com/ing-bank/lion", alt: "ING" },
   {
     imageUrl: "img/logos/Adobe2.png",
     href: "https://github.com/adobe/spectrum-web-components",
+    alt: "Adobe",
   },
   {
     imageUrl: "img/logos/ReactNavigation.png",
     href: "https://github.com/react-navigation/react-navigation",
+    alt: "React Navigation",
   },
   {
     imageUrl: "img/logos/accessibilityinsights.png",
     href: "https://accessibilityinsights.io/",
+    alt: "Accessibility Insights",
   },
 ];
 
 const Home: React.FC = () => {
   const context = useDocusaurusContext();
-  const { siteConfig = {} } = context;
+  const { siteConfig } = context;
   return (
     <Layout
       title={siteConfig.tagline}
@@ -226,7 +229,7 @@ const Home: React.FC = () => {
             >
               Get started
             </Link>
-            <GitHubStarButton owner="microsoft" repo={siteConfig.customFields.repositoryName}/>
+            <GitHubStarButton owner="microsoft" repo={siteConfig.customFields.repositoryNamem as string}/>
           </div>
         </div>
       </header>
@@ -234,9 +237,9 @@ const Home: React.FC = () => {
       <main>
         <br></br>
         <br></br>
-        <center>
-          <img src="img/logos/Browsers.png" width="40%"></img>
-        </center>
+        <div style={{textAlign: 'center'}}>
+          <img src="img/logos/Browsers.png" width="40%" alt="Browsers (Chromium, Firefox, WebKit)" />
+        </div>
         <section className={styles.features}>
           <div className="container">
             <div className="row">
@@ -253,10 +256,10 @@ const Home: React.FC = () => {
               <div className={clsx("col col--12", styles.logosColumn)}>
                 <h2>Chosen by companies and open source projects</h2>
                 <ul className={styles.logosList}>
-                  {logos.map(({ imageUrl, href }, idx) => (
+                  {logos.map(({ imageUrl, href, alt }, idx) => (
                     <li key={idx}>
-                      <a href={href} target="_blank">
-                        <img src={imageUrl} />
+                      <a href={href} target="_blank" rel="noreferrer noopener">
+                        <img src={imageUrl} alt={alt} />
                       </a>
                     </li>
                   ))}
