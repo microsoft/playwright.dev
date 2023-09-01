@@ -8,8 +8,8 @@ import {
 } from '@docusaurus/plugin-content-docs/client';
 
 const Version: React.FC = () => {
-  const versions = useVersions();
-  const latestVersion = useLatestVersion();
+  const versions = useVersions(undefined);
+  const latestVersion = useLatestVersion(undefined);
   const currentVersion = versions.find((version) => version.name === 'current');
   const pastVersions = versions.filter(
     (version) => version !== latestVersion && version.name !== 'current',
@@ -20,7 +20,6 @@ const Version: React.FC = () => {
   return (
     <Layout
       title="Versions"
-      permalink="/versions"
       description="Docusaurus 2 Versions page listing all documented site versions">
       <main className="container margin-vert--lg">
         <h1>Versions</h1>
