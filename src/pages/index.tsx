@@ -229,7 +229,7 @@ const Home: React.FC = () => {
             >
               Get started
             </Link>
-            <GitHubStarButton owner="microsoft" repo={siteConfig.customFields.repositoryNamem as string}/>
+            <GitHubStarButton owner="microsoft" repo={siteConfig.customFields.repositoryName as string}/>
           </div>
         </div>
       </header>
