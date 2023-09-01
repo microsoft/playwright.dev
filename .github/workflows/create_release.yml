@@ -9,7 +9,7 @@ on:
 jobs:
   build:
     name: Build
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-22.04
     steps:
       - name: Validate input version number
         run: |
@@ -24,7 +24,7 @@ jobs:
           repository: 'microsoft/playwright'
           path: playwright
           ref: 'release-${{ github.event.inputs.version }}'
-      - uses: actions/setup-node@v2
+      - uses: actions/setup-node@v3
         with:
           node-version: '18'
       - name: Install dependencies
@@ -62,12 +62,12 @@ jobs:
           git commit -m "feat(roll): roll to ${{ github.event.inputs.version }} Playwright"
           git push origin $BRANCH_NAME --force
       - name: Create Pull Request
-        uses: actions/github-script@v4
+        uses: actions/github-script@v6
         if: ${{ steps.prepare-branch.outputs.HAS_CHANGES == '1' }}
         with:
           github-token: ${{ secrets.GH_SERVICE_ACCOUNT_TOKEN }}
           script: |
-            await github.pulls.create({
+            await github.rest.pulls.create({
               owner: 'microsoft',
               repo: 'playwright.dev',
               head: 'microsoft:${{ steps.prepare-branch.outputs.BRANCH_NAME }}',
