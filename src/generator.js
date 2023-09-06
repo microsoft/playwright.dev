@@ -259,7 +259,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 
         // Generate version.
-        const expressionNameForSearch = member.deprecated ? `` : `<x-search>${clazz.varName}.${name}</x-search>`;
+        const expressionNameForSearch = `<x-search>${clazz.varName}.${name}</x-search>`;
         sections.version.push({
           type: 'text',
           text: `<font size="2" style={{position: "relative", top: "-20px"}}>Added in: ${member.since}</font>${expressionNameForSearch}`
@@ -269,7 +269,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
         if (member.deprecated) {
           sections.deprecation.push({
             type: 'text',
-            text: `:::caution Deprecated
+            text: `:::warning Deprecated
 
 ${this.documentation.renderLinksInText(member.deprecated)}
 

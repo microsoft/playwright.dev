@@ -103,6 +103,7 @@ module.exports = {
             { type: 'doc', id: 'api/class-touchscreen' },
             { type: 'doc', id: 'api/class-tracing' },
             { type: 'doc', id: 'api/class-video' },
+            { type: 'doc', id: 'api/class-weberror' },
             { type: 'doc', id: 'api/class-websocket' },
             { type: 'doc', id: 'api/class-websocketframe' },
             { type: 'doc', id: 'api/class-worker' }
