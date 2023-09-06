@@ -9,6 +9,7 @@ module.exports = {
         { type: 'doc', id: 'running-tests' },
         { type: 'doc', id: 'codegen-intro' },
         { type: 'doc', id: 'trace-viewer-intro' },
+        { type: 'doc', id: 'ci-intro' },
         { type: 'doc', id: 'test-runners' },
       ],
       collapsed: false
