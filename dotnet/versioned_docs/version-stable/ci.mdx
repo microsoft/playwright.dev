@@ -31,88 +31,7 @@ The [Command line tools](./browsers#install-system-dependencies) can be used to 
 
 ### GitHub Actions
 
-#### On push/pull_request
-
-```yml
-name: Playwright Tests
-on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-jobs:
-  test:
-    timeout-minutes: 60
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v3
-    - name: Setup dotnet
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 6.0.x
-    - run: dotnet build
-    - name: Ensure browsers are installed
-      run: pwsh bin/Debug/net6.0/playwright.ps1 install --with-deps
-    - name: Run your tests
-      run: dotnet test
-```
-
-#### Via Containers
-
-GitHub Actions support [running jobs in a container](https://docs.github.com/en/actions/using-jobs/running-jobs-in-a-container) by using the [`jobs.<job_id>.container`](https://docs.github.com/en/actions/using-workflows/workflow-syntax-for-github-actions#jobsjob_idcontainer) option. This is useful to not pollute the host environment with dependencies and to have a consistent environment for e.g. screenshots/visual regression testing across different operating systems.
-
-```yml
-name: Playwright Tests
-on:
-  push:
-    branches: [ main, master ]
-  pull_request:
-    branches: [ main, master ]
-jobs:
-  playwright:
-    name: 'Playwright Tests'
-    runs-on: ubuntu-latest
-    container:
-      image: mcr.microsoft.com/playwright/dotnet:v1.37.0-jammy
-    steps:
-      - uses: actions/checkout@v3
-      - name: Setup dotnet
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: 6.0.x
-      - run: dotnet build
-      - name: Run your tests
-        run: dotnet test
-```
-
-#### On deployment
-
-This will start the tests after a [GitHub Deployment](https://developer.github.com/v3/repos/deployments/) went into the `success` state. Services like Vercel use this pattern so you can run your end-to-end tests on their deployed environment.
-
-```yml
-name: Playwright Tests
-on:
-  deployment_status:
-jobs:
-  test:
-    timeout-minutes: 60
-    runs-on: ubuntu-latest
-    if: github.event.deployment_status.state == 'success'
-    steps:
-    - uses: actions/checkout@v3
-    - name: Setup dotnet
-      uses: actions/setup-dotnet@v3
-      with:
-        dotnet-version: 6.0.x
-    - run: dotnet build
-    - name: Ensure browsers are installed
-      run: pwsh bin/Debug/net6.0/playwright.ps1 install --with-deps
-    - name: Run tests
-      run: dotnet test
-      env:
-        # This might depend on your test-runner
-        PLAYWRIGHT_TEST_BASE_URL: ${{ github.event.deployment_status.target_url }}
-```
+Check out our [GitHub Actions](ci-intro.mdx) guide for more information on how to run your tests on GitHub.
 
 ### Docker
 
@@ -160,7 +79,7 @@ trigger:
 
 pool:
   vmImage: ubuntu-latest
-container: mcr.microsoft.com/playwright/dotnet:v1.37.0-jammy
+container: mcr.microsoft.com/playwright/dotnet:v1.37.1-jammy
 
 steps:
 - task: UseDotNet@2
@@ -183,7 +102,7 @@ Running Playwright on CircleCI is very similar to running on GitHub Actions. In 
 executors:
   pw-jammy-development:
     docker:
-      - image: mcr.microsoft.com/playwright/dotnet:v1.37.0-jammy
+      - image: mcr.microsoft.com/playwright/dotnet:v1.37.1-jammy
 ```
 
 Note: When using the docker agent definition, you are specifying the resource class of where playwright runs to the 'medium' tier [here](https://circleci.com/docs/configuration-reference?#docker-execution-environment). The default behavior of Playwright is to set the number of workers to the detected core count (2 in the case of the medium tier). Overriding the number of workers to greater than this number will cause unnecessary timeouts and failures.
@@ -194,7 +113,7 @@ Jenkins supports Docker agents for pipelines. Use the [Playwright Docker image](
 
 ```groovy
 pipeline {
-   agent { docker { image 'mcr.microsoft.com/playwright/dotnet:v1.37.0-jammy' } }
+   agent { docker { image 'mcr.microsoft.com/playwright/dotnet:v1.37.1-jammy' } }
    stages {
       stage('e2e-tests') {
          steps {
@@ -211,7 +130,7 @@ pipeline {
 Bitbucket Pipelines can use public [Docker images as build environments](https://confluence.atlassian.com/bitbucket/use-docker-images-as-build-environments-792298897.html). To run Playwright tests on Bitbucket, use our public Docker image ([see Dockerfile](./docker.mdx)).
 
 ```yml
-image: mcr.microsoft.com/playwright/dotnet:v1.37.0-jammy
+image: mcr.microsoft.com/playwright/dotnet:v1.37.1-jammy
 ```
 
 ### GitLab CI
@@ -288,6 +207,7 @@ xvfb-run dotnet test
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
+[WebError]: /api/class-weberror.mdx "WebError"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [Worker]: /api/class-worker.mdx "Worker"
