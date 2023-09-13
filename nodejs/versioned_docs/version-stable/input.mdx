@@ -106,15 +106,15 @@ await page.getByRole('button').dispatchEvent('click');
 
 ## Type characters
 
-:::tip
+:::caution
 Most of the time, you should input text with [locator.fill()](/api/class-locator.mdx#locator-fill). See the [Text input](#text-input) section above. You only need to type characters if there is special keyboard handling on the page.
 :::
 
-Type into the field character by character, as if it was a user with a real keyboard with [locator.type()](/api/class-locator.mdx#locator-type).
+Type into the field character by character, as if it was a user with a real keyboard with [locator.pressSequentially()](/api/class-locator.mdx#locator-press-sequentially).
 
 ```js
-// Type character by character
-await page.locator('#area').type('Hello World!');
+// Press keys one by one
+await page.locator('#area').pressSequentially('Hello World!');
 ```
 
 This method will emit all the necessary keyboard events, with all the `keydown`, `keyup`, `keypress` events in place. You can even specify the optional `delay` between the key presses to simulate real user behavior.
@@ -163,10 +163,13 @@ You can select input files for upload using the [locator.setInputFiles()](/api/c
 
 ```js
 // Select one file
-await page.getByLabel('Upload file').setInputFiles('myfile.pdf');
+await page.getByLabel('Upload file').setInputFiles(path.join(__dirname, 'myfile.pdf'));
 
 // Select multiple files
-await page.getByLabel('Upload files').setInputFiles(['file1.txt', 'file2.txt']);
+await page.getByLabel('Upload files').setInputFiles([
+  path.join(__dirname, 'file1.txt'),
+  path.join(__dirname, 'file2.txt'),
+]);
 
 // Remove all the selected files
 await page.getByLabel('Upload file').setInputFiles([]);
@@ -186,7 +189,7 @@ If you don't have input element in hand (it is created dynamically), you can han
 const fileChooserPromise = page.waitForEvent('filechooser');
 await page.getByLabel('Upload file').click();
 const fileChooser = await fileChooserPromise;
-await fileChooser.setFiles('myfile.pdf');
+await fileChooser.setFiles(path.join(__dirname, 'myfile.pdf'));
 ```
 
 ## Focus element
@@ -270,6 +273,7 @@ If your page relies on the `dragover` event being dispatched, you need at least 
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
+[WebError]: /api/class-weberror.mdx "WebError"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [Worker]: /api/class-worker.mdx "Worker"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"

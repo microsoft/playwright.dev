@@ -7,10 +7,14 @@ import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
 
-Playwright provides methods for comparing page and element screenshots with expected values stored in files.
+:::tip
+For visual regression testing, use [expect(page).toHaveScreenshot()](/api/class-pageassertions.mdx#page-assertions-to-have-screenshot-1) and [expect(locator).toHaveScreenshot()](/api/class-locatorassertions.mdx#locator-assertions-to-have-screenshot-1) instead.
+:::
+
+Playwright provides methods for comparing text values with expected values stored in snapshot files.
 
 ```js
-expect(screenshot).toMatchSnapshot('landing-page.png');
+expect(text).toMatchSnapshot('snapshot.txt');
 ```
 
 
@@ -22,7 +26,70 @@ expect(screenshot).toMatchSnapshot('landing-page.png');
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.22</font><x-search>snapshotAssertions.toMatchSnapshot(name)</x-search>
 
+Ensures that the passed [string] matches the expected snapshot stored in the test snapshots directory.
+
+**Usage**
+
+```js
+// Basic usage.
+expect(await page.title()).toMatchSnapshot('page-title.txt');
+
+// Bring some structure to your snapshot files by passing file path segments.
+expect(await page.title()).toMatchSnapshot(['page-title', 'step1.txt']);
+expect(await page.title()).toMatchSnapshot(['page-title', 'step2.txt']);
+```
+
+Note that matching snapshots only work with Playwright test runner.
+
+**Arguments**
+- `name` [string]|[Array]<[string]><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="snapshot-assertions-to-match-snapshot-1-option-name"/><a href="#snapshot-assertions-to-match-snapshot-1-option-name" class="list-anchor">#</a>
+  
+  Snapshot name.
+
+---
+
+### toMatchSnapshot() {#snapshot-assertions-to-match-snapshot-2}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.22</font><x-search>snapshotAssertions.toMatchSnapshot()</x-search>
+
 Ensures that passed value, either a [string] or a [Buffer], matches the expected snapshot stored in the test snapshots directory.
+
+**Usage**
+
+```js
+// Basic usage.
+expect(await page.title()).toMatchSnapshot();
+
+// Configure the snapshot name.
+expect(await page.title()).toMatchSnapshot({
+  name: 'page-title.txt',
+});
+```
+
+Note that matching snapshots only work with Playwright test runner.
+
+**Arguments**
+- `options` [Object] *(optional)*
+  - `name` [string]|[Array]<[string]> *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="snapshot-assertions-to-match-snapshot-2-option-name"/><a href="#snapshot-assertions-to-match-snapshot-2-option-name" class="list-anchor">#</a>
+    
+    Snapshot name. If not passed, the test name and ordinals are used when called multiple times.
+
+---
+
+## Deprecated
+
+### toMatchSnapshot(name) {#snapshot-assertions-to-match-snapshot-3}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.22</font><x-search>snapshotAssertions.toMatchSnapshot(name)</x-search>
+
+:::warning Deprecated
+
+To avoid flakiness, use [expect(page).toHaveScreenshot()](/api/class-pageassertions.mdx#page-assertions-to-have-screenshot-1) instead.
+
+:::
+
+
+Ensures that the passed [Buffer] matches the expected snapshot stored in the test snapshots directory.
 
 **Usage**
 
@@ -48,27 +115,34 @@ Learn more about [visual comparisons](../test-snapshots.mdx).
 Note that matching snapshots only work with Playwright test runner.
 
 **Arguments**
-- `name` [string]|[Array]<[string]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="snapshot-assertions-to-match-snapshot-1-option-name"/><a href="#snapshot-assertions-to-match-snapshot-1-option-name" class="list-anchor">#</a>
+- `name` [string]|[Array]<[string]><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="snapshot-assertions-to-match-snapshot-3-option-name"/><a href="#snapshot-assertions-to-match-snapshot-3-option-name" class="list-anchor">#</a>
   
   Snapshot name.
 - `options` [Object] *(optional)*
-  - `maxDiffPixelRatio` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="snapshot-assertions-to-match-snapshot-1-option-max-diff-pixel-ratio"/><a href="#snapshot-assertions-to-match-snapshot-1-option-max-diff-pixel-ratio" class="list-anchor">#</a>
+  - `maxDiffPixelRatio` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="snapshot-assertions-to-match-snapshot-3-option-max-diff-pixel-ratio"/><a href="#snapshot-assertions-to-match-snapshot-3-option-max-diff-pixel-ratio" class="list-anchor">#</a>
     
     An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1`. Default is configurable with `TestConfig.expect`. Unset by default.
-  - `maxDiffPixels` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="snapshot-assertions-to-match-snapshot-1-option-max-diff-pixels"/><a href="#snapshot-assertions-to-match-snapshot-1-option-max-diff-pixels" class="list-anchor">#</a>
+  - `maxDiffPixels` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="snapshot-assertions-to-match-snapshot-3-option-max-diff-pixels"/><a href="#snapshot-assertions-to-match-snapshot-3-option-max-diff-pixels" class="list-anchor">#</a>
     
     An acceptable amount of pixels that could be different. Default is configurable with `TestConfig.expect`. Unset by default.
-  - `threshold` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="snapshot-assertions-to-match-snapshot-1-option-threshold"/><a href="#snapshot-assertions-to-match-snapshot-1-option-threshold" class="list-anchor">#</a>
+  - `threshold` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="snapshot-assertions-to-match-snapshot-3-option-threshold"/><a href="#snapshot-assertions-to-match-snapshot-3-option-threshold" class="list-anchor">#</a>
     
     An acceptable perceived color difference in the [YIQ color space](https://en.wikipedia.org/wiki/YIQ) between the same pixel in compared images, between zero (strict) and one (lax), default is configurable with `TestConfig.expect`. Defaults to `0.2`.
 
 ---
 
-### toMatchSnapshot() {#snapshot-assertions-to-match-snapshot-2}
+### toMatchSnapshot() {#snapshot-assertions-to-match-snapshot-4}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.22</font><x-search>snapshotAssertions.toMatchSnapshot()</x-search>
 
-Ensures that passed value, either a [string] or a [Buffer], matches the expected snapshot stored in the test snapshots directory.
+:::warning Deprecated
+
+To avoid flakiness, use [expect(page).toHaveScreenshot()](/api/class-pageassertions.mdx#page-assertions-to-have-screenshot-1) instead.
+
+:::
+
+
+Ensures that the passed [Buffer] matches the expected snapshot stored in the test snapshots directory.
 
 **Usage**
 
@@ -94,16 +168,16 @@ Note that matching snapshots only work with Playwright test runner.
 
 **Arguments**
 - `options` [Object] *(optional)*
-  - `maxDiffPixelRatio` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="snapshot-assertions-to-match-snapshot-2-option-max-diff-pixel-ratio"/><a href="#snapshot-assertions-to-match-snapshot-2-option-max-diff-pixel-ratio" class="list-anchor">#</a>
+  - `maxDiffPixelRatio` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="snapshot-assertions-to-match-snapshot-4-option-max-diff-pixel-ratio"/><a href="#snapshot-assertions-to-match-snapshot-4-option-max-diff-pixel-ratio" class="list-anchor">#</a>
     
     An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1`. Default is configurable with `TestConfig.expect`. Unset by default.
-  - `maxDiffPixels` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="snapshot-assertions-to-match-snapshot-2-option-max-diff-pixels"/><a href="#snapshot-assertions-to-match-snapshot-2-option-max-diff-pixels" class="list-anchor">#</a>
+  - `maxDiffPixels` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="snapshot-assertions-to-match-snapshot-4-option-max-diff-pixels"/><a href="#snapshot-assertions-to-match-snapshot-4-option-max-diff-pixels" class="list-anchor">#</a>
     
     An acceptable amount of pixels that could be different. Default is configurable with `TestConfig.expect`. Unset by default.
-  - `name` [string]|[Array]<[string]> *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="snapshot-assertions-to-match-snapshot-2-option-name"/><a href="#snapshot-assertions-to-match-snapshot-2-option-name" class="list-anchor">#</a>
+  - `name` [string]|[Array]<[string]> *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="snapshot-assertions-to-match-snapshot-4-option-name"/><a href="#snapshot-assertions-to-match-snapshot-4-option-name" class="list-anchor">#</a>
     
     Snapshot name. If not passed, the test name and ordinals are used when called multiple times.
-  - `threshold` [number] *(optional)*<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="snapshot-assertions-to-match-snapshot-2-option-threshold"/><a href="#snapshot-assertions-to-match-snapshot-2-option-threshold" class="list-anchor">#</a>
+  - `threshold` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="snapshot-assertions-to-match-snapshot-4-option-threshold"/><a href="#snapshot-assertions-to-match-snapshot-4-option-threshold" class="list-anchor">#</a>
     
     An acceptable perceived color difference in the [YIQ color space](https://en.wikipedia.org/wiki/YIQ) between the same pixel in compared images, between zero (strict) and one (lax), default is configurable with `TestConfig.expect`. Defaults to `0.2`.
 
@@ -153,6 +227,7 @@ Note that matching snapshots only work with Playwright test runner.
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
+[WebError]: /api/class-weberror.mdx "WebError"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [Worker]: /api/class-worker.mdx "Worker"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"

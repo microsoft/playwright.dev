@@ -6,7 +6,7 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-For every attachment downloaded by the page, [page.on("download")](/api/class-page.mdx#page-event-download) event is emitted. All these attachments are downloaded into a temporary folder. You can obtain the download url, file system path and payload stream using the [Download] object from the event.
+For every attachment downloaded by the page, [page.on("download")](/api/class-page.mdx#page-event-download) event is emitted. All these attachments are downloaded into a temporary folder. You can obtain the download url, file name and payload stream using the [Download] object from the event.
 
 You can specify where to persist downloaded files using the `downloads_path` option in [browser_type.launch()](/api/class-browsertype.mdx#browser-type-launch).
 
@@ -31,12 +31,10 @@ Here is the simplest way to handle the file download:
 with page.expect_download() as download_info:
     # Perform the action that initiates download
     page.get_by_text("Download file").click()
-# Wait for the download to start
 download = download_info.value
-# Wait for the download process to complete
-print(download.path())
-# Save downloaded file somewhere
-download.save_as("/path/to/save/download/at.txt")
+
+# Wait for the download process to complete and save the downloaded file somewhere
+download.save_as("/path/to/save/at/" + download.suggested_filename)
 ```
 
 </TabItem>
@@ -48,10 +46,9 @@ async with page.expect_download() as download_info:
     # Perform the action that initiates download
     await page.get_by_text("Download file").click()
 download = await download_info.value
-# Wait for the download process to complete
-print(await download.path())
-# Save downloaded file somewhere
-await download.save_as("/path/to/save/download/at.txt")
+
+# Wait for the download process to complete and save the downloaded file somewhere
+await download.save_as("/path/to/save/at/" + download.suggested_filename)
 ```
 
 </TabItem>
@@ -127,6 +124,7 @@ For uploading files, see the [uploading files](./input.mdx#upload-files) section
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
+[WebError]: /api/class-weberror.mdx "WebError"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"

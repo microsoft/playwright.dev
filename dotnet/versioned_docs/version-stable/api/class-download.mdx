@@ -11,14 +11,16 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 All the downloaded files belonging to the browser context are deleted when the browser context is closed.
 
-Download event is emitted once the download starts. Download path becomes available once download completes:
+Download event is emitted once the download starts. Download path becomes available once download completes.
 
 ```csharp
-var download = await page.RunAndWaitForDownloadAsync(async () =>
-{
-    await page.GetByText("Download file").ClickAsync();
-});
-Console.WriteLine(await download.PathAsync());
+// Start the task of waiting for the download before clicking
+var waitForDownloadTask = page.WaitForDownloadAsync();
+await page.GetByText("Download file").ClickAsync();
+var download = await waitForDownloadTask;
+
+// Wait for the download process to complete and save the downloaded file somewhere
+await download.SaveAsAsync("/path/to/save/at/" + download.SuggestedFilename);
 ```
 
 
@@ -53,7 +55,7 @@ await Download.CreateReadStreamAsync();
 ```
 
 **Returns**
-- [Stream]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-create-read-stream-return"/><a href="#download-create-read-stream-return" class="list-anchor">#</a>
+- [Stream]?<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-create-read-stream-return"/><a href="#download-create-read-stream-return" class="list-anchor">#</a>
 
 ---
 
@@ -84,7 +86,7 @@ await Download.FailureAsync();
 ```
 
 **Returns**
-- [string]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-failure-return"/><a href="#download-failure-return" class="list-anchor">#</a>
+- [string]?<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-failure-return"/><a href="#download-failure-return" class="list-anchor">#</a>
 
 ---
 
@@ -101,7 +103,7 @@ Download.Page
 ```
 
 **Returns**
-- [Page]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-page-return"/><a href="#download-page-return" class="list-anchor">#</a>
+- [Page]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-page-return"/><a href="#download-page-return" class="list-anchor">#</a>
 
 ---
 
@@ -120,7 +122,7 @@ await Download.PathAsync();
 ```
 
 **Returns**
-- [string]?<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-path-return"/><a href="#download-path-return" class="list-anchor">#</a>
+- [string]?<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-path-return"/><a href="#download-path-return" class="list-anchor">#</a>
 
 ---
 
@@ -133,11 +135,11 @@ Copy the download to a user-specified path. It is safe to call this method while
 **Usage**
 
 ```csharp
-await Download.SaveAsAsync(path);
+await download.SaveAsAsync("/path/to/save/at/" + download.SuggestedFilename);
 ```
 
 **Arguments**
-- `path` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-save-as-option-path"/><a href="#download-save-as-option-path" class="list-anchor">#</a>
+- `path` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-save-as-option-path"/><a href="#download-save-as-option-path" class="list-anchor">#</a>
   
   Path where the download should be copied.
 
@@ -156,7 +158,7 @@ Download.SuggestedFilename
 ```
 
 **Returns**
-- [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-suggested-filename-return"/><a href="#download-suggested-filename-return" class="list-anchor">#</a>
+- [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-suggested-filename-return"/><a href="#download-suggested-filename-return" class="list-anchor">#</a>
 
 ---
 
@@ -173,7 +175,7 @@ Download.Url
 ```
 
 **Returns**
-- [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="download-url-return"/><a href="#download-url-return" class="list-anchor">#</a>
+- [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="download-url-return"/><a href="#download-url-return" class="list-anchor">#</a>
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
@@ -211,6 +213,7 @@ Download.Url
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
+[WebError]: /api/class-weberror.mdx "WebError"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [Worker]: /api/class-worker.mdx "Worker"
