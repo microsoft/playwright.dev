@@ -38,7 +38,7 @@ await request.allHeaders();
 ```
 
 **Returns**
-- [Promise]<[Object]<[string], [string]>><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-all-headers-return"/><a href="#request-all-headers-return" class="list-anchor">#</a>
+- [Promise]<[Object]<[string], [string]>><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-all-headers-return"/><a href="#request-all-headers-return" class="list-anchor">#</a>
 
 ---
 
@@ -59,7 +59,7 @@ page.on('requestfailed', request => {
 ```
 
 **Returns**
-- [null]|[Object]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-failure-return"/><a href="#request-failure-return" class="list-anchor">#</a>
+- [null]|[Object]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-failure-return"/><a href="#request-failure-return" class="list-anchor">#</a>
   - `errorText` [string]
     
     Human-readable error message, e.g. `'net::ERR_FAILED'`.
@@ -75,11 +75,28 @@ Returns the [Frame] that initiated this request.
 **Usage**
 
 ```js
-request.frame();
+const frameUrl = request.frame().url();
 ```
 
 **Returns**
-- [Frame]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-frame-return"/><a href="#request-frame-return" class="list-anchor">#</a>
+- [Frame]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-frame-return"/><a href="#request-frame-return" class="list-anchor">#</a>
+
+**Details**
+
+Note that in some cases the frame is not available, and this method will throw.
+* When request originates in the Service Worker. You can use `request.serviceWorker()` to check that.
+* When navigation request is issued before the corresponding frame is created. You can use [request.isNavigationRequest()](/api/class-request.mdx#request-is-navigation-request) to check that.
+
+Here is an example that handles all the cases:
+
+```js
+if (request.serviceWorker())
+  console.log(`request ${request.url()} from a service worker`);
+else if (request.isNavigationRequest())
+  console.log(`request ${request.url()} is a navigation request`);
+else
+  console.log(`request ${request.url()} from a frame ${request.frame().url()}`);
+```
 
 ---
 
@@ -96,12 +113,12 @@ await request.headerValue(name);
 ```
 
 **Arguments**
-- `name` [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-header-value-option-name"/><a href="#request-header-value-option-name" class="list-anchor">#</a>
+- `name` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-header-value-option-name"/><a href="#request-header-value-option-name" class="list-anchor">#</a>
   
   Name of the header.
 
 **Returns**
-- [Promise]<[null]|[string]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-header-value-return"/><a href="#request-header-value-return" class="list-anchor">#</a>
+- [Promise]<[null]|[string]><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-header-value-return"/><a href="#request-header-value-return" class="list-anchor">#</a>
 
 ---
 
@@ -118,7 +135,7 @@ request.headers();
 ```
 
 **Returns**
-- [Object]<[string], [string]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-headers-return"/><a href="#request-headers-return" class="list-anchor">#</a>
+- [Object]<[string], [string]><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-headers-return"/><a href="#request-headers-return" class="list-anchor">#</a>
 
 ---
 
@@ -135,7 +152,7 @@ await request.headersArray();
 ```
 
 **Returns**
-- [Promise]<[Array]<[Object]>><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-headers-array-return"/><a href="#request-headers-array-return" class="list-anchor">#</a>
+- [Promise]<[Array]<[Object]>><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-headers-array-return"/><a href="#request-headers-array-return" class="list-anchor">#</a>
   - `name` [string]
     
     Name of the header.
@@ -151,6 +168,8 @@ await request.headersArray();
 
 Whether this request is driving frame's navigation.
 
+Some navigation requests are issued before the corresponding frame is created, and therefore do not have [request.frame()](/api/class-request.mdx#request-frame) available.
+
 **Usage**
 
 ```js
@@ -158,7 +177,7 @@ request.isNavigationRequest();
 ```
 
 **Returns**
-- [boolean]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-is-navigation-request-return"/><a href="#request-is-navigation-request-return" class="list-anchor">#</a>
+- [boolean]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-is-navigation-request-return"/><a href="#request-is-navigation-request-return" class="list-anchor">#</a>
 
 ---
 
@@ -175,7 +194,7 @@ request.method();
 ```
 
 **Returns**
-- [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-method-return"/><a href="#request-method-return" class="list-anchor">#</a>
+- [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-method-return"/><a href="#request-method-return" class="list-anchor">#</a>
 
 ---
 
@@ -192,7 +211,7 @@ request.postData();
 ```
 
 **Returns**
-- [null]|[string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-post-data-return"/><a href="#request-post-data-return" class="list-anchor">#</a>
+- [null]|[string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-post-data-return"/><a href="#request-post-data-return" class="list-anchor">#</a>
 
 ---
 
@@ -209,7 +228,7 @@ request.postDataBuffer();
 ```
 
 **Returns**
-- [null]|[Buffer]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-post-data-buffer-return"/><a href="#request-post-data-buffer-return" class="list-anchor">#</a>
+- [null]|[Buffer]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-post-data-buffer-return"/><a href="#request-post-data-buffer-return" class="list-anchor">#</a>
 
 ---
 
@@ -228,7 +247,7 @@ request.postDataJSON();
 ```
 
 **Returns**
-- [null]|[Serializable]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-post-data-json-return"/><a href="#request-post-data-json-return" class="list-anchor">#</a>
+- [null]|[Serializable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-post-data-json-return"/><a href="#request-post-data-json-return" class="list-anchor">#</a>
 
 ---
 
@@ -257,7 +276,7 @@ console.log(response.request().redirectedFrom()); // null
 ```
 
 **Returns**
-- [null]|[Request]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-redirected-from-return"/><a href="#request-redirected-from-return" class="list-anchor">#</a>
+- [null]|[Request]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-redirected-from-return"/><a href="#request-redirected-from-return" class="list-anchor">#</a>
 
 ---
 
@@ -276,7 +295,7 @@ console.log(request.redirectedFrom().redirectedTo() === request); // true
 ```
 
 **Returns**
-- [null]|[Request]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-redirected-to-return"/><a href="#request-redirected-to-return" class="list-anchor">#</a>
+- [null]|[Request]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-redirected-to-return"/><a href="#request-redirected-to-return" class="list-anchor">#</a>
 
 ---
 
@@ -293,7 +312,7 @@ request.resourceType();
 ```
 
 **Returns**
-- [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-resource-type-return"/><a href="#request-resource-type-return" class="list-anchor">#</a>
+- [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-resource-type-return"/><a href="#request-resource-type-return" class="list-anchor">#</a>
 
 ---
 
@@ -310,17 +329,13 @@ await request.response();
 ```
 
 **Returns**
-- [Promise]<[null]|[Response]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-response-return"/><a href="#request-response-return" class="list-anchor">#</a>
+- [Promise]<[null]|[Response]><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-response-return"/><a href="#request-response-return" class="list-anchor">#</a>
 
 ---
 
 ### serviceWorker {#request-service-worker}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.24</font><x-search>request.serviceWorker</x-search>
-
-:::note
-This field is Chromium only. It's safe to call when using other browsers, but it will always be `null`.
-:::
 
 The Service [Worker] that is performing the request.
 
@@ -331,7 +346,13 @@ request.serviceWorker();
 ```
 
 **Returns**
-- [null]|[Worker]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-service-worker-return"/><a href="#request-service-worker-return" class="list-anchor">#</a>
+- [null]|[Worker]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-service-worker-return"/><a href="#request-service-worker-return" class="list-anchor">#</a>
+
+**Details**
+
+This method is Chromium only. It's safe to call when using other browsers, but it will always be `null`.
+
+Requests originated in a Service Worker do not have a [request.frame()](/api/class-request.mdx#request-frame) available.
 
 ---
 
@@ -348,7 +369,7 @@ await request.sizes();
 ```
 
 **Returns**
-- [Promise]<[Object]><a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-sizes-return"/><a href="#request-sizes-return" class="list-anchor">#</a>
+- [Promise]<[Object]><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-sizes-return"/><a href="#request-sizes-return" class="list-anchor">#</a>
   - `requestBodySize` [number]
     
     Size of the request body (POST data payload) in bytes. Set to 0 if there was no body.
@@ -380,7 +401,7 @@ console.log(request.timing());
 ```
 
 **Returns**
-- [Object]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-timing-return"/><a href="#request-timing-return" class="list-anchor">#</a>
+- [Object]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-timing-return"/><a href="#request-timing-return" class="list-anchor">#</a>
   - `startTime` [number]
     
     Request start time in milliseconds elapsed since January 1, 1970 00:00:00 UTC
@@ -424,7 +445,7 @@ request.url();
 ```
 
 **Returns**
-- [string]<a aria-hidden="true" tabindex="-1" class="list-anchor-link" id="request-url-return"/><a href="#request-url-return" class="list-anchor">#</a>
+- [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="request-url-return"/><a href="#request-url-return" class="list-anchor">#</a>
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
@@ -472,6 +493,7 @@ request.url();
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
+[WebError]: /api/class-weberror.mdx "WebError"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [Worker]: /api/class-worker.mdx "Worker"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
