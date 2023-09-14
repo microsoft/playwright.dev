@@ -6,10 +6,10 @@ module.exports = {
       items: [
         { type: 'doc', id: 'intro' },
         { type: 'doc', id: 'writing-tests' },
-        { type: 'doc', id: 'running-tests' },
         { type: 'doc', id: 'codegen-intro' },
-        { type: 'doc', id: 'trace-viewer-intro' },
+        { type: 'doc', id: 'running-tests' },
         { type: 'doc', id: 'test-ui-mode' },
+        { type: 'doc', id: 'trace-viewer-intro' },
         { type: 'doc', id: 'ci-intro' },
       ],
       collapsed: false
