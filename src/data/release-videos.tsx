@@ -1,5 +1,10 @@
 const releaseVideos = [
   {
+    version: '1.38',
+    id: "YGJTeXaZDTM",
+    highlights: ['UI Mode update', 'form filling', 'update Playwright'],
+  },
+  {
     version: '1.36 & 1.37',
     id: "cEd4SH_Xf5U",
     highlights: ['merge HTML Report', 'horizontal scaling', 'UI Mode updates', 'Debian 12 support'],

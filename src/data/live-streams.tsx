@@ -1,5 +1,13 @@
 const liveStreams = [
   {
+    title: 'Awesome Web Testing with Playwright',
+    description: '',
+    id: 'OCGef6H09fI',
+    year: '2023',
+    host: 'This Dot Media',
+    speakers: ["Andrew Knight"]
+  },
+  {
     title: 'Playwright Q&A',
     description: '',
     id: 'YSSKlt4i34Q',

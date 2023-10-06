@@ -1,5 +1,37 @@
 const conferenceVideos = [
   {
+    title: "Aprende a crear Test de forma Facil",
+    id: 'x8wmQ-8oaMU',
+    year: '2023',
+    conference: 'MiduConf',
+    language: 'Spanish',
+    speakers: ['Debbie O\'Brien']
+  },
+  {
+    title: "Making Testing Fun",
+    id: 'yY-5EkWktxs',
+    year: '2023',
+    conference: 'Testμ',
+    language: 'English',
+    speakers: ['Max Schmitt']
+  },
+  {
+    title: "Playwright can do this?",
+    id: 'sRjN-CU_Lg4',
+    year: '2023',
+    conference: 'Microsoft meetup',
+    language: 'English',
+    speakers: ['Stefan Judis']
+  },
+  {
+    title: "Playing your tests wright",
+    id: 'yMSIsavrOR4',
+    year: '2023',
+    conference: 'JSHeroes',
+    language: 'English',
+    speakers: ['Debbie O\'Brien']
+  },
+  {
     title: "Playwright at PYCon US",
     id: '5Wykd5OWSDQ',
     year: '2023',
