@@ -6,8 +6,6 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-- [Custom selector engines](#custom-selector-engines)
-
 ## Custom selector engines
 
 Playwright supports custom selector engines, registered with [Selectors.RegisterAsync()](/api/class-selectors.mdx#selectors-register).
@@ -22,6 +20,32 @@ By default the engine is run directly in the frame's JavaScript context and, for
 Selectors must be registered before creating the page.
 
 An example of registering selector engine that queries elements based on a tag name:
+
+```csharp
+// Register the engine. Selectors will be prefixed with "tag=".
+// The script is evaluated in the page context.
+await playwright.Selectors.Register("tag", new() {
+  Script = @"
+  // Must evaluate to a selector engine instance.
+  {
+    // Returns the first element matching given selector in the root's subtree.
+    query(root, selector) {
+      return root.querySelector(selector);
+    },
+
+    // Returns all elements matching given selector in the root's subtree.
+    queryAll(root, selector) {
+      return Array.from(root.querySelectorAll(selector));
+    }
+  }"
+});
+
+// Now we can use "tag=" selectors.
+await page.Locator("tag=button").ClickAsync();
+
+// We can combine it with built-in locators.
+await page.Locator("tag=div").GetByText("Click me").ClickAsync();
+```
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"

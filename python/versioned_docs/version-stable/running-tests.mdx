@@ -1,10 +1,12 @@
 ---
 id: running-tests
-title: "Running tests"
+title: "Running and debugging tests"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
+
+## Introduction
 
 You can run a single test, a set of tests or all tests. Tests can be run on one browser or multiple browsers by using the `--browser` flag. By default tests are run in a headless manner meaning no browser window will be opened while running the tests and results will be seen in the terminal. If you prefer you can run your tests in headed mode by using the `--headed` CLI argument.
 
@@ -12,7 +14,9 @@ You can run a single test, a set of tests or all tests. Tests can be run on one 
 - [How to run tests from the command line](/running-tests.mdx#command-line)
 - [How to debug tests](/running-tests.mdx#debugging-tests)
 
-## Command Line
+## Running tests
+
+### Command Line
 
 To run your tests use the `pytest` command. This will run your tests on the Chromium browser by default. Tests run in headless mode by default meaning no browser window will be opened while running the tests and results will be seen in the terminal.
 
@@ -20,15 +24,15 @@ To run your tests use the `pytest` command. This will run your tests on the Chro
 pytest
 ```
 
-### Running tests headed
+### Run tests in headed mode
 
-To run your tests in headed mode use the `--headed` flag. This will open up a browser window while running your tests.
+To run your tests in headed mode use the `--headed` flag. This will open up a browser window while running your tests and once finished the browser window will close.
 
 ```bash
 pytest --headed
 ```
 
-### Running tests on different browsers
+### Run tests on different browsers
 
 To specify which browser you would like to run your tests on use the `--browser` flag followed by the name of the browser.
 
@@ -42,7 +46,7 @@ To specify multiple browsers to run your tests on use the `--browser` flag multi
 pytest --browser webkit --browser firefox
 ```
 
-### Running specific tests
+### Run specific tests
 
 To run a single test file pass in the name of the test file that you want to run.
 
@@ -62,7 +66,7 @@ To run a specific test pass in the function name of the test you want to run.
 pytest -k test_add_a_todo_item
 ```
 
-### Run tests in Parallel
+### Run tests in parallel
 
 To run your tests in parallel use the `--numprocesses` flag followed by the number of processes you would like to run your tests on. We recommend half of logical CPU cores.
 
@@ -74,9 +78,11 @@ pytest --numprocesses 2
 
 For more information see [Playwright Pytest usage](./test-runners.mdx) or the Pytest documentation for [general CLI usage](https://docs.pytest.org/en/stable/usage.html).
 
-## Debugging Tests
+## Debugging tests
 
 Since Playwright runs in Python, you can debug it with your debugger of choice with e.g. the [Python extension](https://code.visualstudio.com/docs/python/python-tutorial) in Visual Studio Code. Playwright comes with the Playwright Inspector which allows you to step through Playwright API calls, see their debug logs and explore [locators](./locators.mdx).
+
+To debug all tests run the following command.
 
 <Tabs
   groupId="bash-flavor"
@@ -112,13 +118,90 @@ pytest -s
 </TabItem>
 </Tabs>
 
-<img width="712" alt="Playwright Inspector" src="https://user-images.githubusercontent.com/883973/108614092-8c478a80-73ac-11eb-9597-67dfce110e00.png"></img>
+To debug one test file run the command followed by the name of the test file that you want to debug.
+
+<Tabs
+  groupId="bash-flavor"
+  defaultValue="bash"
+  values={[
+    {label: 'Bash', value: 'bash'},
+    {label: 'PowerShell', value: 'powershell'},
+    {label: 'Batch', value: 'batch'}
+  ]
+}>
+<TabItem value="bash">
+
+```bash
+PWDEBUG=1 pytest -s test_example.py
+```
+
+</TabItem>
+<TabItem value="powershell">
+
+```powershell
+$env:PWDEBUG=1
+pytest -s test_example.py
+```
+
+</TabItem>
+<TabItem value="batch">
+
+```batch
+set PWDEBUG=1
+pytest -s test_example.py
+```
+
+</TabItem>
+</Tabs>
+
+To debug a specific test add `-k` followed by the name of the test that you want to debug.
+
+<Tabs
+  groupId="bash-flavor"
+  defaultValue="bash"
+  values={[
+    {label: 'Bash', value: 'bash'},
+    {label: 'PowerShell', value: 'powershell'},
+    {label: 'Batch', value: 'batch'}
+  ]
+}>
+<TabItem value="bash">
+
+```bash
+PWDEBUG=1 pytest -s -k test_get_started_link
+```
+
+</TabItem>
+<TabItem value="powershell">
+
+```powershell
+$env:PWDEBUG=1
+pytest -s -k test_get_started_link
+```
+
+</TabItem>
+<TabItem value="batch">
+
+```batch
+set PWDEBUG=1
+pytest -s -k test_get_started_link
+```
+
+</TabItem>
+</Tabs>
+
+This command will open up a Browser window as well as the Playwright Inspector. You can use the step over button at the top of the inspector to step through your test. Or press the play button to run your test from start to finish. Once the test has finished the browser window will close.
+
+While debugging you can use the Pick Locator button to select an element on the page and see the locator that Playwright would use to find that element. You an also edit the locator and see it highlighting live on the Browser window. Use the Copy Locator button to copy the locator to your clipboard and then paste it into you test.
+
+![Playwright Inspector](https://github.com/microsoft/playwright/assets/13063165/c94c89c8-f945-460c-a653-7809c6ca50ee)
 
 Check out our [debugging guide](./debug.mdx) to learn more about the [Playwright Inspector](./debug.mdx#playwright-inspector) as well as debugging with [Browser Developer tools](./debug.mdx#browser-developer-tools).
 
-## What's Next
+## What's next
 - [Generate tests with Codegen](./codegen.mdx)
 - [See a trace of your tests](./trace-viewer-intro.mdx)
+- [Run your tests on CI with GitHub Actions](./ci-intro.mdx)
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
