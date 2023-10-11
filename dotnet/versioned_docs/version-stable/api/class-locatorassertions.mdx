@@ -241,10 +241,23 @@ await Expect(locator).ToBeInViewportAsync(new() { Ratio = 0.5 });
 
 Ensures that [Locator] points to an [attached](../actionability.mdx#attached) and [visible](../actionability.mdx#visible) DOM node.
 
+To check that at least one element from the list is visible, use [Locator.First](/api/class-locator.mdx#locator-first).
+
 **Usage**
 
 ```csharp
+// A specific element is visible.
 await Expect(Page.GetByText("Welcome")).ToBeVisibleAsync();
+
+// At least one item in the list is visible.
+await Expect(Page.GetByTestId("todo-item").First).ToBeVisibleAsync();
+
+// At least one of the two elements is visible, possibly both.
+await Expect(
+  Page.GetByRole(AriaRole.Button, new() { Name = "Sign in" })
+    .Or(Page.GetByRole(AriaRole.Button, new() { Name = "Sign up" }))
+    .First
+).ToBeVisibleAsync();
 ```
 
 **Arguments**

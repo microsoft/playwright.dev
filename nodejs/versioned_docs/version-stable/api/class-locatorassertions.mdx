@@ -230,10 +230,23 @@ await expect(locator).toBeInViewport({ ratio: 0.5 });
 
 Ensures that [Locator] points to an [attached](../actionability.mdx#attached) and [visible](../actionability.mdx#visible) DOM node.
 
+To check that at least one element from the list is visible, use [locator.first()](/api/class-locator.mdx#locator-first).
+
 **Usage**
 
 ```js
+// A specific element is visible.
 await expect(page.getByText('Welcome')).toBeVisible();
+
+// At least one item in the list is visible.
+await expect(page.getByTestId('todo-item').first()).toBeVisible();
+
+// At least one of the two elements is visible, possibly both.
+await expect(
+    page.getByRole('button', { name: 'Sign in' })
+        .or(page.getByRole('button', { name: 'Sign up' }))
+        .first()
+).toBeVisible();
 ```
 
 **Arguments**
@@ -308,9 +321,9 @@ await expect(page.locator('ul')).toContainText(['Text 3']);
 
 ---
 
-### toHaveAttribute {#locator-assertions-to-have-attribute}
+### toHaveAttribute(name, value) {#locator-assertions-to-have-attribute}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><x-search>locatorAssertions.toHaveAttribute</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><x-search>locatorAssertions.toHaveAttribute(name, value)</x-search>
 
 Ensures the [Locator] points to an element with given attribute.
 
@@ -330,6 +343,37 @@ await expect(locator).toHaveAttribute('type', 'text');
   Expected attribute value.
 - `options` [Object] *(optional)*
   - `timeout` [number] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-have-attribute-option-timeout"/><a href="#locator-assertions-to-have-attribute-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
+
+---
+
+### toHaveAttribute(name) {#locator-assertions-to-have-attribute-2}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.40</font><x-search>locatorAssertions.toHaveAttribute(name)</x-search>
+
+Ensures the [Locator] points to an element with given attribute. The method will assert attribute presence.
+
+```js
+const locator = page.locator('input');
+// Assert attribute existence.
+await expect(locator).toHaveAttribute('disabled');
+await expect(locator).not.toHaveAttribute('open');
+```
+
+**Usage**
+
+```js
+await expect(locator).toHaveAttribute(name);
+await expect(locator).toHaveAttribute(name, options);
+```
+
+**Arguments**
+- `name` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-have-attribute-2-option-name"/><a href="#locator-assertions-to-have-attribute-2-option-name" class="list-anchor">#</a>
+  
+  Attribute name.
+- `options` [Object] *(optional)*
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-have-attribute-2-option-timeout"/><a href="#locator-assertions-to-have-attribute-2-option-timeout" class="list-anchor">#</a>
     
     Time to retry the assertion for in milliseconds. Defaults to `timeout` in `TestConfig.expect`.
 
