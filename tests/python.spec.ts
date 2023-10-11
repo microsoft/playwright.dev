@@ -17,7 +17,7 @@ test('homepage has Playwright in title and get started link linking to the intro
   // Click the get started link.
   await getStarted.click();
 
-  await expect(page.locator('text=pytest-playwright')).toBeVisible();
+  await expect(page.getByText('pytest-playwright', { exact: true })).toBeVisible();
 });
 
 test.describe('next switcher', () => {
@@ -42,7 +42,7 @@ test.describe('next switcher', () => {
     await expect(page).toHaveURL(/\/python\/docs\/next\/intro$/);
     await expect(page.locator('text=Get started by installing Playwright')).toBeVisible();
   });
-  
+
   test('docs -> next docs', async ({ page, switchToNext }) => {
     await page.goto('/python/docs/locators');
     await expect(page.locator('text=locators represent a way to find')).toBeVisible();
