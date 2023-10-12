@@ -60,11 +60,11 @@ const config: PlaywrightTestConfig = {
     },
   ],
 
-  /* Run your local dev server before starting the tests */
-  webServer: process.env.CI ? {
+  webServer: {
     command: 'npx http-server -p 3000 build/',
     port: 3000,
-  } : undefined,
+    reuseExistingServer: !process.env.CI,
+  },
 };
 
 export default config;
