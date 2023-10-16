@@ -11,6 +11,10 @@ const lightTheme = require('prism-react-renderer/themes/github/index.cjs.js');
 
 module.exports = {
   ...lightTheme,
+  plain: {
+    color: "#2e2e2c",
+    backgroundColor: "#f6f8fa"
+  },
   styles: [
     ...lightTheme.styles,
     {
@@ -87,9 +91,15 @@ module.exports = {
       },
     },
     {
+      types: ["entity", "url", "symbol", "number", "boolean", "variable", "constant", "property", "regex", "inserted"],
+      style: {
+        color: "#257c7a"
+      }
+    },
+    {
       types: ['variable'],
       style: {
-        color: '#E36209',
+        color: '#b74e05',
       },
     },
     {
