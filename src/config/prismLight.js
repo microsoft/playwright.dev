@@ -39,7 +39,7 @@ module.exports = {
     {
       types: ['atrule', 'tag'],
       style: {
-        color: '#22863A',
+        color: '#207f37',
       },
     },
     {
