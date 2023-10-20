@@ -1,5 +1,13 @@
 const conferenceVideos = [
   {
+    title: "End to End testing with Playwright",
+    id: 'kqJSrSU9DPY',
+    year: '2023',
+    conference: 'Vite Conf',
+    language: 'English',
+    speakers: ['Debbie O\'Brien']
+  },
+  {
     title: "Aprende a crear Test de forma Facil",
     id: 'x8wmQ-8oaMU',
     year: '2023',
