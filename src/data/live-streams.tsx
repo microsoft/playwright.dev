@@ -1,5 +1,13 @@
 const liveStreams = [
   {
+    title: 'Deconstruct the E2E Workflow for Testing and Deployment',
+    description: '',
+    id: 'FGDQIDtddsY',
+    year: '2023',
+    host: 'Learn Live',
+    speakers: ["Nitya Narasimhan"]
+  },
+  {
     title: 'Awesome Web Testing with Playwright',
     description: '',
     id: 'OCGef6H09fI',
