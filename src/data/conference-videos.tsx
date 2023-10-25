@@ -1,5 +1,13 @@
 const conferenceVideos = [
   {
+    title: "Playwright : l'outil qui va révolutionner les tests end-to-end",
+    id: 'fQ4LICkmG9I',
+    year: '2023',
+    conference: 'BreizhCamp',
+    language: 'French',
+    speakers: ['Jean-François Greffier']
+  },
+  {
     title: "End to End testing with Playwright",
     id: 'kqJSrSU9DPY',
     year: '2023',
