@@ -1,5 +1,10 @@
 const releaseVideos = [
   {
+    version: '1.39',
+    id: "KqVuRAlOkm0",
+    highlights: ['box test steps', 'custom matchers', 'merge test fixtures and assertions'],
+  },
+  {
     version: '1.38',
     id: "YGJTeXaZDTM",
     highlights: ['UI Mode update', 'form filling', 'update Playwright'],
