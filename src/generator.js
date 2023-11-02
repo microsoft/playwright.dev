@@ -565,7 +565,7 @@ ${this.documentation.renderLinksInText(member.discouraged)}
       typeText = this.formatter.formatPromise(typeText);
 
     // Escape < and > to not confuse MDX:
-    // https://github.com/mdx-js/mdx/issues/2264#issuecomment-1450886024
+    // https://docusaurus.io/docs/migration/v3#bad-usage-of--1
     typeText = typeText.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
 
     const optionalText = optional ? ' *(optional)*' : '';
