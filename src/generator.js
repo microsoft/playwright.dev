@@ -564,6 +564,10 @@ ${this.documentation.renderLinksInText(member.discouraged)}
     if (async)
       typeText = this.formatter.formatPromise(typeText);
 
+    // Escape < and > to not confuse MDX:
+    // https://github.com/mdx-js/mdx/issues/2264#issuecomment-1450886024
+    typeText = typeText.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+
     const optionalText = optional ? ' *(optional)*' : '';
     let linkTag = '';
     let linkAnchor = '';
