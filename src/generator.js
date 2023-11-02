@@ -564,6 +564,10 @@ ${this.documentation.renderLinksInText(member.discouraged)}
     if (async)
       typeText = this.formatter.formatPromise(typeText);
 
+    // Escape < and > to not confuse MDX:
+    // https://docusaurus.io/docs/migration/v3#bad-usage-of--1
+    typeText = typeText.replaceAll('<', '&lt;').replaceAll('>', '&gt;');
+
     const optionalText = optional ? ' *(optional)*' : '';
     let linkTag = '';
     let linkAnchor = '';
