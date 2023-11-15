@@ -25,6 +25,12 @@ module.exports = {
       },
     },
     {
+      types: ["namespace"],
+      style: {
+        opacity: 0.9
+      }
+    },
+    {
       types: ['parameter'],
       style: {
         color: '#953800',
