@@ -4,6 +4,46 @@ title: "Release notes"
 toc_max_heading_level: 2
 ---
 
+## Version 1.40
+
+### Test Generator Update
+
+![Playwright Test Generator](https://github.com/microsoft/playwright/assets/9881434/8c3d6fac-5381-4aaf-920f-6e22b964eec6)
+
+New tools to generate assertions:
+- "Assert visibility" tool generates [Expect(Locator).ToBeVisibleAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-be-visible).
+- "Assert value" tool generates [Expect(Locator).ToHaveValueAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-value).
+- "Assert text" tool generates [Expect(Locator).ToContainTextAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-contain-text).
+
+Here is an example of a generated test with assertions:
+
+```csharp
+await Page.GotoAsync("https://playwright.dev/");
+await Page.GetByRole(AriaRole.Link, new() { Name = "Get started" }).ClickAsync();
+await Expect(Page.GetByLabel("Breadcrumbs").GetByRole(AriaRole.List)).ToContainTextAsync("Installation");
+await Expect(Page.GetByLabel("Search")).ToBeVisibleAsync();
+await Page.GetByLabel("Search").ClickAsync();
+await Page.GetByPlaceholder("Search docs").FillAsync("locator");
+await Expect(Page.GetByPlaceholder("Search docs")).ToHaveValueAsync("locator");
+```
+
+### New APIs
+- Option `reason` in [Page.CloseAsync()](/api/class-page.mdx#page-close), [BrowserContext.CloseAsync()](/api/class-browsercontext.mdx#browser-context-close) and [Browser.CloseAsync()](/api/class-browser.mdx#browser-close). Close reason is reported for all operations interrupted by the closure.
+- Option `firefoxUserPrefs` in [BrowserType.LaunchPersistentContextAsync()](/api/class-browsertype.mdx#browser-type-launch-persistent-context).
+
+### Other Changes
+- Methods [Download.PathAsync()](/api/class-download.mdx#download-path) and [Download.CreateReadStreamAsync()](/api/class-download.mdx#download-create-read-stream) throw an error for failed and cancelled downloads.
+- Playwright [docker image](./docker.mdx) now comes with Node.js v20.
+
+### Browser Versions
+* Chromium 120.0.6099.28
+* Mozilla Firefox 119.0
+* WebKit 17.4
+
+This version was also tested against the following stable channels:
+* Google Chrome 119
+* Microsoft Edge 119
+
 ## Version 1.39
 
 Evergreen browsers update.
@@ -317,7 +357,7 @@ await page.GetByLabel("Password").FillAsync("secret-password");
 
 await page.GetByRole(AriaRole.Button, new() { NameString = "Sign in" }).ClickAsync();
 
-await Expect(page.GetByText("Welcome, John!")).ToBeVisibleAsync();
+await Expect(Page.GetByText("Welcome, John!")).ToBeVisibleAsync();
 ```
 
 All the same methods are also available on [Locator], [FrameLocator] and [Frame] classes.
@@ -329,7 +369,7 @@ All the same methods are also available on [Locator], [FrameLocator] and [Frame]
 - [Expect(Locator).ToHaveAttributeAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-attribute) with an empty value does not match missing attribute anymore. For example, the following snippet will succeed when `button` **does not** have a `disabled` attribute.
   
   ```csharp
-  await Expect(page.GetByRole(AriaRole.Button)).ToHaveAttribute("disabled", "");
+  await Expect(Page.GetByRole(AriaRole.Button)).ToHaveAttribute("disabled", "");
   ```
   
 ### Browser Versions
