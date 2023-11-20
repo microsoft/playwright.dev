@@ -45,7 +45,7 @@ class CSharpFormatter {
     let usages = [`${prefix}${name}`];
     let link = `${prefix}${name}`;
     if (member.kind === 'event') {
-      usages = [`${prefix}${name} += async data => {};`];
+      usages = [`${prefix}${name} += async (_, ${formatEventHandler(member)}) => {};`];
       link = `${prefix}${name}`;
       name = `event ${name}`;
     }
@@ -185,6 +185,19 @@ class CSharpFormatter {
    filterComment(spec) {
     return spec.codeLang === this.lang;
   }
+}
+
+/**
+ * @param {Documentation.Member} member 
+ * @returns {string}
+ */
+function formatEventHandler(member) {
+  let name = member.type?.name
+    .replace('?', '')
+    .replace('string', '')
+  if (!name)
+    return 'value';
+  return name[0].toLowerCase() + name.substring(1);
 }
 
 /**
