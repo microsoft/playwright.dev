@@ -7,9 +7,11 @@
 
 // https://github.com/facebook/docusaurus/blob/main/website/src/utils/prismLight.mjs
 
-const lightTheme = require('prism-react-renderer/themes/github/index.cjs.js');
+import {themes, type PrismTheme} from 'prism-react-renderer';
 
-module.exports = {
+const lightTheme = themes.github;
+
+export default {
   ...lightTheme,
   plain: {
     color: "#2e2e2c",
@@ -115,4 +117,4 @@ module.exports = {
       },
     },
   ],
-};
+} satisfies PrismTheme;

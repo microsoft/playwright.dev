@@ -1,7 +1,11 @@
-const path = require("path");
+import prismLight from './src/config/prismLight'
+import prismDark from './src/config/prismDark'
+
+import type {Config} from '@docusaurus/types';
+import path from "path";
 const isProd = process.env.NODE_ENV === "production";
 
-const hasStableVersion = require(path.join(__dirname, 'java/versions.json')).includes('stable');
+const hasStableVersion = require(path.join(__dirname, 'dotnet/versions.json')).includes('stable');
 
 let plugins = [
   [
@@ -37,17 +41,17 @@ if (isProd) {
   plugins.push(require.resolve("@docusaurus/plugin-sitemap"));
 }
 
-module.exports = {
-  title: "Playwright Java",
+export default {
+  title: "Playwright .NET",
   tagline: "Fast and reliable end-to-end testing for modern web apps",
   // Repo config for GitHub Pages
   url: "https://playwright.dev",
-  baseUrl: "/java/",
+  baseUrl: "/dotnet/",
   organizationName: "microsoft",
   projectName: "playwright.dev",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "throw",
-  scripts: ["/java/js/redirection.js"],
+  scripts: ["/dotnet/js/redirection.js"],
   favicon: "img/playwright-logo.svg",
   themeConfig: {
     colorMode: {
@@ -55,12 +59,12 @@ module.exports = {
       respectPrefersColorScheme: true,
     },
     prism: {
-      theme: require('./src/config/prismLight'),
-      darkTheme: require('./src/config/prismDark'),
-      additionalLanguages: ['java', 'bash', 'batch', 'powershell'],
+      theme: prismLight,
+      darkTheme: prismDark,
+      additionalLanguages: ['csharp', 'bash', 'batch', 'powershell'],
     },
     navbar: {
-      title: "Playwright for Java",
+      title: "Playwright for .NET",
       logo: {
         alt: "Playwright logo",
         src: "img/playwright-logo.svg",
@@ -79,7 +83,7 @@ module.exports = {
           position: "left",
         },
         {
-          href: "https://github.com/microsoft/playwright-java",
+          href: "https://github.com/microsoft/playwright-dotnet",
           position: "right",
           className: "header-github-link",
           "aria-label": "GitHub repository",
@@ -91,12 +95,12 @@ module.exports = {
           "aria-label": "Discord server",
         },
         {
-          label: 'Java',
+          label: '.NET',
           position: 'left',
           items: [
             {
-              label: 'Java',
-              'data-language-prefix': '/java/',
+              label: '.NET',
+              'data-language-prefix': '/dotnet/',
               href: '#',
             },
             {
@@ -110,8 +114,8 @@ module.exports = {
               href: '#',
             },
             {
-              label: '.NET',
-              'data-language-prefix': '/dotnet/',
+              label: 'Java',
+              'data-language-prefix': '/java/',
               href: '#',
             },
           ],
@@ -162,7 +166,7 @@ module.exports = {
           items: [
             {
               label: "GitHub",
-              href: "https://github.com/microsoft/playwright-java",
+              href: "https://github.com/microsoft/playwright-dotnet",
             },
             {
               label: "YouTube",
@@ -178,7 +182,7 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} Microsoft`,
     },
     algolia: {
-      indexName: 'playwright-java',
+      indexName: 'playwright-dotnet',
       appId: 'K09ICMCV6X',
       apiKey: 'a5b64422711c37ab6a0ce4d86d16cdd9',
     },
@@ -195,16 +199,29 @@ module.exports = {
   ],
   plugins,
   customFields: {
-    repositoryName: "playwright-java",
+    repositoryName: "playwright-dotnet",
   },
   trailingSlash: false,
   webpack: {
     jsLoader: (isServer) => ({
-      loader: require.resolve('esbuild-loader'),
+      loader: require.resolve('swc-loader'),
       options: {
-        loader: 'tsx',
-        target: isServer ? 'node12' : 'es2017',
+        jsc: {
+          parser: {
+            syntax: 'typescript',
+            tsx: true,
+          },
+          transform: {
+            react: {
+              runtime: 'automatic',
+            },
+          },
+          target: 'es2017',
+        },
+        module: {
+          type: isServer ? 'commonjs' : 'es6',
+        },
       },
     }),
   }
-};
+} satisfies Config;
