@@ -1,5 +1,10 @@
 const releaseVideos = [
   {
+    version: '1.40',
+    id: "mn892dV81_8",
+    highlights: ['test generator update', 'generate assertions'],
+  },
+  {
     version: '1.39',
     id: "KqVuRAlOkm0",
     highlights: ['box test steps', 'custom matchers', 'merge test fixtures and assertions'],
