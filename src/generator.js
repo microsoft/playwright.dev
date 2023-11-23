@@ -439,8 +439,7 @@ ${this.documentation.renderLinksInText(member.discouraged)}
     });
     fs.mkdirSync(this.outDir, { recursive: true });
     let output = [md.render(nodes, { flattenText: true, renderCodeBlockTitlesInHeader: true }), this.generatedLinksSuffix].join('\n');
-    output = output.replace(`"
----`, `"
+    output = output.replace(/("|\d)\n---/, `$1
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';

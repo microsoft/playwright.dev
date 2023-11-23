@@ -1,7 +1,11 @@
-const path = require("path");
+import prismLight from './src/config/prismLight'
+import prismDark from './src/config/prismDark'
+import type {Config} from '@docusaurus/types';
+import path from "path";
+
 const isProd = process.env.NODE_ENV === "production";
 
-const hasStableVersion = require(path.join(__dirname, 'dotnet/versions.json')).includes('stable');
+const hasStableVersion = require(path.join(__dirname, 'java/versions.json')).includes('stable');
 
 let plugins = [
   [
@@ -38,16 +42,16 @@ if (isProd) {
 }
 
 module.exports = {
-  title: "Playwright .NET",
+  title: "Playwright Java",
   tagline: "Fast and reliable end-to-end testing for modern web apps",
   // Repo config for GitHub Pages
   url: "https://playwright.dev",
-  baseUrl: "/dotnet/",
+  baseUrl: "/java/",
   organizationName: "microsoft",
   projectName: "playwright.dev",
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "throw",
-  scripts: ["/dotnet/js/redirection.js"],
+  scripts: ["/java/js/redirection.js"],
   favicon: "img/playwright-logo.svg",
   themeConfig: {
     colorMode: {
@@ -55,12 +59,12 @@ module.exports = {
       respectPrefersColorScheme: true,
     },
     prism: {
-      theme: require('./src/config/prismLight'),
-      darkTheme: require('./src/config/prismDark'),
-      additionalLanguages: ['csharp', 'bash', 'batch', 'powershell'],
+      theme: prismLight,
+      darkTheme: prismDark,
+      additionalLanguages: ['java', 'bash', 'batch', 'powershell'],
     },
     navbar: {
-      title: "Playwright for .NET",
+      title: "Playwright for Java",
       logo: {
         alt: "Playwright logo",
         src: "img/playwright-logo.svg",
@@ -79,7 +83,7 @@ module.exports = {
           position: "left",
         },
         {
-          href: "https://github.com/microsoft/playwright-dotnet",
+          href: "https://github.com/microsoft/playwright-java",
           position: "right",
           className: "header-github-link",
           "aria-label": "GitHub repository",
@@ -91,12 +95,12 @@ module.exports = {
           "aria-label": "Discord server",
         },
         {
-          label: '.NET',
+          label: 'Java',
           position: 'left',
           items: [
             {
-              label: '.NET',
-              'data-language-prefix': '/dotnet/',
+              label: 'Java',
+              'data-language-prefix': '/java/',
               href: '#',
             },
             {
@@ -110,8 +114,8 @@ module.exports = {
               href: '#',
             },
             {
-              label: 'Java',
-              'data-language-prefix': '/java/',
+              label: '.NET',
+              'data-language-prefix': '/dotnet/',
               href: '#',
             },
           ],
@@ -162,7 +166,7 @@ module.exports = {
           items: [
             {
               label: "GitHub",
-              href: "https://github.com/microsoft/playwright-dotnet",
+              href: "https://github.com/microsoft/playwright-java",
             },
             {
               label: "YouTube",
@@ -178,7 +182,7 @@ module.exports = {
       copyright: `Copyright © ${new Date().getFullYear()} Microsoft`,
     },
     algolia: {
-      indexName: 'playwright-dotnet',
+      indexName: 'playwright-java',
       appId: 'K09ICMCV6X',
       apiKey: 'a5b64422711c37ab6a0ce4d86d16cdd9',
     },
@@ -195,16 +199,29 @@ module.exports = {
   ],
   plugins,
   customFields: {
-    repositoryName: "playwright-dotnet",
+    repositoryName: "playwright-java",
   },
   trailingSlash: false,
   webpack: {
     jsLoader: (isServer) => ({
-      loader: require.resolve('esbuild-loader'),
+      loader: require.resolve('swc-loader'),
       options: {
-        loader: 'tsx',
-        target: isServer ? 'node12' : 'es2017',
+        jsc: {
+          parser: {
+            syntax: 'typescript',
+            tsx: true,
+          },
+          transform: {
+            react: {
+              runtime: 'automatic',
+            },
+          },
+          target: 'es2017',
+        },
+        module: {
+          type: isServer ? 'commonjs' : 'es6',
+        },
       },
     }),
   }
-};
+} satisfies Config;

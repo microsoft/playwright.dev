@@ -1,4 +1,8 @@
-const path = require("path");
+import prismLight from './src/config/prismLight'
+import prismDark from './src/config/prismDark'
+
+import type {Config} from '@docusaurus/types';
+import path from "path";
 const isProd = process.env.NODE_ENV === "production";
 
 const hasStableVersion = require(path.join(__dirname, 'python/versions.json')).includes('stable');
@@ -37,7 +41,7 @@ if (isProd) {
   plugins.push(require.resolve("@docusaurus/plugin-sitemap"));
 }
 
-module.exports = {
+export default {
   title: "Playwright Python",
   tagline: "Fast and reliable end-to-end testing for modern web apps",
   // Repo config for GitHub Pages
@@ -55,8 +59,8 @@ module.exports = {
       respectPrefersColorScheme: true,
     },
     prism: {
-      theme: require('./src/config/prismLight'),
-      darkTheme: require('./src/config/prismDark'),
+      theme: prismLight,
+      darkTheme: prismDark,
       additionalLanguages: ['python', 'bash', 'batch', 'powershell'],
     },
     navbar: {
@@ -201,11 +205,24 @@ module.exports = {
   trailingSlash: false,
   webpack: {
     jsLoader: (isServer) => ({
-      loader: require.resolve('esbuild-loader'),
+      loader: require.resolve('swc-loader'),
       options: {
-        loader: 'tsx',
-        target: isServer ? 'node12' : 'es2017',
+        jsc: {
+          parser: {
+            syntax: 'typescript',
+            tsx: true,
+          },
+          transform: {
+            react: {
+              runtime: 'automatic',
+            },
+          },
+          target: 'es2017',
+        },
+        module: {
+          type: isServer ? 'commonjs' : 'es6',
+        },
       },
     }),
   }
-};
+} satisfies Config;
