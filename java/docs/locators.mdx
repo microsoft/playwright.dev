@@ -526,12 +526,27 @@ page.getByRole(AriaRole.LISTITEM)
     .click()
 ```
 
-We can also assert the product card to make sure there is only one
+We can also assert the product card to make sure there is only one:
 
 ```java
 assertThat(page
     .getByRole(AriaRole.LISTITEM)
-    .filter(new Locator.FilterOptions().setHas(page.getByText("Product 2")))
+    .filter(new Locator.FilterOptions()
+        .setHas(page.GetByRole(AriaRole.HEADING,
+                               new Page.GetByRoleOptions().setName("Product 2"))))
+    .hasCount(1);
+```
+
+The filtering locator **must be relative** to the original locator and is queried starting with the original locator match, not the document root. Therefore, the following will not work, because the filtering locator starts matching from the `<ul>` list element that is outside of the `<li>` list item matched by the original locator:
+
+```java
+// ✖ WRONG
+assertThat(page
+    .getByRole(AriaRole.LISTITEM)
+    .filter(new Locator.FilterOptions()
+        .setHas(page.GetByRole(AriaRole.LIST)
+                    .GetByRole(AriaRole.HEADING,
+                               new Page.GetByRoleOptions().setName("Product 2"))))
     .hasCount(1);
 ```
 

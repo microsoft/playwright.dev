@@ -524,13 +524,25 @@ await page
     .ClickAsync();
 ```
 
-We can also assert the product card to make sure there is only one
+We can also assert the product card to make sure there is only one:
 
 ```csharp
 await Expect(Page
     .GetByRole(AriaRole.Listitem)
     .Filter(new() {
         Has = page.GetByRole(AriaRole.Heading, new() { Name = "Product 2" })
+    }))
+    .ToHaveCountAsync(1);
+```
+
+The filtering locator **must be relative** to the original locator and is queried starting with the original locator match, not the document root. Therefore, the following will not work, because the filtering locator starts matching from the `<ul>` list element that is outside of the `<li>` list item matched by the original locator:
+
+```csharp
+// ✖ WRONG
+await Expect(Page
+    .GetByRole(AriaRole.Listitem)
+    .Filter(new() {
+        Has = page.GetByRole(AriaRole.List).GetByRole(AriaRole.Heading, new() { Name = "Product 2" })
     }))
     .ToHaveCountAsync(1);
 ```
