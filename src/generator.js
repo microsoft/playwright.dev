@@ -28,7 +28,7 @@ const { generateTabGroups, renderHTMLCard } = require('./format_utils');
 /** @typedef {import('./documentation').Type} Type */
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
 
-const commonSnippets = new Set(['txt', 'html', 'xml', 'yml', 'yaml', 'json', 'groovy', 'html', 'bash', 'sh', 'ini', 'Dockerfile']);
+const commonSnippets = new Set(['txt', 'html', 'xml', 'yml', 'yaml', 'json', 'groovy', 'html', 'bash', 'sh', 'ini', 'Dockerfile', 'css']);
 
 // -------- HACKS BEGIN --------
 /**
