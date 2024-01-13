@@ -10,8 +10,8 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 Playwright performs a range of actionability checks on the elements before making actions to ensure these actions behave as expected. It auto-waits for all the relevant checks to pass and only then performs the requested action. If the required checks do not pass within the given `timeout`, action fails with the `TimeoutError`.
 
-For example, for [Page.ClickAsync()](/api/class-page.mdx#page-click), Playwright will ensure that:
-- element is [Attached] to the DOM
+For example, for [Locator.ClickAsync()](/api/class-locator.mdx#locator-click), Playwright will ensure that:
+- locator resolves to an exactly one element
 - element is [Visible]
 - element is [Stable], as in not animating or completed animation
 - element [Receives Events], as in not obscured by other elements
@@ -19,67 +19,73 @@ For example, for [Page.ClickAsync()](/api/class-page.mdx#page-click), Playwright
 
 Here is the complete list of actionability checks performed for each action:
 
-| Action | [Attached] | [Visible] | [Stable] | [Receives Events] | [Enabled] | [Editable] |
-| :- | :-: | :-: | :-: | :-: | :-: | :-: |
-| check | Yes | Yes | Yes | Yes | Yes | - |
-| click | Yes | Yes | Yes | Yes | Yes | - |
-| dblclick | Yes | Yes | Yes | Yes | Yes | - |
-| setChecked | Yes | Yes | Yes | Yes | Yes | - |
-| tap | Yes | Yes | Yes | Yes | Yes | - |
-| uncheck | Yes | Yes | Yes | Yes | Yes | - |
-| hover | Yes | Yes | Yes | Yes | - | - |
-| scrollIntoViewIfNeeded | Yes | - | Yes | - | - | - |
-| screenshot | Yes | Yes | Yes | - | - | - |
-| fill | Yes | Yes | - | - | Yes | Yes |
-| selectText | Yes | Yes | - | - | - | - |
-| dispatchEvent | Yes | - | - | - | - | - |
-| focus | Yes | - | - | - | - | - |
-| getAttribute | Yes | - | - | - | - | - |
-| innerText | Yes | - | - | - | - | - |
-| innerHTML | Yes | - | - | - | - | - |
-| press | Yes | - | - | - | - | - |
-| setInputFiles | Yes | - | - | - | - | - |
-| selectOption | Yes | Yes | - | - | Yes | - |
-| textContent | Yes | - | - | - | - | - |
-| type | Yes | - | - | - | - | - |
-
-<br/>
+| Action | [Visible] | [Stable] | [Receives Events] | [Enabled] | [Editable] |
+| :- | :-: | :-: | :-: | :-: | :-: |
+| [Locator.CheckAsync()](/api/class-locator.mdx#locator-check) | Yes | Yes | Yes | Yes | - |
+| [Locator.ClickAsync()](/api/class-locator.mdx#locator-click) | Yes | Yes | Yes | Yes | - |
+| [Locator.DblClickAsync()](/api/class-locator.mdx#locator-dblclick) | Yes | Yes | Yes | Yes | - |
+| [Locator.SetCheckedAsync()](/api/class-locator.mdx#locator-set-checked) | Yes | Yes | Yes | Yes | - |
+| [Locator.TapAsync()](/api/class-locator.mdx#locator-tap) | Yes | Yes | Yes | Yes | - |
+| [Locator.UncheckAsync()](/api/class-locator.mdx#locator-uncheck) | Yes | Yes | Yes | Yes | - |
+| [Locator.HoverAsync()](/api/class-locator.mdx#locator-hover) | Yes | Yes | Yes | - | - |
+| [Locator.DragToAsync()](/api/class-locator.mdx#locator-drag-to) | Yes | Yes | Yes | - | - |
+| [Locator.ScreenshotAsync()](/api/class-locator.mdx#locator-screenshot) | Yes | Yes | - | - | - |
+| [Locator.FillAsync()](/api/class-locator.mdx#locator-fill) | Yes | - | - | Yes | Yes |
+| [Locator.ClearAsync()](/api/class-locator.mdx#locator-clear) | Yes | - | - | Yes | Yes |
+| [Locator.SelectOptionAsync()](/api/class-locator.mdx#locator-select-option) | Yes | - | - | Yes | - |
+| [Locator.SelectTextAsync()](/api/class-locator.mdx#locator-select-text) | Yes | - | - | - | - |
+| [Locator.ScrollIntoViewIfNeededAsync()](/api/class-locator.mdx#locator-scroll-into-view-if-needed) | - | Yes | - | - | - |
+| [Locator.BlurAsync()](/api/class-locator.mdx#locator-blur) | - | - | - | - | - |
+| [Locator.DispatchEventAsync()](/api/class-locator.mdx#locator-dispatch-event) | - | - | - | - | - |
+| [Locator.FocusAsync()](/api/class-locator.mdx#locator-focus) | - | - | - | - | - |
+| [Locator.PressAsync()](/api/class-locator.mdx#locator-press) | - | - | - | - | - |
+| [Locator.PressSequentiallyAsync()](/api/class-locator.mdx#locator-press-sequentially) | - | - | - | - | - |
+| [Locator.SetInputFilesAsync()](/api/class-locator.mdx#locator-set-input-files) | - | - | - | - | - |
 
 ## Forcing actions
 
-Some actions like [Page.ClickAsync()](/api/class-page.mdx#page-click) support `force` option that disables non-essential actionability checks, for example passing truthy `force` to [Page.ClickAsync()](/api/class-page.mdx#page-click) method will not check that the target element actually receives click events.
+Some actions like [Locator.ClickAsync()](/api/class-locator.mdx#locator-click) support `force` option that disables non-essential actionability checks, for example passing truthy `force` to [Locator.ClickAsync()](/api/class-locator.mdx#locator-click) method will not check that the target element actually receives click events.
 
 ## Assertions
 
-You can check the actionability state of the element using one of the following methods as well. This is typically not necessary, but it helps writing assertive tests that ensure that after certain actions, elements reach actionable state:
-- [ElementHandle.IsCheckedAsync()](/api/class-elementhandle.mdx#element-handle-is-checked)
-- [ElementHandle.IsDisabledAsync()](/api/class-elementhandle.mdx#element-handle-is-disabled)
-- [ElementHandle.IsEditableAsync()](/api/class-elementhandle.mdx#element-handle-is-editable)
-- [ElementHandle.IsEnabledAsync()](/api/class-elementhandle.mdx#element-handle-is-enabled)
-- [ElementHandle.IsHiddenAsync()](/api/class-elementhandle.mdx#element-handle-is-hidden)
-- [ElementHandle.IsVisibleAsync()](/api/class-elementhandle.mdx#element-handle-is-visible)
-- [Page.IsCheckedAsync()](/api/class-page.mdx#page-is-checked)
-- [Page.IsDisabledAsync()](/api/class-page.mdx#page-is-disabled)
-- [Page.IsEditableAsync()](/api/class-page.mdx#page-is-editable)
-- [Page.IsEnabledAsync()](/api/class-page.mdx#page-is-enabled)
-- [Page.IsHiddenAsync()](/api/class-page.mdx#page-is-hidden)
-- [Page.IsVisibleAsync()](/api/class-page.mdx#page-is-visible)
-- [Locator.IsCheckedAsync()](/api/class-locator.mdx#locator-is-checked)
-- [Locator.IsDisabledAsync()](/api/class-locator.mdx#locator-is-disabled)
-- [Locator.IsEditableAsync()](/api/class-locator.mdx#locator-is-editable)
-- [Locator.IsEnabledAsync()](/api/class-locator.mdx#locator-is-enabled)
-- [Locator.IsHiddenAsync()](/api/class-locator.mdx#locator-is-hidden)
-- [Locator.IsVisibleAsync()](/api/class-locator.mdx#locator-is-visible)
+Playwright includes auto-retrying assertions that remove flakiness by waiting until the condition is met, similarly to auto-waiting before actions.
 
-<br/>
+| Assertion | Description |
+| :- | :- |
+| [Expect(Locator).ToBeAttachedAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-be-attached) | Element is attached |
+| [Expect(Locator).ToBeCheckedAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-be-checked) | Checkbox is checked |
+| [Expect(Locator).ToBeDisabledAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-be-disabled) | Element is disabled |
+| [Expect(Locator).ToBeEditableAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-be-editable) | Element is editable |
+| [Expect(Locator).ToBeEmptyAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-be-empty) | Container is empty |
+| [Expect(Locator).ToBeEnabledAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-be-enabled) | Element is enabled |
+| [Expect(Locator).ToBeFocusedAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-be-focused) | Element is focused |
+| [Expect(Locator).ToBeHiddenAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-be-hidden) | Element is not visible |
+| [Expect(Locator).ToBeInViewportAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-be-in-viewport) | Element intersects viewport |
+| [Expect(Locator).ToBeVisibleAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-be-visible) | Element is visible |
+| [Expect(Locator).ToContainTextAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-contain-text) | Element contains text |
+| [Expect(Locator).ToHaveAttributeAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-attribute) | Element has a DOM attribute |
+| [Expect(Locator).ToHaveClassAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-class) | Element has a class property |
+| [Expect(Locator).ToHaveCountAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-count) | List has exact number of children |
+| [Expect(Locator).ToHaveCSSAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-css) | Element has CSS property |
+| [Expect(Locator).ToHaveIdAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-id) | Element has an ID |
+| [Expect(Locator).ToHaveJSPropertyAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-js-property) | Element has a JavaScript property |
+| [Expect(Locator).ToHaveTextAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-text) | Element matches text |
+| [Expect(Locator).ToHaveValueAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-value) | Input has a value |
+| [Expect(Locator).ToHaveValuesAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-values) | Select has options selected |
+| [Expect(Page).ToHaveTitleAsync()](/api/class-pageassertions.mdx#page-assertions-to-have-title) | Page has a title |
+| [Expect(Page).ToHaveURLAsync()](/api/class-pageassertions.mdx#page-assertions-to-have-url) | Page has a URL |
+| [Expect(Response).ToBeOKAsync()](/api/class-apiresponseassertions.mdx#api-response-assertions-to-be-ok) | Response has an OK status |
 
-## Attached
-
-Element is considered attached when it is [connected](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) to a Document or a ShadowRoot.
+Learn more in the [assertions guide](./test-assertions.mdx).
 
 ## Visible
 
-Element is considered visible when it has non-empty bounding box and does not have `visibility:hidden` computed style. Note that elements of zero size or with `display:none` are not considered visible.
+Element is considered visible when it has non-empty bounding box and does not have `visibility:hidden` computed style.
+
+Note that according to this definition:
+* Elements of zero size **are not** considered visible.
+* Elements with `display:none` **are not** considered visible.
+* Elements with `opacity:0` **are** considered visible.
 
 ## Stable
 
@@ -97,7 +103,7 @@ Element is considered editable when it is [enabled] and does not have `readonly`
 
 Element is considered receiving pointer events when it is the hit target of the pointer event at the action point. For example, when clicking at the point `(10;10)`, Playwright checks whether some other element (usually an overlay) will instead capture the click at `(10;10)`.
 
-For example, consider a scenario where Playwright will click `Sign Up` button regardless of when the [Page.ClickAsync()](/api/class-page.mdx#page-click) call was made:
+For example, consider a scenario where Playwright will click `Sign Up` button regardless of when the [Locator.ClickAsync()](/api/class-locator.mdx#locator-click) call was made:
 - page is checking that user name is unique and `Sign Up` button is disabled;
 - after checking with the server, the disabled `Sign Up` button is replaced with another one that is now enabled.
 
@@ -106,7 +112,6 @@ For example, consider a scenario where Playwright will click `Sign Up` button re
 [Enabled]: #enabled "Enabled"
 [Editable]: #editable "Editable"
 [Receives Events]: #receives-events "Receives Events"
-[Attached]: #attached "Attached"
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
