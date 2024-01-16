@@ -1009,7 +1009,7 @@ await page.get_by_role("listitem").filter(
 </TabItem>
 </Tabs>
 
-We can also assert the product card to make sure there is only one
+We can also assert the product card to make sure there is only one:
 
 <Tabs
   groupId="python-flavor"
@@ -1036,6 +1036,42 @@ expect(
 await expect(
     page.get_by_role("listitem").filter(
         has=page.get_by_role("heading", name="Product 2")
+    )
+).to_have_count(1)
+```
+
+</TabItem>
+</Tabs>
+
+The filtering locator **must be relative** to the original locator and is queried starting with the original locator match, not the document root. Therefore, the following will not work, because the filtering locator starts matching from the `<ul>` list element that is outside of the `<li>` list item matched by the original locator:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# ✖ WRONG
+expect(
+    page.get_by_role("listitem").filter(
+        has=page.get_by_role("list").get_by_role("heading", name="Product 2")
+    )
+).to_have_count(1)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# ✖ WRONG
+await expect(
+    page.get_by_role("listitem").filter(
+        has=page.get_by_role("list").get_by_role("heading", name="Product 2")
     )
 ).to_have_count(1)
 ```
