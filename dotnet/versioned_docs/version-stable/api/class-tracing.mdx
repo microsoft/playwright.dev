@@ -12,14 +12,15 @@ API for collecting and saving Playwright traces. Playwright traces can be opened
 Start recording a trace before performing actions. At the end, stop tracing and save it to a file.
 
 ```csharp
-await using var browser = playwright.Chromium.LaunchAsync();
+using var playwright = await Playwright.CreateAsync();
+var browser = await playwright.Chromium.LaunchAsync();
 await using var context = await browser.NewContextAsync();
 await context.Tracing.StartAsync(new()
 {
   Screenshots = true,
   Snapshots = true
 });
-var page = context.NewPageAsync();
+var page = await context.NewPageAsync();
 await page.GotoAsync("https://playwright.dev");
 await context.Tracing.StopAsync(new()
 {
@@ -41,14 +42,15 @@ Start tracing.
 **Usage**
 
 ```csharp
-await using var browser = playwright.Chromium.LaunchAsync();
+using var playwright = await Playwright.CreateAsync();
+var browser = await playwright.Chromium.LaunchAsync();
 await using var context = await browser.NewContextAsync();
 await context.Tracing.StartAsync(new()
 {
   Screenshots = true,
   Snapshots = true
 });
-var page = context.NewPageAsync();
+var page = await context.NewPageAsync();
 await page.GotoAsync("https://playwright.dev");
 await context.Tracing.StopAsync(new()
 {
@@ -60,7 +62,7 @@ await context.Tracing.StopAsync(new()
 - `options` `TracingStartOptions?` *(optional)*
   - `Name` [string]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-name"/><a href="#tracing-start-option-name" class="list-anchor">#</a>
     
-    If specified, the trace is going to be saved into the file with the given name inside the `tracesDir` folder specified in [BrowserType.LaunchAsync()](/api/class-browsertype.mdx#browser-type-launch).
+    If specified, intermediate trace files are going to be saved into the files with the given name prefix inside the `tracesDir` folder specified in [BrowserType.LaunchAsync()](/api/class-browsertype.mdx#browser-type-launch). To specify the final trace zip file name, you need to pass `path` option to [Tracing.StopAsync()](/api/class-tracing.mdx#tracing-stop) instead.
   - `Screenshots` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-option-screenshots"/><a href="#tracing-start-option-screenshots" class="list-anchor">#</a>
     
     Whether to capture screenshots during tracing. Screenshots are used to build a timeline preview.
@@ -87,14 +89,15 @@ Start a new trace chunk. If you'd like to record multiple traces on the same [Br
 **Usage**
 
 ```csharp
-await using var browser = playwright.Chromium.LaunchAsync();
+using var playwright = await Playwright.CreateAsync();
+var browser = await playwright.Chromium.LaunchAsync();
 await using var context = await browser.NewContextAsync();
 await context.Tracing.StartAsync(new()
 {
   Screenshots = true,
   Snapshots = true
 });
-var page = context.NewPageAsync();
+var page = await context.NewPageAsync();
 await page.GotoAsync("https://playwright.dev");
 
 await context.Tracing.StartChunkAsync();
@@ -118,7 +121,7 @@ await context.Tracing.StopChunkAsync(new()
 - `options` `TracingStartChunkOptions?` *(optional)*
   - `Name` [string]? *(optional)* <font size="2">Added in: v1.32</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-chunk-option-name"/><a href="#tracing-start-chunk-option-name" class="list-anchor">#</a>
     
-    If specified, the trace is going to be saved into the file with the given name inside the `tracesDir` folder specified in [BrowserType.LaunchAsync()](/api/class-browsertype.mdx#browser-type-launch).
+    If specified, intermediate trace files are going to be saved into the files with the given name prefix inside the `tracesDir` folder specified in [BrowserType.LaunchAsync()](/api/class-browsertype.mdx#browser-type-launch). To specify the final trace zip file name, you need to pass `path` option to [Tracing.StopChunkAsync()](/api/class-tracing.mdx#tracing-stop-chunk) instead.
   - `Title` [string]? *(optional)* <font size="2">Added in: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-chunk-option-title"/><a href="#tracing-start-chunk-option-title" class="list-anchor">#</a>
     
     Trace name to be shown in the Trace Viewer.

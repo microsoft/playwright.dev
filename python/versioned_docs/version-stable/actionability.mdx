@@ -10,8 +10,8 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 Playwright performs a range of actionability checks on the elements before making actions to ensure these actions behave as expected. It auto-waits for all the relevant checks to pass and only then performs the requested action. If the required checks do not pass within the given `timeout`, action fails with the `TimeoutError`.
 
-For example, for [page.click()](/api/class-page.mdx#page-click), Playwright will ensure that:
-- element is [Attached] to the DOM
+For example, for [locator.click()](/api/class-locator.mdx#locator-click), Playwright will ensure that:
+- locator resolves to an exactly one element
 - element is [Visible]
 - element is [Stable], as in not animating or completed animation
 - element [Receives Events], as in not obscured by other elements
@@ -19,67 +19,73 @@ For example, for [page.click()](/api/class-page.mdx#page-click), Playwright will
 
 Here is the complete list of actionability checks performed for each action:
 
-| Action | [Attached] | [Visible] | [Stable] | [Receives Events] | [Enabled] | [Editable] |
-| :- | :-: | :-: | :-: | :-: | :-: | :-: |
-| check | Yes | Yes | Yes | Yes | Yes | - |
-| click | Yes | Yes | Yes | Yes | Yes | - |
-| dblclick | Yes | Yes | Yes | Yes | Yes | - |
-| setChecked | Yes | Yes | Yes | Yes | Yes | - |
-| tap | Yes | Yes | Yes | Yes | Yes | - |
-| uncheck | Yes | Yes | Yes | Yes | Yes | - |
-| hover | Yes | Yes | Yes | Yes | - | - |
-| scrollIntoViewIfNeeded | Yes | - | Yes | - | - | - |
-| screenshot | Yes | Yes | Yes | - | - | - |
-| fill | Yes | Yes | - | - | Yes | Yes |
-| selectText | Yes | Yes | - | - | - | - |
-| dispatchEvent | Yes | - | - | - | - | - |
-| focus | Yes | - | - | - | - | - |
-| getAttribute | Yes | - | - | - | - | - |
-| innerText | Yes | - | - | - | - | - |
-| innerHTML | Yes | - | - | - | - | - |
-| press | Yes | - | - | - | - | - |
-| setInputFiles | Yes | - | - | - | - | - |
-| selectOption | Yes | Yes | - | - | Yes | - |
-| textContent | Yes | - | - | - | - | - |
-| type | Yes | - | - | - | - | - |
-
-<br/>
+| Action | [Visible] | [Stable] | [Receives Events] | [Enabled] | [Editable] |
+| :- | :-: | :-: | :-: | :-: | :-: |
+| [locator.check()](/api/class-locator.mdx#locator-check) | Yes | Yes | Yes | Yes | - |
+| [locator.click()](/api/class-locator.mdx#locator-click) | Yes | Yes | Yes | Yes | - |
+| [locator.dblclick()](/api/class-locator.mdx#locator-dblclick) | Yes | Yes | Yes | Yes | - |
+| [locator.set_checked()](/api/class-locator.mdx#locator-set-checked) | Yes | Yes | Yes | Yes | - |
+| [locator.tap()](/api/class-locator.mdx#locator-tap) | Yes | Yes | Yes | Yes | - |
+| [locator.uncheck()](/api/class-locator.mdx#locator-uncheck) | Yes | Yes | Yes | Yes | - |
+| [locator.hover()](/api/class-locator.mdx#locator-hover) | Yes | Yes | Yes | - | - |
+| [locator.drag_to()](/api/class-locator.mdx#locator-drag-to) | Yes | Yes | Yes | - | - |
+| [locator.screenshot()](/api/class-locator.mdx#locator-screenshot) | Yes | Yes | - | - | - |
+| [locator.fill()](/api/class-locator.mdx#locator-fill) | Yes | - | - | Yes | Yes |
+| [locator.clear()](/api/class-locator.mdx#locator-clear) | Yes | - | - | Yes | Yes |
+| [locator.select_option()](/api/class-locator.mdx#locator-select-option) | Yes | - | - | Yes | - |
+| [locator.select_text()](/api/class-locator.mdx#locator-select-text) | Yes | - | - | - | - |
+| [locator.scroll_into_view_if_needed()](/api/class-locator.mdx#locator-scroll-into-view-if-needed) | - | Yes | - | - | - |
+| [locator.blur()](/api/class-locator.mdx#locator-blur) | - | - | - | - | - |
+| [locator.dispatch_event()](/api/class-locator.mdx#locator-dispatch-event) | - | - | - | - | - |
+| [locator.focus()](/api/class-locator.mdx#locator-focus) | - | - | - | - | - |
+| [locator.press()](/api/class-locator.mdx#locator-press) | - | - | - | - | - |
+| [locator.press_sequentially()](/api/class-locator.mdx#locator-press-sequentially) | - | - | - | - | - |
+| [locator.set_input_files()](/api/class-locator.mdx#locator-set-input-files) | - | - | - | - | - |
 
 ## Forcing actions
 
-Some actions like [page.click()](/api/class-page.mdx#page-click) support `force` option that disables non-essential actionability checks, for example passing truthy `force` to [page.click()](/api/class-page.mdx#page-click) method will not check that the target element actually receives click events.
+Some actions like [locator.click()](/api/class-locator.mdx#locator-click) support `force` option that disables non-essential actionability checks, for example passing truthy `force` to [locator.click()](/api/class-locator.mdx#locator-click) method will not check that the target element actually receives click events.
 
 ## Assertions
 
-You can check the actionability state of the element using one of the following methods as well. This is typically not necessary, but it helps writing assertive tests that ensure that after certain actions, elements reach actionable state:
-- [element_handle.is_checked()](/api/class-elementhandle.mdx#element-handle-is-checked)
-- [element_handle.is_disabled()](/api/class-elementhandle.mdx#element-handle-is-disabled)
-- [element_handle.is_editable()](/api/class-elementhandle.mdx#element-handle-is-editable)
-- [element_handle.is_enabled()](/api/class-elementhandle.mdx#element-handle-is-enabled)
-- [element_handle.is_hidden()](/api/class-elementhandle.mdx#element-handle-is-hidden)
-- [element_handle.is_visible()](/api/class-elementhandle.mdx#element-handle-is-visible)
-- [page.is_checked()](/api/class-page.mdx#page-is-checked)
-- [page.is_disabled()](/api/class-page.mdx#page-is-disabled)
-- [page.is_editable()](/api/class-page.mdx#page-is-editable)
-- [page.is_enabled()](/api/class-page.mdx#page-is-enabled)
-- [page.is_hidden()](/api/class-page.mdx#page-is-hidden)
-- [page.is_visible()](/api/class-page.mdx#page-is-visible)
-- [locator.is_checked()](/api/class-locator.mdx#locator-is-checked)
-- [locator.is_disabled()](/api/class-locator.mdx#locator-is-disabled)
-- [locator.is_editable()](/api/class-locator.mdx#locator-is-editable)
-- [locator.is_enabled()](/api/class-locator.mdx#locator-is-enabled)
-- [locator.is_hidden()](/api/class-locator.mdx#locator-is-hidden)
-- [locator.is_visible()](/api/class-locator.mdx#locator-is-visible)
+Playwright includes auto-retrying assertions that remove flakiness by waiting until the condition is met, similarly to auto-waiting before actions.
 
-<br/>
+| Assertion | Description |
+| :- | :- |
+| [expect(locator).to_be_attached()](/api/class-locatorassertions.mdx#locator-assertions-to-be-attached) | Element is attached |
+| [expect(locator).to_be_checked()](/api/class-locatorassertions.mdx#locator-assertions-to-be-checked) | Checkbox is checked |
+| [expect(locator).to_be_disabled()](/api/class-locatorassertions.mdx#locator-assertions-to-be-disabled) | Element is disabled |
+| [expect(locator).to_be_editable()](/api/class-locatorassertions.mdx#locator-assertions-to-be-editable) | Element is editable |
+| [expect(locator).to_be_empty()](/api/class-locatorassertions.mdx#locator-assertions-to-be-empty) | Container is empty |
+| [expect(locator).to_be_enabled()](/api/class-locatorassertions.mdx#locator-assertions-to-be-enabled) | Element is enabled |
+| [expect(locator).to_be_focused()](/api/class-locatorassertions.mdx#locator-assertions-to-be-focused) | Element is focused |
+| [expect(locator).to_be_hidden()](/api/class-locatorassertions.mdx#locator-assertions-to-be-hidden) | Element is not visible |
+| [expect(locator).to_be_in_viewport()](/api/class-locatorassertions.mdx#locator-assertions-to-be-in-viewport) | Element intersects viewport |
+| [expect(locator).to_be_visible()](/api/class-locatorassertions.mdx#locator-assertions-to-be-visible) | Element is visible |
+| [expect(locator).to_contain_text()](/api/class-locatorassertions.mdx#locator-assertions-to-contain-text) | Element contains text |
+| [expect(locator).to_have_attribute()](/api/class-locatorassertions.mdx#locator-assertions-to-have-attribute) | Element has a DOM attribute |
+| [expect(locator).to_have_class()](/api/class-locatorassertions.mdx#locator-assertions-to-have-class) | Element has a class property |
+| [expect(locator).to_have_count()](/api/class-locatorassertions.mdx#locator-assertions-to-have-count) | List has exact number of children |
+| [expect(locator).to_have_css()](/api/class-locatorassertions.mdx#locator-assertions-to-have-css) | Element has CSS property |
+| [expect(locator).to_have_id()](/api/class-locatorassertions.mdx#locator-assertions-to-have-id) | Element has an ID |
+| [expect(locator).to_have_js_property()](/api/class-locatorassertions.mdx#locator-assertions-to-have-js-property) | Element has a JavaScript property |
+| [expect(locator).to_have_text()](/api/class-locatorassertions.mdx#locator-assertions-to-have-text) | Element matches text |
+| [expect(locator).to_have_value()](/api/class-locatorassertions.mdx#locator-assertions-to-have-value) | Input has a value |
+| [expect(locator).to_have_values()](/api/class-locatorassertions.mdx#locator-assertions-to-have-values) | Select has options selected |
+| [expect(page).to_have_title()](/api/class-pageassertions.mdx#page-assertions-to-have-title) | Page has a title |
+| [expect(page).to_have_url()](/api/class-pageassertions.mdx#page-assertions-to-have-url) | Page has a URL |
+| [expect(response).to_be_ok()](/api/class-apiresponseassertions.mdx#api-response-assertions-to-be-ok) | Response has an OK status |
 
-## Attached
-
-Element is considered attached when it is [connected](https://developer.mozilla.org/en-US/docs/Web/API/Node/isConnected) to a Document or a ShadowRoot.
+Learn more in the [assertions guide](./test-assertions.mdx).
 
 ## Visible
 
-Element is considered visible when it has non-empty bounding box and does not have `visibility:hidden` computed style. Note that elements of zero size or with `display:none` are not considered visible.
+Element is considered visible when it has non-empty bounding box and does not have `visibility:hidden` computed style.
+
+Note that according to this definition:
+* Elements of zero size **are not** considered visible.
+* Elements with `display:none` **are not** considered visible.
+* Elements with `opacity:0` **are** considered visible.
 
 ## Stable
 
@@ -97,7 +103,7 @@ Element is considered editable when it is [enabled] and does not have `readonly`
 
 Element is considered receiving pointer events when it is the hit target of the pointer event at the action point. For example, when clicking at the point `(10;10)`, Playwright checks whether some other element (usually an overlay) will instead capture the click at `(10;10)`.
 
-For example, consider a scenario where Playwright will click `Sign Up` button regardless of when the [page.click()](/api/class-page.mdx#page-click) call was made:
+For example, consider a scenario where Playwright will click `Sign Up` button regardless of when the [locator.click()](/api/class-locator.mdx#locator-click) call was made:
 - page is checking that user name is unique and `Sign Up` button is disabled;
 - after checking with the server, the disabled `Sign Up` button is replaced with another one that is now enabled.
 
@@ -106,7 +112,6 @@ For example, consider a scenario where Playwright will click `Sign Up` button re
 [Enabled]: #enabled "Enabled"
 [Editable]: #editable "Editable"
 [Receives Events]: #receives-events "Receives Events"
-[Attached]: #attached "Attached"
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
