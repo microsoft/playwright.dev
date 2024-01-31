@@ -317,7 +317,6 @@ ${this.documentation.renderLinksInText(member.discouraged)}
         }
 
         // Generate return type.
-        // if (member.type && member.type.name !== 'void') {
         if (member.type) {
           let name;
           switch (member.kind) {
