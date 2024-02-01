@@ -34,6 +34,69 @@ import HTMLCard from '@site/src/components/HTMLCard';
 | [Expect(Page).ToHaveURLAsync()](/api/class-pageassertions.mdx#page-assertions-to-have-url) | Page has a URL |
 | [Expect(Response).ToBeOKAsync()](/api/class-apiresponseassertions.mdx#api-response-assertions-to-be-ok) | Response has an OK status |
 
+## Setting a custom timeout
+
+You can specify a custom timeout for assertions either globally or per assertion. The default timeout is 5 seconds.
+
+### Global timeout
+
+<Tabs groupId="test-runners" defaultValue="nunit" values={[ {label: 'NUnit', value: 'nunit'}, {label: 'MSTest', value: 'mstest'} ] }>
+
+<TabItem value="nunit">
+
+```csharp title="UnitTest1.cs"
+using Microsoft.Playwright;
+using Microsoft.Playwright.NUnit;
+using NUnit.Framework;
+
+namespace PlaywrightTests;
+
+[Parallelizable(ParallelScope.Self)]
+[TestFixture]
+public class Tests : PageTest
+{
+    [OneTimeSetUp]
+    public void GlobalSetup()
+    {
+        SetDefaultExpectTimeout(10_000);
+    }
+    // ...
+}
+```
+
+</TabItem>
+
+<TabItem value="mstest">
+
+```csharp title="UnitTest1.cs"
+using Microsoft.Playwright;
+using Microsoft.Playwright.MSTest;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
+
+namespace PlaywrightTests;
+
+[TestClass]
+public class UnitTest1 : PageTest
+{
+    [ClassInitialize]
+    public static void GlobalSetup(TestContext context)
+    {
+        SetDefaultExpectTimeout(10_000);
+    }
+    // ...
+}
+```
+
+</TabItem>
+
+</Tabs>
+
+### Per assertion timeout
+
+```csharp title="UnitTest1.cs"
+await Expect(Page.GetByText("Name")).ToBeVisibleAsync(new() { Timeout = 10_000 });
+```
+
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
