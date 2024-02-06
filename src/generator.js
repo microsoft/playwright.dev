@@ -316,9 +316,8 @@ ${this.documentation.renderLinksInText(member.discouraged)}
           }));
         }
 
-        // Generate return type.
-        // if (member.type && member.type.name !== 'void') {
-        if (member.type) {
+        // Generate return type, unless it's "void".
+        if (member.type && !(member.type.name === 'void' && !member.async)) {
           let name;
           switch (member.kind) {
             case 'event': name = 'Event data'; break;
