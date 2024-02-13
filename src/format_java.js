@@ -127,7 +127,7 @@ class JavaFormatter {
           case 'BrowserContext.exposeFunction.callback': return '`FunctionCallback`';
           case 'Page.exposeBinding.callback': return '`BindingCallback`';
           case 'Page.exposeFunction.callback': return '`FunctionCallback`';
-          case 'Page.handleLocator.handler': return '`LocatorHandler`';
+          case 'Page.addLocatorHandler.handler': return '`LocatorHandler`';
         }
         throw new Error('Unknwon java type for ' + fullName(member));
       };
