@@ -91,6 +91,76 @@ The order of evaluation of multiple scripts installed via [BrowserContext.addIni
 
 ---
 
+### addLocatorHandler {#page-add-locator-handler}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.42</font><x-search>page.addLocatorHandler</x-search>
+
+Sometimes, the web page can show an overlay that obstructs elements behind it and prevents certain actions, like click, from completing. When such an overlay is shown predictably, we recommend dismissing it as a part of your test flow. However, sometimes such an overlay may appear non-deterministically, for example certain cookies consent dialogs behave this way. In this case, [Page.addLocatorHandler()](/api/class-page.mdx#page-add-locator-handler) allows handling an overlay during an action that it would block.
+
+This method registers a handler for an overlay that is executed once the locator is visible on the page. The handler should get rid of the overlay so that actions blocked by it can proceed. This is useful for nondeterministic interstitial pages or dialogs, like a cookie consent dialog.
+
+Note that execution time of the handler counts towards the timeout of the action/assertion that executed the handler.
+
+You can register multiple handlers. However, only a single handler will be running at a time. Any actions inside a handler must not require another handler to run.
+
+:::warning
+Running the interceptor will alter your page state mid-test. For example it will change the currently focused element and move the mouse. Make sure that the actions that run after the interceptor are self-contained and do not rely on the focus and mouse state. <br /> <br /> For example, consider a test that calls [Locator.focus()](/api/class-locator.mdx#locator-focus) followed by [Keyboard.press()](/api/class-keyboard.mdx#keyboard-press). If your handler clicks a button between these two actions, the focused element most likely will be wrong, and key press will happen on the unexpected element. Use [Locator.press()](/api/class-locator.mdx#locator-press) instead to avoid this problem. <br /> <br /> Another example is a series of mouse actions, where [Mouse.move()](/api/class-mouse.mdx#mouse-move) is followed by [Mouse.down()](/api/class-mouse.mdx#mouse-down). Again, when the handler runs between these two actions, the mouse position will be wrong during the mouse down. Prefer methods like [Locator.click()](/api/class-locator.mdx#locator-click) that are self-contained.
+:::
+
+**Usage**
+
+An example that closes a cookie dialog when it appears:
+
+```java
+// Setup the handler.
+page.addLocatorHandler(page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Accept all cookies")), () => {
+  page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Reject all cookies")).click();
+});
+
+// Write the test as usual.
+page.goto("https://example.com");
+page.getByRole("button", Page.GetByRoleOptions().setName("Start here")).click();
+```
+
+An example that skips the "Confirm your security details" page when it is shown:
+
+```java
+// Setup the handler.
+page.addLocatorHandler(page.getByText("Confirm your security details")), () => {
+  page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Remind me later")).click();
+});
+
+// Write the test as usual.
+page.goto("https://example.com");
+page.getByRole("button", Page.GetByRoleOptions().setName("Start here")).click();
+```
+
+An example with a custom callback on every actionability check. It uses a `<body>` locator that is always visible, so the handler is called before every actionability check:
+
+```java
+// Setup the handler.
+page.addLocatorHandler(page.locator("body")), () => {
+  page.evaluate("window.removeObstructionsForTestIfNeeded()");
+});
+
+// Write the test as usual.
+page.goto("https://example.com");
+page.getByRole("button", Page.GetByRoleOptions().setName("Start here")).click();
+```
+
+**Arguments**
+- `locator` [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-option-locator"/><a href="#page-add-locator-handler-option-locator" class="list-anchor">#</a>
+  
+  Locator that triggers the handler.
+- `handler` `LocatorHandler`<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-option-handler"/><a href="#page-add-locator-handler-option-handler" class="list-anchor">#</a>
+  
+  Function that should be run once `locator` appears. This function should get rid of the element that blocks actions like click.
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-return"/><a href="#page-add-locator-handler-return" class="list-anchor">#</a>
+
+---
+
 ### addScriptTag {#page-add-script-tag}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.addScriptTag</x-search>
@@ -1070,76 +1140,6 @@ Page.goForward(options);
 
 **Returns**
 - [null]|[Response]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-go-forward-return"/><a href="#page-go-forward-return" class="list-anchor">#</a>
-
----
-
-### handleLocator {#page-handle-locator}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.42</font><x-search>page.handleLocator</x-search>
-
-Registers a handler for an element that might block certain actions like click. The handler should get rid of the blocking element so that an action may proceed. This is useful for nondeterministic interstitial pages or dialogs, like a cookie consent dialog.
-
-The handler will be executed before the [actionability checks](../actionability.mdx) for each action, as well as before each probe of the [web assertions](../test-assertions.mdx). When no actions are executed and no assertions are probed, the handler does not run at all, even if the given locator appears on the page. Actions that pass the `force` option do not trigger the handler.
-
-Note that execution time of the handler counts towards the timeout of the action/assertion that executed the handler.
-
-You can register multiple handlers. However, only a single handler will be running at a time. Any actions inside a handler must not require another handler to run.
-
-:::warning
-Running the interceptor will alter your page state mid-test. For example it will change the currently focused element and move the mouse. Make sure that the actions that run after the interceptor are self-contained and do not rely on the focus and mouse state. <br /> <br /> For example, consider a test that calls [Locator.focus()](/api/class-locator.mdx#locator-focus) followed by [Keyboard.press()](/api/class-keyboard.mdx#keyboard-press). If your handler clicks a button between these two actions, the focused element most likely will be wrong, and key press will happen on the unexpected element. Use [Locator.press()](/api/class-locator.mdx#locator-press) instead to avoid this problem. <br /> <br /> Another example is a series of mouse actions, where [Mouse.move()](/api/class-mouse.mdx#mouse-move) is followed by [Mouse.down()](/api/class-mouse.mdx#mouse-down). Again, when the handler runs between these two actions, the mouse position will be wrong during the mouse down. Prefer methods like [Locator.click()](/api/class-locator.mdx#locator-click) that are self-contained.
-:::
-
-**Usage**
-
-An example that closes a cookie dialog when it appears:
-
-```java
-// Setup the handler.
-page.handleLocator(page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Accept all cookies")), () => {
-  page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Reject all cookies")).click();
-});
-
-// Write the test as usual.
-page.goto("https://example.com");
-page.getByRole("button", Page.GetByRoleOptions().setName("Start here")).click();
-```
-
-An example that skips the "Confirm your security details" page when it is shown:
-
-```java
-// Setup the handler.
-page.handleLocator(page.getByText("Confirm your security details")), () => {
-  page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Remind me later")).click();
-});
-
-// Write the test as usual.
-page.goto("https://example.com");
-page.getByRole("button", Page.GetByRoleOptions().setName("Start here")).click();
-```
-
-An example with a custom callback on every actionability check. It uses a `<body>` locator that is always visible, so the handler is called before every actionability check:
-
-```java
-// Setup the handler.
-page.handleLocator(page.locator("body")), () => {
-  page.evaluate("window.removeObstructionsForTestIfNeeded()");
-});
-
-// Write the test as usual.
-page.goto("https://example.com");
-page.getByRole("button", Page.GetByRoleOptions().setName("Start here")).click();
-```
-
-**Arguments**
-- `locator` [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-handle-locator-option-locator"/><a href="#page-handle-locator-option-locator" class="list-anchor">#</a>
-  
-  Locator that triggers the handler.
-- `handler` `LocatorHandler`<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-handle-locator-option-handler"/><a href="#page-handle-locator-option-handler" class="list-anchor">#</a>
-  
-  Function that should be run once `locator` appears. This function should get rid of the element that blocks actions like click.
-
-**Returns**
-- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-handle-locator-return"/><a href="#page-handle-locator-return" class="list-anchor">#</a>
 
 ---
 
