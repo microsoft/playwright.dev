@@ -61,11 +61,11 @@ Continues route's request with optional overrides.
 **Usage**
 
 ```csharp
-await page.RouteAsync("**/*", route =>
+await page.RouteAsync("**/*", async route =>
 {
     var headers = new Dictionary<string, string>(route.Request.Headers) { { "foo", "bar" } };
     headers.Remove("origin");
-    route.ContinueAsync(headers);
+    await route.ContinueAsync(new() { Headers = headers });
 });
 ```
 
@@ -145,11 +145,11 @@ await page.RouteAsync("**/*", route => {
 One can also modify request while falling back to the subsequent handler, that way intermediate route handler can modify url, method, headers and postData of the request.
 
 ```csharp
-await page.RouteAsync("**/*", route =>
+await page.RouteAsync("**/*", async route =>
 {
     var headers = new Dictionary<string, string>(route.Request.Headers) { { "foo", "foo-value" } };
     headers.Remove("bar");
-    route.FallbackAsync(headers);
+    await route.FallbackAsync(new() { Headers = headers });
 });
 ```
 
