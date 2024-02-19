@@ -40,8 +40,7 @@ const ambassadors = [
     languages: 'French, English',
     country: 'France',
     githubUrl: 'https://github.com/jfgreffier',
-    twitterUrl: 'https://twitter.com/jfgreffier',
-    websiteUrl: 'https://medium.com/@jfgreffier'
+    websiteUrl: 'https://linktr.ee/jfgreffier'
   },
   {
     name: 'Giovanni Rago',
