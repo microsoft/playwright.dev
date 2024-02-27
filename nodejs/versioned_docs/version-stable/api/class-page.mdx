@@ -97,6 +97,79 @@ The order of evaluation of multiple scripts installed via [browserContext.addIni
   
   Optional argument to pass to `script` (only supported when passing a function).
 
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-init-script-return"/><a href="#page-add-init-script-return" class="list-anchor">#</a>
+
+---
+
+### addLocatorHandler {#page-add-locator-handler}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.42</font><x-search>page.addLocatorHandler</x-search>
+
+Sometimes, the web page can show an overlay that obstructs elements behind it and prevents certain actions, like click, from completing. When such an overlay is shown predictably, we recommend dismissing it as a part of your test flow. However, sometimes such an overlay may appear non-deterministically, for example certain cookies consent dialogs behave this way. In this case, [page.addLocatorHandler()](/api/class-page.mdx#page-add-locator-handler) allows handling an overlay during an action that it would block.
+
+This method registers a handler for an overlay that is executed once the locator is visible on the page. The handler should get rid of the overlay so that actions blocked by it can proceed. This is useful for nondeterministic interstitial pages or dialogs, like a cookie consent dialog.
+
+Note that execution time of the handler counts towards the timeout of the action/assertion that executed the handler.
+
+You can register multiple handlers. However, only a single handler will be running at a time. Any actions inside a handler must not require another handler to run.
+
+:::warning
+Running the interceptor will alter your page state mid-test. For example it will change the currently focused element and move the mouse. Make sure that the actions that run after the interceptor are self-contained and do not rely on the focus and mouse state. <br /> <br /> For example, consider a test that calls [locator.focus()](/api/class-locator.mdx#locator-focus) followed by [keyboard.press()](/api/class-keyboard.mdx#keyboard-press). If your handler clicks a button between these two actions, the focused element most likely will be wrong, and key press will happen on the unexpected element. Use [locator.press()](/api/class-locator.mdx#locator-press) instead to avoid this problem. <br /> <br /> Another example is a series of mouse actions, where [mouse.move()](/api/class-mouse.mdx#mouse-move) is followed by [mouse.down()](/api/class-mouse.mdx#mouse-down). Again, when the handler runs between these two actions, the mouse position will be wrong during the mouse down. Prefer methods like [locator.click()](/api/class-locator.mdx#locator-click) that are self-contained.
+:::
+
+**Usage**
+
+An example that closes a cookie dialog when it appears:
+
+```js
+// Setup the handler.
+await page.addLocatorHandler(page.getByRole('button', { name: 'Accept all cookies' }), async () => {
+  await page.getByRole('button', { name: 'Reject all cookies' }).click();
+});
+
+// Write the test as usual.
+await page.goto('https://example.com');
+await page.getByRole('button', { name: 'Start here' }).click();
+```
+
+An example that skips the "Confirm your security details" page when it is shown:
+
+```js
+// Setup the handler.
+await page.addLocatorHandler(page.getByText('Confirm your security details'), async () => {
+  await page.getByRole('button', 'Remind me later').click();
+});
+
+// Write the test as usual.
+await page.goto('https://example.com');
+await page.getByRole('button', { name: 'Start here' }).click();
+```
+
+An example with a custom callback on every actionability check. It uses a `<body>` locator that is always visible, so the handler is called before every actionability check:
+
+```js
+// Setup the handler.
+await page.addLocatorHandler(page.locator('body'), async () => {
+  await page.evaluate(() => window.removeObstructionsForTestIfNeeded());
+});
+
+// Write the test as usual.
+await page.goto('https://example.com');
+await page.getByRole('button', { name: 'Start here' }).click();
+```
+
+**Arguments**
+- `locator` [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-option-locator"/><a href="#page-add-locator-handler-option-locator" class="list-anchor">#</a>
+  
+  Locator that triggers the handler.
+- `handler` [function]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-option-handler"/><a href="#page-add-locator-handler-option-handler" class="list-anchor">#</a>
+  
+  Function that should be run once `locator` appears. This function should get rid of the element that blocks actions like click.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-return"/><a href="#page-add-locator-handler-return" class="list-anchor">#</a>
+
 ---
 
 ### addScriptTag {#page-add-script-tag}
@@ -174,6 +247,9 @@ Brings page to front (activates tab).
 await page.bringToFront();
 ```
 
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-bring-to-front-return"/><a href="#page-bring-to-front-return" class="list-anchor">#</a>
+
 ---
 
 ### close {#page-close}
@@ -203,6 +279,9 @@ await page.close(options);
   - `runBeforeUnload` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-close-option-run-before-unload"/><a href="#page-close-option-run-before-unload" class="list-anchor">#</a>
     
     Defaults to `false`. Whether to run the [before unload](https://developer.mozilla.org/en-US/docs/Web/Events/beforeunload) page handlers.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-close-return"/><a href="#page-close-return" class="list-anchor">#</a>
 
 ---
 
@@ -297,6 +376,9 @@ await page.dragAndDrop('#source', '#target', {
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-drag-and-drop-return"/><a href="#page-drag-and-drop-return" class="list-anchor">#</a>
+
 ---
 
 ### emulateMedia {#page-emulate-media}
@@ -350,6 +432,9 @@ await page.evaluate(() => matchMedia('(prefers-color-scheme: no-preference)').ma
   - `reducedMotion` [null]|"reduce"|"no-preference" *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-emulate-media-option-reduced-motion"/><a href="#page-emulate-media-option-reduced-motion" class="list-anchor">#</a>
     
     Emulates `'prefers-reduced-motion'` media feature, supported values are `'reduce'`, `'no-preference'`. Passing `null` disables reduced motion emulation.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-emulate-media-return"/><a href="#page-emulate-media-return" class="list-anchor">#</a>
 
 ---
 
@@ -516,6 +601,9 @@ await page.setContent(`
     
     Whether to pass the argument as a handle, instead of passing by value. When passing a handle, only one argument is supported. When passing by value, multiple arguments are supported.
 
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-expose-binding-return"/><a href="#page-expose-binding-return" class="list-anchor">#</a>
+
 ---
 
 ### exposeFunction {#page-expose-function}
@@ -566,6 +654,9 @@ const crypto = require('crypto');
 - `callback` [function]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-expose-function-option-callback"/><a href="#page-expose-function-option-callback" class="list-anchor">#</a>
   
   Callback function which will be called in Playwright's context.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-expose-function-return"/><a href="#page-expose-function-return" class="list-anchor">#</a>
 
 ---
 
@@ -1206,6 +1297,9 @@ This method requires Playwright to be started in a headed mode, with a falsy `he
 await page.pause();
 ```
 
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-pause-return"/><a href="#page-pause-return" class="list-anchor">#</a>
+
 ---
 
 ### pdf {#page-pdf}
@@ -1302,6 +1396,9 @@ The `format` options are:
       Left margin, accepts values labeled with units. Defaults to `0`.
     
     Paper margins, defaults to none.
+  - `outline` [boolean] *(optional)* <font size="2">Added in: v1.42</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-pdf-option-outline"/><a href="#page-pdf-option-outline" class="list-anchor">#</a>
+    
+    Whether or not to embed the document outline into the PDF. Defaults to `false`.
   - `pageRanges` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-pdf-option-page-ranges"/><a href="#page-pdf-option-page-ranges" class="list-anchor">#</a>
     
     Paper ranges to print, e.g., '1-5, 8, 11-13'. Defaults to the empty string, which means print all pages.
@@ -1317,6 +1414,9 @@ The `format` options are:
   - `scale` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-pdf-option-scale"/><a href="#page-pdf-option-scale" class="list-anchor">#</a>
     
     Scale of the webpage rendering. Defaults to `1`. Scale amount must be between 0.1 and 2.
+  - `tagged` [boolean] *(optional)* <font size="2">Added in: v1.42</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-pdf-option-tagged"/><a href="#page-pdf-option-tagged" class="list-anchor">#</a>
+    
+    Whether or not to generate tagged (accessible) PDF. Defaults to `false`.
   - `width` [string]|[number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-pdf-option-width"/><a href="#page-pdf-option-width" class="list-anchor">#</a>
     
     Paper width, accepts values labeled with units.
@@ -1396,11 +1496,11 @@ await browser.close();
 It is possible to examine the request to decide the route action. For example, mocking all requests that contain some post data, and leaving all other requests as is:
 
 ```js
-await page.route('/api/**', route => {
+await page.route('/api/**', async route => {
   if (route.request().postData().includes('my-string'))
-    route.fulfill({ body: 'mocked-data' });
+    await route.fulfill({ body: 'mocked-data' });
   else
-    route.continue();
+    await route.continue();
 });
 ```
 
@@ -1423,6 +1523,9 @@ Enabling routing disables http cache.
   - `times` [number] *(optional)* <font size="2">Added in: v1.15</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-option-times"/><a href="#page-route-option-times" class="list-anchor">#</a>
     
     How often a route should be used. By default it will be used every time.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-return"/><a href="#page-route-return" class="list-anchor">#</a>
 
 ---
 
@@ -1463,6 +1566,9 @@ await page.routeFromHAR(har, options);
   - `url` [string]|[RegExp] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-from-har-option-url"/><a href="#page-route-from-har-option-url" class="list-anchor">#</a>
     
     A glob pattern, regular expression or predicate to match the request URL. Only requests with URL matching the pattern will be served from the HAR file. If not specified, all requests are served from the HAR file.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-from-har-return"/><a href="#page-route-from-har-return" class="list-anchor">#</a>
 
 ---
 
@@ -1573,6 +1679,9 @@ await page.setContent(html, options);
     * `'networkidle'` - **DISCOURAGED** consider operation to be finished when there are no network connections for at least `500` ms. Don't use this method for testing, rely on web assertions to assess readiness instead.
     * `'commit'` - consider operation to be finished when network response is received and the document started loading.
 
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-content-return"/><a href="#page-set-content-return" class="list-anchor">#</a>
+
 ---
 
 ### setDefaultNavigationTimeout {#page-set-default-navigation-timeout}
@@ -1649,6 +1758,9 @@ await page.setExtraHTTPHeaders(headers);
   
   An object containing additional HTTP headers to be sent with every request. All header values must be strings.
 
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-extra-http-headers-return"/><a href="#page-set-extra-http-headers-return" class="list-anchor">#</a>
+
 ---
 
 ### setViewportSize {#page-set-viewport-size}
@@ -1678,6 +1790,9 @@ await page.goto('https://example.com');
   - `height` [number]
     
     page height in pixels.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-viewport-size-return"/><a href="#page-set-viewport-size-return" class="list-anchor">#</a>
 
 ---
 
@@ -1719,6 +1834,9 @@ await page.unroute(url, handler);
   
   Optional handler function to route the request.
 
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-unroute-return"/><a href="#page-unroute-return" class="list-anchor">#</a>
+
 ---
 
 ### unrouteAll {#page-unroute-all}
@@ -1742,6 +1860,9 @@ await page.unrouteAll(options);
     * `'default'` - do not wait for current handler calls (if any) to finish, if unrouted handler throws, it may result in unhandled error
     * `'wait'` - wait for current handler calls (if any) to finish
     * `'ignoreErrors'` - do not wait for current handler calls (if any) to finish, all errors thrown by the handlers after unrouting are silently caught
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-unroute-all-return"/><a href="#page-unroute-all-return" class="list-anchor">#</a>
 
 ---
 
@@ -1921,6 +2042,9 @@ console.log(await popup.title()); // Popup is ready to use.
     
     Maximum operation time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `navigationTimeout` option in the config, or by using the [browserContext.setDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-load-state-return"/><a href="#page-wait-for-load-state-return" class="list-anchor">#</a>
+
 ---
 
 ### waitForRequest {#page-wait-for-request}
@@ -2023,6 +2147,9 @@ await page.waitForURL('**/target.html');
     * `'load'` - consider operation to be finished when the `load` event is fired.
     * `'networkidle'` - **DISCOURAGED** consider operation to be finished when there are no network connections for at least `500` ms. Don't use this method for testing, rely on web assertions to assess readiness instead.
     * `'commit'` - consider operation to be finished when network response is received and the document started loading.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-url-return"/><a href="#page-wait-for-url-return" class="list-anchor">#</a>
 
 ---
 
@@ -2155,7 +2282,7 @@ page.on('close', data => {});
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.on('console')</x-search>
 
-Emitted when JavaScript within the page calls one of console API methods, e.g. `console.log` or `console.dir`. Also emitted if the page throws an error or a warning.
+Emitted when JavaScript within the page calls one of console API methods, e.g. `console.log` or `console.dir`.
 
 The arguments passed into `console.log` are available on the [ConsoleMessage] event handler argument.
 
@@ -2751,6 +2878,9 @@ await page.check(selector, options);
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-check-return"/><a href="#page-check-return" class="list-anchor">#</a>
+
 ---
 
 ### click {#page-click}
@@ -2820,6 +2950,9 @@ await page.click(selector, options);
   - `trial` [boolean] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-click-option-trial"/><a href="#page-click-option-trial" class="list-anchor">#</a>
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-click-return"/><a href="#page-click-return" class="list-anchor">#</a>
 
 ---
 
@@ -2892,6 +3025,9 @@ await page.dblclick(selector, options);
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-dblclick-return"/><a href="#page-dblclick-return" class="list-anchor">#</a>
+
 ---
 
 ### dispatchEvent {#page-dispatch-event}
@@ -2953,6 +3089,9 @@ await page.dispatchEvent('#source', 'dragstart', { dataTransfer });
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-dispatch-event-return"/><a href="#page-dispatch-event-return" class="list-anchor">#</a>
+
 ---
 
 ### fill {#page-fill}
@@ -3000,6 +3139,9 @@ await page.fill(selector, value, options);
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-fill-return"/><a href="#page-fill-return" class="list-anchor">#</a>
+
 ---
 
 ### focus {#page-focus}
@@ -3033,6 +3175,9 @@ await page.focus(selector, options);
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-focus-option-timeout"/><a href="#page-focus-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-focus-return"/><a href="#page-focus-return" class="list-anchor">#</a>
 
 ---
 
@@ -3134,6 +3279,9 @@ await page.hover(selector, options);
   - `trial` [boolean] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-hover-option-trial"/><a href="#page-hover-option-trial" class="list-anchor">#</a>
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-hover-return"/><a href="#page-hover-return" class="list-anchor">#</a>
 
 ---
 
@@ -3501,7 +3649,7 @@ Holding down `Shift` will type the text that corresponds to the `key` in the upp
 
 If `key` is a single character, it is case-sensitive, so the values `a` and `A` will generate different respective texts.
 
-Shortcuts such as `key: "Control+o"` or `key: "Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
+Shortcuts such as `key: "Control+o"`, `key: "Control++` or `key: "Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
 
 **Usage**
 
@@ -3537,6 +3685,9 @@ await browser.close();
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-press-option-timeout"/><a href="#page-press-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-press-return"/><a href="#page-press-return" class="list-anchor">#</a>
 
 ---
 
@@ -3670,6 +3821,9 @@ await page.setChecked(selector, checked, options);
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
 
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-checked-return"/><a href="#page-set-checked-return" class="list-anchor">#</a>
+
 ---
 
 ### setInputFiles {#page-set-input-files}
@@ -3718,6 +3872,9 @@ await page.setInputFiles(selector, files, options);
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-input-files-option-timeout"/><a href="#page-set-input-files-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-input-files-return"/><a href="#page-set-input-files-return" class="list-anchor">#</a>
 
 ---
 
@@ -3783,6 +3940,9 @@ await page.tap(selector, options);
   - `trial` [boolean] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-tap-option-trial"/><a href="#page-tap-option-trial" class="list-anchor">#</a>
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-tap-return"/><a href="#page-tap-return" class="list-anchor">#</a>
 
 ---
 
@@ -3861,6 +4021,9 @@ To press a special key, like `Control` or `ArrowDown`, use [keyboard.press()](/a
     
     Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-type-return"/><a href="#page-type-return" class="list-anchor">#</a>
+
 ---
 
 ### uncheck {#page-uncheck}
@@ -3920,6 +4083,9 @@ await page.uncheck(selector, options);
   - `trial` [boolean] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-uncheck-option-trial"/><a href="#page-uncheck-option-trial" class="list-anchor">#</a>
     
     When set, this method only performs the [actionability](../actionability.mdx) checks and skips the action. Defaults to `false`. Useful to wait until the element is ready for the action without performing it.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-uncheck-return"/><a href="#page-uncheck-return" class="list-anchor">#</a>
 
 ---
 
@@ -4061,6 +4227,9 @@ await page.waitForTimeout(1000);
   
   A timeout to wait for
 
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-timeout-return"/><a href="#page-wait-for-timeout-return" class="list-anchor">#</a>
+
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
@@ -4144,6 +4313,7 @@ await page.waitForTimeout(1000);
 [EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
 [function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
 [Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
 [null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
 [number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
 [Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"

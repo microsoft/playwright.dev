@@ -78,6 +78,9 @@ Closes Electron application.
 await electronApplication.close();
 ```
 
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-application-close-return"/><a href="#electron-application-close-return" class="list-anchor">#</a>
+
 ---
 
 ### context {#electron-application-context}
@@ -257,13 +260,38 @@ electronApplication.windows();
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.9</font><x-search>electronApplication.on('close')</x-search>
 
-This event is issued when the application closes.
+This event is issued when the application process has been terminated.
 
 **Usage**
 
 ```js
 electronApplication.on('close', data => {});
 ```
+
+---
+
+### on('console') {#electron-application-event-console}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.42</font><x-search>electronApplication.on('console')</x-search>
+
+Emitted when JavaScript within the Electron main process calls one of console API methods, e.g. `console.log` or `console.dir`.
+
+The arguments passed into `console.log` are available on the [ConsoleMessage] event handler argument.
+
+**Usage**
+
+```js
+electronApp.on('console', async msg => {
+  const values = [];
+  for (const arg of msg.args())
+    values.push(await arg.jsonValue());
+  console.log(...values);
+});
+await electronApp.evaluate(() => console.log('hello', 5, { foo: 'bar' }));
+```
+
+**Event data**
+- [ConsoleMessage]
 
 ---
 
@@ -365,6 +393,7 @@ electronApplication.on('window', data => {});
 [EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
 [function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
 [Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
+[Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
 [null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
 [number]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Data_structures#Number_type "Number"
 [Object]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object"
