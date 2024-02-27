@@ -134,6 +134,7 @@ class CSharpFormatter {
           case 'Page.exposeFunction.callback': return '[Action]<T, [TResult]>';
           case 'Page.waitForEvent.predicate': return '[Func]<T, [bool]>';
           case 'Page.waitForEvent2.predicate': return '[Func]<T, [bool]>';
+          case 'Page.addLocatorHandler.handler': return '[Func]<[Task]>';
         }
         throw new Error(`Unknwon C# type for "${fullName(member)}": "${text}"`);
       };
