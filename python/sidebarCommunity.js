@@ -25,6 +25,11 @@ module.exports = {
           type: 'link',
           label: 'Feature Videos',
           href: '/community/feature-videos'
+        },
+        {
+          type: 'link',
+          label: 'Learn Videos',
+          href: '/community/learn-videos'
         }
       ],
       collapsed: false

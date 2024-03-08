@@ -14,6 +14,10 @@ const videoNav = [
   {
     label: 'Feature Videos',
     href: '/community/feature-videos'
+  },
+  {
+    label: 'Learn Videos',
+    href: '/community/learn-videos'
   }
 ];
 
