@@ -11,6 +11,7 @@ module.exports = {
         { type: 'doc', id: 'trace-viewer-intro' },
         { type: 'doc', id: 'ci-intro' },
         { type: 'doc', id: 'test-runners' },
+        { type: 'doc', id: 'junit' },
       ],
       collapsed: false
     },
