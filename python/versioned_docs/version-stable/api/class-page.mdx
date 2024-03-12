@@ -152,7 +152,11 @@ The order of evaluation of multiple scripts installed via [browser_context.add_i
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.42</font><x-search>page.add_locator_handler</x-search>
 
-When testing a web page, sometimes unexpected overlays like a coookie consent dialog appear and block actions you want to automate, e.g. clicking a button. These overlays don't always show up in the same way or at the same time, making them tricky to handle in automated tests.
+:::warning Experimental
+This method is experimental and its behavior may change in the upcoming releases.
+:::
+
+When testing a web page, sometimes unexpected overlays like a "Sign up" dialog appear and block actions you want to automate, e.g. clicking a button. These overlays don't always show up in the same way or at the same time, making them tricky to handle in automated tests.
 
 This method lets you set up a special function, called a handler, that activates when it detects that overlay is visible. The handler's job is to remove the overlay, allowing your test to continue as if the overlay wasn't there.
 
@@ -168,7 +172,7 @@ Running the handler will alter your page state mid-test. For example it will cha
 
 **Usage**
 
-An example that closes a cookie consent dialog when it appears:
+An example that closes a "Sign up to the newsletter" dialog when it appears:
 
 <Tabs
   groupId="python-flavor"
@@ -183,8 +187,8 @@ An example that closes a cookie consent dialog when it appears:
 ```py
 # Setup the handler.
 def handler():
-  page.get_by_role("button", name="Reject all cookies").click()
-page.add_locator_handler(page.get_by_role("button", name="Accept all cookies"), handler)
+  page.get_by_role("button", name="No thanks").click()
+page.add_locator_handler(page.get_by_text("Sign up to the newsletter"), handler)
 
 # Write the test as usual.
 page.goto("https://example.com")
@@ -197,8 +201,8 @@ page.get_by_role("button", name="Start here").click()
 ```py
 # Setup the handler.
 def handler():
-  await page.get_by_role("button", name="Reject all cookies").click()
-await page.add_locator_handler(page.get_by_role("button", name="Accept all cookies"), handler)
+  await page.get_by_role("button", name="No thanks").click()
+await page.add_locator_handler(page.get_by_text("Sign up to the newsletter"), handler)
 
 # Write the test as usual.
 await page.goto("https://example.com")
