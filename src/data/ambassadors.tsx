@@ -8,6 +8,14 @@ const ambassadors = [
     twitterUrl: 'https://twitter.com/AutomationPanda'
   },
   {
+    name: 'Ben Fellows',
+    languages: 'English',
+    city: 'North Carolina',
+    country: 'USA',
+    githubUrl: '',
+    twitterUrl: ''
+  },
+  {
     name: 'Butch Mayhew',
     city: 'Birmingham',
     languages: 'English',
@@ -41,16 +49,6 @@ const ambassadors = [
     country: 'France',
     githubUrl: 'https://github.com/jfgreffier',
     websiteUrl: 'https://linktr.ee/jfgreffier'
-  },
-  {
-    name: 'Giovanni Rago',
-    languages: 'Italian, English',
-    city: 'Berlin',
-    country: 'Germany',
-    imageUrl:
-      'https://pbs.twimg.com/profile_images/1419977078552813568/XVrltX2h_400x400.png',
-    twitterUrl: 'https://twitter.com/rag0g',
-    websiteUrl: 'https://www.youtube.com/c/AutomateTogether'
   },
   {
     name: 'John Hill',
