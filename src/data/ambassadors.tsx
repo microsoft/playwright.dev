@@ -10,11 +10,11 @@ const ambassadors = [
   {
     name: 'Ben Fellows',
     languages: 'English',
-    city: '',
+    city: 'Traverse City',
     country: 'USA',
-    githubUrl: '',
-    twitterUrl: ''
-  },
+    githubUrl: 'https://github.com/bwfellow',
+    twitterUrl: 'https://twitter.com/FellowsBen'
+},
   {
     name: 'Butch Mayhew',
     city: 'Birmingham',
