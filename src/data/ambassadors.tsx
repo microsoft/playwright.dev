@@ -12,7 +12,6 @@ const ambassadors = [
     languages: 'English',
     city: 'Traverse City',
     country: 'USA',
-    githubUrl: 'https://github.com/bwfellow',
     twitterUrl: 'https://twitter.com/FellowsBen',
     imageUrl: 'https://pbs.twimg.com/profile_images/1110917388046921728/2SDYg26G_400x400.png'
 },
