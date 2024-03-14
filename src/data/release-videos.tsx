@@ -1,5 +1,10 @@
 const releaseVideos = [
   {
+    version: '1.41 & 1.42',
+    id: "KjSaIQLlgns",
+    highlights: ['new tag and annotation syntax', 'screenshot styling', 'locator handler'],
+  },
+  {
     version: '1.40',
     id: "mn892dV81_8",
     highlights: ['test generator update', 'generate assertions'],
