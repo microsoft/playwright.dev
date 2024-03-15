@@ -5,16 +5,26 @@ const ambassadors = [
     city: 'North Carolina',
     country: 'USA',
     githubUrl: 'https://github.com/AutomationPanda',
-    twitterUrl: 'https://twitter.com/AutomationPanda'
+    twitterUrl: 'https://twitter.com/AutomationPanda',
+    imageUrl: 'andy-knight.jpeg'
   },
+  {
+    name: 'Ben Fellows',
+    languages: 'English',
+    city: 'Traverse City',
+    country: 'USA',
+    githubUrl: 'https://github.com/bwfellow',
+    twitterUrl: 'https://twitter.com/FellowsBen',
+    imageUrl: 'ben-fellows.png'
+},
   {
     name: 'Butch Mayhew',
     city: 'Birmingham',
     languages: 'English',
     country: 'USA',
-    imageUrl: 'https://pbs.twimg.com/profile_images/1287788058746720256/TI0zkGqB_400x400.jpg',
     twitterUrl: 'https://twitter.com/butchmayhew',
-    websiteUrl: 'https://playwrightsolutions.com/'
+    websiteUrl: 'https://playwrightsolutions.com/',
+    imageUrl: 'butch-mayhew.jpg'
   },
   {
     name: 'Carlos Gauto',
@@ -23,7 +33,8 @@ const ambassadors = [
     country: 'Argentina',
     githubUrl: 'https://github.com/charlyautomatiza',
     twitterUrl: 'https://twitter.com/char_automatiza',
-    websiteUrl: 'https://linktr.ee/charlyautomatiza'
+    websiteUrl: 'https://linktr.ee/charlyautomatiza',
+    imageUrl: 'carlos-gauto.png'
   },
   {
     name: 'Cory House',
@@ -32,7 +43,8 @@ const ambassadors = [
     country: 'USA',
     githubUrl: 'https://github.com/coryhouse',
     twitterUrl: 'https://twitter.com/housecor',
-    websiteUrl: 'https://www.reactjsconsulting.com/'
+    websiteUrl: 'https://www.reactjsconsulting.com/',
+    imageUrl: 'cory-house.jpeg'
   },
   {
     name: 'Jean-François Greffier',
@@ -40,17 +52,8 @@ const ambassadors = [
     languages: 'French, English',
     country: 'France',
     githubUrl: 'https://github.com/jfgreffier',
-    websiteUrl: 'https://linktr.ee/jfgreffier'
-  },
-  {
-    name: 'Giovanni Rago',
-    languages: 'Italian, English',
-    city: 'Berlin',
-    country: 'Germany',
-    imageUrl:
-      'https://pbs.twimg.com/profile_images/1419977078552813568/XVrltX2h_400x400.png',
-    twitterUrl: 'https://twitter.com/rag0g',
-    websiteUrl: 'https://www.youtube.com/c/AutomateTogether'
+    websiteUrl: 'https://linktr.ee/jfgreffier',
+    imageUrl: 'jean-francois.png'
   },
   {
     name: 'John Hill',
@@ -58,7 +61,8 @@ const ambassadors = [
     city: 'Palo Alto',
     country: 'USA',
     githubUrl: 'https://github.com/unlikelyzero',
-    linkedInUrl: 'https://www.linkedin.com/in/linkedjohnhill'
+    linkedInUrl: 'https://www.linkedin.com/in/linkedjohnhill',
+    imageUrl: 'john-hill.jpeg'
   },
   {
     name: 'Kent C. Dodds',
@@ -67,7 +71,8 @@ const ambassadors = [
     country: 'USA',
     githubUrl: 'https://github.com/kentcdodds',
     twitterUrl: 'https://twitter.com/kentcdodds',
-    websiteUrl: 'https://kentcdodds.com'
+    websiteUrl: 'https://kentcdodds.com',
+    imageUrl: 'kent-c-dodds.jpeg'
   },
   {
     name: 'Stefan Judis',
@@ -76,7 +81,8 @@ const ambassadors = [
     country: 'Germany',
     githubUrl: 'https://github.com/stefanjudis',
     twitterUrl: 'https://twitter.com/stefanjudis',
-    websiteUrl: 'https://www.stefanjudis.com'
+    websiteUrl: 'https://www.stefanjudis.com',
+    imageUrl: 'stefan-judis.jpeg'
   },
   {
     name: 'Tally Barak',
@@ -84,13 +90,14 @@ const ambassadors = [
     city: 'Tel Aviv',
     country: 'Israel',
     githubUrl: 'https://github.com/Tallyb',
-    twitterUrl: 'https://twitter.com/TallyBarak'
+    twitterUrl: 'https://twitter.com/TallyBarak',
+    imageUrl: 'tally-barak.jpeg'
   },
   {
     name: 'Are you the next Ambassador?',
     city: '',
     country: '',
-    imageUrl: 'https://playwright.dev/img/playwright-logo.svg'
+    imageUrl: 'playwright-logo.svg'
   }
 ];
 

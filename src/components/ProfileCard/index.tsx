@@ -26,7 +26,7 @@ type Person = {
   twitterUrl?: string;
   websiteUrl?: string;
   linkedInUrl?: string;
-  imageUrl?: string;
+  imageUrl: string;
   languages?: string;
 };
 
@@ -44,7 +44,7 @@ function ProfileCard({ person, className }: ProfileProps) {
             <img
               className="avatar__photo avatar__photo--xl"
               src={
-                person.githubUrl ? `${person.githubUrl}.png` : person.imageUrl
+                `../img/ambassadors/${person.imageUrl}`
               }
               alt={`${person.name}'s avatar`}
             />
