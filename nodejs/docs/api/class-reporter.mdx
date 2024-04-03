@@ -107,6 +107,11 @@ Additionally, [reporter.onStdOut()](/api/class-reporter.mdx#reporter-on-std-out)
 
 If your custom reporter does not print anything to the terminal, implement [reporter.printsToStdio()](/api/class-reporter.mdx#reporter-prints-to-stdio) and return `false`. This way, Playwright will use one of the standard terminal reporters in addition to your custom reporter to enhance user experience.
 
+**Merged report API notes**
+
+When merging multiple [`blob`](../test-reporters#blob-reporter) reports via [`merge-reports`](../test-sharding#merge-reports-cli) CLI command, the same [Reporter] API is called to produce final reports and all existing reporters should work without any changes. There some subtle differences though which might affect some custom reporters.
+* Projects from different shards are always kept as separate [TestProject] objects. E.g. if project 'Desktop Chrome' was sharded across 5 machines then there will be 5 instances of projects with the same name in the config passed to [reporter.onBegin()](/api/class-reporter.mdx#reporter-on-begin).
+
 
 ---
 
@@ -125,7 +130,7 @@ reporter.onBegin(config, suite);
 ```
 
 **Arguments**
-- `config` [TestConfig]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-begin-option-config"/><a href="#reporter-on-begin-option-config" class="list-anchor">#</a>
+- `config` [FullConfig]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-begin-option-config"/><a href="#reporter-on-begin-option-config" class="list-anchor">#</a>
   
   Resolved configuration.
 - `suite` [Suite]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-on-begin-option-suite"/><a href="#reporter-on-begin-option-suite" class="list-anchor">#</a>
@@ -415,7 +420,9 @@ reporter.printsToStdio();
 [WebError]: /api/class-weberror.mdx "WebError"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [Worker]: /api/class-worker.mdx "Worker"
+[ConfigInWorker]: /api/class-configinworker.mdx "ConfigInWorker"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
+[ProjectInWorker]: /api/class-projectinworker.mdx "ProjectInWorker"
 [Test]: /api/class-test.mdx "Test"
 [TestConfig]: /api/class-testconfig.mdx "TestConfig"
 [TestInfo]: /api/class-testinfo.mdx "TestInfo"
@@ -423,6 +430,8 @@ reporter.printsToStdio();
 [TestOptions]: /api/class-testoptions.mdx "TestOptions"
 [TestProject]: /api/class-testproject.mdx "TestProject"
 [WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
+[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
+[FullProject]: /api/class-fullproject.mdx "FullProject"
 [Location]: /api/class-location.mdx "Location"
 [Reporter]: /api/class-reporter.mdx "Reporter"
 [Suite]: /api/class-suite.mdx "Suite"
