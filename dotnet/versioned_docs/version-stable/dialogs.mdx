@@ -15,8 +15,11 @@ Playwright can interact with the web page dialogs such as [`alert`](https://deve
 By default, dialogs are auto-dismissed by Playwright, so you don't have to handle them. However, you can register a dialog handler before the action that triggers the dialog to either [Dialog.AcceptAsync()](/api/class-dialog.mdx#dialog-accept) or [Dialog.DismissAsync()](/api/class-dialog.mdx#dialog-dismiss) it.
 
 ```csharp
-page.Dialog += (_, dialog) => dialog.AcceptAsync();
-await page.GetByRole(AriaRole.Button).ClickAsync();
+Page.Dialog += async (_, dialog) =>
+{
+    await dialog.AcceptAsync();
+};
+await Page.GetByRole(AriaRole.Button).ClickAsync();
 ```
 
 :::note
@@ -45,12 +48,12 @@ When [Page.CloseAsync()](/api/class-page.mdx#page-close) is invoked with the tru
 You can register a dialog handler to handle the `beforeunload` dialog yourself:
 
 ```csharp
-page.Dialog += (_, dialog) =>
+Page.Dialog += async (_, dialog) =>
 {
     Assert.AreEqual("beforeunload", dialog.Type);
-    dialog.DismissAsync();
+    await dialog.DismissAsync();
 };
-await page.CloseAsync(runBeforeUnload: true);
+await Page.CloseAsync(new() { RunBeforeUnload = true });
 ```
 
 
