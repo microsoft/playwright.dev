@@ -102,7 +102,7 @@ Math.random = () => 42;
 ```
 
 ```csharp
-await context.AddInitScriptAsync(scriptPath: "preload.js");
+await Context.AddInitScriptAsync(scriptPath: "preload.js");
 ```
 
 :::note
@@ -140,13 +140,29 @@ BrowserContext.Browser
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>browserContext.ClearCookiesAsync</x-search>
 
-Clears context cookies.
+Removes cookies from context. Accepts optional filter.
 
 **Usage**
 
 ```csharp
-await BrowserContext.ClearCookiesAsync();
+await context.ClearCookiesAsync();
+await context.ClearCookiesAsync(new() { Name = "session-id" });
+await context.ClearCookiesAsync(new() { Domain = "my-origin.com" });
+await context.ClearCookiesAsync(new() { Path = "/api/v1" });
+await context.ClearCookiesAsync(new() { Name = "session-id", Domain = "my-origin.com" });
 ```
+
+**Arguments**
+- `options` `BrowserContextClearCookiesOptions?` *(optional)*
+  - `Domain|DomainRegex` [string]?|[Regex]? *(optional)* <font size="2">Added in: v1.43</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-clear-cookies-option-domain-domain-regex"/><a href="#browser-context-clear-cookies-option-domain-domain-regex" class="list-anchor">#</a>
+    
+    Only removes cookies with the given domain.
+  - `Name|NameRegex` [string]?|[Regex]? *(optional)* <font size="2">Added in: v1.43</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-clear-cookies-option-name-name-regex"/><a href="#browser-context-clear-cookies-option-name-name-regex" class="list-anchor">#</a>
+    
+    Only removes cookies with the given name.
+  - `Path|PathRegex` [string]?|[Regex]? *(optional)* <font size="2">Added in: v1.43</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-clear-cookies-option-path-path-regex"/><a href="#browser-context-clear-cookies-option-path-path-regex" class="list-anchor">#</a>
+    
+    Only removes cookies with the given path.
 
 **Returns**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-clear-cookies-return"/><a href="#browser-context-clear-cookies-return" class="list-anchor">#</a>
@@ -520,7 +536,7 @@ It is possible to examine the request to decide the route action. For example, m
 await page.RouteAsync("/api/**", async r =>
 {
     if (r.Request.PostData.Contains("my-string"))
-        await r.FulfillAsync(body: "mocked-data");
+        await r.FulfillAsync(new() { Body = "mocked-data" });
     else
         await r.ContinueAsync();
 });
@@ -1002,7 +1018,10 @@ Emitted when a JavaScript dialog appears, such as `alert`, `prompt`, `confirm` o
 **Usage**
 
 ```csharp
-context.Dialog += (_, dialog) => dialog.AcceptAsync();
+Context.Dialog += async (_, dialog) =>
+{
+    await dialog.AcceptAsync();
+};
 ```
 
 :::note
