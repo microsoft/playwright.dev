@@ -1479,6 +1479,10 @@ The handler will only be called for the first url if the response is a redirect.
 [page.route()](/api/class-page.mdx#page-route) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception by setting `Browser.newContext.serviceWorkers` to `'block'`.
 :::
 
+:::note
+[page.route()](/api/class-page.mdx#page-route) will not intercept the first request of a popup page. Use [browserContext.route()](/api/class-browsercontext.mdx#browser-context-route) instead.
+:::
+
 **Usage**
 
 An example of a naive handler that aborts all image requests:
@@ -2520,7 +2524,7 @@ page.on('pageerror', data => {});
 
 Emitted when the page opens a new tab or window. This event is emitted in addition to the [browserContext.on('page')](/api/class-browsercontext.mdx#browser-context-event-page), but only for popups relevant to this page.
 
-The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
+The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup. If you would like to route/listen to this network request, use [browserContext.route()](/api/class-browsercontext.mdx#browser-context-route) and [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) respectively instead of similar methods on the [Page].
 
 ```js
 // Start waiting for popup before clicking. Note no await.
