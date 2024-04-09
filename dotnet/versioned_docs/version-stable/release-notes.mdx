@@ -7,6 +7,47 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+## Version 1.43
+
+### New APIs
+- Method [BrowserContext.ClearCookiesAsync()](/api/class-browsercontext.mdx#browser-context-clear-cookies) now supports filters to remove only some cookies.
+  
+  ```csharp
+  // Clear all cookies.
+  await Context.ClearCookiesAsync();
+  // New: clear cookies with a particular name.
+  await Context.ClearCookiesAsync(new() { Name = "session-id" });
+  // New: clear cookies for a particular domain.
+  await Context.ClearCookiesAsync(new() { Domain = "my-origin.com" });
+  ```
+  
+- New property [Locator.ContentFrame](/api/class-locator.mdx#locator-content-frame) converts a [Locator] object to a [FrameLocator]. This can be useful when you have a [Locator] object obtained somewhere, and later on would like to interact with the content inside the frame.
+  
+  ```csharp
+  var locator = Page.Locator("iframe[name='embedded']");
+  // ...
+  var frameLocator = locator.ContentFrame;
+  await frameLocator.GetByRole(AriaRole.Button).ClickAsync();
+  ```
+  
+- New property [FrameLocator.Owner](/api/class-framelocator.mdx#frame-locator-owner) converts a [FrameLocator] object to a [Locator]. This can be useful when you have a [FrameLocator] object obtained somewhere, and later on would like to interact with the `iframe` element.
+  
+  ```csharp
+  var frameLocator = page.FrameLocator("iframe[name='embedded']");
+  // ...
+  var locator = frameLocator.Owner;
+  await Expect(locator).ToBeVisibleAsync();
+  ```
+  
+### Browser Versions
+* Chromium 124.0.6367.8
+* Mozilla Firefox 124.0
+* WebKit 17.4
+
+This version was also tested against the following stable channels:
+* Google Chrome 123
+* Microsoft Edge 123
+
 ## Version 1.42
 
 ### New Locator Handler
