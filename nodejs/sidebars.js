@@ -168,6 +168,8 @@ module.exports = {
           label: 'Test Runner',
           items: [
             { type: 'doc', id: 'api/class-fixtures' },
+            { type: 'doc', id: 'api/class-fullconfig' },
+            { type: 'doc', id: 'api/class-fullproject' },
             { type: 'doc', id: 'api/class-test' },
             { type: 'doc', id: 'api/class-testconfig' },
             { type: 'doc', id: 'api/class-testinfo' },
