@@ -14,6 +14,63 @@ The [FormData] is used create form data that is sent via [APIRequestContext].
 
 ## Methods
 
+### Append {#form-data-append}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.44</font><x-search>formData.Append</x-search>
+
+Appends a new value onto an existing key inside a FormData object, or adds the key if it does not already exist. File values can be passed either as `Path` or as `FilePayload`. Multiple fields with the same name can be added.
+
+The difference between [FormData.Set()](/api/class-formdata.mdx#form-data-set) and [FormData.Append()](/api/class-formdata.mdx#form-data-append) is that if the specified key already exists, [FormData.Set()](/api/class-formdata.mdx#form-data-set) will overwrite all existing values with the new one, whereas [FormData.Append()](/api/class-formdata.mdx#form-data-append) will append the new value onto the end of the existing set of values.
+
+```csharp
+var multipart = Context.APIRequest.CreateFormData();
+// Only name and value are set.
+multipart.Append("firstName", "John");
+// Name, value, filename and Content-Type are set.
+multipart.Append("attachment", new FilePayload()
+{
+    Name = "pic.jpg",
+    MimeType = "image/jpeg",
+    Buffer = File.ReadAllBytes("john.jpg")
+});
+// Name, value, filename and Content-Type are set.
+multipart.Append("attachment", new FilePayload()
+{
+    Name = "table.csv",
+    MimeType = "text/csv",
+    Buffer = File.ReadAllBytes("my-tble.csv")
+});
+await Page.APIRequest.PostAsync("https://localhost/submit", new() { Multipart = multipart });
+```
+
+**Usage**
+
+```csharp
+FormData.Append(name, value);
+```
+
+**Arguments**
+- `name` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="form-data-append-option-name"/><a href="#form-data-append-option-name" class="list-anchor">#</a>
+  
+  Field name.
+- `value` [string]|[bool]|[int]|Value<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="form-data-append-option-value"/><a href="#form-data-append-option-value" class="list-anchor">#</a>
+  - `Name` [string]
+    
+    File name
+  - `MimeType` [string]
+    
+    File type
+  - `Buffer` [byte]&#91;&#93;
+    
+    File content
+  
+  Field value.
+
+**Returns**
+- [FormData]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="form-data-append-return"/><a href="#form-data-append-return" class="list-anchor">#</a>
+
+---
+
 ### Set {#form-data-set}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.18</font><x-search>formData.Set</x-search>
@@ -31,6 +88,7 @@ multipart.Set("profilePicture", new FilePayload()
     MimeType = "image/jpeg",
     Buffer = File.ReadAllBytes("john.jpg")
 });
+multipart.Set("age", 30);
 await Page.APIRequest.PostAsync("https://localhost/submit", new() { Multipart = multipart });
 ```
 
