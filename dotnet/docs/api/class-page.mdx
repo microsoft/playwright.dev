@@ -106,6 +106,7 @@ This method lets you set up a special function, called a handler, that activates
 Things to keep in mind:
 * When an overlay is shown predictably, we recommend explicitly waiting for it in your test and dismissing it as a part of your normal test flow, instead of using [Page.AddLocatorHandlerAsync()](/api/class-page.mdx#page-add-locator-handler).
 * Playwright checks for the overlay every time before executing or retrying an action that requires an [actionability check](../actionability.mdx), or before performing an auto-waiting assertion check. When overlay is visible, Playwright calls the handler first, and then proceeds with the action/assertion. Note that the handler is only called when you perform an action/assertion - if the overlay becomes visible but you don't perform any actions, the handler will not be triggered.
+* After executing the handler, Playwright will ensure that overlay that triggered the handler is not visible anymore. You can opt-out of this behavior with `allowStayingVisible`.
 * The execution time of the handler counts towards the timeout of the action/assertion that executed the handler. If your handler takes too long, it might cause timeouts.
 * You can register multiple handlers. However, only a single handler will be running at a time. Make sure the actions within a handler don't depend on another handler.
 
@@ -141,26 +142,44 @@ await page.GotoAsync("https://example.com");
 await page.GetByRole("button", new() { Name = "Start here" }).ClickAsync();
 ```
 
-An example with a custom callback on every actionability check. It uses a `<body>` locator that is always visible, so the handler is called before every actionability check:
+An example with a custom callback on every actionability check. It uses a `<body>` locator that is always visible, so the handler is called before every actionability check. It is important to specify `allowStayingVisible`, because the handler does not hide the `<body>` element.
 
 ```csharp
 // Setup the handler.
 await page.AddLocatorHandlerAsync(page.Locator("body"), async () => {
   await page.EvaluateAsync("window.removeObstructionsForTestIfNeeded()");
-});
+}, new() { AllowStayingVisible = true });
 
 // Write the test as usual.
 await page.GotoAsync("https://example.com");
 await page.GetByRole("button", new() { Name = "Start here" }).ClickAsync();
 ```
 
+Handler takes the original locator as an argument. You can also automatically remove the handler after a number of invocations by setting `times`:
+
+```csharp
+await page.AddLocatorHandlerAsync(page.GetByText("Sign up to the newsletter"), async locator => {
+  await locator.ClickAsync();
+}, new() { Times = 1 });
+```
+
 **Arguments**
 - `locator` [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-option-locator"/><a href="#page-add-locator-handler-option-locator" class="list-anchor">#</a>
   
   Locator that triggers the handler.
-- `handler` [Func]&lt;[Task]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-option-handler"/><a href="#page-add-locator-handler-option-handler" class="list-anchor">#</a>
+- `handler` [Action]&lt;[Locator]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-option-handler"/><a href="#page-add-locator-handler-option-handler" class="list-anchor">#</a>
   
   Function that should be run once `locator` appears. This function should get rid of the element that blocks actions like click.
+- `options` `PageAddLocatorHandlerOptions?` *(optional)*
+  - `AllowStayingVisible` [bool]? *(optional)* <font size="2">Added in: v1.44</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-option-allow-staying-visible"/><a href="#page-add-locator-handler-option-allow-staying-visible" class="list-anchor">#</a>
+    
+    By default, after calling the handler Playwright will wait until the overlay becomes hidden, and only then Playwright will continue with the action/assertion that triggered the handler. This option allows to opt-out of this behavior, so that overlay can stay visible after the handler has run.
+  - `Times` [int]? *(optional)* <font size="2">Added in: v1.44</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-option-times"/><a href="#page-add-locator-handler-option-times" class="list-anchor">#</a>
+    
+    Specifies the maximum number of times this handler should be called. Unlimited by default.
+- `handler` [Action]&lt;[Locator]&gt; <font size="2">Added in: v1.44</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-option-handler"/><a href="#page-add-locator-handler-option-handler" class="list-anchor">#</a>
+  
+  Handler passed to [Page.AddLocatorHandlerAsync()](/api/class-page.mdx#page-add-locator-handler).
 
 **Returns**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-return"/><a href="#page-add-locator-handler-return" class="list-anchor">#</a>
@@ -1473,6 +1492,32 @@ await Page.ReloadAsync(options);
 
 **Returns**
 - [Response]?<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-reload-return"/><a href="#page-reload-return" class="list-anchor">#</a>
+
+---
+
+### RemoveLocatorHandlerAsync {#page-remove-locator-handler}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.44</font><x-search>page.RemoveLocatorHandlerAsync</x-search>
+
+:::warning[Experimental]
+This method is experimental and its behavior may change in the upcoming releases.
+:::
+
+Removes locator handler added by [Page.AddLocatorHandlerAsync()](/api/class-page.mdx#page-add-locator-handler).
+
+**Usage**
+
+```csharp
+await Page.RemoveLocatorHandlerAsync(locator);
+```
+
+**Arguments**
+- `locator` [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-remove-locator-handler-option-locator"/><a href="#page-remove-locator-handler-option-locator" class="list-anchor">#</a>
+  
+  Locator passed to [Page.AddLocatorHandlerAsync()](/api/class-page.mdx#page-add-locator-handler).
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-remove-locator-handler-return"/><a href="#page-remove-locator-handler-return" class="list-anchor">#</a>
 
 ---
 
