@@ -12,144 +12,21 @@ While Playwright for .NET isn't tied to a particular test runner or testing fram
 
 Playwright and Browser instances can be reused between tests for better performance. We recommend running each test case in a new BrowserContext, this way browser state will be isolated between the tests.
 
-<!-- TOC -->
-
 ## NUnit
 
 Playwright provides base classes to write tests with NUnit via the [`Microsoft.Playwright.NUnit`](https://www.nuget.org/packages/Microsoft.Playwright.NUnit) package.
 
-### Creating an NUnit project
-
-```bash
-# Create a new project
-dotnet new nunit -n PlaywrightTests
-cd PlaywrightTests
-
-# Add the required reference
-dotnet add package Microsoft.Playwright.NUnit
-dotnet build
-
-# Install the required browsers and operating system dependencies
-pwsh bin/Debug/netX/playwright.ps1 install --with-deps
-```
-
-Modify the UnitTest1.cs:
-
-```csharp
-using Microsoft.Playwright.NUnit;
-
-namespace PlaywrightTests;
-
-[Parallelizable(ParallelScope.Self)]
-[TestFixture]
-public class MyTest : PageTest
-{
-    [Test]
-    public async Task ShouldHaveTheCorrectSlogan()
-    {
-        await Page.GotoAsync("https://playwright.dev");
-        await Expect(Page.Locator("text=enables reliable end-to-end testing for modern web apps")).ToBeVisibleAsync();
-    }
-
-    [Test]
-    public async Task ShouldHaveTheCorrectTitle()
-    {
-        await Page.GotoAsync("https://playwright.dev");
-        var title = Page.Locator(".navbar__inner .navbar__title");
-        await Expect(title).ToHaveTextAsync("Playwright");
-    }
-}
-```
-
-Run your tests against Chromium
-
-```bash
-dotnet test
-```
-
-Run your tests against WebKit
-
-<Tabs
-  groupId="bash-flavor"
-  defaultValue="bash"
-  values={[
-    {label: 'Bash', value: 'bash'},
-    {label: 'PowerShell', value: 'powershell'},
-    {label: 'Batch', value: 'batch'}
-  ]
-}>
-<TabItem value="bash">
-
-```bash
-BROWSER=webkit dotnet test
-```
-
-</TabItem>
-<TabItem value="powershell">
-
-```powershell
-$env:BROWSER="webkit"
-dotnet test
-```
-
-</TabItem>
-<TabItem value="batch">
-
-```batch
-set BROWSER=webkit
-dotnet test
-```
-
-</TabItem>
-</Tabs>
-
-Run your tests with GUI
-
-<Tabs
-  groupId="bash-flavor"
-  defaultValue="bash"
-  values={[
-    {label: 'Bash', value: 'bash'},
-    {label: 'PowerShell', value: 'powershell'},
-    {label: 'Batch', value: 'batch'}
-  ]
-}>
-<TabItem value="bash">
-
-```bash
-HEADED=1 dotnet test
-```
-
-</TabItem>
-<TabItem value="powershell">
-
-```powershell
-$env:HEADED="1"
-dotnet test
-```
-
-</TabItem>
-<TabItem value="batch">
-
-```batch
-set HEADED=1
-dotnet test
-```
-
-</TabItem>
-</Tabs>
-
-You can also choose specifically which tests to run, using the [filtering capabilities](https://docs.microsoft.com/en-us/dotnet/core/testing/selective-unit-tests?pivots=nunit):
-
-```bash
-dotnet test --filter "Name~Slogan"
-```
+Check out the [installation guide](./intro.mdx) to get started.
 
 ### Running NUnit tests in Parallel
 
 By default NUnit will run all test files in parallel, while running tests inside each file sequentially (`ParallelScope.Self`). It will create as many processes as there are cores on the host system. You can adjust this behavior using the NUnit.NumberOfTestWorkers parameter. Only `ParallelScope.Self` is supported.
 
 For CPU-bound tests, we recommend using as many workers as there are cores on your system, divided by 2. For IO-bound tests you can use as many workers as you have cores.
+
+```bash
+dotnet test -- NUnit.NumberOfTestWorkers=5
+```
 
 ### Customizing [BrowserContext] options
 
@@ -259,131 +136,7 @@ There are a few base classes available to you in `Microsoft.Playwright.NUnit` na
 
 Playwright provides base classes to write tests with MSTest via the [`Microsoft.Playwright.MSTest`](https://www.nuget.org/packages/Microsoft.Playwright.MSTest) package.
 
-### Creating an MSTest project
-
-```bash
-# Create a new project
-dotnet new mstest -n PlaywrightTests
-cd PlaywrightTests
-
-# Add the required reference
-dotnet add package Microsoft.Playwright.MSTest
-dotnet build
-
-# Install the required browsers and operating system dependencies
-pwsh bin/Debug/netX/playwright.ps1 install --with-deps
-```
-
-Modify the UnitTest1.cs:
-
-```csharp
-using Microsoft.Playwright.MSTest;
-
-namespace PlaywrightTests;
-
-[TestClass]
-public class UnitTest1: PageTest
-{
-    [TestMethod]
-    public async Task ShouldHaveTheCorrectSlogan()
-    {
-        await Page.GotoAsync("https://playwright.dev");
-        await Expect(Page.Locator("text=enables reliable end-to-end testing for modern web apps")).ToBeVisibleAsync();
-    }
-
-    [TestMethod]
-    public async Task ShouldHaveTheCorrectTitle()
-    {
-        await Page.GotoAsync("https://playwright.dev");
-        var title = Page.Locator(".navbar__inner .navbar__title");
-        await Expect(title).ToHaveTextAsync("Playwright");
-    }
-}
-```
-
-Run your tests against Chromium
-
-```bash
-dotnet test
-```
-
-Run your tests against WebKit
-
-<Tabs
-  groupId="bash-flavor"
-  defaultValue="bash"
-  values={[
-    {label: 'Bash', value: 'bash'},
-    {label: 'PowerShell', value: 'powershell'},
-    {label: 'Batch', value: 'batch'}
-  ]
-}>
-<TabItem value="bash">
-
-```bash
-BROWSER=webkit dotnet test
-```
-
-</TabItem>
-<TabItem value="powershell">
-
-```powershell
-$env:BROWSER="webkit"
-dotnet test
-```
-
-</TabItem>
-<TabItem value="batch">
-
-```batch
-set BROWSER=webkit
-dotnet test
-```
-
-</TabItem>
-</Tabs>
-
-Run your tests with GUI
-
-<Tabs
-  groupId="bash-flavor"
-  defaultValue="bash"
-  values={[
-    {label: 'Bash', value: 'bash'},
-    {label: 'PowerShell', value: 'powershell'},
-    {label: 'Batch', value: 'batch'}
-  ]
-}>
-<TabItem value="bash">
-
-```bash
-HEADED=1 dotnet test
-```
-
-</TabItem>
-<TabItem value="powershell">
-
-```powershell
-$env:HEADED="1"
-dotnet test
-```
-
-</TabItem>
-<TabItem value="batch">
-
-```batch
-set HEADED=1
-dotnet test
-```
-
-</TabItem>
-</Tabs>
-
-You can also choose specifically which tests to run, using the [filtering capabilities](https://docs.microsoft.com/en-us/dotnet/core/testing/selective-unit-tests?pivots=mstest):
-
-```bash
-dotnet test --filter "Name~Slogan"
-```
+Check out the [installation guide](./intro.mdx) to get started.
 
 ### Running MSTest tests in Parallel
 
@@ -406,7 +159,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 namespace PlaywrightTests;
 
 [TestClass]
-public class UnitTest1 : PageTest
+public class ExampleTest : PageTest
 {
     [TestMethod]
     public async Task TestWithCustomContextOptions()
