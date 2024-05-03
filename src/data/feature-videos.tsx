@@ -1,5 +1,11 @@
 const featureVideos = [
   {
+    title: 'Codegen',
+    description: '',
+    id: '5XIZPqKkdBA',
+    year: '2024',
+  },
+  {
     title: 'UI Mode',
     description: '',
     id: 'd0u6XhXknzU',

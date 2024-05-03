@@ -29,6 +29,12 @@ const learnVideos = [
     description: '',
     id: 'gRXPp6RuExU',
   },
+  {
+    title: 'Generating Tests',
+    description: '',
+    id: '5XIZPqKkdBA',
+    year: '2024',
+  },
 ];
 
 export default learnVideos;
