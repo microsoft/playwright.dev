@@ -58,7 +58,7 @@ await apiRequestContext.delete(url, options);
   - `maxRedirects` [number] *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-max-redirects"/><a href="#api-request-context-delete-option-max-redirects" class="list-anchor">#</a>
     
     Maximum number of request redirects that will be followed automatically. An error will be thrown if the number is exceeded. Defaults to `20`. Pass `0` to not follow redirects.
-  - `multipart` [Object]&lt;[string], [string]|[number]|[boolean]|[ReadStream]|[Object]&gt; *(optional)* <font size="2">Added in: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-multipart"/><a href="#api-request-context-delete-option-multipart" class="list-anchor">#</a>
+  - `multipart` [FormData]|[Object]&lt;[string], [string]|[number]|[boolean]|[ReadStream]|[Object]&gt; *(optional)* <font size="2">Added in: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-multipart"/><a href="#api-request-context-delete-option-multipart" class="list-anchor">#</a>
     - `name` [string]
       
       File name
@@ -103,9 +103,11 @@ await apiRequestContext.dispose();
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.16</font><x-search>apiRequestContext.fetch</x-search>
 
-Sends HTTP(S) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects. JSON objects can be passed directly to the request.
+Sends HTTP(S) request and returns its response. The method will populate request cookies from the context and update context cookies from the response. The method will automatically follow redirects.
 
 **Usage**
+
+JSON objects can be passed directly to the request:
 
 ```js
 await request.fetch('https://example.com/api/createBook', {
@@ -117,28 +119,17 @@ await request.fetch('https://example.com/api/createBook', {
 });
 ```
 
-The common way to send file(s) in the body of a request is to encode it as form fields with `multipart/form-data` encoding. You can achieve that with Playwright API like this:
+The common way to send file(s) in the body of a request is to upload them as form fields with `multipart/form-data` encoding. Use [FormData] to construct request body and pass it to the request as `multipart` parameter:
 
 ```js
-// Open file as a stream and pass it to the request:
-const stream = fs.createReadStream('team.csv');
-await request.fetch('https://example.com/api/uploadTeamList', {
-  method: 'post',
-  multipart: {
-    fileField: stream
-  }
-});
-
-// Or you can pass the file content directly as an object:
-await request.fetch('https://example.com/api/uploadScript', {
-  method: 'post',
-  multipart: {
-    fileField: {
-      name: 'f.js',
-      mimeType: 'text/javascript',
-      buffer: Buffer.from('console.log(2022);')
-    }
-  }
+const form = new FormData();
+form.set('name', 'John');
+form.append('name', 'Doe');
+// Send two file fields with the same name.
+form.append('file', new File(['console.log(2024);'], 'f1.js', { type: 'text/javascript' }));
+form.append('file', new File(['hello'], 'f2.txt', { type: 'text/plain' }));
+await request.fetch('https://example.com/api/uploadForm', {
+  multipart: form
 });
 ```
 
@@ -168,7 +159,7 @@ await request.fetch('https://example.com/api/uploadScript', {
   - `method` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-method"/><a href="#api-request-context-fetch-option-method" class="list-anchor">#</a>
     
     If set changes the fetch method (e.g. [PUT](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PUT) or [POST](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST)). If not specified, GET method is used.
-  - `multipart` [Object]&lt;[string], [string]|[number]|[boolean]|[ReadStream]|[Object]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-multipart"/><a href="#api-request-context-fetch-option-multipart" class="list-anchor">#</a>
+  - `multipart` [FormData]|[Object]&lt;[string], [string]|[number]|[boolean]|[ReadStream]|[Object]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-multipart"/><a href="#api-request-context-fetch-option-multipart" class="list-anchor">#</a>
     - `name` [string]
       
       File name
@@ -234,7 +225,7 @@ await request.get('https://example.com/api/getText', {
   - `maxRedirects` [number] *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-max-redirects"/><a href="#api-request-context-get-option-max-redirects" class="list-anchor">#</a>
     
     Maximum number of request redirects that will be followed automatically. An error will be thrown if the number is exceeded. Defaults to `20`. Pass `0` to not follow redirects.
-  - `multipart` [Object]&lt;[string], [string]|[number]|[boolean]|[ReadStream]|[Object]&gt; *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-multipart"/><a href="#api-request-context-get-option-multipart" class="list-anchor">#</a>
+  - `multipart` [FormData]|[Object]&lt;[string], [string]|[number]|[boolean]|[ReadStream]|[Object]&gt; *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-multipart"/><a href="#api-request-context-get-option-multipart" class="list-anchor">#</a>
     - `name` [string]
       
       File name
@@ -294,7 +285,7 @@ await apiRequestContext.head(url, options);
   - `maxRedirects` [number] *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-max-redirects"/><a href="#api-request-context-head-option-max-redirects" class="list-anchor">#</a>
     
     Maximum number of request redirects that will be followed automatically. An error will be thrown if the number is exceeded. Defaults to `20`. Pass `0` to not follow redirects.
-  - `multipart` [Object]&lt;[string], [string]|[number]|[boolean]|[ReadStream]|[Object]&gt; *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-multipart"/><a href="#api-request-context-head-option-multipart" class="list-anchor">#</a>
+  - `multipart` [FormData]|[Object]&lt;[string], [string]|[number]|[boolean]|[ReadStream]|[Object]&gt; *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-multipart"/><a href="#api-request-context-head-option-multipart" class="list-anchor">#</a>
     - `name` [string]
       
       File name
@@ -354,7 +345,7 @@ await apiRequestContext.patch(url, options);
   - `maxRedirects` [number] *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-max-redirects"/><a href="#api-request-context-patch-option-max-redirects" class="list-anchor">#</a>
     
     Maximum number of request redirects that will be followed automatically. An error will be thrown if the number is exceeded. Defaults to `20`. Pass `0` to not follow redirects.
-  - `multipart` [Object]&lt;[string], [string]|[number]|[boolean]|[ReadStream]|[Object]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-multipart"/><a href="#api-request-context-patch-option-multipart" class="list-anchor">#</a>
+  - `multipart` [FormData]|[Object]&lt;[string], [string]|[number]|[boolean]|[ReadStream]|[Object]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-multipart"/><a href="#api-request-context-patch-option-multipart" class="list-anchor">#</a>
     - `name` [string]
       
       File name
@@ -408,26 +399,17 @@ await request.post('https://example.com/api/findBook', {
 });
 ```
 
-The common way to send file(s) in the body of a request is to upload them as form fields with `multipart/form-data` encoding. You can achieve that with Playwright API like this:
+The common way to send file(s) in the body of a request is to upload them as form fields with `multipart/form-data` encoding. Use [FormData] to construct request body and pass it to the request as `multipart` parameter:
 
 ```js
-// Open file as a stream and pass it to the request:
-const stream = fs.createReadStream('team.csv');
-await request.post('https://example.com/api/uploadTeamList', {
-  multipart: {
-    fileField: stream
-  }
-});
-
-// Or you can pass the file content directly as an object:
-await request.post('https://example.com/api/uploadScript', {
-  multipart: {
-    fileField: {
-      name: 'f.js',
-      mimeType: 'text/javascript',
-      buffer: Buffer.from('console.log(2022);')
-    }
-  }
+const form = new FormData();
+form.set('name', 'John');
+form.append('name', 'Doe');
+// Send two file fields with the same name.
+form.append('file', new File(['console.log(2024);'], 'f1.js', { type: 'text/javascript' }));
+form.append('file', new File(['hello'], 'f2.txt', { type: 'text/plain' }));
+await request.post('https://example.com/api/uploadForm', {
+  multipart: form
 });
 ```
 
@@ -454,7 +436,7 @@ await request.post('https://example.com/api/uploadScript', {
   - `maxRedirects` [number] *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-max-redirects"/><a href="#api-request-context-post-option-max-redirects" class="list-anchor">#</a>
     
     Maximum number of request redirects that will be followed automatically. An error will be thrown if the number is exceeded. Defaults to `20`. Pass `0` to not follow redirects.
-  - `multipart` [Object]&lt;[string], [string]|[number]|[boolean]|[ReadStream]|[Object]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-multipart"/><a href="#api-request-context-post-option-multipart" class="list-anchor">#</a>
+  - `multipart` [FormData]|[Object]&lt;[string], [string]|[number]|[boolean]|[ReadStream]|[Object]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-multipart"/><a href="#api-request-context-post-option-multipart" class="list-anchor">#</a>
     - `name` [string]
       
       File name
@@ -514,7 +496,7 @@ await apiRequestContext.put(url, options);
   - `maxRedirects` [number] *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-max-redirects"/><a href="#api-request-context-put-option-max-redirects" class="list-anchor">#</a>
     
     Maximum number of request redirects that will be followed automatically. An error will be thrown if the number is exceeded. Defaults to `20`. Pass `0` to not follow redirects.
-  - `multipart` [Object]&lt;[string], [string]|[number]|[boolean]|[ReadStream]|[Object]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-multipart"/><a href="#api-request-context-put-option-multipart" class="list-anchor">#</a>
+  - `multipart` [FormData]|[Object]&lt;[string], [string]|[number]|[boolean]|[ReadStream]|[Object]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-multipart"/><a href="#api-request-context-put-option-multipart" class="list-anchor">#</a>
     - `name` [string]
       
       File name
@@ -649,6 +631,8 @@ await apiRequestContext.storageState(options);
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [Worker]: /api/class-worker.mdx "Worker"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
+[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
+[FullProject]: /api/class-fullproject.mdx "FullProject"
 [Test]: /api/class-test.mdx "Test"
 [TestConfig]: /api/class-testconfig.mdx "TestConfig"
 [TestInfo]: /api/class-testinfo.mdx "TestInfo"
@@ -681,6 +665,7 @@ await apiRequestContext.storageState(options);
 [Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
 [EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
 [function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
 [Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
 [Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
 [null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"

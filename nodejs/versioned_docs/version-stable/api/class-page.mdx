@@ -106,10 +106,6 @@ The order of evaluation of multiple scripts installed via [browserContext.addIni
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.42</font><x-search>page.addLocatorHandler</x-search>
 
-:::warning[Experimental]
-This method is experimental and its behavior may change in the upcoming releases.
-:::
-
 When testing a web page, sometimes unexpected overlays like a "Sign up" dialog appear and block actions you want to automate, e.g. clicking a button. These overlays don't always show up in the same way or at the same time, making them tricky to handle in automated tests.
 
 This method lets you set up a special function, called a handler, that activates when it detects that overlay is visible. The handler's job is to remove the overlay, allowing your test to continue as if the overlay wasn't there.
@@ -117,6 +113,7 @@ This method lets you set up a special function, called a handler, that activates
 Things to keep in mind:
 * When an overlay is shown predictably, we recommend explicitly waiting for it in your test and dismissing it as a part of your normal test flow, instead of using [page.addLocatorHandler()](/api/class-page.mdx#page-add-locator-handler).
 * Playwright checks for the overlay every time before executing or retrying an action that requires an [actionability check](../actionability.mdx), or before performing an auto-waiting assertion check. When overlay is visible, Playwright calls the handler first, and then proceeds with the action/assertion. Note that the handler is only called when you perform an action/assertion - if the overlay becomes visible but you don't perform any actions, the handler will not be triggered.
+* After executing the handler, Playwright will ensure that overlay that triggered the handler is not visible anymore. You can opt-out of this behavior with `noWaitAfter`.
 * The execution time of the handler counts towards the timeout of the action/assertion that executed the handler. If your handler takes too long, it might cause timeouts.
 * You can register multiple handlers. However, only a single handler will be running at a time. Make sure the actions within a handler don't depend on another handler.
 
@@ -152,26 +149,41 @@ await page.goto('https://example.com');
 await page.getByRole('button', { name: 'Start here' }).click();
 ```
 
-An example with a custom callback on every actionability check. It uses a `<body>` locator that is always visible, so the handler is called before every actionability check:
+An example with a custom callback on every actionability check. It uses a `<body>` locator that is always visible, so the handler is called before every actionability check. It is important to specify `noWaitAfter`, because the handler does not hide the `<body>` element.
 
 ```js
 // Setup the handler.
 await page.addLocatorHandler(page.locator('body'), async () => {
   await page.evaluate(() => window.removeObstructionsForTestIfNeeded());
-});
+}, { noWaitAfter: true });
 
 // Write the test as usual.
 await page.goto('https://example.com');
 await page.getByRole('button', { name: 'Start here' }).click();
 ```
 
+Handler takes the original locator as an argument. You can also automatically remove the handler after a number of invocations by setting `times`:
+
+```js
+await page.addLocatorHandler(page.getByLabel('Close'), async locator => {
+  await locator.click();
+}, { times: 1 });
+```
+
 **Arguments**
 - `locator` [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-option-locator"/><a href="#page-add-locator-handler-option-locator" class="list-anchor">#</a>
   
   Locator that triggers the handler.
-- `handler` [function]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-option-handler"/><a href="#page-add-locator-handler-option-handler" class="list-anchor">#</a>
+- `handler` [function]\([Locator]\):[Promise]&lt;[Object]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-option-handler"/><a href="#page-add-locator-handler-option-handler" class="list-anchor">#</a>
   
   Function that should be run once `locator` appears. This function should get rid of the element that blocks actions like click.
+- `options` [Object] *(optional)*
+  - `noWaitAfter` [boolean] *(optional)* <font size="2">Added in: v1.44</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-option-no-wait-after"/><a href="#page-add-locator-handler-option-no-wait-after" class="list-anchor">#</a>
+    
+    By default, after calling the handler Playwright will wait until the overlay becomes hidden, and only then Playwright will continue with the action/assertion that triggered the handler. This option allows to opt-out of this behavior, so that overlay can stay visible after the handler has run.
+  - `times` [number] *(optional)* <font size="2">Added in: v1.44</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-option-times"/><a href="#page-add-locator-handler-option-times" class="list-anchor">#</a>
+    
+    Specifies the maximum number of times this handler should be called. Unlimited by default.
 
 **Returns**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-return"/><a href="#page-add-locator-handler-return" class="list-anchor">#</a>
@@ -1463,6 +1475,28 @@ await page.reload(options);
 
 ---
 
+### removeLocatorHandler {#page-remove-locator-handler}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.44</font><x-search>page.removeLocatorHandler</x-search>
+
+Removes all locator handlers added by [page.addLocatorHandler()](/api/class-page.mdx#page-add-locator-handler) for a specific locator.
+
+**Usage**
+
+```js
+await page.removeLocatorHandler(locator);
+```
+
+**Arguments**
+- `locator` [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-remove-locator-handler-option-locator"/><a href="#page-remove-locator-handler-option-locator" class="list-anchor">#</a>
+  
+  Locator passed to [page.addLocatorHandler()](/api/class-page.mdx#page-add-locator-handler).
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-remove-locator-handler-return"/><a href="#page-remove-locator-handler-return" class="list-anchor">#</a>
+
+---
+
 ### route {#page-route}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.8</font><x-search>page.route</x-search>
@@ -1477,6 +1511,10 @@ The handler will only be called for the first url if the response is a redirect.
 
 :::note
 [page.route()](/api/class-page.mdx#page-route) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception by setting `Browser.newContext.serviceWorkers` to `'block'`.
+:::
+
+:::note
+[page.route()](/api/class-page.mdx#page-route) will not intercept the first request of a popup page. Use [browserContext.route()](/api/class-browsercontext.mdx#browser-context-route) instead.
 :::
 
 **Usage**
@@ -2021,6 +2059,10 @@ Returns when the required load state has been reached.
 
 This resolves when the page reaches a required load state, `load` by default. The navigation must have been committed when this method is called. If current document has already reached the required state, resolves immediately.
 
+:::note
+Most of the time, this method is not needed because Playwright [auto-waits before every action](../actionability.mdx).
+:::
+
 **Usage**
 
 ```js
@@ -2348,9 +2390,7 @@ Emitted when a JavaScript dialog appears, such as `alert`, `prompt`, `confirm` o
 **Usage**
 
 ```js
-page.on('dialog', dialog => {
-  dialog.accept();
-});
+page.on('dialog', dialog => dialog.accept());
 ```
 
 :::note
@@ -2520,7 +2560,7 @@ page.on('pageerror', data => {});
 
 Emitted when the page opens a new tab or window. This event is emitted in addition to the [browserContext.on('page')](/api/class-browsercontext.mdx#browser-context-event-page), but only for popups relevant to this page.
 
-The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup.
+The earliest moment that page is available is when it has navigated to the initial url. For example, when opening a popup with `window.open('http://example.com')`, this event will fire when the network request to "http://example.com" is done and its response has started loading in the popup. If you would like to route/listen to this network request, use [browserContext.route()](/api/class-browsercontext.mdx#browser-context-route) and [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) respectively instead of similar methods on the [Page].
 
 ```js
 // Start waiting for popup before clicking. Note no await.
@@ -2933,9 +2973,9 @@ await page.click(selector, options);
   - `force` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-click-option-force"/><a href="#page-click-option-force" class="list-anchor">#</a>
     
     Whether to bypass the [actionability](../actionability.mdx) checks. Defaults to `false`.
-  - `modifiers` [Array]&lt;"Alt"|"Control"|"Meta"|"Shift"&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-click-option-modifiers"/><a href="#page-click-option-modifiers" class="list-anchor">#</a>
+  - `modifiers` [Array]&lt;"Alt"|"Control"|"ControlOrMeta"|"Meta"|"Shift"&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-click-option-modifiers"/><a href="#page-click-option-modifiers" class="list-anchor">#</a>
     
-    Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used.
+    Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used. "ControlOrMeta" resolves to "Control" on Windows and Linux and to "Meta" on macOS.
   - `noWaitAfter` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-click-option-no-wait-after"/><a href="#page-click-option-no-wait-after" class="list-anchor">#</a>
     
     Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
@@ -3007,9 +3047,9 @@ await page.dblclick(selector, options);
   - `force` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-dblclick-option-force"/><a href="#page-dblclick-option-force" class="list-anchor">#</a>
     
     Whether to bypass the [actionability](../actionability.mdx) checks. Defaults to `false`.
-  - `modifiers` [Array]&lt;"Alt"|"Control"|"Meta"|"Shift"&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-dblclick-option-modifiers"/><a href="#page-dblclick-option-modifiers" class="list-anchor">#</a>
+  - `modifiers` [Array]&lt;"Alt"|"Control"|"ControlOrMeta"|"Meta"|"Shift"&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-dblclick-option-modifiers"/><a href="#page-dblclick-option-modifiers" class="list-anchor">#</a>
     
-    Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used.
+    Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used. "ControlOrMeta" resolves to "Control" on Windows and Linux and to "Meta" on macOS.
   - `noWaitAfter` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-dblclick-option-no-wait-after"/><a href="#page-dblclick-option-no-wait-after" class="list-anchor">#</a>
     
     Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
@@ -3262,9 +3302,9 @@ await page.hover(selector, options);
   - `force` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-hover-option-force"/><a href="#page-hover-option-force" class="list-anchor">#</a>
     
     Whether to bypass the [actionability](../actionability.mdx) checks. Defaults to `false`.
-  - `modifiers` [Array]&lt;"Alt"|"Control"|"Meta"|"Shift"&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-hover-option-modifiers"/><a href="#page-hover-option-modifiers" class="list-anchor">#</a>
+  - `modifiers` [Array]&lt;"Alt"|"Control"|"ControlOrMeta"|"Meta"|"Shift"&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-hover-option-modifiers"/><a href="#page-hover-option-modifiers" class="list-anchor">#</a>
     
-    Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used.
+    Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used. "ControlOrMeta" resolves to "Control" on Windows and Linux and to "Meta" on macOS.
   - `noWaitAfter` [boolean] *(optional)* <font size="2">Added in: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-hover-option-no-wait-after"/><a href="#page-hover-option-no-wait-after" class="list-anchor">#</a>
     
     Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
@@ -3649,7 +3689,7 @@ Focuses the element, and then uses [keyboard.down()](/api/class-keyboard.mdx#key
 
 `F1` - `F12`, `Digit0`- `Digit9`, `KeyA`- `KeyZ`, `Backquote`, `Minus`, `Equal`, `Backslash`, `Backspace`, `Tab`, `Delete`, `Escape`, `ArrowDown`, `End`, `Enter`, `Home`, `Insert`, `PageDown`, `PageUp`, `ArrowRight`, `ArrowUp`, etc.
 
-Following modification shortcuts are also supported: `Shift`, `Control`, `Alt`, `Meta`, `ShiftLeft`.
+Following modification shortcuts are also supported: `Shift`, `Control`, `Alt`, `Meta`, `ShiftLeft`, `ControlOrMeta`. `ControlOrMeta` resolves to `Control` on Windows and Linux and to `Meta` on macOS.
 
 Holding down `Shift` will type the text that corresponds to the `key` in the upper case.
 
@@ -3923,9 +3963,9 @@ await page.tap(selector, options);
   - `force` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-tap-option-force"/><a href="#page-tap-option-force" class="list-anchor">#</a>
     
     Whether to bypass the [actionability](../actionability.mdx) checks. Defaults to `false`.
-  - `modifiers` [Array]&lt;"Alt"|"Control"|"Meta"|"Shift"&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-tap-option-modifiers"/><a href="#page-tap-option-modifiers" class="list-anchor">#</a>
+  - `modifiers` [Array]&lt;"Alt"|"Control"|"ControlOrMeta"|"Meta"|"Shift"&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-tap-option-modifiers"/><a href="#page-tap-option-modifiers" class="list-anchor">#</a>
     
-    Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used.
+    Modifier keys to press. Ensures that only these modifiers are pressed during the operation, and then restores current modifiers back. If not specified, currently pressed modifiers are used. "ControlOrMeta" resolves to "Control" on Windows and Linux and to "Meta" on macOS.
   - `noWaitAfter` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-tap-option-no-wait-after"/><a href="#page-tap-option-no-wait-after" class="list-anchor">#</a>
     
     Actions that initiate navigations are waiting for these navigations to happen and for pages to start loading. You can opt out of waiting via setting this flag. You would only need this option in the exceptional cases such as navigating to inaccessible pages. Defaults to `false`.
@@ -4286,6 +4326,8 @@ await page.waitForTimeout(1000);
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [Worker]: /api/class-worker.mdx "Worker"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
+[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
+[FullProject]: /api/class-fullproject.mdx "FullProject"
 [Test]: /api/class-test.mdx "Test"
 [TestConfig]: /api/class-testconfig.mdx "TestConfig"
 [TestInfo]: /api/class-testinfo.mdx "TestInfo"
@@ -4318,6 +4360,7 @@ await page.waitForTimeout(1000);
 [Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
 [EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
 [function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
 [Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
 [Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
 [null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"

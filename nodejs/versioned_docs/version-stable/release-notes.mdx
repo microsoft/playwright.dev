@@ -9,6 +9,103 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 import LiteYouTube from '@site/src/components/LiteYouTube';
 
+## Version 1.44
+
+### New APIs
+
+**Accessibility assertions**
+- [expect(locator).toHaveAccessibleName()](/api/class-locatorassertions.mdx#locator-assertions-to-have-accessible-name) checks if the element has the specified accessible name:
+  
+  ```js
+  const locator = page.getByRole('button');
+  await expect(locator).toHaveAccessibleName('Submit');
+  ```
+  
+- [expect(locator).toHaveAccessibleDescription()](/api/class-locatorassertions.mdx#locator-assertions-to-have-accessible-description) checks if the element has the specified accessible description:
+  
+  ```js
+  const locator = page.getByRole('button');
+  await expect(locator).toHaveAccessibleName('Upload the photo');
+  ```
+  
+- [expect(locator).toHaveRole()](/api/class-locatorassertions.mdx#locator-assertions-to-have-role) checks if the element has the specified ARIA role:
+  
+  ```js
+  const locator = page.getByTestId('save-button');
+  await expect(locator).toHaveRole('button');
+  ```
+  
+**Locator handler**
+- After executing the handler added with [page.addLocatorHandler()](/api/class-page.mdx#page-add-locator-handler), Playwright will now wait until the overlay that triggered the handler is not visible anymore. You can opt-out of this behavior with the new `noWaitAfter` option.
+- You can use new `times` option in [page.addLocatorHandler()](/api/class-page.mdx#page-add-locator-handler) to specify maximum number of times the handler should be run.
+- The handler in [page.addLocatorHandler()](/api/class-page.mdx#page-add-locator-handler) now accepts the locator as argument.
+- New [page.removeLocatorHandler()](/api/class-page.mdx#page-remove-locator-handler) method for removing previously added locator handlers.
+
+```js
+const locator = page.getByText('This interstitial covers the button');
+await page.addLocatorHandler(locator, async overlay => {
+  await overlay.locator('#close').click();
+}, { times: 3, noWaitAfter: true });
+// Run your tests that can be interrupted by the overlay.
+// ...
+await page.removeLocatorHandler(locator);
+```
+
+**Miscellaneous options**
+- [`multipart`](./api/class-apirequestcontext#api-request-context-fetch-option-multipart) option in `apiRequestContext.fetch()` now accepts [`FormData`](https://developer.mozilla.org/en-US/docs/Web/API/FormData) and supports repeating fields with the same name.
+  
+  ```js
+  const formData = new FormData();
+  formData.append('file', new File(['let x = 2024;'], 'f1.js', { type: 'text/javascript' }));
+  formData.append('file', new File(['hello'], 'f2.txt', { type: 'text/plain' }));
+  context.request.post('https://example.com/uploadFiles', {
+    multipart: formData
+  });
+  ```
+  
+- `expect(callback).toPass({ intervals })` can now be configured by `expect.toPass.inervals` option globally in [testConfig.expect](/api/class-testconfig.mdx#test-config-expect) or per project in [testProject.expect](/api/class-testproject.mdx#test-project-expect).
+- `expect(page).toHaveURL(url)` now supports `ignoreCase` [option](./api/class-pageassertions#page-assertions-to-have-url-option-ignore-case).
+- [testProject.ignoreSnapshots](./api/class-testproject#test-project-ignore-snapshots) allows to configure  per project whether to skip screenshot expectations.
+
+**Reporter API**
+- New method [suite.entries()](/api/class-suite.mdx#suite-entries) returns child test suites and test cases in their declaration order. [suite.type](/api/class-suite.mdx#suite-type) and [testCase.type](/api/class-testcase.mdx#test-case-type) can be used to tell apart test cases and suites in the list.
+- [Blob](./test-reporters#blob-reporter) reporter now allows overriding report file path with a single option `outputFile`. The same option can also be specified as `PLAYWRIGHT_BLOB_OUTPUT_FILE` environment variable that might be more convenient on CI/CD.
+- [JUnit](./test-reporters#junit-reporter) reporter now supports `includeProjectInTestName` option.
+
+**Command line**
+- `--last-failed` CLI option to for running only tests that failed in the previous run.
+  
+  First run all tests:
+  
+  ```sh
+  $ npx playwright test
+  
+  Running 103 tests using 5 workers
+  ...
+  2 failed
+    [chromium] › my-test.spec.ts:8:5 › two ─────────────────────────────────────────────────────────
+    [chromium] › my-test.spec.ts:13:5 › three ──────────────────────────────────────────────────────
+  101 passed (30.0s)
+  ```
+  
+  Now fix the failing tests and run Playwright again with `--last-failed` option:
+  
+  ```sh
+  $ npx playwright test --last-failed
+  
+  Running 2 tests using 2 workers
+    2 passed (1.2s)
+  ```
+  
+### Browser Versions
+* Chromium 125.0.6422.14
+* Mozilla Firefox 125.0.1
+* WebKit 17.4
+
+This version was also tested against the following stable channels:
+* Google Chrome 124
+* Microsoft Edge 124
+
 ## Version 1.43
 
 ### New APIs
@@ -247,7 +344,7 @@ test('pass', async ({ page }) => {
 });
 ```
 
-See the documentation [for a full example](./test-assertions.mdx#add-custom-matchers-using-expectextend).
+See the documentation [for a full example](./test-assertions#add-custom-matchers-using-expectextend).
 
 ### Merge test fixtures
 
@@ -1556,7 +1653,7 @@ This version was also tested against the following stable channels:
 
 ### Locator Improvements
 - [locator.dragTo()](/api/class-locator.mdx#locator-drag-to)
-- [`expect(locator).toBeChecked({ checked })`](./test-assertions#locator-assertions-to-be-checked)
+- [`expect(locator).toBeChecked({ checked })`](./api/class-locatorassertions#locator-assertions-to-be-checked)
 - Each locator can now be optionally filtered by the text it contains:
   
   ```js
@@ -1700,7 +1797,7 @@ Playwright Trace Viewer is now **available online** at https://trace.playwright.
 - [`testInfo.parallelIndex`](./api/class-testinfo#test-info-parallel-index)
 - [`testInfo.titlePath`](./api/class-testinfo#test-info-title-path)
 - [`testOptions.trace`](./api/class-testoptions#test-options-trace) has new options
-- [`expect.toMatchSnapshot`](./test-assertions#expectvaluetomatchsnapshotname-options) supports subdirectories
+- [`expect.toMatchSnapshot`](./api/class-genericassertions.mdx) supports subdirectories
 - [`reporter.printsToStdio()`](./api/class-reporter#reporter-prints-to-stdio)
 
 ## Version 1.16
@@ -1956,25 +2053,25 @@ Playwright Test will be re-testing the node with the selector `.status` until fe
 By default, the timeout for assertions is not set, so it'll wait forever, until the whole test times out.
 
 List of all new assertions:
-- [`expect(locator).toBeChecked()`](./test-assertions#expectlocatortobechecked)
-- [`expect(locator).toBeDisabled()`](./test-assertions#expectlocatortobedisabled)
-- [`expect(locator).toBeEditable()`](./test-assertions#expectlocatortobeeditable)
-- [`expect(locator).toBeEmpty()`](./test-assertions#expectlocatortobeempty)
-- [`expect(locator).toBeEnabled()`](./test-assertions#expectlocatortobeenabled)
-- [`expect(locator).toBeFocused()`](./test-assertions#expectlocatortobefocused)
-- [`expect(locator).toBeHidden()`](./test-assertions#expectlocatortobehidden)
-- [`expect(locator).toBeVisible()`](./test-assertions#expectlocatortobevisible)
-- [`expect(locator).toContainText(text, options?)`](./test-assertions#expectlocatortocontaintexttext-options)
-- [`expect(locator).toHaveAttribute(name, value)`](./test-assertions#expectlocatortohaveattributename-value)
-- [`expect(locator).toHaveClass(expected)`](./test-assertions#expectlocatortohaveclassexpected)
-- [`expect(locator).toHaveCount(count)`](./test-assertions#expectlocatortohavecountcount)
-- [`expect(locator).toHaveCSS(name, value)`](./test-assertions#expectlocatortohavecssname-value)
-- [`expect(locator).toHaveId(id)`](./test-assertions#expectlocatortohaveidid)
-- [`expect(locator).toHaveJSProperty(name, value)`](./test-assertions#expectlocatortohavejspropertyname-value)
-- [`expect(locator).toHaveText(expected, options)`](./test-assertions#expectlocatortohavetextexpected-options)
-- [`expect(page).toHaveTitle(title)`](./test-assertions#expectpagetohavetitletitle)
-- [`expect(page).toHaveURL(url)`](./test-assertions#expectpagetohaveurlurl)
-- [`expect(locator).toHaveValue(value)`](./test-assertions#expectlocatortohavevaluevalue)
+- [`expect(locator).toBeChecked()`](./api/class-locatorassertions#locator-assertions-to-be-checked)
+- [`expect(locator).toBeDisabled()`](./api/class-locatorassertions#locator-assertions-to-be-disabled)
+- [`expect(locator).toBeEditable()`](./api/class-locatorassertions#locator-assertions-to-be-editable)
+- [`expect(locator).toBeEmpty()`](./api/class-locatorassertions#locator-assertions-to-be-empty)
+- [`expect(locator).toBeEnabled()`](./api/class-locatorassertions#locator-assertions-to-be-enabled)
+- [`expect(locator).toBeFocused()`](./api/class-locatorassertions#locator-assertions-to-be-focused)
+- [`expect(locator).toBeHidden()`](./api/class-locatorassertions#locator-assertions-to-be-hidden)
+- [`expect(locator).toBeVisible()`](./api/class-locatorassertions#locator-assertions-to-be-visible)
+- [`expect(locator).toContainText(text, options?)`](./api/class-locatorassertions#locator-assertions-to-contain-text)
+- [`expect(locator).toHaveAttribute(name, value)`](./api/class-locatorassertions#locator-assertions-to-have-attribute)
+- [`expect(locator).toHaveClass(expected)`](./api/class-locatorassertions#locator-assertions-to-have-class)
+- [`expect(locator).toHaveCount(count)`](./api/class-locatorassertions#locator-assertions-to-have-count)
+- [`expect(locator).toHaveCSS(name, value)`](./api/class-locatorassertions#locator-assertions-to-have-css)
+- [`expect(locator).toHaveId(id)`](./api/class-locatorassertions#locator-assertions-to-have-id)
+- [`expect(locator).toHaveJSProperty(name, value)`](./api/class-locatorassertions#locator-assertions-to-have-js-property)
+- [`expect(locator).toHaveText(expected, options)`](./api/class-locatorassertions#locator-assertions-to-have-text)
+- [`expect(page).toHaveTitle(title)`](./api/class-pageassertions#page-assertions-to-have-title)
+- [`expect(page).toHaveURL(url)`](./api/class-pageassertions#page-assertions-to-have-url)
+- [`expect(locator).toHaveValue(value)`](./api/class-locatorassertions#locator-assertions-to-have-value)
 
 #### ⛓ Serial mode with [`describe.serial`](./api/class-test#test-describe-serial)
 
@@ -2010,7 +2107,7 @@ Step information is exposed in reporters API.
 
 #### 🌎 Launch web server before running tests
 
-To launch a server during the tests, use the [`webServer`](./test-webserver) option in the configuration file. The server will wait for a given url to be available before running the tests, and the url will be passed over to Playwright as a [`baseURL`](./api/class-fixtures#fixtures-base-url) when creating a context.
+To launch a server during the tests, use the [`webServer`](./test-webserver) option in the configuration file. The server will wait for a given url to be available before running the tests, and the url will be passed over to Playwright as a [`baseURL`](./api/class-testoptions#test-options-base-url) when creating a context.
 
 ```ts title="playwright.config.ts"
 import { defineConfig } from '@playwright/test';
@@ -2035,7 +2132,7 @@ Learn more in the [documentation](./test-webserver).
 
 #### Playwright Test
 - **⚡️ Introducing [Reporter API](https://github.com/microsoft/playwright/blob/65a9037461ffc15d70cdc2055832a0c5512b227c/packages/playwright-test/types/testReporter.d.ts)** which is already used to create an [Allure Playwright reporter](https://github.com/allure-framework/allure-js/pull/297).
-- **⛺️ New [`baseURL` fixture](./test-configuration#basic-options)** to support relative paths in tests.
+- **⛺️ New [`baseURL` fixture](./test-configuration#basic-configuration)** to support relative paths in tests.
 
 #### Playwright
 - **🖖 Programmatic drag-and-drop support** via the [page.dragAndDrop()](/api/class-page.mdx#page-drag-and-drop) API.
@@ -2315,6 +2412,8 @@ This version of Playwright was also tested against the following stable channels
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [Worker]: /api/class-worker.mdx "Worker"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
+[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
+[FullProject]: /api/class-fullproject.mdx "FullProject"
 [Test]: /api/class-test.mdx "Test"
 [TestConfig]: /api/class-testconfig.mdx "TestConfig"
 [TestInfo]: /api/class-testinfo.mdx "TestInfo"
@@ -2347,6 +2446,7 @@ This version of Playwright was also tested against the following stable channels
 [Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
 [EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
 [function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
 [Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
 [Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
 [null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
