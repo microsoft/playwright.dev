@@ -7,7 +7,7 @@ import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
 
-Playwright Test provides many options to configure how your tests are collected and executed, for example `timeout` or `testDir`. These options are described in the [TestConfig] object in the [configuration file](../test-configuration.mdx).
+Playwright Test provides many options to configure how your tests are collected and executed, for example `timeout` or `testDir`. These options are described in the [TestConfig] object in the [configuration file](../test-configuration.mdx). This type describes format of the configuration file, to access resolved configuration parameters at run time use [FullConfig].
 
 Playwright Test supports running multiple test projects at the same time. Project-specific options should be put to [testConfig.projects](/api/class-testconfig.mdx#test-config-projects), but top-level [TestConfig] can also define base options shared between all projects.
 
@@ -80,45 +80,48 @@ export default defineConfig({
     
     Default timeout for async expect matchers in milliseconds, defaults to 5000ms.
   - `toHaveScreenshot` [Object] *(optional)*
-    - `threshold` [number] *(optional)*
-      
-      an acceptable perceived color difference between the same pixel in compared images, ranging from `0` (strict) and `1` (lax). `"pixelmatch"` comparator computes color difference in [YIQ color space](https://en.wikipedia.org/wiki/YIQ) and defaults `threshold` value to `0.2`.
-    - `maxDiffPixels` [number] *(optional)*
-      
-      an acceptable amount of pixels that could be different, unset by default.
-    - `maxDiffPixelRatio` [number] *(optional)*
-      
-      an acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1` , unset by default.
     - `animations` "allow"|"disabled" *(optional)*
       
       See `animations` in [page.screenshot()](/api/class-page.mdx#page-screenshot). Defaults to `"disabled"`.
     - `caret` "hide"|"initial" *(optional)*
       
       See `caret` in [page.screenshot()](/api/class-page.mdx#page-screenshot). Defaults to `"hide"`.
+    - `maxDiffPixels` [number] *(optional)*
+      
+      An acceptable amount of pixels that could be different, unset by default.
+    - `maxDiffPixelRatio` [number] *(optional)*
+      
+      An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1` , unset by default.
     - `scale` "css"|"device" *(optional)*
       
       See `scale` in [page.screenshot()](/api/class-page.mdx#page-screenshot). Defaults to `"css"`.
     - `stylePath` [string]|[Array]&lt;[string]&gt; *(optional)*
       
       See `style` in [page.screenshot()](/api/class-page.mdx#page-screenshot).
+    - `threshold` [number] *(optional)*
+      
+      An acceptable perceived color difference between the same pixel in compared images, ranging from `0` (strict) and `1` (lax). `"pixelmatch"` comparator computes color difference in [YIQ color space](https://en.wikipedia.org/wiki/YIQ) and defaults `threshold` value to `0.2`.
     
     Configuration for the [expect(page).toHaveScreenshot()](/api/class-pageassertions.mdx#page-assertions-to-have-screenshot-1) method.
   - `toMatchSnapshot` [Object] *(optional)*
-    - `threshold` [number] *(optional)*
-      
-      an acceptable perceived color difference between the same pixel in compared images, ranging from `0` (strict) and `1` (lax). `"pixelmatch"` comparator computes color difference in [YIQ color space](https://en.wikipedia.org/wiki/YIQ) and defaults `threshold` value to `0.2`.
     - `maxDiffPixels` [number] *(optional)*
       
-      an acceptable amount of pixels that could be different, unset by default.
+      An acceptable amount of pixels that could be different, unset by default.
     - `maxDiffPixelRatio` [number] *(optional)*
       
-      an acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1` , unset by default.
+      An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1` , unset by default.
+    - `threshold` [number] *(optional)*
+      
+      An acceptable perceived color difference between the same pixel in compared images, ranging from `0` (strict) and `1` (lax). `"pixelmatch"` comparator computes color difference in [YIQ color space](https://en.wikipedia.org/wiki/YIQ) and defaults `threshold` value to `0.2`.
     
     Configuration for the [expect(value).toMatchSnapshot()](/api/class-snapshotassertions.mdx#snapshot-assertions-to-match-snapshot-1) method.
   - `toPass` [Object] *(optional)*
+    - `intervals` [Array]&lt;[number]&gt; *(optional)*
+      
+      Probe intervals for toPass method in milliseconds.
     - `timeout` [number] *(optional)*
       
-      timeout for toPass method in milliseconds.
+      Timeout for toPass method in milliseconds.
     
     Configuration for the [expect(value).toPass()](../test-assertions.mdx#expecttopass) method.
 
@@ -172,7 +175,7 @@ export default defineConfig({
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testConfig.globalSetup</x-search>
 
-Path to the global setup file. This file will be required and run before all the tests. It must export a single function that takes a [`TestConfig`] argument.
+Path to the global setup file. This file will be required and run before all the tests. It must export a single function that takes a [FullConfig] argument.
 
 Learn more about [global setup and teardown](../test-global-setup-teardown.mdx).
 
@@ -599,12 +602,12 @@ export default defineConfig({
 
 **Type**
 - [null]|[Object]
-  - `total` [number]
-    
-    The total number of shards.
   - `current` [number]
     
     The index of the shard to execute, one-based.
+  - `total` [number]
+    
+    The total number of shards.
 
 ---
 
@@ -654,13 +657,17 @@ test.describe('suite', () => {
 ```
 
 The list of supported tokens:
-* `{testDir}` - Project's [testConfig.testDir](/api/class-testconfig.mdx#test-config-test-dir).
-  * Value: `/home/playwright/tests` (absolute path is since `testDir` is resolved relative to directory with config)
-* `{snapshotDir}` - Project's [testConfig.snapshotDir](/api/class-testconfig.mdx#test-config-snapshot-dir).
-  * Value: `/home/playwright/tests` (since `snapshotDir` is not provided in config, it defaults to `testDir`)
+* `{arg}` - Relative snapshot path **without extension**. These come from the arguments passed to the `toHaveScreenshot()` and `toMatchSnapshot()` calls; if called without arguments, this will be an auto-generated snapshot name.
+  * Value: `foo/bar/baz`
+* `{ext}` - snapshot extension (with dots)
+  * Value: `.png`
 * `{platform}` - The value of `process.platform`.
 * `{projectName}` - Project's file-system-sanitized name, if any.
   * Value: `''` (empty string).
+* `{snapshotDir}` - Project's [testConfig.snapshotDir](/api/class-testconfig.mdx#test-config-snapshot-dir).
+  * Value: `/home/playwright/tests` (since `snapshotDir` is not provided in config, it defaults to `testDir`)
+* `{testDir}` - Project's [testConfig.testDir](/api/class-testconfig.mdx#test-config-test-dir).
+  * Value: `/home/playwright/tests` (absolute path is since `testDir` is resolved relative to directory with config)
 * `{testFileDir}` - Directories in relative path from `testDir` to **test file**.
   * Value: `page`
 * `{testFileName}` - Test file name with extension.
@@ -669,10 +676,6 @@ The list of supported tokens:
   * Value: `page/page-click.spec.ts`
 * `{testName}` - File-system-sanitized test title, including parent describes but excluding file name.
   * Value: `suite-test-should-work`
-* `{arg}` - Relative snapshot path **without extension**. These come from the arguments passed to the `toHaveScreenshot()` and `toMatchSnapshot()` calls; if called without arguments, this will be an auto-generated snapshot name.
-  * Value: `foo/bar/baz`
-* `{ext}` - snapshot extension (with dots)
-  * Value: `.png`
 
 Each token can be preceded with a single character that will be used **only if** this token has non-empty value.
 
@@ -902,18 +905,18 @@ export default defineConfig({
   - `command` [string]
     
     Shell command to start. For example `npm run start`..
-  - `port` [number] *(optional)*
+  - `cwd` [string] *(optional)*
     
-    The port that your http server is expected to appear on. It does wait until it accepts connections. Either `port` or `url` should be specified.
-  - `url` [string] *(optional)*
+    Current working directory of the spawned process, defaults to the directory of the configuration file.
+  - `env` [Object]&lt;[string], [string]&gt; *(optional)*
     
-    The url on your http server that is expected to return a 2xx, 3xx, 400, 401, 402, or 403 status code when the server is ready to accept connections. Redirects (3xx status codes) are being followed and the new location is checked. Either `port` or `url` should be specified.
+    Environment variables to set for the command, `process.env` by default.
   - `ignoreHTTPSErrors` [boolean] *(optional)*
     
     Whether to ignore HTTPS errors when fetching the `url`. Defaults to `false`.
-  - `timeout` [number] *(optional)*
+  - `port` [number] *(optional)*
     
-    How long to wait for the process to start up and be available in milliseconds. Defaults to 60000.
+    The port that your http server is expected to appear on. It does wait until it accepts connections. Either `port` or `url` should be specified.
   - `reuseExistingServer` [boolean] *(optional)*
     
     If true, it will re-use an existing server on the `port` or `url` when available. If no server is running on that `port` or `url`, it will run the command to start a new server. If `false`, it will throw if an existing process is listening on the `port` or `url`. This should be commonly set to `!process.env.CI` to allow the local dev server when running tests locally.
@@ -923,12 +926,12 @@ export default defineConfig({
   - `stderr` "pipe"|"ignore" *(optional)*
     
     Whether to pipe the stderr of the command to the process stderr or ignore it. Defaults to `"pipe"`.
-  - `cwd` [string] *(optional)*
+  - `timeout` [number] *(optional)*
     
-    Current working directory of the spawned process, defaults to the directory of the configuration file.
-  - `env` [Object]&lt;[string], [string]&gt; *(optional)*
+    How long to wait for the process to start up and be available in milliseconds. Defaults to 60000.
+  - `url` [string] *(optional)*
     
-    Environment variables to set for the command, `process.env` by default.
+    The url on your http server that is expected to return a 2xx, 3xx, 400, 401, 402, or 403 status code when the server is ready to accept connections. Redirects (3xx status codes) are being followed and the new location is checked. Either `port` or `url` should be specified.
 
 **Details**
 
@@ -1053,6 +1056,8 @@ This path will serve as the base directory for each test file snapshot directory
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [Worker]: /api/class-worker.mdx "Worker"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
+[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
+[FullProject]: /api/class-fullproject.mdx "FullProject"
 [Test]: /api/class-test.mdx "Test"
 [TestConfig]: /api/class-testconfig.mdx "TestConfig"
 [TestInfo]: /api/class-testinfo.mdx "TestInfo"
@@ -1085,6 +1090,7 @@ This path will serve as the base directory for each test file snapshot directory
 [Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
 [EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
 [function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
 [Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
 [Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
 [null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
