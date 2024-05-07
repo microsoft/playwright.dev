@@ -7,7 +7,7 @@ import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
 
-Playwright Test supports running multiple test projects at the same time. This is useful for running tests in multiple configurations. For example, consider running tests against multiple browsers.
+Playwright Test supports running multiple test projects at the same time. This is useful for running tests in multiple configurations. For example, consider running tests against multiple browsers. This type describes format of a project in the configuration file, to access resolved configuration parameters at run time use [FullProject].
 
 `TestProject` encapsulates configuration specific to a single project. Projects are configured in [testConfig.projects](/api/class-testconfig.mdx#test-config-projects) specified in the [configuration file](../test-configuration.mdx). Note that all properties of [TestProject] are available in the top-level [TestConfig], in which case they are shared between all projects.
 
@@ -156,6 +156,9 @@ testProject.expect
     - `timeout` [number] *(optional)*
       
       timeout for toPass method in milliseconds.
+    - `intervals` [Array]&lt;[number]&gt; *(optional)*
+      
+      probe intervals for toPass method in milliseconds.
     
     Configuration for the [expect(value).toPass()](../test-assertions.mdx) method.
 
@@ -215,6 +218,44 @@ testProject.grepInvert
 
 **Type**
 - [RegExp]|[Array]&lt;[RegExp]&gt;
+
+---
+
+### ignoreSnapshots {#test-project-ignore-snapshots}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.44</font><x-search>testProject.ignoreSnapshots</x-search>
+
+Whether to skip snapshot expectations, such as `expect(value).toMatchSnapshot()` and `await expect(page).toHaveScreenshot()`.
+
+**Usage**
+
+The following example will only perform screenshot assertions on Chromium.
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  projects: [
+    {
+      name: 'chromium',
+      use: devices['Desktop Chrome'],
+    },
+    {
+      name: 'firefox',
+      use: devices['Desktop Firefox'],
+      ignoreSnapshots: true,
+    },
+    {
+      name: 'webkit',
+      use: devices['Desktop Safari'],
+      ignoreSnapshots: true,
+    },
+  ],
+});
+```
+
+**Type**
+- [boolean]
 
 ---
 
@@ -392,13 +433,17 @@ test.describe('suite', () => {
 ```
 
 The list of supported tokens:
-* `{testDir}` - Project's [testConfig.testDir](/api/class-testconfig.mdx#test-config-test-dir).
-  * Value: `/home/playwright/tests` (absolute path is since `testDir` is resolved relative to directory with config)
-* `{snapshotDir}` - Project's [testConfig.snapshotDir](/api/class-testconfig.mdx#test-config-snapshot-dir).
-  * Value: `/home/playwright/tests` (since `snapshotDir` is not provided in config, it defaults to `testDir`)
+* `{arg}` - Relative snapshot path **without extension**. These come from the arguments passed to the `toHaveScreenshot()` and `toMatchSnapshot()` calls; if called without arguments, this will be an auto-generated snapshot name.
+  * Value: `foo/bar/baz`
+* `{ext}` - snapshot extension (with dots)
+  * Value: `.png`
 * `{platform}` - The value of `process.platform`.
 * `{projectName}` - Project's file-system-sanitized name, if any.
   * Value: `''` (empty string).
+* `{snapshotDir}` - Project's [testConfig.snapshotDir](/api/class-testconfig.mdx#test-config-snapshot-dir).
+  * Value: `/home/playwright/tests` (since `snapshotDir` is not provided in config, it defaults to `testDir`)
+* `{testDir}` - Project's [testConfig.testDir](/api/class-testconfig.mdx#test-config-test-dir).
+  * Value: `/home/playwright/tests` (absolute path is since `testDir` is resolved relative to directory with config)
 * `{testFileDir}` - Directories in relative path from `testDir` to **test file**.
   * Value: `page`
 * `{testFileName}` - Test file name with extension.
@@ -407,10 +452,6 @@ The list of supported tokens:
   * Value: `page/page-click.spec.ts`
 * `{testName}` - File-system-sanitized test title, including parent describes but excluding file name.
   * Value: `suite-test-should-work`
-* `{arg}` - Relative snapshot path **without extension**. These come from the arguments passed to the `toHaveScreenshot()` and `toMatchSnapshot()` calls; if called without arguments, this will be an auto-generated snapshot name.
-  * Value: `foo/bar/baz`
-* `{ext}` - snapshot extension (with dots)
-  * Value: `.png`
 
 Each token can be preceded with a single character that will be used **only if** this token has non-empty value.
 
@@ -691,6 +732,8 @@ testProject.use
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [Worker]: /api/class-worker.mdx "Worker"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
+[FullConfig]: /api/class-fullconfig.mdx "FullConfig"
+[FullProject]: /api/class-fullproject.mdx "FullProject"
 [Test]: /api/class-test.mdx "Test"
 [TestConfig]: /api/class-testconfig.mdx "TestConfig"
 [TestInfo]: /api/class-testinfo.mdx "TestInfo"
@@ -723,6 +766,7 @@ testProject.use
 [Error]: https://nodejs.org/api/errors.html#errors_class_error "Error"
 [EventEmitter]: https://nodejs.org/api/events.html#events_class_eventemitter "EventEmitter"
 [function]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Function "Function"
+[FormData]: https://developer.mozilla.org/en-US/docs/Web/API/FormData "FormData"
 [Map]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Map "Map"
 [Metadata]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Object "Object&lt;string, any&gt;"
 [null]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/null "null"
