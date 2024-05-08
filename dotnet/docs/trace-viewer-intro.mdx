@@ -34,7 +34,7 @@ public class Tests : PageTest
     {
         await Context.Tracing.StartAsync(new()
         {
-            Title = TestContext.CurrentContext.Test.ClassName + "." + TestContext.CurrentContext.Test.Name,
+            Title = $"{TestContext.CurrentContext.Test.ClassName}.{TestContext.CurrentContext.Test.Name}",
             Screenshots = true,
             Snapshots = true,
             Sources = true
@@ -81,7 +81,7 @@ public class ExampleTest : PageTest
     {
          await Context.Tracing.StartAsync(new()
         {
-            Title = TestContext.CurrentContext.Test.ClassName + "." + TestContext.
+            Title = $"{TestContext.FullyQualifiedTestClassName}.{TestContext.TestName}",
             Screenshots = true,
             Snapshots = true,
             Sources = true
@@ -96,7 +96,7 @@ public class ExampleTest : PageTest
             Path = Path.Combine(
                 Environment.CurrentDirectory,
                 "playwright-traces",
-                $"{TestContext.CurrentContext.Test.ClassName}.{TestContext.CurrentContext.Test.Name}.zip"
+                $"{TestContext.FullyQualifiedTestClassName}.{TestContext.TestName}.zip"
             )
         });
     }
@@ -123,8 +123,75 @@ You can open the saved trace using the Playwright CLI or in your browser on [`tr
 pwsh bin/Debug/net8.0/playwright.ps1 show-trace bin/Debug/net8.0/playwright-traces/PlaywrightTests.ExampleTest.GetStartedLink.zip
 ```
 
-###### 
 ![playwright trace viewer dotnet](https://github.com/microsoft/playwright/assets/13063165/4372d661-5bfa-4e1f-be65-0d2fe165a75c)
+
+## Run trace only on failure
+
+<Tabs groupId="test-runners" defaultValue="nunit" values={[ {label: 'NUnit', value: 'nunit'}, {label: 'MSTest', value: 'mstest'} ] }>
+
+<TabItem value="nunit">
+
+```csharp
+namespace PlaywrightTests;
+
+[Parallelizable(ParallelScope.Self)]
+[TestFixture]
+public class ExampleTest : PageTest
+{
+    // ...
+    [TearDown]
+    public async Task TearDown()
+    {
+        var failed = TestContext.CurrentContext.Result.Outcome == NUnit.Framework.Interfaces.ResultState.Error 
+            || TestContext.CurrentContext.Result.Outcome == NUnit.Framework.Interfaces.ResultState.Failure;
+
+        await Context.Tracing.StopAsync(new() 
+        { 
+            Path = failed ? Path.Combine( 
+                TestContext.CurrentContext.WorkDirectory, 
+                "playwright-traces", 
+                $"{TestContext.CurrentContext.Test.ClassName}.{TestContext.CurrentContext.Test.Name}.zip" 
+            ) : null, 
+        });
+    }
+}
+```
+
+</TabItem>
+
+<TabItem value="mstest">
+
+```csharp
+using System.Text.RegularExpressions;
+using Microsoft.Playwright;
+using Microsoft.Playwright.MSTest;
+
+namespace PlaywrightTests;
+
+[TestClass]
+public class ExampleTest : PageTest
+{
+    // ...
+    [TestCleanup]
+    public async Task TestCleanup()
+    {
+        var failed = new[] { UnitTestOutcome.Failed, UnitTestOutcome.Error, UnitTestOutcome.Timeout, UnitTestOutcome.Aborted }.Contains(TestContext.CurrentTestOutcome);
+
+        await Context.Tracing.StopAsync(new() 
+        { 
+            Path = failed ? Path.Combine( 
+                Environment.CurrentDirectory, 
+                "playwright-traces", 
+                $"{TestContext.FullyQualifiedTestClassName}.{TestContext.TestName}.zip" 
+            ) : null 
+        });
+    }
+}
+```
+
+</TabItem>
+
+</Tabs>
 
 To learn more check out our detailed guide on [Trace Viewer](/trace-viewer.mdx).
 
