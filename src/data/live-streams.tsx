@@ -1,5 +1,13 @@
 const liveStreams = [
   {
+    title: 'Community, latest release and more',
+    description: '',
+    id: 'ySBp6Kj0PVc',
+    year: '2024',
+    host: 'Playwright Live',
+    speakers: ["Debbie O'Brien", "Ben Fellows"]
+  },
+  {
     title: 'Deconstruct the E2E Workflow for Testing and Deployment',
     description: '',
     id: 'FGDQIDtddsY',
