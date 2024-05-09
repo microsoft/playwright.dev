@@ -581,6 +581,100 @@ await page.mouse.up()
 If your page relies on the `dragover` event being dispatched, you need at least two mouse moves to trigger it in all browsers. To reliably issue the second mouse move, repeat your [mouse.move()](/api/class-mouse.mdx#mouse-move) or [locator.hover()](/api/class-locator.mdx#locator-hover) twice. The sequence of operations would be: hover the drag element, mouse down, hover the drop element, hover the drop element second time, mouse up.
 :::
 
+## Scrolling
+
+Most of the time, Playwright will automatically scroll for you before doing any actions. Therefore, you do not need to scroll explicitly.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Scrolls automatically so that button is visible
+page.get_by_role("button").click()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Scrolls automatically so that button is visible
+await page.get_by_role("button").click()
+```
+
+</TabItem>
+</Tabs>
+
+However, in rare cases you might need to manually scroll. For example, you might want to force an "infinite list" to load more elements, or position the page for a specific screenshot. In such a case, the most reliable way is to find an element that you want to make visible at the bottom, and scroll it into view.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Scroll the footer into view, forcing an "infinite list" to load more content
+page.get_by_text("Footer text").scroll_into_view_if_needed()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Scroll the footer into view, forcing an "infinite list" to load more content
+await page.get_by_text("Footer text").scroll_into_view_if_needed()
+```
+
+</TabItem>
+</Tabs>
+
+If you would like to control the scrolling more precisely, use [mouse.wheel()](/api/class-mouse.mdx#mouse-wheel) or [locator.evaluate()](/api/class-locator.mdx#locator-evaluate):
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Position the mouse and scroll with the mouse wheel
+page.get_by_test_id("scrolling-container").hover()
+page.mouse.wheel(0, 10)
+
+# Alternatively, programmatically scroll a specific element
+page.get_by_test_id("scrolling-container").evaluate("e => e.scrollTop += 100")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Position the mouse and scroll with the mouse wheel
+await page.get_by_test_id("scrolling-container").hover()
+await page.mouse.wheel(0, 10)
+
+# Alternatively, programmatically scroll a specific element
+await page.get_by_test_id("scrolling-container").evaluate("e => e.scrollTop += 100")
+```
+
+</TabItem>
+</Tabs>
+
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
