@@ -5,7 +5,7 @@ const liveStreams = [
     id: 'ySBp6Kj0PVc',
     year: '2024',
     host: 'Playwright Live',
-    speakers: ["Debbie O'Brien, Ben Fellows"]
+    speakers: ["Debbie O'Brien", "Ben Fellows"]
   },
   {
     title: 'Deconstruct the E2E Workflow for Testing and Deployment',
