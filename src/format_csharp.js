@@ -101,7 +101,9 @@ class CSharpFormatter {
       return "[Action]<" + args + ">";
     if (type.returnType.name === 'boolean')
       return "[Func]<" + args + ", bool>";
-    throw new Error('Unknown C# type for function: ' + type);
+    if (type.args?.[0].name === 'Locator' && type.returnType.name === 'Promise')
+      return `[Func]<[Locator], [Task]>`;
+    throw new Error('Unknown C# type for function: ' + JSON.stringify(type));
   }
 
   formatPromise(text) {
