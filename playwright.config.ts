@@ -62,7 +62,7 @@ const config = defineConfig({
   webServer: {
     command: 'npx http-server -p 3000 build/',
     port: 3000,
-    reuseExistingServer: true
+    reuseExistingServer: !process.env.CI,
   },
 });
 

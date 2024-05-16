@@ -1,5 +1,3 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
 import { test, expect } from '@playwright/test';
 import AxeBuilder from '@axe-core/playwright';
 import { exportAxeAsSarifTestResult } from './export-to-sarif';
@@ -16,8 +14,7 @@ test.describe('[passing examples] index.html', () => {
         .withTags(['wcag2a', 'wcag2aa', 'wcag21a', 'wcag21aa'])
         .analyze();
 
-      await exportAxeAsSarifTestResult('index-h1-element.sarif', accessibilityScanResults);
-
+      await exportAxeAsSarifTestResult('axe.sarif', accessibilityScanResults);
       expect(accessibilityScanResults.violations).toEqual([]);
     });
   }

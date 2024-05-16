@@ -1,5 +1,3 @@
-// Copyright (c) Microsoft Corporation. All rights reserved.
-// Licensed under the MIT License.
 import * as Axe from 'axe-core';
 import { convertAxeToSarif } from 'axe-sarif-converter';
 import * as fs from 'fs';
