@@ -624,7 +624,7 @@ ${this.documentation.renderLinksInText(member.discouraged)}
           return `\`enum ${type.name} { ${union.map(l => sanitizeLiteral(l.name)).join(', ')} }${member.required ? '' : '?'}\``;
         }
       }
-      return union.map(l => this.renderType(l, direction, member)).join('|');
+      return union.map(l => this.renderType(l, direction, member)).join(' | ');
     }
     const result = this.formatter.formatArrayType?.(type, direction, member);
     if (result)
