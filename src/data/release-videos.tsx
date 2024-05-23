@@ -1,5 +1,10 @@
 const releaseVideos = [
   {
+    version: '1.44',
+    id: "avjSahFWdCI",
+    highlights: ['VS Code extension', 'accessibility assertions', 'last failed test', 'clear cookies', 'locator handler'],
+  },
+  {
     version: '1.41 & 1.42',
     id: "KjSaIQLlgns",
     highlights: ['new tag and annotation syntax', 'screenshot styling', 'locator handler'],
