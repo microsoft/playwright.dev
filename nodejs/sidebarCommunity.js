@@ -36,6 +36,11 @@ module.exports = {
     },
     {
       type: 'link',
+      label: "Learn Playwright",
+      href: "https://learn.microsoft.com/en-us/training/modules/build-with-playwright/",
+    },
+    {
+      type: 'link',
       label: "Blog",
       href: "https://dev.to/playwright",
     },
