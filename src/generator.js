@@ -95,7 +95,6 @@ class Generator {
       .mergeWith(parseApi(path.join(srcDir, 'test-api'), path.join(srcDir, 'api', 'params.md')))
       .mergeWith(parseApi(path.join(srcDir, 'test-reporter-api')));
     this.documentation.filterForLanguage(lang, { csharpOptionOverloadsShortNotation: true });
-    this.documentation.filterOutExperimental();
     this.documentation.setLinkRenderer(item => {
       const { clazz, member, param, option, href } = item;
       if (param)
