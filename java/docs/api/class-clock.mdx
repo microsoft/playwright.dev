@@ -1,0 +1,202 @@
+---
+id: class-clock
+title: "Clock"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import HTMLCard from '@site/src/components/HTMLCard';
+
+
+Playwright uses [@sinonjs/fake-timers](https://github.com/sinonjs/fake-timers) for clock emulation. Clock is installed for the entire [BrowserContext], so the time in all the pages and iframes is controlled by the same clock.
+
+
+---
+
+## Methods
+
+### install {#clock-install}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.install</x-search>
+
+Creates a clock and installs it globally.
+
+**Usage**
+
+```java
+Clock.install();
+Clock.install(options);
+```
+
+**Arguments**
+- `options` `Clock.InstallOptions` *(optional)*
+  - `setAdvanceTimeDelta` [int] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-option-advance-time-delta"/><a href="#clock-install-option-advance-time-delta" class="list-anchor">#</a>
+    
+    Relevant only when using with `shouldAdvanceTime`. Increment mocked time by advanceTimeDelta ms every advanceTimeDelta ms change in the real system time (default: 20).
+  - `setLoopLimit` [int] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-option-loop-limit"/><a href="#clock-install-option-loop-limit" class="list-anchor">#</a>
+    
+    The maximum number of timers that will be run when calling  [Clock.runAll()](/api/class-clock.mdx#clock-run-all). Defaults to `1000`.
+  - `setNow` [int] | [Date] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-option-now"/><a href="#clock-install-option-now" class="list-anchor">#</a>
+    
+    Install fake timers with the specified unix epoch (default: 0).
+  - `setShouldAdvanceTime` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-option-should-advance-time"/><a href="#clock-install-option-should-advance-time" class="list-anchor">#</a>
+    
+    Tells `@sinonjs/fake-timers` to increment mocked time automatically based on the real system time shift (e.g., the mocked time will be incremented by 20ms for every 20ms change in the real system time). Defaults to `false`.
+  - `setToFake` [List]&lt;`enum FakeMethod { SETTIMEOUT, CLEARTIMEOUT, SETINTERVAL, CLEARINTERVAL, DATE, REQUESTANIMATIONFRAME, CANCELANIMATIONFRAME, REQUESTIDLECALLBACK, CANCELIDLECALLBACK, PERFORMANCE }`&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-option-to-fake"/><a href="#clock-install-option-to-fake" class="list-anchor">#</a>
+    
+    An array with names of global methods and APIs to fake. For instance, `await page.clock.install({ toFake: ['setTimeout'] })` will fake only `setTimeout()`. By default, `setTimeout`, `clearTimeout`, `setInterval`, `clearInterval` and `Date` are faked.
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-return"/><a href="#clock-install-return" class="list-anchor">#</a>
+
+---
+
+### jump {#clock-jump}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.jump</x-search>
+
+Advance the clock by jumping forward in time, firing callbacks at most once. Returns fake milliseconds since the unix epoch. This can be used to simulate the JS engine (such as a browser) being put to sleep and resumed later, skipping intermediary timers.
+
+**Usage**
+
+```java
+Clock.jump(time);
+```
+
+**Arguments**
+- `time` [int] | [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-jump-option-time"/><a href="#clock-jump-option-time" class="list-anchor">#</a>
+  
+  Time may be the number of milliseconds to advance the clock by or a human-readable string. Valid string formats are "08" for eight seconds, "01:00" for one minute and "02:34:10" for two hours, 34 minutes and ten seconds.
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-jump-return"/><a href="#clock-jump-return" class="list-anchor">#</a>
+
+---
+
+### runAll {#clock-run-all}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.runAll</x-search>
+
+Runs all pending timers until there are none remaining. If new timers are added while it is executing they will be run as well. This makes it easier to run asynchronous tests to completion without worrying about the number of timers they use, or the delays in those timers. It runs a maximum of `loopLimit` times after which it assumes there is an infinite loop of timers and throws an error.
+
+**Usage**
+
+```java
+Clock.runAll();
+```
+
+**Returns**
+- [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-run-all-return"/><a href="#clock-run-all-return" class="list-anchor">#</a>
+
+---
+
+### runToLast {#clock-run-to-last}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.runToLast</x-search>
+
+This takes note of the last scheduled timer when it is run, and advances the clock to that time firing callbacks as necessary. If new timers are added while it is executing they will be run only if they would occur before this time. This is useful when you want to run a test to completion, but the test recursively sets timers that would cause runAll to trigger an infinite loop warning.
+
+**Usage**
+
+```java
+Clock.runToLast();
+```
+
+**Returns**
+- [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-run-to-last-return"/><a href="#clock-run-to-last-return" class="list-anchor">#</a>
+
+---
+
+### tick {#clock-tick}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.tick</x-search>
+
+Advance the clock, firing callbacks if necessary. Returns fake milliseconds since the unix epoch.
+
+**Usage**
+
+```java
+Clock.tick(time);
+```
+
+**Arguments**
+- `time` [int] | [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-tick-option-time"/><a href="#clock-tick-option-time" class="list-anchor">#</a>
+  
+  Time may be the number of milliseconds to advance the clock by or a human-readable string. Valid string formats are "08" for eight seconds, "01:00" for one minute and "02:34:10" for two hours, 34 minutes and ten seconds.
+
+**Returns**
+- [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-tick-return"/><a href="#clock-tick-return" class="list-anchor">#</a>
+
+
+[APIRequest]: /api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
+[Browser]: /api/class-browser.mdx "Browser"
+[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: /api/class-browsertype.mdx "BrowserType"
+[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[Clock]: /api/class-clock.mdx "Clock"
+[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: /api/class-dialog.mdx "Dialog"
+[Download]: /api/class-download.mdx "Download"
+[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[FormData]: /api/class-formdata.mdx "FormData"
+[Frame]: /api/class-frame.mdx "Frame"
+[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: /api/class-jshandle.mdx "JSHandle"
+[Keyboard]: /api/class-keyboard.mdx "Keyboard"
+[Locator]: /api/class-locator.mdx "Locator"
+[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
+[Mouse]: /api/class-mouse.mdx "Mouse"
+[Page]: /api/class-page.mdx "Page"
+[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
+[Playwright]: /api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
+[PlaywrightException]: /api/class-playwrightexception.mdx "PlaywrightException"
+[Request]: /api/class-request.mdx "Request"
+[RequestOptions]: /api/class-requestoptions.mdx "RequestOptions"
+[Response]: /api/class-response.mdx "Response"
+[Route]: /api/class-route.mdx "Route"
+[Selectors]: /api/class-selectors.mdx "Selectors"
+[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: /api/class-tracing.mdx "Tracing"
+[Video]: /api/class-video.mdx "Video"
+[WebError]: /api/class-weberror.mdx "WebError"
+[WebSocket]: /api/class-websocket.mdx "WebSocket"
+[WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
+[Worker]: /api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
+[byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
+[Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
+[double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
+[InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
+[int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[JsonObject]: https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/JsonObject.html "JsonObject"
+[List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"
+[Map]: https://docs.oracle.com/javase/8/docs/api/java/util/Map.html "Map"
+[null]: https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.7 "null"
+[Object]: https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html "Object"
+[Path]: https://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html "Path"
+[Pattern]: https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html "Pattern"
+[Predicate]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Predicate.html "Predicate"
+[void]: https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html "void"
+[Runnable]: https://docs.oracle.com/javase/8/docs/api/java/lang/Runnable.html "Runnable"
+[RuntimeException]: https://docs.oracle.com/javase/8/docs/api/java/lang/RuntimeException.html "RuntimeException"
+[String]: https://docs.oracle.com/javase/8/docs/api/java/lang/String.html "String"
+
+[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/java/about "all available image tags"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/java/about "Microsoft Artifact Registry"
+[Dockerfile.jammy]: https://github.com/microsoft/playwright-java/blob/main/utils/docker/Dockerfile.jammy "Dockerfile.jammy"
