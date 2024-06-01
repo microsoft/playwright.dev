@@ -1,154 +1,79 @@
 ---
-id: class-clock
+id: clock
 title: "Clock"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+## Introduction
 
-Playwright uses [@sinonjs/fake-timers](https://github.com/sinonjs/fake-timers) for clock emulation. Clock is installed for the entire [BrowserContext], so the time in all the pages and iframes is controlled by the same clock.
+[page.clock](/api/class-page.mdx#page-clock) overrides native global functions related to time allowing them to be manually controlled:
+- `setTimeout`
+- `clearTimeout`
+- `setInterval`
+- `clearInterval`
+- `Date`
+- `requestAnimationFrame`
+- `cancelAnimationFrame`
+- `requestIdleCallback`
 
-
----
-
-## Methods
-
-### install {#clock-install}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.install</x-search>
-
-Creates a clock and installs it globally.
-
-**Usage**
+By default, the clock starts at the unix epoch (timestamp of 0), but you can override it using the `now` option.
 
 ```js
 await page.clock.install();
-await page.clock.install({ now });
-await page.clock.install({ now, toFake: ['Date'] });
+await page.clock.install({ now: new Date('2020-02-02') });
 ```
 
-**Arguments**
-- `options` [Object] *(optional)*
-  - `advanceTimeDelta` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-option-advance-time-delta"/><a href="#clock-install-option-advance-time-delta" class="list-anchor">#</a>
-    
-    Relevant only when using with `shouldAdvanceTime`. Increment mocked time by advanceTimeDelta ms every advanceTimeDelta ms change in the real system time (default: 20).
-  - `loopLimit` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-option-loop-limit"/><a href="#clock-install-option-loop-limit" class="list-anchor">#</a>
-    
-    The maximum number of timers that will be run when calling  [clock.runAll()](/api/class-clock.mdx#clock-run-all). Defaults to `1000`.
-  - `now` [number] | [Date] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-option-now"/><a href="#clock-install-option-now" class="list-anchor">#</a>
-    
-    Install fake timers with the specified unix epoch (default: 0).
-  - `shouldAdvanceTime` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-option-should-advance-time"/><a href="#clock-install-option-should-advance-time" class="list-anchor">#</a>
-    
-    Tells `@sinonjs/fake-timers` to increment mocked time automatically based on the real system time shift (e.g., the mocked time will be incremented by 20ms for every 20ms change in the real system time). Defaults to `false`.
-  - `toFake` [Array]&lt;"setTimeout" | "clearTimeout" | "setInterval" | "clearInterval" | "Date" | "requestAnimationFrame" | "cancelAnimationFrame" | "requestIdleCallback" | "cancelIdleCallback" | "performance"&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-option-to-fake"/><a href="#clock-install-option-to-fake" class="list-anchor">#</a>
-    
-    An array with names of global methods and APIs to fake. For instance, `await page.clock.install({ toFake: ['setTimeout'] })` will fake only `setTimeout()`. By default, all the methods are faked.
+## Only fake Date.now
 
-**Returns**
-- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-return"/><a href="#clock-install-return" class="list-anchor">#</a>
-
----
-
-### jump {#clock-jump}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.jump</x-search>
-
-Advance the clock by jumping forward in time, firing callbacks at most once. Returns fake milliseconds since the unix epoch. This can be used to simulate the JS engine (such as a browser) being put to sleep and resumed later, skipping intermediary timers.
-
-**Usage**
+```html
+<input type="datetime-local" id="my-time" data-testid="my-time">
+<script>
+  const renderTime = () => {
+    const time = new Date();
+    document.getElementById('my-time').value = time.toISOString().slice(0, 16);
+    setTimeout(renderTime, 1000);
+  };
+  renderTime();
+</script>
+```
 
 ```js
-await page.clock.jump(1000);
+// Initialize clock with a specific time.
+await page.clock.install({
+  now: new Date('2024-01-01T10:00:00Z'),
+  toFake: ['Date'],
+});
+await page.goto('http://localhost:3333');
+await expect(page.getByTestId('my-time')).toHaveValue('2024-01-01T10:00');
+```
+
+## Assert page at different points in time
+
+```html
+<input type="datetime-local" id="my-time" data-testid="my-time">
+<script>
+  const renderTime = () => {
+    const time = new Date();
+    document.getElementById('my-time').value = time.toISOString().slice(0, 16);
+    setTimeout(renderTime, 1000);
+  };
+  renderTime();
+</script>
+```
+
+```js
+// Initialize clock with a specific time.
+await page.clock.install({ now: new Date('2024-01-01T10:00:00Z') });
+await page.goto('http://localhost:3333');
+await expect(page.getByTestId('my-time')).toHaveValue('2024-01-01T10:00');
+
+// Fast forward time 30 minutes without firing intermediate timers, as if the user
+// closed and opened the lid of the laptop.
 await page.clock.jump('30:00');
+await expect(page.getByTestId('my-time')).toHaveValue('2024-01-01T10:30');
 ```
-
-**Arguments**
-- `time` [number] | [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-jump-option-time"/><a href="#clock-jump-option-time" class="list-anchor">#</a>
-  
-  Time may be the number of milliseconds to advance the clock by or a human-readable string. Valid string formats are "08" for eight seconds, "01:00" for one minute and "02:34:10" for two hours, 34 minutes and ten seconds.
-
-**Returns**
-- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-jump-return"/><a href="#clock-jump-return" class="list-anchor">#</a>
-
----
-
-### next {#clock-next}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.next</x-search>
-
-Advances the clock to the the moment of the first scheduled timer, firing it.
-
-**Usage**
-
-```js
-await page.clock.next();
-```
-
-**Returns**
-- [Promise]&lt;[number]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-next-return"/><a href="#clock-next-return" class="list-anchor">#</a>
-
----
-
-### runAll {#clock-run-all}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.runAll</x-search>
-
-Runs all pending timers until there are none remaining. If new timers are added while it is executing they will be run as well.
-
-**Usage**
-
-```js
-await clock.runAll();
-```
-
-**Returns**
-- [Promise]&lt;[number]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-run-all-return"/><a href="#clock-run-all-return" class="list-anchor">#</a>
-
-**Details**
-
-This makes it easier to run asynchronous tests to completion without worrying about the number of timers they use, or the delays in those timers. It runs a maximum of `loopLimit` times after which it assumes there is an infinite loop of timers and throws an error.
-
----
-
-### runToLast {#clock-run-to-last}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.runToLast</x-search>
-
-This takes note of the last scheduled timer when it is run, and advances the clock to that time firing callbacks as necessary. If new timers are added while it is executing they will be run only if they would occur before this time. This is useful when you want to run a test to completion, but the test recursively sets timers that would cause runAll to trigger an infinite loop warning.
-
-**Usage**
-
-```js
-await clock.runToLast();
-```
-
-**Returns**
-- [Promise]&lt;[number]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-run-to-last-return"/><a href="#clock-run-to-last-return" class="list-anchor">#</a>
-
----
-
-### tick {#clock-tick}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.tick</x-search>
-
-Advance the clock, firing callbacks if necessary. Returns fake milliseconds since the unix epoch.
-
-**Usage**
-
-```js
-await page.clock.tick(1000);
-await page.clock.tick('30:00');
-```
-
-**Arguments**
-- `time` [number] | [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-tick-option-time"/><a href="#clock-tick-option-time" class="list-anchor">#</a>
-  
-  Time may be the number of milliseconds to advance the clock by or a human-readable string. Valid string formats are "08" for eight seconds, "01:00" for one minute and "02:34:10" for two hours, 34 minutes and ten seconds.
-
-**Returns**
-- [Promise]&lt;[number]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-tick-return"/><a href="#clock-tick-return" class="list-anchor">#</a>
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
