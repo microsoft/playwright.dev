@@ -19,6 +19,42 @@ import React from 'react';
 import NavbarItem from '@theme-original/NavbarItem';
 import { useLocation } from '@docusaurus/router';
 
+const missingSites = calculateMissingSites(require('../../../nodejs/sidebars').docs, {
+  'python': require('../../../python/sidebars').docs,
+  'dotnet': require('../../../dotnet/sidebars').docs,
+  'java': require('../../../java/sidebars').docs,
+});
+
+function flatSidebar(sidebar, result = []) {
+  for (const item of sidebar) {
+    if (item.type === 'category') {
+      flatSidebar(item.items, result);
+    } else {
+      result.push(item.id);
+    }
+  }
+  return result;
+}
+
+/**
+ * @param {object} baseSidebar
+ * @param {object} sidebars
+ * @returns {string[]}
+ */
+function calculateMissingSites(baseSidebar, sidebars) {
+  const missing = [];
+  const baseItems = flatSidebar(baseSidebar);
+  for (const [language, sidebar] of Object.entries(sidebars)) {
+    const items = flatSidebar(sidebar);
+    const missingInLanguage = [];
+    for (const item of baseItems) {
+      if (!items.includes(item))
+        missing.push(`/${language}/docs/${item}`);
+    }
+  }
+  return missing;
+}
+
 export default function NavbarItemWrapper(props) {
   const location = useLocation();
   const languagePrefix = props['data-language-prefix'];
@@ -27,6 +63,8 @@ export default function NavbarItemWrapper(props) {
     // Rewrite the new link
     const newPathname = location.pathname.replace(/^(\/(java|dotnet|python))?\/(.*)/, '$3');
     propsOverrides.href = "pathname://" + languagePrefix + newPathname + location.hash;
+    if (isMissingInLanguagePort(location.pathname, languagePrefix) && newPathname.startsWith('docs/test-'))
+      propsOverrides.href = "pathname://" + languagePrefix + 'docs/test-runners';
     propsOverrides.autoAddBaseUrl = false
     propsOverrides.target = '_self';
 
@@ -53,4 +91,16 @@ export default function NavbarItemWrapper(props) {
       <NavbarItem {...props} {...propsOverrides} />
     </>
   );
+}
+
+/**
+ * @param {string} location
+ * @param {string} linkPathPrefix
+ * @returns {boolean}
+ */
+function isMissingInLanguagePort(location, linkPathPrefix) {
+  const languagePort = linkPathPrefix.replace(/\//g, '');
+  if (!languagePort)
+    return false;
+  return missingSites.includes('/' + languagePort + location.replace(/^(\/(java|dotnet|python))?(\/.*)/, '$3').replace(/(.*)\.html$/, '$1'));
 }
