@@ -23,94 +23,84 @@ Accurately simulating time-dependent behavior is essential for verifying the cor
 
 By default, the clock starts at the unix epoch (timestamp of 0). You can override it using the `now` option.
 
-## Freeze Date.now
+## Mock Date.now
 
-Sometimes you only need to fake `Date.now` and no other time-related functions. That way the time flows naturally, but `Date.now` returns a fixed value.
+Most of the time, you only need to fake `Date.now` and no other time-related functions. That way the time flows naturally, but `Date.now` returns a fixed value.
 
 ```html
-<input type="datetime-local" id="my-time" data-testid="my-time">
+<div id="current-time" data-testid="current-time"></div>
 <script>
   const renderTime = () => {
-    const time = new Date();
-    document.getElementById('my-time').value = time.toISOString().slice(0, 16);
-    setTimeout(renderTime, 1000);
+    document.getElementById('current-time').textContent =
+        new Date() = time.toLocalTimeString();
   };
-  renderTime();
+  setInterval(renderTime, 1000);
 </script>
 ```
 
 ```java
-// Initialize clock with a specific time, only fake Date.now.
-page.clock().install(
-    new Clock.InstallOptions()
-        .setNow(Instant.parse("2024-01-01T10:00:00Z"))
-        .setToFake(new String[]{"Date"})
-);
+page.clock().setTime(Instant.parse("2024-02-02T10:00:00"));
 page.navigate("http://localhost:3333");
-Locator locator = page.getByTestId("my-time");
-assertThat(locator).hasValue("2024-01-01T10:00");
+Locator locator = page.getByTestId("current-time");
+assertThat(locator).hasText("2/2/2024, 10:00:00 AM");
+
+page.clock().setTime(Instant.parse("2024-02-02T10:30:00"));
+assertThat(locator).hasText("2/2/2024, 10:30:00 AM");
 ```
 
-## Assert page at different points in time
+## Mock Date.now consistent with the timers
 
-More often you need to simulate the passage of time to test time-dependent behavior. You can jump the clock forward in time to simulate the passage of time without waiting for real-time to pass.
+Sometimes your timers depend on `Date.now` and are confused when the time stands still. In cases like this you need to ensure that `Date.now` and timers are consistent. You can achieve this by installing the fake timers.
 
 ```html
-<input type="datetime-local" id="my-time" data-testid="my-time">
+<div id="current-time" data-testid="current-time"></div>
 <script>
   const renderTime = () => {
-    const time = new Date();
-    document.getElementById('my-time').value = time.toISOString().slice(0, 16);
-    setTimeout(renderTime, 1000);
+    document.getElementById('current-time').textContent =
+        new Date() = time.toLocalTimeString();
   };
-  renderTime();
+  setInterval(renderTime, 1000);
 </script>
 ```
 
 ```java
 // Initialize clock with a specific time, take full control over time.
-page.clock().install(
-    new Clock.InstallOptions()
-        .setNow(Instant.parse("2024-01-01T10:00:00Z"))
-);
+page.clock().installFakeTimers(Instant.parse("2024-02-02T10:00:00"));
 page.navigate("http://localhost:3333");
-Locator locator = page.getByTestId("my-time");
-assertThat(locator).hasValue("2024-01-01T10:00");
+Locator locator = page.getByTestId("current-time");
+assertThat(locator).hasText("2/2/2024, 10:00:00 AM")
 
 // Fast forward time 30 minutes without firing intermediate timers, as if the user
 // closed and opened the lid of the laptop.
-page.clock().jump("30:00");
-assertThat(locator).hasValue("2024-01-01T10:30");
+page.clock().skipTime("30:00");
+assertThat(locator).hasText("2/2/2024, 10:30:00 AM");
 ```
 
 ## Tick through time manually
 
-In some cases, you may want to tick through time manually, firing all timers in the process. This can be useful when you want to simulate the passage of time in a controlled manner.
+In rare cases, you may want to tick through time manually, firing all timers and animation frames in the process to achieve a fine-grained control over the passage of time.
 
 ```html
-<input type="datetime-local" id="my-time" data-testid="my-time">
+<div id="current-time" data-testid="current-time"></div>
 <script>
   const renderTime = () => {
-    const time = new Date();
-    document.getElementById('my-time').value = time.toISOString().slice(0, 16);
-    setTimeout(renderTime, 1000);
+    document.getElementById('current-time').textContent =
+        new Date() = time.toLocalTimeString();
   };
-  renderTime();
+  setInterval(renderTime, 1000);
 </script>
 ```
 
 ```java
 // Initialize clock with a specific time, take full control over time.
-page.clock().install(
-    new Clock.InstallOptions()
-        .setNow(Instant.parse("2024-01-01T10:00:00Z"))
-);
+page.clock().installFakeTimers(Instant.parse("2024-02-02T10:00:00"));
 page.navigate("http://localhost:3333");
-Locator locator = page.getByTestId("my-time");
+Locator locator = page.getByTestId("current-time");
 
 // Tick through time manually, firing all timers in the process.
 // In this case, time will be updated in the screen 2 times.
-page.clock().tick(2000);
+page.clock().runFor(2000);
+assertThat(locator).hasText("2/2/2024, 10:00:02 AM");
 ```
 
 

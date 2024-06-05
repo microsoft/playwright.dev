@@ -16,102 +16,58 @@ Note that clock is installed for the entire [BrowserContext], so the time in all
 
 ## Methods
 
-### install {#clock-install}
+### installFakeTimers {#clock-install-fake-timers}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.install</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.installFakeTimers</x-search>
 
-Creates a clock and installs it globally.
+Install fake implementations for the following time-related functions:
+* `setTimeout`
+* `clearTimeout`
+* `setInterval`
+* `clearInterval`
+* `requestAnimationFrame`
+* `cancelAnimationFrame`
+* `requestIdleCallback`
+* `cancelIdleCallback`
+* `performance`
 
-**Usage**
-
-```java
-page.clock().install();
-page.clock().install(
-    new Clock.InstallOptions()
-        .setNow(now));
-page.clock().install(
-    new Clock.InstallOptions()
-        .setNow(now)
-        .setToFake(new String[]{"Date"}));
-```
-
-**Arguments**
-- `options` `Clock.InstallOptions` *(optional)*
-  - `setAdvanceTimeDelta` [int] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-option-advance-time-delta"/><a href="#clock-install-option-advance-time-delta" class="list-anchor">#</a>
-    
-    Relevant only when using with `shouldAdvanceTime`. Increment mocked time by advanceTimeDelta ms every advanceTimeDelta ms change in the real system time (default: 20).
-  - `setLoopLimit` [int] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-option-loop-limit"/><a href="#clock-install-option-loop-limit" class="list-anchor">#</a>
-    
-    The maximum number of timers that will be run when calling  [Clock.runAll()](/api/class-clock.mdx#clock-run-all). Defaults to `1000`.
-  - `setNow` [int] | [Date] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-option-now"/><a href="#clock-install-option-now" class="list-anchor">#</a>
-    
-    Install fake timers with the specified unix epoch (default: 0).
-  - `setShouldAdvanceTime` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-option-should-advance-time"/><a href="#clock-install-option-should-advance-time" class="list-anchor">#</a>
-    
-    Tells `@sinonjs/fake-timers` to increment mocked time automatically based on the real system time shift (e.g., the mocked time will be incremented by 20ms for every 20ms change in the real system time). Defaults to `false`.
-  - `setToFake` [List]&lt;`enum FakeMethod { SETTIMEOUT, CLEARTIMEOUT, SETINTERVAL, CLEARINTERVAL, DATE, REQUESTANIMATIONFRAME, CANCELANIMATIONFRAME, REQUESTIDLECALLBACK, CANCELIDLECALLBACK, PERFORMANCE }`&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-option-to-fake"/><a href="#clock-install-option-to-fake" class="list-anchor">#</a>
-    
-    An array with names of global methods and APIs to fake. For instance, `await page.clock.install({ toFake: ['setTimeout'] })` will fake only `setTimeout()`. By default, all the methods are faked.
-
-**Returns**
-- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-return"/><a href="#clock-install-return" class="list-anchor">#</a>
-
----
-
-### jump {#clock-jump}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.jump</x-search>
-
-Advance the clock by jumping forward in time, firing callbacks at most once. This can be used to simulate the JS engine (such as a browser) being put to sleep and resumed later, skipping intermediary timers.
+Fake timers are used to manually control the flow of time in tests. They allow you to advance time, fire timers, and control the behavior of time-dependent functions. See [Clock.runFor()](/api/class-clock.mdx#clock-run-for) and [Clock.skipTime()](/api/class-clock.mdx#clock-skip-time) for more information.
 
 **Usage**
 
 ```java
-page.clock().jump(1000);
-page.clock().jump("30:00");
+Clock.installFakeTimers(time);
+Clock.installFakeTimers(time, options);
 ```
 
 **Arguments**
-- `time` [int] | [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-jump-option-time"/><a href="#clock-jump-option-time" class="list-anchor">#</a>
+- `time` [int] | [Date]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-fake-timers-option-time"/><a href="#clock-install-fake-timers-option-time" class="list-anchor">#</a>
   
-  Time may be the number of milliseconds to advance the clock by or a human-readable string. Valid string formats are "08" for eight seconds, "01:00" for one minute and "02:34:10" for two hours, 34 minutes and ten seconds.
+  Install fake timers with the specified base time.
+- `options` `Clock.InstallFakeTimersOptions` *(optional)*
+  - `setLoopLimit` [int] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-fake-timers-option-loop-limit"/><a href="#clock-install-fake-timers-option-loop-limit" class="list-anchor">#</a>
+    
+    The maximum number of timers that will be run in [Clock.runAllTimers()](/api/class-clock.mdx#clock-run-all-timers). Defaults to `1000`.
 
 **Returns**
-- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-jump-return"/><a href="#clock-jump-return" class="list-anchor">#</a>
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-fake-timers-return"/><a href="#clock-install-fake-timers-return" class="list-anchor">#</a>
 
 ---
 
-### next {#clock-next}
+### runAllTimers {#clock-run-all-timers}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.next</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.runAllTimers</x-search>
 
-Advances the clock to the the moment of the first scheduled timer, firing it. Returns fake milliseconds since the unix epoch.
+Runs all pending timers until there are none remaining. If new timers are added while it is executing they will be run as well. Fake timers must be installed. Returns fake milliseconds since the unix epoch.
 
 **Usage**
 
 ```java
-page.clock().next();
+Clock.runAllTimers();
 ```
 
 **Returns**
-- [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-next-return"/><a href="#clock-next-return" class="list-anchor">#</a>
-
----
-
-### runAll {#clock-run-all}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.runAll</x-search>
-
-Runs all pending timers until there are none remaining. If new timers are added while it is executing they will be run as well. Returns fake milliseconds since the unix epoch.
-
-**Usage**
-
-```java
-Clock.runAll();
-```
-
-**Returns**
-- [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-run-all-return"/><a href="#clock-run-all-return" class="list-anchor">#</a>
+- [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-run-all-timers-return"/><a href="#clock-run-all-timers-return" class="list-anchor">#</a>
 
 **Details**
 
@@ -119,43 +75,107 @@ This makes it easier to run asynchronous tests to completion without worrying ab
 
 ---
 
-### runToLast {#clock-run-to-last}
+### runFor {#clock-run-for}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.runToLast</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.runFor</x-search>
 
-This takes note of the last scheduled timer when it is run, and advances the clock to that time firing callbacks as necessary. If new timers are added while it is executing they will be run only if they would occur before this time. This is useful when you want to run a test to completion, but the test recursively sets timers that would cause runAll to trigger an infinite loop warning. Returns fake milliseconds since the unix epoch.
-
-**Usage**
-
-```java
-Clock.runToLast();
-```
-
-**Returns**
-- [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-run-to-last-return"/><a href="#clock-run-to-last-return" class="list-anchor">#</a>
-
----
-
-### tick {#clock-tick}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.tick</x-search>
-
-Advance the clock, firing callbacks if necessary. Returns fake milliseconds since the unix epoch. Returns fake milliseconds since the unix epoch.
+Advance the clock, firing callbacks if necessary. Returns fake milliseconds since the unix epoch. Fake timers must be installed. Returns fake milliseconds since the unix epoch.
 
 **Usage**
 
 ```java
-page.clock().tick(1000);
-page.clock().tick("30:00");
+page.clock().runFor(1000);
+page.clock().runFor("30:00");
 ```
 
 **Arguments**
-- `time` [int] | [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-tick-option-time"/><a href="#clock-tick-option-time" class="list-anchor">#</a>
+- `time` [int] | [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-run-for-option-time"/><a href="#clock-run-for-option-time" class="list-anchor">#</a>
   
   Time may be the number of milliseconds to advance the clock by or a human-readable string. Valid string formats are "08" for eight seconds, "01:00" for one minute and "02:34:10" for two hours, 34 minutes and ten seconds.
 
 **Returns**
-- [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-tick-return"/><a href="#clock-tick-return" class="list-anchor">#</a>
+- [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-run-for-return"/><a href="#clock-run-for-return" class="list-anchor">#</a>
+
+---
+
+### runToLastTimer {#clock-run-to-last-timer}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.runToLastTimer</x-search>
+
+This takes note of the last scheduled timer when it is run, and advances the clock to that time firing callbacks as necessary. If new timers are added while it is executing they will be run only if they would occur before this time. This is useful when you want to run a test to completion, but the test recursively sets timers that would cause runAll to trigger an infinite loop warning. Fake timers must be installed. Returns fake milliseconds since the unix epoch.
+
+**Usage**
+
+```java
+Clock.runToLastTimer();
+```
+
+**Returns**
+- [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-run-to-last-timer-return"/><a href="#clock-run-to-last-timer-return" class="list-anchor">#</a>
+
+---
+
+### runToNextTimer {#clock-run-to-next-timer}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.runToNextTimer</x-search>
+
+Advances the clock to the moment of the first scheduled timer, firing it. Fake timers must be installed. Returns fake milliseconds since the unix epoch.
+
+**Usage**
+
+```java
+Clock.runToNextTimer();
+```
+
+**Returns**
+- [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-run-to-next-timer-return"/><a href="#clock-run-to-next-timer-return" class="list-anchor">#</a>
+
+---
+
+### setTime {#clock-set-time}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.setTime</x-search>
+
+Set the clock to the specified time.
+
+When fake timers are installed, only fires timers at most once. This can be used to simulate the JS engine (such as a browser) being put to sleep and resumed later, skipping intermediary timers.
+
+**Usage**
+
+```java
+Clock.setTime(time);
+```
+
+**Arguments**
+- `time` [int] | [Date]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-set-time-option-time"/><a href="#clock-set-time-option-time" class="list-anchor">#</a>
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-set-time-return"/><a href="#clock-set-time-return" class="list-anchor">#</a>
+
+---
+
+### skipTime {#clock-skip-time}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.skipTime</x-search>
+
+Advance the clock by jumping forward in time, equivalent to running [Clock.setTime()](/api/class-clock.mdx#clock-set-time) with the new target time.
+
+When fake timers are installed, [Clock.skipTime()](/api/class-clock.mdx#clock-skip-time) only fires due timers at most once, while [Clock.runFor()](/api/class-clock.mdx#clock-run-for) fires all the timers up to the current time. Returns fake milliseconds since the unix epoch.
+
+**Usage**
+
+```java
+page.clock().skipTime(1000);
+page.clock().skipTime("30:00");
+```
+
+**Arguments**
+- `time` [int] | [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-skip-time-option-time"/><a href="#clock-skip-time-option-time" class="list-anchor">#</a>
+  
+  Time may be the number of milliseconds to advance the clock by or a human-readable string. Valid string formats are "08" for eight seconds, "01:00" for one minute and "02:34:10" for two hours, 34 minutes and ten seconds.
+
+**Returns**
+- [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-skip-time-return"/><a href="#clock-skip-time-return" class="list-anchor">#</a>
 
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
