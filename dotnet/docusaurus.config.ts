@@ -177,7 +177,7 @@ export default {
           items: [
             {
               label: "GitHub",
-              href: "https://github.com/microsoft/playwright",
+              href: "https://github.com/microsoft/playwright-dotnet",
             },
             {
               label: "YouTube",

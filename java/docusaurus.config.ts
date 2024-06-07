@@ -177,7 +177,7 @@ module.exports = {
           items: [
             {
               label: "GitHub",
-              href: "https://github.com/microsoft/playwright",
+              href: "https://github.com/microsoft/playwright-java",
             },
             {
               label: "YouTube",
