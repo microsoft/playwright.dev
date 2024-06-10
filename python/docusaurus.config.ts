@@ -132,15 +132,23 @@ export default {
       style: "dark",
       links: [
         {
-          title: "Docs",
+          title: "Learn",
           items: [
             {
               label: "Getting started",
               to: "docs/intro",
             },
             {
-              label: "API reference",
-              to: "docs/api/class-playwright",
+              label: "Playwright Training",
+              href: "https://learn.microsoft.com/en-us/training/modules/build-with-playwright/",
+            },
+            {
+              label: "Learn Videos",
+              to: "/community/learn-videos",
+            },
+            {
+              label: "Feature Videos",
+              to: "/community/feature-videos",
             },
           ],
         },
@@ -159,6 +167,10 @@ export default {
               label: "Twitter",
               href: "https://twitter.com/playwrightweb",
             },
+            {
+              label: "LinkedIn",
+              href: "https://www.linkedin.com/company/playwrightweb",
+            },
           ],
         },
         {
@@ -175,6 +187,10 @@ export default {
             {
               label: "Blog",
               href: "https://dev.to/playwright",
+            },
+            {
+              label: "Ambassadors",
+              href: "/community/ambassadors",
             },
           ],
         },
