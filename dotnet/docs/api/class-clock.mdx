@@ -16,11 +16,35 @@ Note that clock is installed for the entire [BrowserContext], so the time in all
 
 ## Methods
 
-### InstallFakeTimersAsync {#clock-install-fake-timers}
+### FastForwardAsync {#clock-fast-forward}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.InstallFakeTimersAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.FastForwardAsync</x-search>
+
+Advance the clock by jumping forward in time. Only fires due timers at most once. This is equivalent to user closing the laptop lid for a while and reopening it later, after given time.
+
+**Usage**
+
+```csharp
+await page.Clock.FastForwardAsync(1000);
+await page.Clock.FastForwardAsync("30:00");
+```
+
+**Arguments**
+- `ticks` [int] | [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-fast-forward-option-ticks"/><a href="#clock-fast-forward-option-ticks" class="list-anchor">#</a>
+  
+  Time may be the number of milliseconds to advance the clock by or a human-readable string. Valid string formats are "08" for eight seconds, "01:00" for one minute and "02:34:10" for two hours, 34 minutes and ten seconds.
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-fast-forward-return"/><a href="#clock-fast-forward-return" class="list-anchor">#</a>
+
+---
+
+### InstallAsync {#clock-install}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.InstallAsync</x-search>
 
 Install fake implementations for the following time-related functions:
+* `Date`
 * `setTimeout`
 * `clearTimeout`
 * `setInterval`
@@ -31,46 +55,62 @@ Install fake implementations for the following time-related functions:
 * `cancelIdleCallback`
 * `performance`
 
-Fake timers are used to manually control the flow of time in tests. They allow you to advance time, fire timers, and control the behavior of time-dependent functions. See [Clock.RunForAsync()](/api/class-clock.mdx#clock-run-for) and [Clock.SkipTimeAsync()](/api/class-clock.mdx#clock-skip-time) for more information.
+Fake timers are used to manually control the flow of time in tests. They allow you to advance time, fire timers, and control the behavior of time-dependent functions. See [Clock.RunForAsync()](/api/class-clock.mdx#clock-run-for) and [Clock.FastForwardAsync()](/api/class-clock.mdx#clock-fast-forward) for more information.
 
 **Usage**
 
 ```csharp
-await Clock.InstallFakeTimersAsync(time, options);
+await Clock.InstallAsync(options);
 ```
 
 **Arguments**
-- `time` [int] | [Date]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-fake-timers-option-time"/><a href="#clock-install-fake-timers-option-time" class="list-anchor">#</a>
-  
-  Install fake timers with the specified base time.
-- `options` `ClockInstallFakeTimersOptions?` *(optional)*
-  - `LoopLimit` [int]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-fake-timers-option-loop-limit"/><a href="#clock-install-fake-timers-option-loop-limit" class="list-anchor">#</a>
+- `options` `ClockInstallOptions?` *(optional)*
+  - `TimeInt|Time|TimeDate` [int]? | [string]? | [Date]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-option-time-int-time-time-date"/><a href="#clock-install-option-time-int-time-time-date" class="list-anchor">#</a>
     
-    The maximum number of timers that will be run in [Clock.RunAllTimersAsync()](/api/class-clock.mdx#clock-run-all-timers). Defaults to `1000`.
+    Time to initialize with, current system time by default.
 
 **Returns**
-- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-fake-timers-return"/><a href="#clock-install-fake-timers-return" class="list-anchor">#</a>
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-install-return"/><a href="#clock-install-return" class="list-anchor">#</a>
 
 ---
 
-### RunAllTimersAsync {#clock-run-all-timers}
+### PauseAtAsync {#clock-pause-at}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.RunAllTimersAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.PauseAtAsync</x-search>
 
-Runs all pending timers until there are none remaining. If new timers are added while it is executing they will be run as well. Fake timers must be installed. Returns fake milliseconds since the unix epoch.
+Advance the clock by jumping forward in time and pause the time. Once this method is called, no timers are fired unless [Clock.RunForAsync()](/api/class-clock.mdx#clock-run-for), [Clock.FastForwardAsync()](/api/class-clock.mdx#clock-fast-forward), [Clock.PauseAtAsync()](/api/class-clock.mdx#clock-pause-at) or [Clock.ResumeAsync()](/api/class-clock.mdx#clock-resume) is called.
+
+Only fires due timers at most once. This is equivalent to user closing the laptop lid for a while and reopening it at the specified time and pausing.
 
 **Usage**
 
 ```csharp
-await Clock.RunAllTimersAsync();
+await page.Clock.PauseAtAsync(DateTime.Parse("2020-02-02"));
+await page.Clock.PauseAtAsync("2020-02-02");
+```
+
+**Arguments**
+- `time` [int] | [string] | [Date]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-pause-at-option-time"/><a href="#clock-pause-at-option-time" class="list-anchor">#</a>
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-pause-at-return"/><a href="#clock-pause-at-return" class="list-anchor">#</a>
+
+---
+
+### ResumeAsync {#clock-resume}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.ResumeAsync</x-search>
+
+Resumes timers. Once this method is called, time resumes flowing, timers are fired as usual.
+
+**Usage**
+
+```csharp
+await Clock.ResumeAsync();
 ```
 
 **Returns**
-- [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-run-all-timers-return"/><a href="#clock-run-all-timers-return" class="list-anchor">#</a>
-
-**Details**
-
-This makes it easier to run asynchronous tests to completion without worrying about the number of timers they use, or the delays in those timers. It runs a maximum of `loopLimit` times after which it assumes there is an infinite loop of timers and throws an error.
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-resume-return"/><a href="#clock-resume-return" class="list-anchor">#</a>
 
 ---
 
@@ -78,7 +118,7 @@ This makes it easier to run asynchronous tests to completion without worrying ab
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.RunForAsync</x-search>
 
-Advance the clock, firing callbacks if necessary. Returns fake milliseconds since the unix epoch. Fake timers must be installed. Returns fake milliseconds since the unix epoch.
+Advance the clock, firing all the time-related callbacks.
 
 **Usage**
 
@@ -88,93 +128,58 @@ await page.Clock.RunForAsync("30:00");
 ```
 
 **Arguments**
-- `time` [int] | [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-run-for-option-time"/><a href="#clock-run-for-option-time" class="list-anchor">#</a>
+- `ticks` [int] | [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-run-for-option-ticks"/><a href="#clock-run-for-option-ticks" class="list-anchor">#</a>
   
   Time may be the number of milliseconds to advance the clock by or a human-readable string. Valid string formats are "08" for eight seconds, "01:00" for one minute and "02:34:10" for two hours, 34 minutes and ten seconds.
 
 **Returns**
-- [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-run-for-return"/><a href="#clock-run-for-return" class="list-anchor">#</a>
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-run-for-return"/><a href="#clock-run-for-return" class="list-anchor">#</a>
 
 ---
 
-### RunToLastTimerAsync {#clock-run-to-last-timer}
+### SetFixedTimeAsync {#clock-set-fixed-time}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.RunToLastTimerAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.SetFixedTimeAsync</x-search>
 
-This takes note of the last scheduled timer when it is run, and advances the clock to that time firing callbacks as necessary. If new timers are added while it is executing they will be run only if they would occur before this time. This is useful when you want to run a test to completion, but the test recursively sets timers that would cause runAll to trigger an infinite loop warning. Fake timers must be installed. Returns fake milliseconds since the unix epoch.
+Makes `Date.now` and `new Date()` return fixed fake time at all times, keeps all the timers running.
 
 **Usage**
 
 ```csharp
-await Clock.RunToLastTimerAsync();
-```
-
-**Returns**
-- [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-run-to-last-timer-return"/><a href="#clock-run-to-last-timer-return" class="list-anchor">#</a>
-
----
-
-### RunToNextTimerAsync {#clock-run-to-next-timer}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.RunToNextTimerAsync</x-search>
-
-Advances the clock to the moment of the first scheduled timer, firing it. Fake timers must be installed. Returns fake milliseconds since the unix epoch.
-
-**Usage**
-
-```csharp
-await Clock.RunToNextTimerAsync();
-```
-
-**Returns**
-- [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-run-to-next-timer-return"/><a href="#clock-run-to-next-timer-return" class="list-anchor">#</a>
-
----
-
-### SetTimeAsync {#clock-set-time}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.SetTimeAsync</x-search>
-
-Set the clock to the specified time.
-
-When fake timers are installed, only fires timers at most once. This can be used to simulate the JS engine (such as a browser) being put to sleep and resumed later, skipping intermediary timers.
-
-**Usage**
-
-```csharp
-await Clock.SetTimeAsync(time);
+await page.Clock.SetFixedTimeAsync(DateTime.Now);
+await page.Clock.SetFixedTimeAsync(new DateTime(2020, 2, 2));
+await page.Clock.SetFixedTimeAsync("2020-02-02");
 ```
 
 **Arguments**
-- `time` [int] | [Date]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-set-time-option-time"/><a href="#clock-set-time-option-time" class="list-anchor">#</a>
-
-**Returns**
-- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-set-time-return"/><a href="#clock-set-time-return" class="list-anchor">#</a>
-
----
-
-### SkipTimeAsync {#clock-skip-time}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.SkipTimeAsync</x-search>
-
-Advance the clock by jumping forward in time, equivalent to running [Clock.SetTimeAsync()](/api/class-clock.mdx#clock-set-time) with the new target time.
-
-When fake timers are installed, [Clock.SkipTimeAsync()](/api/class-clock.mdx#clock-skip-time) only fires due timers at most once, while [Clock.RunForAsync()](/api/class-clock.mdx#clock-run-for) fires all the timers up to the current time. Returns fake milliseconds since the unix epoch.
-
-**Usage**
-
-```csharp
-await page.Clock.SkipTimeAsync(1000);
-await page.Clock.SkipTimeAsync("30:00");
-```
-
-**Arguments**
-- `time` [int] | [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-skip-time-option-time"/><a href="#clock-skip-time-option-time" class="list-anchor">#</a>
+- `time` [int] | [string] | [Date]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-set-fixed-time-option-time"/><a href="#clock-set-fixed-time-option-time" class="list-anchor">#</a>
   
-  Time may be the number of milliseconds to advance the clock by or a human-readable string. Valid string formats are "08" for eight seconds, "01:00" for one minute and "02:34:10" for two hours, 34 minutes and ten seconds.
+  Time to be set.
 
 **Returns**
-- [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-skip-time-return"/><a href="#clock-skip-time-return" class="list-anchor">#</a>
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-set-fixed-time-return"/><a href="#clock-set-fixed-time-return" class="list-anchor">#</a>
+
+---
+
+### SetSystemTimeAsync {#clock-set-system-time}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>clock.SetSystemTimeAsync</x-search>
+
+Sets current system time but does not trigger any timers.
+
+**Usage**
+
+```csharp
+await page.Clock.SetSystemTimeAsync(DateTime.Now);
+await page.Clock.SetSystemTimeAsync(new DateTime(2020, 2, 2));
+await page.Clock.SetSystemTimeAsync("2020-02-02");
+```
+
+**Arguments**
+- `time` [int] | [string] | [Date]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-set-system-time-option-time"/><a href="#clock-set-system-time-option-time" class="list-anchor">#</a>
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="clock-set-system-time-return"/><a href="#clock-set-system-time-return" class="list-anchor">#</a>
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
