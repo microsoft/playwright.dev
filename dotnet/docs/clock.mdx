@@ -20,66 +20,81 @@ Accurately simulating time-dependent behavior is essential for verifying the cor
 - `cancelAnimationFrame`
 - `requestIdleCallback`
 - `cancelIdleCallback`
+- `performance`
 
-By default, the clock starts at the unix epoch (timestamp of 0). You can override it using the `now` option.
+## Test with predefined time
 
-## Mock Date.now
-
-Most of the time, you only need to fake `Date.now` and no other time-related functions. That way the time flows naturally, but `Date.now` returns a fixed value.
-
-```html
-<div id="current-time" data-testid="current-time"></div>
-<script>
-  const renderTime = () => {
-    document.getElementById('current-time').textContent =
-        new Date() = time.toLocalTimeString();
-  };
-  setInterval(renderTime, 1000);
-</script>
-```
-
-```csharp
-// Initialize clock with a specific time, only fake Date.now.
-await page.Clock.SetTimeAsync(new DateTime(2024, 2, 2, 10, 0, 0, DateTimeKind.Pst));
-await page.GotoAsync("http://localhost:3333");
-var locator = page.GetByTestId("current-time");
-await Expect(locator).ToHaveTextAsync("2/2/2024, 10:00:00 AM");
-
-await page.Clock.SetTimeAsync(new DateTime(2024, 2, 2, 10, 30, 0, DateTimeKind.Pst));
-await Expect(locator).ToHaveTextAsync("2/2/2024, 10:30:00 AM");
-```
-
-## Mock Date.now consistent with the timers
-
-Sometimes your timers depend on `Date.now` and are confused when the time stands still. In cases like this you need to ensure that `Date.now` and timers are consistent. You can achieve this by installing the fake timers.
+Often you only need to fake `Date.now` while keeping the timers going. That way the time flows naturally, but `Date.now` always returns a fixed value.
 
 ```html
 <div id="current-time" data-testid="current-time"></div>
 <script>
   const renderTime = () => {
     document.getElementById('current-time').textContent =
-        new Date() = time.toLocalTimeString();
+        new Date().toLocaleTimeString();
+  };
+  setInterval(renderTime, 1000);
+</script>
+```
+
+## Consistent time and timers
+
+Sometimes your timers depend on `Date.now` and are confused when the `Date.now` value does not change over time. In this case, you can install the clock and fast forward to the time of interest when testing.
+
+```html
+<div id="current-time" data-testid="current-time"></div>
+<script>
+  const renderTime = () => {
+    document.getElementById('current-time').textContent =
+        new Date().toLocaleTimeString();
   };
   setInterval(renderTime, 1000);
 </script>
 ```
 
 ```csharp
-// Initialize clock with a specific time, take full control over time.
-await page.Clock.InstallFakeTimersAsync(
-    new DateTime(2024, 2, 2, 10, 0, 0, DateTimeKind.Pst)
-);
-await page.GotoAsync("http://localhost:3333");
-var locator = page.GetByTestId("current-time");
-await Expect(locator).ToHaveTextAsync("2/2/2024, 10:00:00 AM");
+// Initialize clock with some time before the test time and let the page load naturally.
+// `Date.now` will progress as the timers fire.
+await Page.Clock.InstallAsync(new
+{
+  Time = new DateTime(2024, 2, 2, 8, 0, 0)
+});
+await Page.GotoAsync("http://localhost:3333");
 
-// Fast forward time 30 minutes without firing intermediate timers, as if the user
-// closed and opened the lid of the laptop.
-await page.Clock.SkipTimeAsync("30:00");
-await Expect(locator).ToHaveTextAsync("2/2/2024, 10:30:00 AM");
+// Pretend that the user closed the laptop lid and opened it again at 10am.
+// Pause the time once reached that point.
+await Page.Clock.PauseAtAsync(new DateTime(2024, 2, 2, 10, 0, 0));
+
+// Assert the page state.
+await Expect(Page.GetByTestId("current-time")).ToHaveText("2/2/2024, 10:00:00 AM");
+
+// Close the laptop lid again and open it at 10:30am.
+await Page.Clock.FastForwardAsync("30:00");
+await Expect(Page.GetByTestId("current-time")).ToHaveText("2/2/2024, 10:30:00 AM");
 ```
 
-## Tick through time manually
+## Test inactivity monitoring
+
+Inactivity monitoring is a common feature in web applications that logs out users after a period of inactivity. Testing this feature can be tricky because you need to wait for a long time to see the effect. With the help of the clock, you can speed up time and test this feature quickly.
+
+```csharp
+// Initial time does not matter for the test, so we can pick current time.
+await Page.Clock.InstallAsync();
+await page.GotoAsync("http://localhost:3333");
+
+// Interact with the page
+await page.GetByRole("button").ClickAsync();
+
+// Fast forward time 5 minutes as if the user did not do anything.
+// Fast forward is like closing the laptop lid and opening it after 5 minutes.
+// All the timers due will fire once immediately, as in the real browser.
+await Page.Clock.FastForwardAsync("5:00");
+
+// Check that the user was logged out automatically.
+await Expect(Page.GetByText("You have been logged out due to inactivity.")).ToBeVisibleAsync();
+```
+
+## Tick through time manually, firing all the timers consistently
 
 In rare cases, you may want to tick through time manually, firing all timers and animation frames in the process to achieve a fine-grained control over the passage of time.
 
@@ -88,23 +103,29 @@ In rare cases, you may want to tick through time manually, firing all timers and
 <script>
   const renderTime = () => {
     document.getElementById('current-time').textContent =
-        new Date() = time.toLocalTimeString();
+        new Date().toLocaleTimeString();
   };
   setInterval(renderTime, 1000);
 </script>
 ```
 
 ```csharp
-// Initialize clock with a specific time, take full control over time.
-await page.Clock.InstallFakeTimersAsync(
-    new DateTime(2024, 2, 2, 10, 0, 0, DateTimeKind.Pst)
-);
+// Initialize clock with a specific time, let the page load naturally.
+await Page.Clock.InstallAsync(new
+{
+  Time = new DateTime(2024, 2, 2, 8, 0, 0, DateTimeKind.Pst)
+});
 await page.GotoAsync("http://localhost:3333");
 var locator = page.GetByTestId("current-time");
 
+// Pause the time flow, stop the timers, you now have manual control
+// over the page time.
+await Page.Clock.PauseAtAsync(new DateTime(2024, 2, 2, 10, 0, 0));
+await Expect(locator).ToHaveTextAsync("2/2/2024, 10:00:00 AM");
+
 // Tick through time manually, firing all timers in the process.
 // In this case, time will be updated in the screen 2 times.
-await page.Clock.RunForAsync(2000);
+await Page.Clock.RunForAsync(2000);
 await Expect(locator).ToHaveTextAsync("2/2/2024, 10:00:02 AM");
 ```
 
