@@ -1157,7 +1157,7 @@ response = response_info.value
 return response.ok
 
 # or with a lambda
-with page.expect_response(lambda response: response.url == "https://example.com" and response.status == 200) as response_info:
+with page.expect_response(lambda response: response.url == "https://example.com" and response.status == 200 and response.request.method == "get") as response_info:
     page.get_by_text("trigger response").click()
 response = response_info.value
 return response.ok
@@ -1173,7 +1173,7 @@ response = await response_info.value
 return response.ok
 
 # or with a lambda
-async with page.expect_response(lambda response: response.url == "https://example.com" and response.status == 200) as response_info:
+async with page.expect_response(lambda response: response.url == "https://example.com" and response.status == 200 and response.request.method == "get") as response_info:
     await page.get_by_text("trigger response").click()
 response = await response_info.value
 return response.ok
@@ -2933,7 +2933,7 @@ page.unroute_all(**kwargs)
 **Arguments**
 - `behavior` "wait" | "ignoreErrors" | "default" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-unroute-all-option-behavior"/><a href="#page-unroute-all-option-behavior" class="list-anchor">#</a>
   
-  Specifies wether to wait for already running handlers and what to do if they throw errors:
+  Specifies whether to wait for already running handlers and what to do if they throw errors:
   * `'default'` - do not wait for current handler calls (if any) to finish, if unrouted handler throws, it may result in unhandled error
   * `'wait'` - wait for current handler calls (if any) to finish
   * `'ignoreErrors'` - do not wait for current handler calls (if any) to finish, all errors thrown by the handlers after unrouting are silently caught
@@ -3227,6 +3227,23 @@ await page.wait_for_url("**/target.html")
 ---
 
 ## Properties
+
+### clock {#page-clock}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>page.clock</x-search>
+
+Playwright has ability to mock clock and passage of time.
+
+**Usage**
+
+```python
+page.clock
+```
+
+**Type**
+- [Clock]
+
+---
 
 ### context {#page-context}
 
@@ -5282,7 +5299,7 @@ Use locator-based [locator.set_input_files()](/api/class-locator.mdx#locator-set
 :::
 
 
-Sets the value of the file input to these file paths or files. If some of the `filePaths` are relative paths, then they are resolved relative to the current working directory. For empty array, clears the selected files.
+Sets the value of the file input to these file paths or files. If some of the `filePaths` are relative paths, then they are resolved relative to the current working directory. For empty array, clears the selected files. For inputs with a `[webkitdirectory]` attribute, only a single directory path is supported.
 
 This method expects `selector` to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input). However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), targets the control instead.
 
@@ -5689,6 +5706,7 @@ await page.wait_for_timeout(1000)
 [BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
 [BrowserType]: /api/class-browsertype.mdx "BrowserType"
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"

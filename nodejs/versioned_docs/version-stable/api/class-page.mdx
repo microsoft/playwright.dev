@@ -1900,7 +1900,7 @@ await page.unrouteAll(options);
 - `options` [Object] *(optional)*
   - `behavior` "wait" | "ignoreErrors" | "default" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-unroute-all-option-behavior"/><a href="#page-unroute-all-option-behavior" class="list-anchor">#</a>
     
-    Specifies wether to wait for already running handlers and what to do if they throw errors:
+    Specifies whether to wait for already running handlers and what to do if they throw errors:
     * `'default'` - do not wait for current handler calls (if any) to finish, if unrouted handler throws, it may result in unhandled error
     * `'wait'` - wait for current handler calls (if any) to finish
     * `'ignoreErrors'` - do not wait for current handler calls (if any) to finish, all errors thrown by the handlers after unrouting are silently caught
@@ -2148,6 +2148,7 @@ const response = await responsePromise;
 // Alternative way with a predicate. Note no await.
 const responsePromise = page.waitForResponse(response =>
   response.url() === 'https://example.com' && response.status() === 200
+      && response.request().method() === 'GET'
 );
 await page.getByText('trigger response').click();
 const response = await responsePromise;
@@ -2223,6 +2224,23 @@ page.workers();
 ---
 
 ## Properties
+
+### clock {#page-clock}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>page.clock</x-search>
+
+Playwright has ability to mock clock and passage of time.
+
+**Usage**
+
+```js
+page.clock
+```
+
+**Type**
+- [Clock]
+
+---
 
 ### coverage {#page-coverage}
 
@@ -3883,7 +3901,7 @@ Use locator-based [locator.setInputFiles()](/api/class-locator.mdx#locator-set-i
 :::
 
 
-Sets the value of the file input to these file paths or files. If some of the `filePaths` are relative paths, then they are resolved relative to the current working directory. For empty array, clears the selected files.
+Sets the value of the file input to these file paths or files. If some of the `filePaths` are relative paths, then they are resolved relative to the current working directory. For empty array, clears the selected files. For inputs with a `[webkitdirectory]` attribute, only a single directory path is supported.
 
 This method expects `selector` to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input). However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), targets the control instead.
 
@@ -4292,6 +4310,7 @@ await page.waitForTimeout(1000);
 [BrowserServer]: /api/class-browserserver.mdx "BrowserServer"
 [BrowserType]: /api/class-browsertype.mdx "BrowserType"
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
 [Dialog]: /api/class-dialog.mdx "Dialog"
