@@ -578,22 +578,6 @@ public class Example {
 }
 ```
 
-An example of passing an element handle:
-
-```java
-page.exposeBinding("clicked", (source, args) -> {
-  ElementHandle element = (ElementHandle) args[0];
-  System.out.println(element.textContent());
-  return null;
-}, new Page.ExposeBindingOptions().setHandle(true));
-page.setContent("" +
-  "<script>\n" +
-  "  document.addEventListener('click', event => window.clicked(event.target));\n" +
-  "</script>\n" +
-  "<div>Click me</div>\n" +
-  "<div>Or click me</div>\n");
-```
-
 **Arguments**
 - `name` [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-expose-binding-option-name"/><a href="#page-expose-binding-option-name" class="list-anchor">#</a>
   
@@ -603,6 +587,11 @@ page.setContent("" +
   Callback function that will be called in the Playwright's context.
 - `options` `Page.ExposeBindingOptions` *(optional)*
   - `setHandle` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-expose-binding-option-handle"/><a href="#page-expose-binding-option-handle" class="list-anchor">#</a>
+    
+    :::warning[Deprecated]
+    This option will be removed in the future.
+    :::
+    
     
     Whether to pass the argument as a handle, instead of passing by value. When passing a handle, only one argument is supported. When passing by value, multiple arguments are supported.
 
@@ -2370,7 +2359,7 @@ Response response = page.waitForResponse("https://example.com/resource", () -> {
 });
 
 // Waits for the next response matching some conditions
-Response response = page.waitForResponse(response -> "https://example.com".equals(response.url()) && response.status() == 200, () -> {
+Response response = page.waitForResponse(response -> "https://example.com".equals(response.url()) && response.status() == 200 && "GET".equals(response.request().method()), () -> {
   // Triggers the response
   page.getByText("trigger response").click();
 });
@@ -2509,6 +2498,23 @@ Page.workers();
 ---
 
 ## Properties
+
+### clock() {#page-clock}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>page.clock()</x-search>
+
+Playwright has ability to mock clock and passage of time.
+
+**Usage**
+
+```java
+Page.clock()
+```
+
+**Returns**
+- [Clock]
+
+---
 
 ### keyboard() {#page-keyboard}
 
@@ -4121,7 +4127,7 @@ Use locator-based [Locator.setInputFiles()](/api/class-locator.mdx#locator-set-i
 :::
 
 
-Sets the value of the file input to these file paths or files. If some of the `filePaths` are relative paths, then they are resolved relative to the current working directory. For empty array, clears the selected files.
+Sets the value of the file input to these file paths or files. If some of the `filePaths` are relative paths, then they are resolved relative to the current working directory. For empty array, clears the selected files. For inputs with a `[webkitdirectory]` attribute, only a single directory path is supported.
 
 This method expects `selector` to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input). However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), targets the control instead.
 
@@ -4532,6 +4538,7 @@ page.waitForTimeout(1000);
 [BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
 [BrowserType]: /api/class-browsertype.mdx "BrowserType"
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
@@ -4577,9 +4584,11 @@ page.waitForTimeout(1000);
 [boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
 [byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
 [Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
+[Date]: https://docs.oracle.com/javase/8/docs/api/java/util/Date.html "Date"
 [double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
 [InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
 [int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[long]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "long"
 [JsonObject]: https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/JsonObject.html "JsonObject"
 [List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"
 [Map]: https://docs.oracle.com/javase/8/docs/api/java/util/Map.html "Map"

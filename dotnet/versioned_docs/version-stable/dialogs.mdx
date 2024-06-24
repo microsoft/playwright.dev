@@ -8,7 +8,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Introduction
 
-Playwright can interact with the web page dialogs such as [`alert`](https://developer.mozilla.org/en-US/docs/Web/API/Window/alert), [`confirm`](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm), [`prompt`](https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt) as well as [`beforeunload`](https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event) confirmation.
+Playwright can interact with the web page dialogs such as [`alert`](https://developer.mozilla.org/en-US/docs/Web/API/Window/alert), [`confirm`](https://developer.mozilla.org/en-US/docs/Web/API/Window/confirm), [`prompt`](https://developer.mozilla.org/en-US/docs/Web/API/Window/prompt) as well as [`beforeunload`](https://developer.mozilla.org/en-US/docs/Web/API/Window/beforeunload_event) confirmation. For print dialogs, see [Print](#print-dialogs).
 
 ## alert(), confirm(), prompt() dialogs
 
@@ -56,6 +56,21 @@ Page.Dialog += async (_, dialog) =>
 await Page.CloseAsync(new() { RunBeforeUnload = true });
 ```
 
+## Print dialogs
+
+In order to assert that a print dialog via [`window.print`](https://developer.mozilla.org/en-US/docs/Web/API/Window/print) was triggered, you can use the following snippet:
+
+```csharp
+await Page.GotoAsync("<url>");
+
+await Page.EvaluateAsync("(() => {window.waitForPrintDialog = new Promise(f => window.print = f);})()");
+await Page.GetByText("Print it!").ClickAsync();
+
+await Page.WaitForFunctionAsync("window.waitForPrintDialog");
+```
+
+This will wait for the print dialog to be opened after the button is clicked. Make sure to evaluate the script before clicking the button / after the page is loaded.
+
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
@@ -67,6 +82,7 @@ await Page.CloseAsync(new() { RunBeforeUnload = true });
 [BrowserType]: /api/class-browsertype.mdx "BrowserType"
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
+[Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
@@ -108,9 +124,11 @@ await Page.CloseAsync(new() { RunBeforeUnload = true });
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
 [bool]: https://docs.microsoft.com/en-us/dotnet/api/system.boolean "bool"
+[Date]: https://learn.microsoft.com/en-us/dotnet/api/system.datetime "DateTime"
 [double]: https://docs.microsoft.com/en-us/dotnet/api/system.double "double"
 [byte]: https://docs.microsoft.com/en-us/dotnet/api/system.byte "byte"
 [int]: https://docs.microsoft.com/en-us/dotnet/api/system.int32 "int"
+[long]: https://docs.microsoft.com/en-us/dotnet/api/system.int64 "long"
 [void]: https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/void "void"
 [string]: https://docs.microsoft.com/en-us/dotnet/api/system.string "string"
 [URL]: https://nodejs.org/api/url.html "URL"

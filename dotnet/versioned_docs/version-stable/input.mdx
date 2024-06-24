@@ -174,6 +174,9 @@ await page.GetByLabel("Upload file").SetInputFilesAsync("myfile.pdf");
 // Select multiple files
 await page.GetByLabel("Upload files").SetInputFilesAsync(new[] { "file1.txt", "file12.txt" });
 
+// Select a directory
+await page.GetByLabel("Upload directory").SetInputFilesAsync("mydir");
+
 // Remove all the selected files
 await page.GetByLabel("Upload file").SetInputFilesAsync(new[] {});
 
@@ -231,6 +234,33 @@ await page.Mouse.UpAsync();
 If your page relies on the `dragover` event being dispatched, you need at least two mouse moves to trigger it in all browsers. To reliably issue the second mouse move, repeat your [Mouse.MoveAsync()](/api/class-mouse.mdx#mouse-move) or [Locator.HoverAsync()](/api/class-locator.mdx#locator-hover) twice. The sequence of operations would be: hover the drag element, mouse down, hover the drop element, hover the drop element second time, mouse up.
 :::
 
+## Scrolling
+
+Most of the time, Playwright will automatically scroll for you before doing any actions. Therefore, you do not need to scroll explicitly.
+
+```csharp
+// Scrolls automatically so that button is visible
+await page.GetByRole(AriaRole.Button).ClickAsync();
+```
+
+However, in rare cases you might need to manually scroll. For example, you might want to force an "infinite list" to load more elements, or position the page for a specific screenshot. In such a case, the most reliable way is to find an element that you want to make visible at the bottom, and scroll it into view.
+
+```csharp
+// Scroll the footer into view, forcing an "infinite list" to load more content
+await page.GetByText("Footer text").ScrollIntoViewIfNeededAsync();
+```
+
+If you would like to control the scrolling more precisely, use [Mouse.WheelAsync()](/api/class-mouse.mdx#mouse-wheel) or [Locator.EvaluateAsync()](/api/class-locator.mdx#locator-evaluate):
+
+```csharp
+// Position the mouse and scroll with the mouse wheel
+await page.GetByTestId("scrolling-container").HoverAsync();
+await page.Mouse.WheelAsync(0, 10);
+
+// Alternatively, programmatically scroll a specific element
+await page.GetByTestId("scrolling-container").EvaluateAsync("e => e.scrollTop += 100");
+```
+
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
@@ -242,6 +272,7 @@ If your page relies on the `dragover` event being dispatched, you need at least 
 [BrowserType]: /api/class-browsertype.mdx "BrowserType"
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
+[Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
@@ -283,9 +314,11 @@ If your page relies on the `dragover` event being dispatched, you need at least 
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
 [bool]: https://docs.microsoft.com/en-us/dotnet/api/system.boolean "bool"
+[Date]: https://learn.microsoft.com/en-us/dotnet/api/system.datetime "DateTime"
 [double]: https://docs.microsoft.com/en-us/dotnet/api/system.double "double"
 [byte]: https://docs.microsoft.com/en-us/dotnet/api/system.byte "byte"
 [int]: https://docs.microsoft.com/en-us/dotnet/api/system.int32 "int"
+[long]: https://docs.microsoft.com/en-us/dotnet/api/system.int64 "long"
 [void]: https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/void "void"
 [string]: https://docs.microsoft.com/en-us/dotnet/api/system.string "string"
 [URL]: https://nodejs.org/api/url.html "URL"

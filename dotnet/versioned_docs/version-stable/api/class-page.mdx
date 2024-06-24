@@ -163,7 +163,7 @@ await page.AddLocatorHandlerAsync(page.GetByText("Sign up to the newsletter"), a
 - `locator` [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-option-locator"/><a href="#page-add-locator-handler-option-locator" class="list-anchor">#</a>
   
   Locator that triggers the handler.
-- `handler` [Action]&lt;[Locator]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-option-handler"/><a href="#page-add-locator-handler-option-handler" class="list-anchor">#</a>
+- `handler` [Func]&lt;[Locator], [Task]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-option-handler"/><a href="#page-add-locator-handler-option-handler" class="list-anchor">#</a>
   
   Function that should be run once `locator` appears. This function should get rid of the element that blocks actions like click.
 - `options` `PageAddLocatorHandlerOptions?` *(optional)*
@@ -579,25 +579,6 @@ class PageExamples
 }
 ```
 
-An example of passing an element handle:
-
-```csharp
-var result = new TaskCompletionSource<string>();
-await page.ExposeBindingAsync("clicked", async (BindingSource _, IJSHandle t) =>
-{
-    return result.TrySetResult(await t.AsElement().TextContentAsync());
-});
-
-await page.SetContentAsync("<script>\n" +
-  "  document.addEventListener('click', event => window.clicked(event.target));\n" +
-  "</script>\n" +
-  "<div>Click me</div>\n" +
-  "<div>Or click me</div>\n");
-
-await page.ClickAsync("div");
-Console.WriteLine(await result.Task);
-```
-
 **Arguments**
 - `name` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-expose-binding-option-name"/><a href="#page-expose-binding-option-name" class="list-anchor">#</a>
   
@@ -607,6 +588,11 @@ Console.WriteLine(await result.Task);
   Callback function that will be called in the Playwright's context.
 - `options` `PageExposeBindingOptions?` *(optional)*
   - `Handle` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-expose-binding-option-handle"/><a href="#page-expose-binding-option-handle" class="list-anchor">#</a>
+    
+    :::warning[Deprecated]
+    This option will be removed in the future.
+    :::
+    
     
     Whether to pass the argument as a handle, instead of passing by value. When passing a handle, only one argument is supported. When passing by value, multiple arguments are supported.
 
@@ -1996,7 +1982,7 @@ await page.RunAndWaitForResponseAsync(async () =>
 await page.RunAndWaitForResponseAsync(async () =>
 {
     await page.GetByText("trigger response").ClickAsync();
-}, response => response.Url == "https://example.com" && response.Status == 200);
+}, response => response.Url == "https://example.com" && response.Status == 200 && response.Request.Method == "GET");
 ```
 
 **Arguments**
@@ -2035,7 +2021,7 @@ await page.RunAndWaitForResponseAsync(async () =>
 await page.RunAndWaitForResponseAsync(async () =>
 {
     await page.GetByText("trigger response").ClickAsync();
-}, response => response.Url == "https://example.com" && response.Status == 200);
+}, response => response.Url == "https://example.com" && response.Status == 200 && response.Request.Method == "GET");
 ```
 
 **Arguments**
@@ -2434,7 +2420,7 @@ await Page.UnrouteAllAsync(options);
 - `options` `PageUnrouteAllOptions?` *(optional)*
   - `Behavior` `enum UnrouteBehavior { Wait, IgnoreErrors, Default }?` *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-unroute-all-option-behavior"/><a href="#page-unroute-all-option-behavior" class="list-anchor">#</a>
     
-    Specifies wether to wait for already running handlers and what to do if they throw errors:
+    Specifies whether to wait for already running handlers and what to do if they throw errors:
     * `'default'` - do not wait for current handler calls (if any) to finish, if unrouted handler throws, it may result in unhandled error
     * `'wait'` - wait for current handler calls (if any) to finish
     * `'ignoreErrors'` - do not wait for current handler calls (if any) to finish, all errors thrown by the handlers after unrouting are silently caught
@@ -2668,6 +2654,23 @@ Page.APIRequest
 
 **Type**
 - [APIRequestContext]
+
+---
+
+### Clock {#page-clock}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>page.Clock</x-search>
+
+Playwright has ability to mock clock and passage of time.
+
+**Usage**
+
+```csharp
+Page.Clock
+```
+
+**Type**
+- [Clock]
 
 ---
 
@@ -4370,7 +4373,7 @@ Use locator-based [Locator.SetInputFilesAsync()](/api/class-locator.mdx#locator-
 :::
 
 
-Sets the value of the file input to these file paths or files. If some of the `filePaths` are relative paths, then they are resolved relative to the current working directory. For empty array, clears the selected files.
+Sets the value of the file input to these file paths or files. If some of the `filePaths` are relative paths, then they are resolved relative to the current working directory. For empty array, clears the selected files. For inputs with a `[webkitdirectory]` attribute, only a single directory path is supported.
 
 This method expects `selector` to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input). However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), targets the control instead.
 
@@ -4731,6 +4734,7 @@ await page.WaitForTimeoutAsync(1000);
 [BrowserType]: /api/class-browsertype.mdx "BrowserType"
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
+[Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
@@ -4772,9 +4776,11 @@ await page.WaitForTimeoutAsync(1000);
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
 [bool]: https://docs.microsoft.com/en-us/dotnet/api/system.boolean "bool"
+[Date]: https://learn.microsoft.com/en-us/dotnet/api/system.datetime "DateTime"
 [double]: https://docs.microsoft.com/en-us/dotnet/api/system.double "double"
 [byte]: https://docs.microsoft.com/en-us/dotnet/api/system.byte "byte"
 [int]: https://docs.microsoft.com/en-us/dotnet/api/system.int32 "int"
+[long]: https://docs.microsoft.com/en-us/dotnet/api/system.int64 "long"
 [void]: https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/void "void"
 [string]: https://docs.microsoft.com/en-us/dotnet/api/system.string "string"
 [URL]: https://nodejs.org/api/url.html "URL"

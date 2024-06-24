@@ -545,52 +545,6 @@ asyncio.run(main())
 </TabItem>
 </Tabs>
 
-An example of passing an element handle:
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-def print(source, element):
-    print(element.text_content())
-
-context.expose_binding("clicked", print, handle=true)
-page.set_content("""
-  <script>
-    document.addEventListener('click', event => window.clicked(event.target));
-  </script>
-  <div>Click me</div>
-  <div>Or click me</div>
-""")
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-async def print(source, element):
-    print(await element.text_content())
-
-await context.expose_binding("clicked", print, handle=true)
-await page.set_content("""
-  <script>
-    document.addEventListener('click', event => window.clicked(event.target));
-  </script>
-  <div>Click me</div>
-  <div>Or click me</div>
-""")
-```
-
-</TabItem>
-</Tabs>
-
 **Arguments**
 - `name` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-binding-option-name"/><a href="#browser-context-expose-binding-option-name" class="list-anchor">#</a>
   
@@ -599,6 +553,11 @@ await page.set_content("""
   
   Callback function that will be called in the Playwright's context.
 - `handle` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-binding-option-handle"/><a href="#browser-context-expose-binding-option-handle" class="list-anchor">#</a>
+  
+  :::warning[Deprecated]
+  This option will be removed in the future.
+  :::
+  
   
   Whether to pass the argument as a handle, instead of passing by value. When passing a handle, only one argument is supported. When passing by value, multiple arguments are supported.
 
@@ -732,21 +691,22 @@ browser_context.grant_permissions(permissions, **kwargs)
 - `permissions` [List]\[[str]\]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-grant-permissions-option-permissions"/><a href="#browser-context-grant-permissions-option-permissions" class="list-anchor">#</a>
   
   A permission or an array of permissions to grant. Permissions can be one of the following values:
-  * `'geolocation'`
-  * `'midi'`
-  * `'midi-sysex'` (system-exclusive midi)
-  * `'notifications'`
-  * `'camera'`
-  * `'microphone'`
-  * `'background-sync'`
-  * `'ambient-light-sensor'`
   * `'accelerometer'`
-  * `'gyroscope'`
-  * `'magnetometer'`
   * `'accessibility-events'`
+  * `'ambient-light-sensor'`
+  * `'background-sync'`
+  * `'camera'`
   * `'clipboard-read'`
   * `'clipboard-write'`
+  * `'geolocation'`
+  * `'gyroscope'`
+  * `'magnetometer'`
+  * `'microphone'`
+  * `'midi-sysex'` (system-exclusive midi)
+  * `'midi'`
+  * `'notifications'`
   * `'payment-handler'`
+  * `'storage-access'`
 - `origin` [str] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-grant-permissions-option-origin"/><a href="#browser-context-grant-permissions-option-origin" class="list-anchor">#</a>
   
   The [origin] to grant permissions to, e.g. "https://example.com".
@@ -1238,7 +1198,7 @@ browser_context.unroute_all(**kwargs)
 **Arguments**
 - `behavior` "wait" | "ignoreErrors" | "default" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-unroute-all-option-behavior"/><a href="#browser-context-unroute-all-option-behavior" class="list-anchor">#</a>
   
-  Specifies wether to wait for already running handlers and what to do if they throw errors:
+  Specifies whether to wait for already running handlers and what to do if they throw errors:
   * `'default'` - do not wait for current handler calls (if any) to finish, if unrouted handler throws, it may result in unhandled error
   * `'wait'` - wait for current handler calls (if any) to finish
   * `'ignoreErrors'` - do not wait for current handler calls (if any) to finish, all errors thrown by the handlers after unrouting are silently caught
@@ -1318,6 +1278,23 @@ browser_context.browser
 
 **Returns**
 - [NoneType] | [Browser]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-browser-return"/><a href="#browser-context-browser-return" class="list-anchor">#</a>
+
+---
+
+### clock {#browser-context-clock}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>browserContext.clock</x-search>
+
+Playwright has ability to mock clock and passage of time.
+
+**Usage**
+
+```python
+browser_context.clock
+```
+
+**Type**
+- [Clock]
 
 ---
 
@@ -1703,6 +1680,7 @@ browser_context.on("weberror", handler)
 [BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
 [BrowserType]: /api/class-browsertype.mdx "BrowserType"
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
