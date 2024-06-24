@@ -174,6 +174,9 @@ page.getByLabel("Upload file").setInputFiles(Paths.get("myfile.pdf"));
 // Select multiple files
 page.getByLabel("Upload files").setInputFiles(new Path[] {Paths.get("file1.txt"), Paths.get("file2.txt")});
 
+// Select a directory
+page.getByLabel("Upload directory").setInputFiles(Paths.get("mydir"));
+
 // Remove all the selected files
 page.getByLabel("Upload file").setInputFiles(new Path[0]);
 
@@ -226,6 +229,33 @@ page.mouse().up();
 If your page relies on the `dragover` event being dispatched, you need at least two mouse moves to trigger it in all browsers. To reliably issue the second mouse move, repeat your [Mouse.move()](/api/class-mouse.mdx#mouse-move) or [Locator.hover()](/api/class-locator.mdx#locator-hover) twice. The sequence of operations would be: hover the drag element, mouse down, hover the drop element, hover the drop element second time, mouse up.
 :::
 
+## Scrolling
+
+Most of the time, Playwright will automatically scroll for you before doing any actions. Therefore, you do not need to scroll explicitly.
+
+```java
+// Scrolls automatically so that button is visible
+page.getByRole(AriaRole.BUTTON).click();
+```
+
+However, in rare cases you might need to manually scroll. For example, you might want to force an "infinite list" to load more elements, or position the page for a specific screenshot. In such a case, the most reliable way is to find an element that you want to make visible at the bottom, and scroll it into view.
+
+```java
+// Scroll the footer into view, forcing an "infinite list" to load more content
+page.getByText("Footer text").scrollIntoViewIfNeeded();
+```
+
+If you would like to control the scrolling more precisely, use [Mouse.wheel()](/api/class-mouse.mdx#mouse-wheel) or [Locator.evaluate()](/api/class-locator.mdx#locator-evaluate):
+
+```java
+// Position the mouse and scroll with the mouse wheel
+page.getByTestId("scrolling-container").hover();
+page.mouse.wheel(0, 10);
+
+// Alternatively, programmatically scroll a specific element
+page.getByTestId("scrolling-container").evaluate("e => e.scrollTop += 100");
+```
+
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
@@ -235,6 +265,7 @@ If your page relies on the `dragover` event being dispatched, you need at least 
 [BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
 [BrowserType]: /api/class-browsertype.mdx "BrowserType"
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
@@ -280,9 +311,11 @@ If your page relies on the `dragover` event being dispatched, you need at least 
 [boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
 [byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
 [Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
+[Date]: https://docs.oracle.com/javase/8/docs/api/java/util/Date.html "Date"
 [double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
 [InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
 [int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[long]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "long"
 [JsonObject]: https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/JsonObject.html "JsonObject"
 [List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"
 [Map]: https://docs.oracle.com/javase/8/docs/api/java/util/Map.html "Map"

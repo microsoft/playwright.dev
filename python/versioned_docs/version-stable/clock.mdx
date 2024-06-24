@@ -1,0 +1,297 @@
+---
+id: clock
+title: "Clock"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import HTMLCard from '@site/src/components/HTMLCard';
+
+## Introduction
+
+Accurately simulating time-dependent behavior is essential for verifying the correctness of applications. Utilizing [Clock] functionality allows developers to manipulate and control time within tests, enabling the precise validation of features such as rendering time, timeouts, scheduled tasks without the delays and variability of real-time execution.
+
+[page.clock](/api/class-page.mdx#page-clock) overrides native global classes and functions related to time allowing them to be manually controlled:
+- `Date`
+- `setTimeout`
+- `clearTimeout`
+- `setInterval`
+- `clearInterval`
+- `requestAnimationFrame`
+- `cancelAnimationFrame`
+- `requestIdleCallback`
+- `cancelIdleCallback`
+- `performance`
+
+## Test with predefined time
+
+Often you only need to fake `Date.now` while keeping the timers going. That way the time flows naturally, but `Date.now` always returns a fixed value.
+
+```html
+<div id="current-time" data-testid="current-time"></div>
+<script>
+  const renderTime = () => {
+    document.getElementById('current-time').textContent =
+        new Date().toLocaleTimeString();
+  };
+  setInterval(renderTime, 1000);
+</script>
+```
+
+## Consistent time and timers
+
+Sometimes your timers depend on `Date.now` and are confused when the `Date.now` value does not change over time. In this case, you can install the clock and fast forward to the time of interest when testing.
+
+```html
+<div id="current-time" data-testid="current-time"></div>
+<script>
+  const renderTime = () => {
+    document.getElementById('current-time').textContent =
+        new Date().toLocaleTimeString();
+  };
+  setInterval(renderTime, 1000);
+</script>
+```
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Initialize clock with some time before the test time and let the page load
+# naturally. `Date.now` will progress as the timers fire.
+page.clock.install(time=datetime.datetime(2024, 2, 2, 8, 0, 0))
+page.goto("http://localhost:3333")
+
+# Pretend that the user closed the laptop lid and opened it again at 10am.
+# Pause the time once reached that point.
+page.clock.pause_at(datetime.datetime(2024, 2, 2, 10, 0, 0))
+
+# Assert the page state.
+expect(page.get_by_test_id("current-time")).to_have_text("2/2/2024, 10:00:00 AM")
+
+# Close the laptop lid again and open it at 10:30am.
+page.clock.fast_forward("30:00")
+expect(page.get_by_test_id("current-time")).to_have_text("2/2/2024, 10:30:00 AM")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Initialize clock with some time before the test time and let the page load
+# naturally. `Date.now` will progress as the timers fire.
+await page.clock.install(time=datetime.datetime(2024, 2, 2, 8, 0, 0))
+await page.goto("http://localhost:3333")
+
+# Pretend that the user closed the laptop lid and opened it again at 10am.
+# Pause the time once reached that point.
+await page.clock.pause_at(datetime.datetime(2024, 2, 2, 10, 0, 0))
+
+# Assert the page state.
+await expect(page.get_by_test_id("current-time")).to_have_text("2/2/2024, 10:00:00 AM")
+
+# Close the laptop lid again and open it at 10:30am.
+await page.clock.fast_forward("30:00")
+await expect(page.get_by_test_id("current-time")).to_have_text("2/2/2024, 10:30:00 AM")
+```
+
+</TabItem>
+</Tabs>
+
+## Test inactivity monitoring
+
+Inactivity monitoring is a common feature in web applications that logs out users after a period of inactivity. Testing this feature can be tricky because you need to wait for a long time to see the effect. With the help of the clock, you can speed up time and test this feature quickly.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Initial time does not matter for the test, so we can pick current time.
+page.clock.install()
+page.goto("http://localhost:3333")
+# Interact with the page
+page.get_by_role("button").click()
+
+# Fast forward time 5 minutes as if the user did not do anything.
+# Fast forward is like closing the laptop lid and opening it after 5 minutes.
+# All the timers due will fire once immediately, as in the real browser.
+page.clock.fast_forward("5:00")
+
+# Check that the user was logged out automatically.
+expect(page.get_by_text("You have been logged out due to inactivity.")).to_be_visible()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Initial time does not matter for the test, so we can pick current time.
+await page.clock.install()
+await page.goto("http://localhost:3333")
+# Interact with the page
+await page.get_by_role("button").click()
+
+# Fast forward time 5 minutes as if the user did not do anything.
+# Fast forward is like closing the laptop lid and opening it after 5 minutes.
+# All the timers due will fire once immediately, as in the real browser.
+await page.clock.fast_forward("5:00")
+
+# Check that the user was logged out automatically.
+await expect(page.getByText("You have been logged out due to inactivity.")).toBeVisible()
+```
+
+</TabItem>
+</Tabs>
+
+## Tick through time manually, firing all the timers consistently
+
+In rare cases, you may want to tick through time manually, firing all timers and animation frames in the process to achieve a fine-grained control over the passage of time.
+
+```html
+<div id="current-time" data-testid="current-time"></div>
+<script>
+  const renderTime = () => {
+    document.getElementById('current-time').textContent =
+        new Date().toLocaleTimeString();
+  };
+  setInterval(renderTime, 1000);
+</script>
+```
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Initialize clock with a specific time, let the page load naturally.
+page.clock.install(
+    time=datetime.datetime(2024, 2, 2, 8, 0, 0, tzinfo=datetime.timezone.pst),
+)
+page.goto("http://localhost:3333")
+locator = page.get_by_test_id("current-time")
+
+# Pause the time flow, stop the timers, you now have manual control
+# over the page time.
+page.clock.pause_at(datetime.datetime(2024, 2, 2, 10, 0, 0))
+expect(locator).to_have_text("2/2/2024, 10:00:00 AM")
+
+# Tick through time manually, firing all timers in the process.
+# In this case, time will be updated in the screen 2 times.
+page.clock.run_for(2000)
+expect(locator).to_have_text("2/2/2024, 10:00:02 AM")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Initialize clock with a specific time, let the page load naturally.
+await page.clock.install(time=
+    datetime.datetime(2024, 2, 2, 8, 0, 0, tzinfo=datetime.timezone.pst),
+)
+await page.goto("http://localhost:3333")
+locator = page.get_by_test_id("current-time")
+
+# Pause the time flow, stop the timers, you now have manual control
+# over the page time.
+await page.clock.pause_at(datetime.datetime(2024, 2, 2, 10, 0, 0))
+await expect(locator).to_have_text("2/2/2024, 10:00:00 AM")
+
+# Tick through time manually, firing all timers in the process.
+# In this case, time will be updated in the screen 2 times.
+await page.clock.run_for(2000)
+await expect(locator).to_have_text("2/2/2024, 10:00:02 AM")
+```
+
+</TabItem>
+</Tabs>
+
+
+[Accessibility]: /api/class-accessibility.mdx "Accessibility"
+[APIRequest]: /api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
+[Browser]: /api/class-browser.mdx "Browser"
+[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: /api/class-browsertype.mdx "BrowserType"
+[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[Clock]: /api/class-clock.mdx "Clock"
+[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: /api/class-dialog.mdx "Dialog"
+[Download]: /api/class-download.mdx "Download"
+[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
+[Error]: /api/class-error.mdx "Error"
+[FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[Frame]: /api/class-frame.mdx "Frame"
+[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: /api/class-jshandle.mdx "JSHandle"
+[Keyboard]: /api/class-keyboard.mdx "Keyboard"
+[Locator]: /api/class-locator.mdx "Locator"
+[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
+[Mouse]: /api/class-mouse.mdx "Mouse"
+[Page]: /api/class-page.mdx "Page"
+[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
+[Playwright]: /api/class-playwright.mdx "Playwright"
+[Request]: /api/class-request.mdx "Request"
+[Response]: /api/class-response.mdx "Response"
+[Route]: /api/class-route.mdx "Route"
+[Selectors]: /api/class-selectors.mdx "Selectors"
+[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: /api/class-tracing.mdx "Tracing"
+[Video]: /api/class-video.mdx "Video"
+[WebError]: /api/class-weberror.mdx "WebError"
+[WebSocket]: /api/class-websocket.mdx "WebSocket"
+[Worker]: /api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
+[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[bytes]: https://docs.python.org/3/library/stdtypes.html#bytes "bytes"
+[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
+[Exception]: https://docs.python.org/3/library/exceptions.html#Exception "Exception"
+[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
+[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
+[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
+[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
+[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
+[URL]: https://en.wikipedia.org/wiki/URL "URL"
+[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
+[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
+[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"
+
+[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/python/about "all available image tags"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/python/about "Microsoft Artifact Registry"
+[Dockerfile.jammy]: https://github.com/microsoft/playwright-python/blob/main/utils/docker/Dockerfile.jammy "Dockerfile.jammy"

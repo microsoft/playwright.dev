@@ -317,28 +317,6 @@ await page.SetContentAsync("<script>\n" +
 await page.GetByRole(AriaRole.Button).ClickAsync();
 ```
 
-An example of passing an element handle:
-
-```csharp
-var result = new TaskCompletionSource<string>();
-var page = await Context.NewPageAsync();
-await Context.ExposeBindingAsync("clicked", async (BindingSource _, IJSHandle t) =>
-{
-    return result.TrySetResult(await t.AsElement().TextContentAsync());
-});
-
-await page.SetContentAsync("<script>\n" +
-  "  document.addEventListener('click', event => window.clicked(event.target));\n" +
-  "</script>\n" +
-  "<div>Click me</div>\n" +
-  "<div>Or click me</div>\n");
-
-await page.ClickAsync("div");
-// Note: it makes sense to await the result here, because otherwise, the context
-//  gets closed and the binding function will throw an exception.
-Assert.AreEqual("Click me", await result.Task);
-```
-
 **Arguments**
 - `name` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-binding-option-name"/><a href="#browser-context-expose-binding-option-name" class="list-anchor">#</a>
   
@@ -348,6 +326,11 @@ Assert.AreEqual("Click me", await result.Task);
   Callback function that will be called in the Playwright's context.
 - `options` `BrowserContextExposeBindingOptions?` *(optional)*
   - `Handle` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-binding-option-handle"/><a href="#browser-context-expose-binding-option-handle" class="list-anchor">#</a>
+    
+    :::warning[Deprecated]
+    This option will be removed in the future.
+    :::
+    
     
     Whether to pass the argument as a handle, instead of passing by value. When passing a handle, only one argument is supported. When passing by value, multiple arguments are supported.
 
@@ -434,21 +417,22 @@ await BrowserContext.GrantPermissionsAsync(permissions, options);
 - `permissions` [IEnumerable]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-grant-permissions-option-permissions"/><a href="#browser-context-grant-permissions-option-permissions" class="list-anchor">#</a>
   
   A permission or an array of permissions to grant. Permissions can be one of the following values:
-  * `'geolocation'`
-  * `'midi'`
-  * `'midi-sysex'` (system-exclusive midi)
-  * `'notifications'`
-  * `'camera'`
-  * `'microphone'`
-  * `'background-sync'`
-  * `'ambient-light-sensor'`
   * `'accelerometer'`
-  * `'gyroscope'`
-  * `'magnetometer'`
   * `'accessibility-events'`
+  * `'ambient-light-sensor'`
+  * `'background-sync'`
+  * `'camera'`
   * `'clipboard-read'`
   * `'clipboard-write'`
+  * `'geolocation'`
+  * `'gyroscope'`
+  * `'magnetometer'`
+  * `'microphone'`
+  * `'midi-sysex'` (system-exclusive midi)
+  * `'midi'`
+  * `'notifications'`
   * `'payment-handler'`
+  * `'storage-access'`
 - `options` `BrowserContextGrantPermissionsOptions?` *(optional)*
   - `Origin` [string]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-grant-permissions-option-origin"/><a href="#browser-context-grant-permissions-option-origin" class="list-anchor">#</a>
     
@@ -939,7 +923,7 @@ await BrowserContext.UnrouteAllAsync(options);
 - `options` `BrowserContextUnrouteAllOptions?` *(optional)*
   - `Behavior` `enum UnrouteBehavior { Wait, IgnoreErrors, Default }?` *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-unroute-all-option-behavior"/><a href="#browser-context-unroute-all-option-behavior" class="list-anchor">#</a>
     
-    Specifies wether to wait for already running handlers and what to do if they throw errors:
+    Specifies whether to wait for already running handlers and what to do if they throw errors:
     * `'default'` - do not wait for current handler calls (if any) to finish, if unrouted handler throws, it may result in unhandled error
     * `'wait'` - wait for current handler calls (if any) to finish
     * `'ignoreErrors'` - do not wait for current handler calls (if any) to finish, all errors thrown by the handlers after unrouting are silently caught
@@ -965,6 +949,23 @@ BrowserContext.APIRequest
 
 **Type**
 - [APIRequestContext]
+
+---
+
+### Clock {#browser-context-clock}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.45</font><x-search>browserContext.Clock</x-search>
+
+Playwright has ability to mock clock and passage of time.
+
+**Usage**
+
+```csharp
+BrowserContext.Clock
+```
+
+**Type**
+- [Clock]
 
 ---
 
@@ -1214,6 +1215,7 @@ BrowserContext.WebError += async (_, webError) => {};
 [BrowserType]: /api/class-browsertype.mdx "BrowserType"
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
+[Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
@@ -1255,9 +1257,11 @@ BrowserContext.WebError += async (_, webError) => {};
 [xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
 
 [bool]: https://docs.microsoft.com/en-us/dotnet/api/system.boolean "bool"
+[Date]: https://learn.microsoft.com/en-us/dotnet/api/system.datetime "DateTime"
 [double]: https://docs.microsoft.com/en-us/dotnet/api/system.double "double"
 [byte]: https://docs.microsoft.com/en-us/dotnet/api/system.byte "byte"
 [int]: https://docs.microsoft.com/en-us/dotnet/api/system.int32 "int"
+[long]: https://docs.microsoft.com/en-us/dotnet/api/system.int64 "long"
 [void]: https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/void "void"
 [string]: https://docs.microsoft.com/en-us/dotnet/api/system.string "string"
 [URL]: https://nodejs.org/api/url.html "URL"
