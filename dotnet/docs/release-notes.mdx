@@ -7,6 +7,66 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+## Version 1.45
+
+### Clock
+
+Utilizing the new [Clock] API allows to manipulate and control time within tests to verify time-related behavior. This API covers many common scenarios, including:
+* testing with predefined time;
+* keeping consistent time and timers;
+* monitoring inactivity;
+* ticking through time manually.
+
+```csharp
+// Initialize clock with some time before the test time and let the page load naturally.
+// `Date.now` will progress as the timers fire.
+await Page.Clock.InstallAsync(new
+{
+  Time = new DateTime(2024, 2, 2, 8, 0, 0)
+});
+await Page.GotoAsync("http://localhost:3333");
+
+// Pretend that the user closed the laptop lid and opened it again at 10am.
+// Pause the time once reached that point.
+await Page.Clock.PauseAtAsync(new DateTime(2024, 2, 2, 10, 0, 0));
+
+// Assert the page state.
+await Expect(Page.GetByTestId("current-time")).ToHaveText("2/2/2024, 10:00:00 AM");
+
+// Close the laptop lid again and open it at 10:30am.
+await Page.Clock.FastForwardAsync("30:00");
+await Expect(Page.GetByTestId("current-time")).ToHaveText("2/2/2024, 10:30:00 AM");
+```
+
+See [the clock guide](./clock.mdx) for more details.
+
+### Miscellaneous
+- Method [Locator.SetInputFilesAsync()](/api/class-locator.mdx#locator-set-input-files) now supports uploading a directory for `<input type=file webkitdirectory>` elements.
+  
+  ```csharp
+  await page.GetByLabel("Upload directory").SetInputFilesAsync("mydir");
+  ```
+  
+- Multiple methods like [Locator.ClickAsync()](/api/class-locator.mdx#locator-click) or [Locator.PressAsync()](/api/class-locator.mdx#locator-press) now support a `ControlOrMeta` modifier key. This key maps to `Meta` on macOS and maps to `Control` on Windows and Linux.
+  
+  ```csharp
+  // Press the common keyboard shortcut Control+S or Meta+S to trigger a "Save" operation.
+  await page.Keyboard.PressAsync("ControlOrMeta+S");
+  ```
+  
+- New property `httpCredentials.send` in [ApiRequest.NewContextAsync()](/api/class-apirequest.mdx#api-request-new-context) that allows to either always send the `Authorization` header or only send it in response to `401 Unauthorized`.
+- Playwright now supports Chromium, Firefox and WebKit on Ubuntu 24.04.
+- v1.45 is the last release to receive WebKit update for macOS 12 Monterey. Please update macOS to keep using the latest WebKit.
+
+### Browser Versions
+* Chromium 127.0.6533.5
+* Mozilla Firefox 127.0
+* WebKit 17.4
+
+This version was also tested against the following stable channels:
+* Google Chrome 126
+* Microsoft Edge 126
+
 ## Version 1.44
 
 ### New APIs
