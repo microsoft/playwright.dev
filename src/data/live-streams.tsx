@@ -1,5 +1,21 @@
 const liveStreams = [
   {
+    title: 'It\'s time to talk Playwright with the clock API',
+    description: '',
+    id: '263x99Oe1g4',
+    year: '2024',
+    host: 'Playwright Live',
+    speakers: ["Debbie O'Brien", "Ben Fellows"]
+  },
+  {
+    title: 'Comunidad de Playwright, última versión y más',
+    description: '',
+    id: 'WOBbNW-MApw',
+    year: '2024',
+    host: 'Playwright Live Spanish',
+    speakers: ["Debbie O'Brien", "Carlos Gauto"]
+  },
+  {
     title: 'Community, latest release and more',
     description: '',
     id: 'ySBp6Kj0PVc',
