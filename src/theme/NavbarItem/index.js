@@ -46,7 +46,6 @@ function calculateMissingSites(baseSidebar, sidebars) {
   const baseItems = flatSidebar(baseSidebar);
   for (const [language, sidebar] of Object.entries(sidebars)) {
     const items = flatSidebar(sidebar);
-    const missingInLanguage = [];
     for (const item of baseItems) {
       if (!items.includes(item))
         missing.push(`/${language}/docs/${item}`);

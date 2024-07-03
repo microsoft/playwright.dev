@@ -101,6 +101,8 @@ class PythonFormatter {
       case 'void': return '[NoneType]';
       case 'boolean': return '[bool]';
       case 'string': return '[str]';
+      case 'Date': return '[datetime]';
+      case 'long': return '[int]';
       case 'Buffer': return '[bytes]';
     }
     return `[${text}]`;
