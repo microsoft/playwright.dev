@@ -2,7 +2,7 @@ const releaseVideos = [
   {
     version: '1.45',
     id: "54_aC-rVKHg",
-    highlights: ['Clock API', 'setInputFiles', 'ControlOrMeta+modifier'],
+    highlights: ['Clock API', 'directory uploads', 'ControlOrMeta+modifier'],
   },
   {
     version: '1.44',
