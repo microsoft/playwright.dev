@@ -1,5 +1,10 @@
 const releaseVideos = [
   {
+    version: '1.45',
+    id: "54_aC-rVKHg",
+    highlights: ['Clock API', 'directory uploads', 'ControlOrMeta+modifier'],
+  },
+  {
     version: '1.44',
     id: "avjSahFWdCI",
     highlights: ['VS Code extension', 'accessibility assertions', 'last failed test', 'clear cookies', 'locator handler'],
