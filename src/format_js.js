@@ -89,6 +89,7 @@ class JavaScriptFormatter {
     switch (text) {
       case 'int': return '[number]';
       case 'float': return '[number]';
+      case 'long': return '[number]';
       case 'path': return '[string]';
       case 'any': return '[Object]';
     }
