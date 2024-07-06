@@ -36,7 +36,7 @@ Often you only need to fake `Date.now` while keeping the timers going. That way 
 <script>
   const renderTime = () => {
     document.getElementById('current-time').textContent =
-        new Date().toLocaleTimeString();
+        new Date().toLocaleString();
   };
   setInterval(renderTime, 1000);
 </script>
@@ -51,7 +51,7 @@ Sometimes your timers depend on `Date.now` and are confused when the `Date.now` 
 <script>
   const renderTime = () => {
     document.getElementById('current-time').textContent =
-        new Date().toLocaleTimeString();
+        new Date().toLocaleString();
   };
   setInterval(renderTime, 1000);
 </script>
@@ -81,6 +81,26 @@ assertThat(locator).hasText("2/2/2024, 10:30:00 AM");
 
 Inactivity monitoring is a common feature in web applications that logs out users after a period of inactivity. Testing this feature can be tricky because you need to wait for a long time to see the effect. With the help of the clock, you can speed up time and test this feature quickly.
 
+```html
+<div id="remaining-time" data-testid="remaining-time"></div>
+<script>
+  const endTime = Date.now() + 5 * 60_000;
+  const renderTime = () => {
+    const diffInSeconds = Math.round((endTime - Date.now()) / 1000);
+    if (diffInSeconds <= 0) {
+      document.getElementById('remaining-time').textContent =
+        'You have been logged out due to inactivity.';
+    } else {
+      document.getElementById('remaining-time').textContent =
+        `You will be logged out in ${diffInSeconds} seconds.`;
+    }
+    setTimeout(renderTime, 1000);
+  };
+  renderTime();
+</script>
+<button type="button">Interaction</button>
+```
+
 ```java
 // Initial time does not matter for the test, so we can pick current time.
 page.clock().install();
@@ -93,7 +113,7 @@ locator.click();
 // Fast forward time 5 minutes as if the user did not do anything.
 // Fast forward is like closing the laptop lid and opening it after 5 minutes.
 // All the timers due will fire once immediately, as in the real browser.
-page.clock().fastForward("5:00");
+page.clock().fastForward("05:00");
 
 // Check that the user was logged out automatically.
 assertThat(page.getByText("You have been logged out due to inactivity.")).isVisible();
@@ -108,7 +128,7 @@ In rare cases, you may want to tick through time manually, firing all timers and
 <script>
   const renderTime = () => {
     document.getElementById('current-time').textContent =
-        new Date().toLocaleTimeString();
+        new Date().toLocaleString();
   };
   setInterval(renderTime, 1000);
 </script>
