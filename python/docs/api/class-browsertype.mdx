@@ -263,16 +263,16 @@ browser = await playwright.chromium.launch( # or "firefox" or "webkit".
   
   If `true`, Playwright does not pass its own configurations args and only uses the ones from `args`. If an array is given, then filters out the given default arguments. Dangerous option; use with care. Defaults to `false`.
 - `proxy` [Dict] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-proxy"/><a href="#browser-type-launch-option-proxy" class="list-anchor">#</a>
-  - `server` [str]
+  - `server` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-server"/><a href="#browser-type-launch-option-server" class="list-anchor">#</a>
     
     Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
-  - `bypass` [str] *(optional)*
+  - `bypass` [str] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-bypass"/><a href="#browser-type-launch-option-bypass" class="list-anchor">#</a>
     
     Optional comma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
-  - `username` [str] *(optional)*
+  - `username` [str] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-username"/><a href="#browser-type-launch-option-username" class="list-anchor">#</a>
     
     Optional username to use if HTTP proxy requires authentication.
-  - `password` [str] *(optional)*
+  - `password` [str] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-option-password"/><a href="#browser-type-launch-option-password" class="list-anchor">#</a>
     
     Optional password to use if HTTP proxy requires authentication.
   
@@ -336,6 +336,36 @@ browser_type.launch_persistent_context(user_data_dir, **kwargs)
 - `chromium_sandbox` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-chromium-sandbox"/><a href="#browser-type-launch-persistent-context-option-chromium-sandbox" class="list-anchor">#</a>
   
   Enable Chromium sandboxing. Defaults to `false`.
+- `client_certificates` [List]\[[Dict]\] *(optional)* <font size="2">Added in: 1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-client-certificates"/><a href="#browser-type-launch-persistent-context-option-client-certificates" class="list-anchor">#</a>
+  - `url` [str] <font size="2">Added in: 1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-url"/><a href="#browser-type-launch-persistent-context-option-url" class="list-anchor">#</a>
+    
+    Glob pattern to match the URLs that the certificate is valid for.
+  - `certs` [List]\[[Dict]\] <font size="2">Added in: 1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-certs"/><a href="#browser-type-launch-persistent-context-option-certs" class="list-anchor">#</a>
+    - `certPath` [str] *(optional)* <font size="2">Added in: 1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-cert-path"/><a href="#browser-type-launch-persistent-context-option-cert-path" class="list-anchor">#</a>
+      
+      Path to the file with the certificate in PEM format.
+    - `keyPath` [str] *(optional)* <font size="2">Added in: 1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-key-path"/><a href="#browser-type-launch-persistent-context-option-key-path" class="list-anchor">#</a>
+      
+      Path to the file with the private key in PEM format.
+    - `pfxPath` [str] *(optional)* <font size="2">Added in: 1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-pfx-path"/><a href="#browser-type-launch-persistent-context-option-pfx-path" class="list-anchor">#</a>
+      
+      Path to the PFX or PKCS12 encoded private key and certificate chain.
+    - `passphrase` [str] *(optional)* <font size="2">Added in: 1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-passphrase"/><a href="#browser-type-launch-persistent-context-option-passphrase" class="list-anchor">#</a>
+      
+      Passphrase for the private key (PEM or PFX).
+    
+    List of client certificates to be used.
+  
+  An array of client certificates to be used. Each certificate object must have both `certPath` and `keyPath` or a single `pfxPath` to load the client certificate. Optionally, `passphrase` property should be provided if the private key is encrypted. If the certificate is valid only for specific URLs, the `url` property should be provided with a glob pattern to match the URLs that the certificate is valid for.
+  
+  :::note
+  Using Client Certificates in combination with Proxy Servers is not supported.
+  :::
+  
+  :::note
+  When using WebKit on macOS, accessing `localhost` will not pick up client certificates. You can make it work by replacing `localhost` with `local.playwright`.
+  :::
+  
 - `color_scheme` "light" | "dark" | "no-preference" | "null" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-color-scheme"/><a href="#browser-type-launch-persistent-context-option-color-scheme" class="list-anchor">#</a>
   
   Emulates `'prefers-colors-scheme'` media feature, supported values are `'light'`, `'dark'`, `'no-preference'`. See [page.emulate_media()](/api/class-page.mdx#page-emulate-media) for more details. Passing `'null'` resets emulation to system defaults. Defaults to `'light'`.
@@ -369,13 +399,13 @@ browser_type.launch_persistent_context(user_data_dir, **kwargs)
   
   Emulates `'forced-colors'` media feature, supported values are `'active'`, `'none'`. See [page.emulate_media()](/api/class-page.mdx#page-emulate-media) for more details. Passing `'null'` resets emulation to system defaults. Defaults to `'none'`.
 - `geolocation` [Dict] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-geolocation"/><a href="#browser-type-launch-persistent-context-option-geolocation" class="list-anchor">#</a>
-  - `latitude` [float]
+  - `latitude` [float]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-latitude"/><a href="#browser-type-launch-persistent-context-option-latitude" class="list-anchor">#</a>
     
     Latitude between -90 and 90.
-  - `longitude` [float]
+  - `longitude` [float]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-longitude"/><a href="#browser-type-launch-persistent-context-option-longitude" class="list-anchor">#</a>
     
     Longitude between -180 and 180.
-  - `accuracy` [float] *(optional)*
+  - `accuracy` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-accuracy"/><a href="#browser-type-launch-persistent-context-option-accuracy" class="list-anchor">#</a>
     
     Non-negative accuracy value. Defaults to `0`.
 - `handle_sighup` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-handle-sighup"/><a href="#browser-type-launch-persistent-context-option-handle-sighup" class="list-anchor">#</a>
@@ -394,16 +424,16 @@ browser_type.launch_persistent_context(user_data_dir, **kwargs)
   
   Whether to run browser in headless mode. More details for [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) and [Firefox](https://developer.mozilla.org/en-US/docs/Mozilla/Firefox/Headless_mode). Defaults to `true` unless the `devtools` option is `true`.
 - `http_credentials` [Dict] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-http-credentials"/><a href="#browser-type-launch-persistent-context-option-http-credentials" class="list-anchor">#</a>
-  - `username` [str]
+  - `username` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-username"/><a href="#browser-type-launch-persistent-context-option-username" class="list-anchor">#</a>
     
     
-  - `password` [str]
+  - `password` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-password"/><a href="#browser-type-launch-persistent-context-option-password" class="list-anchor">#</a>
     
     
-  - `origin` [str] *(optional)*
+  - `origin` [str] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-origin"/><a href="#browser-type-launch-persistent-context-option-origin" class="list-anchor">#</a>
     
     Restrain sending http credentials on specific origin (scheme://host:port).
-  - `send` "unauthorized" | "always" *(optional)*
+  - `send` "unauthorized" | "always" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-send"/><a href="#browser-type-launch-persistent-context-option-send" class="list-anchor">#</a>
     
     This option only applies to the requests sent from corresponding [APIRequestContext] and does not affect requests sent from the browser. `'always'` - `Authorization` header with basic authentication credentials will be sent with the each API request. `'unauthorized` - the credentials are only sent when 401 (Unauthorized) response with `WWW-Authenticate` header is received. Defaults to `'unauthorized'`.
   
@@ -433,16 +463,16 @@ browser_type.launch_persistent_context(user_data_dir, **kwargs)
   
   A list of permissions to grant to all pages in this context. See [browser_context.grant_permissions()](/api/class-browsercontext.mdx#browser-context-grant-permissions) for more details. Defaults to none.
 - `proxy` [Dict] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-proxy"/><a href="#browser-type-launch-persistent-context-option-proxy" class="list-anchor">#</a>
-  - `server` [str]
+  - `server` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-server"/><a href="#browser-type-launch-persistent-context-option-server" class="list-anchor">#</a>
     
     Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
-  - `bypass` [str] *(optional)*
+  - `bypass` [str] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-bypass"/><a href="#browser-type-launch-persistent-context-option-bypass" class="list-anchor">#</a>
     
     Optional comma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
-  - `username` [str] *(optional)*
+  - `username` [str] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-username"/><a href="#browser-type-launch-persistent-context-option-username" class="list-anchor">#</a>
     
     Optional username to use if HTTP proxy requires authentication.
-  - `password` [str] *(optional)*
+  - `password` [str] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-password"/><a href="#browser-type-launch-persistent-context-option-password" class="list-anchor">#</a>
     
     Optional password to use if HTTP proxy requires authentication.
   
@@ -464,10 +494,10 @@ browser_type.launch_persistent_context(user_data_dir, **kwargs)
   
   Enables video recording for all pages into the specified directory. If not specified videos are not recorded. Make sure to call [browser_context.close()](/api/class-browsercontext.mdx#browser-context-close) for videos to be saved.
 - `record_video_size` [Dict] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-record-video-size"/><a href="#browser-type-launch-persistent-context-option-record-video-size" class="list-anchor">#</a>
-  - `width` [int]
+  - `width` [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-width"/><a href="#browser-type-launch-persistent-context-option-width" class="list-anchor">#</a>
     
     Video frame width.
-  - `height` [int]
+  - `height` [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-height"/><a href="#browser-type-launch-persistent-context-option-height" class="list-anchor">#</a>
     
     Video frame height.
   
@@ -476,10 +506,10 @@ browser_type.launch_persistent_context(user_data_dir, **kwargs)
   
   Emulates `'prefers-reduced-motion'` media feature, supported values are `'reduce'`, `'no-preference'`. See [page.emulate_media()](/api/class-page.mdx#page-emulate-media) for more details. Passing `'null'` resets emulation to system defaults. Defaults to `'no-preference'`.
 - `screen` [Dict] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-screen"/><a href="#browser-type-launch-persistent-context-option-screen" class="list-anchor">#</a>
-  - `width` [int]
+  - `width` [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-width"/><a href="#browser-type-launch-persistent-context-option-width" class="list-anchor">#</a>
     
     page width in pixels.
-  - `height` [int]
+  - `height` [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-height"/><a href="#browser-type-launch-persistent-context-option-height" class="list-anchor">#</a>
     
     page height in pixels.
   
@@ -508,10 +538,10 @@ browser_type.launch_persistent_context(user_data_dir, **kwargs)
   
   Specific user agent to use in this context.
 - `viewport` [NoneType] | [Dict] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-viewport"/><a href="#browser-type-launch-persistent-context-option-viewport" class="list-anchor">#</a>
-  - `width` [int]
+  - `width` [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-width"/><a href="#browser-type-launch-persistent-context-option-width" class="list-anchor">#</a>
     
     page width in pixels.
-  - `height` [int]
+  - `height` [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-persistent-context-option-height"/><a href="#browser-type-launch-persistent-context-option-height" class="list-anchor">#</a>
     
     page height in pixels.
   
