@@ -34,20 +34,50 @@ await ApiRequest.NewContextAsync(options);
     * baseURL: `http://localhost:3000` and sending request to `/bar.html` results in `http://localhost:3000/bar.html`
     * baseURL: `http://localhost:3000/foo/` and sending request to `./bar.html` results in `http://localhost:3000/foo/bar.html`
     * baseURL: `http://localhost:3000/foo` (without trailing slash) and navigating to `./bar.html` results in `http://localhost:3000/bar.html`
+  - `ClientCertificates` [IEnumerable]?&lt;ClientCertificates&gt; *(optional)* <font size="2">Added in: 1.46</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-client-certificates"/><a href="#api-request-new-context-option-client-certificates" class="list-anchor">#</a>
+    - `Url` [string] <font size="2">Added in: v1.0</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-url"/><a href="#api-request-new-context-option-url" class="list-anchor">#</a>
+      
+      Glob pattern to match the URLs that the certificate is valid for.
+    - `Certs` [IEnumerable]&lt;Certs&gt; <font size="2">Added in: v1.0</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-certs"/><a href="#api-request-new-context-option-certs" class="list-anchor">#</a>
+      - `CertPath` [string]? *(optional)* <font size="2">Added in: v1.0</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-cert-path"/><a href="#api-request-new-context-option-cert-path" class="list-anchor">#</a>
+        
+        Path to the file with the certificate in PEM format.
+      - `KeyPath` [string]? *(optional)* <font size="2">Added in: v1.0</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-key-path"/><a href="#api-request-new-context-option-key-path" class="list-anchor">#</a>
+        
+        Path to the file with the private key in PEM format.
+      - `PfxPath` [string]? *(optional)* <font size="2">Added in: v1.0</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-pfx-path"/><a href="#api-request-new-context-option-pfx-path" class="list-anchor">#</a>
+        
+        Path to the PFX or PKCS12 encoded private key and certificate chain.
+      - `Passphrase` [string]? *(optional)* <font size="2">Added in: v1.0</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-passphrase"/><a href="#api-request-new-context-option-passphrase" class="list-anchor">#</a>
+        
+        Passphrase for the private key (PEM or PFX).
+      
+      List of client certificates to be used.
+    
+    An array of client certificates to be used. Each certificate object must have both `certPath` and `keyPath` or a single `pfxPath` to load the client certificate. Optionally, `passphrase` property should be provided if the private key is encrypted. If the certificate is valid only for specific URLs, the `url` property should be provided with a glob pattern to match the URLs that the certificate is valid for.
+    
+    :::note
+    Using Client Certificates in combination with Proxy Servers is not supported.
+    :::
+    
+    :::note
+    When using WebKit on macOS, accessing `localhost` will not pick up client certificates. You can make it work by replacing `localhost` with `local.playwright`.
+    :::
+    
   - `ExtraHTTPHeaders` [IDictionary]?&lt;[string], [string]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-extra-http-headers"/><a href="#api-request-new-context-option-extra-http-headers" class="list-anchor">#</a>
     
     An object containing additional HTTP headers to be sent with every request. Defaults to none.
   - `HttpCredentials` HttpCredentials? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-http-credentials"/><a href="#api-request-new-context-option-http-credentials" class="list-anchor">#</a>
-    - `Username` [string]
+    - `Username` [string] <font size="2">Added in: v1.0</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-username"/><a href="#api-request-new-context-option-username" class="list-anchor">#</a>
       
       
-    - `Password` [string]
+    - `Password` [string] <font size="2">Added in: v1.0</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-password"/><a href="#api-request-new-context-option-password" class="list-anchor">#</a>
       
       
-    - `Origin` [string]? *(optional)*
+    - `Origin` [string]? *(optional)* <font size="2">Added in: v1.0</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-origin"/><a href="#api-request-new-context-option-origin" class="list-anchor">#</a>
       
       Restrain sending http credentials on specific origin (scheme://host:port).
-    - `Send` `enum HttpCredentialsSend { Unauthorized, Always }?` *(optional)*
+    - `Send` `enum HttpCredentialsSend { Unauthorized, Always }?` *(optional)* <font size="2">Added in: v1.0</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-send"/><a href="#api-request-new-context-option-send" class="list-anchor">#</a>
       
       This option only applies to the requests sent from corresponding [APIRequestContext] and does not affect requests sent from the browser. `'always'` - `Authorization` header with basic authentication credentials will be sent with the each API request. `'unauthorized` - the credentials are only sent when 401 (Unauthorized) response with `WWW-Authenticate` header is received. Defaults to `'unauthorized'`.
     
@@ -56,16 +86,16 @@ await ApiRequest.NewContextAsync(options);
     
     Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.
   - `Proxy` Proxy? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-proxy"/><a href="#api-request-new-context-option-proxy" class="list-anchor">#</a>
-    - `Server` [string]
+    - `Server` [string] <font size="2">Added in: v1.0</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-server"/><a href="#api-request-new-context-option-server" class="list-anchor">#</a>
       
       Proxy to be used for all requests. HTTP and SOCKS proxies are supported, for example `http://myproxy.com:3128` or `socks5://myproxy.com:3128`. Short form `myproxy.com:3128` is considered an HTTP proxy.
-    - `Bypass` [string]? *(optional)*
+    - `Bypass` [string]? *(optional)* <font size="2">Added in: v1.0</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-bypass"/><a href="#api-request-new-context-option-bypass" class="list-anchor">#</a>
       
       Optional comma-separated domains to bypass proxy, for example `".com, chromium.org, .domain.com"`.
-    - `Username` [string]? *(optional)*
+    - `Username` [string]? *(optional)* <font size="2">Added in: v1.0</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-username"/><a href="#api-request-new-context-option-username" class="list-anchor">#</a>
       
       Optional username to use if HTTP proxy requires authentication.
-    - `Password` [string]? *(optional)*
+    - `Password` [string]? *(optional)* <font size="2">Added in: v1.0</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-new-context-option-password"/><a href="#api-request-new-context-option-password" class="list-anchor">#</a>
       
       Optional password to use if HTTP proxy requires authentication.
     
