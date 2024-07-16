@@ -19,8 +19,9 @@ import clsx from 'clsx';
 import Link from '@docusaurus/Link';
 import LiteYouTube from '@site/src/components/LiteYouTube';
 import styles from './styles.module.css';
+import { Video } from '@site/src/data/types';
 
-function VideoCards({ videos }) {
+function VideoCards({ videos }: { videos: Video[] }) {
   return (
     <section className="margin-top--lg margin-bottom--xl">
       <div className="container">
@@ -34,7 +35,12 @@ function VideoCards({ videos }) {
   );
 }
 
-function VideoCard({ video }) {
+function videoToReleasePageAnchor(video: Video) {
+  const versions = video.version.split(' & ');
+  return `version-${versions[versions.length - 1].replace('.', '')}`;
+}
+
+function VideoCard({ video }: { video: Video }) {
   return (
     <li key={video.title} className="card shadow--md">
       <div className={styles.videoCardVideo}>
@@ -64,10 +70,7 @@ function VideoCard({ video }) {
         {video.version ? (
           <div className={styles.videoCardHeader}>
             <Link
-              href={`/docs/release-notes#version-${video.version.replace(
-                '.',
-                ''
-              )}`}
+              href={`/docs/release-notes#${videoToReleasePageAnchor(video)}`}
             >
               <h4 className={styles.videoCardTitle}>
                 Playwright v{video.version}

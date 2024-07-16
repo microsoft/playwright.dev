@@ -1,4 +1,6 @@
-const learnVideos = [
+import { Video } from './types';
+
+const learnVideos: Video[] = [
   {
     title: 'How to Run Tests in Playwright with the VS Code Extension',
     description: '',
