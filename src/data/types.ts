@@ -1,7 +1,7 @@
 export type Video = {
   version?: string;
   speakers?: string[];
-  id: string;
+  id?: string;
   title?: string;
   description?: string;
   highlights?: string[];
@@ -11,4 +11,5 @@ export type Video = {
   src?: string;
   conference?: string;
   host?: string;
+  language?: string;
 };
