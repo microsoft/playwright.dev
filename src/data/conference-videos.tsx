@@ -1,4 +1,6 @@
-const conferenceVideos = [
+import { Video } from './types';
+
+const conferenceVideos: Video[] = [
   {
     title: "Playwright : l'outil qui va révolutionner les tests end-to-end",
     id: 'fQ4LICkmG9I',

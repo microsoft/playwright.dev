@@ -1,4 +1,6 @@
-const releaseVideos = [
+import { Video } from './types';
+
+const releaseVideos: Video[] = [
   {
     version: '1.45',
     id: "54_aC-rVKHg",
