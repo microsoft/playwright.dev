@@ -181,6 +181,12 @@ import HTMLCard from '@site/src/components/HTMLCard';
     writeFileSyncCached(path.join(this.outDir, 'api', `class-${clazz.name.toLowerCase()}.mdx`), this.mdxLinks(output));
   }
 
+  _formatSince(since) {
+    if (since === 'v1.8')
+      return 'Added before v1.9';
+    return `Added in: ${since}`;
+  }
+
   /**
    * @param {docs.Class} clazz
    * @return {MarkdownNode[]}
@@ -261,7 +267,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
         const expressionNameForSearch = `<x-search>${clazz.varName}.${name}</x-search>`;
         sections.version.push({
           type: 'text',
-          text: `<font size="2" style={{position: "relative", top: "-20px"}}>Added in: ${member.since}</font>${expressionNameForSearch}`
+          text: `<font size="2" style={{position: "relative", top: "-20px"}}>${this._formatSince(member.since)}</font>${expressionNameForSearch}`
         });
 
         // Generate deprecations.
@@ -575,7 +581,7 @@ ${this.documentation.renderLinksInText(member.discouraged)}
       const hash = calculatePropertyHash(member, direction);
       linkTag = `<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="${hash}"/>`;
       if (member.enclosingMethod.since !== member.since)
-        sinceVersion = ` <font size="2">Added in: ${member.since}</font>`;
+        sinceVersion = ` <font size="2">${this._formatSince(member.since)}</font>`;
       linkAnchor = `<a href="#${hash}" class="list-anchor">#</a>`;
     }
 
