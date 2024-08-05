@@ -17,7 +17,7 @@ test('homepage has Playwright in title and get started link linking to the intro
   // Click the get started link.
   await getStarted.click();
 
-  await expect(page.getByRole('heading', { name: 'Installing Playwright' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Installing Playwright Pytest' })).toBeVisible();
 });
 
 test.describe('next switcher', () => {
