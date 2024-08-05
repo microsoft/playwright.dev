@@ -6,21 +6,26 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+import LiteYouTube from '@site/src/components/LiteYouTube';
+
 ## Introduction
 
 Accurately simulating time-dependent behavior is essential for verifying the correctness of applications. Utilizing [Clock] functionality allows developers to manipulate and control time within tests, enabling the precise validation of features such as rendering time, timeouts, scheduled tasks without the delays and variability of real-time execution.
 
-[Page.clock()](/api/class-page.mdx#page-clock) overrides native global classes and functions related to time allowing them to be manually controlled:
-- `Date`
-- `setTimeout`
-- `clearTimeout`
-- `setInterval`
-- `clearInterval`
-- `requestAnimationFrame`
-- `cancelAnimationFrame`
-- `requestIdleCallback`
-- `cancelIdleCallback`
-- `performance`
+The [Clock] API provides the following methods to control time:
+- `setFixedTime`: Sets the fixed time for `Date.now()` and `new Date()`.
+- `install`: initializes the clock and allows you to:
+  - `pauseAt`: Pauses the time at a specific time.
+  - `fastForward`: Fast forwards the time.
+  - `runFor`: Runs the time for a specific duration.
+  - `resume`: Resumes the time.
+- `setSystemTime`: Sets the current system time.
+
+The recommended approach is to use `setFixedTime` to set the time to a specific value. If that doesn't work for your use case, you can use `install` which allows you to pause time later on, fast forward it, tick it, etc. `setSystemTime` is only recommended for advanced use cases.
+
+:::note
+[Page.clock()](/api/class-page.mdx#page-clock) overrides native global classes and functions related to time allowing them to be manually controlled:   - `Date`   - `setTimeout`   - `clearTimeout`   - `setInterval`   - `clearInterval`   - `requestAnimationFrame`   - `cancelAnimationFrame`   - `requestIdleCallback`   - `cancelIdleCallback`   - `performance`
+:::
 
 ## Test with predefined time
 
@@ -31,7 +36,7 @@ Often you only need to fake `Date.now` while keeping the timers going. That way 
 <script>
   const renderTime = () => {
     document.getElementById('current-time').textContent =
-        new Date().toLocaleTimeString();
+        new Date().toLocaleString();
   };
   setInterval(renderTime, 1000);
 </script>
@@ -46,7 +51,7 @@ Sometimes your timers depend on `Date.now` and are confused when the `Date.now` 
 <script>
   const renderTime = () => {
     document.getElementById('current-time').textContent =
-        new Date().toLocaleTimeString();
+        new Date().toLocaleString();
   };
   setInterval(renderTime, 1000);
 </script>
@@ -76,6 +81,26 @@ assertThat(locator).hasText("2/2/2024, 10:30:00 AM");
 
 Inactivity monitoring is a common feature in web applications that logs out users after a period of inactivity. Testing this feature can be tricky because you need to wait for a long time to see the effect. With the help of the clock, you can speed up time and test this feature quickly.
 
+```html
+<div id="remaining-time" data-testid="remaining-time"></div>
+<script>
+  const endTime = Date.now() + 5 * 60_000;
+  const renderTime = () => {
+    const diffInSeconds = Math.round((endTime - Date.now()) / 1000);
+    if (diffInSeconds <= 0) {
+      document.getElementById('remaining-time').textContent =
+        'You have been logged out due to inactivity.';
+    } else {
+      document.getElementById('remaining-time').textContent =
+        `You will be logged out in ${diffInSeconds} seconds.`;
+    }
+    setTimeout(renderTime, 1000);
+  };
+  renderTime();
+</script>
+<button type="button">Interaction</button>
+```
+
 ```java
 // Initial time does not matter for the test, so we can pick current time.
 page.clock().install();
@@ -88,7 +113,7 @@ locator.click();
 // Fast forward time 5 minutes as if the user did not do anything.
 // Fast forward is like closing the laptop lid and opening it after 5 minutes.
 // All the timers due will fire once immediately, as in the real browser.
-page.clock().fastForward("5:00");
+page.clock().fastForward("05:00");
 
 // Check that the user was logged out automatically.
 assertThat(page.getByText("You have been logged out due to inactivity.")).isVisible();
@@ -103,7 +128,7 @@ In rare cases, you may want to tick through time manually, firing all timers and
 <script>
   const renderTime = () => {
     document.getElementById('current-time').textContent =
-        new Date().toLocaleTimeString();
+        new Date().toLocaleString();
   };
   setInterval(renderTime, 1000);
 </script>
@@ -127,6 +152,10 @@ assertThat(locator).hasText("2/2/2024, 10:00:00 AM");
 page.clock().runFor(2000);
 assertThat(locator).hasText("2/2/2024, 10:00:02 AM");
 ```
+
+## Related Videos
+
+<LiteYouTube id="54_aC-rVKHg" title="Playwright 1.45" />
 
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
