@@ -423,6 +423,16 @@ ${this.documentation.renderLinksInText(member.discouraged)}
   generateDoc(name, outName) {
     const content = fs.readFileSync(path.join(this.srcDir, name)).toString();
     let nodes = this.filterForLanguage(md.parse(content));
+    if (outName === 'release-notes.mdx') {
+      nodes = nodes.filter(node => {
+        if (node.type !== 'h2')
+          return true;
+        if (!node.text.startsWith('Version '))
+          throw new Error('Unexpected release notes format');
+        const version = node.text.trim().substring('Version '.length);
+        return +version.split('.')[1] <= +this.version.split('.')[1];
+      })
+    }
     return this.generateDocFromMd(nodes, outName);
   }
 
