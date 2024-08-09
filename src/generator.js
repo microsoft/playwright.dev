@@ -569,8 +569,9 @@ ${this.documentation.renderLinksInText(member.discouraged)}
     let sinceVersion = '';
 
     if (member.enclosingMethod && member.name !== 'options') {
-      const hash = calculatePropertyHash(member, direction);
+      let hash = calculatePropertyHash(member, direction);
       linkTag = `<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="${hash}"/>`;
+      hash = calculatePropertyHash(member, direction);
       if (member.enclosingMethod.since !== member.since)
         sinceVersion = ` <font size="2">${this._formatSince(member.since)}</font>`;
       linkAnchor = `<a href="#${hash}" class="list-anchor">#</a>`;
@@ -714,13 +715,23 @@ function calculateHeadingHash(member) {
  */
 function calculatePropertyHash(member, direction) {
   const className = toKebabCase(member.enclosingMethod.clazz.name);
-  const memberName = toKebabCase(member.enclosingMethod.name);
-  const prefix = `${className}-${memberName}`;
+  const prefix = `${className}-${toKebabCase(member.enclosingMethod.name)}`;
   if (direction === 'out')
     return `${prefix}-return`;
-  const propertyName = toKebabCase(member.name);
-  const propertyDescription = member.paramOrOption ? 'param' : 'option';
-  return `${prefix}-${propertyDescription}-${propertyName}`.toLowerCase();
+  return `${prefix}-option-${member2Name(member)}`.toLowerCase();
+}
+
+/**
+ * @param {docs.Member} member
+ */
+function member2Name(member) {
+  const parts = [];
+  while (member) {
+    if (member.name !== 'options')
+      parts.unshift(toKebabCase(member.name));
+    member = member.parent;
+  }
+  return parts.join('-');
 }
 
 const fileWriteCache = new Map();
