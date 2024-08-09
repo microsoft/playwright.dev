@@ -428,15 +428,6 @@ ${this.documentation.renderLinksInText(member.discouraged)}
 
   generateDocFromMd(nodes, outName) {
     this.documentation.renderLinksInNodes(nodes);
-    const tocIndex = nodes.findIndex(node => node.text === '<!-- TOC -->' || node.text === '<!-- TOC3 -->');
-    if (tocIndex !== -1) {
-      const node = nodes[tocIndex];
-      if (node.text === '<!-- TOC -->')
-        node.text = md.generateToc(nodes);
-      if (node.text === '<!-- TOC3 -->')
-        node.text = md.generateToc(nodes, true);
-    }
-
     nodes = this.formatComment(nodes);
     md.visitAll(nodes, node => {
       if (node.children)
