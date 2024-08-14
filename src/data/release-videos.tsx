@@ -2,6 +2,11 @@ import { Video } from './types';
 
 const releaseVideos: Video[] = [
   {
+    version: '1.46',
+    id: "tQo7w-QQBsI",
+    highlights: ['client certificates', '--only-changed', 'UI mode updates'],
+  },
+  {
     version: '1.45',
     id: "54_aC-rVKHg",
     highlights: ['Clock API', 'directory uploads', 'ControlOrMeta+modifier'],

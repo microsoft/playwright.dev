@@ -1,5 +1,11 @@
 const featureVideos = [
   {
+    title: 'Trace Viewer',
+    description: '',
+    id: 'yP6AnTxC34s',
+    year: '2024',
+  },
+  {
     title: 'Codegen',
     description: '',
     id: '5XIZPqKkdBA',
@@ -9,12 +15,6 @@ const featureVideos = [
     title: 'UI Mode',
     description: '',
     id: 'd0u6XhXknzU',
-    year: '2023',
-  },
-  {
-    title: 'Trace Viewer',
-    description: '',
-    id: 'lfxjs--9ZQs',
     year: '2023',
   },
   {
