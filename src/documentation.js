@@ -375,7 +375,7 @@ class Member {
     if (this.kind === 'method')
       this.enclosingMethod = this;
     const indexArg = (/** @type {Member} */ arg) => {
-      arg.type.deepProperties().forEach(p => {
+      arg.type?.deepProperties().forEach(p => {
         p.enclosingMethod = this;
         p.parent = arg;
         indexArg(p);
