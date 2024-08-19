@@ -568,7 +568,7 @@ ${this.documentation.renderLinksInText(member.discouraged)}
     let linkAnchor = '';
     let sinceVersion = '';
 
-    if (member.enclosingMethod && member.name !== 'options') {
+    if (member.enclosingMethod && member.name !== 'options' && (!member.parent || member.parent.name === 'options')) {
       const hash = calculatePropertyHash(member, direction);
       linkTag = `<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="${hash}"/>`;
       if (member.enclosingMethod.since !== member.since)
