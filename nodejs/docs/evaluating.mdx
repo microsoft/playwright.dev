@@ -25,9 +25,33 @@ const status = await page.evaluate(async () => {
 });
 ```
 
+## Different environments
+
+Evaluated scripts run in the browser environment, while your test runs in a testing environments. This means you cannot use variables from your test in the page and vice versa. Instead, you should pass them explicitly as an argument.
+
+The following snippet is **WRONG** because it uses the variable directly:
+
+```js
+const data = 'some data';
+const result = await page.evaluate(() => {
+  // WRONG: there is no "data" in the web page.
+  window.myApp.use(data);
+});
+```
+
+The following snippet is **CORRECT** because it passes the value explicitly as an argument:
+
+```js
+const data = 'some data';
+// Pass |data| as a parameter.
+const result = await page.evaluate(data => {
+  window.myApp.use(data);
+}, data);
+```
+
 ## Evaluation Argument
 
-Playwright evaluation methods like [page.evaluate()](/api/class-page.mdx#page-evaluate) take a single optional argument. This argument can be a mix of [Serializable] values and [JSHandle] or [ElementHandle] instances. Handles are automatically converted to the value they represent.
+Playwright evaluation methods like [page.evaluate()](/api/class-page.mdx#page-evaluate) take a single optional argument. This argument can be a mix of [Serializable] values and [JSHandle] instances. Handles are automatically converted to the value they represent.
 
 ```js
 // A primitive value.
@@ -43,7 +67,7 @@ await page.evaluate(object => object.foo, { foo: 'bar' });
 const button = await page.evaluateHandle('window.button');
 await page.evaluate(button => button.textContent, button);
 
-// Alternative notation using elementHandle.evaluate.
+// Alternative notation using JSHandle.evaluate.
 await button.evaluate((button, from) => button.textContent.substring(from), 5);
 
 // Object with multiple handles.
@@ -66,29 +90,50 @@ await page.evaluate(
     ([b1, b2]) => b1.textContent + b2.textContent,
     [button1, button2]);
 
-// Any non-cyclic mix of serializables and handles works.
+// Any mix of serializables and handles works.
 await page.evaluate(
     x => x.button1.textContent + x.list[0].textContent + String(x.foo),
     { button1, list: [button2], foo: null });
 ```
 
-Right:
+## Init scripts
+
+Sometimes it is convenient to evaluate something in the page before it starts loading. For example, you might want to setup some mocks or test data.
+
+In this case, use [page.addInitScript()](/api/class-page.mdx#page-add-init-script) or [browserContext.addInitScript()](/api/class-browsercontext.mdx#browser-context-add-init-script). In the example below, we will replace `Math.random()` with a constant value.
+
+First, create a `preload.js` file that contains the mock.
 
 ```js
-const data = { text: 'some data', value: 1 };
-// Pass |data| as a parameter.
-const result = await page.evaluate(data => {
-  window.myApp.use(data);
-}, data);
+// preload.js
+Math.random = () => 42;
 ```
 
-Wrong:
+Next, add init script to the page.
 
 ```js
-const data = { text: 'some data', value: 1 };
-const result = await page.evaluate(() => {
-  // There is no |data| in the web page.
-  window.myApp.use(data);
+import { test, expect } from '@playwright/test';
+import path from 'path';
+
+test.beforeEach(async ({ page }) => {
+  // Add script for every test in the beforeEach hook.
+  // Make sure to correctly resolve the script path.
+  await page.addInitScript({ path: path.resolve(__dirname, '../mocks/preload.js') });
+});
+```
+
+###### 
+Alternatively, you can pass a function instead of creating a preload script file. This is more convenient for short or one-off scripts. You can also pass an argument this way.
+
+```js
+import { test, expect } from '@playwright/test';
+
+// Add script for every test in the beforeEach hook.
+test.beforeEach(async ({ page }) => {
+  const value = 42;
+  await page.addInitScript(value => {
+    Math.random = () => value;
+  }, value);
 });
 ```
 
