@@ -62,18 +62,18 @@ await apiRequestContext.delete(url, options);
     
     Maximum number of times network errors should be retried. Currently only `ECONNRESET` error is retried. Does not retry based on HTTP response codes. An error will be thrown if the limit is exceeded. Defaults to `0` - no retries.
   - `multipart` [FormData] | [Object]&lt;[string], [string] | [number] | [boolean] | [ReadStream] | [Object]&gt; *(optional)* <font size="2">Added in: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-multipart"/><a href="#api-request-context-delete-option-multipart" class="list-anchor">#</a>
-    - `name` [string] <font size="2">Added in: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-name"/><a href="#api-request-context-delete-option-name" class="list-anchor">#</a>
+    - `name` [string]
       
       File name
-    - `mimeType` [string] <font size="2">Added in: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-mime-type"/><a href="#api-request-context-delete-option-mime-type" class="list-anchor">#</a>
+    - `mimeType` [string]
       
       File type
-    - `buffer` [Buffer] <font size="2">Added in: v1.17</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-buffer"/><a href="#api-request-context-delete-option-buffer" class="list-anchor">#</a>
+    - `buffer` [Buffer]
       
       File content
     
     Provides an object that will be serialized as html form using `multipart/form-data` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `multipart/form-data` unless explicitly provided. File values can be passed either as [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream) or as file-like object containing file name, mime-type and its content.
-  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-params"/><a href="#api-request-context-delete-option-params" class="list-anchor">#</a>
+  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-params"/><a href="#api-request-context-delete-option-params" class="list-anchor">#</a>
     
     Query parameters to be sent with the URL.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-delete-option-timeout"/><a href="#api-request-context-delete-option-timeout" class="list-anchor">#</a>
@@ -173,18 +173,18 @@ await request.fetch('https://example.com/api/uploadForm', {
     
     If set changes the fetch method (e.g. [PUT](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/PUT) or [POST](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/POST)). If not specified, GET method is used.
   - `multipart` [FormData] | [Object]&lt;[string], [string] | [number] | [boolean] | [ReadStream] | [Object]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-multipart"/><a href="#api-request-context-fetch-option-multipart" class="list-anchor">#</a>
-    - `name` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-name"/><a href="#api-request-context-fetch-option-name" class="list-anchor">#</a>
+    - `name` [string]
       
       File name
-    - `mimeType` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-mime-type"/><a href="#api-request-context-fetch-option-mime-type" class="list-anchor">#</a>
+    - `mimeType` [string]
       
       File type
-    - `buffer` [Buffer]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-buffer"/><a href="#api-request-context-fetch-option-buffer" class="list-anchor">#</a>
+    - `buffer` [Buffer]
       
       File content
     
     Provides an object that will be serialized as html form using `multipart/form-data` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `multipart/form-data` unless explicitly provided. File values can be passed either as [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream) or as file-like object containing file name, mime-type and its content.
-  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-params"/><a href="#api-request-context-fetch-option-params" class="list-anchor">#</a>
+  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-params"/><a href="#api-request-context-fetch-option-params" class="list-anchor">#</a>
     
     Query parameters to be sent with the URL.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-fetch-option-timeout"/><a href="#api-request-context-fetch-option-timeout" class="list-anchor">#</a>
@@ -207,12 +207,24 @@ Sends HTTP(S) [GET](https://developer.mozilla.org/en-US/docs/Web/HTTP/Methods/GE
 Request parameters can be configured with `params` option, they will be serialized into the URL search parameters:
 
 ```js
+// Passing params as object
 await request.get('https://example.com/api/getText', {
   params: {
     'isbn': '1234',
     'page': 23,
   }
 });
+
+// Passing params as URLSearchParams
+const searchParams = new URLSearchParams();
+searchParams.set('isbn', '1234');
+searchParams.append('page', 23);
+searchParams.append('page', 24);
+await request.get('https://example.com/api/getText', { params: searchParams });
+
+// Passing params as string
+const queryString = 'isbn=1234&page=23&page=24';
+await request.get('https://example.com/api/getText', { params: queryString });
 ```
 
 **Arguments**
@@ -242,18 +254,18 @@ await request.get('https://example.com/api/getText', {
     
     Maximum number of times network errors should be retried. Currently only `ECONNRESET` error is retried. Does not retry based on HTTP response codes. An error will be thrown if the limit is exceeded. Defaults to `0` - no retries.
   - `multipart` [FormData] | [Object]&lt;[string], [string] | [number] | [boolean] | [ReadStream] | [Object]&gt; *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-multipart"/><a href="#api-request-context-get-option-multipart" class="list-anchor">#</a>
-    - `name` [string] <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-name"/><a href="#api-request-context-get-option-name" class="list-anchor">#</a>
+    - `name` [string]
       
       File name
-    - `mimeType` [string] <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-mime-type"/><a href="#api-request-context-get-option-mime-type" class="list-anchor">#</a>
+    - `mimeType` [string]
       
       File type
-    - `buffer` [Buffer] <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-buffer"/><a href="#api-request-context-get-option-buffer" class="list-anchor">#</a>
+    - `buffer` [Buffer]
       
       File content
     
     Provides an object that will be serialized as html form using `multipart/form-data` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `multipart/form-data` unless explicitly provided. File values can be passed either as [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream) or as file-like object containing file name, mime-type and its content.
-  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-params"/><a href="#api-request-context-get-option-params" class="list-anchor">#</a>
+  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-params"/><a href="#api-request-context-get-option-params" class="list-anchor">#</a>
     
     Query parameters to be sent with the URL.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-get-option-timeout"/><a href="#api-request-context-get-option-timeout" class="list-anchor">#</a>
@@ -305,18 +317,18 @@ await apiRequestContext.head(url, options);
     
     Maximum number of times network errors should be retried. Currently only `ECONNRESET` error is retried. Does not retry based on HTTP response codes. An error will be thrown if the limit is exceeded. Defaults to `0` - no retries.
   - `multipart` [FormData] | [Object]&lt;[string], [string] | [number] | [boolean] | [ReadStream] | [Object]&gt; *(optional)* <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-multipart"/><a href="#api-request-context-head-option-multipart" class="list-anchor">#</a>
-    - `name` [string] <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-name"/><a href="#api-request-context-head-option-name" class="list-anchor">#</a>
+    - `name` [string]
       
       File name
-    - `mimeType` [string] <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-mime-type"/><a href="#api-request-context-head-option-mime-type" class="list-anchor">#</a>
+    - `mimeType` [string]
       
       File type
-    - `buffer` [Buffer] <font size="2">Added in: v1.26</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-buffer"/><a href="#api-request-context-head-option-buffer" class="list-anchor">#</a>
+    - `buffer` [Buffer]
       
       File content
     
     Provides an object that will be serialized as html form using `multipart/form-data` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `multipart/form-data` unless explicitly provided. File values can be passed either as [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream) or as file-like object containing file name, mime-type and its content.
-  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-params"/><a href="#api-request-context-head-option-params" class="list-anchor">#</a>
+  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-params"/><a href="#api-request-context-head-option-params" class="list-anchor">#</a>
     
     Query parameters to be sent with the URL.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-head-option-timeout"/><a href="#api-request-context-head-option-timeout" class="list-anchor">#</a>
@@ -368,18 +380,18 @@ await apiRequestContext.patch(url, options);
     
     Maximum number of times network errors should be retried. Currently only `ECONNRESET` error is retried. Does not retry based on HTTP response codes. An error will be thrown if the limit is exceeded. Defaults to `0` - no retries.
   - `multipart` [FormData] | [Object]&lt;[string], [string] | [number] | [boolean] | [ReadStream] | [Object]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-multipart"/><a href="#api-request-context-patch-option-multipart" class="list-anchor">#</a>
-    - `name` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-name"/><a href="#api-request-context-patch-option-name" class="list-anchor">#</a>
+    - `name` [string]
       
       File name
-    - `mimeType` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-mime-type"/><a href="#api-request-context-patch-option-mime-type" class="list-anchor">#</a>
+    - `mimeType` [string]
       
       File type
-    - `buffer` [Buffer]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-buffer"/><a href="#api-request-context-patch-option-buffer" class="list-anchor">#</a>
+    - `buffer` [Buffer]
       
       File content
     
     Provides an object that will be serialized as html form using `multipart/form-data` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `multipart/form-data` unless explicitly provided. File values can be passed either as [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream) or as file-like object containing file name, mime-type and its content.
-  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-params"/><a href="#api-request-context-patch-option-params" class="list-anchor">#</a>
+  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-params"/><a href="#api-request-context-patch-option-params" class="list-anchor">#</a>
     
     Query parameters to be sent with the URL.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-patch-option-timeout"/><a href="#api-request-context-patch-option-timeout" class="list-anchor">#</a>
@@ -462,18 +474,18 @@ await request.post('https://example.com/api/uploadForm', {
     
     Maximum number of times network errors should be retried. Currently only `ECONNRESET` error is retried. Does not retry based on HTTP response codes. An error will be thrown if the limit is exceeded. Defaults to `0` - no retries.
   - `multipart` [FormData] | [Object]&lt;[string], [string] | [number] | [boolean] | [ReadStream] | [Object]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-multipart"/><a href="#api-request-context-post-option-multipart" class="list-anchor">#</a>
-    - `name` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-name"/><a href="#api-request-context-post-option-name" class="list-anchor">#</a>
+    - `name` [string]
       
       File name
-    - `mimeType` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-mime-type"/><a href="#api-request-context-post-option-mime-type" class="list-anchor">#</a>
+    - `mimeType` [string]
       
       File type
-    - `buffer` [Buffer]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-buffer"/><a href="#api-request-context-post-option-buffer" class="list-anchor">#</a>
+    - `buffer` [Buffer]
       
       File content
     
     Provides an object that will be serialized as html form using `multipart/form-data` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `multipart/form-data` unless explicitly provided. File values can be passed either as [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream) or as file-like object containing file name, mime-type and its content.
-  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-params"/><a href="#api-request-context-post-option-params" class="list-anchor">#</a>
+  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-params"/><a href="#api-request-context-post-option-params" class="list-anchor">#</a>
     
     Query parameters to be sent with the URL.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-post-option-timeout"/><a href="#api-request-context-post-option-timeout" class="list-anchor">#</a>
@@ -525,18 +537,18 @@ await apiRequestContext.put(url, options);
     
     Maximum number of times network errors should be retried. Currently only `ECONNRESET` error is retried. Does not retry based on HTTP response codes. An error will be thrown if the limit is exceeded. Defaults to `0` - no retries.
   - `multipart` [FormData] | [Object]&lt;[string], [string] | [number] | [boolean] | [ReadStream] | [Object]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-multipart"/><a href="#api-request-context-put-option-multipart" class="list-anchor">#</a>
-    - `name` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-name"/><a href="#api-request-context-put-option-name" class="list-anchor">#</a>
+    - `name` [string]
       
       File name
-    - `mimeType` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-mime-type"/><a href="#api-request-context-put-option-mime-type" class="list-anchor">#</a>
+    - `mimeType` [string]
       
       File type
-    - `buffer` [Buffer]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-buffer"/><a href="#api-request-context-put-option-buffer" class="list-anchor">#</a>
+    - `buffer` [Buffer]
       
       File content
     
     Provides an object that will be serialized as html form using `multipart/form-data` encoding and sent as this request body. If this parameter is specified `content-type` header will be set to `multipart/form-data` unless explicitly provided. File values can be passed either as [`fs.ReadStream`](https://nodejs.org/api/fs.html#fs_class_fs_readstream) or as file-like object containing file name, mime-type and its content.
-  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-params"/><a href="#api-request-context-put-option-params" class="list-anchor">#</a>
+  - `params` [Object]&lt;[string], [string] | [number] | [boolean]&gt; | [URLSearchParams] | [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-params"/><a href="#api-request-context-put-option-params" class="list-anchor">#</a>
     
     Query parameters to be sent with the URL.
   - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-request-context-put-option-timeout"/><a href="#api-request-context-put-option-timeout" class="list-anchor">#</a>

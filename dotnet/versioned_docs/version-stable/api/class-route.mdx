@@ -56,7 +56,7 @@ await Route.AbortAsync(errorCode);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>route.ContinueAsync</x-search>
 
-Continues route's request with optional overrides.
+Sends route's request to the network with optional overrides.
 
 **Usage**
 
@@ -91,15 +91,19 @@ await page.RouteAsync("**/*", async route =>
 
 Note that any overrides such as `url` or `headers` only apply to the request being routed. If this request results in a redirect, overrides will not be applied to the new redirected request. If you want to propagate a header through redirects, use the combination of [Route.FetchAsync()](/api/class-route.mdx#route-fetch) and [Route.FulfillAsync()](/api/class-route.mdx#route-fulfill) instead.
 
+[Route.ContinueAsync()](/api/class-route.mdx#route-continue) will immediately send the request to the network, other matching handlers won't be invoked. Use [Route.FallbackAsync()](/api/class-route.mdx#route-fallback) If you want next matching handler in the chain to be invoked.
+
 ---
 
 ### FallbackAsync {#route-fallback}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.23</font><x-search>route.FallbackAsync</x-search>
 
-When several routes match the given pattern, they run in the order opposite to their registration. That way the last registered route can always override all the previous ones. In the example below, request will be handled by the bottom-most handler first, then it'll fall back to the previous one and in the end will be aborted by the first registered route.
+Continues route's request with optional overrides. The method is similar to [Route.ContinueAsync()](/api/class-route.mdx#route-continue) with the difference that other matching handlers will be invoked before sending the request.
 
 **Usage**
+
+When several routes match the given pattern, they run in the order opposite to their registration. That way the last registered route can always override all the previous ones. In the example below, request will be handled by the bottom-most handler first, then it'll fall back to the previous one and in the end will be aborted by the first registered route.
 
 ```csharp
 await page.RouteAsync("**/*", route => {
@@ -152,6 +156,8 @@ await page.RouteAsync("**/*", async route =>
     await route.FallbackAsync(new() { Headers = headers });
 });
 ```
+
+Use [Route.ContinueAsync()](/api/class-route.mdx#route-continue) to immediately send the request to the network, other matching handlers won't be invoked in that case.
 
 **Arguments**
 - `options` `RouteFallbackOptions?` *(optional)*
