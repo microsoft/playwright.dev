@@ -101,7 +101,7 @@ jobs:
     name: 'Playwright Tests'
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:v1.46.1-jammy
+      image: mcr.microsoft.com/playwright:v1.47.0-jammy
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -160,6 +160,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
+      with:
+        # Force a non-shallow checkout, so that we can reference $GITHUB_BASE_REF.
+        # See https://github.com/actions/checkout for more details.
+        fetch-depth: 0
     - uses: actions/setup-node@v4
       with:
         node-version: 18
@@ -337,7 +341,7 @@ trigger:
 
 pool:
   vmImage: ubuntu-latest
-container: mcr.microsoft.com/playwright:v1.46.1-noble
+container: mcr.microsoft.com/playwright:v1.47.0-noble
 
 steps:
 - task: NodeTool@0
@@ -361,7 +365,7 @@ Running Playwright on CircleCI is very similar to running on GitHub Actions. In 
 executors:
   pw-jammy-development:
     docker:
-      - image: mcr.microsoft.com/playwright:v1.46.1-noble
+      - image: mcr.microsoft.com/playwright:v1.47.0-noble
 ```
 
 Note: When using the docker agent definition, you are specifying the resource class of where playwright runs to the 'medium' tier [here](https://circleci.com/docs/configuration-reference?#docker-execution-environment). The default behavior of Playwright is to set the number of workers to the detected core count (2 in the case of the medium tier). Overriding the number of workers to greater than this number will cause unnecessary timeouts and failures.
@@ -384,7 +388,7 @@ Jenkins supports Docker agents for pipelines. Use the [Playwright Docker image](
 
 ```groovy
 pipeline {
-   agent { docker { image 'mcr.microsoft.com/playwright:v1.46.1-noble' } }
+   agent { docker { image 'mcr.microsoft.com/playwright:v1.47.0-noble' } }
    stages {
       stage('e2e-tests') {
          steps {
@@ -401,7 +405,7 @@ pipeline {
 Bitbucket Pipelines can use public [Docker images as build environments](https://confluence.atlassian.com/bitbucket/use-docker-images-as-build-environments-792298897.html). To run Playwright tests on Bitbucket, use our public Docker image ([see Dockerfile](./docker.mdx)).
 
 ```yml
-image: mcr.microsoft.com/playwright:v1.46.1-noble
+image: mcr.microsoft.com/playwright:v1.47.0-noble
 ```
 
 ### GitLab CI
@@ -414,7 +418,7 @@ stages:
 
 tests:
   stage: test
-  image: mcr.microsoft.com/playwright:v1.46.1-noble
+  image: mcr.microsoft.com/playwright:v1.47.0-noble
   script:
   ...
 ```
@@ -429,7 +433,7 @@ stages:
 
 tests:
   stage: test
-  image: mcr.microsoft.com/playwright:v1.46.1-noble
+  image: mcr.microsoft.com/playwright:v1.47.0-noble
   parallel: 7
   script:
     - npm ci
@@ -444,7 +448,7 @@ stages:
 
 tests:
   stage: test
-  image: mcr.microsoft.com/playwright:v1.46.1-noble
+  image: mcr.microsoft.com/playwright:v1.47.0-noble
   parallel:
     matrix:
       - PROJECT: ['chromium', 'webkit']
@@ -460,7 +464,7 @@ To run Playwright tests on Google Cloud Build, use our public Docker image ([see
 
 ```yml
 steps:
-- name: mcr.microsoft.com/playwright:v1.46.1-noble
+- name: mcr.microsoft.com/playwright:v1.47.0-noble
   script: 
   ...
   env:
@@ -478,7 +482,7 @@ type: docker
 
 steps:
   - name: test
-    image: mcr.microsoft.com/playwright:v1.46.1-jammy
+    image: mcr.microsoft.com/playwright:v1.47.0-jammy
     commands:
       - npx playwright test
 ```
@@ -563,6 +567,7 @@ xvfb-run npx playwright test
 [Test]: /api/class-test.mdx "Test"
 [TestConfig]: /api/class-testconfig.mdx "TestConfig"
 [TestInfo]: /api/class-testinfo.mdx "TestInfo"
+[TestInfoErrorMatcherResult]: /api/class-testinfoerrormatcherresult.mdx "TestInfoErrorMatcherResult"
 [TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
 [TestOptions]: /api/class-testoptions.mdx "TestOptions"
 [TestProject]: /api/class-testproject.mdx "TestProject"
@@ -571,6 +576,7 @@ xvfb-run npx playwright test
 [Reporter]: /api/class-reporter.mdx "Reporter"
 [Suite]: /api/class-suite.mdx "Suite"
 [TestCase]: /api/class-testcase.mdx "TestCase"
+[TestErrorMatcherResult]: /api/class-testerrormatcherresult.mdx "TestErrorMatcherResult"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
 [TestStep]: /api/class-teststep.mdx "TestStep"
