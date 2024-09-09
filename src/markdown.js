@@ -208,7 +208,7 @@ function buildTree(lines) {
         tokens.push(line.substring(indent.length));
         line = lines[++i];
       }
-      node.text = tokens.join('↵');
+      node.children = buildTree(tokens);
       appendNode(indent, node);
       continue;
     }
@@ -341,7 +341,10 @@ function innerRenderMdNode(indent, node, lastNode, result, options) {
   if (node.type === 'note') {
     newLine();
     result.push(`${indent}:::${node.noteType}`);
-    result.push(wrapText(node.text, options, indent));
+    for (const child of node.children || []) {
+      innerRenderMdNode(indent, child, lastNode, result, options);
+      // lastNode = child;
+    }
     result.push(`${indent}:::`);
     newLine();
     return;
