@@ -21,11 +21,11 @@ jobs:
         id: determine-version
         with:
           script: |
-            if (github.event_name === 'schedule') {
+            if (context.eventName === 'schedule') {
               if (!github.event.inputs.version.match(/^[0-9]+\.[0-9]+$/))
                 throw new Error('Version is not a two digit semver version');
               return github.event.inputs.version;
-            } else if (github.event_name === 'workflow_dispatch') {
+            } else if (context.eventName === 'workflow_dispatch') {
               const allBranches = await github.repos.listBranches({
                 owner: 'microsoft',
                 repo: 'playwright',
@@ -38,7 +38,7 @@ jobs:
               });
               return relevantBranches.pop().name.replace(/^release-/, '');
             }
-            throw new Error(`Unexpected event name: ${github.event_name}`);
+            throw new Error(`Unexpected event name: ${context.eventName}`);
           result-encoding: string
       - uses: actions/checkout@v3
       - uses: actions/checkout@v3
