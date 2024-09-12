@@ -1,6 +1,6 @@
 # playwright.dev
 
-This website is built using [Docusaurus v2](https://v2.docusaurus.io/). Content is pulled from the microsoft/playwright repo.
+This website is built using [Docusaurus](https://docusaurus.io/). Content is pulled from the microsoft/playwright repo.
 
 ## Development
 
@@ -95,6 +95,6 @@ You can set the `BASE_URL=https://playwright.dev` env var, otherwise `http://loc
 
 #### Stable docs rolling
 
-1. Go to the [Release GitHub Actions workflow](https://github.com/microsoft/playwright.dev/actions/workflows/create_release.yml)
-1. Execute it with the version number e.g. `1.25` and wait for the PR [getting created](https://github.com/microsoft/playwright.dev/pulls). The PR will copy changes from the release branch in playwright repo.
+1. Go to the [Release GitHub Actions workflow](https://github.com/microsoft/playwright.dev/actions/workflows/roll-stable.yml)
+1. Execute it and wait for the PR [getting created](https://github.com/microsoft/playwright.dev/pulls). The PR will copy changes from the release branch in playwright repo.
 2. Review the PR and merge it.

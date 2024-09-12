@@ -1,35 +1,56 @@
-name: Roll
+name: Roll Stable
 on:
   workflow_dispatch:
   schedule:
+    # Every day at 10:00 UTC
     - cron: "0 10 * * *"
-
 permissions:
-  contents: write 
+  contents: write
 
 jobs:
-  roll-docs:
-    name: Roll Playwright to ToT
+  build:
+    name: Build
     runs-on: ubuntu-22.04
     steps:
+      - uses: actions/github-script@v7
+        id: determine-version
+        with:
+          script: |
+            const allBranches = await github.rest.repos.listBranches({
+              owner: 'microsoft',
+              repo: 'playwright',
+            });
+            const relevantBranches = allBranches.data.filter(branch => branch.name.startsWith('release-'));
+            relevantBranches.sort((a, b) => {
+              const aVersion = parseFloat(a.name.split('-')[1]);
+              const bVersion = parseFloat(b.name.split('-')[1]);
+              return aVersion - bVersion;
+            });
+            return relevantBranches.pop().name.replace(/^release-/, '');
+          result-encoding: string
       - uses: actions/checkout@v4
       - uses: actions/checkout@v4
         with:
           repository: 'microsoft/playwright'
           path: playwright
+          ref: 'release-${{ steps.determine-version.outputs.result }}'
       - uses: actions/setup-node@v4
         with:
           node-version: 20
       - name: Install dependencies
         run: npm ci
+      - name: Delete previous Stable
+        run: node src/versions.js --delete stable
       - name: Roll
         run: npm run roll
         env:
           SRC_DIR: ./playwright
+      - name: Create new version
+        run: npm run version-all
       - name: Prepare branch
         id: prepare-branch
         run: |
-          BRANCH_NAME="roll/$(date +"%d-%m-%y")"
+          BRANCH_NAME="roll-release/$(date +"%d-%m-%y")"
           set +e
           git diff -s --exit-code
           HAS_CHANGES="$?"
@@ -45,8 +66,10 @@ jobs:
           git config --global user.name github-actions
           git config --global user.email 41898282+github-actions[bot]@users.noreply.github.com
           git checkout -b "$BRANCH_NAME"
-          git add .
-          git commit -m "feat(roll): roll to ToT Playwright ($(date +"%d-%m-%y"))"
+          # We only want to upgrade the version itself, not the next release
+          git add "*versioned*"
+          git add "**/versions.json"
+          git commit -m "feat(roll): roll to ${{ steps.determine-version.outputs.result }} Playwright"
           git push origin $BRANCH_NAME --force
       - name: Create Pull Request
         uses: actions/github-script@v6
@@ -59,6 +82,6 @@ jobs:
               repo: 'playwright.dev',
               head: 'microsoft:${{ steps.prepare-branch.outputs.BRANCH_NAME }}',
               base: 'main',
-              title: 'feat(roll): roll to ToT Playwright (${{ steps.prepare-branch.outputs.BRANCH_NAME }})',
+              title: 'feat(roll): roll to ${{ steps.determine-version.outputs.result }} Playwright',
               body: 'Upstream commit: https://github.com/microsoft/playwright/commit/${{ steps.prepare-branch.outputs.GIT_COMMIT }}',
             });
