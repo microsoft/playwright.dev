@@ -68,81 +68,9 @@ status = await page.evaluate("""async () => {
 </TabItem>
 </Tabs>
 
-## Different environments
-
-Evaluated scripts run in the browser environment, while your test runs in a testing environments. This means you cannot use variables from your test in the page and vice versa. Instead, you should pass them explicitly as an argument.
-
-The following snippet is **WRONG** because it uses the variable directly:
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-data = "some data"
-result = page.evaluate("""() => {
-  // WRONG: there is no "data" in the web page.
-  window.myApp.use(data)
-}""")
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-data = "some data"
-result = await page.evaluate("""() => {
-  // WRONG: there is no "data" in the web page.
-  window.myApp.use(data)
-}""")
-```
-
-</TabItem>
-</Tabs>
-
-The following snippet is **CORRECT** because it passes the value explicitly as an argument:
-
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-data = "some data"
-# Pass |data| as a parameter.
-result = page.evaluate("""data => {
-  window.myApp.use(data)
-}""", data)
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-data = "some data"
-# Pass |data| as a parameter.
-result = await page.evaluate("""data => {
-  window.myApp.use(data)
-}""", data)
-```
-
-</TabItem>
-</Tabs>
-
 ## Evaluation Argument
 
-Playwright evaluation methods like [page.evaluate()](/api/class-page.mdx#page-evaluate) take a single optional argument. This argument can be a mix of [Serializable] values and [JSHandle] instances. Handles are automatically converted to the value they represent.
+Playwright evaluation methods like [page.evaluate()](/api/class-page.mdx#page-evaluate) take a single optional argument. This argument can be a mix of [Serializable] values and [JSHandle] or [ElementHandle] instances. Handles are automatically converted to the value they represent.
 
 <Tabs
   groupId="python-flavor"
@@ -168,7 +96,7 @@ page.evaluate('object => object.foo', { 'foo': 'bar' })
 button = page.evaluate_handle('window.button')
 page.evaluate('button => button.textContent', button)
 
-# Alternative notation using JSHandle.evaluate.
+# Alternative notation using elementHandle.evaluate.
 button.evaluate('(button, from) => button.textContent.substring(from)', 5)
 
 # Object with multiple handles.
@@ -190,7 +118,7 @@ page.evaluate("""
     ([b1, b2]) => b1.textContent + b2.textContent""",
     [button1, button2])
 
-# Any mix of serializables and handles works.
+# Any non-cyclic mix of serializables and handles works.
 page.evaluate("""
     x => x.button1.textContent + x.list[0].textContent + String(x.foo)""",
     { 'button1': button1, 'list': [button2], 'foo': None })
@@ -213,7 +141,7 @@ await page.evaluate('object => object.foo', { 'foo': 'bar' })
 button = await page.evaluate_handle('button')
 await page.evaluate('button => button.textContent', button)
 
-# Alternative notation using JSHandle.evaluate.
+# Alternative notation using elementHandle.evaluate.
 await button.evaluate('(button, from) => button.textContent.substring(from)', 5)
 
 # Object with multiple handles.
@@ -236,7 +164,7 @@ await page.evaluate("""
     ([b1, b2]) => b1.textContent + b2.textContent""",
     [button1, button2])
 
-# Any mix of serializables and handles works.
+# Any non-cyclic mix of serializables and handles works.
 await page.evaluate("""
     x => x.button1.textContent + x.list[0].textContent + String(x.foo)""",
     { 'button1': button1, 'list': [button2], 'foo': None })
@@ -245,20 +173,7 @@ await page.evaluate("""
 </TabItem>
 </Tabs>
 
-## Init scripts
-
-Sometimes it is convenient to evaluate something in the page before it starts loading. For example, you might want to setup some mocks or test data.
-
-In this case, use [page.add_init_script()](/api/class-page.mdx#page-add-init-script) or [browser_context.add_init_script()](/api/class-browsercontext.mdx#browser-context-add-init-script). In the example below, we will replace `Math.random()` with a constant value.
-
-First, create a `preload.js` file that contains the mock.
-
-```js
-// preload.js
-Math.random = () => 42;
-```
-
-Next, add init script to the page.
+Right:
 
 <Tabs
   groupId="python-flavor"
@@ -271,16 +186,56 @@ Next, add init script to the page.
 <TabItem value="sync">
 
 ```py
-# In your test, assuming the "preload.js" file is in the "mocks" directory.
-page.add_init_script(path="mocks/preload.js")
+data = { 'text': 'some data', 'value': 1 }
+# Pass |data| as a parameter.
+result = page.evaluate("""data => {
+  window.myApp.use(data)
+}""", data)
 ```
 
 </TabItem>
 <TabItem value="async">
 
 ```py
-# In your test, assuming the "preload.js" file is in the "mocks" directory.
-await page.add_init_script(path="mocks/preload.js")
+data = { 'text': 'some data', 'value': 1 }
+# Pass |data| as a parameter.
+result = await page.evaluate("""data => {
+  window.myApp.use(data)
+}""", data)
+```
+
+</TabItem>
+</Tabs>
+
+Wrong:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+data = { 'text': 'some data', 'value': 1 }
+result = page.evaluate("""() => {
+  // There is no |data| in the web page.
+  window.myApp.use(data)
+}""")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+data = { 'text': 'some data', 'value': 1 }
+result = await page.evaluate("""() => {
+  // There is no |data| in the web page.
+  window.myApp.use(data)
+}""")
 ```
 
 </TabItem>
