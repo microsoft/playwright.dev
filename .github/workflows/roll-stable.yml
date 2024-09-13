@@ -19,6 +19,7 @@ jobs:
             const allBranches = await github.rest.repos.listBranches({
               owner: 'microsoft',
               repo: 'playwright',
+              per_page: 100,
             });
             const relevantBranches = allBranches.data.filter(branch => branch.name.startsWith('release-'));
             relevantBranches.sort((a, b) => {
@@ -72,7 +73,7 @@ jobs:
           git commit -m "feat(roll): roll to ${{ steps.determine-version.outputs.result }} Playwright"
           git push origin $BRANCH_NAME --force
       - name: Create Pull Request
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         if: ${{ steps.prepare-branch.outputs.HAS_CHANGES == '1' }}
         with:
           github-token: ${{ secrets.GH_SERVICE_ACCOUNT_TOKEN }}
