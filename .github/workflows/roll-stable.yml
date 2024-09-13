@@ -16,11 +16,11 @@ jobs:
         id: determine-version
         with:
           script: |
-            const allBranches = await github.rest.repos.listBranches({
+            const allBranches = await github.paginate("GET /repos/{owner}/{repo}/branches", {
               owner: 'microsoft',
               repo: 'playwright',
             });
-            const relevantBranches = allBranches.data.filter(branch => branch.name.startsWith('release-'));
+            const relevantBranches = allBranches.filter(branch => branch.name.startsWith('release-'));
             relevantBranches.sort((a, b) => {
               const aVersion = parseFloat(a.name.split('-')[1]);
               const bVersion = parseFloat(b.name.split('-')[1]);
@@ -72,7 +72,7 @@ jobs:
           git commit -m "feat(roll): roll to ${{ steps.determine-version.outputs.result }} Playwright"
           git push origin $BRANCH_NAME --force
       - name: Create Pull Request
-        uses: actions/github-script@v6
+        uses: actions/github-script@v7
         if: ${{ steps.prepare-branch.outputs.HAS_CHANGES == '1' }}
         with:
           github-token: ${{ secrets.GH_SERVICE_ACCOUNT_TOKEN }}
