@@ -172,6 +172,7 @@ module.exports = {
             { type: 'doc', id: 'api/class-fixtures' },
             { type: 'doc', id: 'api/class-fullconfig' },
             { type: 'doc', id: 'api/class-fullproject' },
+            { type: 'doc', id: 'api/class-location' },
             { type: 'doc', id: 'api/class-test' },
             { type: 'doc', id: 'api/class-testconfig' },
             { type: 'doc', id: 'api/class-testinfo' },
@@ -186,7 +187,6 @@ module.exports = {
           type: 'category',
           label: 'Test Reporter',
           items: [
-            { type: 'doc', id: 'api/class-location' },
             { type: 'doc', id: 'api/class-reporter' },
             { type: 'doc', id: 'api/class-suite' },
             { type: 'doc', id: 'api/class-testcase' },
