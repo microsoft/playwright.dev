@@ -1,0 +1,294 @@
+---
+id: class-websocketroute
+title: "WebSocketRoute"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import HTMLCard from '@site/src/components/HTMLCard';
+
+
+Whenever a [`WebSocket`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) route is set up with [page.route_web_socket()](/api/class-page.mdx#page-route-web-socket) or [browser_context.route_web_socket()](/api/class-browsercontext.mdx#browser-context-route-web-socket), the `WebSocketRoute` object allows to handle the WebSocket.
+
+By default, the routed WebSocket will not actually connect to the server. This way, you can mock entire communcation over the WebSocket. Here is an example that responds to a `"query"` with a `"result"`.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+def message_handler(ws, message):
+  if message == "query":
+    ws.receive("result")
+
+page.route_web_socket("/ws", lambda ws: ws.route_send(
+    lambda message: message_handler(ws, message)
+))
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+def message_handler(ws, message):
+  if message == "query":
+    ws.receive("result")
+
+await page.route_web_socket("/ws", lambda ws: ws.route_send(
+    lambda message: message_handler(ws, message)
+))
+```
+
+</TabItem>
+</Tabs>
+
+
+---
+
+## Methods
+
+### close {#web-socket-route-close}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.close</x-search>
+
+Closes the server connection and the [`WebSocket`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) object in the page.
+
+**Usage**
+
+```python
+web_socket_route.close()
+web_socket_route.close(**kwargs)
+```
+
+**Arguments**
+- `code` [int] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-close-option-code"/><a href="#web-socket-route-close-option-code" class="list-anchor">#</a>
+  
+  Optional [close code](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#code).
+- `reason` [str] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-close-option-reason"/><a href="#web-socket-route-close-option-reason" class="list-anchor">#</a>
+  
+  Optional [close reason](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#reason).
+
+**Returns**
+- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-close-return"/><a href="#web-socket-route-close-return" class="list-anchor">#</a>
+
+---
+
+### connect {#web-socket-route-connect}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.connect</x-search>
+
+By default, routed WebSocket does not connect to the server, so you can mock entire WebSocket communication. This method connects to the actual WebSocket server, giving the ability to send and receive messages from the server.
+
+Once connected:
+* Messages received from the server will be automatically dispatched to the [`WebSocket`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) object in the page, unless [web_socket_route.route_receive()](/api/class-websocketroute.mdx#web-socket-route-route-receive) is called.
+* Messages sent by the `WebSocket.send()` call in the page will be automatically sent to the server, unless [web_socket_route.route_send()](/api/class-websocketroute.mdx#web-socket-route-route-send) is called.
+
+**Usage**
+
+```python
+web_socket_route.connect()
+```
+
+**Returns**
+- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-connect-return"/><a href="#web-socket-route-connect-return" class="list-anchor">#</a>
+
+---
+
+### receive {#web-socket-route-receive}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.receive</x-search>
+
+Dispatches a message to the [`WebSocket`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) object in the page, like it was received from the server.
+
+**Usage**
+
+```python
+web_socket_route.receive(message)
+```
+
+**Arguments**
+- `message` [str] | [bytes]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-receive-option-message"/><a href="#web-socket-route-receive-option-message" class="list-anchor">#</a>
+  
+  Message to receive.
+
+---
+
+### route_receive {#web-socket-route-route-receive}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.route_receive</x-search>
+
+This method allows to route messages that are received by the [`WebSocket`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) object in the page from the server. This method only makes sense if you are also calling [web_socket_route.connect()](/api/class-websocketroute.mdx#web-socket-route-connect).
+
+Once this method is called, received messages are not automatically dispatched to the [`WebSocket`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) object in the page - you should do that manually by calling [web_socket_route.receive()](/api/class-websocketroute.mdx#web-socket-route-receive).
+
+Calling this method again times will override the handler with a new one.
+
+**Usage**
+
+```python
+web_socket_route.route_receive(handler)
+```
+
+**Arguments**
+- `handler` [Callable]\[[str]\]:[Promise]\[[Any]\] | [Any]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-route-receive-option-handler"/><a href="#web-socket-route-route-receive-option-handler" class="list-anchor">#</a>
+  
+  Handler function to route received messages.
+
+**Returns**
+- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-route-receive-return"/><a href="#web-socket-route-route-receive-return" class="list-anchor">#</a>
+
+---
+
+### route_send {#web-socket-route-route-send}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.route_send</x-search>
+
+This method allows to route messages that are sent by `WebSocket.send()` call in the page, instead of actually sending them to the server. Once this method is called, sent messages **are not** automatically forwarded to the server - you should do that manually by calling [web_socket_route.send()](/api/class-websocketroute.mdx#web-socket-route-send).
+
+Calling this method again times will override the handler with a new one.
+
+**Usage**
+
+```python
+web_socket_route.route_send(handler)
+```
+
+**Arguments**
+- `handler` [Callable]\[[str] | [bytes]\]:[Promise]\[[Any]\] | [Any]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-route-send-option-handler"/><a href="#web-socket-route-route-send-option-handler" class="list-anchor">#</a>
+  
+  Handler function to route sent messages.
+
+**Returns**
+- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-route-send-return"/><a href="#web-socket-route-route-send-return" class="list-anchor">#</a>
+
+---
+
+### send {#web-socket-route-send}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.send</x-search>
+
+Sends a message to the server, like it was sent in the page with `WebSocket.send()`.
+
+**Usage**
+
+```python
+web_socket_route.send(message)
+```
+
+**Arguments**
+- `message` [str] | [bytes]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-send-option-message"/><a href="#web-socket-route-send-option-message" class="list-anchor">#</a>
+  
+  Message to send.
+
+---
+
+## Properties
+
+### url {#web-socket-route-url}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.url</x-search>
+
+URL of the WebSocket created in the page.
+
+**Usage**
+
+```python
+web_socket_route.url
+```
+
+**Returns**
+- [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-url-return"/><a href="#web-socket-route-url-return" class="list-anchor">#</a>
+
+---
+
+## Events
+
+### on("close") {#web-socket-route-event-close}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.on("close")</x-search>
+
+Emitted when the [`WebSocket`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) closes.
+
+**Usage**
+
+```python
+web_socket_route.on("close", handler)
+```
+
+
+[Accessibility]: /api/class-accessibility.mdx "Accessibility"
+[APIRequest]: /api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
+[Browser]: /api/class-browser.mdx "Browser"
+[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: /api/class-browsertype.mdx "BrowserType"
+[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[Clock]: /api/class-clock.mdx "Clock"
+[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: /api/class-dialog.mdx "Dialog"
+[Download]: /api/class-download.mdx "Download"
+[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
+[Error]: /api/class-error.mdx "Error"
+[FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[Frame]: /api/class-frame.mdx "Frame"
+[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: /api/class-jshandle.mdx "JSHandle"
+[Keyboard]: /api/class-keyboard.mdx "Keyboard"
+[Locator]: /api/class-locator.mdx "Locator"
+[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
+[Mouse]: /api/class-mouse.mdx "Mouse"
+[Page]: /api/class-page.mdx "Page"
+[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
+[Playwright]: /api/class-playwright.mdx "Playwright"
+[Request]: /api/class-request.mdx "Request"
+[Response]: /api/class-response.mdx "Response"
+[Route]: /api/class-route.mdx "Route"
+[Selectors]: /api/class-selectors.mdx "Selectors"
+[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: /api/class-tracing.mdx "Tracing"
+[Video]: /api/class-video.mdx "Video"
+[WebError]: /api/class-weberror.mdx "WebError"
+[WebSocket]: /api/class-websocket.mdx "WebSocket"
+[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[Worker]: /api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
+[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[bytes]: https://docs.python.org/3/library/stdtypes.html#bytes "bytes"
+[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
+[Exception]: https://docs.python.org/3/library/exceptions.html#Exception "Exception"
+[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
+[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
+[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
+[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
+[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
+[URL]: https://en.wikipedia.org/wiki/URL "URL"
+[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
+[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
+[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"
+[datetime]: https://docs.python.org/3/library/datetime.html#datetime.datetime "datetime"
+
+[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/python/about "all available image tags"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/python/about "Microsoft Artifact Registry"
+[Dockerfile.jammy]: https://github.com/microsoft/playwright-python/blob/main/utils/docker/Dockerfile.jammy "Dockerfile.jammy"

@@ -1690,6 +1690,42 @@ Page.routeFromHAR(har, options);
 
 ---
 
+### routeWebSocket {#page-route-web-socket}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>page.routeWebSocket</x-search>
+
+This method allows to modify websocket connections that are made by the page.
+
+Note that only `WebSocket`s created after this method was called will be routed. It is recommended to call this method before navigating the page.
+
+**Usage**
+
+Below is an example of a simple handler that blocks some websocket messages. See [WebSocketRoute] for more details and examples.
+
+```java
+page.routeWebSocket("/ws", ws -> {
+  ws.routeSend(message -> {
+    if ("to-be-blocked".equals(message))
+      return;
+    ws.send(message);
+  });
+  ws.connect();
+});
+```
+
+**Arguments**
+- `url` [String] | [Pattern] | [Predicate]&lt;[String]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-web-socket-option-url"/><a href="#page-route-web-socket-option-url" class="list-anchor">#</a>
+  
+  Only WebSockets with the url matching this pattern will be routed. A string pattern can be relative to the `baseURL` from the context options.
+- `handler` [Consumer]&lt;[WebSocketRoute]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-web-socket-option-handler"/><a href="#page-route-web-socket-option-handler" class="list-anchor">#</a>
+  
+  Handler function to route the WebSocket.
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-web-socket-return"/><a href="#page-route-web-socket-return" class="list-anchor">#</a>
+
+---
+
 ### screenshot {#page-screenshot}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.screenshot</x-search>
@@ -4645,6 +4681,7 @@ page.waitForTimeout(1000);
 [WebError]: /api/class-weberror.mdx "WebError"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
+[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

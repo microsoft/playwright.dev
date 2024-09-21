@@ -2613,6 +2613,73 @@ page.route_from_har(har, **kwargs)
 
 ---
 
+### route_web_socket {#page-route-web-socket}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>page.route_web_socket</x-search>
+
+This method allows to modify websocket connections that are made by the page.
+
+Note that only `WebSocket`s created after this method was called will be routed. It is recommended to call this method before navigating the page.
+
+**Usage**
+
+Below is an example of a simple handler that blocks some websocket messages. See [WebSocketRoute] for more details and examples.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+def message_handler(ws: WebSocketRoute, message: Union[str, bytes]):
+  if message == "to-be-blocked":
+    return
+  ws.send(message)
+
+def handler(ws: WebSocketRoute):
+  ws.route_send(lambda message: message_handler(ws, message))
+  ws.connect()
+
+page.route_web_socket("/ws", handler)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+def message_handler(ws: WebSocketRoute, message: Union[str, bytes]):
+  if message == "to-be-blocked":
+    return
+  ws.send(message)
+
+async def handler(ws: WebSocketRoute):
+  ws.route_send(lambda message: message_handler(ws, message))
+  await ws.connect()
+
+await page.route_web_socket("/ws", handler)
+```
+
+</TabItem>
+</Tabs>
+
+**Arguments**
+- `url` [str] | [Pattern] | [Callable]\[[URL]\]:[bool]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-web-socket-option-url"/><a href="#page-route-web-socket-option-url" class="list-anchor">#</a>
+  
+  Only WebSockets with the url matching this pattern will be routed. A string pattern can be relative to the `base_url` from the context options.
+- `handler` [Callable]\[[WebSocketRoute]\]:[Promise]\[[Any]\] | [Any]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-web-socket-option-handler"/><a href="#page-route-web-socket-option-handler" class="list-anchor">#</a>
+  
+  Handler function to route the WebSocket.
+
+**Returns**
+- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-web-socket-return"/><a href="#page-route-web-socket-return" class="list-anchor">#</a>
+
+---
+
 ### screenshot {#page-screenshot}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.screenshot</x-search>
@@ -5767,6 +5834,7 @@ await page.wait_for_timeout(1000)
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
+[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
