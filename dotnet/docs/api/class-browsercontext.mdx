@@ -609,6 +609,42 @@ await BrowserContext.RouteFromHARAsync(har, options);
 
 ---
 
+### RouteWebSocketAsync {#browser-context-route-web-socket}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>browserContext.RouteWebSocketAsync</x-search>
+
+This method allows to modify websocket connections that are made by any page in the browser context.
+
+Note that only `WebSocket`s created after this method was called will be routed. It is recommended to call this method before creating any pages.
+
+**Usage**
+
+Below is an example of a simple handler that blocks some websocket messages. See [WebSocketRoute] for more details and examples.
+
+```csharp
+await context.RouteWebSocketAsync("/ws", async ws => {
+  ws.RouteSend(message => {
+    if (message == "to-be-blocked")
+      return;
+    ws.Send(message);
+  });
+  await ws.ConnectAsync();
+});
+```
+
+**Arguments**
+- `url` [string] | [Regex] | [Func]&lt;[string], bool&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-web-socket-option-url"/><a href="#browser-context-route-web-socket-option-url" class="list-anchor">#</a>
+  
+  Only WebSockets with the url matching this pattern will be routed. A string pattern can be relative to the `baseURL` from the context options.
+- `handler` [Action]&lt;[WebSocketRoute]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-web-socket-option-handler"/><a href="#browser-context-route-web-socket-option-handler" class="list-anchor">#</a>
+  
+  Handler function to route the WebSocket.
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-web-socket-return"/><a href="#browser-context-route-web-socket-return" class="list-anchor">#</a>
+
+---
+
 ### RunAndWaitForConsoleMessageAsync {#browser-context-wait-for-console-message}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.34</font><x-search>browserContext.RunAndWaitForConsoleMessageAsync</x-search>
@@ -1239,6 +1275,7 @@ BrowserContext.WebError += async (_, webError) => {};
 [WebError]: /api/class-weberror.mdx "WebError"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
+[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

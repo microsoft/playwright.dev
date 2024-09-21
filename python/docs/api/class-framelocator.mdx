@@ -7,7 +7,7 @@ import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
 
-FrameLocator represents a view to the `iframe` on the page. It captures the logic sufficient to retrieve the `iframe` and locate elements in that iframe. FrameLocator can be created with either [page.frame_locator()](/api/class-page.mdx#page-frame-locator) or [locator.frame_locator()](/api/class-locator.mdx#locator-frame-locator) method.
+FrameLocator represents a view to the `iframe` on the page. It captures the logic sufficient to retrieve the `iframe` and locate elements in that iframe. FrameLocator can be created with either [locator.content_frame](/api/class-locator.mdx#locator-content-frame), [page.frame_locator()](/api/class-page.mdx#page-frame-locator) or [locator.frame_locator()](/api/class-locator.mdx#locator-frame-locator) method.
 
 <Tabs
   groupId="python-flavor"
@@ -20,7 +20,7 @@ FrameLocator represents a view to the `iframe` on the page. It captures the logi
 <TabItem value="sync">
 
 ```py
-locator = page.frame_locator("my-frame").get_by_text("Submit")
+locator = page.locator("my-frame").content_frame.get_by_text("Submit")
 locator.click()
 ```
 
@@ -28,7 +28,7 @@ locator.click()
 <TabItem value="async">
 
 ```py
-locator = page.frame_locator("#my-frame").get_by_text("Submit")
+locator = page.locator("#my-frame").content_frame.get_by_text("Submit")
 await locator.click()
 ```
 
@@ -51,10 +51,10 @@ Frame locators are strict. This means that all operations on frame locators will
 
 ```py
 # Throws if there are several frames in DOM:
-page.frame_locator('.result-frame').get_by_role('button').click()
+page.locator('.result-frame').content_frame.get_by_role('button').click()
 
 # Works because we explicitly tell locator to pick the first frame:
-page.frame_locator('.result-frame').first.get_by_role('button').click()
+page.locator('.result-frame').first.content_frame.get_by_role('button').click()
 ```
 
 </TabItem>
@@ -62,10 +62,10 @@ page.frame_locator('.result-frame').first.get_by_role('button').click()
 
 ```py
 # Throws if there are several frames in DOM:
-await page.frame_locator('.result-frame').get_by_role('button').click()
+await page.locator('.result-frame').content_frame.get_by_role('button').click()
 
 # Works because we explicitly tell locator to pick the first frame:
-await page.frame_locator('.result-frame').first.get_by_role('button').click()
+await page.locator('.result-frame').first.content_frame.get_by_role('button').click()
 ```
 
 </TabItem>
@@ -618,61 +618,7 @@ frame_locator.locator(selector_or_locator, **kwargs)
 
 ---
 
-### nth {#frame-locator-nth}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.nth</x-search>
-
-Returns locator to the n-th matching frame. It's zero based, `nth(0)` selects the first frame.
-
-**Usage**
-
-```python
-frame_locator.nth(index)
-```
-
-**Arguments**
-- `index` [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-nth-option-index"/><a href="#frame-locator-nth-option-index" class="list-anchor">#</a>
-
-**Returns**
-- [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-nth-return"/><a href="#frame-locator-nth-return" class="list-anchor">#</a>
-
----
-
 ## Properties
-
-### first {#frame-locator-first}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.first</x-search>
-
-Returns locator to the first matching frame.
-
-**Usage**
-
-```python
-frame_locator.first
-```
-
-**Returns**
-- [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-first-return"/><a href="#frame-locator-first-return" class="list-anchor">#</a>
-
----
-
-### last {#frame-locator-last}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.last</x-search>
-
-Returns locator to the last matching frame.
-
-**Usage**
-
-```python
-frame_locator.last
-```
-
-**Returns**
-- [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-last-return"/><a href="#frame-locator-last-return" class="list-anchor">#</a>
-
----
 
 ### owner {#frame-locator-owner}
 
@@ -697,7 +643,7 @@ For a reverse operation, use [locator.content_frame](/api/class-locator.mdx#loca
 <TabItem value="sync">
 
 ```py
-frame_locator = page.frame_locator("iframe[name=\"embedded\"]")
+frame_locator = page.locator("iframe[name=\"embedded\"]").content_frame
 # ...
 locator = frame_locator.owner
 expect(locator).to_be_visible()
@@ -707,7 +653,7 @@ expect(locator).to_be_visible()
 <TabItem value="async">
 
 ```py
-frame_locator = page.frame_locator("iframe[name=\"embedded\"]")
+frame_locator = page.locator("iframe[name=\"embedded\"]").content_frame
 # ...
 locator = frame_locator.owner
 await expect(locator).to_be_visible()
@@ -718,6 +664,83 @@ await expect(locator).to_be_visible()
 
 **Returns**
 - [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-owner-return"/><a href="#frame-locator-owner-return" class="list-anchor">#</a>
+
+---
+
+## Deprecated
+
+### first {#frame-locator-first}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.first</x-search>
+
+:::warning Deprecated
+
+Use [locator.first](/api/class-locator.mdx#locator-first) followed by [locator.content_frame](/api/class-locator.mdx#locator-content-frame) instead.
+
+:::
+
+
+Returns locator to the first matching frame.
+
+**Usage**
+
+```python
+frame_locator.first
+```
+
+**Returns**
+- [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-first-return"/><a href="#frame-locator-first-return" class="list-anchor">#</a>
+
+---
+
+### last {#frame-locator-last}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.last</x-search>
+
+:::warning Deprecated
+
+Use [locator.last](/api/class-locator.mdx#locator-last) followed by [locator.content_frame](/api/class-locator.mdx#locator-content-frame) instead.
+
+:::
+
+
+Returns locator to the last matching frame.
+
+**Usage**
+
+```python
+frame_locator.last
+```
+
+**Returns**
+- [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-last-return"/><a href="#frame-locator-last-return" class="list-anchor">#</a>
+
+---
+
+### nth {#frame-locator-nth}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.nth</x-search>
+
+:::warning Deprecated
+
+Use [locator.nth()](/api/class-locator.mdx#locator-nth) followed by [locator.content_frame](/api/class-locator.mdx#locator-content-frame) instead.
+
+:::
+
+
+Returns locator to the n-th matching frame. It's zero based, `nth(0)` selects the first frame.
+
+**Usage**
+
+```python
+frame_locator.nth(index)
+```
+
+**Arguments**
+- `index` [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-nth-option-index"/><a href="#frame-locator-nth-option-index" class="list-anchor">#</a>
+
+**Returns**
+- [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-nth-return"/><a href="#frame-locator-nth-return" class="list-anchor">#</a>
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
@@ -756,6 +779,7 @@ await expect(locator).to_be_visible()
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
+[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"

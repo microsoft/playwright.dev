@@ -7,10 +7,10 @@ import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
 
-FrameLocator represents a view to the `iframe` on the page. It captures the logic sufficient to retrieve the `iframe` and locate elements in that iframe. FrameLocator can be created with either [page.frameLocator()](/api/class-page.mdx#page-frame-locator) or [locator.frameLocator()](/api/class-locator.mdx#locator-frame-locator) method.
+FrameLocator represents a view to the `iframe` on the page. It captures the logic sufficient to retrieve the `iframe` and locate elements in that iframe. FrameLocator can be created with either [locator.contentFrame()](/api/class-locator.mdx#locator-content-frame), [page.frameLocator()](/api/class-page.mdx#page-frame-locator) or [locator.frameLocator()](/api/class-locator.mdx#locator-frame-locator) method.
 
 ```js
-const locator = page.frameLocator('#my-frame').getByText('Submit');
+const locator = page.locator('#my-frame').contentFrame().getByText('Submit');
 await locator.click();
 ```
 
@@ -20,10 +20,10 @@ Frame locators are strict. This means that all operations on frame locators will
 
 ```js
 // Throws if there are several frames in DOM:
-await page.frameLocator('.result-frame').getByRole('button').click();
+await page.locator('.result-frame').contentFrame().getByRole('button').click();
 
 // Works because we explicitly tell locator to pick the first frame:
-await page.frameLocator('.result-frame').first().getByRole('button').click();
+await page.locator('.result-frame').contentFrame().first().getByRole('button').click();
 ```
 
 **Converting Locator to FrameLocator**
@@ -38,23 +38,6 @@ If you have a [FrameLocator] object it can be converted to [Locator] pointing to
 ---
 
 ## Methods
-
-### first {#frame-locator-first}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.first</x-search>
-
-Returns locator to the first matching frame.
-
-**Usage**
-
-```js
-frameLocator.first();
-```
-
-**Returns**
-- [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-first-return"/><a href="#frame-locator-first-return" class="list-anchor">#</a>
-
----
 
 ### frameLocator {#frame-locator-frame-locator}
 
@@ -408,23 +391,6 @@ await expect(page.getByTitle('Issues count')).toHaveText('25 issues');
 
 ---
 
-### last {#frame-locator-last}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.last</x-search>
-
-Returns locator to the last matching frame.
-
-**Usage**
-
-```js
-frameLocator.last();
-```
-
-**Returns**
-- [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-last-return"/><a href="#frame-locator-last-return" class="list-anchor">#</a>
-
----
-
 ### locator {#frame-locator-locator}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.locator</x-search>
@@ -469,9 +435,90 @@ frameLocator.locator(selectorOrLocator, options);
 
 ---
 
+### owner {#frame-locator-owner}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.43</font><x-search>frameLocator.owner</x-search>
+
+Returns a [Locator] object pointing to the same `iframe` as this frame locator.
+
+Useful when you have a [FrameLocator] object obtained somewhere, and later on would like to interact with the `iframe` element.
+
+For a reverse operation, use [locator.contentFrame()](/api/class-locator.mdx#locator-content-frame).
+
+**Usage**
+
+```js
+const frameLocator = page.locator('iframe[name="embedded"]').contentFrame();
+// ...
+const locator = frameLocator.owner();
+await expect(locator).toBeVisible();
+```
+
+**Returns**
+- [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-owner-return"/><a href="#frame-locator-owner-return" class="list-anchor">#</a>
+
+---
+
+## Deprecated
+
+### first {#frame-locator-first}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.first</x-search>
+
+:::warning Deprecated
+
+Use [locator.first()](/api/class-locator.mdx#locator-first) followed by [locator.contentFrame()](/api/class-locator.mdx#locator-content-frame) instead.
+
+:::
+
+
+Returns locator to the first matching frame.
+
+**Usage**
+
+```js
+frameLocator.first();
+```
+
+**Returns**
+- [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-first-return"/><a href="#frame-locator-first-return" class="list-anchor">#</a>
+
+---
+
+### last {#frame-locator-last}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.last</x-search>
+
+:::warning Deprecated
+
+Use [locator.last()](/api/class-locator.mdx#locator-last) followed by [locator.contentFrame()](/api/class-locator.mdx#locator-content-frame) instead.
+
+:::
+
+
+Returns locator to the last matching frame.
+
+**Usage**
+
+```js
+frameLocator.last();
+```
+
+**Returns**
+- [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-last-return"/><a href="#frame-locator-last-return" class="list-anchor">#</a>
+
+---
+
 ### nth {#frame-locator-nth}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.nth</x-search>
+
+:::warning Deprecated
+
+Use [locator.nth()](/api/class-locator.mdx#locator-nth) followed by [locator.contentFrame()](/api/class-locator.mdx#locator-content-frame) instead.
+
+:::
+
 
 Returns locator to the n-th matching frame. It's zero based, `nth(0)` selects the first frame.
 
@@ -486,30 +533,6 @@ frameLocator.nth(index);
 
 **Returns**
 - [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-nth-return"/><a href="#frame-locator-nth-return" class="list-anchor">#</a>
-
----
-
-### owner {#frame-locator-owner}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.43</font><x-search>frameLocator.owner</x-search>
-
-Returns a [Locator] object pointing to the same `iframe` as this frame locator.
-
-Useful when you have a [FrameLocator] object obtained somewhere, and later on would like to interact with the `iframe` element.
-
-For a reverse operation, use [locator.contentFrame()](/api/class-locator.mdx#locator-content-frame).
-
-**Usage**
-
-```js
-const frameLocator = page.frameLocator('iframe[name="embedded"]');
-// ...
-const locator = frameLocator.owner();
-await expect(locator).toBeVisible();
-```
-
-**Returns**
-- [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-owner-return"/><a href="#frame-locator-owner-return" class="list-anchor">#</a>
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
@@ -560,10 +583,12 @@ await expect(locator).toBeVisible();
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
+[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
 [Worker]: /api/class-worker.mdx "Worker"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
+[Location]: /api/class-location.mdx "Location"
 [Test]: /api/class-test.mdx "Test"
 [TestConfig]: /api/class-testconfig.mdx "TestConfig"
 [TestInfo]: /api/class-testinfo.mdx "TestInfo"
@@ -571,7 +596,6 @@ await expect(locator).toBeVisible();
 [TestOptions]: /api/class-testoptions.mdx "TestOptions"
 [TestProject]: /api/class-testproject.mdx "TestProject"
 [WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
-[Location]: /api/class-location.mdx "Location"
 [Reporter]: /api/class-reporter.mdx "Reporter"
 [Suite]: /api/class-suite.mdx "Suite"
 [TestCase]: /api/class-testcase.mdx "TestCase"
