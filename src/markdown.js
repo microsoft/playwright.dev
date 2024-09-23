@@ -50,7 +50,6 @@
 
 /** @typedef {MarkdownBaseNode & {
  *    type: 'note',
- *    text: string,
  *    noteType: string,
  *  }} MarkdownNoteNode */
 
@@ -66,8 +65,9 @@
 /** @typedef {{
  * maxColumns?: number,
  * omitLastCR?: boolean,
- * flattenText?: boolean
- * renderCodeBlockTitlesInHeader?: boolean
+ * flattenText?: boolean,
+ * renderCodeBlockTitlesInHeader?: boolean,
+ * renderNoteAsText?: boolean,
  * }} RenderOptions
  */
 
@@ -208,7 +208,7 @@ function buildTree(lines) {
         tokens.push(line.substring(indent.length));
         line = lines[++i];
       }
-      node.text = tokens.join('↵');
+      node.children = buildTree(tokens);
       appendNode(indent, node);
       continue;
     }
@@ -340,10 +340,21 @@ function innerRenderMdNode(indent, node, lastNode, result, options) {
 
   if (node.type === 'note') {
     newLine();
-    result.push(`${indent}:::${node.noteType}`);
-    result.push(wrapText(node.text, options, indent));
-    result.push(`${indent}:::`);
-    newLine();
+    if (options?.renderNoteAsText) {
+      /** @type {MarkdownTextNode} */
+      const textNode = {
+        type: 'text',
+        text: `**NOTE** ` + (node.children || []).map(child => render([child], { flattenText: false, omitLastCR: true })).join('↵').trimEnd(),
+      }
+      innerRenderMdNode(indent, textNode, lastNode, result, options);
+    } else {
+      result.push(`${indent}:::${node.noteType}`);
+      const children = node.children ?? [];
+      for (let i = 0; i < children.length; i++)
+        innerRenderMdNode(indent, children[i], lastNode, result, options);
+      result.push(`${indent}:::`);
+      newLine();
+    }
     return;
   }
 
