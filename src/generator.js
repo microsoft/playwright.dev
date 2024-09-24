@@ -719,8 +719,7 @@ function calculatePropertyHash(member, direction) {
   if (direction === 'out')
     return `${prefix}-return`;
   const propertyName = toKebabCase(member.name);
-  const propertyDescription = member.paramOrOption ? 'param' : 'option';
-  return `${prefix}-${propertyDescription}-${propertyName}`.toLowerCase();
+  return `${prefix}-option-${propertyName}`.toLowerCase();
 }
 
 const fileWriteCache = new Map();
