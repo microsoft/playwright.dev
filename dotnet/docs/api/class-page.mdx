@@ -940,7 +940,7 @@ await page
     
   - `Exact` [bool]? *(optional)* <font size="2">Added in: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-get-by-role-option-exact"/><a href="#page-get-by-role-option-exact" class="list-anchor">#</a>
     
-    Whether `name` is matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when `name` is a regular expression. Note that exact match still trims whitespace.
+    Whether `name|nameRegex` is matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when `name|nameRegex` is a regular expression. Note that exact match still trims whitespace.
   - `Expanded` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-get-by-role-option-expanded"/><a href="#page-get-by-role-option-expanded" class="list-anchor">#</a>
     
     An attribute that is usually set by `aria-expanded`.
@@ -956,7 +956,7 @@ await page
     A number attribute that is usually present for roles `heading`, `listitem`, `row`, `treeitem`, with default values for `<h1>-<h6>` elements.
     
     Learn more about [`aria-level`](https://www.w3.org/TR/wai-aria-1.2/#aria-level).
-  - `Name|NameRegex` [string]? | [Regex]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-get-by-role-option-name-name-regex"/><a href="#page-get-by-role-option-name-name-regex" class="list-anchor">#</a>
+  - `Name|NameRegex` [string]? | [Regex]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-get-by-role-option-name"/><a href="#page-get-by-role-option-name" class="list-anchor">#</a>
     
     Option to match the [accessible name](https://w3c.github.io/accname/#dfn-accessible-name). By default, matching is case-insensitive and searches for a substring, use `exact` to control this behavior.
     
@@ -1272,10 +1272,10 @@ Page.Locator(selector, options);
     Matches elements that do not contain an element that matches an inner locator. Inner locator is queried against the outer one. For example, `article` that does not have `div` matches `<article><span>Playwright</span></article>`.
     
     Note that outer and inner locators must belong to the same frame. Inner locator must not contain [FrameLocator]s.
-  - `HasNotText|HasNotTextRegex` [string]? | [Regex]? *(optional)* <font size="2">Added in: v1.33</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-locator-option-has-not-text-has-not-text-regex"/><a href="#page-locator-option-has-not-text-has-not-text-regex" class="list-anchor">#</a>
+  - `HasNotText|HasNotTextRegex` [string]? | [Regex]? *(optional)* <font size="2">Added in: v1.33</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-locator-option-has-not-text"/><a href="#page-locator-option-has-not-text" class="list-anchor">#</a>
     
     Matches elements that do not contain specified text somewhere inside, possibly in a child or a descendant element. When passed a [string], matching is case-insensitive and searches for a substring.
-  - `HasText|HasTextRegex` [string]? | [Regex]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-locator-option-has-text-has-text-regex"/><a href="#page-locator-option-has-text-has-text-regex" class="list-anchor">#</a>
+  - `HasText|HasTextRegex` [string]? | [Regex]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-locator-option-has-text"/><a href="#page-locator-option-has-text" class="list-anchor">#</a>
     
     Matches elements containing specified text somewhere inside, possibly in a child or a descendant element. When passed a [string], matching is case-insensitive and searches for a substring. For example, `"Playwright"` matches `<article><div>Playwright</div></article>`.
 
@@ -1327,7 +1327,7 @@ Pauses script execution. Playwright will stop executing the script and wait for 
 User can inspect selectors or perform manual steps while paused. Resume will continue running the original script from the place it was paused.
 
 :::note
-This method requires Playwright to be started in a headed mode, with a falsy `headless` value in the [BrowserType.LaunchAsync()](/api/class-browsertype.mdx#browser-type-launch).
+This method requires Playwright to be started in a headed mode, with a falsy `headless` option.
 :::
 
 **Usage**
@@ -1530,7 +1530,7 @@ The handler will only be called for the first url if the response is a redirect.
 :::
 
 :::note
-[Page.RouteAsync()](/api/class-page.mdx#page-route) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception by setting `Browser.newContext.serviceWorkers` to `'block'`.
+[Page.RouteAsync()](/api/class-page.mdx#page-route) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception by setting `serviceWorkers` to `'block'`.
 :::
 
 :::note
@@ -1598,7 +1598,7 @@ Enabling routing disables http cache.
 
 If specified the network requests that are made in the page will be served from the HAR file. Read more about [Replaying from HAR](../mock.mdx#replaying-from-har).
 
-Playwright will not serve requests intercepted by Service Worker from the HAR file. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception by setting `Browser.newContext.serviceWorkers` to `'block'`.
+Playwright will not serve requests intercepted by Service Worker from the HAR file. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception by setting `serviceWorkers` to `'block'`.
 
 **Usage**
 
@@ -1625,7 +1625,7 @@ await Page.RouteFromHARAsync(har, options);
   - `UpdateMode` `enum HarMode { Full, Minimal }?` *(optional)* <font size="2">Added in: v1.32</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-from-har-option-update-mode"/><a href="#page-route-from-har-option-update-mode" class="list-anchor">#</a>
     
     When set to `minimal`, only record information necessary for routing from HAR. This omits sizes, timing, page, cookies, security and other types of HAR information that are not used when replaying from HAR. Defaults to `minimal`.
-  - `Url|UrlRegex` [string]? | [Regex]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-from-har-option-url-url-regex"/><a href="#page-route-from-har-option-url-url-regex" class="list-anchor">#</a>
+  - `Url|UrlRegex` [string]? | [Regex]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-from-har-option-url"/><a href="#page-route-from-har-option-url" class="list-anchor">#</a>
     
     A glob pattern, regular expression or predicate to match the request URL. Only requests with URL matching the pattern will be served from the HAR file. If not specified, all requests are served from the HAR file.
 
@@ -1660,7 +1660,7 @@ await page.RouteWebSocketAsync("/ws", async ws => {
 **Arguments**
 - `url` [string] | [Regex] | [Func]&lt;[string], bool&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-web-socket-option-url"/><a href="#page-route-web-socket-option-url" class="list-anchor">#</a>
   
-  Only WebSockets with the url matching this pattern will be routed. A string pattern can be relative to the `baseURL` from the context options.
+  Only WebSockets with the url matching this pattern will be routed. A string pattern can be relative to the `baseURL` context option.
 - `handler` [Action]&lt;[WebSocketRoute]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-web-socket-option-handler"/><a href="#page-route-web-socket-option-handler" class="list-anchor">#</a>
   
   Handler function to route the WebSocket.
@@ -4247,7 +4247,7 @@ Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/Hist
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-timeout"/><a href="#page-wait-for-navigation-option-timeout" class="list-anchor">#</a>
     
     Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [Page.SetDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-  - `Url|UrlRegex|UrlFunc` [string]? | [Regex]? | [Func]&lt;[string]?, bool&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-url-url-regex-url-func"/><a href="#page-wait-for-navigation-option-url-url-regex-url-func" class="list-anchor">#</a>
+  - `Url|UrlRegex|UrlFunc` [string]? | [Regex]? | [Func]&lt;[string]?, bool&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-url"/><a href="#page-wait-for-navigation-option-url" class="list-anchor">#</a>
     
     A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
   - `WaitUntil` `enum WaitUntilState { Load, DOMContentLoaded, NetworkIdle, Commit }?` *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-wait-until"/><a href="#page-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
@@ -4299,7 +4299,7 @@ Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/Hist
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-timeout"/><a href="#page-wait-for-navigation-option-timeout" class="list-anchor">#</a>
     
     Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [Page.SetDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-  - `Url|UrlRegex|UrlFunc` [string]? | [Regex]? | [Func]&lt;[string]?, bool&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-url-url-regex-url-func"/><a href="#page-wait-for-navigation-option-url-url-regex-url-func" class="list-anchor">#</a>
+  - `Url|UrlRegex|UrlFunc` [string]? | [Regex]? | [Func]&lt;[string]?, bool&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-url"/><a href="#page-wait-for-navigation-option-url" class="list-anchor">#</a>
     
     A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
   - `WaitUntil` `enum WaitUntilState { Load, DOMContentLoaded, NetworkIdle, Commit }?` *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-wait-until"/><a href="#page-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
