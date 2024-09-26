@@ -32,6 +32,7 @@ class JavaScriptFormatter {
 
   /**
    * @param {Documentation.Member} member
+   * @returns {import('./generator').FormattedMember[]}
    */
   formatMember(member) {
     let args = [];
@@ -65,26 +66,35 @@ class JavaScriptFormatter {
     return [{ name, link, usages, args, signatures }];
   }
 
-  formatArgumentName(name) {
-    return name;
-  }
-
+  /**
+   * @param {string} text
+   */
   formatTemplate(text) {
     return`<${text}>`;
   }
 
-  formatFunction(args, ret) {
+  /**
+   * @param {string} args
+   * @param {string} ret
+   * @param {Documentation.Type} type
+   */
+  formatFunction(args, ret, type) {
     return `[function]\\(${args}\\)${ret}`;
   }
 
+  /**
+   * @param {string} text
+   */
   formatPromise(text) {
     return `[Promise]<${text}>`;
   }
 
   /**
    * @param {Documentation.Type} type
+   * @param {'in'|'out'} direction
+   * @param {Documentation.Member} member
    */
-  renderType(type) {
+  formatTypeName(type, direction, member) {
     const text = type.name;
     switch (text) {
       case 'int': return '[number]';
@@ -97,19 +107,33 @@ class JavaScriptFormatter {
   }
 
   /**
-   * @param {MarkdownNode[]} spec
-   * @returns {MarkdownNode[]}
-   */
-  preprocessComment(spec) {
-    return spec;
-  }
-
-  /**
    * @param {MarkdownNode} spec
-   * @returns boolean
+   * @returns {boolean}
    */
   filterComment(spec) {
     return spec.codeLang === 'ts' || spec.codeLang === 'js';
+  }
+
+  /**
+   * @param {string} className
+   */
+  rewriteClassTitle(className) {
+    if (className === 'Test')
+      return 'Playwright Test';
+    if (className === 'Playwright')
+      return 'Playwright Library';
+    return className;
+  }
+
+  /**
+   * @param {string} text
+   */
+  rewriteMarkdownContent(text) {
+    return text.replace(/\.\(call\)/g, '');
+  }
+
+  propertyTypeTitle() {
+    return 'Type';
   }
 }
 

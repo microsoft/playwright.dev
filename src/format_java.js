@@ -31,6 +31,7 @@ class JavaFormatter {
 
   /**
    * @param {Documentation.Member} member
+   * @returns {import('./generator').FormattedMember[]}
    */
   formatMember(member) {
     let args = [];
@@ -62,14 +63,18 @@ class JavaFormatter {
     return [{ name, link, usages, args, signatures }];
   }
 
-  formatArgumentName(name) {
-    return name;
-  }
-
+  /**
+   * @param {string} text
+   */
   formatTemplate(text) {
     return `<${text}>`;
   }
 
+  /**
+   * @param {string} args
+   * @param {string} ret
+   * @param {Documentation.Type} type
+   */
   formatFunction(args, ret, type) {
     if (type.args.length !== 1)
       throw new Error('Unsupported number of arguments in function: ' + type);
@@ -80,14 +85,11 @@ class JavaFormatter {
     throw new Error('Unknown java type for function: ' + type);
   }
 
-  formatPromise(text) {
-    return text;
-  }
-
   /**
    * @param {Documentation.Type} type
-   * @param {string} direction
+   * @param {'in'|'out'} direction
    * @param {Documentation.Member} member
+   * @returns {string?}
    */
   formatArrayType(type, direction, member) {
     const text = type.name;
@@ -102,16 +104,16 @@ class JavaFormatter {
     // (List overloads don't work because of type erasure in java).
     if (member.type.union.filter(e => e.name === 'Array').length < 2)
       return null;
-    const elementType = this.renderType(type.templates[0], direction, member);
+    const elementType = this.formatTypeName(type.templates[0], direction, member);
     return `${elementType}&#91;&#93;`;
   }
 
   /**
    * @param {Documentation.Type} type
-   * @param {string} direction
+   * @param {'in'|'out'} direction
    * @param {Documentation.Member} member
    */
-  renderType(type, direction, member) {
+  formatTypeName(type, direction, member) {
     if (member.kind === 'property' && member.name === 'options') {
       const method = member.enclosingMethod;
       return `\`${toTitleCase(method.clazz.varName)}.${toTitleCase(method.alias)}Options\``;
@@ -165,6 +167,10 @@ class JavaFormatter {
     return `[${text}]`;
   }
 
+  /**
+   * @param {import('./markdown').MarkdownNode[]} spec
+   * @returns {import('./markdown').MarkdownNode[]}
+   */
   preprocessComment(spec) {
     spec = spec.filter(n => !n.text || !n.text.startsWith('extends: [EventEmitter]'));
     spec.forEach(n => {
@@ -176,10 +182,33 @@ class JavaFormatter {
 
   /**
    * @param {import('./markdown').MarkdownNode} spec
-   * @returns boolean
+   * @returns {boolean}
    */
-   filterComment(spec) {
+  filterComment(spec) {
     return spec.codeLang === this.lang;
+  }
+
+  propertyTypeTitle() {
+    return 'Returns';
+  }
+
+  /**
+   * @param {string} option
+   */
+  formatOptionName(option) {
+    return option.split('.').map(o => `set${toTitleCase(o)}`).join('.');
+  }
+
+  /**
+   * @param {Documentation.Type} type
+   * @param {'in'|'out'} direction
+   * @param {Documentation.Member} member
+   */
+  formatUnionType(type, direction, member) {
+    if (type.union.some(v => v.name.startsWith('"'))) {
+      const values = type.union.map(l => l.name.substring(1, l.name.length - 1).replace('-', '_').toLocaleUpperCase());
+      return `\`enum ${type.name} { ${values.join(', ')} }\``;
+    }
   }
 }
 

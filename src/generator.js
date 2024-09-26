@@ -27,44 +27,29 @@ const { generateTabGroups, renderHTMLCard } = require('./format_utils');
 
 /** @typedef {import('./documentation').Type} Type */
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
+/** @export @typedef {{ name: string, link: string, usages: string[], args: docs.Member[], signatures?: string[] }} FormattedMember */
 
 const commonSnippets = new Set(['txt', 'html', 'xml', 'yml', 'yaml', 'json', 'groovy', 'html', 'bash', 'sh', 'ini', 'Dockerfile', 'css']);
-
-// -------- HACKS BEGIN --------
-/**
- * @param {string} className
- * @param {string} lang
- * @returns {string|undefined}
- */
-function rewriteClassTitle(className, lang) {
-  if (className === 'Test')
-    return 'Playwright Test';
-  if (lang === 'js' && className === 'Playwright')
-    return 'Playwright Library';
-}
-
-/**
- * @param {string} text
- * @returns {string}
- */
-function rewriteContent(text) {
-  return text.replace(/\.\(call\)/g, '');
-}
-// -------- HACKS END --------
 
 /** @typedef {"header"|"link"|"usage"} FormatMode */
 
 /**
  * @typedef {{
- *   formatMember: function(docs.Member): { name: string, link: string, usages: string[], args: docs.Member[], signatures?: string[] }[],
- *   formatArgumentName: function(string): string,
+ *   formatMember: function(docs.Member): FormattedMember[],
+ *   formatParamName?: function(string): string,
+ *   formatOptionName?: function(string, docs.Member?): string,
  *   formatTemplate: function(string): string,
  *   formatFunction: function(string, string, docs.Type): string,
- *   formatPromise: function(string): string,
- *   formatArrayType?: function(docs.Type, string, docs.Member): string?,
- *   preprocessComment: function(MarkdownNode[]): MarkdownNode[]
- *   filterComment: function(MarkdownNode): boolean
- *   renderType: function(docs.Type, string, docs.Member): string,
+ *   formatPromise?: function(string): string,
+ *   formatArrayType?: function(docs.Type, 'in'|'out', docs.Member): string?,
+ *   formatUnionType?: function(docs.Type, 'in'|'out', docs.Member): string?,
+ *   formatTypeName: function(docs.Type, 'in'|'out', docs.Member): string,
+ *   preprocessComment?: function(MarkdownNode[]): MarkdownNode[],
+ *   filterComment: function(MarkdownNode): boolean,
+ *   rewriteClassTitle?: function(string): string,
+ *   rewriteMarkdownContent?: function(string): string,
+ *   shouldRenderMemberAsProperty?: function(docs.Member): boolean,
+ *   propertyTypeTitle(): string,
  * }} GeneratorFormatter
  */
 
@@ -78,15 +63,13 @@ class Generator {
    * srcDir: string,
    * outDir: string,
    * formatter: GeneratorFormatter,
-   * renderSyncNoArgsMethodAsProperty?: boolean,
    * }} options
    */
-  constructor({ lang, version, srcDir, outDir, formatter, renderSyncNoArgsMethodAsProperty }) {
+  constructor({ lang, version, srcDir, outDir, formatter }) {
     this.lang = lang;
     this.version = version;
     this.outDir = outDir;
     this.srcDir = srcDir;
-    this.renderSyncNoArgsMethodAsProperty = renderSyncNoArgsMethodAsProperty;
     /** @type {Set<string>} */
     this.generatedFiles = new Set();
     this.formatter = formatter;
@@ -96,14 +79,20 @@ class Generator {
       .mergeWith(parseApi(path.join(srcDir, 'test-reporter-api')));
     this.documentation.filterForLanguage(lang, { csharpOptionOverloadsShortNotation: true });
     this.documentation.setLinkRenderer(item => {
-      const { clazz, member, param, option, optionFullPath, href } = item;
-      if (param)
-        return `\`${formatter.formatArgumentName(param)}\``;
-      if (optionFullPath)
-        return `\`${formatter.formatArgumentName(optionFullPath)}\``;
+      const { clazz, member, param, option, href } = item;
       if (clazz)
         return href ? `[${clazz.name}](${href})` : `[${clazz.name}]`;
-      return this.createMemberLink(member, href)[0];
+      if (!member || !member.clazz)
+        throw new Error(`docs link must have a top-level member`);
+      if (param) {
+        const text = formatter.formatParamName?.(param.alias) || param.alias;
+        return this.createMemberLink(member, href, { text, name: param.name });
+      }
+      if (option) {
+        const text = formatter.formatOptionName?.(option.alias, member) || option.alias;
+        return this.createMemberLink(member, href, { text, name: option.name });
+      }
+      return this.createMemberLink(member, href);
     });
 
     this.generatedLinksSuffix = '';
@@ -152,7 +141,7 @@ class Generator {
       type: 'text',
       text: `---
 id: class-${clazz.name.toLowerCase()}
-title: "${rewriteClassTitle(clazz.name, this.lang) || clazz.name}"
+title: "${this.formatter.rewriteClassTitle?.(clazz.name) || clazz.name}"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -316,7 +305,7 @@ ${this.documentation.renderLinksInText(member.discouraged)}
           });
 
           sections.arguments.push(...args.map(a => {
-            let name = this.formatter.formatArgumentName(a.alias);
+            const name = this.formatter.formatParamName?.(a.alias) || a.alias;
             return this.renderProperty(name, a, a.spec, 'in', false, !a.required);
           }));
         }
@@ -326,7 +315,7 @@ ${this.documentation.renderLinksInText(member.discouraged)}
           let name;
           switch (member.kind) {
             case 'event': name = 'Event data'; break;
-            case 'property': name = this.lang === 'java' ? 'Returns' : 'Type'; break;
+            case 'property': name = this.formatter.propertyTypeTitle(); break;
             case 'method': name = 'Returns'; break;
           }
 
@@ -335,7 +324,7 @@ ${this.documentation.renderLinksInText(member.discouraged)}
             text: '**' + name + '**',
           });
 
-          sections.return.push(this.renderProperty('', member, undefined, 'out', member.async));
+          sections.return.push(this.renderProperty('', member, undefined, 'out', member.async, false));
         }
 
         memberNode.children.push(...this.formatComment(sections.version));
@@ -360,8 +349,7 @@ ${this.documentation.renderLinksInText(member.discouraged)}
       return { key: 'd', title: 'Deprecated' };
     if (member.kind === 'event')
       return { key: 'c', title: 'Events' };
-    const treatAsProperty = (this.renderSyncNoArgsMethodAsProperty && member.kind === 'method' && !member.async && member.argsArray.length === 0)
-    if (member.kind === 'property' || treatAsProperty)
+    if (member.kind === 'property' || this.formatter.shouldRenderMemberAsProperty?.(member))
       return { key: 'b', title: 'Properties' };
     if (member.kind === 'method')
       return { key: 'a', title: 'Methods' };
@@ -374,7 +362,7 @@ ${this.documentation.renderLinksInText(member.discouraged)}
   mdxLinks(text) {
     for (const name of this.generatedFiles)
       text = text.replace(new RegExp(`(${path.basename(name)})([^x])`, 'g'), "$1x$2");
-    return rewriteContent(text);
+    return this.formatter.rewriteMarkdownContent?.(text) ?? text;
   }
 
   /**
@@ -382,7 +370,7 @@ ${this.documentation.renderLinksInText(member.discouraged)}
    * @return {MarkdownNode[]}
    */
   formatComment(spec) {
-    spec = this.formatter.preprocessComment(spec);
+    spec = this.formatter.preprocessComment?.(spec) || spec;
     spec = generateTabGroups(spec, this.lang);
     spec = renderHTMLCard(spec);
 
@@ -492,13 +480,19 @@ import HTMLCard from '@site/src/components/HTMLCard';`);
   /**
    * @param {docs.Member} member
    * @param {string=} href
-   * @return {string[]}
+   * @param {{name: string, text: string}=} paramOrOption
+   * @return {string}
    */
-  createMemberLink(member, href) {
+  createMemberLink(member, href, paramOrOption) {
     const file = apiClassLink(member.clazz);
-    const hash = calculateHeadingHash(member);
+    let hash = calculateHeadingHash(member);
     this.heading2ExplicitId.set(member, hash);
-    return this.formatter.formatMember(member).map(f => this.createLink(file, f.link, hash, href));
+    if (paramOrOption) {
+      hash += '-option-' + toKebabCase(paramOrOption.name).toLowerCase();
+      return this.createLink(file, paramOrOption.text, hash, href);
+    }
+    const formatted = this.formatter.formatMember(member)[0];
+    return this.createLink(file, formatted.link, hash, href);
   }
 
   /**
@@ -514,8 +508,8 @@ import HTMLCard from '@site/src/components/HTMLCard';`);
    * @param {docs.Member} member
    * @param {MarkdownNode[]} spec
    * @param {'in'|'out'} direction
-   * @param {boolean=} async
-   * @param {boolean=} optional
+   * @param {boolean} async
+   * @param {boolean} optional
    */
   renderProperty(name, member, spec, direction, async, optional) {
     const type = member.type;
@@ -545,10 +539,8 @@ ${this.documentation.renderLinksInText(member.discouraged)}
     if (properties && properties.length) {
       children.push(...properties.map(p => {
         let alias = p.alias;
-        if (this.lang === 'java' && member.kind === 'property' && direction === 'in')
-          alias = `set${toTitleCase(alias)}`;
-        if (this.lang === 'csharp' && member.kind === 'property' && direction === 'in')
-          alias = toTitleCase(alias);
+        if (member.kind === 'property' && direction === 'in')
+          alias = this.formatter.formatOptionName?.(alias, p) || alias;
         return this.renderProperty(alias, p, p.spec, direction, false, !p.required);
       }));
     }
@@ -557,7 +549,7 @@ ${this.documentation.renderLinksInText(member.discouraged)}
 
     let typeText = this.renderType(type, direction, member);
     if (async)
-      typeText = this.formatter.formatPromise(typeText);
+      typeText = this.formatter.formatPromise?.(typeText) || typeText;
 
     // Escape < and > to not confuse MDX:
     // https://docusaurus.io/docs/migration/v3#bad-usage-of--1
@@ -593,56 +585,20 @@ ${this.documentation.renderLinksInText(member.discouraged)}
    * @param {docs.Member} member
    */
   renderType(type, direction, member) {
-    if (type.union) {
-      if (this.lang === 'java' && type.union.some(v => v.name.startsWith('"'))) {
-        const values = type.union.map(l => l.name.substring(1, l.name.length - 1).replace('-', '_').toLocaleUpperCase());
-        return `\`enum ${type.name} { ${values.join(', ')} }\``;
-      }
-      let union = type.union;
-      if (this.lang === 'csharp') {
-        if (type.union.length && type.union[0].name === 'null') {
-          union = type.union.slice(1);
-          member.required = false;
-        }
-        if (type.union.some(v => v.name.startsWith('"'))) {
-          // Keep in sync with microsoft/playwright's utils/doclint/generateDotnetApi.js
-          const enumValueOverrides = new Map([
-            ['domcontentloaded', 'DOMContentLoaded'],
-            ['networkidle', 'NetworkIdle'],
-          ]);
-          // strip out the quotes
-          const sanitizeLiteral = (literal) => {
-            return literal.split('-').map(l => {
-              const enumValue = l.replace(/[\"]/g, '');
-              return enumValueOverrides.get(enumValue) || toTitleCase(enumValue)
-            }).join('');
-          }
-          return `\`enum ${type.name} { ${union.map(l => sanitizeLiteral(l.name)).join(', ')} }${member.required ? '' : '?'}\``;
-        }
-      }
-      return union.map(l => this.renderType(l, direction, member)).join(' | ');
-    }
+    if (type.union)
+      return this.formatter.formatUnionType?.(type, direction, member) || type.union.map(l => this.renderType(l, direction, member)).join(' | ');
     const result = this.formatter.formatArrayType?.(type, direction, member);
     if (result)
       return result;
     if (type.templates)
-      return `${this.renderTypeName(type, direction, member)}${this.formatter.formatTemplate(type.templates.map(l => {
+      return `${this.formatter.formatTypeName(type, direction, member)}${this.formatter.formatTemplate(type.templates.map(l => {
         return this.renderType(l, direction, /** @type {docs.Member} */({ ...member, required: true }));
       }).join(', '))}`;
     if (type.args)
       return `${this.formatter.formatFunction(type.args.map(l => this.renderType(l, direction, member)).join(', '), type.returnType ? ':' + this.renderType(type.returnType, direction, member) : '', type)}`;
     if (type.name.startsWith('"'))
       return type.name;
-    return `${this.renderTypeName(type, direction, member)}`;
-  }
-
-  /**
-   * @param {docs.Type} type
-   * @param {'in'|'out'} direction
-   * @param {docs.Member} member
-   */
-  renderTypeName(type, direction, member) {
-    return this.formatter.renderType(type, direction, member);
+    return `${this.formatter.formatTypeName(type, direction, member)}`;
   }
 }
 
