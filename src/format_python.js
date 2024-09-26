@@ -32,6 +32,7 @@ class PythonFormatter {
 
   /**
    * @param {Documentation.Member} member
+   * @returns {import('./generator').FormattedMember[]}
    */
   formatMember(member) {
     const args = [];
@@ -68,27 +69,35 @@ class PythonFormatter {
     return [{ name, link, usages, args, signatures }];
   }
 
-  formatArgumentName(name) {
+  /**
+   * @param {string} name
+   */
+  formatParamName(name) {
     return toSnakeCase(name);
   }
 
+  /**
+   * @param {string} text
+   */
   formatTemplate(text) {
     return `\\[${text}\\]`;
   }
 
-  formatFunction(args, ret) {
+  /**
+   * @param {string} args
+   * @param {string} ret
+   * @param {Documentation.Type} type
+   */
+  formatFunction(args, ret, type) {
     return `[Callable]\\[${args}\\]${ret}`;
-  }
-
-  formatPromise(text) {
-    return text;
   }
 
   /**
    * @param {Documentation.Type} type
-   * @param {string} direction
+   * @param {'in'|'out'} direction
+   * @param {Documentation.Member} member
    */
-  renderType(type, direction) {
+  formatTypeName(type, direction, member) {
     const text = type.name;
     switch (text) {
       case 'RegExp': return '[Pattern]';
@@ -109,19 +118,36 @@ class PythonFormatter {
   }
 
   /**
-   * @param {MarkdownNode[]} spec
-   * @returns {MarkdownNode[]}
-   */
-  preprocessComment(spec) {
-    return spec;
-  }
-
-  /**
    * @param {MarkdownNode} spec
-   * @returns boolean
+   * @returns {boolean}
    */
   filterComment(spec) {
     return spec.codeLang === this.lang;
+  }
+
+  /**
+   * @param {Documentation.Member} member
+   */
+  shouldRenderMemberAsProperty(member) {
+    return member.kind === 'method' && !member.async && member.argsArray.length === 0;
+  }
+
+  propertyTypeTitle() {
+    return 'Type';
+  }
+
+  /**
+   * @param {string} option
+   * @param {Documentation.Member?} member
+   */
+  formatOptionName(option, member) {
+    // Python only snake-cases top-level options/arguments.
+    const shouldSnake = !member || !member.parent || member.parent.name === 'options' && !member.parent.parent;
+    if (!shouldSnake)
+      return option;
+    let [first, ...rest] = option.split('.');
+    first = toSnakeCase(first);
+    return [first, ...rest].join('.');
   }
 }
 

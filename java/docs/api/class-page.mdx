@@ -102,7 +102,7 @@ This method lets you set up a special function, called a handler, that activates
 Things to keep in mind:
 * When an overlay is shown predictably, we recommend explicitly waiting for it in your test and dismissing it as a part of your normal test flow, instead of using [Page.addLocatorHandler()](/api/class-page.mdx#page-add-locator-handler).
 * Playwright checks for the overlay every time before executing or retrying an action that requires an [actionability check](../actionability.mdx), or before performing an auto-waiting assertion check. When overlay is visible, Playwright calls the handler first, and then proceeds with the action/assertion. Note that the handler is only called when you perform an action/assertion - if the overlay becomes visible but you don't perform any actions, the handler will not be triggered.
-* After executing the handler, Playwright will ensure that overlay that triggered the handler is not visible anymore. You can opt-out of this behavior with `noWaitAfter`.
+* After executing the handler, Playwright will ensure that overlay that triggered the handler is not visible anymore. You can opt-out of this behavior with [setNoWaitAfter](/api/class-page.mdx#page-add-locator-handler-option-no-wait-after).
 * The execution time of the handler counts towards the timeout of the action/assertion that executed the handler. If your handler takes too long, it might cause timeouts.
 * You can register multiple handlers. However, only a single handler will be running at a time. Make sure the actions within a handler don't depend on another handler.
 
@@ -138,7 +138,7 @@ page.goto("https://example.com");
 page.getByRole("button", Page.GetByRoleOptions().setName("Start here")).click();
 ```
 
-An example with a custom callback on every actionability check. It uses a `<body>` locator that is always visible, so the handler is called before every actionability check. It is important to specify `noWaitAfter`, because the handler does not hide the `<body>` element.
+An example with a custom callback on every actionability check. It uses a `<body>` locator that is always visible, so the handler is called before every actionability check. It is important to specify [setNoWaitAfter](/api/class-page.mdx#page-add-locator-handler-option-no-wait-after), because the handler does not hide the `<body>` element.
 
 ```java
 // Setup the handler.
@@ -151,7 +151,7 @@ page.goto("https://example.com");
 page.getByRole("button", Page.GetByRoleOptions().setName("Start here")).click();
 ```
 
-Handler takes the original locator as an argument. You can also automatically remove the handler after a number of invocations by setting `times`:
+Handler takes the original locator as an argument. You can also automatically remove the handler after a number of invocations by setting [setTimes](/api/class-page.mdx#page-add-locator-handler-option-times):
 
 ```java
 page.addLocatorHandler(page.getByLabel("Close"), locator => {
@@ -165,7 +165,7 @@ page.addLocatorHandler(page.getByLabel("Close"), locator => {
   Locator that triggers the handler.
 - `handler` [Consumer]&lt;[Locator]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-option-handler"/><a href="#page-add-locator-handler-option-handler" class="list-anchor">#</a>
   
-  Function that should be run once `locator` appears. This function should get rid of the element that blocks actions like click.
+  Function that should be run once [locator](/api/class-page.mdx#page-add-locator-handler-option-locator) appears. This function should get rid of the element that blocks actions like click.
 - `options` `Page.AddLocatorHandlerOptions` *(optional)*
   - `setNoWaitAfter` [boolean] *(optional)* <font size="2">Added in: v1.44</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-locator-handler-option-no-wait-after"/><a href="#page-add-locator-handler-option-no-wait-after" class="list-anchor">#</a>
     
@@ -263,12 +263,12 @@ Page.bringToFront();
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.close</x-search>
 
-If `runBeforeUnload` is `false`, does not run any unload handlers and waits for the page to be closed. If `runBeforeUnload` is `true` the method will run unload handlers, but will **not** wait for the page to close.
+If [setRunBeforeUnload](/api/class-page.mdx#page-close-option-run-before-unload) is `false`, does not run any unload handlers and waits for the page to be closed. If [setRunBeforeUnload](/api/class-page.mdx#page-close-option-run-before-unload) is `true` the method will run unload handlers, but will **not** wait for the page to close.
 
 By default, `page.close()` **does not** run `beforeunload` handlers.
 
 :::note
-if `runBeforeUnload` is passed as true, a `beforeunload` dialog might be summoned and should be handled manually via [Page.onDialog(handler)](/api/class-page.mdx#page-event-dialog) event.
+if [setRunBeforeUnload](/api/class-page.mdx#page-close-option-run-before-unload) is passed as true, a `beforeunload` dialog might be summoned and should be handled manually via [Page.onDialog(handler)](/api/class-page.mdx#page-event-dialog) event.
 :::
 
 **Usage**
@@ -452,7 +452,7 @@ page.evaluate("() => matchMedia('(prefers-color-scheme: no-preference)').matches
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.evaluate</x-search>
 
-Returns the value of the `expression` invocation.
+Returns the value of the [expression](/api/class-page.mdx#page-evaluate-option-expression) invocation.
 
 If the function passed to the [Page.evaluate()](/api/class-page.mdx#page-evaluate) returns a [Promise], then [Page.evaluate()](/api/class-page.mdx#page-evaluate) would wait for the promise to resolve and return its value.
 
@@ -460,7 +460,7 @@ If the function passed to the [Page.evaluate()](/api/class-page.mdx#page-evaluat
 
 **Usage**
 
-Passing argument to `expression`:
+Passing argument to [expression](/api/class-page.mdx#page-evaluate-option-expression):
 
 ```java
 Object result = page.evaluate("([x, y]) => {\n" +
@@ -489,7 +489,7 @@ bodyHandle.dispose();
   JavaScript expression to be evaluated in the browser context. If the expression evaluates to a function, the function is automatically invoked.
 - `arg` [EvaluationArgument] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-evaluate-option-arg"/><a href="#page-evaluate-option-arg" class="list-anchor">#</a>
   
-  Optional argument to pass to `expression`.
+  Optional argument to pass to [expression](/api/class-page.mdx#page-evaluate-option-expression).
 
 **Returns**
 - [Object]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-evaluate-return"/><a href="#page-evaluate-return" class="list-anchor">#</a>
@@ -500,7 +500,7 @@ bodyHandle.dispose();
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.evaluateHandle</x-search>
 
-Returns the value of the `expression` invocation as a [JSHandle].
+Returns the value of the [expression](/api/class-page.mdx#page-evaluate-handle-option-expression) invocation as a [JSHandle].
 
 The only difference between [Page.evaluate()](/api/class-page.mdx#page-evaluate) and [Page.evaluateHandle()](/api/class-page.mdx#page-evaluate-handle) is that [Page.evaluateHandle()](/api/class-page.mdx#page-evaluate-handle) returns [JSHandle].
 
@@ -534,7 +534,7 @@ resultHandle.dispose();
   JavaScript expression to be evaluated in the browser context. If the expression evaluates to a function, the function is automatically invoked.
 - `arg` [EvaluationArgument] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-evaluate-handle-option-arg"/><a href="#page-evaluate-handle-option-arg" class="list-anchor">#</a>
   
-  Optional argument to pass to `expression`.
+  Optional argument to pass to [expression](/api/class-page.mdx#page-evaluate-handle-option-expression).
 
 **Returns**
 - [JSHandle]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-evaluate-handle-return"/><a href="#page-evaluate-handle-return" class="list-anchor">#</a>
@@ -545,9 +545,9 @@ resultHandle.dispose();
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.exposeBinding</x-search>
 
-The method adds a function called `name` on the `window` object of every frame in this page. When called, the function executes `callback` and returns a [Promise] which resolves to the return value of `callback`. If the `callback` returns a [Promise], it will be awaited.
+The method adds a function called [name](/api/class-page.mdx#page-expose-binding-option-name) on the `window` object of every frame in this page. When called, the function executes [callback](/api/class-page.mdx#page-expose-binding-option-callback) and returns a [Promise] which resolves to the return value of [callback](/api/class-page.mdx#page-expose-binding-option-callback). If the [callback](/api/class-page.mdx#page-expose-binding-option-callback) returns a [Promise], it will be awaited.
 
-The first argument of the `callback` function contains information about the caller: `{ browserContext: BrowserContext, page: Page, frame: Frame }`.
+The first argument of the [callback](/api/class-page.mdx#page-expose-binding-option-callback) function contains information about the caller: `{ browserContext: BrowserContext, page: Page, frame: Frame }`.
 
 See [BrowserContext.exposeBinding()](/api/class-browsercontext.mdx#browser-context-expose-binding) for the context-wide version.
 
@@ -609,9 +609,9 @@ public class Example {
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.exposeFunction</x-search>
 
-The method adds a function called `name` on the `window` object of every frame in the page. When called, the function executes `callback` and returns a [Promise] which resolves to the return value of `callback`.
+The method adds a function called [name](/api/class-page.mdx#page-expose-function-option-name) on the `window` object of every frame in the page. When called, the function executes [callback](/api/class-page.mdx#page-expose-function-option-callback) and returns a [Promise] which resolves to the return value of [callback](/api/class-page.mdx#page-expose-function-option-callback).
 
-If the `callback` returns a [Promise], it will be awaited.
+If the [callback](/api/class-page.mdx#page-expose-function-option-callback) returns a [Promise], it will be awaited.
 
 See [BrowserContext.exposeFunction()](/api/class-browsercontext.mdx#browser-context-expose-function) for context-wide exposed function.
 
@@ -939,7 +939,7 @@ page.getByRole(AriaRole.BUTTON,
     
   - `setExact` [boolean] *(optional)* <font size="2">Added in: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-get-by-role-option-exact"/><a href="#page-get-by-role-option-exact" class="list-anchor">#</a>
     
-    Whether `name` is matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when `name` is a regular expression. Note that exact match still trims whitespace.
+    Whether [setName](/api/class-page.mdx#page-get-by-role-option-name) is matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when [setName](/api/class-page.mdx#page-get-by-role-option-name) is a regular expression. Note that exact match still trims whitespace.
   - `setExpanded` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-get-by-role-option-expanded"/><a href="#page-get-by-role-option-expanded" class="list-anchor">#</a>
     
     An attribute that is usually set by `aria-expanded`.
@@ -957,7 +957,7 @@ page.getByRole(AriaRole.BUTTON,
     Learn more about [`aria-level`](https://www.w3.org/TR/wai-aria-1.2/#aria-level).
   - `setName` [String] | [Pattern] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-get-by-role-option-name"/><a href="#page-get-by-role-option-name" class="list-anchor">#</a>
     
-    Option to match the [accessible name](https://w3c.github.io/accname/#dfn-accessible-name). By default, matching is case-insensitive and searches for a substring, use `exact` to control this behavior.
+    Option to match the [accessible name](https://w3c.github.io/accname/#dfn-accessible-name). By default, matching is case-insensitive and searches for a substring, use [setExact](/api/class-page.mdx#page-get-by-role-option-exact) to control this behavior.
     
     Learn more about [accessible name](https://w3c.github.io/accname/#dfn-accessible-name).
   - `setPressed` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-get-by-role-option-pressed"/><a href="#page-get-by-role-option-pressed" class="list-anchor">#</a>
@@ -1259,7 +1259,7 @@ Returns the main resource response. In case of multiple redirects, the navigatio
 The method will throw an error if:
 * there's an SSL error (e.g. in case of self-signed certificates).
 * target URL is invalid.
-* the `timeout` is exceeded during navigation.
+* the [setTimeout](/api/class-page.mdx#page-goto-option-timeout) is exceeded during navigation.
 * the remote server does not respond or is unreachable.
 * the main resource failed to load.
 
@@ -1283,7 +1283,7 @@ Page.navigate(url, options);
 **Arguments**
 - `url` [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-goto-option-url"/><a href="#page-goto-option-url" class="list-anchor">#</a>
   
-  URL to navigate page to. The url should include scheme, e.g. `https://`. When a `baseURL` via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.
+  URL to navigate page to. The url should include scheme, e.g. `https://`. When a [setBaseURL](/api/class-browser.mdx#browser-new-context-option-base-url) via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.
 - `options` `Page.NavigateOptions` *(optional)*
   - `setReferer` [String] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-goto-option-referer"/><a href="#page-goto-option-referer" class="list-anchor">#</a>
     
@@ -1380,7 +1380,7 @@ Pauses script execution. Playwright will stop executing the script and wait for 
 User can inspect selectors or perform manual steps while paused. Resume will continue running the original script from the place it was paused.
 
 :::note
-This method requires Playwright to be started in a headed mode, with a falsy `headless` option.
+This method requires Playwright to be started in a headed mode, with a falsy [setHeadless](/api/class-browsertype.mdx#browser-type-launch-option-headless) option.
 :::
 
 **Usage**
@@ -1418,7 +1418,7 @@ page.emulateMedia(new Page.EmulateMediaOptions().setMedia(Media.SCREEN));
 page.pdf(new Page.PdfOptions().setPath(Paths.get("page.pdf")));
 ```
 
-The `width`, `height`, and `margin` options accept values labeled with units. Unlabeled values are treated as pixels.
+The [setWidth](/api/class-page.mdx#page-pdf-option-width), [setHeight](/api/class-page.mdx#page-pdf-option-height), and [setMargin](/api/class-page.mdx#page-pdf-option-margin) options accept values labeled with units. Unlabeled values are treated as pixels.
 
 A few examples:
 * `page.pdf({width: 100})` - prints with width set to 100 pixels
@@ -1431,7 +1431,7 @@ All possible units are:
 * `cm` - centimeter
 * `mm` - millimeter
 
-The `format` options are:
+The [setFormat](/api/class-page.mdx#page-pdf-option-format) options are:
 * `Letter`: 8.5in x 11in
 * `Legal`: 8.5in x 14in
 * `Tabloid`: 11in x 17in
@@ -1445,7 +1445,7 @@ The `format` options are:
 * `A6`: 4.13in x 5.83in
 
 :::note
-`headerTemplate` and `footerTemplate` markup have the following limitations: > 1. Script tags inside templates are not evaluated. > 2. Page styles are not visible inside templates.
+[setHeaderTemplate](/api/class-page.mdx#page-pdf-option-header-template) and [setFooterTemplate](/api/class-page.mdx#page-pdf-option-footer-template) markup have the following limitations: > 1. Script tags inside templates are not evaluated. > 2. Page styles are not visible inside templates.
 :::
 
 **Arguments**
@@ -1455,10 +1455,10 @@ The `format` options are:
     Display header and footer. Defaults to `false`.
   - `setFooterTemplate` [String] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-pdf-option-footer-template"/><a href="#page-pdf-option-footer-template" class="list-anchor">#</a>
     
-    HTML template for the print footer. Should use the same format as the `headerTemplate`.
+    HTML template for the print footer. Should use the same format as the [setHeaderTemplate](/api/class-page.mdx#page-pdf-option-header-template).
   - `setFormat` [String] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-pdf-option-format"/><a href="#page-pdf-option-format" class="list-anchor">#</a>
     
-    Paper format. If set, takes priority over `width` or `height` options. Defaults to 'Letter'.
+    Paper format. If set, takes priority over [setWidth](/api/class-page.mdx#page-pdf-option-width) or [setHeight](/api/class-page.mdx#page-pdf-option-height) options. Defaults to 'Letter'.
   - `setHeaderTemplate` [String] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-pdf-option-header-template"/><a href="#page-pdf-option-header-template" class="list-anchor">#</a>
     
     HTML template for the print header. Should be valid HTML markup with following classes used to inject printing values into them:
@@ -1496,10 +1496,10 @@ The `format` options are:
     Paper ranges to print, e.g., '1-5, 8, 11-13'. Defaults to the empty string, which means print all pages.
   - `setPath` [Path] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-pdf-option-path"/><a href="#page-pdf-option-path" class="list-anchor">#</a>
     
-    The file path to save the PDF to. If `path` is a relative path, then it is resolved relative to the current working directory. If no path is provided, the PDF won't be saved to the disk.
+    The file path to save the PDF to. If [setPath](/api/class-page.mdx#page-pdf-option-path) is a relative path, then it is resolved relative to the current working directory. If no path is provided, the PDF won't be saved to the disk.
   - `setPreferCSSPageSize` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-pdf-option-prefer-css-page-size"/><a href="#page-pdf-option-prefer-css-page-size" class="list-anchor">#</a>
     
-    Give any CSS `@page` size declared in the page priority over what is declared in `width` and `height` or `format` options. Defaults to `false`, which will scale the content to fit the paper size.
+    Give any CSS `@page` size declared in the page priority over what is declared in [setWidth](/api/class-page.mdx#page-pdf-option-width) and [setHeight](/api/class-page.mdx#page-pdf-option-height) or [setFormat](/api/class-page.mdx#page-pdf-option-format) options. Defaults to `false`, which will scale the content to fit the paper size.
   - `setPrintBackground` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-pdf-option-print-background"/><a href="#page-pdf-option-print-background" class="list-anchor">#</a>
     
     Print background graphics. Defaults to `false`.
@@ -1584,7 +1584,7 @@ The handler will only be called for the first url if the response is a redirect.
 :::
 
 :::note
-[Page.route()](/api/class-page.mdx#page-route) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception by setting `serviceWorkers` to `'block'`.
+[Page.route()](/api/class-page.mdx#page-route) will not intercept requests intercepted by Service Worker. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception by setting [setServiceWorkers](/api/class-browser.mdx#browser-new-context-option-service-workers) to `'block'`.
 :::
 
 :::note
@@ -1633,7 +1633,7 @@ Enabling routing disables http cache.
 **Arguments**
 - `url` [String] | [Pattern] | [Predicate]&lt;[String]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-option-url"/><a href="#page-route-option-url" class="list-anchor">#</a>
   
-  A glob pattern, regex pattern or predicate receiving [URL] to match while routing. When a `baseURL` via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.
+  A glob pattern, regex pattern or predicate receiving [URL] to match while routing. When a [setBaseURL](/api/class-browser.mdx#browser-new-context-option-base-url) via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.
 - `handler` [Consumer]&lt;[Route]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-option-handler"/><a href="#page-route-option-handler" class="list-anchor">#</a>
   
   handler function to route the request.
@@ -1653,7 +1653,7 @@ Enabling routing disables http cache.
 
 If specified the network requests that are made in the page will be served from the HAR file. Read more about [Replaying from HAR](../mock.mdx#replaying-from-har).
 
-Playwright will not serve requests intercepted by Service Worker from the HAR file. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception by setting `serviceWorkers` to `'block'`.
+Playwright will not serve requests intercepted by Service Worker from the HAR file. See [this](https://github.com/microsoft/playwright/issues/1090) issue. We recommend disabling Service Workers when using request interception by setting [setServiceWorkers](/api/class-browser.mdx#browser-new-context-option-service-workers) to `'block'`.
 
 **Usage**
 
@@ -1716,7 +1716,7 @@ page.routeWebSocket("/ws", ws -> {
 **Arguments**
 - `url` [String] | [Pattern] | [Predicate]&lt;[String]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-web-socket-option-url"/><a href="#page-route-web-socket-option-url" class="list-anchor">#</a>
   
-  Only WebSockets with the url matching this pattern will be routed. A string pattern can be relative to the `baseURL` context option.
+  Only WebSockets with the url matching this pattern will be routed. A string pattern can be relative to the [setBaseURL](/api/class-browser.mdx#browser-new-context-option-base-url) context option.
 - `handler` [Consumer]&lt;[WebSocketRoute]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-web-socket-option-handler"/><a href="#page-route-web-socket-option-handler" class="list-anchor">#</a>
   
   Handler function to route the WebSocket.
@@ -1771,7 +1771,7 @@ Page.screenshot(options);
     When true, takes a screenshot of the full scrollable page, instead of the currently visible viewport. Defaults to `false`.
   - `setMask` [List]&lt;[Locator]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-screenshot-option-mask"/><a href="#page-screenshot-option-mask" class="list-anchor">#</a>
     
-    Specify locators that should be masked when the screenshot is taken. Masked elements will be overlaid with a pink box `#FF00FF` (customized by `maskColor`) that completely covers its bounding box.
+    Specify locators that should be masked when the screenshot is taken. Masked elements will be overlaid with a pink box `#FF00FF` (customized by [setMaskColor](/api/class-page.mdx#page-screenshot-option-mask-color)) that completely covers its bounding box.
   - `setMaskColor` [String] *(optional)* <font size="2">Added in: v1.35</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-screenshot-option-mask-color"/><a href="#page-screenshot-option-mask-color" class="list-anchor">#</a>
     
     Specify the color of the overlay box for masked elements, in [CSS color format](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value). Default color is pink `#FF00FF`.
@@ -1780,7 +1780,7 @@ Page.screenshot(options);
     Hides default white background and allows capturing screenshots with transparency. Not applicable to `jpeg` images. Defaults to `false`.
   - `setPath` [Path] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-screenshot-option-path"/><a href="#page-screenshot-option-path" class="list-anchor">#</a>
     
-    The file path to save the image to. The screenshot type will be inferred from file extension. If `path` is a relative path, then it is resolved relative to the current working directory. If no path is provided, the image won't be saved to the disk.
+    The file path to save the image to. The screenshot type will be inferred from file extension. If [setPath](/api/class-page.mdx#page-screenshot-option-path) is a relative path, then it is resolved relative to the current working directory. If no path is provided, the image won't be saved to the disk.
   - `setQuality` [int] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-screenshot-option-quality"/><a href="#page-screenshot-option-quality" class="list-anchor">#</a>
     
     The quality of the image, between 0-100. Not applicable to `png` images.
@@ -1872,7 +1872,7 @@ Page.setDefaultNavigationTimeout(timeout);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.setDefaultTimeout</x-search>
 
-This setting will change the default maximum time for all the methods accepting `timeout` option.
+This setting will change the default maximum time for all the methods accepting [timeout](/api/class-page.mdx#page-set-default-timeout-option-timeout) option.
 
 :::note
 [Page.setDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) takes priority over [Page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout).
@@ -1963,7 +1963,7 @@ Page.title();
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.unroute</x-search>
 
-Removes a route created with [Page.route()](/api/class-page.mdx#page-route). When `handler` is not specified, removes all routes for the `url`.
+Removes a route created with [Page.route()](/api/class-page.mdx#page-route). When [handler](/api/class-page.mdx#page-unroute-option-handler) is not specified, removes all routes for the [url](/api/class-page.mdx#page-unroute-option-url).
 
 **Usage**
 
@@ -2207,7 +2207,7 @@ Page.waitForFileChooser(callback, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.waitForFunction</x-search>
 
-Returns when the `expression` returns a truthy value. It resolves to a JSHandle of the truthy value.
+Returns when the [expression](/api/class-page.mdx#page-wait-for-function-option-expression) returns a truthy value. It resolves to a JSHandle of the truthy value.
 
 **Usage**
 
@@ -2243,11 +2243,11 @@ page.waitForFunction("selector => !!document.querySelector(selector)", selector)
   JavaScript expression to be evaluated in the browser context. If the expression evaluates to a function, the function is automatically invoked.
 - `arg` [EvaluationArgument] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-function-option-arg"/><a href="#page-wait-for-function-option-arg" class="list-anchor">#</a>
   
-  Optional argument to pass to `expression`.
+  Optional argument to pass to [expression](/api/class-page.mdx#page-wait-for-function-option-expression).
 - `options` `Page.WaitForFunctionOptions` *(optional)*
   - `setPollingInterval` [double] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-function-option-polling-interval"/><a href="#page-wait-for-function-option-polling-interval" class="list-anchor">#</a>
     
-    If specified, then it is treated as an interval in milliseconds at which the function would be executed. By default if the option is not specified `expression` is executed in `requestAnimationFrame` callback.
+    If specified, then it is treated as an interval in milliseconds at which the function would be executed. By default if the option is not specified [expression](/api/class-page.mdx#page-wait-for-function-option-expression) is executed in `requestAnimationFrame` callback.
   - `setTimeout` [double] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-function-option-timeout"/><a href="#page-wait-for-function-option-timeout" class="list-anchor">#</a>
     
     Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
@@ -2357,7 +2357,7 @@ Request request = page.waitForRequest(request -> "https://example.com".equals(re
 **Arguments**
 - `urlOrPredicate` [String] | [Pattern] | [Predicate]&lt;[Request]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-request-option-url-or-predicate"/><a href="#page-wait-for-request-option-url-or-predicate" class="list-anchor">#</a>
   
-  Request URL string, regex or predicate receiving [Request] object. When a `baseURL` via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.
+  Request URL string, regex or predicate receiving [Request] object. When a [setBaseURL](/api/class-browser.mdx#browser-new-context-option-base-url) via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.
 - `options` `Page.WaitForRequestOptions` *(optional)*
   - `setTimeout` [double] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-request-option-timeout"/><a href="#page-wait-for-request-option-timeout" class="list-anchor">#</a>
     
@@ -2426,7 +2426,7 @@ Response response = page.waitForResponse(response -> "https://example.com".equal
 **Arguments**
 - `urlOrPredicate` [String] | [Pattern] | [Predicate]&lt;[Response]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-response-option-url-or-predicate"/><a href="#page-wait-for-response-option-url-or-predicate" class="list-anchor">#</a>
   
-  Request URL string, regex or predicate receiving [Response] object. When a `baseURL` via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.
+  Request URL string, regex or predicate receiving [Response] object. When a [setBaseURL](/api/class-browser.mdx#browser-new-context-option-base-url) via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor.
 - `options` `Page.WaitForResponseOptions` *(optional)*
   - `setTimeout` [double] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-response-option-timeout"/><a href="#page-wait-for-response-option-timeout" class="list-anchor">#</a>
     
@@ -3038,15 +3038,15 @@ Use locator-based [Locator.check()](/api/class-locator.mdx#locator-check) instea
 :::
 
 
-This method checks an element matching `selector` by performing the following steps:
-1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
+This method checks an element matching [selector](/api/class-page.mdx#page-check-option-selector) by performing the following steps:
+1. Find an element matching [selector](/api/class-page.mdx#page-check-option-selector). If there is none, wait until a matching element is attached to the DOM.
 1. Ensure that matched element is a checkbox or a radio input. If not, this method throws. If the element is already checked, this method returns immediately.
-1. Wait for [actionability](../actionability.mdx) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
+1. Wait for [actionability](../actionability.mdx) checks on the matched element, unless [setForce](/api/class-page.mdx#page-check-option-force) option is set. If the element is detached during the checks, the whole action is retried.
 1. Scroll the element into view if needed.
 1. Use [Page.mouse()](/api/class-page.mdx#page-mouse) to click in the center of the element.
 1. Ensure that the element is now checked. If not, this method throws.
 
-When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
+When all steps combined have not finished during the specified [setTimeout](/api/class-page.mdx#page-check-option-timeout), this method throws a [TimeoutError]. Passing zero timeout disables this.
 
 **Usage**
 
@@ -3105,14 +3105,14 @@ Use locator-based [Locator.click()](/api/class-locator.mdx#locator-click) instea
 :::
 
 
-This method clicks an element matching `selector` by performing the following steps:
-1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
-1. Wait for [actionability](../actionability.mdx) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
+This method clicks an element matching [selector](/api/class-page.mdx#page-click-option-selector) by performing the following steps:
+1. Find an element matching [selector](/api/class-page.mdx#page-click-option-selector). If there is none, wait until a matching element is attached to the DOM.
+1. Wait for [actionability](../actionability.mdx) checks on the matched element, unless [setForce](/api/class-page.mdx#page-click-option-force) option is set. If the element is detached during the checks, the whole action is retried.
 1. Scroll the element into view if needed.
-1. Use [Page.mouse()](/api/class-page.mdx#page-mouse) to click in the center of the element, or the specified `position`.
-1. Wait for initiated navigations to either succeed or fail, unless `noWaitAfter` option is set.
+1. Use [Page.mouse()](/api/class-page.mdx#page-mouse) to click in the center of the element, or the specified [setPosition](/api/class-page.mdx#page-click-option-position).
+1. Wait for initiated navigations to either succeed or fail, unless [setNoWaitAfter](/api/class-page.mdx#page-click-option-no-wait-after) option is set.
 
-When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
+When all steps combined have not finished during the specified [setTimeout](/api/class-page.mdx#page-click-option-timeout), this method throws a [TimeoutError]. Passing zero timeout disables this.
 
 **Usage**
 
@@ -3183,13 +3183,13 @@ Use locator-based [Locator.dblclick()](/api/class-locator.mdx#locator-dblclick) 
 :::
 
 
-This method double clicks an element matching `selector` by performing the following steps:
-1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
-1. Wait for [actionability](../actionability.mdx) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
+This method double clicks an element matching [selector](/api/class-page.mdx#page-dblclick-option-selector) by performing the following steps:
+1. Find an element matching [selector](/api/class-page.mdx#page-dblclick-option-selector). If there is none, wait until a matching element is attached to the DOM.
+1. Wait for [actionability](../actionability.mdx) checks on the matched element, unless [setForce](/api/class-page.mdx#page-dblclick-option-force) option is set. If the element is detached during the checks, the whole action is retried.
 1. Scroll the element into view if needed.
-1. Use [Page.mouse()](/api/class-page.mdx#page-mouse) to double click in the center of the element, or the specified `position`.
+1. Use [Page.mouse()](/api/class-page.mdx#page-mouse) to double click in the center of the element, or the specified [setPosition](/api/class-page.mdx#page-dblclick-option-position).
 
-When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
+When all steps combined have not finished during the specified [setTimeout](/api/class-page.mdx#page-dblclick-option-timeout), this method throws a [TimeoutError]. Passing zero timeout disables this.
 
 :::note
 `page.dblclick()` dispatches two `click` events and a single `dblclick` event.
@@ -3269,9 +3269,9 @@ The snippet below dispatches the `click` event on the element. Regardless of the
 page.dispatchEvent("button#submit", "click");
 ```
 
-Under the hood, it creates an instance of an event based on the given `type`, initializes it with `eventInit` properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
+Under the hood, it creates an instance of an event based on the given [type](/api/class-page.mdx#page-dispatch-event-option-type), initializes it with [eventInit](/api/class-page.mdx#page-dispatch-event-option-event-init) properties and dispatches it on the element. Events are `composed`, `cancelable` and bubble by default.
 
-Since `eventInit` is event-specific, please refer to the events documentation for the lists of initial properties:
+Since [eventInit](/api/class-page.mdx#page-dispatch-event-option-event-init) is event-specific, please refer to the events documentation for the lists of initial properties:
 * [DeviceMotionEvent](https://developer.mozilla.org/en-US/docs/Web/API/DeviceMotionEvent/DeviceMotionEvent)
 * [DeviceOrientationEvent](https://developer.mozilla.org/en-US/docs/Web/API/DeviceOrientationEvent/DeviceOrientationEvent)
 * [DragEvent](https://developer.mozilla.org/en-US/docs/Web/API/DragEvent/DragEvent)
@@ -3327,9 +3327,9 @@ This method does not wait for the element to pass actionability checks and there
 :::
 
 
-The method finds an element matching the specified selector within the page and passes it as a first argument to `expression`. If no elements match the selector, the method throws an error. Returns the value of `expression`.
+The method finds an element matching the specified selector within the page and passes it as a first argument to [expression](/api/class-page.mdx#page-eval-on-selector-option-expression). If no elements match the selector, the method throws an error. Returns the value of [expression](/api/class-page.mdx#page-eval-on-selector-option-expression).
 
-If `expression` returns a [Promise], then [Page.evalOnSelector()](/api/class-page.mdx#page-eval-on-selector) would wait for the promise to resolve and return its value.
+If [expression](/api/class-page.mdx#page-eval-on-selector-option-expression) returns a [Promise], then [Page.evalOnSelector()](/api/class-page.mdx#page-eval-on-selector) would wait for the promise to resolve and return its value.
 
 **Usage**
 
@@ -3348,7 +3348,7 @@ String html = (String) page.evalOnSelector(".main-container", "(e, suffix) => e.
   JavaScript expression to be evaluated in the browser context. If the expression evaluates to a function, the function is automatically invoked.
 - `arg` [EvaluationArgument] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-eval-on-selector-option-arg"/><a href="#page-eval-on-selector-option-arg" class="list-anchor">#</a>
   
-  Optional argument to pass to `expression`.
+  Optional argument to pass to [expression](/api/class-page.mdx#page-eval-on-selector-option-expression).
 - `options` `Page.EvalOnSelectorOptions` *(optional)*
   - `setStrict` [boolean] *(optional)* <font size="2">Added in: v1.14</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-eval-on-selector-option-strict"/><a href="#page-eval-on-selector-option-strict" class="list-anchor">#</a>
     
@@ -3370,9 +3370,9 @@ In most cases, [Locator.evaluateAll()](/api/class-locator.mdx#locator-evaluate-a
 :::
 
 
-The method finds all elements matching the specified selector within the page and passes an array of matched elements as a first argument to `expression`. Returns the result of `expression` invocation.
+The method finds all elements matching the specified selector within the page and passes an array of matched elements as a first argument to [expression](/api/class-page.mdx#page-eval-on-selector-all-option-expression). Returns the result of [expression](/api/class-page.mdx#page-eval-on-selector-all-option-expression) invocation.
 
-If `expression` returns a [Promise], then [Page.evalOnSelectorAll()](/api/class-page.mdx#page-eval-on-selector-all) would wait for the promise to resolve and return its value.
+If [expression](/api/class-page.mdx#page-eval-on-selector-all-option-expression) returns a [Promise], then [Page.evalOnSelectorAll()](/api/class-page.mdx#page-eval-on-selector-all) would wait for the promise to resolve and return its value.
 
 **Usage**
 
@@ -3389,7 +3389,7 @@ boolean divCounts = (boolean) page.evalOnSelectorAll("div", "(divs, min) => divs
   JavaScript expression to be evaluated in the browser context. If the expression evaluates to a function, the function is automatically invoked.
 - `arg` [EvaluationArgument] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-eval-on-selector-all-option-arg"/><a href="#page-eval-on-selector-all-option-arg" class="list-anchor">#</a>
   
-  Optional argument to pass to `expression`.
+  Optional argument to pass to [expression](/api/class-page.mdx#page-eval-on-selector-all-option-expression).
 
 **Returns**
 - [Object]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-eval-on-selector-all-return"/><a href="#page-eval-on-selector-all-return" class="list-anchor">#</a>
@@ -3407,7 +3407,7 @@ Use locator-based [Locator.fill()](/api/class-locator.mdx#locator-fill) instead.
 :::
 
 
-This method waits for an element matching `selector`, waits for [actionability](../actionability.mdx) checks, focuses the element, fills it and triggers an `input` event after filling. Note that you can pass an empty string to clear the input field.
+This method waits for an element matching [selector](/api/class-page.mdx#page-fill-option-selector), waits for [actionability](../actionability.mdx) checks, focuses the element, fills it and triggers an `input` event after filling. Note that you can pass an empty string to clear the input field.
 
 If the target element is not an `<input>`, `<textarea>` or `[contenteditable]` element, this method throws an error. However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), the control will be filled instead.
 
@@ -3462,7 +3462,7 @@ Use locator-based [Locator.focus()](/api/class-locator.mdx#locator-focus) instea
 :::
 
 
-This method fetches an element with `selector` and focuses it. If there's no element matching `selector`, the method waits until a matching element appears in the DOM.
+This method fetches an element with [selector](/api/class-page.mdx#page-focus-option-selector) and focuses it. If there's no element matching [selector](/api/class-page.mdx#page-focus-option-selector), the method waits until a matching element appears in the DOM.
 
 **Usage**
 
@@ -3539,13 +3539,13 @@ Use locator-based [Locator.hover()](/api/class-locator.mdx#locator-hover) instea
 :::
 
 
-This method hovers over an element matching `selector` by performing the following steps:
-1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
-1. Wait for [actionability](../actionability.mdx) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
+This method hovers over an element matching [selector](/api/class-page.mdx#page-hover-option-selector) by performing the following steps:
+1. Find an element matching [selector](/api/class-page.mdx#page-hover-option-selector). If there is none, wait until a matching element is attached to the DOM.
+1. Wait for [actionability](../actionability.mdx) checks on the matched element, unless [setForce](/api/class-page.mdx#page-hover-option-force) option is set. If the element is detached during the checks, the whole action is retried.
 1. Scroll the element into view if needed.
-1. Use [Page.mouse()](/api/class-page.mdx#page-mouse) to hover over the center of the element, or the specified `position`.
+1. Use [Page.mouse()](/api/class-page.mdx#page-mouse) to hover over the center of the element, or the specified [setPosition](/api/class-page.mdx#page-hover-option-position).
 
-When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
+When all steps combined have not finished during the specified [setTimeout](/api/class-page.mdx#page-hover-option-timeout), this method throws a [TimeoutError]. Passing zero timeout disables this.
 
 **Usage**
 
@@ -3868,7 +3868,7 @@ Use locator-based [Locator.isHidden()](/api/class-locator.mdx#locator-is-hidden)
 :::
 
 
-Returns whether the element is hidden, the opposite of [visible](../actionability.mdx#visible).  `selector` that does not match any elements is considered hidden.
+Returns whether the element is hidden, the opposite of [visible](../actionability.mdx#visible).  [selector](/api/class-page.mdx#page-is-hidden-option-selector) that does not match any elements is considered hidden.
 
 **Usage**
 
@@ -3908,7 +3908,7 @@ Use locator-based [Locator.isVisible()](/api/class-locator.mdx#locator-is-visibl
 :::
 
 
-Returns whether the element is [visible](../actionability.mdx#visible). `selector` that does not match any elements is considered not visible.
+Returns whether the element is [visible](../actionability.mdx#visible). [selector](/api/class-page.mdx#page-is-visible-option-selector) that does not match any elements is considered not visible.
 
 **Usage**
 
@@ -3950,15 +3950,15 @@ Use locator-based [Locator.press()](/api/class-locator.mdx#locator-press) instea
 
 Focuses the element, and then uses [Keyboard.down()](/api/class-keyboard.mdx#keyboard-down) and [Keyboard.up()](/api/class-keyboard.mdx#keyboard-up).
 
-`key` can specify the intended [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) value or a single character to generate the text for. A superset of the `key` values can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values). Examples of the keys are:
+[key](/api/class-page.mdx#page-press-option-key) can specify the intended [keyboardEvent.key](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key) value or a single character to generate the text for. A superset of the [key](/api/class-page.mdx#page-press-option-key) values can be found [here](https://developer.mozilla.org/en-US/docs/Web/API/KeyboardEvent/key/Key_Values). Examples of the keys are:
 
 `F1` - `F12`, `Digit0`- `Digit9`, `KeyA`- `KeyZ`, `Backquote`, `Minus`, `Equal`, `Backslash`, `Backspace`, `Tab`, `Delete`, `Escape`, `ArrowDown`, `End`, `Enter`, `Home`, `Insert`, `PageDown`, `PageUp`, `ArrowRight`, `ArrowUp`, etc.
 
 Following modification shortcuts are also supported: `Shift`, `Control`, `Alt`, `Meta`, `ShiftLeft`, `ControlOrMeta`. `ControlOrMeta` resolves to `Control` on Windows and Linux and to `Meta` on macOS.
 
-Holding down `Shift` will type the text that corresponds to the `key` in the upper case.
+Holding down `Shift` will type the text that corresponds to the [key](/api/class-page.mdx#page-press-option-key) in the upper case.
 
-If `key` is a single character, it is case-sensitive, so the values `a` and `A` will generate different respective texts.
+If [key](/api/class-page.mdx#page-press-option-key) is a single character, it is case-sensitive, so the values `a` and `A` will generate different respective texts.
 
 Shortcuts such as `key: "Control+o"`, `key: "Control++` or `key: "Control+Shift+T"` are supported as well. When specified with the modifier, modifier is pressed and being held while the subsequent key is being pressed.
 
@@ -4080,7 +4080,7 @@ Use locator-based [Locator.selectOption()](/api/class-locator.mdx#locator-select
 :::
 
 
-This method waits for an element matching `selector`, waits for [actionability](../actionability.mdx) checks, waits until all specified options are present in the `<select>` element and selects these options.
+This method waits for an element matching [selector](/api/class-page.mdx#page-select-option-option-selector), waits for [actionability](../actionability.mdx) checks, waits until all specified options are present in the `<select>` element and selects these options.
 
 If the target element is not a `<select>` element, this method throws an error. However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), the control will be used instead.
 
@@ -4150,16 +4150,16 @@ Use locator-based [Locator.setChecked()](/api/class-locator.mdx#locator-set-chec
 :::
 
 
-This method checks or unchecks an element matching `selector` by performing the following steps:
-1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
+This method checks or unchecks an element matching [selector](/api/class-page.mdx#page-set-checked-option-selector) by performing the following steps:
+1. Find an element matching [selector](/api/class-page.mdx#page-set-checked-option-selector). If there is none, wait until a matching element is attached to the DOM.
 1. Ensure that matched element is a checkbox or a radio input. If not, this method throws.
 1. If the element already has the right checked state, this method returns immediately.
-1. Wait for [actionability](../actionability.mdx) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
+1. Wait for [actionability](../actionability.mdx) checks on the matched element, unless [setForce](/api/class-page.mdx#page-set-checked-option-force) option is set. If the element is detached during the checks, the whole action is retried.
 1. Scroll the element into view if needed.
 1. Use [Page.mouse()](/api/class-page.mdx#page-mouse) to click in the center of the element.
 1. Ensure that the element is now checked or unchecked. If not, this method throws.
 
-When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
+When all steps combined have not finished during the specified [setTimeout](/api/class-page.mdx#page-set-checked-option-timeout), this method throws a [TimeoutError]. Passing zero timeout disables this.
 
 **Usage**
 
@@ -4223,7 +4223,7 @@ Use locator-based [Locator.setInputFiles()](/api/class-locator.mdx#locator-set-i
 
 Sets the value of the file input to these file paths or files. If some of the `filePaths` are relative paths, then they are resolved relative to the current working directory. For empty array, clears the selected files. For inputs with a `[webkitdirectory]` attribute, only a single directory path is supported.
 
-This method expects `selector` to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input). However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), targets the control instead.
+This method expects [selector](/api/class-page.mdx#page-set-input-files-option-selector) to point to an [input element](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input). However, if the element is inside the `<label>` element that has an associated [control](https://developer.mozilla.org/en-US/docs/Web/API/HTMLLabelElement/control), targets the control instead.
 
 **Usage**
 
@@ -4278,16 +4278,16 @@ Use locator-based [Locator.tap()](/api/class-locator.mdx#locator-tap) instead. R
 :::
 
 
-This method taps an element matching `selector` by performing the following steps:
-1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
-1. Wait for [actionability](../actionability.mdx) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
+This method taps an element matching [selector](/api/class-page.mdx#page-tap-option-selector) by performing the following steps:
+1. Find an element matching [selector](/api/class-page.mdx#page-tap-option-selector). If there is none, wait until a matching element is attached to the DOM.
+1. Wait for [actionability](../actionability.mdx) checks on the matched element, unless [setForce](/api/class-page.mdx#page-tap-option-force) option is set. If the element is detached during the checks, the whole action is retried.
 1. Scroll the element into view if needed.
-1. Use [Page.touchscreen()](/api/class-page.mdx#page-touchscreen) to tap the center of the element, or the specified `position`.
+1. Use [Page.touchscreen()](/api/class-page.mdx#page-touchscreen) to tap the center of the element, or the specified [setPosition](/api/class-page.mdx#page-tap-option-position).
 
-When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
+When all steps combined have not finished during the specified [setTimeout](/api/class-page.mdx#page-tap-option-timeout), this method throws a [TimeoutError]. Passing zero timeout disables this.
 
 :::note
-[Page.tap()](/api/class-page.mdx#page-tap) the method will throw if `hasTouch` option of the browser context is false.
+[Page.tap()](/api/class-page.mdx#page-tap) the method will throw if [setHasTouch](/api/class-browser.mdx#browser-new-context-option-has-touch) option of the browser context is false.
 :::
 
 **Usage**
@@ -4435,15 +4435,15 @@ Use locator-based [Locator.uncheck()](/api/class-locator.mdx#locator-uncheck) in
 :::
 
 
-This method unchecks an element matching `selector` by performing the following steps:
-1. Find an element matching `selector`. If there is none, wait until a matching element is attached to the DOM.
+This method unchecks an element matching [selector](/api/class-page.mdx#page-uncheck-option-selector) by performing the following steps:
+1. Find an element matching [selector](/api/class-page.mdx#page-uncheck-option-selector). If there is none, wait until a matching element is attached to the DOM.
 1. Ensure that matched element is a checkbox or a radio input. If not, this method throws. If the element is already unchecked, this method returns immediately.
-1. Wait for [actionability](../actionability.mdx) checks on the matched element, unless `force` option is set. If the element is detached during the checks, the whole action is retried.
+1. Wait for [actionability](../actionability.mdx) checks on the matched element, unless [setForce](/api/class-page.mdx#page-uncheck-option-force) option is set. If the element is detached during the checks, the whole action is retried.
 1. Scroll the element into view if needed.
 1. Use [Page.mouse()](/api/class-page.mdx#page-mouse) to click in the center of the element.
 1. Ensure that the element is now unchecked. If not, this method throws.
 
-When all steps combined have not finished during the specified `timeout`, this method throws a [TimeoutError]. Passing zero timeout disables this.
+When all steps combined have not finished during the specified [setTimeout](/api/class-page.mdx#page-uncheck-option-timeout), this method throws a [TimeoutError]. Passing zero timeout disables this.
 
 **Usage**
 
@@ -4555,13 +4555,13 @@ Use web assertions that assert visibility or a locator-based [Locator.waitFor()]
 :::
 
 
-Returns when element specified by selector satisfies `state` option. Returns `null` if waiting for `hidden` or `detached`.
+Returns when element specified by selector satisfies [setState](/api/class-page.mdx#page-wait-for-selector-option-state) option. Returns `null` if waiting for `hidden` or `detached`.
 
 :::note
 Playwright automatically waits for element to be ready before performing an action. Using [Locator] objects and web-first assertions makes the code wait-for-selector-free.
 :::
 
-Wait for the `selector` to satisfy `state` option (either appear/disappear from dom, or become visible/hidden). If at the moment of calling the method `selector` already satisfies the condition, the method will return immediately. If the selector doesn't satisfy the condition for the `timeout` milliseconds, the function will throw.
+Wait for the [selector](/api/class-page.mdx#page-wait-for-selector-option-selector) to satisfy [setState](/api/class-page.mdx#page-wait-for-selector-option-state) option (either appear/disappear from dom, or become visible/hidden). If at the moment of calling the method [selector](/api/class-page.mdx#page-wait-for-selector-option-selector) already satisfies the condition, the method will return immediately. If the selector doesn't satisfy the condition for the [setTimeout](/api/class-page.mdx#page-wait-for-selector-option-timeout) milliseconds, the function will throw.
 
 **Usage**
 
@@ -4622,7 +4622,7 @@ Never wait for timeout in production. Tests that wait for time are inherently fl
 :::
 
 
-Waits for the given `timeout` in milliseconds.
+Waits for the given [timeout](/api/class-page.mdx#page-wait-for-timeout-option-timeout) in milliseconds.
 
 Note that `page.waitForTimeout()` should only be used for debugging. Tests using the timer in production are going to be flaky. Use signals such as network events, selectors becoming visible and others instead.
 

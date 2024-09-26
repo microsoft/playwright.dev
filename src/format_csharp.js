@@ -30,6 +30,7 @@ class CSharpFormatter {
 
   /**
    * @param {Documentation.Member} member
+   * @returns {import('./generator').FormattedMember[]}
    */
   formatMember(member) {
     let args = [];
@@ -84,14 +85,18 @@ class CSharpFormatter {
     return [{ name, link, usages, args, signatures }];
   }
 
-  formatArgumentName(name) {
-    return name;
-  }
-
+  /**
+   * @param {string} text
+   */
   formatTemplate(text) {
     return`<${text}>`;
   }
 
+  /**
+   * @param {string} args
+   * @param {string} ret
+   * @param {Documentation.Type} type
+   */
   formatFunction(args, ret, type) {
     if (type.args.length === 0 && type.returnType.name === 'Promise')
       return `[Func]<[Task]>`;
@@ -106,16 +111,12 @@ class CSharpFormatter {
     throw new Error('Unknown C# type for function: ' + JSON.stringify(type));
   }
 
-  formatPromise(text) {
-    return text;
-  }
-
   /**
    * @param {Documentation.Type} type
-   * @param {string} direction
+   * @param {'in'|'out'} direction
    * @param {Documentation.Member} member
    */
-  renderType(type, direction, member) {
+  formatTypeName(type, direction, member) {
     if (member.kind === 'property' && member.name === 'options') {
       const method = member.enclosingMethod;
       return `\`${toTitleCase(method.clazz.varName)}${toTitleCase(method.alias, { omitAsync: true })}Options?\``;
@@ -179,16 +180,50 @@ class CSharpFormatter {
     return `[${text}]${optionalSuffix}`;
   }
 
-  preprocessComment(spec) {
-    return spec;
+  /**
+   * @param {import('./markdown').MarkdownNode} spec
+   * @returns {boolean}
+   */
+  filterComment(spec) {
+    return spec.codeLang === this.lang;
+  }
+
+  propertyTypeTitle() {
+    return 'Type';
   }
 
   /**
-   * @param {import('./markdown').MarkdownNode} spec
-   * @returns boolean
+   * @param {string} option
    */
-   filterComment(spec) {
-    return spec.codeLang === this.lang;
+  formatOptionName(option) {
+    return option.split('.').map(o => toTitleCase(o)).join('.');
+  }
+
+  /**
+   * @param {Documentation.Type} type
+   * @param {'in'|'out'} direction
+   * @param {Documentation.Member} member
+   */
+  formatUnionType(type, direction, member) {
+    if (type.union.length && type.union[0].name === 'null') {
+      const extraNullable = member.required ? '?' : '';
+      return type.union.slice(1).map(t => this.formatTypeName(t, direction, member)).join(' | ') + extraNullable;
+    }
+    if (type.union.some(v => v.name.startsWith('"'))) {
+      // Keep in sync with microsoft/playwright's utils/doclint/generateDotnetApi.js
+      const enumValueOverrides = new Map([
+        ['domcontentloaded', 'DOMContentLoaded'],
+        ['networkidle', 'NetworkIdle'],
+      ]);
+      // strip out the quotes
+      const sanitizeLiteral = (literal) => {
+        return literal.split('-').map(l => {
+          const enumValue = l.replace(/[\"]/g, '');
+          return enumValueOverrides.get(enumValue) || toTitleCase(enumValue);
+        }).join('');
+      }
+      return `\`enum ${type.name} { ${type.union.map(l => sanitizeLiteral(l.name)).join(', ')} }${member.required ? '' : '?'}\``;
+    }
   }
 }
 
