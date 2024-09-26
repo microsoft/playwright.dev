@@ -51,9 +51,9 @@ async function getVersionForLanguageBinding(lang) {
       return npmData['dist-tags'].latest;
 
     case 'java':
-      const mavenResponse = await fetch('https://search.maven.org/solrsearch/select?q=g:com.microsoft.playwright+AND+a:playwright&rows=1&wt=json');
-      const mavenData = await mavenResponse.json();
-      return mavenData.response.docs[0].latestVersion;
+      const githubResponse = await fetch('https://api.github.com/repos/microsoft/playwright-java/releases');
+      const githubData = await githubResponse.json();
+      return githubData[0].tag_name;
 
     case 'python':
       const pypiResponse = await fetch('https://pypi.org/pypi/playwright/json');
