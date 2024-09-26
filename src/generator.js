@@ -96,11 +96,11 @@ class Generator {
       .mergeWith(parseApi(path.join(srcDir, 'test-reporter-api')));
     this.documentation.filterForLanguage(lang, { csharpOptionOverloadsShortNotation: true });
     this.documentation.setLinkRenderer(item => {
-      const { clazz, member, param, option, href } = item;
+      const { clazz, member, param, option, optionFullPath, href } = item;
       if (param)
         return `\`${formatter.formatArgumentName(param)}\``;
-      if (option)
-        return `\`${formatter.formatArgumentName(option)}\``;
+      if (optionFullPath)
+        return `\`${formatter.formatArgumentName(optionFullPath)}\``;
       if (clazz)
         return href ? `[${clazz.name}](${href})` : `[${clazz.name}]`;
       return this.createMemberLink(member, href)[0];

@@ -156,6 +156,8 @@ async function syncWithWorkingDirectory(event, from) {
 }
 
 (async () => {
+  Error.stackTraceLimit = 100;
+
   if (isWatch) {
     chokidar.watch(srcDir, { ignoreInitial: true }).on('all', (event, path) => {
       generateDocsForLanguages().catch((error) => {
