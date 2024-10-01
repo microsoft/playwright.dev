@@ -107,6 +107,7 @@ module.exports = {
             { type: 'doc', id: 'api/class-video' },
             { type: 'doc', id: 'api/class-weberror' },
             { type: 'doc', id: 'api/class-websocket' },
+            { type: 'doc', id: 'api/class-websocketroute' },
             { type: 'doc', id: 'api/class-worker' }
           ],
           collapsed: false
