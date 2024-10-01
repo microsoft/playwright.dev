@@ -82,6 +82,11 @@ export default {
           position: "left",
         },
         {
+          position: 'right',
+          type: 'html',
+          value: `<!-- language switcher -->`,
+        },
+        {
           href: "https://github.com/microsoft/playwright",
           position: "right",
           className: "header-github-link",
@@ -92,32 +97,6 @@ export default {
           position: "right",
           className: "header-discord-link",
           "aria-label": "Discord server",
-        },
-        {
-          label: 'Node.js',
-          position: 'left',
-          items: [
-            {
-              label: 'Node.js',
-              'data-language-prefix': '/',
-              href: '#',
-            },
-            {
-              label: 'Python',
-              'data-language-prefix': '/python/',
-              href: '#',
-            },
-            {
-              label: 'Java',
-              'data-language-prefix': '/java/',
-              href: '#',
-            },
-            {
-              label: '.NET',
-              'data-language-prefix': '/dotnet/',
-              href: '#',
-            },
-          ],
         },
         {
           to: '/community/welcome',

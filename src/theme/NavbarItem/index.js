@@ -54,42 +54,86 @@ function calculateMissingSites(baseSidebar, sidebars) {
   return missing;
 }
 
+function LanguageRadioLink({ languagePrefix, name, isCurrent, ...props }) {
+  const location = useLocation();
+
+  const newPathname = location.pathname.replace(
+    /^(\/(java|dotnet|python))?\/(.*)/,
+    "$3"
+  );
+  let href = languagePrefix + newPathname + location.hash;
+  if (
+    isMissingInLanguagePort(location.pathname, languagePrefix) &&
+    newPathname.startsWith("docs/test-")
+  )
+    href = languagePrefix + "docs/test-runners";
+
+  const onClick = () => {
+    if ("localStorage" in window) {
+      if (languagePrefix !== "/")
+        localStorage.setItem("previousLanguagePrefix", languagePrefix);
+      else localStorage.removeItem("previousLanguagePrefix");
+    }
+  };
+  
+  return (
+    <a
+      href={href}
+      target="_self"
+      onClick={onClick}
+      className={isCurrent ? "current" : undefined}
+      {...props}
+    >
+      {name}
+    </a>
+  );
+}
+
 export default function NavbarItemWrapper(props) {
   const location = useLocation();
-  const languagePrefix = props['data-language-prefix'];
-  const propsOverrides = {};
-  if (languagePrefix) {
-    // Rewrite the new link
-    const newPathname = location.pathname.replace(/^(\/(java|dotnet|python))?\/(.*)/, '$3');
-    propsOverrides.href = "pathname://" + languagePrefix + newPathname + location.hash;
-    if (isMissingInLanguagePort(location.pathname, languagePrefix) && newPathname.startsWith('docs/test-'))
-      propsOverrides.href = "pathname://" + languagePrefix + 'docs/test-runners';
-    propsOverrides.autoAddBaseUrl = false
-    propsOverrides.target = '_self';
-
-    // Detect if the link is active
-    const languagesInSubfolders = ['java', 'dotnet', 'python'];
-    const currentLanguageIsInSubfolder = languagesInSubfolders.some(l => location.pathname.startsWith(`/${l}`));
-    if (location.pathname.startsWith(languagePrefix) && currentLanguageIsInSubfolder && languagePrefix.length > 1 || languagePrefix.length === 1 && !currentLanguageIsInSubfolder) {
-      propsOverrides.className += ` ${props.activeClassName}`;
-    }
-    propsOverrides.skipExternalLinkCheck = true;
-    propsOverrides.onClick = (e) => {
-      if ('localStorage' in window) {
-        if (languagePrefix !== '/')
-          localStorage.setItem('previousLanguagePrefix', languagePrefix);
-        else
-          localStorage.removeItem('previousLanguagePrefix');
-      }
-      if (props.onClick)
-        props.onClick(e);
-    }
+  
+  const isLanguagePicker = props.value?.includes("language switcher");
+  if (isLanguagePicker) {
+    const isJava = location.pathname.startsWith("/java/");
+    const isPython = location.pathname.startsWith("/python/");
+    const isDotnet = location.pathname.startsWith("/dotnet/");
+    
+    return (
+      <div
+        className={
+          "language-radio" + (props.mobile ? "" : " language-radio-navbar")
+        }
+        style={{ width: "220px" }}
+      >
+        <LanguageRadioLink
+          languagePrefix="/"
+          name="Node.js"
+          isCurrent={!(isDotnet || isPython || isJava)}
+          style={{ width: "60px" }}
+        />
+        <LanguageRadioLink
+          languagePrefix="/java/"
+          name="Java"
+          isCurrent={isJava}
+          style={{ width: "40px" }}
+        />
+        <LanguageRadioLink
+          languagePrefix="/dotnet/"
+          name=".NET"
+          isCurrent={isDotnet}
+          style={{ width: "40px" }}
+        />
+        <LanguageRadioLink
+          languagePrefix="/python/"
+          name="Python"
+          isCurrent={isPython}
+          style={{ width: "50px" }}
+        />
+      </div>
+    );
   }
-  return (
-    <>
-      <NavbarItem {...props} {...propsOverrides} />
-    </>
-  );
+
+  return <NavbarItem {...props} />;
 }
 
 /**
