@@ -7,10 +7,10 @@ import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
 
-FrameLocator represents a view to the `iframe` on the page. It captures the logic sufficient to retrieve the `iframe` and locate elements in that iframe. FrameLocator can be created with either [Page.FrameLocator()](/api/class-page.mdx#page-frame-locator) or [Locator.FrameLocator()](/api/class-locator.mdx#locator-frame-locator) method.
+FrameLocator represents a view to the `iframe` on the page. It captures the logic sufficient to retrieve the `iframe` and locate elements in that iframe. FrameLocator can be created with either [Locator.ContentFrame](/api/class-locator.mdx#locator-content-frame), [Page.FrameLocator()](/api/class-page.mdx#page-frame-locator) or [Locator.FrameLocator()](/api/class-locator.mdx#locator-frame-locator) method.
 
 ```csharp
-var locator = page.FrameLocator("#my-frame").GetByText("Submit");
+var locator = page.Locator("#my-frame").ContentFrame.GetByText("Submit");
 await locator.ClickAsync();
 ```
 
@@ -20,10 +20,10 @@ Frame locators are strict. This means that all operations on frame locators will
 
 ```csharp
 // Throws if there are several frames in DOM:
-await page.FrameLocator(".result-frame").GetByRole(AriaRole.Button).ClickAsync();
+await page.Locator(".result-frame").ContentFrame.GetByRole(AriaRole.Button).ClickAsync();
 
 // Works because we explicitly tell locator to pick the first frame:
-await page.FrameLocator(".result-frame").First.getByRole(AriaRole.Button).ClickAsync();
+await page.Locator(".result-frame").First.ContentFrame.getByRole(AriaRole.Button).ClickAsync();
 ```
 
 **Converting Locator to FrameLocator**
@@ -38,23 +38,6 @@ If you have a [FrameLocator] object it can be converted to [Locator] pointing to
 ---
 
 ## Methods
-
-### First {#frame-locator-first}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.First</x-search>
-
-Returns locator to the first matching frame.
-
-**Usage**
-
-```csharp
-FrameLocator.First
-```
-
-**Returns**
-- [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-first-return"/><a href="#frame-locator-first-return" class="list-anchor">#</a>
-
----
 
 ### FrameLocator {#frame-locator-frame-locator}
 
@@ -233,12 +216,13 @@ await page
     An attribute that is usually set by `aria-disabled` or `disabled`.
     
     :::note
+    
     Unlike most other attributes, `disabled` is inherited through the DOM hierarchy. Learn more about [`aria-disabled`](https://www.w3.org/TR/wai-aria-1.2/#aria-disabled).
     :::
     
   - `Exact` [bool]? *(optional)* <font size="2">Added in: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-exact"/><a href="#frame-locator-get-by-role-option-exact" class="list-anchor">#</a>
     
-    Whether `name` is matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when `name` is a regular expression. Note that exact match still trims whitespace.
+    Whether [Name|NameRegex](/api/class-framelocator.mdx#frame-locator-get-by-role-option-name) is matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when [Name|NameRegex](/api/class-framelocator.mdx#frame-locator-get-by-role-option-name) is a regular expression. Note that exact match still trims whitespace.
   - `Expanded` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-expanded"/><a href="#frame-locator-get-by-role-option-expanded" class="list-anchor">#</a>
     
     An attribute that is usually set by `aria-expanded`.
@@ -254,9 +238,9 @@ await page
     A number attribute that is usually present for roles `heading`, `listitem`, `row`, `treeitem`, with default values for `<h1>-<h6>` elements.
     
     Learn more about [`aria-level`](https://www.w3.org/TR/wai-aria-1.2/#aria-level).
-  - `Name|NameRegex` [string]? | [Regex]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-name-name-regex"/><a href="#frame-locator-get-by-role-option-name-name-regex" class="list-anchor">#</a>
+  - `Name|NameRegex` [string]? | [Regex]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-name"/><a href="#frame-locator-get-by-role-option-name" class="list-anchor">#</a>
     
-    Option to match the [accessible name](https://w3c.github.io/accname/#dfn-accessible-name). By default, matching is case-insensitive and searches for a substring, use `exact` to control this behavior.
+    Option to match the [accessible name](https://w3c.github.io/accname/#dfn-accessible-name). By default, matching is case-insensitive and searches for a substring, use [Exact](/api/class-framelocator.mdx#frame-locator-get-by-role-option-exact) to control this behavior.
     
     Learn more about [accessible name](https://w3c.github.io/accname/#dfn-accessible-name).
   - `Pressed` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-get-by-role-option-pressed"/><a href="#frame-locator-get-by-role-option-pressed" class="list-anchor">#</a>
@@ -405,23 +389,6 @@ await Expect(Page.GetByTitle("Issues count")).toHaveText("25 issues");
 
 ---
 
-### Last {#frame-locator-last}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.Last</x-search>
-
-Returns locator to the last matching frame.
-
-**Usage**
-
-```csharp
-FrameLocator.Last
-```
-
-**Returns**
-- [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-last-return"/><a href="#frame-locator-last-return" class="list-anchor">#</a>
-
----
-
 ### Locator {#frame-locator-locator}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.Locator</x-search>
@@ -453,35 +420,15 @@ FrameLocator.Locator(selectorOrLocator, options);
     Matches elements that do not contain an element that matches an inner locator. Inner locator is queried against the outer one. For example, `article` that does not have `div` matches `<article><span>Playwright</span></article>`.
     
     Note that outer and inner locators must belong to the same frame. Inner locator must not contain [FrameLocator]s.
-  - `HasNotText|HasNotTextRegex` [string]? | [Regex]? *(optional)* <font size="2">Added in: v1.33</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-locator-option-has-not-text-has-not-text-regex"/><a href="#frame-locator-locator-option-has-not-text-has-not-text-regex" class="list-anchor">#</a>
+  - `HasNotText|HasNotTextRegex` [string]? | [Regex]? *(optional)* <font size="2">Added in: v1.33</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-locator-option-has-not-text"/><a href="#frame-locator-locator-option-has-not-text" class="list-anchor">#</a>
     
     Matches elements that do not contain specified text somewhere inside, possibly in a child or a descendant element. When passed a [string], matching is case-insensitive and searches for a substring.
-  - `HasText|HasTextRegex` [string]? | [Regex]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-locator-option-has-text-has-text-regex"/><a href="#frame-locator-locator-option-has-text-has-text-regex" class="list-anchor">#</a>
+  - `HasText|HasTextRegex` [string]? | [Regex]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-locator-option-has-text"/><a href="#frame-locator-locator-option-has-text" class="list-anchor">#</a>
     
     Matches elements containing specified text somewhere inside, possibly in a child or a descendant element. When passed a [string], matching is case-insensitive and searches for a substring. For example, `"Playwright"` matches `<article><div>Playwright</div></article>`.
 
 **Returns**
 - [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-locator-return"/><a href="#frame-locator-locator-return" class="list-anchor">#</a>
-
----
-
-### Nth {#frame-locator-nth}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.Nth</x-search>
-
-Returns locator to the n-th matching frame. It's zero based, `nth(0)` selects the first frame.
-
-**Usage**
-
-```csharp
-FrameLocator.Nth(index);
-```
-
-**Arguments**
-- `index` [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-nth-option-index"/><a href="#frame-locator-nth-option-index" class="list-anchor">#</a>
-
-**Returns**
-- [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-nth-return"/><a href="#frame-locator-nth-return" class="list-anchor">#</a>
 
 ---
 
@@ -498,7 +445,7 @@ For a reverse operation, use [Locator.ContentFrame](/api/class-locator.mdx#locat
 **Usage**
 
 ```csharp
-var frameLocator = Page.FrameLocator("iframe[name=\"embedded\"]");
+var frameLocator = Page.Locator("iframe[name=\"embedded\"]").ContentFrame;
 // ...
 var locator = frameLocator.Owner;
 await Expect(locator).ToBeVisibleAsync();
@@ -506,6 +453,83 @@ await Expect(locator).ToBeVisibleAsync();
 
 **Returns**
 - [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-owner-return"/><a href="#frame-locator-owner-return" class="list-anchor">#</a>
+
+---
+
+## Deprecated
+
+### First {#frame-locator-first}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.First</x-search>
+
+:::warning Deprecated
+
+Use [Locator.First](/api/class-locator.mdx#locator-first) followed by [Locator.ContentFrame](/api/class-locator.mdx#locator-content-frame) instead.
+
+:::
+
+
+Returns locator to the first matching frame.
+
+**Usage**
+
+```csharp
+FrameLocator.First
+```
+
+**Returns**
+- [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-first-return"/><a href="#frame-locator-first-return" class="list-anchor">#</a>
+
+---
+
+### Last {#frame-locator-last}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.Last</x-search>
+
+:::warning Deprecated
+
+Use [Locator.Last](/api/class-locator.mdx#locator-last) followed by [Locator.ContentFrame](/api/class-locator.mdx#locator-content-frame) instead.
+
+:::
+
+
+Returns locator to the last matching frame.
+
+**Usage**
+
+```csharp
+FrameLocator.Last
+```
+
+**Returns**
+- [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-last-return"/><a href="#frame-locator-last-return" class="list-anchor">#</a>
+
+---
+
+### Nth {#frame-locator-nth}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.17</font><x-search>frameLocator.Nth</x-search>
+
+:::warning Deprecated
+
+Use [Locator.Nth()](/api/class-locator.mdx#locator-nth) followed by [Locator.ContentFrame](/api/class-locator.mdx#locator-content-frame) instead.
+
+:::
+
+
+Returns locator to the n-th matching frame. It's zero based, `nth(0)` selects the first frame.
+
+**Usage**
+
+```csharp
+FrameLocator.Nth(index);
+```
+
+**Arguments**
+- `index` [int]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-nth-option-index"/><a href="#frame-locator-nth-option-index" class="list-anchor">#</a>
+
+**Returns**
+- [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-locator-nth-return"/><a href="#frame-locator-nth-return" class="list-anchor">#</a>
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
@@ -547,6 +571,7 @@ await Expect(locator).ToBeVisibleAsync();
 [WebError]: /api/class-weberror.mdx "WebError"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
+[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
