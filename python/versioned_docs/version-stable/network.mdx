@@ -458,6 +458,25 @@ await page.route("**/title.html", handle_route)
 </TabItem>
 </Tabs>
 
+## Glob URL patterns
+
+Playwright uses simplified glob patterns for URL matching in network interception methods like [page.route()](/api/class-page.mdx#page-route) or [page.expect_response()](/api/class-page.mdx#page-wait-for-response). These patterns support basic wildcards:
+1. Asterisks:
+   - A single `*` matches any characters except `/`
+   - A double `**` matches any characters including `/`
+1. Question mark `?` matches any single character except `/`
+1. Curly braces `{}` can be used to match a list of options separated by commas `,`
+
+Examples:
+- `https://example.com/*.js` matches `https://example.com/file.js` but not `https://example.com/path/file.js`
+- `**/*.js` matches both `https://example.com/file.js` and `https://example.com/path/file.js`
+- `**/*.{png,jpg,jpeg}` matches all image requests
+
+Important notes:
+- The glob pattern must match the entire URL, not just a part of it.
+- When using globs for URL matching, consider the full URL structure, including the protocol and path separators.
+- For more complex matching requirements, consider using [RegExp] instead of glob patterns.
+
 ## WebSockets
 
 Playwright supports [WebSockets](https://developer.mozilla.org/en-US/docs/Web/API/WebSockets_API) inspection out of the box. Every time a WebSocket is created, the [page.on("websocket")](/api/class-page.mdx#page-event-web-socket) event is fired. This event contains the [WebSocket] instance for further web socket frames inspection:
@@ -475,7 +494,7 @@ page.on("websocket", on_web_socket)
 ## Missing Network Events and Service Workers
 
 Playwright's built-in [browser_context.route()](/api/class-browsercontext.mdx#browser-context-route) and [page.route()](/api/class-page.mdx#page-route) allow your tests to natively route requests and perform mocking and interception.
-1. If you're using Playwright's native [browser_context.route()](/api/class-browsercontext.mdx#browser-context-route) and [page.route()](/api/class-page.mdx#page-route), and it appears network events are missing, disable Service Workers by setting `browser.new_context.service_workers` to `'block'`.
+1. If you're using Playwright's native [browser_context.route()](/api/class-browsercontext.mdx#browser-context-route) and [page.route()](/api/class-page.mdx#page-route), and it appears network events are missing, disable Service Workers by setting [service_workers](/api/class-browser.mdx#browser-new-context-option-service-workers) to `'block'`.
 1. It might be that you are using a mock tool such as Mock Service Worker (MSW). While this tool works out of the box for mocking responses, it adds its own Service Worker that takes over the network requests, hence making them invisible to [browser_context.route()](/api/class-browsercontext.mdx#browser-context-route) and [page.route()](/api/class-page.mdx#page-route). If you are interested in both network testing and mocking, consider using built-in [browser_context.route()](/api/class-browsercontext.mdx#browser-context-route) and [page.route()](/api/class-page.mdx#page-route) for [response mocking](#handle-requests).
 1. If you're interested in not solely using Service Workers for testing and network mocking, but in routing and listening for requests made by Service Workers themselves, please see [this experimental feature](https://github.com/microsoft/playwright/issues/15684).
 
@@ -516,6 +535,7 @@ Playwright's built-in [browser_context.route()](/api/class-browsercontext.mdx#br
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
+[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
