@@ -50,7 +50,8 @@ jobs:
       - name: Prepare branch
         id: prepare-branch
         run: |
-          BRANCH_NAME="roll/stable-$(date +"%d-%m-%y")"
+          VERSION=${{ steps.determine-version.outputs.result }}
+          BRANCH_NAME="roll/stable-$VERSION"
           set +e
           git diff -s --exit-code
           HAS_CHANGES="$?"
@@ -69,11 +70,25 @@ jobs:
           # We only want to upgrade the version itself, not the next release
           git add "*versioned*"
           git add "**/versions.json"
-          git commit -m "feat(roll): roll to ${{ steps.determine-version.outputs.result }} Playwright"
+          git commit -m "feat(roll): roll to $VERSION Playwright"
           git push origin $BRANCH_NAME --force
+      - name: Check for existing Pull Request
+        id: check-pr
+        uses: actions/github-script@v7
+        with:
+          github-token: ${{ secrets.GH_SERVICE_ACCOUNT_TOKEN }}
+          script: |
+            const { data: pullRequests } = await github.rest.pulls.list({
+              owner: 'microsoft',
+              repo: 'playwright.dev',
+              head: `microsoft:${{ steps.prepare-branch.outputs.BRANCH_NAME }}`,
+              state: 'open'
+            });
+            return pullRequests.length > 0 ? 'true' : 'false';
+          result-encoding: string
       - name: Create Pull Request
         uses: actions/github-script@v7
-        if: ${{ steps.prepare-branch.outputs.HAS_CHANGES == '1' }}
+        if: ${{ steps.prepare-branch.outputs.HAS_CHANGES == '1' && steps.check-pr.outputs.result == 'false' }}
         with:
           github-token: ${{ secrets.GH_SERVICE_ACCOUNT_TOKEN }}
           script: |
