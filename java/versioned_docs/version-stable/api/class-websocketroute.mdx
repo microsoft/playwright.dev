@@ -1,0 +1,281 @@
+---
+id: class-websocketroute
+title: "WebSocketRoute"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import HTMLCard from '@site/src/components/HTMLCard';
+
+
+Whenever a [`WebSocket`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket) route is set up with [Page.routeWebSocket()](/api/class-page.mdx#page-route-web-socket) or [BrowserContext.routeWebSocket()](/api/class-browsercontext.mdx#browser-context-route-web-socket), the `WebSocketRoute` object allows to handle the WebSocket, like an actual server would do.
+
+**Mocking**
+
+By default, the routed WebSocket will not connect to the server. This way, you can mock entire communcation over the WebSocket. Here is an example that responds to a `"request"` with a `"response"`.
+
+```java
+page.routeWebSocket("/ws", ws -> {
+  ws.onMessage(message -> {
+    if ("request".equals(message))
+      ws.send("response");
+  });
+});
+```
+
+Since we do not call [WebSocketRoute.connectToServer()](/api/class-websocketroute.mdx#web-socket-route-connect-to-server) inside the WebSocket route handler, Playwright assumes that WebSocket will be mocked, and opens the WebSocket inside the page automatically.
+
+**Intercepting**
+
+Alternatively, you may want to connect to the actual server, but intercept messages in-between and modify or block them. Calling [WebSocketRoute.connectToServer()](/api/class-websocketroute.mdx#web-socket-route-connect-to-server) returns a server-side `WebSocketRoute` instance that you can send messages to, or handle incoming messages.
+
+Below is an example that modifies some messages sent by the page to the server. Messages sent from the server to the page are left intact, relying on the default forwarding.
+
+```java
+page.routeWebSocket("/ws", ws -> {
+  WebSocketRoute server = ws.connectToServer();
+  ws.onMessage(message -> {
+    if ("request".equals(message))
+      server.send("request2");
+    else
+      server.send(message);
+  });
+});
+```
+
+After connecting to the server, all **messages are forwarded** between the page and the server by default.
+
+However, if you call [WebSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) on the original route, messages from the page to the server **will not be forwarded** anymore, but should instead be handled by the [handler](/api/class-websocketroute.mdx#web-socket-route-on-message-option-handler).
+
+Similarly, calling [WebSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) on the server-side WebSocket will **stop forwarding messages** from the server to the page, and [handler](/api/class-websocketroute.mdx#web-socket-route-on-message-option-handler) should take care of them.
+
+The following example blocks some messages in both directions. Since it calls [WebSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) in both directions, there is no automatic forwarding at all.
+
+```java
+page.routeWebSocket("/ws", ws -> {
+  WebSocketRoute server = ws.connectToServer();
+  ws.onMessage(message -> {
+    if (!"blocked-from-the-page".equals(message))
+      server.send(message);
+  });
+  server.onMessage(message -> {
+    if (!"blocked-from-the-server".equals(message))
+      ws.send(message);
+  });
+});
+```
+
+
+---
+
+## Methods
+
+### close {#web-socket-route-close}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.close</x-search>
+
+Closes one side of the WebSocket connection.
+
+**Usage**
+
+```java
+WebSocketRoute.close();
+WebSocketRoute.close(options);
+```
+
+**Arguments**
+- `options` `WebSocketRoute.CloseOptions` *(optional)*
+  - `setCode` [int] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-close-option-code"/><a href="#web-socket-route-close-option-code" class="list-anchor">#</a>
+    
+    Optional [close code](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#code).
+  - `setReason` [String] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-close-option-reason"/><a href="#web-socket-route-close-option-reason" class="list-anchor">#</a>
+    
+    Optional [close reason](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#reason).
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-close-return"/><a href="#web-socket-route-close-return" class="list-anchor">#</a>
+
+---
+
+### connectToServer {#web-socket-route-connect-to-server}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.connectToServer</x-search>
+
+By default, routed WebSocket does not connect to the server, so you can mock entire WebSocket communication. This method connects to the actual WebSocket server, and returns the server-side [WebSocketRoute] instance, giving the ability to send and receive messages from the server.
+
+Once connected to the server:
+* Messages received from the server will be **automatically forwarded** to the WebSocket in the page, unless [WebSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) is called on the server-side `WebSocketRoute`.
+* Messages sent by the [`WebSocket.send()`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/send) call in the page will be **automatically forwarded** to the server, unless [WebSocketRoute.onMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) is called on the original `WebSocketRoute`.
+
+See examples at the top for more details.
+
+**Usage**
+
+```java
+WebSocketRoute.connectToServer();
+```
+
+**Returns**
+- [WebSocketRoute]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-connect-to-server-return"/><a href="#web-socket-route-connect-to-server-return" class="list-anchor">#</a>
+
+---
+
+### onClose {#web-socket-route-on-close}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.onClose</x-search>
+
+Allows to handle [`WebSocket.close`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close).
+
+By default, closing one side of the connection, either in the page or on the server, will close the other side. However, when [WebSocketRoute.onClose()](/api/class-websocketroute.mdx#web-socket-route-on-close) handler is set up, the default forwarding of closure is disabled, and handler should take care of it.
+
+**Usage**
+
+```java
+WebSocketRoute.onClose(handler);
+```
+
+**Arguments**
+- `handler` [Consumer]&lt;[null] | [number]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-on-close-option-handler"/><a href="#web-socket-route-on-close-option-handler" class="list-anchor">#</a>
+  
+  Function that will handle WebSocket closure. Received an optional [close code](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#code) and an optional [close reason](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#reason).
+
+---
+
+### onMessage {#web-socket-route-on-message}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.onMessage</x-search>
+
+This method allows to handle messages that are sent by the WebSocket, either from the page or from the server.
+
+When called on the original WebSocket route, this method handles messages sent from the page. You can handle this messages by responding to them with [WebSocketRoute.send()](/api/class-websocketroute.mdx#web-socket-route-send), forwarding them to the server-side connection returned by [WebSocketRoute.connectToServer()](/api/class-websocketroute.mdx#web-socket-route-connect-to-server) or do something else.
+
+Once this method is called, messages are not automatically forwarded to the server or to the page - you should do that manually by calling [WebSocketRoute.send()](/api/class-websocketroute.mdx#web-socket-route-send). See examples at the top for more details.
+
+Calling this method again will override the handler with a new one.
+
+**Usage**
+
+```java
+WebSocketRoute.onMessage(handler);
+```
+
+**Arguments**
+- `handler` [Consumer]&lt;[WebSocketFrame]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-on-message-option-handler"/><a href="#web-socket-route-on-message-option-handler" class="list-anchor">#</a>
+  
+  Function that will handle messages.
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-on-message-return"/><a href="#web-socket-route-on-message-return" class="list-anchor">#</a>
+
+---
+
+### send {#web-socket-route-send}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.send</x-search>
+
+Sends a message to the WebSocket. When called on the original WebSocket, sends the message to the page. When called on the result of [WebSocketRoute.connectToServer()](/api/class-websocketroute.mdx#web-socket-route-connect-to-server), sends the message to the server. See examples at the top for more details.
+
+**Usage**
+
+```java
+WebSocketRoute.send(message);
+```
+
+**Arguments**
+- `message` [String] | [byte&#91;&#93;]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-send-option-message"/><a href="#web-socket-route-send-option-message" class="list-anchor">#</a>
+  
+  Message to send.
+
+---
+
+### url {#web-socket-route-url}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.url</x-search>
+
+URL of the WebSocket created in the page.
+
+**Usage**
+
+```java
+WebSocketRoute.url();
+```
+
+**Returns**
+- [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-url-return"/><a href="#web-socket-route-url-return" class="list-anchor">#</a>
+
+
+[APIRequest]: /api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
+[Browser]: /api/class-browser.mdx "Browser"
+[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: /api/class-browsertype.mdx "BrowserType"
+[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[Clock]: /api/class-clock.mdx "Clock"
+[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: /api/class-dialog.mdx "Dialog"
+[Download]: /api/class-download.mdx "Download"
+[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[FormData]: /api/class-formdata.mdx "FormData"
+[Frame]: /api/class-frame.mdx "Frame"
+[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: /api/class-jshandle.mdx "JSHandle"
+[Keyboard]: /api/class-keyboard.mdx "Keyboard"
+[Locator]: /api/class-locator.mdx "Locator"
+[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
+[Mouse]: /api/class-mouse.mdx "Mouse"
+[Page]: /api/class-page.mdx "Page"
+[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
+[Playwright]: /api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
+[PlaywrightException]: /api/class-playwrightexception.mdx "PlaywrightException"
+[Request]: /api/class-request.mdx "Request"
+[RequestOptions]: /api/class-requestoptions.mdx "RequestOptions"
+[Response]: /api/class-response.mdx "Response"
+[Route]: /api/class-route.mdx "Route"
+[Selectors]: /api/class-selectors.mdx "Selectors"
+[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: /api/class-tracing.mdx "Tracing"
+[Video]: /api/class-video.mdx "Video"
+[WebError]: /api/class-weberror.mdx "WebError"
+[WebSocket]: /api/class-websocket.mdx "WebSocket"
+[WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
+[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[Worker]: /api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
+[byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
+[Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
+[Date]: https://docs.oracle.com/javase/8/docs/api/java/util/Date.html "Date"
+[double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
+[InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
+[int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[long]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "long"
+[JsonObject]: https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/JsonObject.html "JsonObject"
+[List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"
+[Map]: https://docs.oracle.com/javase/8/docs/api/java/util/Map.html "Map"
+[null]: https://docs.oracle.com/javase/specs/jls/se8/html/jls-3.html#jls-3.10.7 "null"
+[Object]: https://docs.oracle.com/javase/8/docs/api/java/lang/Object.html "Object"
+[Path]: https://docs.oracle.com/javase/8/docs/api/java/nio/file/Path.html "Path"
+[Pattern]: https://docs.oracle.com/javase/8/docs/api/java/util/regex/Pattern.html "Pattern"
+[Predicate]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Predicate.html "Predicate"
+[void]: https://docs.oracle.com/javase/tutorial/java/javaOO/methods.html "void"
+[Runnable]: https://docs.oracle.com/javase/8/docs/api/java/lang/Runnable.html "Runnable"
+[RuntimeException]: https://docs.oracle.com/javase/8/docs/api/java/lang/RuntimeException.html "RuntimeException"
+[String]: https://docs.oracle.com/javase/8/docs/api/java/lang/String.html "String"
+
+[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/java/about "all available image tags"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/java/about "Microsoft Artifact Registry"
+[Dockerfile.jammy]: https://github.com/microsoft/playwright-java/blob/main/utils/docker/Dockerfile.jammy "Dockerfile.jammy"
