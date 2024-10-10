@@ -53,7 +53,7 @@ async function getVersionForLanguageBinding(lang) {
     case 'java':
       const githubResponse = await fetch('https://api.github.com/repos/microsoft/playwright-java/releases');
       const githubData = await githubResponse.json();
-      return githubData[0].tag_name;
+      return githubData[0].tag_name.substring(1);
 
     case 'python':
       const pypiResponse = await fetch('https://pypi.org/pypi/playwright/json');
