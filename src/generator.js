@@ -360,8 +360,10 @@ ${this.documentation.renderLinksInText(member.discouraged)}
    * @param {string} text
    */
   mdxLinks(text) {
-    for (const name of this.generatedFiles)
+    for (const name of this.generatedFiles) {
       text = text.replace(new RegExp(`(${path.basename(name)})([^x])`, 'g'), "$1x$2");
+      text = text.replace(new RegExp(`\\((\\./${path.basename(name, '.md')})\\)`, 'g'), "($1.mdx)");
+    }
     return this.formatter.rewriteMarkdownContent?.(text) ?? text;
   }
 
