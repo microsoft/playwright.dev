@@ -217,7 +217,7 @@ export default {
   customFields: {
     repositoryName: "playwright-python",
   },
-  trailingSlash: false,
+  trailingSlash: true,
   webpack: {
     jsLoader: (isServer) => ({
       loader: require.resolve('swc-loader'),

@@ -216,7 +216,7 @@ export default {
   customFields: {
     repositoryName: "playwright-dotnet",
   },
-  trailingSlash: false,
+  trailingSlash: true,
   webpack: {
     jsLoader: (isServer) => ({
       loader: require.resolve('swc-loader'),

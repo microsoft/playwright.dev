@@ -216,7 +216,7 @@ module.exports = {
   customFields: {
     repositoryName: "playwright-java",
   },
-  trailingSlash: false,
+  trailingSlash: true,
   webpack: {
     jsLoader: (isServer) => ({
       loader: require.resolve('swc-loader'),
