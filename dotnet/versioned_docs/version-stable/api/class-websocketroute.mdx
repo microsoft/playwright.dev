@@ -14,7 +14,7 @@ Whenever a [`WebSocket`](https://developer.mozilla.org/en-US/docs/Web/API/WebSoc
 By default, the routed WebSocket will not connect to the server. This way, you can mock entire communcation over the WebSocket. Here is an example that responds to a `"request"` with a `"response"`.
 
 ```csharp
-await page.RouteWebSocketAsync("/ws", ws => {
+await page.RouteWebSocketAsync("wss://example.com/ws", ws => {
   ws.OnMessage(message => {
     if (message == "request")
       ws.Send("response");
@@ -23,6 +23,23 @@ await page.RouteWebSocketAsync("/ws", ws => {
 ```
 
 Since we do not call [WebSocketRoute.ConnectToServer](/api/class-websocketroute.mdx#web-socket-route-connect-to-server) inside the WebSocket route handler, Playwright assumes that WebSocket will be mocked, and opens the WebSocket inside the page automatically.
+
+Here is another example that handles JSON messages:
+
+```csharp
+await page.RouteWebSocketAsync("wss://example.com/ws", ws => {
+  ws.OnMessage(message => {
+    using var jsonDoc = JsonDocument.Parse(message);
+    JsonElement root = jsonDoc.RootElement;
+    if (root.TryGetProperty("request", out JsonElement requestElement) && requestElement.GetString() == "question")
+    {
+      var response = new Dictionary<string, string> { ["response"] = "answer" };
+      string jsonResponse = JsonSerializer.Serialize(response);
+      ws.Send(jsonResponse);
+    }
+  });
+});
+```
 
 **Intercepting**
 
@@ -44,11 +61,11 @@ await page.RouteWebSocketAsync("/ws", ws => {
 
 After connecting to the server, all **messages are forwarded** between the page and the server by default.
 
-However, if you call [WebSocketRoute.OnMessageAsync()](/api/class-websocketroute.mdx#web-socket-route-on-message) on the original route, messages from the page to the server **will not be forwarded** anymore, but should instead be handled by the [handler](/api/class-websocketroute.mdx#web-socket-route-on-message-option-handler).
+However, if you call [WebSocketRoute.OnMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) on the original route, messages from the page to the server **will not be forwarded** anymore, but should instead be handled by the [handler](/api/class-websocketroute.mdx#web-socket-route-on-message-option-handler).
 
-Similarly, calling [WebSocketRoute.OnMessageAsync()](/api/class-websocketroute.mdx#web-socket-route-on-message) on the server-side WebSocket will **stop forwarding messages** from the server to the page, and [handler](/api/class-websocketroute.mdx#web-socket-route-on-message-option-handler) should take care of them.
+Similarly, calling [WebSocketRoute.OnMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) on the server-side WebSocket will **stop forwarding messages** from the server to the page, and [handler](/api/class-websocketroute.mdx#web-socket-route-on-message-option-handler) should take care of them.
 
-The following example blocks some messages in both directions. Since it calls [WebSocketRoute.OnMessageAsync()](/api/class-websocketroute.mdx#web-socket-route-on-message) in both directions, there is no automatic forwarding at all.
+The following example blocks some messages in both directions. Since it calls [WebSocketRoute.OnMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) in both directions, there is no automatic forwarding at all.
 
 ```csharp
 await page.RouteWebSocketAsync("/ws", ws => {
@@ -102,8 +119,8 @@ await WebSocketRoute.CloseAsync(options);
 By default, routed WebSocket does not connect to the server, so you can mock entire WebSocket communication. This method connects to the actual WebSocket server, and returns the server-side [WebSocketRoute] instance, giving the ability to send and receive messages from the server.
 
 Once connected to the server:
-* Messages received from the server will be **automatically forwarded** to the WebSocket in the page, unless [WebSocketRoute.OnMessageAsync()](/api/class-websocketroute.mdx#web-socket-route-on-message) is called on the server-side `WebSocketRoute`.
-* Messages sent by the [`WebSocket.send()`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/send) call in the page will be **automatically forwarded** to the server, unless [WebSocketRoute.OnMessageAsync()](/api/class-websocketroute.mdx#web-socket-route-on-message) is called on the original `WebSocketRoute`.
+* Messages received from the server will be **automatically forwarded** to the WebSocket in the page, unless [WebSocketRoute.OnMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) is called on the server-side `WebSocketRoute`.
+* Messages sent by the [`WebSocket.send()`](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/send) call in the page will be **automatically forwarded** to the server, unless [WebSocketRoute.OnMessage()](/api/class-websocketroute.mdx#web-socket-route-on-message) is called on the original `WebSocketRoute`.
 
 See examples at the top for more details.
 
@@ -133,15 +150,15 @@ WebSocketRoute.OnClose(handler);
 ```
 
 **Arguments**
-- `handler` [Action]&lt;[number]?&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-on-close-option-handler"/><a href="#web-socket-route-on-close-option-handler" class="list-anchor">#</a>
+- `handler` Action&lt;int?, string&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-on-close-option-handler"/><a href="#web-socket-route-on-close-option-handler" class="list-anchor">#</a>
   
   Function that will handle WebSocket closure. Received an optional [close code](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#code) and an optional [close reason](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#reason).
 
 ---
 
-### OnMessageAsync {#web-socket-route-on-message}
+### OnMessage {#web-socket-route-on-message}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.OnMessageAsync</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.OnMessage</x-search>
 
 This method allows to handle messages that are sent by the WebSocket, either from the page or from the server.
 
@@ -154,16 +171,13 @@ Calling this method again will override the handler with a new one.
 **Usage**
 
 ```csharp
-await WebSocketRoute.OnMessageAsync(handler);
+WebSocketRoute.OnMessage(handler);
 ```
 
 **Arguments**
 - `handler` [Action]&lt;[WebSocketFrame]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-on-message-option-handler"/><a href="#web-socket-route-on-message-option-handler" class="list-anchor">#</a>
   
   Function that will handle messages.
-
-**Returns**
-- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-on-message-return"/><a href="#web-socket-route-on-message-return" class="list-anchor">#</a>
 
 ---
 
