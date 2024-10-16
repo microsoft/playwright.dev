@@ -2,6 +2,14 @@ import { Video } from './types';
 
 const conferenceVideos: Video[] = [
   {
+    title: "Advanced Playwright Techniques for Flawless Testing",
+    id: 'O0TeeSbQPWY',
+    year: '2024',
+    conference: 'TestU',
+    language: 'English',
+    speakers: ['Debbie O\'Brien']
+  },
+  {
     title: "Playwright : l'outil qui va révolutionner les tests end-to-end",
     id: 'fQ4LICkmG9I',
     year: '2023',

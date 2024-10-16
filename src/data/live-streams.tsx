@@ -1,5 +1,21 @@
 const liveStreams = [
   {
+    title: 'Testing with Playwright, Epic React testing tab, Epic web testing course and more',
+    description: '',
+    id: 'ie2v5OVqWt4',
+    year: '2024',
+    host: 'Playwright Live',
+    speakers: ["Debbie O'Brien", "Kent C. Dodds"]
+  },
+  {
+    title: 'The Playwright team demos how to iterate quickly using the new-only-changed option',
+    description: '',
+    id: '8ssf762p3dY',
+    year: '2024',
+    host: 'Playwright Live',
+    speakers: ["Debbie O'Brien", "Simon Knott"]
+  },
+  {
     title: 'It\'s time to talk Playwright with the clock API',
     description: '',
     id: '263x99Oe1g4',

@@ -1,5 +1,11 @@
 const featureVideos = [
   {
+    title: 'API Mocking',
+    description: '',
+    id: 'kvGszYAYQ6M',
+    year: '2024',
+  },
+  {
     title: 'Trace Viewer',
     description: '',
     id: 'yP6AnTxC34s',

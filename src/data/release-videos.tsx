@@ -2,6 +2,11 @@ import { Video } from './types';
 
 const releaseVideos: Video[] = [
   {
+    version: '1.48',
+    id: "VGlkSBkMVCQ",
+    highlights: ['webSocket routing', 'UI mode / Trace Viewer'],
+  },
+  {
     version: '1.46',
     id: "tQo7w-QQBsI",
     highlights: ['client certificates', '--only-changed', 'UI mode updates'],
