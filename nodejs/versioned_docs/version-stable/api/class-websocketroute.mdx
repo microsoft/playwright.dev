@@ -14,7 +14,7 @@ Whenever a [`WebSocket`](https://developer.mozilla.org/en-US/docs/Web/API/WebSoc
 By default, the routed WebSocket will not connect to the server. This way, you can mock entire communcation over the WebSocket. Here is an example that responds to a `"request"` with a `"response"`.
 
 ```js
-await page.routeWebSocket('/ws', ws => {
+await page.routeWebSocket('wss://example.com/ws', ws => {
   ws.onMessage(message => {
     if (message === 'request')
       ws.send('response');
@@ -23,6 +23,18 @@ await page.routeWebSocket('/ws', ws => {
 ```
 
 Since we do not call [webSocketRoute.connectToServer()](/api/class-websocketroute.mdx#web-socket-route-connect-to-server) inside the WebSocket route handler, Playwright assumes that WebSocket will be mocked, and opens the WebSocket inside the page automatically.
+
+Here is another example that handles JSON messages:
+
+```js
+await page.routeWebSocket('wss://example.com/ws', ws => {
+  ws.onMessage(message => {
+    const json = JSON.parse(message);
+    if (json.request === 'question')
+      ws.send(JSON.stringify({ response: 'answer' }));
+  });
+});
+```
 
 **Intercepting**
 
@@ -155,16 +167,13 @@ Calling this method again will override the handler with a new one.
 **Usage**
 
 ```js
-await webSocketRoute.onMessage(handler);
+webSocketRoute.onMessage(handler);
 ```
 
 **Arguments**
 - `handler` [function]\([string]\):[Promise]&lt;[Object]&gt; | [Object]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-on-message-option-handler"/><a href="#web-socket-route-on-message-option-handler" class="list-anchor">#</a>
   
   Function that will handle messages.
-
-**Returns**
-- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-on-message-return"/><a href="#web-socket-route-on-message-return" class="list-anchor">#</a>
 
 ---
 
