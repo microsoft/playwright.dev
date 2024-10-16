@@ -153,6 +153,35 @@ pwsh bin/Debug/netX/playwright.ps1 open --save-har=example.har --save-har-glob="
 
 Read more about [advanced networking](./network.mdx).
 
+## Mock WebSockets
+
+The following code will intercept WebSocket connections and mock entire communcation over the WebSocket, instead of connecting to the server. This example responds to a `"request"` with a `"response"`.
+
+```csharp
+await page.RouteWebSocketAsync("wss://example.com/ws", ws => {
+  ws.OnMessage(message => {
+    if (message == "request")
+      ws.Send("response");
+  });
+});
+```
+
+Alternatively, you may want to connect to the actual server, but intercept messages in-between and modify or block them. Here is an example that modifies some of the messages sent by the page to the server, and leaves the rest unmodified.
+
+```csharp
+await page.RouteWebSocketAsync("wss://example.com/ws", ws => {
+  var server = ws.ConnectToServer();
+  ws.OnMessage(message => {
+    if (message == "request")
+      server.Send("request2");
+    else
+      server.Send(message);
+  });
+});
+```
+
+For more details, see [WebSocketRoute].
+
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"

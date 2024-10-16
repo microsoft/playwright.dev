@@ -28,7 +28,7 @@ def message_handler(ws: WebSocketRoute, message: Union[str, bytes]):
   if message == "request":
     ws.send("response")
 
-page.route_web_socket("/ws", lambda ws: ws.on_message(
+page.route_web_socket("wss://example.com/ws", lambda ws: ws.on_message(
     lambda message: message_handler(ws, message)
 ))
 ```
@@ -41,7 +41,7 @@ def message_handler(ws: WebSocketRoute, message: Union[str, bytes]):
   if message == "request":
     ws.send("response")
 
-await page.route_web_socket("/ws", lambda ws: ws.on_message(
+await page.route_web_socket("wss://example.com/ws", lambda ws: ws.on_message(
     lambda message: message_handler(ws, message)
 ))
 ```
@@ -50,6 +50,46 @@ await page.route_web_socket("/ws", lambda ws: ws.on_message(
 </Tabs>
 
 Since we do not call [web_socket_route.connect_to_server](/api/class-websocketroute.mdx#web-socket-route-connect-to-server) inside the WebSocket route handler, Playwright assumes that WebSocket will be mocked, and opens the WebSocket inside the page automatically.
+
+Here is another example that handles JSON messages:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+def message_handler(ws: WebSocketRoute, message: Union[str, bytes]):
+  json_message = json.loads(message)
+  if json_message["request"] == "question":
+    ws.send(json.dumps({ "response": "answer" }))
+
+page.route_web_socket("wss://example.com/ws", lambda ws: ws.on_message(
+    lambda message: message_handler(ws, message)
+))
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+def message_handler(ws: WebSocketRoute, message: Union[str, bytes]):
+  json_message = json.loads(message)
+  if json_message["request"] == "question":
+    ws.send(json.dumps({ "response": "answer" }))
+
+await page.route_web_socket("wss://example.com/ws", lambda ws: ws.on_message(
+    lambda message: message_handler(ws, message)
+))
+```
+
+</TabItem>
+</Tabs>
 
 **Intercepting**
 
@@ -205,7 +245,7 @@ web_socket_route.on_close(handler)
 ```
 
 **Arguments**
-- `handler` [Callable]\[[number] | [undefined]\]:[Promise]\[[Any]\] | [Any]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-on-close-option-handler"/><a href="#web-socket-route-on-close-option-handler" class="list-anchor">#</a>
+- `handler` [Callable]\[[int] | [undefined]\]:[Promise]\[[Any]\] | [Any]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-on-close-option-handler"/><a href="#web-socket-route-on-close-option-handler" class="list-anchor">#</a>
   
   Function that will handle WebSocket closure. Received an optional [close code](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#code) and an optional [close reason](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/close#reason).
 
@@ -233,9 +273,6 @@ web_socket_route.on_message(handler)
 - `handler` [Callable]\[[str]\]:[Promise]\[[Any]\] | [Any]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-on-message-option-handler"/><a href="#web-socket-route-on-message-option-handler" class="list-anchor">#</a>
   
   Function that will handle messages.
-
-**Returns**
-- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-on-message-return"/><a href="#web-socket-route-on-message-return" class="list-anchor">#</a>
 
 ---
 
