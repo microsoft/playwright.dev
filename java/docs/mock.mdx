@@ -150,6 +150,35 @@ mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="op
 
 Read more about [advanced networking](./network.mdx).
 
+## Mock WebSockets
+
+The following code will intercept WebSocket connections and mock entire communcation over the WebSocket, instead of connecting to the server. This example responds to a `"request"` with a `"response"`.
+
+```java
+page.routeWebSocket("wss://example.com/ws", ws -> {
+  ws.onMessage(message -> {
+    if ("request".equals(message))
+      ws.send("response");
+  });
+});
+```
+
+Alternatively, you may want to connect to the actual server, but intercept messages in-between and modify or block them. Here is an example that modifies some of the messages sent by the page to the server, and leaves the rest unmodified.
+
+```java
+page.routeWebSocket("wss://example.com/ws", ws -> {
+  WebSocketRoute server = ws.connectToServer();
+  ws.onMessage(message -> {
+    if ("request".equals(message))
+      server.send("request2");
+    else
+      server.send(message);
+  });
+});
+```
+
+For more details, see [WebSocketRoute].
+
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"

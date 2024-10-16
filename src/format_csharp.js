@@ -100,8 +100,10 @@ class CSharpFormatter {
   formatFunction(args, ret, type) {
     if (type.args.length === 0 && type.returnType.name === 'Promise')
       return `[Func]<[Task]>`;
+    if (type.args.length === 2 && type.args[0].name === 'int?' && type.args[1].name === 'string' && !type.returnType)
+      return 'Action<int?, string>';
     if (type.args.length !== 1)
-      throw new Error('Unsupported number of arguments in function: ' + type);
+      throw new Error('Unsupported number of arguments in function: ' + JSON.stringify(type));
     if (!type.returnType)
       return "[Action]<" + args + ">";
     if (type.returnType.name === 'boolean')
