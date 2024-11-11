@@ -38,7 +38,7 @@ jobs:
         with:
           node-version: 20
       - name: Change branch
-        run:
+        run: |
           git fetch origin
           git checkout roll/stable-${{ steps.determine-version.outputs.result }} || exit 0
       - name: Install dependencies
@@ -70,7 +70,9 @@ jobs:
           fi
           git config --global user.name github-actions
           git config --global user.email 41898282+github-actions[bot]@users.noreply.github.com
-          git checkout -b "$BRANCH_NAME"
+          if [[ "$(git branch --show-current)" != "$BRANCH_NAME" ]]; then
+            git checkout -b "$BRANCH_NAME"
+          fi
           # We only want to upgrade the version itself, not the next release
           git add "*versioned*"
           git add "**/versions.json"
