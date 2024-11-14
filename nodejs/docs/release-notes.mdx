@@ -11,57 +11,105 @@ import LiteYouTube from '@site/src/components/LiteYouTube';
 
 ## Version 1.49
 
-### New Chromium Headless
+### Aria snapshots
 
-Prior to this release, Playwright was running the old established implementation of Chromium headless. However, Chromium had entirely switched to the [new headless mode](https://developer.chrome.com/docs/chromium/headless) implementation, so Playwright had to switch as well.
+New assertion [expect(locator).toMatchAriaSnapshot()](/api/class-locatorassertions.mdx#locator-assertions-to-match-aria-snapshot) verifies page structure by comparing to an expected accessibility tree, represented as YAML.
 
-Most likely, this change should go unnoticed for you. However, the new headless implementation differs in a number of ways, for example when handling pdf documents, so please file an issue if you encounter a problem.
+```js
+await page.goto('https://playwright.dev');
+await expect(page.locator('body')).toMatchAriaSnapshot(`
+  - banner:
+    - heading /Playwright enables reliable/ [level=1]
+    - link "Get started"
+    - link "Star microsoft/playwright on GitHub"
+  - main:
+    - img "Browsers (Chromium, Firefox, WebKit)"
+    - heading "Any browser • Any platform • One API"
+`);
+```
 
-### Chromium Headless Shell
+You can generate this assertion with [Test Generator](./codegen) and update the expected snapshot with `--update-snapshots` command line flag.
 
-Playwright now also ships `chromium-headless-shell` channel that is a separate build that closely follows the old headless implementation. If you would like to keep the old behavior before you are ready to switch to the new headless, please fallback to this channel:
-1. First, install this channel prior to running tests. Make sure to list all browsers that you use.
-   
-   ```bash
-   # running tests in all three browsers, headless and headed
-   npx playwright install chromium chromium-headless-shell firefox webkit
-   
-   # running tests in all three browsers on CI, headless only
-   npx playwright install chromium-headless-shell firefox webkit
-   ```
-   
-1. Update your config file to specify `'chromium-headless-shell'` channel.
-   
-   ```js
-   import { defineConfig, devices } from '@playwright/test';
-   
-   export default defineConfig({
-     projects: [
-       {
-         name: 'chromium',
-         use: {
-           ...devices['Desktop Chrome'],
-           channel: 'chromium-headless-shell',
-         },
-       },
-       {
-         name: 'firefox',
-         use: { ...devices['Desktop Firefox'] },
-       },
-       {
-         name: 'webkit',
-         use: { ...devices['Desktop Safari'] },
-       },
-     ],
-   });
-   ```
-   
-1. Note that `chromium-headless-shell` channel only supports headless operations. If you try to run tests in headed mode, it will automatically fallback to regular `chromium`.
+Learn more in the [aria snapshots guide](./aria-snapshots).
+
+### Test runner
+- New option [testConfig.tsconfig](/api/class-testconfig.mdx#test-config-tsconfig) allows to specify a single `tsconfig` to be used for all tests.
+- New method [test.fail.only()](/api/class-test.mdx#test-fail-only) to focus on a failing test.
+- Options [testConfig.globalSetup](/api/class-testconfig.mdx#test-config-global-setup) and [testConfig.globalTeardown](/api/class-testconfig.mdx#test-config-global-teardown) now support multiple setups/teardowns.
+- New value `'on-first-failure'` for [testOptions.screenshot](/api/class-testoptions.mdx#test-options-screenshot).
+- Added "previous" and "next" buttons to the HTML report to quickly switch between test cases.
+- New properties [testInfoError.cause](/api/class-testinfoerror.mdx#test-info-error-cause) and [testError.cause](/api/class-testerror.mdx#test-error-cause) mirroring [`Error.cause`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Error/cause).
+
+### Breaking: `chrome` and `msedge` channels switch to new headless mode
+
+Chromium recently introduced a new mode for [headless operation](https://developer.chrome.com/docs/chromium/headless). While Playwright was able to continue using the old, established mode in previous versions, the old mode got removed from the chromium binary and is now distributed separately.
+
+![Chromium Headless](https://github.com/user-attachments/assets/2829e86a-dfe2-4743-a6d4-2aa65beea890)
+
+To prevent breaking changes, Playwright continues making both modes available in the standard `chromium` channel for the foreseeable future by downloading both distributables. Since branded browser distributables are subject to the removal of the old mode, Playwright uses the new mode with them starting with this version. This keeps your tests running, but it comes with changes in behavior that might affect your test suite.
+
+#### Am I affected?
+
+This change affects you if you're using one of the following channels in your Playwright configuration:
+- `chrome`, `chrome-dev`, `chrome-beta`, or `chrome-canary`
+- `msedge`, `msedge-dev`, `msedge-beta`, or `msedge-canary`
+
+If your `playwright.config.ts` doesn't contain any `channel: '...'` options, or none of them specify one of the above channels, you're not affected by this change today.
+
+#### What do I need to do?
+
+After updating to Playwright 1.49, run your test suite. If it still passes, you're good to go. If not, you will probably need to update your snapshots, and adapt some of your test code around PDF viewers and extensions. See [issue #33566](https://github.com/microsoft/playwright/issues/33566) for more details.
+
+#### Saving CI resources
+
+To keep both headless modes available, Playwright now downloads two different browser builds. One is regular headed chromium, and the other is a chromium headless shell. If you are running only headless tests, for example on CI, you can save resources by explictly specifying that you only need the headless shell:
+
+```bash
+# only running tests headlessly
+npx playwright install chromium-headless-shell firefox webkit
+```
+
+#### Opt-in to new headless mode
+
+To prevent breaking changes in the future, we encourage you to try switching to the new headless mode today. You can do this by opting into the `chromium-next` channel.
+
+First, install it prior to running tests. 
+
+```bash
+npx playwright install chromium-next firefox webkit # don't forget to list all browsers you use!
+```
+
+Then update your config file to specify the `'chromium-next'` channel.
+
+```js
+import { defineConfig, devices } from '@playwright/test';
+export default defineConfig({
+  projects: [
+    {
+      name: 'chromium',
+      use: {
+        ...devices['Desktop Chrome'],
+        channel: 'chromium-next',
+      },
+    },
+  ],
+});
+```
+
+### Other breaking changes
+- There will be no more updates for WebKit on Ubuntu 20.04 and Debian 11. We recommend updating your OS to a later version.
+- Package `@playwright/experimental-ct-vue2` will no longer be updated.
+- Package `@playwright/experimental-ct-solid` will no longer be updated.
+
+### Miscellaneous
+- `<canvas>` elements inside a snapshot now draw a preview.
+- New method [tracing.group()](/api/class-tracing.mdx#tracing-group) to visually group actions in the trace.
+- Playwright docker images switched from Node.js v20 to Node.js v22 LTS.
 
 ### Browser Versions
-- Chromium 131.0.6778.24
+- Chromium 131.0.6778.33
 - Mozilla Firefox 132.0
-- WebKit 18.0
+- WebKit 18.2
 
 This version was also tested against the following stable channels:
 - Google Chrome 130
