@@ -26,7 +26,7 @@ import liveStreams from '@site/src/data/live-streams';
 const TITLE = 'Live Streams';
 const DESCRIPTION = 'Check out the latest Playwright live streams';
 
-export default function Video(): JSX.Element {
+export default function Video(): React.ReactElement {
   return (
     <Layout title={TITLE} description={DESCRIPTION}>
       <main className="margin-vert--lg">

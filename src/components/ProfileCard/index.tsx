@@ -75,7 +75,7 @@ function ProfileCard({ person, className }: ProfileProps) {
   );
 }
 
-export function ProfileCards({ people }): JSX.Element {
+export function ProfileCards({ people }): React.ReactElement {
   return (
     <section className="margin-top--lg margin-bottom--xl">
       <div className="container">

@@ -26,7 +26,7 @@ import videoNav from '@site/src/data/video-nav';
 const TITLE = 'Conference Videos';
 const DESCRIPTION = 'Check out the latest conference talks on Playwright';
 
-export default function Video(): JSX.Element {
+export default function Video(): React.ReactElement {
   return (
     <Layout title={TITLE} description={DESCRIPTION}>
       <main className="margin-vert--lg">
