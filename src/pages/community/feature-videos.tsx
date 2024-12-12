@@ -26,7 +26,7 @@ import featureVideos from '@site/src/data/feature-videos';
 const TITLE = 'Feature Videos';
 const DESCRIPTION = 'Check out the latest Playwright feature videos';
 
-export default function Video(): JSX.Element {
+export default function Video(): React.ReactElement {
   return (
     <Layout title={TITLE} description={DESCRIPTION}>
       <main className="margin-vert--lg">

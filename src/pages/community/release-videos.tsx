@@ -26,7 +26,7 @@ import releaseVideos from '@site/src/data/release-videos';
 const TITLE = 'Release Videos';
 const DESCRIPTION = 'Check out the latest Playwright release videos';
 
-export default function Video(): JSX.Element {
+export default function Video(): React.ReactElement {
   return (
     <Layout title={TITLE} description={DESCRIPTION}>
       <main className="margin-vert--lg">
