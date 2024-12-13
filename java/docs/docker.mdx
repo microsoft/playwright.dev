@@ -70,6 +70,50 @@ Using `--ipc=host` is recommended when using Chrome ([Docker docs](https://docs.
 
 See our [Continuous Integration guides](./ci.mdx) for sample configs.
 
+### Remote Connection
+
+You can run Playwright Server in Docker while keeping your tests running on the host system or another machine. This is useful for running tests on unsupported Linux distributions or remote execution scenarios.
+
+#### Running the Playwright Server
+
+Start the Playwright Server in Docker:
+
+```bash
+docker run -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.49.0-noble /bin/sh -c "npx -y playwright@1.49.0 run-server --port 3000 --host 0.0.0.0"
+```
+
+#### Connecting to the Server
+
+```java
+package org.example;
+
+import com.microsoft.playwright.*;
+import java.nio.file.Paths;
+
+public class App {
+  public static void main(String[] args) {
+    try (Playwright playwright = Playwright.create()) {
+      Browser browser = playwright.chromium().connect("ws://127.0.0.1:3000/");
+    }
+  }
+}
+```
+
+#### Network Configuration
+
+If you need to access local servers from within the Docker container:
+
+```bash
+docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.49.0-noble /bin/sh -c "npx -y playwright@1.49.0 run-server --port 3000 --host 0.0.0.0"
+```
+
+This makes `hostmachine` point to the host's localhost. Your tests should use `hostmachine` instead of `localhost` when accessing local servers.
+
+:::note
+
+When running tests remotely, ensure the Playwright version in your tests matches the version running in the Docker container.
+:::
+
 ## Image tags
 
 See [all available image tags].
