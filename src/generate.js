@@ -156,12 +156,12 @@ async function syncWithWorkingDirectory(event, from) {
   if (isWatch) {
     chokidar.watch(srcDir, { ignoreInitial: true }).on('all', (event, path) => {
       generateDocsForLanguages().catch((error) => {
-        console.error(`Error auto syncing docs (generating): ${error}`);
+        console.error(`Error auto syncing docs (generating)`, error);
       })
     });
     chokidar.watch(path.join(__dirname, '..', lang2Folder[watchProject])).on('all', (event, path) => {
       syncWithWorkingDirectory(event, path).catch(error => {
-        console.error(`Error auto syncing docs (mirroring): ${error}`);
+        console.error(`Error auto syncing docs (mirroring)`, error);
       })
     });
     await generateDocsForLanguages();
