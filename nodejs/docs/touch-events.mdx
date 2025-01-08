@@ -1,6 +1,6 @@
 ---
-id: intro
-title: "Installation"
+id: touch-events
+title: "Emulating touch events"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -8,253 +8,148 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Introduction
 
-Playwright Test was created specifically to accommodate the needs of end-to-end testing. Playwright supports all modern rendering engines including Chromium, WebKit, and Firefox. Test on Windows, Linux, and macOS, locally or on CI, headless or headed with native mobile emulation of Google Chrome for Android and Mobile Safari.
+Mobile web sites may listen to [touch events](https://developer.mozilla.org/en-US/docs/Web/API/Touch_events) and react to user touch gestures such as swipe, pinch, tap etc. To test this functionality you can manually generate [TouchEvent]s in the page context using [locator.evaluate()](/api/class-locator.mdx#locator-evaluate).
 
-**You will learn**
-- [How to install Playwright](/intro.mdx#installing-playwright)
-- [What's Installed](/intro.mdx#whats-installed)
-- [How to run the example test](/intro.mdx#running-the-example-test)
-- [How to open the HTML test report](/intro.mdx#html-test-reports)
+If your web application relies on [pointer events](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events) instead of touch events, you can use [locator.click()](/api/class-locator.mdx#locator-click) and raw [`Mouse`] events to simulate a single-finger touch, and this will trigger all the same pointer events.
 
-## Installing Playwright
+### Dispatching TouchEvent
 
-Get started by installing Playwright using npm, yarn or pnpm. Alternatively you can also get started and run your tests using the [VS Code Extension](./getting-started-vscode.mdx).
+You can dispatch touch events to the page using [locator.dispatchEvent()](/api/class-locator.mdx#locator-dispatch-event). [Touch](https://developer.mozilla.org/en-US/docs/Web/API/Touch) points can be passed as arguments, see examples below.
 
-<Tabs defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
+:::note
 
-<TabItem value="npm">
+The examples work only in Chromium and Firefox, as the [`Touch()`](https://developer.mozilla.org/en-US/docs/Web/API/Touch/Touch) constructor is not supported in WebKit.
+:::
 
-```bash
-npm init playwright@latest
+#### Emulating pan gesture
+
+In the example below, we emulate pan gesture that is expected to move the map. The app under test only uses `clientX/clientY` coordinates of the touch point, so we initialize just that. In a more complex scenario you may need to also set `pageX/pageY/screenX/screenY`, if your app needs them.
+
+```js
+import { test, expect, devices, type Locator } from '@playwright/test';
+
+test.use({ ...devices['Pixel 7'] });
+
+async function pan(locator: Locator, deltaX?: number, deltaY?: number, steps?: number) {
+  const { centerX, centerY } = await locator.evaluate((target: HTMLElement) => {
+    const bounds = target.getBoundingClientRect();
+    const centerX = bounds.left + bounds.width / 2;
+    const centerY = bounds.top + bounds.height / 2;
+    return { centerX, centerY };
+  });
+
+  // Providing only clientX and clientY as the app only cares about those.
+  const touches = [{
+    identifier: 0,
+    clientX: centerX,
+    clientY: centerY,
+  }];
+  await locator.dispatchEvent('touchstart',
+      { touches, changedTouches: touches, targetTouches: touches });
+
+  steps = steps ?? 5;
+  deltaX = deltaX ?? 0;
+  deltaY = deltaY ?? 0;
+  for (let i = 1; i <= steps; i++) {
+    const touches = [{
+      identifier: 0,
+      clientX: centerX + deltaX * i / steps,
+      clientY: centerY + deltaY * i / steps,
+    }];
+    await locator.dispatchEvent('touchmove',
+        { touches, changedTouches: touches, targetTouches: touches });
+  }
+
+  await locator.dispatchEvent('touchend');
+}
+
+test(`pan gesture to move the map`, async ({ page }) => {
+  await page.goto('https://www.google.com/maps/place/@37.4117722,-122.0713234,15z',
+      { waitUntil: 'commit' });
+  await page.getByRole('button', { name: 'Keep using web' }).click();
+  await expect(page.getByRole('button', { name: 'Keep using web' })).not.toBeVisible();
+  // Get the map element.
+  const met = page.locator('[data-test-id="met"]');
+  for (let i = 0; i < 5; i++)
+    await pan(met, 200, 100);
+  // Ensure the map has been moved.
+  await expect(met).toHaveScreenshot();
+});
 ```
 
-</TabItem>
+#### Emulating pinch gesture
 
-<TabItem value="yarn">
+In the example below, we emulate pinch gesture, i.e. two touch points moving closer to each other. It is expected to zoom out the map. The app under test only uses `clientX/clientY` coordinates of touch points, so we initialize just that. In a more complex scenario you may need to also set `pageX/pageY/screenX/screenY`, if your app needs them.
 
-```bash
-yarn create playwright
+```js
+import { test, expect, devices, type Locator } from '@playwright/test';
+
+test.use({ ...devices['Pixel 7'] });
+
+async function pinch(locator: Locator,
+  arg: { deltaX?: number, deltaY?: number, steps?: number, direction?: 'in' | 'out' }) {
+  const { centerX, centerY } = await locator.evaluate((target: HTMLElement) => {
+    const bounds = target.getBoundingClientRect();
+    const centerX = bounds.left + bounds.width / 2;
+    const centerY = bounds.top + bounds.height / 2;
+    return { centerX, centerY };
+  });
+
+  const deltaX = arg.deltaX ?? 50;
+  const steps = arg.steps ?? 5;
+  const stepDeltaX = deltaX / (steps + 1);
+
+  // Two touch points equally distant from the center of the element.
+  const touches = [
+    {
+      identifier: 0,
+      clientX: centerX - (arg.direction === 'in' ? deltaX : stepDeltaX),
+      clientY: centerY,
+    },
+    {
+      identifier: 1,
+      clientX: centerX + (arg.direction === 'in' ? deltaX : stepDeltaX),
+      clientY: centerY,
+    },
+  ];
+  await locator.dispatchEvent('touchstart',
+      { touches, changedTouches: touches, targetTouches: touches });
+
+  // Move the touch points towards or away from each other.
+  for (let i = 1; i <= steps; i++) {
+    const offset = (arg.direction === 'in' ? (deltaX - i * stepDeltaX) : (stepDeltaX * (i + 1)));
+    const touches = [
+      {
+        identifier: 0,
+        clientX: centerX - offset,
+        clientY: centerY,
+      },
+      {
+        identifier: 0,
+        clientX: centerX + offset,
+        clientY: centerY,
+      },
+    ];
+    await locator.dispatchEvent('touchmove',
+        { touches, changedTouches: touches, targetTouches: touches });
+  }
+
+  await locator.dispatchEvent('touchend', { touches: [], changedTouches: [], targetTouches: [] });
+}
+
+test(`pinch in gesture to zoom out the map`, async ({ page }) => {
+  await page.goto('https://www.google.com/maps/place/@37.4117722,-122.0713234,15z',
+      { waitUntil: 'commit' });
+  await page.getByRole('button', { name: 'Keep using web' }).click();
+  await expect(page.getByRole('button', { name: 'Keep using web' })).not.toBeVisible();
+  // Get the map element.
+  const met = page.locator('[data-test-id="met"]');
+  for (let i = 0; i < 5; i++)
+    await pinch(met, { deltaX: 40, direction: 'in' });
+  // Ensure the map has been zoomed out.
+  await expect(met).toHaveScreenshot();
+});
 ```
-
-</TabItem>
-
-<TabItem value="pnpm">
-
-```bash
-pnpm create playwright
-```
-
-</TabItem>
-
-</Tabs>
-
-Run the install command and select the following to get started:
-- Choose between TypeScript or JavaScript (default is TypeScript)
-- Name of your Tests folder (default is tests or e2e if you already have a tests folder in your project)
-- Add a GitHub Actions workflow to easily run tests on CI
-- Install Playwright browsers (default is true)
-
-## What's Installed
-
-Playwright will download the browsers needed as well as create the following files.
-
-```bash
-playwright.config.ts
-package.json
-package-lock.json
-tests/
-  example.spec.ts
-tests-examples/
-  demo-todo-app.spec.ts
-```
-
-The [playwright.config](./test-configuration.mdx) is where you can add configuration for Playwright including modifying which browsers you would like to run Playwright on. If you are running tests inside an already existing project then dependencies will be added directly to your `package.json`.
-
-The `tests` folder contains a basic example test to help you get started with testing. For a more detailed example check out the `tests-examples` folder which contains tests written to test a todo app.
-
-## Running the Example Test
-
-By default tests will be run on all 3 browsers, Chromium, Firefox and WebKit using 3 workers. This can be configured in the [playwright.config file](./test-configuration.mdx). Tests are run in headless mode meaning no browser will open up when running the tests. Results of the tests and test logs will be shown in the terminal.
-
-<Tabs defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
-
-<TabItem value="npm">
-
-```bash
-npx playwright test
-```
-
-</TabItem>
-
-<TabItem value="yarn">
-
-```bash
-yarn playwright test
-```
-
-</TabItem>
-
-<TabItem value="pnpm">
-
-```bash
-pnpm exec playwright test
-```
-
-</TabItem>
-
-</Tabs>
-
-![tests running in command line](https://github.com/microsoft/playwright/assets/13063165/981c1b2b-dc7e-4b85-b241-272b44da6628)  See our doc on [Running Tests](./running-tests.mdx) to learn more about running tests in headed mode, running multiple tests, running specific tests etc.
-
-## HTML Test Reports
-
-After your test completes, an [HTML Reporter](./test-reporters.mdx#html-reporter) will be generated, which shows you a full report of your tests allowing you to filter the report by browsers, passed tests, failed tests, skipped tests and flaky tests. You can click on each test and explore the test's errors as well as each step of the test. By default, the HTML report is opened automatically if some of the tests failed.
-
-<Tabs defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
-
-<TabItem value="npm">
-
-```bash
-npx playwright show-report
-```
-
-</TabItem>
-
-<TabItem value="yarn">
-
-```bash
-yarn playwright show-report
-```
-
-</TabItem>
-
-<TabItem value="pnpm">
-
-```bash
-pnpm exec playwright show-report
-```
-
-</TabItem>
-
-</Tabs>
-
-![HTML Report](https://github.com/microsoft/playwright/assets/13063165/38ec17a7-9e61-4002-b137-a93812765501)
-
-## Running the Example Test in UI Mode
-
-Run your tests with [UI Mode](./test-ui-mode.mdx) for a better developer experience with time travel debugging, watch mode and more.
-
-<Tabs defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
-
-<TabItem value="npm">
-
-```bash
-npx playwright test --ui
-```
-
-</TabItem>
-
-<TabItem value="yarn">
-
-```bash
-yarn playwright test --ui
-```
-
-</TabItem>
-
-<TabItem value="pnpm">
-
-```bash
-pnpm exec playwright test --ui
-```
-
-</TabItem>
-
-</Tabs>
-
-![UI Mode](https://github.com/microsoft/playwright/assets/13063165/c5b501cc-4f5d-485a-87cc-66044c651786)
-
-Check out or [detailed guide on UI Mode](./test-ui-mode.mdx) to learn more about its features.
-
-## Updating Playwright
-
-To update Playwright to the latest version run the following command:
-
-<Tabs defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
-
-<TabItem value="npm">
-
-```bash
-npm install -D @playwright/test@latest
-# Also download new browser binaries and their dependencies:
-npx playwright install --with-deps
-```
-
-</TabItem>
-
-<TabItem value="yarn">
-
-```bash
-yarn add --dev @playwright/test@latest
-# Also download new browser binaries and their dependencies:
-yarn playwright install --with-deps
-```
-
-</TabItem>
-
-<TabItem value="pnpm">
-
-```bash
-pnpm install --save-dev @playwright/test@latest
-# Also download new browser binaries and their dependencies:
-pnpm exec playwright install --with-deps
-```
-
-</TabItem>
-
-</Tabs>
-
-You can always check which version of Playwright you have by running the following command:
-
-<Tabs defaultValue="npm" values={[ {label: 'npm', value: 'npm'}, {label: 'yarn', value: 'yarn'}, {label: 'pnpm', value: 'pnpm'} ] }>
-
-<TabItem value="npm">
-
-```bash
-npx playwright --version
-```
-
-</TabItem>
-
-<TabItem value="yarn">
-
-```bash
-yarn playwright --version
-```
-
-</TabItem>
-
-<TabItem value="pnpm">
-
-```bash
-pnpm exec playwright --version
-```
-
-</TabItem>
-
-</Tabs>
-
-## System requirements
-- Latest version of Node.js 18, 20 or 22.
-- Windows 10+, Windows Server 2016+ or Windows Subsystem for Linux (WSL).
-- macOS 13 Ventura, or later.
-- Debian 12, Ubuntu 22.04, Ubuntu 24.04, on x86-64 and arm64 architecture.
-
-## What's next
-- [Write tests using web first assertions, page fixtures and locators](./writing-tests.mdx)
-- [Run single test, multiple tests, headed mode](./running-tests.mdx)
-- [Generate tests with Codegen](./codegen-intro.mdx)
-- [See a trace of your tests](./trace-viewer-intro.mdx)
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
