@@ -200,8 +200,13 @@ import HTMLCard from '@site/src/components/HTMLCard';
       for (const { name: memberName, usages, args, signatures } of this.formatter.formatMember(member)) {
         let name = memberName;
         // Use test. prefix for test.* members for readability.
-        if (membersWithOverloads.has(name) && signatures)
-          name = `${name}(${signatures[0]})`;
+        if (membersWithOverloads.has(name) && signatures) {
+          // Pick first non-empty signature if any that way following will stand:
+          // - toMatchAriaSnapshot(expected) signatures=['expected', 'expected, options']
+          // - toMatchAriaSnapshot(options)  signatures=['options']
+          const signature = signatures.find(s => !!s.trim()) || '';
+          name = `${name}(${signature})`;
+        }
         if (clazz.varName === 'test')
           name = `test.${name}`;
 
