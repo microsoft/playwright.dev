@@ -28,6 +28,9 @@ node src/versions.js --delete 1.16
 npm run start-nodejs
 ```
 
+> [!IMPORTANT]  
+> The docs will start up in "current release" mode by default. To see the latest version of the docs (and likely your changes), visit `/next` or press shift 5 times.
+
 See `package.json` for other languages (java, python, .NET).
 
 ### Run prod build and serve
