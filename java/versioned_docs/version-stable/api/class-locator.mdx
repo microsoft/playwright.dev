@@ -115,7 +115,7 @@ Locator button = page.getByRole(AriaRole.BUTTON).and(page.getByTitle("Subscribe"
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.49</font><x-search>locator.ariaSnapshot</x-search>
 
-Captures the aria snapshot of the given element. Read more about [aria snapshots](../aria-snapshots.mdx) and [assertThat(locator).matchesAriaSnapshot()](/api/class-locatorassertions.mdx#locator-assertions-to-match-aria-snapshot) for the corresponding assertion.
+Captures the aria snapshot of the given element. Read more about [aria snapshots](../aria-snapshots.mdx) and [assertThat(locator).matchesAriaSnapshot()](/api/class-locatorassertions.mdx#locator-assertions-to-match-aria-snapshot-1) for the corresponding assertion.
 
 **Usage**
 
@@ -571,7 +571,6 @@ Since [eventInit](/api/class-locator.mdx#locator-dispatch-event-option-event-ini
 You can also specify [JSHandle] as the property value if you want live objects to be passed into the event:
 
 ```java
-// Note you can only create DataTransfer in Chromium and Firefox
 JSHandle dataTransfer = page.evaluateHandle("() => new DataTransfer()");
 Map<String, Object> arg = new HashMap<>();
 arg.put("dataTransfer", dataTransfer);
@@ -1493,7 +1492,7 @@ boolean disabled = page.getByRole(AriaRole.BUTTON).isDisabled();
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.isEditable</x-search>
 
-Returns whether the element is [editable](../actionability.mdx#editable).
+Returns whether the element is [editable](../actionability.mdx#editable). If the target element is not an `<input>`, `<textarea>`, `<select>`, `[contenteditable]` and does not have a role allowing `[aria-readonly]`, this method throws an error.
 
 :::warning[Asserting editable state]
 
@@ -1694,16 +1693,21 @@ Locator banana = page.getByRole(AriaRole.LISTITEM).nth(2);
 
 Creates a locator matching all elements that match one or both of the two locators.
 
-Note that when both locators match something, the resulting locator will have multiple matches and violate [locator strictness](../locators.mdx#strictness) guidelines.
+Note that when both locators match something, the resulting locator will have multiple matches, potentially causing a [locator strictness](../locators.mdx#strictness) violation.
 
 **Usage**
 
 Consider a scenario where you'd like to click on a "New email" button, but sometimes a security settings dialog shows up instead. In this case, you can wait for either a "New email" button, or a dialog and act accordingly.
 
+:::note
+
+If both "New email" button and security dialog appear on screen, the "or" locator will match both of them, possibly throwing the ["strict mode violation" error](../locators.mdx#strictness). In this case, you can use [Locator.first()](/api/class-locator.mdx#locator-first) to only match one of them.
+:::
+
 ```java
 Locator newEmail = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("New"));
 Locator dialog = page.getByText("Confirm security settings");
-assertThat(newEmail.or(dialog)).isVisible();
+assertThat(newEmail.or(dialog).first()).isVisible();
 if (dialog.isVisible())
   page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Dismiss")).click();
 newEmail.click();

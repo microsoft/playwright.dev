@@ -1,6 +1,6 @@
 ---
-id: library
-title: "Getting started - Library"
+id: touch-events
+title: "Emulating touch events"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -8,94 +8,21 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 ## Introduction
 
-Playwright can either be used with the [MSTest, NUnit, or xUnit base classes](./test-runners.mdx) or as a Playwright Library (this guide). If you are working on an application that utilizes Playwright capabilities or you are using Playwright with another test runner, read on.
+Mobile web sites may listen to [touch events](https://developer.mozilla.org/en-US/docs/Web/API/Touch_events) and react to user touch gestures such as swipe, pinch, tap etc. To test this functionality you can manually generate [TouchEvent]s in the page context using [Locator.EvaluateAsync()](/api/class-locator.mdx#locator-evaluate).
 
-## Usage
+If your web application relies on [pointer events](https://developer.mozilla.org/en-US/docs/Web/API/Pointer_events) instead of touch events, you can use [Locator.ClickAsync()](/api/class-locator.mdx#locator-click) and raw [`Mouse`] events to simulate a single-finger touch, and this will trigger all the same pointer events.
 
-Create a console project and add the Playwright dependency.
+### Dispatching TouchEvent
 
-```bash
-# Create project
-dotnet new console -n PlaywrightDemo
-cd PlaywrightDemo
+You can dispatch touch events to the page using [Locator.DispatchEventAsync()](/api/class-locator.mdx#locator-dispatch-event). [Touch](https://developer.mozilla.org/en-US/docs/Web/API/Touch) points can be passed as arguments, see examples below.
 
-# Add project dependency
-dotnet add package Microsoft.Playwright
-# Build the project
-dotnet build
-# Install required browsers - replace netX with actual output folder name, e.g. net8.0.
-pwsh bin/Debug/netX/playwright.ps1 install
+#### Emulating pan gesture
 
-# If the pwsh command does not work (throws TypeNotFound), make sure to use an up-to-date version of PowerShell.
-dotnet tool update --global PowerShell
-```
+In the example below, we emulate pan gesture that is expected to move the map. The app under test only uses `clientX/clientY` coordinates of the touch point, so we initialize just that. In a more complex scenario you may need to also set `pageX/pageY/screenX/screenY`, if your app needs them.
 
-Create a `Program.cs` that will navigate to `https://playwright.dev/dotnet` and take a screenshot in Chromium.
+#### Emulating pinch gesture
 
-```csharp
-using Microsoft.Playwright;
-
-using var playwright = await Playwright.CreateAsync();
-await using var browser = await playwright.Chromium.LaunchAsync();
-var page = await browser.NewPageAsync();
-await page.GotoAsync("https://playwright.dev/dotnet");
-await page.ScreenshotAsync(new()
-{
-    Path = "screenshot.png"
-});
-```
-
-Now run it.
-
-```bash
-dotnet run
-```
-
-By default, Playwright runs the browsers in headless mode. To see the browser UI, set [Headless](/api/class-browsertype.mdx#browser-type-launch-option-headless) option to `false`. You can also use [SlowMo](/api/class-browsertype.mdx#browser-type-launch-option-slow-mo) to slow down execution. Learn more in the debugging tools [section](./debug.mdx).
-
-```csharp
-await using var browser = await playwright.Firefox.LaunchAsync(new()
-{
-    Headless = false,
-    SlowMo = 50,
-});
-```
-
-## Using Assertions
-
-You can do the following to leverage Playwright's web-first assertions when you are using your own test framework. These will automatically retry until the condition is met, e.g. an element has a certain text or the timeout is reached:
-
-```csharp
-using Microsoft.Playwright;
-using static Microsoft.Playwright.Assertions;
-
-// Change the default 5 seconds timeout if you'd like.
-SetDefaultExpectTimeout(10_000);
-
-using var playwright = await Playwright.CreateAsync();
-await using var browser = await playwright.Chromium.LaunchAsync();
-var page = await browser.NewPageAsync();
-await page.GotoAsync("https://playwright.dev/dotnet");
-await Expect(page.GetByRole(AriaRole.Link, new() { Name = "Get started" })).ToBeVisibleAsync();
-```
-
-## Bundle drivers for different platforms
-
-Playwright by default does bundle only the driver for the .NET publish target runtime. If you want to bundle for additional platforms, you can override this behavior by using either `all`, `none` or `linux`, `win`, `osx` in your project file.
-
-```xml
-<PropertyGroup>
-  <PlaywrightPlatform>all</PlaywrightPlatform>
-</PropertyGroup>
-```
-
-or:
-
-```xml
-<PropertyGroup>
-  <PlaywrightPlatform>osx;linux</PlaywrightPlatform>
-</PropertyGroup>
-```
+In the example below, we emulate pinch gesture, i.e. two touch points moving closer to each other. It is expected to zoom out the map. The app under test only uses `clientX/clientY` coordinates of touch points, so we initialize just that. In a more complex scenario you may need to also set `pageX/pageY/screenX/screenY`, if your app needs them.
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
