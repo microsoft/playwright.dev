@@ -15,6 +15,109 @@ Playwright Trace Viewer is a GUI tool that helps you explore recorded Playwright
 ###### 
 <LiteYouTube id="yP6AnTxC34s" title="Viewing Playwright Traces" />
 
+## Opening Trace Viewer
+
+You can open a saved trace using either the Playwright CLI or in the browser at [trace.playwright.dev](https://trace.playwright.dev). Make sure to add the full path to where your `trace.zip` file is located.
+
+```bash
+npx playwright show-trace path/to/trace.zip
+```
+
+### Using [trace.playwright.dev](https://trace.playwright.dev)
+
+[trace.playwright.dev](https://trace.playwright.dev) is a statically hosted variant of the Trace Viewer. You can upload trace files using drag and drop or via the `Select file(s)` button.
+
+Trace Viewer loads the trace entirely in your browser and does not transmit any data externally.
+
+<img width="1119" alt="Drop Playwright Trace to load" src="https://user-images.githubusercontent.com/13063165/194577918-b4d45726-2692-4093-8a28-9e73552617ef.png" />
+
+### Viewing remote traces
+
+You can open remote traces directly using its URL. This makes it easy to view the remote trace without having to manually download the file from CI runs, for example.
+
+```bash
+npx playwright show-trace https://example.com/trace.zip
+```
+
+When using [trace.playwright.dev](https://trace.playwright.dev), you can also pass the URL of your uploaded trace at some accessible storage (e.g. inside your CI) as a query parameter. CORS (Cross-Origin Resource Sharing) rules might apply.
+
+```txt
+https://trace.playwright.dev/?trace=https://demo.playwright.dev/reports/todomvc/data/cb0fa77ebd9487a5c899f3ae65a7ffdbac681182.zip
+```
+
+## Recording a trace
+
+### Tracing locally
+
+To record a trace during development mode set the `--trace` flag to `on` when running your tests. You can also use [UI Mode](./test-ui-mode.mdx) for a better developer experience, as it traces each test automatically.
+
+```bash
+npx playwright test --trace on
+```
+
+You can then open the HTML report and click on the trace icon to open the trace.
+
+```bash
+npx playwright show-report
+```
+
+### Tracing on CI
+
+Traces should be run on continuous integration on the first retry of a failed test by setting the `trace: 'on-first-retry'` option in the test configuration file. This will produce a `trace.zip` file for each test that was retried.
+
+<Tabs
+  groupId="js-flavor"
+  defaultValue="test"
+  values={[
+    {label: 'Test', value: 'test'},
+    {label: 'Library', value: 'library'}
+  ]
+}>
+<TabItem value="test">
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+export default defineConfig({
+  retries: 1,
+  use: {
+    trace: 'on-first-retry',
+  },
+});
+```
+
+</TabItem>
+<TabItem value="library">
+
+```js
+const browser = await chromium.launch();
+const context = await browser.newContext();
+
+// Start tracing before creating / navigating a page.
+await context.tracing.start({ screenshots: true, snapshots: true });
+
+const page = await context.newPage();
+await page.goto('https://playwright.dev');
+
+// Stop tracing and export it into a zip archive.
+await context.tracing.stop({ path: 'trace.zip' });
+```
+
+</TabItem>
+</Tabs>
+
+Available options to record a trace:
+- `'on-first-retry'` - Record a trace only when retrying a test for the first time.
+- `'on-all-retries'` - Record traces for all test retries.
+- `'off'` - Do not record a trace.
+- `'on'` - Record a trace for each test. (not recommended as it's performance heavy)
+- `'retain-on-failure'` - Record a trace for each test, but remove it from successful test runs.
+
+You can also use `trace: 'retain-on-failure'` if you do not enable retries but still want traces for failed tests.
+
+There are more granular options available, see [testOptions.trace](/api/class-testoptions.mdx#test-options-trace).
+
+If you are not using Playwright as a Test Runner, use the [browserContext.tracing](/api/class-browsercontext.mdx#browser-context-tracing) API instead.
+
 ## Trace Viewer features
 
 ### Actions
@@ -24,9 +127,9 @@ In the Actions tab you can see what locator was used for every action and how lo
 ![actions tab in trace viewer](https://github.com/microsoft/playwright/assets/13063165/948b65cd-f0fd-4c7f-8e53-2c632b5a07f1)
 
 **Selecting each action reveals:**
-- action snapshots
-- action log
-- source code location
+- Action snapshots
+- Action log
+- Source code location
 
 ### Screenshots
 
@@ -107,105 +210,6 @@ Next to the Actions tab you will find the Metadata tab which will show you more 
 The "Attachments" tab allows you to explore attachments. If you're doing [visual regression testing](./test-snapshots.mdx), you'll be able to compare screenshots by examining the image diff, the actual image and the expected image. When you click on the expected image you can use the slider to slide one image over the other so you can easily see the differences in your screenshots.
 
 ![attachments tab in trace viewer](https://github.com/microsoft/playwright/assets/13063165/4386178a-5808-4fa8-9436-315350a23b04)
-
-## Recording a trace locally
-
-To record a trace during development mode set the `--trace` flag to `on` when running your tests. You can also use [UI Mode](./test-ui-mode.mdx) for a better developer experience.
-
-```bash
-npx playwright test --trace on
-```
-
-You can then open the HTML report and click on the trace icon to open the trace.
-
-```bash
-npx playwright show-report
-```
-
-## Recording a trace on CI
-
-Traces should be run on continuous integration on the first retry of a failed test by setting the `trace: 'on-first-retry'` option in the test configuration file. This will produce a `trace.zip` file for each test that was retried.
-
-<Tabs
-  groupId="js-flavor"
-  defaultValue="test"
-  values={[
-    {label: 'Test', value: 'test'},
-    {label: 'Library', value: 'library'}
-  ]
-}>
-<TabItem value="test">
-
-```js title="playwright.config.ts"
-import { defineConfig } from '@playwright/test';
-export default defineConfig({
-  retries: 1,
-  use: {
-    trace: 'on-first-retry',
-  },
-});
-```
-
-</TabItem>
-<TabItem value="library">
-
-```js
-const browser = await chromium.launch();
-const context = await browser.newContext();
-
-// Start tracing before creating / navigating a page.
-await context.tracing.start({ screenshots: true, snapshots: true });
-
-const page = await context.newPage();
-await page.goto('https://playwright.dev');
-
-// Stop tracing and export it into a zip archive.
-await context.tracing.stop({ path: 'trace.zip' });
-```
-
-</TabItem>
-</Tabs>
-
-Available options to record a trace:
-- `'on-first-retry'` - Record a trace only when retrying a test for the first time.
-- `'on-all-retries'` - Record traces for all test retries.
-- `'off'` - Do not record a trace.
-- `'on'` - Record a trace for each test. (not recommended as it's performance heavy)
-- `'retain-on-failure'` - Record a trace for each test, but remove it from successful test runs.
-
-You can also use `trace: 'retain-on-failure'` if you do not enable retries but still want traces for failed tests.
-
-There are more granular options available, see [testOptions.trace](/api/class-testoptions.mdx#test-options-trace).
-
-If you are not using Playwright as a Test Runner, use the [browserContext.tracing](/api/class-browsercontext.mdx#browser-context-tracing) API instead.
-
-## Opening the trace
-
-You can open the saved trace using the Playwright CLI or in your browser on [`trace.playwright.dev`](https://trace.playwright.dev). Make sure to add the full path to where your `trace.zip` file is located.
-
-```bash
-npx playwright show-trace path/to/trace.zip
-```
-
-## Using [trace.playwright.dev](https://trace.playwright.dev)
-
-[trace.playwright.dev](https://trace.playwright.dev) is a statically hosted variant of the Trace Viewer. You can upload trace files using drag and drop.
-
-<img width="1119" alt="Drop Playwright Trace to load" src="https://user-images.githubusercontent.com/13063165/194577918-b4d45726-2692-4093-8a28-9e73552617ef.png" />
-
-## Viewing remote traces
-
-You can open remote traces using its URL. They could be generated on a CI run which makes it easy to view the remote trace without having to manually download the file.
-
-```bash
-npx playwright show-trace https://example.com/trace.zip
-```
-
-You can also pass the URL of your uploaded trace (e.g. inside your CI) from some accessible storage as a parameter. CORS (Cross-Origin Resource Sharing) rules might apply.
-
-```txt
-https://trace.playwright.dev/?trace=https://demo.playwright.dev/reports/todomvc/data/cb0fa77ebd9487a5c899f3ae65a7ffdbac681182.zip
-```
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"

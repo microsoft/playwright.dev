@@ -1375,6 +1375,9 @@ test('test', async ({ page }) => {
   - `location` [Location] *(optional)* <font size="2">Added in: v1.48</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-option-location"/><a href="#test-step-option-location" class="list-anchor">#</a>
     
     Specifies a custom location for the step to be shown in test reports and trace viewer. By default, location of the [test.step()](/api/class-test.mdx#test-step) call is shown.
+  - `timeout` [number] *(optional)* <font size="2">Added in: v1.50</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-option-timeout"/><a href="#test-step-option-timeout" class="list-anchor">#</a>
+    
+    The maximum time, in milliseconds, allowed for the step to complete. If the step does not complete within the specified timeout, the [test.step()](/api/class-test.mdx#test-step) method will throw a [TimeoutError]. Defaults to `0` (no timeout).
 
 **Returns**
 - [Promise]&lt;[Object]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-return"/><a href="#test-step-return" class="list-anchor">#</a>
@@ -1505,6 +1508,50 @@ test('example', async ({ page }) => {
   await loginPage.login();  // <-- Error will be reported on this line.
 });
 ```
+
+---
+
+### test.step.skip {#test-step-skip}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.50</font><x-search>test.test.step.skip</x-search>
+
+Mark a test step as "skip" to temporarily disable its execution, useful for steps that are currently failing and planned for a near-term fix. Playwright will not run the step.
+
+**Usage**
+
+You can declare a skipped step, and Playwright will not run it.
+
+```js
+import { test, expect } from '@playwright/test';
+
+test('my test', async ({ page }) => {
+  // ...
+  await test.step.skip('not yet ready', async () => {
+    // ...
+  });
+});
+```
+
+**Arguments**
+- `title` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-skip-option-title"/><a href="#test-step-skip-option-title" class="list-anchor">#</a>
+  
+  Step name.
+- `body` [function]\(\):[Promise]&lt;[Object]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-skip-option-body"/><a href="#test-step-skip-option-body" class="list-anchor">#</a>
+  
+  Step body.
+- `options` [Object] *(optional)*
+  - `box` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-skip-option-box"/><a href="#test-step-skip-option-box" class="list-anchor">#</a>
+    
+    Whether to box the step in the report. Defaults to `false`. When the step is boxed, errors thrown from the step internals point to the step call site. See below for more details.
+  - `location` [Location] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-skip-option-location"/><a href="#test-step-skip-option-location" class="list-anchor">#</a>
+    
+    Specifies a custom location for the step to be shown in test reports and trace viewer. By default, location of the [test.step()](/api/class-test.mdx#test-step) call is shown.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-skip-option-timeout"/><a href="#test-step-skip-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time in milliseconds for the step to finish. Defaults to `0` (no timeout).
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-skip-return"/><a href="#test-step-skip-return" class="list-anchor">#</a>
 
 ---
 
