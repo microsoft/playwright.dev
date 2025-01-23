@@ -73,6 +73,11 @@ await Expect(locator).ToBeCheckedAsync();
 **Arguments**
 - `options` `LocatorAssertionsToBeCheckedOptions?` *(optional)*
   - `Checked` [bool]? *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-be-checked-option-checked"/><a href="#locator-assertions-to-be-checked-option-checked" class="list-anchor">#</a>
+    
+    Provides state to assert for. Asserts for input to be checked by default. This option can't be used when [Indeterminate](/api/class-locatorassertions.mdx#locator-assertions-to-be-checked-option-indeterminate) is set to true.
+  - `Indeterminate` [bool]? *(optional)* <font size="2">Added in: v1.50</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-be-checked-option-indeterminate"/><a href="#locator-assertions-to-be-checked-option-indeterminate" class="list-anchor">#</a>
+    
+    Asserts that the element is in the indeterminate (mixed) state. Only supported for checkboxes and radio buttons. This option can't be true when [Checked](/api/class-locatorassertions.mdx#locator-assertions-to-be-checked-option-checked) is provided.
   - `Timeout` [float]? *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-be-checked-option-timeout"/><a href="#locator-assertions-to-be-checked-option-timeout" class="list-anchor">#</a>
     
     Time to retry the assertion for in milliseconds. Defaults to `5000`.
@@ -165,7 +170,7 @@ Ensures the [Locator] points to an enabled element.
 
 ```csharp
 var locator = Page.Locator("button.submit");
-await Expect(locator).toBeEnabledAsync();
+await Expect(locator).ToBeEnabledAsync();
 ```
 
 **Arguments**
@@ -377,7 +382,7 @@ Ensures the [Locator] points to an element with a given [accessible description]
 
 ```csharp
 var locator = Page.GetByTestId("save-button");
-await Expect(locator).toHaveAccessibleDescriptionAsync("Save results to disk");
+await Expect(locator).ToHaveAccessibleDescriptionAsync("Save results to disk");
 ```
 
 **Arguments**
@@ -397,6 +402,36 @@ await Expect(locator).toHaveAccessibleDescriptionAsync("Save results to disk");
 
 ---
 
+### ToHaveAccessibleErrorMessageAsync {#locator-assertions-to-have-accessible-error-message}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.50</font><x-search>locatorAssertions.ToHaveAccessibleErrorMessageAsync</x-search>
+
+Ensures the [Locator] points to an element with a given [aria errormessage](https://w3c.github.io/aria/#aria-errormessage).
+
+**Usage**
+
+```csharp
+var locator = Page.GetByTestId("username-input");
+await Expect(locator).ToHaveAccessibleErrorMessageAsync("Username is required.");
+```
+
+**Arguments**
+- `errorMessage` [string] | [Regex]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-have-accessible-error-message-option-error-message"/><a href="#locator-assertions-to-have-accessible-error-message-option-error-message" class="list-anchor">#</a>
+  
+  Expected accessible error message.
+- `options` `LocatorAssertionsToHaveAccessibleErrorMessageOptions?` *(optional)*
+  - `IgnoreCase` [bool]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-have-accessible-error-message-option-ignore-case"/><a href="#locator-assertions-to-have-accessible-error-message-option-ignore-case" class="list-anchor">#</a>
+    
+    Whether to perform case-insensitive match. [IgnoreCase](/api/class-locatorassertions.mdx#locator-assertions-to-have-accessible-error-message-option-ignore-case) option takes precedence over the corresponding regular expression flag if specified.
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-have-accessible-error-message-option-timeout"/><a href="#locator-assertions-to-have-accessible-error-message-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for in milliseconds. Defaults to `5000`.
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-have-accessible-error-message-return"/><a href="#locator-assertions-to-have-accessible-error-message-return" class="list-anchor">#</a>
+
+---
+
 ### ToHaveAccessibleNameAsync {#locator-assertions-to-have-accessible-name}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.44</font><x-search>locatorAssertions.ToHaveAccessibleNameAsync</x-search>
@@ -407,7 +442,7 @@ Ensures the [Locator] points to an element with a given [accessible name](https:
 
 ```csharp
 var locator = Page.GetByTestId("save-button");
-await Expect(locator).toHaveAccessibleNameAsync("Save to disk");
+await Expect(locator).ToHaveAccessibleNameAsync("Save to disk");
 ```
 
 **Arguments**
@@ -464,21 +499,21 @@ await Expect(locator).ToHaveAttributeAsync("type", "text");
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><x-search>locatorAssertions.ToHaveClassAsync</x-search>
 
-Ensures the [Locator] points to an element with given CSS classes. This needs to be a full match or using a relaxed regular expression.
+Ensures the [Locator] points to an element with given CSS classes. When a string is provided, it must fully match the element's `class` attribute. To match individual classes or perform partial matches, use a regular expression:
 
 **Usage**
 
 ```html
-<div class='selected row' id='component'></div>
+<div class='middle selected row' id='component'></div>
 ```
 
 ```csharp
 var locator = Page.Locator("#component");
-await Expect(locator).ToHaveClassAsync(new Regex("selected"));
-await Expect(locator).ToHaveClassAsync("selected row");
+await Expect(locator).ToHaveClassAsync(new Regex("(^|\\s)selected(\\s|$)"));
+await Expect(locator).ToHaveClassAsync("middle selected row");
 ```
 
-Note that if array is passed as an expected value, entire lists of elements can be asserted:
+When an array is passed, the method asserts that the list of elements located matches the corresponding list of expected class values. Each element's class attribute is matched against the corresponding string or regular expression in the array:
 
 ```csharp
 var locator = Page.Locator("list > .component");
@@ -776,7 +811,7 @@ await Expect(locator).ToHaveValuesAsync(new Regex[] { new Regex("R"), new Regex(
 
 ---
 
-### ToMatchAriaSnapshotAsync {#locator-assertions-to-match-aria-snapshot}
+### ToMatchAriaSnapshotAsync {#locator-assertions-to-match-aria-snapshot-1}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.49</font><x-search>locatorAssertions.ToMatchAriaSnapshotAsync</x-search>
 
@@ -793,14 +828,14 @@ await Expect(page.Locator("body")).ToMatchAriaSnapshotAsync(@"
 ```
 
 **Arguments**
-- `expected` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-match-aria-snapshot-option-expected"/><a href="#locator-assertions-to-match-aria-snapshot-option-expected" class="list-anchor">#</a>
+- `expected` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-match-aria-snapshot-1-option-expected"/><a href="#locator-assertions-to-match-aria-snapshot-1-option-expected" class="list-anchor">#</a>
 - `options` `LocatorAssertionsToMatchAriaSnapshotOptions?` *(optional)*
-  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-match-aria-snapshot-option-timeout"/><a href="#locator-assertions-to-match-aria-snapshot-option-timeout" class="list-anchor">#</a>
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-match-aria-snapshot-1-option-timeout"/><a href="#locator-assertions-to-match-aria-snapshot-1-option-timeout" class="list-anchor">#</a>
     
     Time to retry the assertion for in milliseconds. Defaults to `5000`.
 
 **Returns**
-- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-match-aria-snapshot-return"/><a href="#locator-assertions-to-match-aria-snapshot-return" class="list-anchor">#</a>
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-match-aria-snapshot-1-return"/><a href="#locator-assertions-to-match-aria-snapshot-1-return" class="list-anchor">#</a>
 
 ---
 

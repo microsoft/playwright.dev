@@ -655,7 +655,7 @@ expect(locator).not_to_have_values(values, **kwargs)
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.49</font><x-search>locatorAssertions.not_to_match_aria_snapshot</x-search>
 
-The opposite of [expect(locator).to_match_aria_snapshot()](/api/class-locatorassertions.mdx#locator-assertions-to-match-aria-snapshot).
+The opposite of [expect(locator).to_match_aria_snapshot()](/api/class-locatorassertions.mdx#locator-assertions-to-match-aria-snapshot-1).
 
 **Usage**
 
@@ -758,6 +758,11 @@ await expect(locator).to_be_checked()
 
 **Arguments**
 - `checked` [bool] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-be-checked-option-checked"/><a href="#locator-assertions-to-be-checked-option-checked" class="list-anchor">#</a>
+  
+  Provides state to assert for. Asserts for input to be checked by default. This option can't be used when [indeterminate](/api/class-locatorassertions.mdx#locator-assertions-to-be-checked-option-indeterminate) is set to true.
+- `indeterminate` [bool] *(optional)* <font size="2">Added in: v1.50</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-be-checked-option-indeterminate"/><a href="#locator-assertions-to-be-checked-option-indeterminate" class="list-anchor">#</a>
+  
+  Asserts that the element is in the indeterminate (mixed) state. Only supported for checkboxes and radio buttons. This option can't be true when [checked](/api/class-locatorassertions.mdx#locator-assertions-to-be-checked-option-checked) is provided.
 - `timeout` [float] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-be-checked-option-timeout"/><a href="#locator-assertions-to-be-checked-option-timeout" class="list-anchor">#</a>
   
   Time to retry the assertion for in milliseconds. Defaults to `5000`.
@@ -1366,6 +1371,56 @@ await expect(locator).to_have_accessible_description("Save results to disk")
 
 ---
 
+### to_have_accessible_error_message {#locator-assertions-to-have-accessible-error-message}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.50</font><x-search>locatorAssertions.to_have_accessible_error_message</x-search>
+
+Ensures the [Locator] points to an element with a given [aria errormessage](https://w3c.github.io/aria/#aria-errormessage).
+
+**Usage**
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+locator = page.get_by_test_id("username-input")
+expect(locator).to_have_accessible_error_message("Username is required.")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+locator = page.get_by_test_id("username-input")
+await expect(locator).to_have_accessible_error_message("Username is required.")
+```
+
+</TabItem>
+</Tabs>
+
+**Arguments**
+- `error_message` [str] | [Pattern]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-have-accessible-error-message-option-error-message"/><a href="#locator-assertions-to-have-accessible-error-message-option-error-message" class="list-anchor">#</a>
+  
+  Expected accessible error message.
+- `ignore_case` [bool] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-have-accessible-error-message-option-ignore-case"/><a href="#locator-assertions-to-have-accessible-error-message-option-ignore-case" class="list-anchor">#</a>
+  
+  Whether to perform case-insensitive match. [ignore_case](/api/class-locatorassertions.mdx#locator-assertions-to-have-accessible-error-message-option-ignore-case) option takes precedence over the corresponding regular expression flag if specified.
+- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-have-accessible-error-message-option-timeout"/><a href="#locator-assertions-to-have-accessible-error-message-option-timeout" class="list-anchor">#</a>
+  
+  Time to retry the assertion for in milliseconds. Defaults to `5000`.
+
+**Returns**
+- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-have-accessible-error-message-return"/><a href="#locator-assertions-to-have-accessible-error-message-return" class="list-anchor">#</a>
+
+---
+
 ### to_have_accessible_name {#locator-assertions-to-have-accessible-name}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.44</font><x-search>locatorAssertions.to_have_accessible_name</x-search>
@@ -1477,12 +1532,12 @@ await expect(locator).to_have_attribute("type", "text")
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><x-search>locatorAssertions.to_have_class</x-search>
 
-Ensures the [Locator] points to an element with given CSS classes. This needs to be a full match or using a relaxed regular expression.
+Ensures the [Locator] points to an element with given CSS classes. When a string is provided, it must fully match the element's `class` attribute. To match individual classes or perform partial matches, use a regular expression:
 
 **Usage**
 
 ```html
-<div class='selected row' id='component'></div>
+<div class='middle selected row' id='component'></div>
 ```
 
 <Tabs
@@ -1499,8 +1554,8 @@ Ensures the [Locator] points to an element with given CSS classes. This needs to
 from playwright.sync_api import expect
 
 locator = page.locator("#component")
-expect(locator).to_have_class(re.compile(r"selected"))
-expect(locator).to_have_class("selected row")
+expect(locator).to_have_class(re.compile(r"(^|\\s)selected(\\s|$)"))
+expect(locator).to_have_class("middle selected row")
 ```
 
 </TabItem>
@@ -1510,14 +1565,14 @@ expect(locator).to_have_class("selected row")
 from playwright.async_api import expect
 
 locator = page.locator("#component")
-await expect(locator).to_have_class(re.compile(r"selected"))
-await expect(locator).to_have_class("selected row")
+await expect(locator).to_have_class(re.compile(r"(^|\\s)selected(\\s|$)"))
+await expect(locator).to_have_class("middle selected row")
 ```
 
 </TabItem>
 </Tabs>
 
-Note that if array is passed as an expected value, entire lists of elements can be asserted:
+When an array is passed, the method asserts that the list of elements located matches the corresponding list of expected class values. Each element's class attribute is matched against the corresponding string or regular expression in the array:
 
 <Tabs
   groupId="python-flavor"
@@ -2069,7 +2124,7 @@ await expect(locator).to_have_values([re.compile(r"R"), re.compile(r"G")])
 
 ---
 
-### to_match_aria_snapshot {#locator-assertions-to-match-aria-snapshot}
+### to_match_aria_snapshot {#locator-assertions-to-match-aria-snapshot-1}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.49</font><x-search>locatorAssertions.to_match_aria_snapshot</x-search>
 
@@ -2110,13 +2165,13 @@ await expect(page.locator('body')).to_match_aria_snapshot('''
 </Tabs>
 
 **Arguments**
-- `expected` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-match-aria-snapshot-option-expected"/><a href="#locator-assertions-to-match-aria-snapshot-option-expected" class="list-anchor">#</a>
-- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-match-aria-snapshot-option-timeout"/><a href="#locator-assertions-to-match-aria-snapshot-option-timeout" class="list-anchor">#</a>
+- `expected` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-match-aria-snapshot-1-option-expected"/><a href="#locator-assertions-to-match-aria-snapshot-1-option-expected" class="list-anchor">#</a>
+- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-match-aria-snapshot-1-option-timeout"/><a href="#locator-assertions-to-match-aria-snapshot-1-option-timeout" class="list-anchor">#</a>
   
   Time to retry the assertion for in milliseconds. Defaults to `5000`.
 
 **Returns**
-- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-match-aria-snapshot-return"/><a href="#locator-assertions-to-match-aria-snapshot-return" class="list-anchor">#</a>
+- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-match-aria-snapshot-1-return"/><a href="#locator-assertions-to-match-aria-snapshot-1-return" class="list-anchor">#</a>
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"
