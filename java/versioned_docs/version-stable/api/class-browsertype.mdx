@@ -35,18 +35,42 @@ public class Example {
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserType.connect</x-search>
 
-This method attaches Playwright to an existing browser instance created via `BrowserType.launchServer` in Node.js.
-
-:::note
-
-The major and minor version of the Playwright instance that connects needs to match the version of Playwright that launches the browser (1.2.3 → is compatible with 1.2.x).
-:::
+This method attaches Playwright to an existing browser instance. When connecting to another browser launched via `BrowserType.launchServer` in Node.js, the major and minor version needs to match the client version (1.2.3 → is compatible with 1.2.x).
 
 **Usage**
 
 ```java
-BrowserType.connect();
+BrowserType.connect(wsEndpoint);
+BrowserType.connect(wsEndpoint, options);
 ```
+
+**Arguments**
+- `wsEndpoint` [String] <font size="2">Added in: v1.10</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-option-ws-endpoint"/><a href="#browser-type-connect-option-ws-endpoint" class="list-anchor">#</a>
+  
+  A browser websocket endpoint to connect to.
+- `options` `BrowserType.ConnectOptions` *(optional)*
+  - `setExposeNetwork` [String] *(optional)* <font size="2">Added in: v1.37</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-option-expose-network"/><a href="#browser-type-connect-option-expose-network" class="list-anchor">#</a>
+    
+    This option exposes network available on the connecting client to the browser being connected to. Consists of a list of rules separated by comma.
+    
+    Available rules:
+    1. Hostname pattern, for example: `example.com`, `*.org:99`, `x.*.y.com`, `*foo.org`.
+    1. IP literal, for example: `127.0.0.1`, `0.0.0.0:99`, `[::1]`, `[0:0::1]:99`.
+    1. `<loopback>` that matches local loopback interfaces: `localhost`, `*.localhost`, `127.0.0.1`, `[::1]`.
+    
+    Some common examples:
+    1. `"*"` to expose all network.
+    1. `"<loopback>"` to expose localhost network.
+    1. `"*.test.internal-domain,*.staging.internal-domain,<loopback>"` to expose test/staging deployments and localhost.
+  - `setHeaders` [Map]&lt;[String], [String]&gt; *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-option-headers"/><a href="#browser-type-connect-option-headers" class="list-anchor">#</a>
+    
+    Additional HTTP headers to be sent with web socket connect request. Optional.
+  - `setSlowMo` [double] *(optional)* <font size="2">Added in: v1.10</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-option-slow-mo"/><a href="#browser-type-connect-option-slow-mo" class="list-anchor">#</a>
+    
+    Slows down Playwright operations by the specified amount of milliseconds. Useful so that you can see what is going on. Defaults to 0.
+  - `setTimeout` [double] *(optional)* <font size="2">Added in: v1.10</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-option-timeout"/><a href="#browser-type-connect-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time in milliseconds to wait for the connection to be established. Defaults to `0` (no timeout).
 
 **Returns**
 - [Browser]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-return"/><a href="#browser-type-connect-return" class="list-anchor">#</a>
@@ -64,10 +88,6 @@ The default browser context is accessible via [Browser.contexts()](/api/class-br
 :::note
 
 Connecting over the Chrome DevTools Protocol is only supported for Chromium-based browsers.
-:::
-
-:::note
-This connection is significantly lower fidelity than the Playwright protocol connection via [BrowserType.connect()](/api/class-browsertype.mdx#browser-type-connect). If you are experiencing issues or attempting to use advanced functionality, you probably want to use [BrowserType.connect()](/api/class-browsertype.mdx#browser-type-connect).
 :::
 
 **Usage**
