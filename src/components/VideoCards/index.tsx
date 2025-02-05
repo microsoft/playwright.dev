@@ -26,8 +26,8 @@ function VideoCards({ videos }: { videos: Video[] }) {
     <section className="margin-top--lg margin-bottom--xl">
       <div className="container">
         <ul className={clsx('clean-list', styles.videoList)}>
-          {videos.map((video) => (
-            <VideoCard key={video.title} video={video} />
+          {videos.map((video, i) => (
+            <VideoCard key={i} video={video} />
           ))}
         </ul>
       </div>

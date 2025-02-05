@@ -22,8 +22,8 @@ function Navigation({ links }) {
   return (
     <nav className="container">
       <ul className={styles.nav}>
-        {links.map((link) => (
-          <li className={styles.links}>
+        {links.map((link, i) => (
+          <li key={i} className={styles.links}>
             <Link href={link.href}>{link.label}</Link>
           </li>
         ))}
