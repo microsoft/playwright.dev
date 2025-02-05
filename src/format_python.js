@@ -113,6 +113,7 @@ class PythonFormatter {
       case 'Date': return '[datetime]';
       case 'long': return '[int]';
       case 'Buffer': return '[bytes]';
+      case 'Serializable': return '[Dict]';
     }
     return `[${text}]`;
   }
