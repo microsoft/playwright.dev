@@ -128,7 +128,7 @@ async function generateDocsForLanguages () {
 };
 
 /**
- * @param {'add'|'addDir'|'change'|'unlink'|'unlinkDir'} event
+ * @param {import('chokidar').FSWatcherEventMap['all'][0]} event
  * @param {string} from
  */
 async function syncWithWorkingDirectory(event, from) {
