@@ -26,6 +26,71 @@ test('basic test', async ({ page, browserName }, TestStepInfo) => {
 
 ## Methods
 
+### attach {#test-step-info-attach}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.51</font><x-search>testStepInfo.attach</x-search>
+
+Attach a value or a file from disk to the current test step. Some reporters show test step attachments. Either [path](/api/class-teststepinfo.mdx#test-step-info-attach-option-path) or [body](/api/class-teststepinfo.mdx#test-step-info-attach-option-body) must be specified, but not both. Calling this method will attribute the attachment to the step, as opposed to [testInfo.attach()](/api/class-testinfo.mdx#test-info-attach) which stores all attachments at the test level.
+
+For example, you can attach a screenshot to the test step:
+
+```js
+import { test, expect } from '@playwright/test';
+
+test('basic test', async ({ page }) => {
+  await page.goto('https://playwright.dev');
+  await test.step('check page rendering', async step => {
+    const screenshot = await page.screenshot();
+    await step.attach('screenshot', { body: screenshot, contentType: 'image/png' });
+  });
+});
+```
+
+Or you can attach files returned by your APIs:
+
+```js
+import { test, expect } from '@playwright/test';
+import { download } from './my-custom-helpers';
+
+test('basic test', async ({}) => {
+  await test.step('check download behavior', async step => {
+    const tmpPath = await download('a');
+    await step.attach('downloaded', { path: tmpPath });
+  });
+});
+```
+
+:::note
+[testStepInfo.attach()](/api/class-teststepinfo.mdx#test-step-info-attach) automatically takes care of copying attached files to a location that is accessible to reporters. You can safely remove the attachment after awaiting the attach call.
+:::
+
+**Usage**
+
+```js
+await testStepInfo.attach(name);
+await testStepInfo.attach(name, options);
+```
+
+**Arguments**
+- `name` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-info-attach-option-name"/><a href="#test-step-info-attach-option-name" class="list-anchor">#</a>
+  
+  Attachment name. The name will also be sanitized and used as the prefix of file name when saving to disk.
+- `options` [Object] *(optional)*
+  - `body` [string] | [Buffer] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-info-attach-option-body"/><a href="#test-step-info-attach-option-body" class="list-anchor">#</a>
+    
+    Attachment body. Mutually exclusive with [path](/api/class-teststepinfo.mdx#test-step-info-attach-option-path).
+  - `contentType` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-info-attach-option-content-type"/><a href="#test-step-info-attach-option-content-type" class="list-anchor">#</a>
+    
+    Content type of this attachment to properly present in the report, for example `'application/json'` or `'image/png'`. If omitted, content type is inferred based on the [path](/api/class-teststepinfo.mdx#test-step-info-attach-option-path), or defaults to `text/plain` for [string] attachments and `application/octet-stream` for [Buffer] attachments.
+  - `path` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-info-attach-option-path"/><a href="#test-step-info-attach-option-path" class="list-anchor">#</a>
+    
+    Path on the filesystem to the attached file. Mutually exclusive with [body](/api/class-teststepinfo.mdx#test-step-info-attach-option-body).
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-info-attach-return"/><a href="#test-step-info-attach-return" class="list-anchor">#</a>
+
+---
+
 ### skip() {#test-step-info-skip-1}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.51</font><x-search>testStepInfo.skip()</x-search>
