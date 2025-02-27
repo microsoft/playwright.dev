@@ -114,6 +114,7 @@ class PythonFormatter {
       case 'long': return '[int]';
       case 'Buffer': return '[bytes]';
       case 'Serializable': return '[Dict]';
+      case 'unknown': return '[Any]';
     }
     return `[${text}]`;
   }

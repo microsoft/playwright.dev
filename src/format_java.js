@@ -163,6 +163,7 @@ class JavaFormatter {
       case 'Readable': return '[InputStream]';
       case 'Serializable': return '[Object]';
       case 'URL': return '[String]';
+      case 'unknown': return '[Object]';
     }
     return `[${text}]`;
   }
