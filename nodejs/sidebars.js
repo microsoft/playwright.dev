@@ -181,6 +181,7 @@ module.exports = {
             { type: 'doc', id: 'api/class-testinfoerror' },
             { type: 'doc', id: 'api/class-testoptions' },
             { type: 'doc', id: 'api/class-testproject' },
+            { type: 'doc', id: 'api/class-teststepinfo' },
             { type: 'doc', id: 'api/class-workerinfo' }
           ],
           collapsed: false
