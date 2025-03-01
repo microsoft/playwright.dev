@@ -12,7 +12,7 @@ import HTMLCard from '@site/src/components/HTMLCard';
 ```js
 import { test, expect } from '@playwright/test';
 
-test('basic test', async ({ page, browserName }, TestStepInfo) => {
+test('basic test', async ({ page, browserName }) => {
   await test.step('check some behavior', async step => {
     await step.skip(browserName === 'webkit', 'The feature is not available in WebKit');
     // ... rest of the step code
@@ -95,12 +95,20 @@ await testStepInfo.attach(name, options);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.51</font><x-search>testStepInfo.skip()</x-search>
 
-Unconditionally skip the currently running step. Test step is immediately aborted. This is similar to [test.step.skip()](/api/class-test.mdx#test-step-skip).
+Abort the currently running step and mark it as skipped. Useful for steps that are currently failing and planned for a near-term fix.
 
 **Usage**
 
 ```js
-testStepInfo.skip();
+import { test, expect } from '@playwright/test';
+
+test('my test', async ({ page }) => {
+  await test.step('check expectations', async () => {
+    test.skip();
+    // step body below will not run
+    // ...
+  });
+});
 ```
 
 ---
@@ -109,13 +117,21 @@ testStepInfo.skip();
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.51</font><x-search>testStepInfo.skip(condition)</x-search>
 
-Conditionally skips the currently running step with an optional description. This is similar to [test.step.skip()](/api/class-test.mdx#test-step-skip).
+Conditionally abort the currently running step and mark it as skipped with an optional description. Useful for steps that should not be executed in some cases.
 
 **Usage**
 
 ```js
-testStepInfo.skip(condition);
-testStepInfo.skip(condition, description);
+import { test, expect } from '@playwright/test';
+
+test('my test', async ({ page, isMobile }) => {
+  await test.step('check desktop expectations', async () => {
+    test.skip(isMobile, 'not present in the mobile layout');
+
+    // step body below will not run
+    // ...
+  });
+});
 ```
 
 **Arguments**
