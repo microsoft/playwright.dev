@@ -1,66 +1,146 @@
 ---
-id: codegen-intro
-title: "Generating tests"
+id: class-teststepinfo
+title: "TestStepInfo"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
 
-Playwright comes with the ability to generate tests out of the box and is a great way to quickly get started with testing. It will open two windows, a browser window where you interact with the website you wish to test and the Playwright Inspector window where you can record your tests, copy the tests, clear your tests as well as change the language of your tests.
+`TestStepInfo` contains information about currently running test step. It is passed as an argument to the step function. `TestStepInfo` provides utilities to control test step execution.
 
-**You will learn**
-- [How to record a test](/codegen.mdx#recording-a-test)
-- [How to generate locators](/codegen.mdx#generating-locators)
+```js
+import { test, expect } from '@playwright/test';
 
-## Running Codegen
-
-Use the `codegen` command to run the test generator followed by the URL of the website you want to generate tests for. The URL is optional and you can always run the command without it and then add the URL directly into the browser window instead.
-
-```bash
-npx playwright codegen demo.playwright.dev/todomvc
+test('basic test', async ({ page, browserName }) => {
+  await test.step('check some behavior', async step => {
+    await step.skip(browserName === 'webkit', 'The feature is not available in WebKit');
+    // ... rest of the step code
+    await page.check('input');
+  });
+});
 ```
 
-### Recording a test
 
-Run `codegen` and perform actions in the browser. Playwright will generate the code for the user interactions. `Codegen` will look at the rendered page and figure out the recommended locator, prioritizing role, text and test id locators. If the generator identifies multiple elements matching the locator, it will improve the locator to make it resilient and uniquely identify the target element, therefore eliminating and reducing test(s) failing and flaking due to locators.
+---
 
-With the test generator you can record:
-* Actions like click or fill by simply interacting with the page
-* Assertions by clicking on one of the icons in the toolbar and then clicking on an element on the page to assert against. You can choose:
-  * `'assert visibility'` to assert that an element is visible
-  * `'assert text'` to assert that an element contains specific text
-  * `'assert value'` to assert that an element has a specific value
+## Methods
 
-###### 
-![Recording a test](https://github.com/microsoft/playwright/assets/13063165/34a79ea1-639e-4cb3-8115-bfdc78e3d34d)
+### attach {#test-step-info-attach}
 
-###### 
-When you have finished interacting with the page, press the `'record'` button to stop the recording and use the `'copy'` button to copy the generated code to your editor.
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.51</font><x-search>testStepInfo.attach</x-search>
 
-Use the `'clear'` button to clear the code to start recording again. Once finished close the Playwright inspector window or stop the terminal command.
+Attach a value or a file from disk to the current test step. Some reporters show test step attachments. Either [path](/api/class-teststepinfo.mdx#test-step-info-attach-option-path) or [body](/api/class-teststepinfo.mdx#test-step-info-attach-option-body) must be specified, but not both. Calling this method will attribute the attachment to the step, as opposed to [testInfo.attach()](/api/class-testinfo.mdx#test-info-attach) which stores all attachments at the test level.
 
-To learn more about generating tests check out or detailed guide on [Codegen](./codegen.mdx).
+For example, you can attach a screenshot to the test step:
 
-### Generating locators
+```js
+import { test, expect } from '@playwright/test';
 
-You can generate [locators](/locators.mdx) with the test generator.
-* Press the `'Record'` button to stop the recording and the `'Pick Locator'` button will appear.
-* Click on the `'Pick Locator'` button and then hover over elements in the browser window to see the locator highlighted underneath each element.
-* To choose a locator click on the element you would like to locate and the code for that locator will appear in the locator playground next to the Pick Locator button.
-* You can then edit the locator in the locator playground to fine tune it and see the matching element highlighted in the browser window. 
-* Use the copy button to copy the locator and paste it into your code.
+test('basic test', async ({ page }) => {
+  await page.goto('https://playwright.dev');
+  await test.step('check page rendering', async step => {
+    const screenshot = await page.screenshot();
+    await step.attach('screenshot', { body: screenshot, contentType: 'image/png' });
+  });
+});
+```
 
-###### 
-![picking a locator](https://github.com/microsoft/playwright/assets/13063165/2c8a12e2-4e98-4fdd-af92-1d73ae696d86)
+Or you can attach files returned by your APIs:
 
-### Emulation
+```js
+import { test, expect } from '@playwright/test';
+import { download } from './my-custom-helpers';
 
-You can also generate tests using emulation so as to generate a test for a specific viewport, device, color scheme, as well as emulate the geolocation, language or timezone. The test generator can also generate a test while preserving authenticated state. Check out the [Test Generator](./codegen.mdx#emulation) guide to learn more.
+test('basic test', async ({}) => {
+  await test.step('check download behavior', async step => {
+    const tmpPath = await download('a');
+    await step.attach('downloaded', { path: tmpPath });
+  });
+});
+```
 
-## What's Next
-- [See a trace of your tests](./trace-viewer-intro.mdx)
+:::note
+[testStepInfo.attach()](/api/class-teststepinfo.mdx#test-step-info-attach) automatically takes care of copying attached files to a location that is accessible to reporters. You can safely remove the attachment after awaiting the attach call.
+:::
+
+**Usage**
+
+```js
+await testStepInfo.attach(name);
+await testStepInfo.attach(name, options);
+```
+
+**Arguments**
+- `name` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-info-attach-option-name"/><a href="#test-step-info-attach-option-name" class="list-anchor">#</a>
+  
+  Attachment name. The name will also be sanitized and used as the prefix of file name when saving to disk.
+- `options` [Object] *(optional)*
+  - `body` [string] | [Buffer] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-info-attach-option-body"/><a href="#test-step-info-attach-option-body" class="list-anchor">#</a>
+    
+    Attachment body. Mutually exclusive with [path](/api/class-teststepinfo.mdx#test-step-info-attach-option-path).
+  - `contentType` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-info-attach-option-content-type"/><a href="#test-step-info-attach-option-content-type" class="list-anchor">#</a>
+    
+    Content type of this attachment to properly present in the report, for example `'application/json'` or `'image/png'`. If omitted, content type is inferred based on the [path](/api/class-teststepinfo.mdx#test-step-info-attach-option-path), or defaults to `text/plain` for [string] attachments and `application/octet-stream` for [Buffer] attachments.
+  - `path` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-info-attach-option-path"/><a href="#test-step-info-attach-option-path" class="list-anchor">#</a>
+    
+    Path on the filesystem to the attached file. Mutually exclusive with [body](/api/class-teststepinfo.mdx#test-step-info-attach-option-body).
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-info-attach-return"/><a href="#test-step-info-attach-return" class="list-anchor">#</a>
+
+---
+
+### skip() {#test-step-info-skip-1}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.51</font><x-search>testStepInfo.skip()</x-search>
+
+Abort the currently running step and mark it as skipped. Useful for steps that are currently failing and planned for a near-term fix.
+
+**Usage**
+
+```js
+import { test, expect } from '@playwright/test';
+
+test('my test', async ({ page }) => {
+  await test.step('check expectations', async () => {
+    test.skip();
+    // step body below will not run
+    // ...
+  });
+});
+```
+
+---
+
+### skip(condition) {#test-step-info-skip-2}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.51</font><x-search>testStepInfo.skip(condition)</x-search>
+
+Conditionally abort the currently running step and mark it as skipped with an optional description. Useful for steps that should not be executed in some cases.
+
+**Usage**
+
+```js
+import { test, expect } from '@playwright/test';
+
+test('my test', async ({ page, isMobile }) => {
+  await test.step('check desktop expectations', async () => {
+    test.skip(isMobile, 'not present in the mobile layout');
+
+    // step body below will not run
+    // ...
+  });
+});
+```
+
+**Arguments**
+- `condition` [boolean]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-info-skip-2-option-condition"/><a href="#test-step-info-skip-2-option-condition" class="list-anchor">#</a>
+  
+  A skip condition. Test step is skipped when the condition is `true`.
+- `description` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-info-skip-2-option-description"/><a href="#test-step-info-skip-2-option-description" class="list-anchor">#</a>
+  
+  Optional description that will be reflected in a test report.
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"

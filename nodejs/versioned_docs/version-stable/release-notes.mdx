@@ -9,6 +9,83 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 import LiteYouTube from '@site/src/components/LiteYouTube';
 
+## Version 1.51
+
+### Highlights
+* New option [indexedDB](/api/class-browsercontext.mdx#browser-context-storage-state-option-indexed-db) for [browserContext.storageState()](/api/class-browsercontext.mdx#browser-context-storage-state) allows to save and restore IndexedDB contents. Useful when your application uses [IndexedDB API](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) to store authentication tokens, like Firebase Authentication.
+  
+  Here is an example following the [authentication guide](./auth.mdx#basic-shared-account-in-all-tests):
+  
+  ```js title="tests/auth.setup.ts"
+  import { test as setup, expect } from '@playwright/test';
+  import path from 'path';
+  
+  const authFile = path.join(__dirname, '../playwright/.auth/user.json');
+  
+  setup('authenticate', async ({ page }) => {
+    await page.goto('/');
+    // ... perform authentication steps ...
+  
+    // make sure to save indexedDB
+    await page.context().storageState({ path: authFile, indexedDB: true });
+  });
+  ```
+  
+* New option [visible](/api/class-locator.mdx#locator-filter-option-visible) for [locator.filter()](/api/class-locator.mdx#locator-filter) allows matching only visible elements.
+  
+  ```js title="example.spec.ts"
+  test('some test', async ({ page }) => {
+    // Ignore invisible todo items.
+    const todoItems = page.getByTestId('todo-item').filter({ visible: true });
+    // Check there are exactly 3 visible ones.
+    await expect(todoItems).toHaveCount(3);
+  });
+  ```
+  
+* Set option [testConfig.captureGitInfo](/api/class-testconfig.mdx#test-config-capture-git-info) to capture git information into [testConfig.metadata](/api/class-testconfig.mdx#test-config-metadata).
+  
+  ```js title="playwright.config.ts"
+  import { defineConfig } from '@playwright/test';
+  
+  export default defineConfig({
+    captureGitInfo: { commit: true, diff: true }
+  });
+  ```
+  
+  HTML report will show this information when available:
+  
+  ![Git information in the report](https://github.com/user-attachments/assets/9ca4a05a-1485-4521-826b-50568babec3f)
+
+### Test runner
+* A new [TestStepInfo] object is now available in test steps. You can add step attachments or skip the step under some conditions.
+  
+  ```js
+  test('some test', async ({ page, isMobile }) => {
+    // Note the new "step" argument:
+    await test.step('here is my step', async step => {
+      step.skip(isMobile, 'not relevant on mobile layouts');
+  
+      // ...
+      await step.attach('my attachment', { body: 'some text' });
+      // ...
+    });
+  });
+  ```
+  
+### Miscellaneous
+* New option `contrast` for methods [page.emulateMedia()](/api/class-page.mdx#page-emulate-media) and [browser.newContext()](/api/class-browser.mdx#browser-new-context) allows to emulate the `prefers-contrast` media feature.
+* New option [failOnStatusCode](/api/class-apirequest.mdx#api-request-new-context-option-fail-on-status-code) makes all fetch requests made through the [APIRequestContext] throw on response codes other than 2xx and 3xx.
+* Assertion [expect(page).toHaveURL()](/api/class-pageassertions.mdx#page-assertions-to-have-url) now supports a predicate.
+
+### Browser Versions
+* Chromium 134.0.6998.35
+* Mozilla Firefox 135.0
+* WebKit 18.4
+
+This version was also tested against the following stable channels:
+* Google Chrome 133
+* Microsoft Edge 133
+
 ## Version 1.50
 
 ### Test runner
@@ -1350,9 +1427,9 @@ This version was also tested against the following stable channels:
   
   ```html
   <select multiple>
-    <option value="red">Red</div>
-    <option value="green">Green</div>
-    <option value="blue">Blue</div>
+    <option value="red">Red</option>
+    <option value="green">Green</option>
+    <option value="blue">Blue</option>
   </select>
   ```
   
@@ -2840,6 +2917,7 @@ This version of Playwright was also tested against the following stable channels
 [TestInfoError]: /api/class-testinfoerror.mdx "TestInfoError"
 [TestOptions]: /api/class-testoptions.mdx "TestOptions"
 [TestProject]: /api/class-testproject.mdx "TestProject"
+[TestStepInfo]: /api/class-teststepinfo.mdx "TestStepInfo"
 [WorkerInfo]: /api/class-workerinfo.mdx "WorkerInfo"
 [Reporter]: /api/class-reporter.mdx "Reporter"
 [Suite]: /api/class-suite.mdx "Suite"
