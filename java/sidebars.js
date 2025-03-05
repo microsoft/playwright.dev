@@ -48,6 +48,7 @@ module.exports = {
         { type: 'doc', id: 'pom' },
         { type: 'doc', id: 'screenshots' },
         { type: 'doc', id: 'aria-snapshots' },
+        { type: 'doc', id: 'touch-events' },
         { type: 'doc', id: 'codegen' },
         { type: 'doc', id: 'trace-viewer' },
         { type: 'doc', id: 'videos' },
