@@ -11,7 +11,7 @@ import LiteYouTube from '@site/src/components/LiteYouTube';
 
 ## Version 1.51
 
-### Highlights
+### StorageState for indexedDB
 * New option [indexedDB](/api/class-browsercontext.mdx#browser-context-storage-state-option-indexed-db) for [browserContext.storageState()](/api/class-browsercontext.mdx#browser-context-storage-state) allows to save and restore IndexedDB contents. Useful when your application uses [IndexedDB API](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) to store authentication tokens, like Firebase Authentication.
   
   Here is an example following the [authentication guide](./auth.mdx#basic-shared-account-in-all-tests):
@@ -31,47 +31,58 @@ import LiteYouTube from '@site/src/components/LiteYouTube';
   });
   ```
   
-* New option [visible](/api/class-locator.mdx#locator-filter-option-visible) for [locator.filter()](/api/class-locator.mdx#locator-filter) allows matching only visible elements.
-  
-  ```js title="example.spec.ts"
-  test('some test', async ({ page }) => {
-    // Ignore invisible todo items.
-    const todoItems = page.getByTestId('todo-item').filter({ visible: true });
-    // Check there are exactly 3 visible ones.
-    await expect(todoItems).toHaveCount(3);
-  });
-  ```
-  
-* Set option [testConfig.captureGitInfo](/api/class-testconfig.mdx#test-config-capture-git-info) to capture git information into [testConfig.metadata](/api/class-testconfig.mdx#test-config-metadata).
-  
-  ```js title="playwright.config.ts"
-  import { defineConfig } from '@playwright/test';
-  
-  export default defineConfig({
-    captureGitInfo: { commit: true, diff: true }
-  });
-  ```
-  
-  HTML report will show this information when available:
-  
-  ![Git information in the report](https://github.com/user-attachments/assets/9ca4a05a-1485-4521-826b-50568babec3f)
+### Copy as prompt
 
-### Test runner
-* A new [TestStepInfo] object is now available in test steps. You can add step attachments or skip the step under some conditions.
-  
-  ```js
-  test('some test', async ({ page, isMobile }) => {
-    // Note the new "step" argument:
-    await test.step('here is my step', async step => {
-      step.skip(isMobile, 'not relevant on mobile layouts');
-  
-      // ...
-      await step.attach('my attachment', { body: 'some text' });
-      // ...
-    });
+New "Copy prompt" button on errors in the HTML report, trace viewer and UI mode. Click to copy a pre-filled LLM prompt that contains the error message and useful context for fixing the error.
+
+![Copy prompt](https://github.com/user-attachments/assets/f3654407-dd6d-4240-9845-0d96df2bf30a)
+
+### Filter visible elements
+
+New option [visible](/api/class-locator.mdx#locator-filter-option-visible) for [locator.filter()](/api/class-locator.mdx#locator-filter) allows matching only visible elements.
+
+```js title="example.spec.ts"
+test('some test', async ({ page }) => {
+  // Ignore invisible todo items.
+  const todoItems = page.getByTestId('todo-item').filter({ visible: true });
+  // Check there are exactly 3 visible ones.
+  await expect(todoItems).toHaveCount(3);
+});
+```
+
+### Git information in HTML report
+
+Set option [testConfig.captureGitInfo](/api/class-testconfig.mdx#test-config-capture-git-info) to capture git information into [testConfig.metadata](/api/class-testconfig.mdx#test-config-metadata).
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  captureGitInfo: { commit: true, diff: true }
+});
+```
+
+HTML report will show this information when available:
+
+![Git information in the report](https://github.com/user-attachments/assets/f5b3f6f4-aa08-4a24-816c-7edf33ef0c37)
+
+### Test Step improvements
+
+A new [TestStepInfo] object is now available in test steps. You can add step attachments or skip the step under some conditions.
+
+```js
+test('some test', async ({ page, isMobile }) => {
+  // Note the new "step" argument:
+  await test.step('here is my step', async step => {
+    step.skip(isMobile, 'not relevant on mobile layouts');
+
+    // ...
+    await step.attach('my attachment', { body: 'some text' });
+    // ...
   });
-  ```
-  
+});
+```
+
 ### Miscellaneous
 * New option `contrast` for methods [page.emulateMedia()](/api/class-page.mdx#page-emulate-media) and [browser.newContext()](/api/class-browser.mdx#browser-new-context) allows to emulate the `prefers-contrast` media feature.
 * New option [failOnStatusCode](/api/class-apirequest.mdx#api-request-new-context-option-fail-on-status-code) makes all fetch requests made through the [APIRequestContext] throw on response codes other than 2xx and 3xx.
