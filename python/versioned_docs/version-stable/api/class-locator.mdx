@@ -914,32 +914,6 @@ Execute JavaScript code in the page, taking the matching element as an argument.
 
 **Usage**
 
-<Tabs
-  groupId="python-flavor"
-  defaultValue="sync"
-  values={[
-    {label: 'Sync', value: 'sync'},
-    {label: 'Async', value: 'async'}
-  ]
-}>
-<TabItem value="sync">
-
-```py
-tweets = page.locator(".tweet .retweets")
-assert tweets.evaluate("node => node.innerText") == "10 retweets"
-```
-
-</TabItem>
-<TabItem value="async">
-
-```py
-tweets = page.locator(".tweet .retweets")
-assert await tweets.evaluate("node => node.innerText") == "10 retweets"
-```
-
-</TabItem>
-</Tabs>
-
 **Arguments**
 - `expression` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-option-expression"/><a href="#locator-evaluate-option-expression" class="list-anchor">#</a>
   
@@ -952,7 +926,7 @@ assert await tweets.evaluate("node => node.innerText") == "10 retweets"
   Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.set_default_timeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
-- [Serializable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-return"/><a href="#locator-evaluate-return" class="list-anchor">#</a>
+- [Dict]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-return"/><a href="#locator-evaluate-return" class="list-anchor">#</a>
 
 **Details**
 
@@ -1007,7 +981,7 @@ more_than_ten = await locator.evaluate_all("(divs, min) => divs.length > min", 1
   Optional argument to pass to [expression](/api/class-locator.mdx#locator-evaluate-all-option-expression).
 
 **Returns**
-- [Serializable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-all-return"/><a href="#locator-evaluate-all-return" class="list-anchor">#</a>
+- [Dict]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-all-return"/><a href="#locator-evaluate-all-return" class="list-anchor">#</a>
 
 **Details**
 
@@ -1184,6 +1158,9 @@ await row_locator.filter(has_text="text in column 1").filter(
 - `has_text` [str] | [Pattern] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-option-has-text"/><a href="#locator-filter-option-has-text" class="list-anchor">#</a>
   
   Matches elements containing specified text somewhere inside, possibly in a child or a descendant element. When passed a [string], matching is case-insensitive and searches for a substring. For example, `"Playwright"` matches `<article><div>Playwright</div></article>`.
+- `visible` [bool] *(optional)* <font size="2">Added in: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-option-visible"/><a href="#locator-filter-option-visible" class="list-anchor">#</a>
+  
+  Only matches visible or invisible elements.
 
 **Returns**
 - [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-return"/><a href="#locator-filter-return" class="list-anchor">#</a>
@@ -2625,7 +2602,7 @@ await page.get_by_role("link").screenshot(animations="disabled", path="link.png"
   When set to `"hide"`, screenshot will hide text caret. When set to `"initial"`, text caret behavior will not be changed.  Defaults to `"hide"`.
 - `mask` [List]\[[Locator]\] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-mask"/><a href="#locator-screenshot-option-mask" class="list-anchor">#</a>
   
-  Specify locators that should be masked when the screenshot is taken. Masked elements will be overlaid with a pink box `#FF00FF` (customized by [mask_color](/api/class-locator.mdx#locator-screenshot-option-mask-color)) that completely covers its bounding box.
+  Specify locators that should be masked when the screenshot is taken. Masked elements will be overlaid with a pink box `#FF00FF` (customized by [mask_color](/api/class-locator.mdx#locator-screenshot-option-mask-color)) that completely covers its bounding box. The mask is also applied to invisible elements, see [Matching only visible elements](../locators.mdx#matching-only-visible-elements) to disable that.
 - `mask_color` [str] *(optional)* <font size="2">Added in: v1.35</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-screenshot-option-mask-color"/><a href="#locator-screenshot-option-mask-color" class="list-anchor">#</a>
   
   Specify the color of the overlay box for masked elements, in [CSS color format](https://developer.mozilla.org/en-US/docs/Web/CSS/color_value). Default color is pink `#FF00FF`.
@@ -2701,9 +2678,9 @@ Selects option or options in `<select>`.
 
 ```html
 <select multiple>
-  <option value="red">Red</div>
-  <option value="green">Green</div>
-  <option value="blue">Blue</div>
+  <option value="red">Red</option>
+  <option value="green">Green</option>
+  <option value="blue">Blue</option>
 </select>
 ```
 
@@ -2995,7 +2972,7 @@ This method expects [Locator] to point to an [input element](https://developer.m
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.tap</x-search>
 
-Perform a tap gesture on the element matching the locator.
+Perform a tap gesture on the element matching the locator. For examples of emulating other gestures by manually dispatching touch events, see the [emulating legacy touch events](../touch-events.mdx) page.
 
 **Usage**
 
