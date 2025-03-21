@@ -1561,7 +1561,7 @@ await expect(locator).to_have_attribute("type", "text")
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><x-search>locatorAssertions.to_have_class</x-search>
 
-Ensures the [Locator] points to an element with given CSS classes. When a string is provided, it must fully match the element's `class` attribute. To match individual classes or perform partial matches, use a regular expression:
+Ensures the [Locator] points to an element with given CSS classes. When a string is provided, it must fully match the element's `class` attribute. To match individual classes or perform partial matches use [partial](/api/class-locatorassertions.mdx#locator-assertions-to-have-class-option-partial).
 
 **Usage**
 
@@ -1583,8 +1583,9 @@ Ensures the [Locator] points to an element with given CSS classes. When a string
 from playwright.sync_api import expect
 
 locator = page.locator("#component")
-expect(locator).to_have_class(re.compile(r"(^|\\s)selected(\\s|$)"))
 expect(locator).to_have_class("middle selected row")
+expect(locator).to_have_class("selected", partial=True)
+expect(locator).to_have_class("middle row", partial=True)
 ```
 
 </TabItem>
@@ -1594,8 +1595,8 @@ expect(locator).to_have_class("middle selected row")
 from playwright.async_api import expect
 
 locator = page.locator("#component")
-await expect(locator).to_have_class(re.compile(r"(^|\\s)selected(\\s|$)"))
 await expect(locator).to_have_class("middle selected row")
+await expect(locator).to_have_class("middle row", partial=True)
 ```
 
 </TabItem>
@@ -1637,6 +1638,9 @@ await expect(locator).to_have_class(["component", "component selected", "compone
 - `expected` [str] | [Pattern] | [List]\[[str]\] | [List]\[[Pattern]\] | [List]\[[str] | [Pattern]\] <font size="2">Added in: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-have-class-option-expected"/><a href="#locator-assertions-to-have-class-option-expected" class="list-anchor">#</a>
   
   Expected class or RegExp or a list of those.
+- `partial` [bool] *(optional)* <font size="2">Added in: v1.52</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-have-class-option-partial"/><a href="#locator-assertions-to-have-class-option-partial" class="list-anchor">#</a>
+  
+  Whether to perform a partial match, defaults to `false`. In an exact match, which is the default, the `className` attribute must be exactly the same as the asserted value. In a partial match, all classes from the asserted value, separated by spaces, must be present in the [Element.classList](https://developer.mozilla.org/en-US/docs/Web/API/Element/classList) in any order. Partial match does not support a regular expression.
 - `timeout` [float] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-have-class-option-timeout"/><a href="#locator-assertions-to-have-class-option-timeout" class="list-anchor">#</a>
   
   Time to retry the assertion for in milliseconds. Defaults to `5000`.
