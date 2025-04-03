@@ -69,11 +69,16 @@ jobs:
           git add "**/versions.json"
           git commit -m "feat(roll): roll to $VERSION Playwright"
           git push origin $BRANCH_NAME --force
+      - uses: actions/create-github-app-token@v1
+        id: app-token
+        with:
+          app-id: ${{ vars.PLAYWRIGHT_APP_ID }}
+          private-key: ${{ secrets.PLAYWRIGHT_PRIVATE_KEY }}
       - name: Check for existing Pull Request
         id: check-pr
         uses: actions/github-script@v7
         with:
-          github-token: ${{ secrets.GH_SERVICE_ACCOUNT_TOKEN }}
+          github-token: ${{ steps.app-token.outputs.token }}
           script: |
             const { data: pullRequests } = await github.rest.pulls.list({
               owner: 'microsoft',
@@ -87,7 +92,7 @@ jobs:
         uses: actions/github-script@v7
         if: ${{ steps.prepare-branch.outputs.HAS_CHANGES == '1' && steps.check-pr.outputs.result == 'false' }}
         with:
-          github-token: ${{ secrets.GH_SERVICE_ACCOUNT_TOKEN }}
+          github-token: ${{ steps.app-token.outputs.token }}
           script: |
             await github.rest.pulls.create({
               owner: 'microsoft',
