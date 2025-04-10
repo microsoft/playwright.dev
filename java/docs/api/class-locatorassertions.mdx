@@ -29,6 +29,52 @@ public class TestLocator {
 
 ## Methods
 
+### containsClass {#locator-assertions-to-contain-class}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.52</font><x-search>locatorAssertions.containsClass</x-search>
+
+Ensures the [Locator] points to an element with given CSS classes. All classes from the asserted value, separated by spaces, must be present in the [Element.classList](https://developer.mozilla.org/en-US/docs/Web/API/Element/classList) in any order.
+
+**Usage**
+
+```html
+<div class='middle selected row' id='component'></div>
+```
+
+```java
+assertThat(page.locator("#component")).containsClass("middle selected row");
+assertThat(page.locator("#component")).containsClass("selected");
+assertThat(page.locator("#component")).containsClass("row middle");
+```
+
+When an array is passed, the method asserts that the list of elements located matches the corresponding list of expected class lists. Each element's class attribute is matched against the corresponding class in the array:
+
+```html
+<div class='list'></div>
+  <div class='component inactive'></div>
+  <div class='component active'></div>
+  <div class='component inactive'></div>
+</div>
+```
+
+```java
+assertThat(page.locator("list > .component")).containsClass(new String[] {"inactive", "active", "inactive"});
+```
+
+**Arguments**
+- `expected` [String] | [List]&lt;[String]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-contain-class-option-expected"/><a href="#locator-assertions-to-contain-class-option-expected" class="list-anchor">#</a>
+  
+  A string containing expected class names, separated by spaces, or a list of such strings to assert multiple elements.
+- `options` `LocatorAssertions.ContainsClassOptions` *(optional)*
+  - `setTimeout` [double] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-contain-class-option-timeout"/><a href="#locator-assertions-to-contain-class-option-timeout" class="list-anchor">#</a>
+    
+    Time to retry the assertion for in milliseconds. Defaults to `5000`.
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-contain-class-return"/><a href="#locator-assertions-to-contain-class-return" class="list-anchor">#</a>
+
+---
+
 ### containsText {#locator-assertions-to-contain-text}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><x-search>locatorAssertions.containsText</x-search>
@@ -223,7 +269,7 @@ assertThat(page.locator("input")).hasAttribute("type", "text");
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.20</font><x-search>locatorAssertions.hasClass</x-search>
 
-Ensures the [Locator] points to an element with given CSS classes. When a string is provided, it must fully match the element's `class` attribute. To match individual classes or perform partial matches use [setPartial](/api/class-locatorassertions.mdx#locator-assertions-to-have-class-option-partial).
+Ensures the [Locator] points to an element with given CSS classes. When a string is provided, it must fully match the element's `class` attribute. To match individual classes use [assertThat(locator).containsClass()](/api/class-locatorassertions.mdx#locator-assertions-to-contain-class).
 
 **Usage**
 
@@ -233,8 +279,7 @@ Ensures the [Locator] points to an element with given CSS classes. When a string
 
 ```java
 assertThat(page.locator("#component")).hasClass("middle selected row");
-assertThat(page.locator("#component")).hasClass("selected", new LocatorAssertions.HasClassOptions().setPartial(true));
-assertThat(page.locator("#component")).hasClass("middle row", new LocatorAssertions.HasClassOptions().setPartial(true));
+assertThat(page.locator("#component")).hasClass(Pattern.compile("(^|\\s)selected(\\s|$)"));
 ```
 
 When an array is passed, the method asserts that the list of elements located matches the corresponding list of expected class values. Each element's class attribute is matched against the corresponding string or regular expression in the array:
@@ -248,9 +293,6 @@ assertThat(page.locator("list > .component")).hasClass(new String[] {"component"
   
   Expected class or RegExp or a list of those.
 - `options` `LocatorAssertions.HasClassOptions` *(optional)*
-  - `setPartial` [boolean] *(optional)* <font size="2">Added in: v1.52</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-have-class-option-partial"/><a href="#locator-assertions-to-have-class-option-partial" class="list-anchor">#</a>
-    
-    Whether to perform a partial match, defaults to `false`. In an exact match, which is the default, the `className` attribute must be exactly the same as the asserted value. In a partial match, all classes from the asserted value, separated by spaces, must be present in the [Element.classList](https://developer.mozilla.org/en-US/docs/Web/API/Element/classList) in any order. Partial match does not support a regular expression.
   - `setTimeout` [double] *(optional)* <font size="2">Added in: v1.18</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-assertions-to-have-class-option-timeout"/><a href="#locator-assertions-to-have-class-option-timeout" class="list-anchor">#</a>
     
     Time to retry the assertion for in milliseconds. Defaults to `5000`.
