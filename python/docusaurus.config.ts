@@ -51,7 +51,7 @@ export default {
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "throw",
   scripts: ["/python/js/redirection.js"],
-  favicon: "img/playwright-logo.svg",
+  favicon: "img/playwright-logo.ico",
   themeConfig: {
     colorMode: {
       defaultMode: "dark",

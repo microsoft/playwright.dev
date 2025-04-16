@@ -51,7 +51,7 @@ module.exports = {
   onBrokenLinks: "throw",
   onBrokenMarkdownLinks: "throw",
   scripts: ["/java/js/redirection.js"],
-  favicon: "img/playwright-logo.svg",
+  favicon: "img/playwright-logo.ico",
   themeConfig: {
     colorMode: {
       defaultMode: "dark",
