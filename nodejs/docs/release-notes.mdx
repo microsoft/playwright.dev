@@ -9,6 +9,52 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 import LiteYouTube from '@site/src/components/LiteYouTube';
 
+## Version 1.52
+
+### Highlights
+- New method [expect(locator).toContainClass()](/api/class-locatorassertions.mdx#locator-assertions-to-contain-class) to ergonomically assert individual class names on the element.
+  
+  ```ts
+  await expect(page.getByRole('listitem', { name: 'Ship v1.52' })).toContainClass('done');
+  ```
+  
+- [Aria Snapshots](./aria-snapshots.mdx) got two new properties: [`/children`](./aria-snapshots.mdx#strict-matching) for strict matching and `/url` for links.
+  
+  ```ts
+  await expect(locator).toMatchAriaSnapshot(`
+    - list
+      - /children: equal
+      - listitem: Feature A
+      - listitem:
+        - link "Feature B":
+          - /url: "https://playwright.dev"
+  `);
+  ```
+  
+### Test Runner
+- New property [testProject.workers](/api/class-testproject.mdx#test-project-workers) allows to specify the number of concurrent worker processes to use for a test project. The global limit of property [testConfig.workers](/api/class-testconfig.mdx#test-config-workers) still applies.
+- New [testConfig.failOnFlakyTests](/api/class-testconfig.mdx#test-config-fail-on-flaky-tests) option to fail the test run if any flaky tests are detected, similarly to `--fail-on-flaky-tests`. This is useful for CI/CD environments where you want to ensure that all tests are stable before deploying.
+- New property [testResult.annotations](/api/class-testresult.mdx#test-result-annotations) contains annotations for each test retry.
+
+### Miscellaneous
+- New option [maxRedirects](/api/class-apirequest.mdx#api-request-new-context-option-max-redirects) in [apiRequest.newContext()](/api/class-apirequest.mdx#api-request-new-context) to control the maximum number of redirects.
+- New option [ref](/api/class-locator.mdx#locator-aria-snapshot-option-ref) in [locator.ariaSnapshot()](/api/class-locator.mdx#locator-aria-snapshot) to generate reference for each element in the snapshot which can later be used to locate the element.
+- HTML reporter now supports *NOT filtering* via `!@my-tag` or `!my-file.spec.ts` or `!p:my-project`.
+
+### Breaking Changes
+- Glob URL patterns in methods like [page.route()](/api/class-page.mdx#page-route) do not support `?` and `[]` anymore. We recommend using regular expressions instead.
+- Method [route.continue()](/api/class-route.mdx#route-continue) does not allow to override the `Cookie` header anymore. If a `Cookie` header is provided, it will be ignored, and the cookie will be loaded from the browser's cookie store. To set custom cookies, use [browserContext.addCookies()](/api/class-browsercontext.mdx#browser-context-add-cookies).
+- macOS 13 is now deprecated and will no longer receive WebKit updates. Please upgrade to a more recent macOS version to continue benefiting from the latest WebKit improvements.
+
+### Browser Versions
+- Chromium 136.0.7103.25
+- Mozilla Firefox 137.0
+- WebKit 18.4
+
+This version was also tested against the following stable channels:
+- Google Chrome 135
+- Microsoft Edge 135
+
 ## Version 1.51
 
 ### StorageState for indexedDB
