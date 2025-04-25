@@ -301,21 +301,41 @@ testInfo.slow(condition, description);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testInfo.snapshotPath</x-search>
 
-Returns a path to a snapshot file with the given `pathSegments`. Learn more about [snapshots](../test-snapshots.mdx).
-
-> Note that `pathSegments` accepts path segments to the snapshot file such as `testInfo.snapshotPath('relative', 'path', 'to', 'snapshot.png')`.
-> However, this path must stay within the snapshots directory for each test file (i.e. `a.spec.js-snapshots`), otherwise it will throw.
+Returns a path to a snapshot file with the given `name`. Pass [kind](/api/class-testinfo.mdx#test-info-snapshot-path-option-kind) to obtain a specific path:
+* `kind: 'screenshot'` for [expect(page).toHaveScreenshot()](/api/class-pageassertions.mdx#page-assertions-to-have-screenshot-1);
+* `kind: 'aria'` for [expect(locator).toMatchAriaSnapshot()](/api/class-locatorassertions.mdx#locator-assertions-to-match-aria-snapshot);
+* `kind: 'snapshot'` for [expect(value).toMatchSnapshot()](/api/class-snapshotassertions.mdx#snapshot-assertions-to-match-snapshot-1).
 
 **Usage**
 
 ```js
-testInfo.snapshotPath(...pathSegments);
+await expect(page).toHaveScreenshot('header.png');
+// Screenshot assertion above expects screenshot at this path:
+const screenshotPath = test.info().snapshotPath('header.png', { kind: 'screenshot' });
+
+await expect(page.getByRole('main')).toMatchAriaSnapshot({ name: 'main.aria.yml' });
+// Aria snapshot assertion above expects snapshot at this path:
+const ariaSnapshotPath = test.info().snapshotPath('main.aria.yml', { kind: 'aria' });
+
+expect('some text').toMatchSnapshot('snapshot.txt');
+// Snapshot assertion above expects snapshot at this path:
+const snapshotPath = test.info().snapshotPath('snapshot.txt');
+
+expect('some text').toMatchSnapshot(['dir', 'subdir', 'snapshot.txt']);
+// Snapshot assertion above expects snapshot at this path:
+const nestedPath = test.info().snapshotPath('dir', 'subdir', 'snapshot.txt');
 ```
 
 **Arguments**
-- `...pathSegments` [Array]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-info-snapshot-path-option-path-segments"/><a href="#test-info-snapshot-path-option-path-segments" class="list-anchor">#</a>
+- `...name` [Array]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-info-snapshot-path-option-name"/><a href="#test-info-snapshot-path-option-name" class="list-anchor">#</a>
   
   The name of the snapshot or the path segments to define the snapshot file path. Snapshots with the same name in the same test file are expected to be the same.
+  
+  When passing [kind](/api/class-testinfo.mdx#test-info-snapshot-path-option-kind), multiple name segments are not supported.
+- `options` [Object] *(optional)*
+  - `kind` "snapshot" | "screenshot" | "aria" *(optional)* <font size="2">Added in: v1.53</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-info-snapshot-path-option-kind"/><a href="#test-info-snapshot-path-option-kind" class="list-anchor">#</a>
+    
+    The snapshot kind controls which snapshot path template is used. See [testConfig.snapshotPathTemplate](/api/class-testconfig.mdx#test-config-snapshot-path-template) for more details. Defaults to `'snapshot'`.
 
 **Returns**
 - [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-info-snapshot-path-return"/><a href="#test-info-snapshot-path-return" class="list-anchor">#</a>
