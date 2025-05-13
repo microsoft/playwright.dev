@@ -14,11 +14,10 @@
  * limitations under the License.
  */
 
-import React, { type ReactNode } from 'react';
+import React from 'react';
 import styles from './styles.module.css';
 
 type Person = {
-  className?: string;
   name: string;
   city: string;
   country: string;
@@ -31,13 +30,12 @@ type Person = {
 };
 
 type ProfileProps = {
-  className?: string;
   person: Person;
 };
 
-function ProfileCard({ person, className }: ProfileProps) {
+function ProfileCard({ person }: ProfileProps) {
   return (
-    <div className={className}>
+    <li>
       <div className={styles.card}>
         <div className={styles.cardBody}>
           <div className="avatar avatar--vertical">
@@ -58,20 +56,20 @@ function ProfileCard({ person, className }: ProfileProps) {
         </div>
         <div className={styles.socialLinks}>
           {person.githubUrl && (
-            <a className="header-github-link" href={person.githubUrl}></a>
+            <a className="header-github-link" href={person.githubUrl} aria-label='GitHub'></a>
           )}
           {person.twitterUrl && (
-            <a className={styles.twitterLink} href={person.twitterUrl}></a>
+            <a className={styles.twitterLink} href={person.twitterUrl} aria-label='Twitter'></a>
           )}
           {person.websiteUrl && (
-            <a className={styles.websiteLink} href={person.websiteUrl}></a>
+            <a className={styles.websiteLink} href={person.websiteUrl} aria-label="Website"></a>
           )}
           {person.linkedInUrl && (
-            <a className={styles.linkedInLink} href={person.linkedInUrl}></a>
+            <a className={styles.linkedInLink} href={person.linkedInUrl} aria-label="LinkedIn"></a>
           )}
         </div>
       </div>
-    </div>
+    </li>
   );
 }
 
