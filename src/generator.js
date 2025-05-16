@@ -147,6 +147,14 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 `});
+    if (clazz.deprecated) {
+      result.push({
+        type: 'text',
+        text: `:::warning[Deprecated]
+${this.documentation.renderLinksInText(clazz.deprecated)}
+:::
+`      });
+    }
     result.push(...this.formatComment(clazz.spec));
     result.push({
       type: 'text',
