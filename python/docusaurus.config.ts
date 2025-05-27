@@ -220,5 +220,6 @@ export default {
   trailingSlash: false,
   future: {
     experimental_faster: true,
+    v4: true,
   },
 } satisfies Config;
