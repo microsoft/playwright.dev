@@ -2,6 +2,36 @@ import { Video } from './types';
 
 const learnVideos: Video[] = [
   {
+    title: 'Handling Visibility in Playwright: getByText vs. getByRole',
+    description: '',
+    id: '4w0W8qYub2U',
+    year: '2025',
+  },
+  {
+    title: 'How to trigger flaky Playwright tests locally after they fail on CI',
+    description: '',
+    id: '0dHDmSjx55o',
+    year: '2025',
+  },
+  {
+    title: 'Playwright Assertions: Avoid Race Conditions with This Simple Fix!',
+    description: '',
+    id: '1VxkHP8vfGg',
+    year: '2025',
+  },
+  {
+    title: 'Getting started with ARIA Snapshots',
+    description: '',
+    id: 'P4R6hnsE0UY',
+    year: '2024',
+  },
+  {
+    title: 'How to test dynamic content in Playwright with API mocking',
+    description: '',
+    id: 'kvGszYAYQ6M',
+    year: '2024',
+  },
+  {
     title: 'How to Run Tests in Playwright with the VS Code Extension',
     description: '',
     id: 'mQmcIBMsc38',

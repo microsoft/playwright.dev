@@ -1,4 +1,37 @@
 const liveStreams = [
+ 
+  {
+    title: 'Testing with AI using Playwright MCP (Model Context Protocol) + Live Demo',
+    description: '',
+    id: 'CNzg1aPwrKI',
+    year: '2025',
+    host: 'Playwright Live',
+    speakers: ["Debbie O'Brien", "Simon Knott"]
+  },
+  {
+    title: 'Community updates and Playwright MCP Server',
+    description: '',
+    id: 'P-JVscQW5AE',
+    year: '2025',
+    host: 'Playwright Live',
+    speakers: ["Debbie O'Brien", "Ben Fellows", "Jean-Francois"]
+  },
+  {
+    title: 'Playwright Live: Exploring the Latest Features!',
+    description: '',
+    id: 'NcSk9fOGEac',
+    year: '2025',
+    host: 'Playwright Live',
+    speakers: ["Debbie O'Brien", "Simon Knott"]
+  },
+  {
+    title: 'Playwright community updates and more',
+    description: '',
+    id: 'YH1tJs2GcUM',
+    year: '2025',
+    host: 'Playwright Live',
+    speakers: ["Debbie O'Brien", "Ben Fellows"]
+  },
   {
     title: 'Testing with Playwright, Epic React testing tab, Epic web testing course and more',
     description: '',
