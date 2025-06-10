@@ -1,5 +1,11 @@
 const featureVideos = [
   {
+    title: 'Debugging with AI',
+    description: '',
+    id: 'Ec_3h5Q8RHY',
+    year: '2025',
+  },
+  {
     title: 'API Mocking',
     description: '',
     id: 'kvGszYAYQ6M',

@@ -18,6 +18,10 @@ const videoNav = [
   {
     label: 'Learn Videos',
     href: '/community/learn-videos'
+  },
+  {
+    label: 'MCP Videos',
+    href: '/community/mcp-videos'
   }
 ];
 
