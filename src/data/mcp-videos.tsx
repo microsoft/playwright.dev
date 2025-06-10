@@ -1,6 +1,6 @@
 const mcpVideos = [
   {
-    title: 'How to Generate Playwright Tests using MCP + Copilot',
+    title: 'How to Generate Playwright Tests using MCP + GitHub Copilot',
     description: '',
     id: 'AaCj939XIQ4',
     year: '2025',
