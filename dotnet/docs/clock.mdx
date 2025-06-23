@@ -58,6 +58,17 @@ Often you only need to fake `Date.now` while keeping the timers going. That way 
 </script>
 ```
 
+```csharp
+// Set the fixed time for the clock.
+await Page.Clock.SetFixedTimeAsync(new DateTime(2024, 2, 2, 10, 0, 0));
+await Page.GotoAsync("http://localhost:3333");
+await Expect(Page.GetByTestId("current-time")).ToHaveTextAsync("2/2/2024, 10:00:00 AM");
+// Set the fixed time for the clock.
+await Page.Clock.SetFixedTimeAsync(new DateTime(2024, 2, 2, 10, 30, 0));
+// We know that the page has a timer that updates the time every second.
+await Expect(Page.GetByTestId("current-time")).ToHaveTextAsync("2/2/2024, 10:30:00 AM");
+```
+
 ## Consistent time and timers
 
 Sometimes your timers depend on `Date.now` and are confused when the `Date.now` value does not change over time. In this case, you can install the clock and fast forward to the time of interest when testing.

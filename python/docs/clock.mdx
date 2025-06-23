@@ -58,6 +58,41 @@ Often you only need to fake `Date.now` while keeping the timers going. That way 
 </script>
 ```
 
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.clock.set_fixed_time(datetime.datetime(2024, 2, 2, 10, 0, 0))
+page.goto("http://localhost:3333")
+expect(page.get_by_test_id("current-time")).to_have_text("2/2/2024, 10:00:00 AM")
+page.clock.set_fixed_time(datetime.datetime(2024, 2, 2, 10, 30, 0))
+# We know that the page has a timer that updates the time every second.
+expect(page.get_by_test_id("current-time")).to_have_text("2/2/2024, 10:30:00 AM")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.clock.set_fixed_time(datetime.datetime(2024, 2, 2, 10, 0, 0))
+await page.goto("http://localhost:3333")
+await expect(page.get_by_test_id("current-time")).to_have_text("2/2/2024, 10:00:00 AM")
+
+await page.clock.set_fixed_time(datetime.datetime(2024, 2, 2, 10, 30, 0))
+# We know that the page has a timer that updates the time every second.
+await expect(page.get_by_test_id("current-time")).to_have_text("2/2/2024, 10:30:00 AM")
+```
+
+</TabItem>
+</Tabs>
+
 ## Consistent time and timers
 
 Sometimes your timers depend on `Date.now` and are confused when the `Date.now` value does not change over time. In this case, you can install the clock and fast forward to the time of interest when testing.
