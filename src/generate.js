@@ -31,6 +31,8 @@ const watchProject = process.argv[3];
 const forcedVersion = process.argv.find(arg => arg.startsWith('--version='))?.substring('--version='.length);
 
 const srcDir = path.join(process.env.SRC_DIR || '../playwright', 'docs', 'src');
+const sourceImagesDir = path.join(process.env.SRC_DIR || '../playwright', 'docs', 'src', 'images');
+const targetImagesDir = path.join(__dirname, '..', 'docs', 'images');
 
 const lang2Folder = {
   'js': 'nodejs',
@@ -128,6 +130,139 @@ async function generateDocsForLanguages () {
 };
 
 /**
+ * Check if file is an image
+ * @param {string} filePath 
+ * @returns {boolean}
+ */
+function isImageFile(filePath) {
+  const ext = path.extname(filePath).toLowerCase();
+  const imageExtensions = ['.png', '.jpg', '.jpeg', '.gif', '.svg', '.webp'];
+  return imageExtensions.includes(ext);
+}
+
+/**
+ * Get relative path from source images directory
+ * @param {string} fullPath 
+ * @returns {string}
+ */
+function getRelativePath(fullPath) {
+  return path.relative(sourceImagesDir, fullPath);
+}
+
+/**
+ * Copy a single file from source to target
+ * @param {string} sourcePath 
+ * @param {string} targetPath 
+ */
+function copyImageFile(sourcePath, targetPath) {
+  if (!isImageFile(sourcePath)) {
+    return;
+  }
+  
+  // Ensure target directory exists
+  const targetDir = path.dirname(targetPath);
+  if (!fs.existsSync(targetDir)) {
+    fs.mkdirSync(targetDir, { recursive: true });
+  }
+  
+  console.log(`Copying image: ${getRelativePath(sourcePath)}`);
+  fs.copyFileSync(sourcePath, targetPath);
+}
+
+/**
+ * Remove a file from target
+ * @param {string} targetPath 
+ */
+function removeImageFile(targetPath) {
+  if (fs.existsSync(targetPath)) {
+    console.log(`Removing image: ${getRelativePath(targetPath)}`);
+    fs.unlinkSync(targetPath);
+  }
+}
+
+/**
+ * Recursively copy all images from source directory to target directory
+ * @param {string} sourceDir 
+ * @param {string} targetDir 
+ */
+function copyImagesRecursive(sourceDir, targetDir) {
+  // Create target directory if it doesn't exist
+  if (!fs.existsSync(targetDir)) {
+    fs.mkdirSync(targetDir, { recursive: true });
+  }
+
+  // Read the source directory
+  const files = fs.readdirSync(sourceDir);
+  let imageCount = 0;
+
+  files.forEach(file => {
+    const sourcePath = path.join(sourceDir, file);
+    const targetPath = path.join(targetDir, file);
+    
+    if (fs.statSync(sourcePath).isDirectory()) {
+      // Recursively copy subdirectories
+      imageCount += copyImagesRecursive(sourcePath, targetPath);
+    } else if (isImageFile(sourcePath)) {
+      copyImageFile(sourcePath, targetPath);
+      imageCount++;
+    }
+  });
+
+  return imageCount;
+}
+
+/**
+ * Handle image file system events when watching
+ * @param {string} event 
+ * @param {string} sourcePath 
+ */
+function handleImageEvent(event, sourcePath) {
+  if (!isImageFile(sourcePath)) {
+    return;
+  }
+
+  const relativePath = getRelativePath(sourcePath);
+  const targetPath = path.join(targetImagesDir, relativePath);
+
+  switch (event) {
+    case 'add':
+    case 'change':
+      copyImageFile(sourcePath, targetPath);
+      break;
+    case 'unlink':
+      removeImageFile(targetPath);
+      break;
+    case 'addDir':
+      // Directory events are handled automatically by file events
+      break;
+    case 'unlinkDir':
+      const targetDir = path.join(targetImagesDir, relativePath);
+      if (fs.existsSync(targetDir)) {
+        console.log(`Removing directory: ${relativePath}`);
+        fs.rmSync(targetDir, { recursive: true, force: true });
+      }
+      break;
+  }
+}
+
+/**
+ * Sync all images from upstream playwright repo
+ */
+function syncImages() {
+  console.log('Syncing images from upstream playwright repo...');
+  console.log(`Source: ${sourceImagesDir}`);
+  console.log(`Target: ${targetImagesDir}`);
+
+  if (!fs.existsSync(sourceImagesDir)) {
+    console.warn(`Source images directory does not exist: ${sourceImagesDir}`);
+    return;
+  }
+
+  const imageCount = copyImagesRecursive(sourceImagesDir, targetImagesDir);
+  console.log(`Image sync completed! Copied ${imageCount} images.`);
+}
+
+/**
  * @param {import('chokidar').FSWatcherEventMap['all'][0]} event
  * @param {string} from
  */
@@ -159,14 +294,31 @@ async function syncWithWorkingDirectory(event, from) {
         console.error(`Error auto syncing docs (generating)`, error);
       })
     });
-    chokidar.watch(path.join(__dirname, '..', lang2Folder[watchProject])).on('all', (event, path) => {
-      syncWithWorkingDirectory(event, path).catch(error => {
-        console.error(`Error auto syncing docs (mirroring)`, error);
-      })
-    });
+
+    // Watch for image changes
+    if (fs.existsSync(sourceImagesDir)) {
+      chokidar.watch(sourceImagesDir, {
+        ignored: /(^|[\/\\])\../, // ignore dotfiles
+        persistent: true,
+        ignoreInitial: true
+      }).on('all', (event, imagePath) => {
+        handleImageEvent(event, imagePath);
+      });
+    }
+
+    if (watchProject) {
+      chokidar.watch(path.join(__dirname, '..', lang2Folder[watchProject])).on('all', (event, path) => {
+        syncWithWorkingDirectory(event, path).catch(error => {
+          console.error(`Error auto syncing docs (mirroring)`, error);
+        })
+      });
+    }
+
     await generateDocsForLanguages();
+    syncImages();
   } else {
     await generateDocsForLanguages();
+    syncImages();
     await updateStarsButton();
   }
 
