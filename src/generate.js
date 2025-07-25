@@ -175,7 +175,7 @@ function copyImageFile(sourcePath, targetPath) {
  */
 function removeImageFile(targetPath) {
   if (fs.existsSync(targetPath)) {
-    console.log(`Removing image: ${getRelativePath(targetPath)}`);
+    console.log(`Removing image: ${path.relative(targetImagesDir, targetPath)}`);
     fs.unlinkSync(targetPath);
   }
 }
