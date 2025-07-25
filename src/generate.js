@@ -306,11 +306,12 @@ async function syncWithWorkingDirectory(event, from) {
       });
     }
 
-    if (watchProject) {
-      chokidar.watch(path.join(__dirname, '..', lang2Folder[watchProject])).on('all', (event, path) => {
+    const watchPath = watchProject ? path.join(__dirname, '..', lang2Folder[watchProject]) : null;
+    if (watchPath && fs.existsSync(watchPath)) {
+      chokidar.watch(watchPath).on('all', (event, path) => {
         syncWithWorkingDirectory(event, path).catch(error => {
           console.error(`Error auto syncing docs (mirroring)`, error);
-        })
+        });
       });
     }
 
