@@ -267,6 +267,55 @@ function syncImages() {
 }
 
 /**
+ * Convert relative image paths to absolute paths in generated markdown files
+ */
+function fixImagePathsInGeneratedDocs() {
+  console.log('Fixing image paths in generated documentation...');
+  
+  const docsDirs = [
+    path.join(__dirname, '..', 'nodejs', 'docs'),
+    path.join(__dirname, '..', 'python', 'docs'),
+    path.join(__dirname, '..', 'java', 'docs'),
+    path.join(__dirname, '..', 'dotnet', 'docs'),
+  ];
+
+  let filesFixed = 0;
+
+  docsDirs.forEach(docsDir => {
+    if (!fs.existsSync(docsDir)) return;
+
+    const walkDir = (dir) => {
+      const files = fs.readdirSync(dir);
+      files.forEach(file => {
+        const filePath = path.join(dir, file);
+        const stat = fs.statSync(filePath);
+        
+        if (stat.isDirectory()) {
+          walkDir(filePath);
+        } else if (file.endsWith('.mdx') || file.endsWith('.md')) {
+          let content = fs.readFileSync(filePath, 'utf8');
+          const originalContent = content;
+          
+          // Convert relative image paths to absolute paths
+          content = content.replace(/!\[([^\]]*)\]\(\.\/images\//g, '![$1](/images/');
+          
+          if (content !== originalContent) {
+            fs.writeFileSync(filePath, content);
+            filesFixed++;
+          }
+        }
+      });
+    };
+
+    walkDir(docsDir);
+  });
+
+  if (filesFixed > 0) {
+    console.log(`Fixed image paths in ${filesFixed} documentation files.`);
+  }
+}
+
+/**
  * @param {import('chokidar').FSWatcherEventMap['all'][0]} event
  * @param {string} from
  */
@@ -321,9 +370,11 @@ async function syncWithWorkingDirectory(event, from) {
 
     await generateDocsForLanguages();
     syncImages();
+    fixImagePathsInGeneratedDocs();
   } else {
     await generateDocsForLanguages();
     syncImages();
+    fixImagePathsInGeneratedDocs();
     await updateStarsButton();
   }
 
