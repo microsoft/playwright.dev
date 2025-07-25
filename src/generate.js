@@ -239,7 +239,11 @@ function handleImageEvent(event, sourcePath) {
       const targetDir = path.join(targetImagesDir, relativePath);
       if (fs.existsSync(targetDir)) {
         console.log(`Removing directory: ${relativePath}`);
-        fs.rmSync(targetDir, { recursive: true, force: true });
+        try {
+          fs.rmSync(targetDir, { recursive: true, force: true });
+        } catch (error) {
+          console.error(`Failed to remove directory: ${relativePath}. Error: ${error.message}`);
+        }
       }
       break;
   }
