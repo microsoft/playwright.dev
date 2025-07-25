@@ -32,7 +32,7 @@ const forcedVersion = process.argv.find(arg => arg.startsWith('--version='))?.su
 
 const srcDir = path.join(process.env.SRC_DIR || '../playwright', 'docs', 'src');
 const sourceImagesDir = path.join(process.env.SRC_DIR || '../playwright', 'docs', 'src', 'images');
-const targetImagesDir = path.join(__dirname, '..', 'static', 'docs');
+const targetImagesDir = path.join(__dirname, '..', 'static', 'images');
 
 const lang2Folder = {
   'js': 'nodejs',
