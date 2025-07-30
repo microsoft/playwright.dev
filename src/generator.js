@@ -129,6 +129,11 @@ class Generator {
 
     for (const [name, outName] of guides)
       this.generateDoc(name, outName + 'x');
+
+    // this symlink makes the relative path from the markdown just work.
+    // TODO: rewrite markdown to use optimised <Image /> instead: https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-ideal-image
+    // then we can put path manipulation there and remove the symlink.
+    fs.symlinkSync('../../images', path.join(outDir, 'images'), 'dir');
   }
 
   /**
