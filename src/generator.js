@@ -129,11 +129,6 @@ class Generator {
 
     for (const [name, outName] of guides)
       this.generateDoc(name, outName + 'x');
-
-    // this symlink makes the relative path from the markdown just work.
-    // TODO: rewrite markdown to use optimised <Image /> instead: https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-ideal-image
-    // then we can put path manipulation there and remove the symlink.
-    fs.symlinkSync('../../images', path.join(outDir, 'images'), 'dir');
   }
 
   /**
@@ -428,8 +423,18 @@ ${this.documentation.renderLinksInText(member.discouraged)}
    */
   generateDoc(name, outName) {
     const content = fs.readFileSync(path.join(this.srcDir, name)).toString();
-    let nodes = this.filterForLanguage(md.parse(content));
+    let nodes = this.filterForLanguage(md.parse(this.rewriteImageLinks(content)));
     return this.generateDocFromMd(nodes, outName);
+  }
+
+  /**
+   * @param {string} content 
+   */
+  rewriteImageLinks(content) {
+    // use optimised <Image /> instead: https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-ideal-image
+    return content.replaceAll(/!\[(.*)\]\((\.\/images\/.*)\)/g, (match, alt, link) => {
+      return `![${alt}](${path.join('..', link)})`;
+    });
   }
 
   generateDocFromMd(nodes, outName) {
