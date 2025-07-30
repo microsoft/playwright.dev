@@ -125,6 +125,9 @@ async function generateDocsForLanguages () {
     outDir: path.join(__dirname, '..', 'dotnet', 'docs'),
     formatter: new CSharpFormatter(),
   });
+
+  console.log('copying images');
+  fs.cpSync(path.join(srcDir, 'images'), path.join(__dirname, '..', 'images'), { recursive: true });
 };
 
 /**
