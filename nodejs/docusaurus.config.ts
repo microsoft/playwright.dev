@@ -34,6 +34,15 @@ let plugins = [
     }),
   ],
   require.resolve("@docusaurus/plugin-content-pages"),
+  [
+    require.resolve('@docusaurus/plugin-ideal-image'),
+    {
+      max: 1024,
+      min: 640,
+      steps: 4,
+      disableInDev: false
+    }
+  ],
 ];
 
 if (isProd) {
