@@ -23,10 +23,11 @@ function shouldAutoDownload() {
 
 // This is duplicated from plugin-ideal-image in order to always enable automatic download
 // image prop is injected by the plugin-ideal-image Webpack plugin
-function ProgressiveImage({ image: { preSrc, src } }) {
+function ProgressiveImage({ image: { preSrc, src }, alt }) {
   return (
     <Image
       placeholder={{ lqip: preSrc }}
+      alt={alt}
       height={src.height ?? 100}
       width={src.width ?? 100}
       src={src.src}
