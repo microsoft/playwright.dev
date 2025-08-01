@@ -146,6 +146,7 @@ title: "${this.formatter.rewriteClassTitle?.(clazz.name) || clazz.name}"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
+import ProgressiveImage from '@theme/ProgressiveImage';
 `});
     if (clazz.deprecated) {
       result.push({
@@ -431,9 +432,8 @@ ${this.documentation.renderLinksInText(member.discouraged)}
    * @param {string} content 
    */
   rewriteImageLinks(content) {
-    // use optimised <Image /> instead: https://docusaurus.io/docs/api/plugins/@docusaurus/plugin-ideal-image
     return content.replaceAll(/!\[(.*)\]\((\.\/images\/.*)\)/g, (match, alt, link) => {
-      return `![${alt}](${path.join('..', link)})`;
+      return `<ProgressiveImage image={require("${path.join('..', link)}")} alt="${alt}" />`;
     });
   }
 
@@ -450,7 +450,8 @@ ${this.documentation.renderLinksInText(member.discouraged)}
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import HTMLCard from '@site/src/components/HTMLCard';`);
+import HTMLCard from '@site/src/components/HTMLCard';
+import ProgressiveImage from '@theme/ProgressiveImage';`);
   writeFileSyncCached(path.join(this.outDir, outName), this.rewriteVersion(this.mdxLinks(output)));
   }
 
