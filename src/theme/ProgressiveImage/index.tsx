@@ -28,8 +28,6 @@ export default function ProgressiveImage({ image: { preSrc, src }, alt }) {
     <Image
       placeholder={{ lqip: preSrc }}
       alt={alt}
-      height={src.height}
-      width={src.width}
       src={src.src}
       srcSet={src.images.map((image) => ({
         ...image,
