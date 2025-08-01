@@ -14,8 +14,8 @@
  * limitations under the License.
  */
 
-import React from 'react';
-import Image from '@theme/IdealImageLegacy';
+import React from "react";
+import Image from "@theme-original/IdealImageLegacy";
 
 function shouldAutoDownload() {
   return true;
@@ -23,13 +23,13 @@ function shouldAutoDownload() {
 
 // This is duplicated from plugin-ideal-image in order to always enable automatic download
 // image prop is injected by the plugin-ideal-image Webpack plugin
-function ProgressiveImage({ image: { preSrc, src }, alt }) {
+export default function ProgressiveImage({ image: { preSrc, src }, alt }) {
   return (
     <Image
       placeholder={{ lqip: preSrc }}
       alt={alt}
-      height={src.height ?? 100}
-      width={src.width ?? 100}
+      height={src.height}
+      width={src.width}
       src={src.src}
       srcSet={src.images.map((image) => ({
         ...image,
@@ -39,5 +39,3 @@ function ProgressiveImage({ image: { preSrc, src }, alt }) {
     />
   );
 }
-
-export default ProgressiveImage;
