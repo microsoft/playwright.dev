@@ -33,6 +33,16 @@ let plugins = [
       sidebarPath: require.resolve('./sidebarCommunity.js'),
     }),
   ],
+  [
+    'content-docs',
+    /** @type {import('@docusaurus/plugin-content-docs').Options} */
+    ({
+      id: 'ai',
+      path: 'ai',
+      routeBasePath: 'ai',
+      sidebarPath: require.resolve('./sidebarAI.js'),
+    }),
+  ],
   require.resolve("@docusaurus/plugin-content-pages"),
   [
     require.resolve('@docusaurus/plugin-ideal-image'),
@@ -127,6 +137,12 @@ export default {
               href: '#',
             },
           ],
+        },
+        {
+          to: '/ai/intro',
+          label: 'AI',
+          position: 'left',
+          activeBaseRegex: `/ai/`,
         },
         {
           to: '/community/welcome',
