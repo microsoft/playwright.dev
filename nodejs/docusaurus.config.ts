@@ -139,7 +139,7 @@ export default {
           ],
         },
         {
-          to: '/ai/intro',
+          to: '/ai',
           label: 'AI',
           position: 'left',
           activeBaseRegex: `/ai/`,
