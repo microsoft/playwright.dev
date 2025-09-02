@@ -1,0 +1,191 @@
+---
+id: playwright-mcp-generating-tests
+title: "Generating Tests"
+---
+# Playwright MCP: Generating Tests
+
+import LiteYouTube from '@site/src/components/LiteYouTube';
+
+## Overview
+
+Learn how to generate end-to-end Playwright tests using the Playwright MCP (Model Context Protocol) server with GitHub Copilot, even when you don't have access to the source code. This powerful approach enables black-box testing, AI-driven automation, and rapid test generation using natural language descriptions.
+
+<LiteYouTube
+  id="AaCj939XIQ4"
+  title="How to Generate Playwright Tests using MCP + Copilot"
+/>
+
+## What Makes MCP Different
+
+Traditional AI code generation with Copilot works great when you have access to source code, but what happens when you only have a URL and a browser? That's where Playwright MCP shines:
+
+- **No Source Code Required**: Generate tests for any website without needing the underlying codebase
+- **Real Browser Interaction**: MCP gives Copilot actual browser access to interact with pages like a real user
+- **Page Snapshots**: Uses the accessibility tree to understand UI elements and their accessible names
+
+## How It Works
+
+The Playwright MCP server acts as a bridge between GitHub Copilot and a real browser, enabling this workflow:
+
+1. **Copilot opens a browser** using the MCP server
+2. **Navigates to the target website** as specified in a prompt
+3. **Takes page snapshots** to understand the page structure and available elements
+4. **Interacts with the page** based on the test scenario
+5. **Generates a Playwright test file** based on the actions taken
+6. **Executes and validates** the generated test
+
+## Setting Up Your Environment
+
+### Tools Used
+
+- **Playwright MCP**: [`https://github.com/microsoft/playwright-mcp`](https://github.com/microsoft/playwright-mcp)
+- **GitHub Copilot**: Agent mode with custom prompts
+- **AI Model**: Claude 3.5 Sonnet (or similar LLM that supports MCP)
+
+## Creating Effective Prompts
+
+### Reusable Prompt Template
+
+Create a reusable prompt file (e.g., `generate-test.md`) in a prompts folder inside the `.github` directory:
+
+```markdown
+# Playwright Test Generator Prompt
+
+- You are a Playwright test generator
+- You are given a scenario and you need to generate a Playwright test for it
+- DO NOT generate test code based on the scenario alone
+- DO run steps one by one using the tools provided by the Playwright MCP
+- Only after all steps are completed, emit a Playwright TypeScript test that uses @playwright/test
+- Save generated test file in the tests directory
+- Execute the test file and iterate until the test passes
+```
+
+### Example Test Scenarios
+
+#### Basic Navigation and Search
+```
+Generate a Playwright test for the following scenario:
+- Navigate to [URL]
+- Search for "Garfield"
+- Verify the movie is in the search results list
+```
+
+#### Form Interaction
+```
+Generate a Playwright test for the following scenario:
+- Navigate to [URL]
+- Fill out the contact form with sample data
+- Submit the form
+- Verify success message appears
+```
+
+#### Multi-step Workflow
+```
+Generate a Playwright test for the following scenario:
+- Navigate to [URL]
+- Add multiple items to shopping cart
+- Proceed to checkout
+- Verify cart contents and total
+```
+
+## Step-by-Step Walkthrough
+
+### 1. Start with Your Prompt
+
+1. Drag and drop your reusable prompt file into Copilot chat
+2. Add your specific test scenario
+
+### 2. Watch the Playwright MCP Server in Action
+
+Playwright MCP will:
+- **Open a browser window** automatically
+- **Navigate to your target URL**
+- **Analyze the page structure** using accessibility snapshots
+- **Adapt to UI challenges** (e.g., finding hidden search fields)
+- **Perform the required actions** step by step
+
+### 3. Intelligent Problem Solving
+
+When the AI encounters issues (like a hidden search input), it will:
+- Take a page snapshot to understand the current state
+- Identify the correct element to interact with
+- Adjust its approach (e.g., click search icon before typing)
+- Continue with the test scenario
+
+### 4. Test Generation and Validation
+
+Once all actions are completed:
+- A complete Playwright test file is generated
+- The test is saved to your tests directory
+- The test is executed to ensure it passes
+- Any issues are debugged and fixed automatically
+
+## Example Generated Test
+
+Here's what a typical generated test might look like:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('search for Garfield movie', async ({ page }) => {
+  // Navigate to the website
+  await page.goto('https://example-movie-site.com');
+  
+  // Click search icon to reveal search input
+  await page.getByRole('button', { name: 'Search' }).click();
+  
+  // Type search term
+  await page.getByPlaceholder('Search movies...').fill('Garfield');
+  
+  // Submit search
+  await page.getByRole('button', { name: 'Search' }).click();
+  
+  // Verify Garfield appears in results
+  await expect(page.getByText('Garfield')).toBeVisible();
+});
+```
+
+## Best Practices
+
+### Prompt Engineering Tips
+
+- **Be specific** about the exact steps you want to test
+- **Use clear, natural language** descriptions
+- **Break complex scenarios** into smaller, manageable steps
+- **Specify verification points** clearly
+
+### Handling Dynamic Content
+
+- The MCP can adapt to dynamic UIs and changing page structures
+- Page snapshots help identify the current state of elements
+- Tests are generated based on actual page interaction, not assumptions
+
+### Iteration and Refinement
+
+- Generated tests are automatically executed and debugged
+- Failed tests trigger automatic iteration until they pass
+- You can refine prompts based on generated test quality
+
+## Limitations and Considerations
+
+### Context Window Management
+- For longer test flows, break them into smaller scenarios
+- The LLM may lose context with very complex multi-step workflows
+- Consider generating multiple focused tests instead of one large test
+
+## Next Steps
+
+After successfully generating tests with Playwright MCP:
+
+1. **Review and refactor** generated code to match your project standards
+2. **Integrate with your CI/CD pipeline** for automated execution
+3. **Create reusable prompt templates** for common testing scenarios
+
+This approach revolutionizes how we think about test automation, making it accessible even when source code isn't available and dramatically speeding up the test creation process.
+
+## Related Resources
+
+- [Playwright MCP GitHub Repository](https://github.com/microsoft/playwright-mcp)
+- [Example Prompts Repository](https://github.com/debs-obrien/generate-test-with-copilot)
+- [Debugging with AI](debugging-with-ai.mdx)
+- [Maintaining Tests](playwright-mcp-maintaining-tests)

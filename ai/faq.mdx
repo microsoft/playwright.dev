@@ -1,0 +1,45 @@
+---
+id: faq
+title: "Frequently Asked Questions"
+---
+
+## FAQ
+
+### What's the difference between MCP automation and Playwright tests?
+MCP sessions are interactive and ephemeral (good for exploration and drafting). Playwright tests are versioned, repeatable code run in CI for regression prevention.
+
+### When do I use Copy Prompt vs Fix with AI?
+Use Copy Prompt to shuttle rich failure context into chat for deeper reasoning. Use Fix with AI for a fast inline suggestion when the change is likely mechanical.
+
+### Is it safe to paste credentials into chat?
+No. Use placeholders (e.g. `{{USER}}`) or storage state. Never paste secrets; rotate dedicated test accounts instead.
+
+### How do I reuse a logged-in session with AI?
+Launch via the MCP browser extension attached to an existing profile or export/import Playwright storage state (`--save-storage` / load in config) before asking the agent to act.
+
+### Headless or headed for AI-driven workflows?
+Start headed while iterating (visual trust), then switch to headless for speed once stable. AI does not "see" pixels—only accessibility data—so headed adds no vision beyond human verification.
+
+### The agent picked a brittle locator—what now?
+Ask MCP to list accessible roles/names for that region and regenerate a semantic locator (`getByRole`, `getByLabel`). Replace rather than layering multiple fallbacks.
+
+### Can the AI run my whole test suite in CI?
+Today it's best used to generate and maintain tests. The suite itself should run via standard `npx playwright test` in CI—AI is optional for interactive repair, not required for execution.
+
+### When should I promote an automation script into a test?
+If you'll reuse it ≥3 times, it guards a critical path, or a failure should block deploys—promote it to a Playwright test or helper library.
+
+### How do I handle sensitive production data?
+Prefer staging. If production is required: least privilege accounts, explicit confirmation prompts, logging of changes, and no credential exposure in chat.
+
+### Why did Fix with AI suggest an over-simplified change?
+Inline fix heuristics optimize for speed. If the suggestion removes meaningful assertions, reject it and ask in chat for a more robust alternative referencing the actual DOM via MCP.
+
+### Can the agent see dynamically rendered elements?
+Yes, once they are in the accessibility tree. If something is missing, ensure the UI has completed rendering (wait for network/animation) before requesting the tree.
+
+### Does MCP enable image or visual diffing?
+No—MCP exposes structured accessibility data, not pixels. Use Playwright's built-in screenshot or snapshot tooling for visual comparisons.
+
+---
+Have questions not covered here? Open a PR or start a discussion referencing `faq`.

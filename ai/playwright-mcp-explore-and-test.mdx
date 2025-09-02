@@ -1,0 +1,222 @@
+---
+id: playwright-mcp-explore-and-test
+title: Explore and Generate Tests
+---
+
+import LiteYouTube from '@site/src/components/LiteYouTube';
+
+# Playwright MCP: Explore and Generate Tests
+
+## Overview
+
+Unleash the power of AI to supercharge your testing workflow. This guide demonstrates how Playwright's Model Context Protocol (MCP) can autonomously explore your web application, discover key user flows, and automatically generate robust end-to-end tests.
+
+<LiteYouTube
+  id="IixdI2bTR1g"
+  title="Let AI Explore Your Site & Write Tests with Playwright MCP!"
+/>
+
+## Overview
+
+What if your tests could write themselves by actually using your app like a real user? The Playwright MCP (Model Context Protocol) in Agent Mode enables AI to explore websites autonomously, detect features, and generate meaningful end-to-end tests automatically.
+
+This powerful approach allows AI to:
+- Navigate through your application like a real user
+- Discover functionalities you might have missed
+- Identify edge cases and potential bugs
+- Generate comprehensive test suites without manual coding
+- Provide detailed test execution steps for review
+
+## Key Features Demonstrated
+
+### Autonomous Website Exploration
+- AI navigates through your application independently
+- Discovers key functionalities by interacting with the UI
+- Maps out different user workflows and paths
+- Identifies interactive elements and features
+
+### Intelligent Test Generation
+- Creates tests based on actual user interactions
+- Generates realistic test scenarios
+- Writes complete Playwright test files
+- Includes proper assertions and test structure
+
+### Edge Case Detection
+As demonstrated in the video, the AI discovered an unexpected edge case:
+- Searched for "Star Wars" but received results showing "Kill"
+- This revealed a data inconsistency that might have been missed
+- Shows how AI exploration can uncover hidden bugs
+
+### Comprehensive Test Coverage
+The AI identified five key functionalities:
+1. **Homepage Navigation** - Basic site navigation and layout
+2. **Search Functionality** - Movie search with results validation
+3. **Movie Details Page** - Individual movie information display
+4. **Theme Toggle** - Dark/light mode switching
+5. **Navigation Flow** - Overall user journey mapping
+
+## Implementation Workflow
+
+### 1. Playwright MCP Server Setup
+
+Install and start the Playwright MCP server. Here is an example configuration in `mcp.json`:
+
+```json
+{
+    "servers": {
+        "playwright": {
+            "command": "npx",
+            "args": [
+                "@playwright/mcp@latest"
+            ]
+        }
+    }
+}
+```
+
+### 2. Create Exploration Prompt
+
+The AI uses a specialized prompt for autonomous exploration:
+- Instructs the agent to explore the website systematically
+- Defines the scope and depth of exploration
+- Specifies the number of tests to generate
+- Sets parameters for test complexity
+
+Create a reusable prompt file (e.g., `generate-test.md`) in a prompts folder inside the `.github` directory and add the following content:
+
+```md
+---
+tools: ['playwright']
+mode: 'agent'
+---
+
+- You are a playwright test generator.
+- You are given a scenario and you need to generate a playwright test for it.
+- DO NOT generate test code based on the scenario alone. 
+- DO run steps one by one using the tools provided by the Playwright MCP.
+- When asked to explore a website:
+  1. Navigate to the specified URL
+  2. Explore 1 key functionality of the site and when finished close the browser.
+  3. Implement a Playwright TypeScript test that uses @playwright/test based on message history using Playwright's best practices including role based locators, auto retrying assertions and with no added timeouts unless necessary as Playwright has built in retries and autowaiting if the correct locators and assertions are used.
+- Save generated test file in the tests directory
+- Execute the test file and iterate until the test passes
+- Include appropriate assertions to verify the expected behavior
+- Structure tests properly with descriptive test titles and comments
+```
+### 3. Agent Mode Exploration Process
+
+To activate agent mode with the exploration prompt:
+
+1. **Open your AI assistant chat interface**
+2. **Enable Agent Mode** in the settings or mode selector
+3. **Add the prompt file** (`generate-test.md`) to the conversation context
+4. **Execute the exploration command**:
+
+
+```bash
+Explore https://debs-obrien.github.io/playwright-movies-app
+```
+
+The AI will:
+1. **Initial Navigation** - AI visits the target website
+2. **Feature Discovery** - Systematically explores available functionalities
+3. **User Interaction Simulation** - Performs actions like searching, clicking, navigation
+4. **Data Collection** - Gathers information about application behavior
+5. **Edge Case Investigation** - Tests various input scenarios
+
+### 4. Test Generation
+
+After exploration, the agent analyzes its findings and creates a comprehensive summary of discovered functionalities. From this analysis, it intelligently selects the most suitable functionality as the focus for test generation.
+
+The agent then generates a complete Playwright test file that includes:
+- Proper test structure with descriptive names and comments
+- Role-based locators following Playwright best practices
+- Auto-retrying assertions for robust test execution
+- Comprehensive validation of expected behaviors
+- Error handling for edge cases discovered during exploration
+
+```javascript
+import { test, expect } from '@playwright/test';
+
+test.describe('Movie search', () => {
+  test('Search for a movie by title', async ({ page }) => {
+    // Navigate to the movies app
+    await page.goto('https://debs-obrien.github.io/playwright-movies-app');
+
+    // Click on the search button to activate the search input
+    await page.getByRole('search').click();
+
+    // Type 'Star Wars' into the search input and press Enter
+    const searchTerm = 'Star Wars';
+    await page.getByRole('textbox', { name: 'Search Input' }).fill(searchTerm);
+    await page.getByRole('textbox', { name: 'Search Input' }).press('Enter');
+
+    // Verify we're on the search results page with correct title
+    await expect(page).toHaveTitle(`${searchTerm} - Search Results`);
+
+    // Verify the search results heading contains the search term
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(searchTerm);
+    await expect(page.getByRole('heading', { name: 'search results', level: 2 })).toBeVisible();
+
+    // Verify that search results are displayed
+    await expect(page.getByRole('list', { name: 'movies' })).toBeVisible();
+
+    // Click on a movie from search results
+    const firstMovie = page.getByRole('list', { name: 'movies' }).getByRole('link').first();
+    const movieTitleElement = firstMovie.getByRole('heading', { level: 2 });
+    const movieTitle = await movieTitleElement.textContent() || '';
+    await firstMovie.click();
+
+    // Verify that the movie details page is loaded with the correct title
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(movieTitle);
+
+    // Verify movie details sections are present
+    await expect(page.getByText('The Synopsis')).toBeVisible();
+    await expect(page.getByText('The Cast')).toBeVisible();
+
+    // Verify recommended movies section is present
+    await expect(page.getByRole('heading', { name: 'Recommended Movies' })).toBeVisible();
+
+    // Go back to search results
+    await page.getByRole('button', { name: 'Back' }).click();
+
+    // Verify we're back on the search results page
+    await expect(page.getByRole('heading', { level: 1 })).toHaveText(searchTerm);
+  });
+});
+```
+
+
+## Running the Test
+### Test Execution and Validation
+
+After test generation, the AI automatically executes the test to verify it works correctly. For this example, the generated test passed on the first run.
+
+You can iterate, refine the prompt, increase test count, or tell the agent to explore different areas.
+
+## Best Practices
+
+### Effective Prompting
+- **Be Specific**: Define clear exploration boundaries and objectives
+- **Set Scope**: Specify how many tests to generate (start with 1-3)
+- **Define Focus**: Target specific functionalities or user journeys
+- **Include Context**: Provide relevant application information
+
+### Exploration Strategy
+- **Start Simple**: Begin with core functionalities
+- **Iterate Gradually**: Expand to more complex scenarios
+- **Review Results**: Always examine generated tests and traces
+- **Refine Approach**: Adjust prompts based on initial results
+
+### Test Quality Assurance
+- **Validate Logic**: Ensure generated tests make logical sense
+- **Check Assertions**: Verify that test assertions are meaningful
+- **Review Edge Cases**: Examine discovered edge cases carefully
+
+
+## Additional Resources
+
+- **Blog Post**: [Detailed setup and implementation guide](https://dev.to/debs_obrien/letting-playwright-mcp-explore-your-site-and-write-your-tests-mf1)
+- **MCP Documentation**: Learn more about Model Context Protocol
+- **Playwright Test Generation**: Explore other AI-powered testing approaches
+- **Agent Mode**: Advanced AI automation techniques

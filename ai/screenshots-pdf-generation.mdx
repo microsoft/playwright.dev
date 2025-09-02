@@ -1,0 +1,83 @@
+---
+id: screenshots-pdf-generation
+title: Screenshots and PDF Generation
+description: enable PDF generation via Playwright MCP, `browser_pdf_save` usage, examples and best practices.
+---
+
+# Screenshots and PDF Generation
+
+The Playwright MCP can capture what your users see by taking screenshots or generating print-friendly PDF documents. Use screenshots for visual regression testing, debugging UI failures, or documenting application states. Use PDF generation to create shareable, high-fidelity artifacts of your web content for reports or offline viewing.
+
+## Screenshots
+
+Playwright can capture screenshots of the current page via the MCP server. Ask the agent to navigate to a page and save a screenshot with an optional filename. If omitted, a timestamped name like `page-<timestamp>.png` is used.
+
+Typical flow:
+1. Navigate to the page and wait for the UI to load (network idle, images and fonts loaded).
+2. Optionally set viewport and expand sections you want visible.
+3. Save a screenshot.
+
+### Example Prompt full page screenshot
+
+```bash
+Navigate to playwright.dev and take a screenshot and save it as playwright.png
+```
+
+### Example Prompt partial screenshot
+
+```bash
+navigate to playwright.dev and find the footer and take a screenshot of it
+```
+
+## PDF Generation
+
+PDF generation is an opt-in capability that lets the agent render the current page to a PDF file which is useful for creating print-friendly versions of web content.
+
+### Enable the capability
+
+Add the `--caps=pdf` argument to your Playwright MCP server configuration, for example in your `mcp.json` file:
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest", 
+        "--caps=pdf"
+      ]
+    }
+  }
+}
+```
+
+### Example Prompt pdf generation
+
+```bash
+navigate to playwright.dev, wait for images to load and save the page as a PDF named "mcp-test.pdf".
+```
+
+## Setting the Output Directory
+
+By default the generated PDF is written to the MCP server's artifacts location. If you set `--output-dir` the file will be written there; otherwise the server may use a default like `.playwright-mcp/`.
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--caps=pdf",
+        "--output-dir",
+        "full/path/to/output/folder"
+      ]
+    }
+  }
+}
+```
+
+
+
+
+
