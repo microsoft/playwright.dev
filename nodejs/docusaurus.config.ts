@@ -140,7 +140,7 @@ export default {
         },
         {
           to: '/ai',
-          label: 'AI',
+          label: 'Agents',
           position: 'left',
           activeBaseRegex: `/ai/`,
         },

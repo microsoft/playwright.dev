@@ -139,8 +139,8 @@ export default {
           ],
         },
         {
-          to: '/ai/intro',
-          label: 'AI',
+          to: '/ai',
+          label: 'Agents',
           position: 'left',
           activeBaseRegex: `/ai/`,
         },
