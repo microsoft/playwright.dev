@@ -1,0 +1,138 @@
+---
+id: session-and-state
+title: Session and State
+description: How to manage sessions, storage state, and user data directories with Playwright MCP.
+---
+# Session and State
+
+## Overview
+
+These settings are for managing user data, login states, and browser profiles.
+
+### Starting a Clean Session
+
+Isolated mode `--isolated` starts each session with a fresh, temporary browser profile. When the browser is closed (or the MCP server restarts), all cookies, localStorage, and other storage for that session are discarded.
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--isolated"
+      ]
+    }
+  }
+}
+```
+
+If you need state to persist across runs, avoid `--isolated` and instead use `--save-session` or a user data directory.
+
+Learn more: https://playwright.dev/docs/auth
+
+### Persisting Login State
+
+To avoid logging in every time, you can save your authentication state to a file and reuse it across sessions. Use the `--storage-state` flag and provide a path to your state file.
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--isolated",
+        "--storage-state",
+        "auth.json"
+      ]
+    }
+  }
+}
+```
+
+### Saving the Session
+
+To persist the session's state, including cookies and local storage, use the `--save-session` flag. This is useful for tasks that require maintaining a logged-in state across multiple runs.
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--isolated",
+        "--save-session"
+      ]
+    }
+  }
+}
+```
+
+### Using a Custom User Data Directory
+
+To control where the browser stores its profile data, you can specify a path with the `--user-data-dir` flag.
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--user-data-dir",
+        "path/to/user/data"
+      ]
+    }
+  }
+}
+```
+
+### Connecting to an Existing Browser Session
+
+You can connect to a running instance of Chrome or Edge using the `--extension` flag. This allows the AI assistant to interact with websites where you're already logged in, using your existing cookies, sessions, and browser state. This requires the "Playwright MCP Bridge" browser extension to be installed.
+
+#### Extension Installation
+
+1.  **Download the Extension**: Download the latest `chrome-extension.zip` from the [Playwright MCP GitHub releases page](https://github.com/microsoft/playwright-mcp/releases).
+2.  **Unzip the file**.
+3.  **Load the Extension**:
+    *   Open your Chrome/Edge browser and navigate to `chrome://extensions/`.
+    *   Enable "Developer mode" using the toggle in the top-right corner.
+    *   Click "Load unpacked" and select the unzipped extension directory.
+
+Once the extension is installed, you can use the `--extension` flag in your configuration.
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--extension"
+      ]
+    }
+  }
+}
+```
+
+### Connecting to a CDP Endpoint
+
+For advanced use cases, you can connect to a running browser's Chrome DevTools Protocol (CDP) endpoint using the `--cdp-endpoint` flag.
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--cdp-endpoint",
+        "ws://127.0.0.1:9222/devtools/browser/..."
+      ]
+    }
+  }
+}
+```
