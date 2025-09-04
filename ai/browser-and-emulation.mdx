@@ -1,19 +1,13 @@
 ---
 id: browser-and-emulation
-title: Browser and Emulation
-description: Options for selecting browsers, device emulation, viewport sizes and user agents.
+title: Browser Profiles and Emulation
+description: Options for selecting browsers, device emulation, viewport sizes and user agents as well as session and state.
 ---
+# Browser Profiles and Emulation
 
+## Overview
 
 These settings let you control which browser Playwright uses and how it simulates devices and environments. Below you'll find concise JSON `mcpServers` examples you can paste into your configuration, along with guidance on when to use each option and a few troubleshooting tips.
-
-## Choose the right option
-
-- Browser selection (`--browser`): use when reproducing browser-specific behavior (Chromium, Firefox, WebKit, Edge).
-- Device emulation (`--device`): use for responsive layout tests, touch interactions, and mobile-specific features.
-- Viewport and user agent (`--viewport-size`, `--user-agent`): useful for targeted layout checks and simulating specific clients.
-- Executable path (`--executable-path`): use a system or custom browser build instead of Playwright's bundled browsers.
-- Ignore HTTPS errors (`--ignore-https-errors`): only for local development where self-signed certs are unavoidable.
 
 ## Browser Selection
 
@@ -34,7 +28,7 @@ Using a specific browser (example: msedge):
 }
 ```
 
-### Example Prompt browser selection
+#### Example Prompt browser selection
 
 ```bash
 navigate to playwright.dev and tell me what browser you are using
@@ -44,7 +38,7 @@ If prompted to "Install the browser specified in the config", choose Allow. Play
 
 ## Device Emulation
 
-Emulating a mobile device (example: iPhone 13):
+Playwright comes with a [registry of device parameters](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json) for selected desktop, tablet and mobile devices. It can be used to simulate browser behavior for a specific device such as user agent, screen size, viewport and if it has touch enabled.Emulating a mobile device (example: iPhone 13):
 
 ```json
 {
@@ -61,17 +55,17 @@ Emulating a mobile device (example: iPhone 13):
 }
 ```
 
-### Example Prompt device emulation
+#### Example Prompt device emulation
 
 ```bash
-navigate to playwright.dev and wait for the page to load, then take a screenshot and save it as iphone13.png
+navigate to playwright.dev and take a screenshot and save it as iphone13.png
 ```
 
 You should now have a full page screenshot emulating an iPhone 13 device.
 
 ## Custom Viewport
 
-Setting a custom viewport size (example: 1600x720):
+Playwright's default viewport is 1280x720. You can set a custom viewport size should you need to (for example: 1600x720). Note that once you set the viewport due to persistent profiles the viewport will remain saved and you will need to reset it if you want to return to the default viewport:
 
 ```json
 {
@@ -88,7 +82,7 @@ Setting a custom viewport size (example: 1600x720):
 }
 ```
 
-### Example Prompt viewport size
+#### Example Prompt viewport size
 
 ```bash
 navigate to playwright.dev and tell me what viewport size is being used
@@ -113,24 +107,6 @@ Using a custom user agent:
 }
 ```
 
-## Custom Executable Path
-
-Specifying a browser executable path:
-
-```json
-{
-  "mcpServers": {
-    "playwright": {
-      "command": "npx",
-      "args": [
-        "@playwright/mcp@latest",
-        "--executable-path",
-        "/path/to/your/browser"
-      ]
-    }
-  }
-}
-```
 ## Ignore HTTPS Errors
 
 Ignore HTTPS errors (development only):
@@ -143,6 +119,140 @@ Ignore HTTPS errors (development only):
       "args": [
         "@playwright/mcp@latest",
         "--ignore-https-errors"
+      ]
+    }
+  }
+}
+```
+
+## Session and State
+
+Playwright MCP uses persistent profiles by default. This means that user data, login states and cookies are preserved across sessions.
+
+### Starting a Clean Session
+
+Isolated mode `--isolated` starts each session with a fresh, temporary browser profile. When the browser is closed (or the MCP server restarts), all cookies, localStorage, and other storage for that session are discarded.
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--isolated"
+      ]
+    }
+  }
+}
+```
+//TODO Simon check this
+If you need state to persist across runs, avoid `--isolated` and instead use `--save-session` or a user data directory.
+
+Learn more: https://playwright.dev/docs/auth
+
+### Saving the Session
+
+To persist the session's state, including cookies and local storage, use the `--save-session` flag. This is useful for tasks that require maintaining a logged-in state across multiple runs.
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--isolated",
+        "--save-session"
+      ]
+    }
+  }
+}
+```
+
+### Loading the Session
+
+To avoid logging in every time, you can save your authentication state to a file and reuse it across sessions. Use the `--storage-state` flag and provide a path to your state file.
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--isolated",
+        "--storage-state",
+        "auth.json"
+      ]
+    }
+  }
+}
+```
+
+
+
+### Using a Custom User Data Directory
+
+To control where the browser stores its profile data, you can specify a path with the `--user-data-dir` flag.
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--user-data-dir",
+        "path/to/user/data"
+      ]
+    }
+  }
+}
+```
+
+### Connecting to an Existing Browser Session
+
+You can connect to a running instance of Chrome or Edge using the `--extension` flag. This allows the AI assistant to interact with websites where you're already logged in, using your existing cookies, sessions, and browser state. This requires the "Playwright MCP Bridge" browser extension to be installed.
+
+#### Extension Installation
+
+1.  **Download the Extension**: Download the latest `chrome-extension.zip` from the [Playwright MCP GitHub releases page](https://github.com/microsoft/playwright-mcp/releases).
+2.  **Unzip the file**.
+3.  **Load the Extension**:
+    *   Open your Chrome/Edge browser and navigate to `chrome://extensions/`.
+    *   Enable "Developer mode" using the toggle in the top-right corner.
+    *   Click "Load unpacked" and select the unzipped extension directory.
+
+Once the extension is installed, you can use the `--extension` flag in your configuration.
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--extension"
+      ]
+    }
+  }
+}
+```
+
+### Connecting to a CDP Endpoint
+
+For advanced use cases, you can connect to a running browser's Chrome DevTools Protocol (CDP) endpoint using the `--cdp-endpoint` flag.
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp@latest",
+        "--cdp-endpoint",
+        "ws://127.0.0.1:9222/devtools/browser/..."
       ]
     }
   }
