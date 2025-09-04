@@ -3,13 +3,9 @@ id: traces-and-screenshots
 title: Traces and Screenshots
 description: Guidance on saving traces, specifying output directories, and other debugging tips for Playwright MCP.
 ---
-# Traces and Screenshots
 
-## Overview
-
-When working with Playwright MCP, it's often helpful to save traces and other output artifacts for debugging and analysis such as screenshots and PDFs.
-
-These settings are useful for development, troubleshooting, and saving artifacts from your sessions.
+When working with Playwright MCP, it's often helpful to save traces and other output artifacts like screenshots or PDFs.
+They can help in debugging and analysis, troubleshooting and reporting.
 
 ### Saving a Trace of the Session
 
@@ -59,20 +55,20 @@ To enable it, add the `--save-session` flag.
 
 ## Screenshots
 
-Playwright can capture screenshots of the current page via the MCP server. Ask the agent to navigate to a page and save a screenshot with an optional filename. If omitted, a timestamped name like `page-<timestamp>.png` is used.
+Playwright can capture screenshots of the current page via the MCP server. Ask the agent to navigate to a page and save a screenshot.
 
 Typical flow:
-1. Navigate to the page and wait for the UI to load (network idle, images and fonts loaded).
+1. Navigate to the page.
 2. Optionally set viewport and expand sections you want visible.
 3. Save a screenshot.
 
-### Example Prompt full page screenshot
+#### Example Prompt full page screenshot
 
 ```bash
 Navigate to playwright.dev and take a screenshot and save it as playwright.png
 ```
 
-### Example Prompt partial screenshot
+#### Example Prompt partial screenshot
 
 ```bash
 navigate to playwright.dev and find the footer and take a screenshot of it
@@ -80,11 +76,9 @@ navigate to playwright.dev and find the footer and take a screenshot of it
 
 ## PDF Generation
 
-PDF generation is an opt-in capability that lets the agent render the current page to a PDF file which is useful for creating print-friendly versions of web content.
+PDF generation lets the agent render the current page to a PDF file which is useful for creating print-friendly versions of web content.
 
-### Enable the capability
-
-Add the `--caps=pdf` argument to your Playwright MCP server configuration, for example in your `mcp.json` file:
+This is opt-in, so you need to add the `--caps=pdf` argument to your configuration:
 
 ```json
 {
@@ -100,7 +94,7 @@ Add the `--caps=pdf` argument to your Playwright MCP server configuration, for e
 }
 ```
 
-### Example Prompt pdf generation
+#### Example Prompt for PDF generation
 
 ```bash
 navigate to playwright.dev, wait for images to load and save the page as a PDF named "mcp-test.pdf".
@@ -108,7 +102,8 @@ navigate to playwright.dev, wait for images to load and save the page as a PDF n
 
 ## Setting the Output Directory
 
-By default the generated PDF is written to the MCP server's artifacts location. If you set `--output-dir` the file will be written there; otherwise the server may use a default like `.playwright-mcp/`.
+By default the artifacts are written to the MCP server's artifacts location.
+If you set `--output-dir` the files will be written there; otherwise the server may use a default like `.playwright-mcp/`.
 
 ```json
 {
@@ -127,17 +122,11 @@ By default the generated PDF is written to the MCP server's artifacts location. 
 
 ## Agents on CI
 
-Agents on CI are great because they can run unattended, on a schedule, and at scale. This is perfect for tasks like:
--   Automated testing
--   Data extraction
--   Monitoring web pages for changes
--   Filling out forms or submitting data
--   Generating reports
-However, running agents on CI comes with its own set of challenges. Here are some tips to help you get started.
+Running an agent on CI is useful for automation and development purposes.
+For proper observability into what the agent is doing, the trace and session log features above are useful, but there's more to consider.
 
-## Headless Mode
-
-By default, Playwright MCP launches a headed browser so you can see the automation happen. For CI/CD environments or when a visible UI is not needed, you can run in headless mode using the `--headless` flag.
+By default, Playwright MCP launches a headed browser so you can see the automation happen.
+For CI/CD environments or when a visible UI is not needed, you can run in headless mode using the `--headless` flag.
 
 ```json
 {
@@ -152,50 +141,6 @@ By default, Playwright MCP launches a headed browser so you can see the automati
   }
 }
 ```
-## CI tips
 
-- Use `--output-dir` to collect traces and artifacts for failing runs.
-- use `--save-traces` to capture traces for all runs.
-- Pin browser versions or run `npx playwright install` in CI to ensure browsers are available.
-
-
-## Using a Configuration File
-
-You can specify a path to a configuration file using the `--config` flag. This allows you to manage your settings in a separate file.
-
-```json
-{
-  "mcpServers": {
-    "playwright": {
-      "command": "npx",
-      "args": [
-        "@playwright/mcp@latest",
-        "--config",
-        "path/to/your/config.json"
-      ]
-    }
-  }
-}
-```
-
-config.json example:
-
-```json
-{
-  "browser": {
-    "browserName": "edge",
-    "isolated": true,
-    "launchOptions": { "headless": true },
-    "contextOptions": { "viewport": { "width": 1280, "height": 720 } }
-  },
-  "server": { "host": "0.0.0.0", "port": 8931 },
-  "capabilities": ["verify", "pdf"],
-  "network": { "allowedOrigins": ["https://example.com"], "blockedOrigins": ["https://tracker.example"] },
-  "imageResponses": "omit",
-  "outputDir": "./mcp-output"
-}
-```
-
-Check the [Playwright MCP README](https://github.com/microsoft/playwright-mcp?tab=readme-ov-file#configuration-file) for details on the configuration file format and options.
-
-
+Also, consider running `npx playwright install` in CI to ensure browsers are downloaded before the agent starts.
+This can save the agent from having to install browsers at the beginning.
