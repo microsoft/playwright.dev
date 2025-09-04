@@ -3,13 +3,13 @@ id: browser-and-emulation
 title: Browser Profiles and Emulation
 description: Options for selecting browsers, device emulation, viewport sizes and user agents as well as session and state.
 ---
-# Browser Profiles and Emulation
 
-## Overview
+## Emulation
 
-These settings let you control which browser Playwright uses and how it simulates devices and environments. Below you'll find concise JSON `mcpServers` examples you can paste into your configuration, along with guidance on when to use each option and a few troubleshooting tips.
+You can control which browser Playwright uses and how it simulates devices and environments.
+Below you'll find concise config examples you can paste into your configuration, along with guidance on when to use each option and a few troubleshooting tips.
 
-## Browser Selection
+### Browser Selection
 
 Using a specific browser (example: msedge):
 
@@ -34,11 +34,14 @@ Using a specific browser (example: msedge):
 navigate to playwright.dev and tell me what browser you are using
 ```
 
-If prompted to "Install the browser specified in the config", choose Allow. Playwright will download the required browser if missing, and the run will launch Microsoft Edge (msedge) instead of the default bundled Chromium.
+If prompted to "Install the browser specified in the config", choose Allow.
+Playwright will download the required browser if missing, and the run will launch Microsoft Edge (msedge) instead of the default bundled Chromium.
 
-## Device Emulation
+### Device Emulation
 
-Playwright comes with a [registry of device parameters](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json) for selected desktop, tablet and mobile devices. It can be used to simulate browser behavior for a specific device such as user agent, screen size, viewport and if it has touch enabled.Emulating a mobile device (example: iPhone 13):
+Playwright comes with a [registry of device parameters](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/server/deviceDescriptorsSource.json) for selected desktop, tablet and mobile devices.
+It can be used to simulate browser behavior for a specific device such as user agent, screen size, viewport and if it has touch enabled.
+Emulating a mobile device (example: iPhone 13):
 
 ```json
 {
@@ -63,9 +66,10 @@ navigate to playwright.dev and take a screenshot and save it as iphone13.png
 
 You should now have a full page screenshot emulating an iPhone 13 device.
 
-## Custom Viewport
+### Custom Viewport
 
-Playwright's default viewport is 1280x720. You can set a custom viewport size should you need to (for example: 1600x720). Note that once you set the viewport due to persistent profiles the viewport will remain saved and you will need to reset it if you want to return to the default viewport:
+Playwright's default viewport is 1280x720.
+You can set a custom viewport size should you need to:
 
 ```json
 {
@@ -88,9 +92,10 @@ Playwright's default viewport is 1280x720. You can set a custom viewport size sh
 navigate to playwright.dev and tell me what viewport size is being used
 ```
 
-## Custom User Agent
+Note that if you're using a persistent profile (the default), the viewport size will be saved and reused across sessions.
+If you want to return to the default viewport, you need to reset it explicitly.
 
-Using a custom user agent:
+### Custom User Agent
 
 ```json
 {
@@ -107,9 +112,9 @@ Using a custom user agent:
 }
 ```
 
-## Ignore HTTPS Errors
+### Ignore HTTPS Errors
 
-Ignore HTTPS errors (development only):
+Only use this in development.
 
 ```json
 {
@@ -125,13 +130,18 @@ Ignore HTTPS errors (development only):
 }
 ```
 
-## Session and State
+## Browser Profiles and State
 
-Playwright MCP uses persistent profiles by default. This means that user data, login states and cookies are preserved across sessions.
+By default, Playwright MCP uses persistent profiles.
+This means that user data, login states and cookies are preserved across sessions.
+For some usecases, this is the desired behavior as it allows the agent to stay logged in to websites and maintain session data.
+
+In other usecases, this is not ideal because you want a clean slate every time the agent starts.
+There's a few ways to control this behavior.
 
 ### Starting a Clean Session
 
-Isolated mode `--isolated` starts each session with a fresh, temporary browser profile. When the browser is closed (or the MCP server restarts), all cookies, localStorage, and other storage for that session are discarded.
+Isolated mode `--isolated` starts each session with a fresh, temporary browser profile. When the browser is closed or the MCP server restarts, all cookies, localStorage, and other storage for that session are discarded.
 
 ```json
 {
@@ -146,33 +156,10 @@ Isolated mode `--isolated` starts each session with a fresh, temporary browser p
   }
 }
 ```
-//TODO Simon check this
-If you need state to persist across runs, avoid `--isolated` and instead use `--save-session` or a user data directory.
 
-Learn more: https://playwright.dev/docs/auth
+### Providing Storage State
 
-### Saving the Session
-
-To persist the session's state, including cookies and local storage, use the `--save-session` flag. This is useful for tasks that require maintaining a logged-in state across multiple runs.
-
-```json
-{
-  "mcpServers": {
-    "playwright": {
-      "command": "npx",
-      "args": [
-        "@playwright/mcp@latest",
-        "--isolated",
-        "--save-session"
-      ]
-    }
-  }
-}
-```
-
-### Loading the Session
-
-To avoid logging in every time, you can save your authentication state to a file and reuse it across sessions. Use the `--storage-state` flag and provide a path to your state file.
+To pre-populate a clean session with local storage and Cookies, you can use the `--storage-state` flag to load the state from a file. See docs on [`BrowserContext.storageState()`](https://playwright.dev/docs/api/class-browsercontext#browser-context-storage-state) for details on the file format.
 
 ```json
 {
@@ -189,8 +176,6 @@ To avoid logging in every time, you can save your authentication state to a file
   }
 }
 ```
-
-
 
 ### Using a Custom User Data Directory
 
