@@ -1,0 +1,82 @@
+---
+id: playwright-mcp-generating-tests
+title: Generating Tests
+description: Learn how to generate end-to-end Playwright tests using Playwright MCP with GitHub Copilot, even without access to source code.
+---
+
+import LiteYouTube from '@site/src/components/LiteYouTube';
+
+While Copilot can generate test code based on source code, it cannot interact with live websites to understand their actual behavior.
+When you only have access to a browser and no source code, traditional AI-assisted testing approaches hit a wall.  
+This gap becomes a major barrier for black-box testing scenarios, where testers need to validate functionality without internal knowledge of the application structure.
+
+Playwright MCP can help by allowing Copilot to interact with the browser and explore the website.
+The agent can then capture these interactions and transform them into reusable, automated test scripts.
+
+This creates a powerful workflow where the agent can navigate websites, interact with UI elements via page snapshots, generate comprehensive test files, and validate functionality without requiring access to the application's source code.
+
+<LiteYouTube
+  id="AaCj939XIQ4"
+  title="How to Generate Playwright Tests using MCP + Copilot"
+/>
+
+### Creating the Prompt File
+
+The foundation of effective MCP testing lies in crafting a clear, directive prompt. Create a reusable prompt file in your `.github/prompts` folder called `generate-test.prompt.md`:
+
+```markdown
+---
+tools: ['playwright']
+mode: 'agent'
+---
+
+You are a playwright test generator.
+You are given a scenario and you need to generate a playwright test for it.
+DO NOT generate test code based on the scenario alone.
+DO run steps one by one using the tools provided by the Playwright MCP.
+Only after all steps are completed, emit a Playwright TypeScript test that uses @playwright/test.
+Save generated test file in the tests directory.
+Execute the test file and iterate until the test passes.
+```
+
+### Configuring the MCP Server
+
+Ensure you have the [Playwright MCP server installed](./index.mdx#getting-started) and running locally. The server acts as the intermediary that allows Copilot to control browser instances and capture interaction data.
+
+### Initiating the Process
+
+With your prompt file ready and the MCP server running, drag and drop the prompt file into GitHub Copilot to provide context. Then specify your testing scenario in natural language. For example:
+
+```
+Generate a Playwright test for the following scenario:
+Navigate to [URL],
+search for Garfield,
+and verify the movie is in the list.
+```
+
+### Exploration
+
+When you initiate the process using agent mode, the agent begins by opening a browser window through the Playwright MCP server. This marks the beginning of autonomous test generation.
+
+The agent navigates to your specified URL and begins exploring the interface. When it encounters challenges, such as needing to activate a search field before typing, it automatically takes page snapshots to understand the current state of the application.
+
+### Problem Solving
+
+The page snapshots provide the agent with all accessible elements and their names, enabling it to make informed decisions about required interactions.
+When the agent discovers it needs to click a search icon before entering text, it adapts its approach automatically.
+
+This means the agent can handle dynamic interfaces and discover the correct interaction patterns needed to complete the specified scenario.
+
+### Test Generation and Validation
+
+Once the agent has completed the scenario, it automatically generates a comprehensive Playwright test file.
+This file captures all the necessary steps, navigation, element interactions, search actions, and verification, reflecting the manual process the agent performed.
+
+Next, the agent executes the generated test to confirm it passes, providing immediate feedback and validation.
+This seamless workflow from scenario exploration to automated test creation and execution ensures your tests are both accurate and reliable.
+
+To improve the effectiveness of MCP generated tests, focus on crafting clear and detailed prompts.
+Specify each step of the user journey you want to automate.
+The more precise your instructions, the more closely the generated tests will match your requirements.
+Use these tests as a foundation for building out more robust test suites,
+and experiment with different AI models, to determine which produces the best results for your needs.
