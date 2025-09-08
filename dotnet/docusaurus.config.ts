@@ -37,10 +37,10 @@ let plugins = [
     'content-docs',
     /** @type {import('@docusaurus/plugin-content-docs').Options} */
     ({
-      id: 'ai',
-      path: 'ai',
-      routeBasePath: 'ai',
-      sidebarPath: require.resolve('./sidebarAI.js'),
+      id: 'agents',
+      path: 'agents',
+      routeBasePath: 'agents',
+      sidebarPath: require.resolve('./sidebarAgents.js'),
     }),
   ],
   require.resolve("@docusaurus/plugin-content-pages"),
