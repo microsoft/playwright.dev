@@ -139,10 +139,10 @@ export default {
           ],
         },
         {
-          to: '/ai',
+          to: '/agents',
           label: 'Agents',
           position: 'left',
-          activeBaseRegex: `/ai/`,
+          activeBaseRegex: `/agents/`,
         },
         {
           to: '/community/welcome',
