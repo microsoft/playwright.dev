@@ -47,7 +47,7 @@ let plugins = [
   [
     require.resolve('@docusaurus/plugin-ideal-image'),
     {
-      // The plugin will take the min of this and the actual dimensions
+      // The plugin will take the min of this and the actual dimensions 
       // https://github.com/slorber/responsive-loader/blob/master/src/index.js#L187C32-L187C46
       max: Number.MAX_SAFE_INTEGER,
       min: 640,
