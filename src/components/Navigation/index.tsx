@@ -16,17 +16,41 @@
 
 import React, { type ReactNode } from 'react';
 import Link from '@docusaurus/Link';
+import { useLocation } from '@docusaurus/router';
+import useBaseUrl from '@docusaurus/useBaseUrl';
 import styles from './styles.module.css';
 
-function Navigation({ links }) {
+interface NavLink {
+  label: string;
+  href: string;
+}
+
+interface NavigationProps {
+  links: NavLink[];
+}
+
+function Navigation({ links }: NavigationProps) {
+  const location = useLocation();
+  
   return (
     <nav className="container">
       <ul className={styles.nav}>
-        {links.map((link, i) => (
-          <li key={i} className={styles.links}>
-            <Link href={link.href}>{link.label}</Link>
-          </li>
-        ))}
+        {links.map((link, i) => {
+          const baseHref = useBaseUrl(link.href);
+          const isActive = location.pathname === baseHref || 
+                          location.pathname.startsWith(baseHref + '/');
+          
+          return (
+            <li key={i} className={`${styles.links} ${isActive ? styles.active : ''}`}>
+              <Link 
+                href={link.href}
+                aria-current={isActive ? 'page' : undefined}
+              >
+                {link.label}
+              </Link>
+            </li>
+          );
+        })}
       </ul>
     </nav>
   );
