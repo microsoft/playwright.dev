@@ -1,158 +1,214 @@
 ---
-id: test-configuration
-title: "Configuration"
+id: test-agents
+title: "Agents"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 import ProgressiveImage from '@theme/ProgressiveImage';
 
-## Introduction
+# Playwright Agents
 
-Playwright has many options to configure how your tests are run. You can specify these options in the configuration file. Note that test runner options are **top-level**, do not put them into the `use` section.
+## Test Coverage in 1-2-3
 
-## Basic Configuration
+Playwright’s agentic workflow makes it possible to generate test coverage in three straightforward steps. These steps can be performed independently, manually, or as chained calls in an agentic loop.
+1. **Plan**: A planning agent explores the app and produces a test plan in `specs/*.md`.
 
-Here are some of the most common configuration options.
+2. **Generate**: A generating agent transforms the plan into `tests/*.spec.ts` files. It executes actions live to verify selectors and flows, then emits testing code and assertions.
 
-```js
-import { defineConfig, devices } from '@playwright/test';
+3. **Heal**: A healing agent executes the test suite and automatically repairs failing tests by applying diffs in place.
 
-export default defineConfig({
-  // Look for test files in the "tests" directory, relative to this configuration file.
-  testDir: 'tests',
+## 1. Plan
 
-  // Run all tests in parallel.
-  fullyParallel: true,
+**Input**
+* A clear request (e.g., “Generate a plan for guest checkout.”)
+* A live entry point (URL) or a seed Playwright test that sets up the environment
+* PRD (optional)
 
-  // Fail the build on CI if you accidentally left test.only in the source code.
-  forbidOnly: !!process.env.CI,
+**Prompt**
 
-  // Retry on CI only.
-  retries: process.env.CI ? 2 : 0,
+```markdown
+Ask `playwright-test-planner` agent to generate a test plan for "Guest Checkout" scenario.
+Use `seed.spec.ts` as a seed test for the plan.
+```
 
-  // Opt out of parallel tests on CI.
-  workers: process.env.CI ? 1 : undefined,
+**Output**
+* A Markdown test plan saved to `specs/guest-checkout.md`. The plan is human-readable but precise enough for test generation.
 
-  // Reporter to use
-  reporter: 'html',
+<details>
 
-  use: {
-    // Base URL to use in actions like `await page.goto('/')`.
-    baseURL: 'http://localhost:3000',
+<summary>Example: specs/guest-checkout.md</summary>
 
-    // Collect trace when retrying the failed test.
-    trace: 'on-first-retry',
-  },
-  // Configure projects for major browsers.
-  projects: [
-    {
-      name: 'chromium',
-      use: { ...devices['Desktop Chrome'] },
-    },
-  ],
-  // Run your local dev server before starting the tests.
-  webServer: {
-    command: 'npm run start',
-    url: 'http://localhost:3000',
-    reuseExistingServer: !process.env.CI,
-  },
+```markdown
+# Feature: Guest Checkout
+
+## Purpose
+Allow a user to purchase without creating an account.
+
+## Preconditions
+- Test seed `tests/seed.spec.ts`.
+- Payment sandbox credentials available via env vars.
+
+## Scenarios
+
+### SC-1: Add single item to cart and purchase
+**Steps**
+1. Open home page.
+2. Search for "Wireless Mouse".
+3. Open product page and add to cart.
+4. Proceed to checkout as guest.
+5. Fill shipping and payment details.
+6. Confirm order.
+
+**Expected**
+- Cart count increments after item is added.
+- Checkout page shows item, price, tax, and total.
+- Order confirmation number appears; status is "Processing".
+
+### SC-2: Tax and shipping recalculation on address change
+**Steps**
+1. Start checkout with a CA address.
+2. Change state to NY.
+
+**Expected**
+- Tax and shipping values recalculate.
+
+## Data
+- Product SKU: `WM-123`
+- Payment: sandbox card `4111 1111 1111 1111`, valid expiry, CVV `123`.
+
+## Methodology
+*Optional notes about testing methodology*
+```
+
+</details>
+
+## 2. Generate
+
+The generating agent uses the Markdown plan to produce executable Playwright tests. It verifies selectors and assertions live against the application. Playwright supports generation hints and provides a catalog of assertions for efficient structural and behavioral validation.
+
+**Input**
+* Markdown plan from `specs/`
+
+**Prompt**
+
+```markdown
+Ask `playwright-test-generator` to generate tests for the guest checkout plan under `specs/`.
+```
+
+**Output**
+* A test suite under `tests/`
+* Tests may include initial errors that can be healed automatically
+
+<details>
+
+<summary>Example: tests/guest-checkout.spec.ts</summary>
+
+```ts
+import { test, expect } from '@playwright/test';
+
+test.describe('Guest Checkout', () => {
+  test('SC-1: add item and purchase', async ({ page }) => {
+    await page.goto('/');
+    await page.getByRole('searchbox', { name: /search/i }).fill('Wireless Mouse');
+    await page.getByRole('button', { name: /search/i }).click();
+
+    await page.getByRole('link', { name: /wireless mouse/i }).click();
+    await page.getByRole('button', { name: /add to cart/i }).click();
+
+    // Assertion: cart badge increments
+    await expect(page.getByTestId('cart-badge')).toHaveText('1');
+
+    await page.getByRole('link', { name: /checkout/i }).click();
+    await page.getByRole('button', { name: /continue as guest/i }).click();
+
+    // Fill checkout form
+    await page.getByLabel('Email').fill(process.env.CHECKOUT_EMAIL!);
+    await page.getByLabel('Full name').fill('Alex Guest');
+    await page.getByLabel('Address').fill('1 Market St');
+    await page.getByLabel('City').fill('San Francisco');
+    await page.getByLabel('State').selectOption('CA');
+    await page.getByLabel('ZIP').fill('94105');
+
+    // Payment (sandbox)
+    const frame = page.frameLocator('[data-testid="card-iframe"]');
+    await frame.getByLabel('Card number').fill('4111111111111111');
+    await frame.getByLabel('MM / YY').fill('12/30');
+    await frame.getByLabel('CVC').fill('123');
+
+    await page.getByRole('button', { name: /pay/i }).click();
+
+    // Assertions: confirmation invariants
+    await expect(page).toHaveURL(/\/orders\/\w+\/confirmation/);
+    await expect(page.getByRole('heading', { name: /thank you/i })).toBeVisible();
+    await expect(page.getByTestId('order-status')).toHaveText(/processing/i);
+
+    // Optional visual check
+    await expect(page.locator('[data-testid="order-summary"]')).toHaveScreenshot();
+  });
 });
 ```
 
-| Option | Description |
-| :- | :- |
-| [testConfig.forbidOnly](/api/class-testconfig.mdx#test-config-forbid-only) | Whether to exit with an error if any tests are marked as `test.only`. Useful on CI.|
-| [testConfig.fullyParallel](/api/class-testconfig.mdx#test-config-fully-parallel) | have all tests in all files to run in parallel. See [Parallelism](./test-parallel) and [Sharding](./test-sharding) for more details. |
-| [testConfig.projects](/api/class-testconfig.mdx#test-config-projects) | Run tests in multiple configurations or on multiple browsers |
-| [testConfig.reporter](/api/class-testconfig.mdx#test-config-reporter) | Reporter to use. See [Test Reporters](/test-reporters.mdx) to learn more about which reporters are available. |
-| [testConfig.retries](/api/class-testconfig.mdx#test-config-retries) | The maximum number of retry attempts per test. See [Test Retries](/test-retries.mdx) to learn more about retries.|
-| [testConfig.testDir](/api/class-testconfig.mdx#test-config-test-dir) | Directory with the test files. |
-| [testConfig.use](/api/class-testconfig.mdx#test-config-use)  | Options with `use{}` |
-| [testConfig.webServer](/api/class-testconfig.mdx#test-config-web-server) | To launch a server during the tests, use the `webServer` option |
-| [testConfig.workers](/api/class-testconfig.mdx#test-config-workers) | The maximum number of concurrent worker processes to use for parallelizing tests. Can also be set as percentage of logical CPU cores, e.g. `'50%'.`. See [Parallelism](./test-parallel) and [Sharding](./test-sharding) for more details. |
+</details>
 
-## Filtering Tests
+## 3. Heal
 
-Filter tests by glob patterns or regular expressions.
+When a test fails, the healing agent:
+* Replays the failing steps
+* Inspects the current UI to locate equivalent elements or flows
+* Suggests a patch (e.g., locator update, wait adjustment, data fix)
+* Re-runs the test until it passes or until guardrails stop the loop
 
-```js title="playwright.config.ts"
-import { defineConfig } from '@playwright/test';
+**Input**
+* Failing test name
 
-export default defineConfig({
-  // Glob patterns or regular expressions to ignore test files.
-  testIgnore: '*test-assets',
+**Prompt**
 
-  // Glob patterns or regular expressions that match test files.
-  testMatch: '*todo-tests/*.spec.ts',
-});
+```markdown
+Ask `playwright-test-healer` to fix all failing tests for the guest checkout scenario.
 ```
 
-| Option | Description |
-| :- | :- |
-| [testConfig.testIgnore](/api/class-testconfig.mdx#test-config-test-ignore) | Glob patterns or regular expressions that should be ignored when looking for the test files. For example, `'*test-assets'` |
-| [testConfig.testMatch](/api/class-testconfig.mdx#test-config-test-match) | Glob patterns or regular expressions that match test files. For example, `'*todo-tests/*.spec.ts'`. By default, Playwright runs <code>.*(test&#124;spec)\.(js&#124;ts&#124;mjs)</code> files. |
+**Output**
+* A passing test, or a skipped test if the functionality is broken
 
-## Advanced Configuration
+## Artifacts and Conventions
 
-```js title="playwright.config.ts"
-import { defineConfig } from '@playwright/test';
+Follow a simple, auditable structure:
 
-export default defineConfig({
-  // Folder for test artifacts such as screenshots, videos, traces, etc.
-  outputDir: 'test-results',
-
-  // path to the global setup files.
-  globalSetup: require.resolve('./global-setup'),
-
-  // path to the global teardown files.
-  globalTeardown: require.resolve('./global-teardown'),
-
-  // Each test is given 30 seconds.
-  timeout: 30000,
-
-});
+```bash
+repo/
+  .{claude|copilot|vscode|...}/ # agent definitions, tools, guardrails
+  specs/                        # human-readable test plans
+    checkout-guest.md
+    account-settings.md
+  tests/                        # generated Playwright tests
+    seed.spec.ts
+    checkout-guest.spec.ts
+    account-settings.spec.ts
+  playwright.config.ts
 ```
 
-| Option | Description |
-| :- | :- |
-| [testConfig.globalSetup](/api/class-testconfig.mdx#test-config-global-setup) | Path to the global setup file. This file will be required and run before all the tests. It must export a single function. |
-| [testConfig.globalTeardown](/api/class-testconfig.mdx#test-config-global-teardown) |Path to the global teardown file. This file will be required and run after all the tests. It must export a single function. |
-| [testConfig.outputDir](/api/class-testconfig.mdx#test-config-output-dir) | Folder for test artifacts such as screenshots, videos, traces, etc. |
-| [testConfig.timeout](/api/class-testconfig.mdx#test-config-timeout) | Playwright enforces a [timeout](./test-timeouts.mdx) for each test, 30 seconds by default. Time spent by the test function, test fixtures and beforeEach hooks is included in the test timeout. |
+### Agents definitions
 
-## Expect Options
+Agent definitions are collections of instructions and MCP tools. They are provided by Playwright and should be regenerated whenever Playwright is updated.
 
-Configuration for the expect assertion library.
+Example for Claude Code subagents:
 
-```js title="playwright.config.ts"
-import { defineConfig } from '@playwright/test';
-
-export default defineConfig({
-  expect: {
-    // Maximum time expect() should wait for the condition to be met.
-    timeout: 5000,
-
-    toHaveScreenshot: {
-      // An acceptable amount of pixels that could be different, unset by default.
-      maxDiffPixels: 10,
-    },
-
-    toMatchSnapshot: {
-      // An acceptable ratio of pixels that are different to the
-      // total amount of pixels, between 0 and 1.
-      maxDiffPixelRatio: 0.1,
-    },
-  },
-
-});
+```bash
+npx playwright init-agents --claude
 ```
 
-| Option | Description |
-| :- | :- |
-| [testConfig.expect](/api/class-testconfig.mdx#test-config-expect) | [Web first assertions](./test-assertions.mdx) like `expect(locator).toHaveText()` have a separate timeout of 5 seconds by default. This is the maximum time the `expect()` should wait for the condition to be met. Learn more about [test and expect timeouts](./test-timeouts.mdx) and how to set them for a single test. |
-| [expect(page).toHaveScreenshot()](/api/class-pageassertions.mdx#page-assertions-to-have-screenshot-1) | Configuration for the `expect(locator).toHaveScreenshot()` method. |
-| [expect(value).toMatchSnapshot()](/api/class-snapshotassertions.mdx#snapshot-assertions-to-match-snapshot-1)| Configuration for the `expect(locator).toMatchSnapshot()` method.|
+### Specs in `specs/`
+
+Specs are structured plans describing scenarios in human-readable terms. They include steps, expected outcomes, and data. Specs can start from scratch or extend a seed test.
+
+### Tests in `tests/`
+
+Generated Playwright tests, aligned one-to-one with specs wherever feasible.
+
+### Seed tests `seed.spec.ts`
+
+Seed tests provide a ready-to-use `page` context to bootstrap execution.
 
 
 [Accessibility]: /api/class-accessibility.mdx "Accessibility"

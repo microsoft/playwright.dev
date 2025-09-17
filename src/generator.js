@@ -29,7 +29,7 @@ const { generateTabGroups, renderHTMLCard } = require('./format_utils');
 /** @typedef {import('./markdown').MarkdownNode} MarkdownNode */
 /** @export @typedef {{ name: string, link: string, usages: string[], args: docs.Member[], signatures?: string[] }} FormattedMember */
 
-const commonSnippets = new Set(['txt', 'html', 'xml', 'yml', 'yaml', 'json', 'groovy', 'html', 'bash', 'sh', 'ini', 'Dockerfile', 'css']);
+const commonSnippets = new Set(['txt', 'html', 'xml', 'yml', 'yaml', 'json', 'groovy', 'html', 'bash', 'sh', 'ini', 'Dockerfile', 'css', 'markdown']);
 
 /** @typedef {"header"|"link"|"usage"} FormatMode */
 
