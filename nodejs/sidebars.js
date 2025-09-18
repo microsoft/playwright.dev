@@ -20,10 +20,11 @@ module.exports = {
       type: 'category',
       label: 'Playwright Test',
       items: [
-        { type: 'doc', id: 'test-configuration' },
-        { type: 'doc', id: 'test-use-options' },
+        { type: 'doc', id: 'test-agents' },
         { type: 'doc', id: 'test-annotations' },
         { type: 'doc', id: 'test-cli' },
+        { type: 'doc', id: 'test-configuration' },
+        { type: 'doc', id: 'test-use-options' },
         { type: 'doc', id: 'emulation' },
         { type: 'doc', id: 'test-fixtures' },
         { type: 'doc', id: 'test-global-setup-teardown' },
