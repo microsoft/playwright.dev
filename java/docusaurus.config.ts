@@ -33,16 +33,6 @@ let plugins = [
       sidebarPath: require.resolve('./sidebarCommunity.js'),
     }),
   ],
-  [
-    'content-docs',
-    /** @type {import('@docusaurus/plugin-content-docs').Options} */
-    ({
-      id: 'agents',
-      path: 'agents',
-      routeBasePath: 'agents',
-      sidebarPath: require.resolve('./sidebarAgents.js'),
-    }),
-  ],
   require.resolve("@docusaurus/plugin-content-pages"),
   [
     require.resolve('@docusaurus/plugin-ideal-image'),
@@ -139,12 +129,6 @@ module.exports = {
               href: '#',
             },
           ],
-        },
-        {
-          to: '/agents',
-          label: 'Agents',
-          position: 'left',
-          activeBaseRegex: `/agents/`,
         },
         {
           to: '/community/welcome',
