@@ -182,28 +182,28 @@ const FeatureRow: React.FC<FeatureRowProps> = ({ title, description, videoUrl, i
 }
 
 const logos = [
-  { image: require("../../static/img/logos/VSCode.png"), href: "https://code.visualstudio.com", alt: "VS Code" },
-  { image: require("../../static/img/logos/Bing.png"), href: "https://bing.com", alt: "Bing" },
-  { image: require("../../static/img/logos/Outlook.png"), href: "https://outlook.com", alt: "Outlook" },
-  { image: require("../../static/img/logos/DHotstar.jpg"), href: "https://www.hotstar.com/", alt: "Disney+ Hotstar" },
+  { image: require("../../images/logos/VSCode.png"), href: "https://code.visualstudio.com", alt: "VS Code" },
+  { image: require("../../images/logos/Bing.png"), href: "https://bing.com", alt: "Bing" },
+  { image: require("../../images/logos/Outlook.png"), href: "https://outlook.com", alt: "Outlook" },
+  { image: require("../../images/logos/DHotstar.jpg"), href: "https://www.hotstar.com/", alt: "Disney+ Hotstar" },
   {
-    image: require("../../static/img/logos/MUI.png"),
+    image: require("../../images/logos/MUI.png"),
     href: "https://github.com/mui-org/material-ui",
     alt: "Material UI",
   },
-  { image: require("../../static/img/logos/ING.png"), href: "https://github.com/ing-bank/lion", alt: "ING" },
+  { image: require("../../images/logos/ING.png"), href: "https://github.com/ing-bank/lion", alt: "ING" },
   {
-    image: require("../../static/img/logos/Adobe2.png"),
+    image: require("../../images/logos/Adobe2.png"),
     href: "https://github.com/adobe/spectrum-web-components",
     alt: "Adobe",
   },
   {
-    image: require("../../static/img/logos/ReactNavigation.png"),
+    image: require("../../images/logos/ReactNavigation.png"),
     href: "https://github.com/react-navigation/react-navigation",
     alt: "React Navigation",
   },
   {
-    image: require("../../static/img/logos/accessibilityinsights.png"),
+    image: require("../../images/logos/accessibilityinsights.png"),
     href: "https://accessibilityinsights.io/",
     alt: "Accessibility Insights",
   },

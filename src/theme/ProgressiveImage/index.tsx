@@ -25,15 +25,17 @@ function shouldAutoDownload() {
 // image prop is injected by the plugin-ideal-image Webpack plugin
 export default function ProgressiveImage({ image: { preSrc, src }, alt }) {
   return (
-    <Image
-      placeholder={{ lqip: preSrc }}
-      alt={alt}
-      src={src.src}
-      srcSet={src.images.map((image) => ({
-        ...image,
-        src: image.path,
-      }))}
-      shouldAutoDownload={shouldAutoDownload}
-    />
+    <span role="img" aria-label={alt} title={alt}>
+      <Image
+        placeholder={{ lqip: preSrc }}
+        alt={alt}
+        src={src.src}
+        srcSet={src.images.map((image) => ({
+          ...image,
+          src: image.path,
+        }))}
+        shouldAutoDownload={shouldAutoDownload}
+      />
+    </span>
   );
 }
