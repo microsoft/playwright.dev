@@ -5,6 +5,7 @@ import Link from "@docusaurus/Link";
 import useDocusaurusContext from "@docusaurus/useDocusaurusContext";
 import useBaseUrl from "@docusaurus/useBaseUrl";
 import GitHubStarButton from '../components/GitHubStarButton';
+import ProgressiveImage from '@theme/ProgressiveImage';
 import styles from "./styles.module.css";
 
 const features = [
@@ -181,28 +182,28 @@ const FeatureRow: React.FC<FeatureRowProps> = ({ title, description, videoUrl, i
 }
 
 const logos = [
-  { imageUrl: "img/logos/VSCode.png", href: "https://code.visualstudio.com", alt: "VS Code" },
-  { imageUrl: "img/logos/Bing.png", href: "https://bing.com", alt: "Bing" },
-  { imageUrl: "img/logos/Outlook.png", href: "https://outlook.com", alt: "Outlook" },
-  { imageUrl: "img/logos/DHotstar.jpg", href: "https://www.hotstar.com/", alt: "Disney+ Hotstar" },
+  { image: require("../../static/img/logos/VSCode.png"), href: "https://code.visualstudio.com", alt: "VS Code" },
+  { image: require("../../static/img/logos/Bing.png"), href: "https://bing.com", alt: "Bing" },
+  { image: require("../../static/img/logos/Outlook.png"), href: "https://outlook.com", alt: "Outlook" },
+  { image: require("../../static/img/logos/DHotstar.jpg"), href: "https://www.hotstar.com/", alt: "Disney+ Hotstar" },
   {
-    imageUrl: "img/logos/MUI.png",
+    image: require("../../static/img/logos/MUI.png"),
     href: "https://github.com/mui-org/material-ui",
     alt: "Material UI",
   },
-  { imageUrl: "img/logos/ING.png", href: "https://github.com/ing-bank/lion", alt: "ING" },
+  { image: require("../../static/img/logos/ING.png"), href: "https://github.com/ing-bank/lion", alt: "ING" },
   {
-    imageUrl: "img/logos/Adobe2.png",
+    image: require("../../static/img/logos/Adobe2.png"),
     href: "https://github.com/adobe/spectrum-web-components",
     alt: "Adobe",
   },
   {
-    imageUrl: "img/logos/ReactNavigation.png",
+    image: require("../../static/img/logos/ReactNavigation.png"),
     href: "https://github.com/react-navigation/react-navigation",
     alt: "React Navigation",
   },
   {
-    imageUrl: "img/logos/accessibilityinsights.png",
+    image: require("../../static/img/logos/accessibilityinsights.png"),
     href: "https://accessibilityinsights.io/",
     alt: "Accessibility Insights",
   },
@@ -256,10 +257,10 @@ const Home: React.FC = () => {
               <div className={clsx("col col--12", styles.logosColumn)}>
                 <h2>Chosen by companies and open source projects</h2>
                 <ul className={styles.logosList}>
-                  {logos.map(({ imageUrl, href, alt }, idx) => (
+                  {logos.map(({ image, href, alt }, idx) => (
                     <li key={idx}>
                       <a href={href} target="_blank" rel="noreferrer noopener">
-                        <img src={imageUrl} alt={alt} />
+                        <ProgressiveImage image={image} alt={alt} />
                       </a>
                     </li>
                   ))}
