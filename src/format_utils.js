@@ -85,6 +85,7 @@ function renderHTMLCard(spec) {
 /**
  * @param {string} groupId
  * @param {string} value
+ * @returns {string}
  */
 function tabLabel(groupId, value) {
   if (groupId === 'python-flavor' && value === 'sync')
@@ -103,8 +104,14 @@ function tabLabel(groupId, value) {
     return 'Bash';
   if (value === 'batch')
     return 'Batch';
-    if (value === 'powershell')
+  if (value === 'powershell')
     return 'PowerShell'
+  if (value === 'vscode')
+    return 'VS Code';
+  if (value === 'claude')
+    return 'Claude Code';
+  if (value === 'opencode')
+    return 'OpenCode';
   throw new Error(`Unknown label type: ${value}`)
 }
 
@@ -126,9 +133,7 @@ function tabWeight(type) {
     ['sync', 2],
     ['async', 1],
   ])
-  if (!weights.has(type))
-    throw new Error(`Unrecognized language: ${type}`)
-  return weights.get(type);
+  return weights.get(type) || 0;
 }
 
 module.exports = {
