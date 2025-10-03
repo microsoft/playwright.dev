@@ -146,7 +146,6 @@ title: "${this.formatter.rewriteClassTitle?.(clazz.name) || clazz.name}"
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
-import ProgressiveImage from '@theme/ProgressiveImage';
 `});
     if (clazz.deprecated) {
       result.push({
@@ -433,7 +432,7 @@ ${this.documentation.renderLinksInText(member.discouraged)}
    */
   rewriteImageLinks(content) {
     return content.replaceAll(/!\[(.*)\]\((\.\/images\/.*)\)/g, (match, alt, link) => {
-      return `<ProgressiveImage image={require("${path.join('..', link)}")} alt="${alt}" />`;
+      return `![${alt}](${path.join('..', link)})`;
     });
   }
 
@@ -450,8 +449,7 @@ ${this.documentation.renderLinksInText(member.discouraged)}
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
-import HTMLCard from '@site/src/components/HTMLCard';
-import ProgressiveImage from '@theme/ProgressiveImage';`);
+import HTMLCard from '@site/src/components/HTMLCard';`);
   writeFileSyncCached(path.join(this.outDir, outName), this.rewriteVersion(this.mdxLinks(output)));
   }
 
