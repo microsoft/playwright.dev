@@ -2,12 +2,12 @@ const mcpVideos = [
   {
     title: 'Playwright Testing Agents: under the hood',
     id: "HLegcP8qxVY",
-    year: ['2025'],
+    year: '2025',
   },
   {
     title: 'Playwright Agents, Plan, generate and fix',
     id: "_AifxZGxwuk",
-    year: ['2025'],
+    year: '2025',
   },
    {
     title: 'Let AI explore your site and write tests with Playwright MCP',
