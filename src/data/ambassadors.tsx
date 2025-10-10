@@ -93,12 +93,7 @@ const ambassadors = [
     twitterUrl: 'https://twitter.com/TallyBarak',
     imageUrl: 'tally-barak.jpeg'
   },
-  {
-    name: 'Are you the next Ambassador?',
-    city: '',
-    country: '',
-    imageUrl: 'playwright-logo.svg'
-  }
+
 ];
 
 export default ambassadors;
