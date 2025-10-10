@@ -30,7 +30,12 @@ module.exports = {
           type: 'link',
           label: 'Learn Videos',
           href: '/community/learn-videos'
-        }
+        },
+        {
+          type: 'link',
+          label: 'MCP & Agent Videos',
+          href: '/community/mcp-videos'
+        },
       ],
       collapsed: false
     },

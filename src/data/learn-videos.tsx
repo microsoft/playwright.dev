@@ -2,6 +2,24 @@ import { Video } from './types';
 
 const learnVideos: Video[] = [
   {
+    title: 'Playwright Testing Agents: under the hood',
+    description: '',
+    id: 'HLegcP8qxVY',
+    year: '2025',
+  },
+  {
+    title: 'Playwright for Beginners: Install and run tests',
+    description: '',
+    id: 'SLhz2KmBh2Q',
+    year: '2025',
+  },
+  {
+    title: 'Getting started with Playwright in VS Code',
+    description: '',
+    id: 'WvsLGZnHmzw',
+    year: '2025',
+  },
+  {
     title: 'Handling Visibility in Playwright: getByText vs. getByRole',
     description: '',
     id: '4w0W8qYub2U',

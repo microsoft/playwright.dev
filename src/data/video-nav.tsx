@@ -20,7 +20,7 @@ const videoNav = [
     href: '/community/learn-videos'
   },
   {
-    label: 'MCP Videos',
+    label: 'MCP & Agent Videos',
     href: '/community/mcp-videos'
   }
 ];
