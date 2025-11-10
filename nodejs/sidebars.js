@@ -46,7 +46,6 @@ module.exports = {
       label: 'Guides',
       items: [
         { type: 'doc', id: 'library' },
-        { type: 'doc', id: 'accessibility-testing' },
         { type: 'doc', id: 'input' },
         { type: 'doc', id: 'test-assertions' },
         { type: 'doc', id: 'api-testing' },
@@ -121,7 +120,6 @@ module.exports = {
             { type: 'doc', id: 'api/class-apirequest' },
             { type: 'doc', id: 'api/class-apirequestcontext' },
             { type: 'doc', id: 'api/class-apiresponse' },
-            { type: 'doc', id: 'api/class-accessibility' },
             { type: 'doc', id: 'api/class-browser' },
             { type: 'doc', id: 'api/class-browsercontext' },
             { type: 'doc', id: 'api/class-browserserver' },
