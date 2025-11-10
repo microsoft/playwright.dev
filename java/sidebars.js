@@ -20,7 +20,6 @@ module.exports = {
       type: 'category',
       label: 'Guides',
       items: [
-        { type: 'doc', id: 'accessibility-testing' },
         { type: 'doc', id: 'input' },
         { type: 'doc', id: 'actionability' },
         { type: 'doc', id: 'api-testing' },
