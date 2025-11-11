@@ -46,6 +46,7 @@ module.exports = {
       label: 'Guides',
       items: [
         { type: 'doc', id: 'library' },
+        { type: 'doc', id: 'accessibility-testing' },
         { type: 'doc', id: 'input' },
         { type: 'doc', id: 'test-assertions' },
         { type: 'doc', id: 'api-testing' },
