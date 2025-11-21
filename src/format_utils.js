@@ -112,6 +112,10 @@ function tabLabel(groupId, value) {
     return 'Claude Code';
   if (value === 'opencode')
     return 'OpenCode';
+  if (value === 'cjs')
+    return 'CommonJS';
+  if (value === 'esm')
+    return 'ES Modules';
   throw new Error(`Unknown label type: ${value}`)
 }
 
