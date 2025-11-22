@@ -1,6 +1,6 @@
 import prismLight from './src/config/prismLight'
 import prismDark from './src/config/prismDark'
-import type {Config} from '@docusaurus/types';
+import type { Config } from '@docusaurus/types';
 import path from "path";
 
 const isProd = process.env.NODE_ENV === "production";
@@ -174,8 +174,8 @@ module.exports = {
               href: "https://aka.ms/playwright/discord",
             },
             {
-              label: "Twitter",
-              href: "https://twitter.com/playwrightweb",
+              label: "X",
+              href: "https://x.com/playwrightweb",
             },
             {
               label: "LinkedIn",

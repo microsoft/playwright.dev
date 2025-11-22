@@ -5,7 +5,7 @@ const ambassadors = [
     city: 'North Carolina',
     country: 'USA',
     githubUrl: 'https://github.com/AutomationPanda',
-    twitterUrl: 'https://twitter.com/AutomationPanda',
+    xUrl: 'https://x.com/AutomationPanda',
     imageUrl: 'andy-knight.jpeg'
   },
   {
@@ -14,15 +14,15 @@ const ambassadors = [
     city: 'Traverse City',
     country: 'USA',
     githubUrl: 'https://github.com/bwfellow',
-    twitterUrl: 'https://twitter.com/FellowsBen',
+    xUrl: 'https://x.com/FellowsBen',
     imageUrl: 'ben-fellows.png'
-},
+  },
   {
     name: 'Butch Mayhew',
     city: 'Birmingham',
     languages: 'English',
     country: 'USA',
-    twitterUrl: 'https://twitter.com/butchmayhew',
+    xUrl: 'https://x.com/butchmayhew',
     websiteUrl: 'https://playwrightsolutions.com/',
     imageUrl: 'butch-mayhew.jpg'
   },
@@ -32,7 +32,7 @@ const ambassadors = [
     languages: 'Spanish, English',
     country: 'Argentina',
     githubUrl: 'https://github.com/charlyautomatiza',
-    twitterUrl: 'https://twitter.com/char_automatiza',
+    xUrl: 'https://x.com/char_automatiza',
     websiteUrl: 'https://linktr.ee/charlyautomatiza',
     imageUrl: 'carlos-gauto.png'
   },
@@ -42,7 +42,7 @@ const ambassadors = [
     city: 'Kansas City',
     country: 'USA',
     githubUrl: 'https://github.com/coryhouse',
-    twitterUrl: 'https://twitter.com/housecor',
+    xUrl: 'https://x.com/housecor',
     websiteUrl: 'https://www.reactjsconsulting.com/',
     imageUrl: 'cory-house.jpeg'
   },
@@ -70,7 +70,7 @@ const ambassadors = [
     city: 'Utah',
     country: 'USA',
     githubUrl: 'https://github.com/kentcdodds',
-    twitterUrl: 'https://twitter.com/kentcdodds',
+    xUrl: 'https://x.com/kentcdodds',
     websiteUrl: 'https://kentcdodds.com',
     imageUrl: 'kent-c-dodds.jpeg'
   },
@@ -80,7 +80,7 @@ const ambassadors = [
     city: 'Berlin',
     country: 'Germany',
     githubUrl: 'https://github.com/stefanjudis',
-    twitterUrl: 'https://twitter.com/stefanjudis',
+    xUrl: 'https://x.com/stefanjudis',
     websiteUrl: 'https://www.stefanjudis.com',
     imageUrl: 'stefan-judis.jpeg'
   },
@@ -90,7 +90,7 @@ const ambassadors = [
     city: 'Tel Aviv',
     country: 'Israel',
     githubUrl: 'https://github.com/Tallyb',
-    twitterUrl: 'https://twitter.com/TallyBarak',
+    xUrl: 'https://x.com/TallyBarak',
     imageUrl: 'tally-barak.jpeg'
   },
 

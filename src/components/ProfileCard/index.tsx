@@ -22,7 +22,7 @@ type Person = {
   city: string;
   country: string;
   githubUrl?: string;
-  twitterUrl?: string;
+  xUrl?: string;
   websiteUrl?: string;
   linkedInUrl?: string;
   imageUrl: string;
@@ -58,8 +58,8 @@ function ProfileCard({ person }: ProfileProps) {
           {person.githubUrl && (
             <a className="header-github-link" href={person.githubUrl} aria-label='GitHub'></a>
           )}
-          {person.twitterUrl && (
-            <a className={styles.twitterLink} href={person.twitterUrl} aria-label='Twitter'></a>
+          {person.xUrl && (
+            <a className={styles.xLink} href={person.xUrl} aria-label='X'></a>
           )}
           {person.websiteUrl && (
             <a className={styles.websiteLink} href={person.websiteUrl} aria-label="Website"></a>

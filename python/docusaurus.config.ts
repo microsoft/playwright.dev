@@ -1,7 +1,7 @@
 import prismLight from './src/config/prismLight'
 import prismDark from './src/config/prismDark'
 
-import type {Config} from '@docusaurus/types';
+import type { Config } from '@docusaurus/types';
 import path from "path";
 const isProd = process.env.NODE_ENV === "production";
 
@@ -34,7 +34,7 @@ let plugins = [
     }),
   ],
   require.resolve("@docusaurus/plugin-content-pages"),
-    [
+  [
     require.resolve('@docusaurus/plugin-ideal-image'),
     {
       // The plugin will take the min of this and the actual dimensions
@@ -175,8 +175,8 @@ export default {
               href: "https://aka.ms/playwright/discord",
             },
             {
-              label: "Twitter",
-              href: "https://twitter.com/playwrightweb",
+              label: "X",
+              href: "https://x.com/playwrightweb",
             },
             {
               label: "LinkedIn",
