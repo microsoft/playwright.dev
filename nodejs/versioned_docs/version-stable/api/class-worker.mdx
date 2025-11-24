@@ -100,6 +100,44 @@ worker.url();
 
 ---
 
+### waitForEvent {#worker-wait-for-event}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.57</font><x-search>worker.waitForEvent</x-search>
+
+Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the page is closed before the event is fired. Returns the event data value.
+
+**Usage**
+
+```js
+// Start waiting for download before clicking. Note no await.
+const consolePromise = worker.waitForEvent('console');
+await worker.evaluate('console.log(42)');
+const consoleMessage = await consolePromise;
+```
+
+**Arguments**
+- `event` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="worker-wait-for-event-option-event"/><a href="#worker-wait-for-event-option-event" class="list-anchor">#</a>
+  
+  Event name, same one typically passed into `*.on(event)`.
+- `optionsOrPredicate` [function] | [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="worker-wait-for-event-option-options-or-predicate"/><a href="#worker-wait-for-event-option-options-or-predicate" class="list-anchor">#</a>
+  - `predicate` [function]
+    
+    Receives the event data and resolves to truthy value when the waiting should resolve.
+  - `timeout` [number] *(optional)*
+    
+    Maximum time to wait for in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  
+  Either a predicate that receives an event or an options object. Optional.
+- `options` [Object] *(optional)*
+  - `predicate` [function] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="worker-wait-for-event-option-predicate"/><a href="#worker-wait-for-event-option-predicate" class="list-anchor">#</a>
+    
+    Receives the event data and resolves to truthy value when the waiting should resolve.
+
+**Returns**
+- [Promise]&lt;[Object]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="worker-wait-for-event-return"/><a href="#worker-wait-for-event-return" class="list-anchor">#</a>
+
+---
+
 ## Events
 
 ### on('close') {#worker-event-close}
@@ -117,8 +155,24 @@ worker.on('close', data => {});
 **Event data**
 - [Worker]
 
+---
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
+### on('console') {#worker-event-console}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.57</font><x-search>worker.on('console')</x-search>
+
+Emitted when JavaScript within the worker calls one of console API methods, e.g. `console.log` or `console.dir`.
+
+**Usage**
+
+```js
+worker.on('console', data => {});
+```
+
+**Event data**
+- [ConsoleMessage]
+
+
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"

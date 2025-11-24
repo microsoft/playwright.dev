@@ -608,7 +608,7 @@ The list of reporters to use. Each reporter can be:
 * A module name like `'my-awesome-reporter'`.
 * A relative path to the reporter like `'./reporters/my-awesome-reporter.js'`.
 
-You can pass options to the reporter in a tuple like `['json', { outputFile: './report.json' }]`.
+You can pass options to the reporter in a tuple like `['json', { outputFile: './report.json' }]`. If the property is not specified, Playwright uses the `'dot'` reporter when the CI environment variable is set, and the `'list'` reporter otherwise.
 
 Learn more in the [reporters guide](../test-reporters.mdx).
 
@@ -802,6 +802,29 @@ In this config:
 1. Second project **does** have a name, so its snapshots will be stored in `<configDir>/__screenshots__/chromium/example.spec.ts/..`.
 1. Since `snapshotPathTemplate` resolves to relative path, it will be resolved relative to `configDir`.
 1. Forward slashes `"/"` can be used as path separators on any platform.
+
+---
+
+### tag {#test-config-tag}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.57</font><x-search>testConfig.tag</x-search>
+
+Tag or tags prepended to each test in the report. Useful for tagging your test run to differentiate between [CI environments](../test-sharding.mdx#merging-reports-from-multiple-environments).
+
+Note that each tag must start with `@` symbol. Learn more about [tagging](../test-annotations.mdx#tag-tests).
+
+**Usage**
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  tag: process.env.CI_ENVIRONMENT_NAME,  // for example "@APIv2"
+});
+```
+
+**Type**
+- [string] | [Array]&lt;[string]&gt;
 
 ---
 
@@ -1047,6 +1070,31 @@ export default defineConfig({
 });
 ```
 
+If your webserver runs on varying ports, use `wait` to capture the port:
+
+```js
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  webServer: {
+    command: 'npm run start',
+    wait: {
+      stdout: '/Listening on port (?<my_server_port>\\d+)/'
+    },
+  },
+});
+```
+
+```js
+import { test, expect } from '@playwright/test';
+
+test.use({ baseUrl: `http://localhost:${process.env.MY_SERVER_PORT ?? 3000}` });
+
+test('homepage', async ({ page }) => {
+  await page.goto('/');
+});
+```
+
 **Type**
 - [Object] | [Array]&lt;[Object]&gt;
   - `command` [string]
@@ -1084,6 +1132,15 @@ export default defineConfig({
   - `stdout` "pipe" | "ignore" *(optional)*
     
     If `"pipe"`, it will pipe the stdout of the command to the process stdout. If `"ignore"`, it will ignore the stdout of the command. Default to `"ignore"`.
+  - `wait` [Object] *(optional)*
+    - `stdout` [RegExp] *(optional)*
+      
+      Regular expression to wait for in the `stdout` of the command output. Named capture groups are stored in the environment, for example `/Listening on port (?<my_server_port>\\d+)/` will store the port number in `process.env['MY_SERVER_PORT']`.
+    - `stderr` [RegExp] *(optional)*
+      
+      Regular expression to wait for in the `stderr` of the command output. Named capture groups are stored in the environment, for example `/Listening on port (?<my_server_port>\\d+)/` will store the port number in `process.env['MY_SERVER_PORT']`.
+    
+    Consider command started only when given output has been produced.
   - `timeout` [number] *(optional)*
     
     How long to wait for the process to start up and be available in milliseconds. Defaults to 60000.
@@ -1166,7 +1223,6 @@ The directory for each test can be accessed by [testInfo.snapshotDir](/api/class
 This path will serve as the base directory for each test file snapshot directory. Setting `snapshotDir` to `'snapshots'`, the [testInfo.snapshotDir](/api/class-testinfo.mdx#test-info-snapshot-dir) would resolve to `snapshots/a.spec.js-snapshots`.
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
