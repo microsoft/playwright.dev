@@ -86,6 +86,58 @@ worker.evaluate_handle(expression, **kwargs)
 
 ---
 
+### expect_event {#worker-wait-for-event}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.57</font><x-search>worker.expect_event</x-search>
+
+Waits for event to fire and passes its value into the predicate function. Returns when the predicate returns truthy value. Will throw an error if the page is closed before the event is fired. Returns the event data value.
+
+**Usage**
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+with worker.expect_event("console") as event_info:
+    worker.evaluate("console.log(42)")
+message = event_info.value
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+async with worker.expect_event("console") as event_info:
+    await worker.evaluate("console.log(42)")
+message = await event_info.value
+```
+
+</TabItem>
+</Tabs>
+
+**Arguments**
+- `event` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="worker-wait-for-event-option-event"/><a href="#worker-wait-for-event-option-event" class="list-anchor">#</a>
+  
+  Event name, same one typically passed into `*.on(event)`.
+- `predicate` [Callable] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="worker-wait-for-event-option-predicate"/><a href="#worker-wait-for-event-option-predicate" class="list-anchor">#</a>
+  
+  Receives the event data and resolves to truthy value when the waiting should resolve.
+- `timeout` [float] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="worker-wait-for-event-option-timeout"/><a href="#worker-wait-for-event-option-timeout" class="list-anchor">#</a>
+  
+  Maximum time to wait for in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [browser_context.set_default_timeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout).
+
+**Returns**
+- [EventContextManager]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="worker-wait-for-event-return"/><a href="#worker-wait-for-event-return" class="list-anchor">#</a>
+
+---
+
 ## Properties
 
 ### url {#worker-url}
@@ -120,8 +172,24 @@ worker.on("close", handler)
 **Event data**
 - [Worker]
 
+---
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
+### on("console") {#worker-event-console}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.57</font><x-search>worker.on("console")</x-search>
+
+Emitted when JavaScript within the worker calls one of console API methods, e.g. `console.log` or `console.dir`.
+
+**Usage**
+
+```python
+worker.on("console", handler)
+```
+
+**Event data**
+- [ConsoleMessage]
+
+
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"

@@ -1,6 +1,6 @@
 ---
-id: service-workers-experimental
-title: "(Experimental) Service Worker Network Events"
+id: service-workers
+title: "Service Workers"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
@@ -10,6 +10,10 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 :::warning
 
+Service workers are only supported on Chromium-based browsers.
+:::
+
+:::note
 If you're looking to do general network mocking, routing, and interception, please see the [Network Guide](./network.mdx) first. Playwright provides built-in APIs for this use case that don't require the information below. However, if you're interested in requests made by Service Workers themselves, please read below.
 :::
 
@@ -19,17 +23,23 @@ They can act as a **network proxy** between the page and the external network to
 
 Many sites that use Service Workers simply use them as a transparent optimization technique. While users might notice a faster experience, the app's implementation is unaware of their existence. Running the app with or without Service Workers enabled appears functionally equivalent.
 
-## How to Enable
+## How to Disable Service Workers
 
-Playwright's inspection and routing of requests made by Service Workers are **experimental** and disabled by default.
+Playwright allows to disable Service Workers during testing. This makes tests more predictable and performant. However, if your actual page uses a Service Worker, the behavior might be different.
 
-Set the `PW_EXPERIMENTAL_SERVICE_WORKER_NETWORK_EVENTS` environment variable to `1` (or any other value) to enable the feature. Only Chrome/Chromium are currently supported.
+To disable service workers, set [testOptions.serviceWorkers](/api/class-testoptions.mdx#test-options-service-workers) to `'block'`.
 
-If you're using (or are interested in using this feature), please comment on [this issue](https://github.com/microsoft/playwright/issues/15684) letting us know your use case.
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
 
-## Service Worker Fetch
+export default defineConfig({
+  use: {
+    serviceWorkers: 'allow'
+  },
+});
+```
 
-### Accessing Service Workers and Waiting for Activation
+## Accessing Service Workers and Waiting for Activation
 
 You can use [browserContext.serviceWorkers()](/api/class-browsercontext.mdx#browser-context-service-workers) to list the Service [Worker]s, or specifically watch for the Service [Worker] if you anticipate a page will trigger its [registration](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerContainer/register):
 
@@ -39,7 +49,7 @@ await page.goto('/example-with-a-service-worker.html');
 const serviceworker = await serviceWorkerPromise;
 ```
 
-[browserContext.on('serviceworker')](/api/class-browsercontext.mdx#browser-context-event-service-worker) is fired ***before*** the Service Worker's main script has been evaluated, so ***before*** calling service[worker.evaluate()](/api/class-worker.mdx#worker-evaluate) you should wait on its activation.
+[browserContext.on('serviceworker')](/api/class-browsercontext.mdx#browser-context-event-service-worker) event is fired ***before*** the Service Worker has taken control over the page, so ***before*** evaluating in the worker with [worker.evaluate()](/api/class-worker.mdx#worker-evaluate) you should wait on its activation.
 
 There are more idiomatic methods of waiting for a Service Worker to be activated, but the following is an implementation agnostic method:
 
@@ -48,28 +58,22 @@ await page.evaluate(async () => {
   const registration = await window.navigator.serviceWorker.getRegistration();
   if (registration.active?.state === 'activated')
     return;
-  await new Promise(res =>
-    window.navigator.serviceWorker.addEventListener('controllerchange', res),
-  );
+  await new Promise(resolve => {
+    window.navigator.serviceWorker.addEventListener('controllerchange', resolve);
+  });
 });
 ```
 
-### Network Events and Routing
+## Network Events and Routing
 
-Any network request made by the **Service Worker** will have:
-* [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) and its corresponding events ([browserContext.on('requestfinished')](/api/class-browsercontext.mdx#browser-context-event-request-finished) and [browserContext.on('response')](/api/class-browsercontext.mdx#browser-context-event-response), or [browserContext.on('requestfailed')](/api/class-browsercontext.mdx#browser-context-event-request-failed))
-* [browserContext.route()](/api/class-browsercontext.mdx#browser-context-route) will see the request
+Any network request made by the **Service Worker** is reported through the [BrowserContext] object:
+* [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request), [browserContext.on('requestfinished')](/api/class-browsercontext.mdx#browser-context-event-request-finished), [browserContext.on('response')](/api/class-browsercontext.mdx#browser-context-event-response) and [browserContext.on('requestfailed')](/api/class-browsercontext.mdx#browser-context-event-request-failed) are fired
+* [browserContext.route()](/api/class-browsercontext.mdx#browser-context-route) sees the request
 * [request.serviceWorker()](/api/class-request.mdx#request-service-worker) will be set to the Service [Worker] instance, and [request.frame()](/api/class-request.mdx#request-frame) will **throw**
-* [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) will return `false`
 
-Additionally, any network request made by the **Page** (including its sub-[Frame]s) will have:
-* [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) and its corresponding events ([browserContext.on('requestfinished')](/api/class-browsercontext.mdx#browser-context-event-request-finished) and [browserContext.on('response')](/api/class-browsercontext.mdx#browser-context-event-response), or [browserContext.on('requestfailed')](/api/class-browsercontext.mdx#browser-context-event-request-failed))
-* [page.on('request')](/api/class-page.mdx#page-event-request) and its corresponding events ([page.on('requestfinished')](/api/class-page.mdx#page-event-request-finished) and [page.on('response')](/api/class-page.mdx#page-event-response), or [page.on('requestfailed')](/api/class-page.mdx#page-event-request-failed))
-* [page.route()](/api/class-page.mdx#page-route) and [page.route()](/api/class-page.mdx#page-route) will **not** see the request (if a Service Worker's fetch handler was registered)
-* [request.serviceWorker()](/api/class-request.mdx#request-service-worker) will be set to `null`, and [request.frame()](/api/class-request.mdx#request-frame) will return the [Frame]
-* [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) will return `true` (if a Service Worker's fetch handler was registered)
+Additionally, for any network request made by the **Page**, method [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) return `true` when the request was handled a Service Worker's fetch handler.
 
-Many Service Worker implementations simply execute the request from the page (possibly with some custom caching/offline logic omitted for simplicity):
+Consider a simple service worker that fetches every request made by the page:
 
 ```js title="transparent-service-worker.js"
 self.addEventListener('fetch', event => {
@@ -84,16 +88,7 @@ self.addEventListener('activate', event => {
 });
 ```
 
-If a page registers the above Service Worker:
-
-```html
-<!-- filename: index.html -->
-<script>
-  window.registrationPromise = navigator.serviceWorker.register('/transparent-service-worker.js');
-</script>
-```
-
-On the first visit to the page via [page.goto()](/api/class-page.mdx#page-goto), the following Request/Response events would be emitted (along with the corresponding network lifecycle events):
+If `index.html` registers this service worker, and then fetches `data.json`, the following Request/Response events would be emitted (along with the corresponding network lifecycle events):
 
 | Event                             | Owner            | URL                            | Routed | [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) |
 | -                                 | -                | -                              | -      | -                                      |
@@ -113,115 +108,19 @@ Since the example Service Worker just acts a basic transparent "proxy":
 It's important to note: calling [request.frame()](/api/class-request.mdx#request-frame) or [response.frame()](/api/class-response.mdx#response-frame) will **throw** an exception, if called on a [Request]/[Response] that has a non-null [request.serviceWorker()](/api/class-request.mdx#request-service-worker).
 :::
 
-#### Advanced Example
-
-When a Service Worker handles a page's request, the Service Worker can make 0 to n requests to the external network. The Service Worker might respond directly from a cache, generate a response in memory, rewrite the request, make two requests and then combine into 1, etc.
-
-Consider the code snippets below to understand Playwright's view into the Request/Responses and how it impacts routing in some of these cases.
-
-```js title="complex-service-worker.js"
-self.addEventListener('install', function(event) {
-  event.waitUntil(
-      caches.open('v1').then(function(cache) {
-      // 1. Pre-fetches and caches /addressbook.json
-        return cache.add('/addressbook.json');
-      })
-  );
-});
-
-// Opt to handle FetchEvent's from the page
-self.addEventListener('fetch', event => {
-  event.respondWith(
-      (async () => {
-        // 1. Try to first serve directly from caches
-        const response = await caches.match(event.request);
-        if (response)
-          return response;
-
-        // 2. Re-write request for /foo to /bar
-        if (event.request.url.endsWith('foo'))
-          return fetch('./bar');
-
-        // 3. Prevent tracker.js from being retrieved, and returns a placeholder response
-        if (event.request.url.endsWith('tracker.js')) {
-          return new Response('console.log("no trackers!")', {
-            status: 200,
-            headers: { 'Content-Type': 'text/javascript' },
-          });
-        }
-
-        // 4. Otherwise, fallthrough, perform the fetch and respond
-        return fetch(event.request);
-      })()
-  );
-});
-
-self.addEventListener('activate', event => {
-  event.waitUntil(clients.claim());
-});
-```
-
-And a page that simply registers the Service Worker:
-
-```html
-<!-- filename: index.html -->
-<script>
-  window.registrationPromise = navigator.serviceWorker.register('/complex-service-worker.js');
-</script>
-```
-
-On the first visit to the page via [page.goto()](/api/class-page.mdx#page-goto), the following Request/Response events would be emitted:
-
-| Event                             | Owner            | URL                            | Routed | [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) |
-| -                                 | -                | -                              | -      | -                                      |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | index.html                     | Yes    |                                        |
-| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | index.html                     | Yes    |                                        |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | complex-service-worker.js      | Yes    |                                        |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | addressbook.json               | Yes    |                                        |
-
-It's important to note that [`cache.add`](https://developer.mozilla.org/en-US/docs/Web/API/Cache/add) caused the Service Worker to make a request (Service [Worker]-owned), even before `addressbook.json` was asked for in the page.
-
-Once the Service Worker is activated and handling FetchEvents, if the page makes the following requests:
-
-```js
-await page.evaluate(() => fetch('/addressbook.json'));
-await page.evaluate(() => fetch('/foo'));
-await page.evaluate(() => fetch('/tracker.js'));
-await page.evaluate(() => fetch('/fallthrough.txt'));
-```
-
-The following Request/Response events would be emitted:
-
-| Event                             | Owner            | URL                            | Routed | [response.fromServiceWorker()](/api/class-response.mdx#response-from-service-worker) |
-| -                                 | -                | -                              | -      | -                                      |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | addressbook.json               |        | Yes                                    |
-| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | addressbook.json               |        | Yes                                    |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | bar                            | Yes    |                                        |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | foo                            |        | Yes                                    |
-| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | foo                            |        | Yes                                    |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | tracker.js                     |        | Yes                                    |
-| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | tracker.js                     |        | Yes                                    |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | fallthrough.txt                | Yes    |                                        |
-| [browserContext.on('request')](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | fallthrough.txt                |        | Yes                                    |
-| [page.on('request')](/api/class-page.mdx#page-event-request)           | [Frame]          | fallthrough.txt                |        | Yes                                    |
-
-It's important to note:
-* The page requested `/foo`, but the Service Worker requested `/bar`, so there are only [Frame]-owned events for `/foo`, but not `/bar`.
-* Likewise, the Service Worker never hit the network for `tracker.js`, so only [Frame]-owned events were emitted for that request.
-
 ## Routing Service Worker Requests Only
 
 ```js
 await context.route('**', async route => {
   if (route.request().serviceWorker()) {
     // NB: calling route.request().frame() here would THROW
-    return route.fulfill({
+    await route.fulfill({
       contentType: 'text/plain',
       status: 200,
       body: 'from sw',
     });
   } else {
-    return route.continue();
+    await route.continue();
   }
 });
 ```
@@ -231,7 +130,6 @@ await context.route('**', async route => {
 Requests for updated Service Worker main script code currently cannot be routed (https://github.com/microsoft/playwright/issues/14711).
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
