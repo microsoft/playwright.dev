@@ -64,7 +64,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v5
-    - uses: actions/setup-node@v5
+    - uses: actions/setup-node@v6
       with:
         node-version: lts/*
     - name: Install dependencies
@@ -73,7 +73,7 @@ jobs:
       run: npx playwright install --with-deps
     - name: Run Playwright tests
       run: npx playwright test
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v5
       if: ${{ !cancelled() }}
       with:
         name: playwright-report
@@ -101,11 +101,11 @@ jobs:
     name: 'Playwright Tests'
     runs-on: ubuntu-latest
     container:
-      image: mcr.microsoft.com/playwright:v1.56.1-noble
+      image: mcr.microsoft.com/playwright:v1.57.0-noble
       options: --user 1001
     steps:
       - uses: actions/checkout@v5
-      - uses: actions/setup-node@v5
+      - uses: actions/setup-node@v6
         with:
           node-version: lts/*
       - name: Install dependencies
@@ -129,7 +129,7 @@ jobs:
     if: github.event.deployment_status.state == 'success'
     steps:
     - uses: actions/checkout@v5
-    - uses: actions/setup-node@v5
+    - uses: actions/setup-node@v6
       with:
         node-version: lts/*
     - name: Install dependencies
@@ -163,7 +163,7 @@ jobs:
         # Force a non-shallow checkout, so that we can reference $GITHUB_BASE_REF.
         # See https://github.com/actions/checkout for more details.
         fetch-depth: 0
-    - uses: actions/setup-node@v5
+    - uses: actions/setup-node@v6
       with:
         node-version: lts/*
     - name: Install dependencies
@@ -175,7 +175,7 @@ jobs:
       if: github.event_name == 'pull_request'
     - name: Run Playwright tests
       run: npx playwright test
-    - uses: actions/upload-artifact@v4
+    - uses: actions/upload-artifact@v5
       if: ${{ !cancelled() }}
       with:
         name: playwright-report
@@ -335,7 +335,7 @@ trigger:
 
 pool:
   vmImage: ubuntu-latest
-container: mcr.microsoft.com/playwright:v1.56.1-noble
+container: mcr.microsoft.com/playwright:v1.57.0-noble
 
 steps:
 - task: UseNode@1
@@ -359,7 +359,7 @@ Running Playwright on CircleCI is very similar to running on GitHub Actions. In 
 executors:
   pw-noble-development:
     docker:
-      - image: mcr.microsoft.com/playwright:v1.56.1-noble
+      - image: mcr.microsoft.com/playwright:v1.57.0-noble
 ```
 
 Note: When using the docker agent definition, you are specifying the resource class of where playwright runs to the 'medium' tier [here](https://circleci.com/docs/configuration-reference?#docker-execution-environment). The default behavior of Playwright is to set the number of workers to the detected core count (2 in the case of the medium tier). Overriding the number of workers to greater than this number will cause unnecessary timeouts and failures.
@@ -382,7 +382,7 @@ Jenkins supports Docker agents for pipelines. Use the [Playwright Docker image](
 
 ```groovy
 pipeline {
-   agent { docker { image 'mcr.microsoft.com/playwright:v1.56.1-noble' } }
+   agent { docker { image 'mcr.microsoft.com/playwright:v1.57.0-noble' } }
    stages {
       stage('e2e-tests') {
          steps {
@@ -399,7 +399,7 @@ pipeline {
 Bitbucket Pipelines can use public [Docker images as build environments](https://confluence.atlassian.com/bitbucket/use-docker-images-as-build-environments-792298897.html). To run Playwright tests on Bitbucket, use our public Docker image ([see Dockerfile](./docker.mdx)).
 
 ```yml
-image: mcr.microsoft.com/playwright:v1.56.1-noble
+image: mcr.microsoft.com/playwright:v1.57.0-noble
 ```
 
 ### GitLab CI
@@ -412,7 +412,7 @@ stages:
 
 tests:
   stage: test
-  image: mcr.microsoft.com/playwright:v1.56.1-noble
+  image: mcr.microsoft.com/playwright:v1.57.0-noble
   script:
   ...
 ```
@@ -427,7 +427,7 @@ stages:
 
 tests:
   stage: test
-  image: mcr.microsoft.com/playwright:v1.56.1-noble
+  image: mcr.microsoft.com/playwright:v1.57.0-noble
   parallel: 7
   script:
     - npm ci
@@ -442,7 +442,7 @@ stages:
 
 tests:
   stage: test
-  image: mcr.microsoft.com/playwright:v1.56.1-noble
+  image: mcr.microsoft.com/playwright:v1.57.0-noble
   parallel:
     matrix:
       - PROJECT: ['chromium', 'webkit']
@@ -458,7 +458,7 @@ To run Playwright tests on Google Cloud Build, use our public Docker image ([see
 
 ```yml
 steps:
-- name: mcr.microsoft.com/playwright:v1.56.1-noble
+- name: mcr.microsoft.com/playwright:v1.57.0-noble
   script: 
   ...
   env:
@@ -476,7 +476,7 @@ type: docker
 
 steps:
   - name: test
-    image: mcr.microsoft.com/playwright:v1.56.1-noble
+    image: mcr.microsoft.com/playwright:v1.57.0-noble
     commands:
       - npx playwright test
 ```
@@ -506,7 +506,6 @@ xvfb-run npx playwright test
 ```
 
 
-[Accessibility]: /api/class-accessibility.mdx "Accessibility"
 [Android]: /api/class-android.mdx "Android"
 [AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
 [AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
