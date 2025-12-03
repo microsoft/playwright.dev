@@ -75,6 +75,7 @@ module.exports = {
         { type: 'doc', id: 'pages' },
         { type: 'doc', id: 'pom' },
         { type: 'doc', id: 'screenshots' },
+        { type: 'doc', id: 'service-workers' },
         { type: 'doc', id: 'aria-snapshots' },
         { type: 'doc', id: 'codegen' },
         { type: 'doc', id: 'touch-events' },
