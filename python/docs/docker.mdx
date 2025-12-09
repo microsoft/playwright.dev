@@ -22,7 +22,7 @@ This Docker image is intended to be used for testing and development purposes on
 ### Pull the image
 
 ```bash
-docker pull mcr.microsoft.com/playwright/python:v1.56.0-noble
+docker pull mcr.microsoft.com/playwright/python:v1.57.0-noble
 ```
 
 ### Run the image
@@ -34,7 +34,7 @@ By default, the Docker image will use the `root` user to run the browsers. This 
 On trusted websites, you can avoid creating a separate user and use root for it since you trust the code which will run on the browsers.
 
 ```bash
-docker run -it --rm --ipc=host mcr.microsoft.com/playwright/python:v1.56.0-noble /bin/bash
+docker run -it --rm --ipc=host mcr.microsoft.com/playwright/python:v1.57.0-noble /bin/bash
 ```
 
 #### Crawling and scraping
@@ -42,7 +42,7 @@ docker run -it --rm --ipc=host mcr.microsoft.com/playwright/python:v1.56.0-noble
 On untrusted websites, it's recommended to use a separate user for launching the browsers in combination with the seccomp profile. Inside the container or if you are using the Docker image as a base image you have to use `adduser` for it.
 
 ```bash
-docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_profile.json mcr.microsoft.com/playwright/python:v1.56.0-noble /bin/bash
+docker run -it --rm --ipc=host --user pwuser --security-opt seccomp=seccomp_profile.json mcr.microsoft.com/playwright/python:v1.57.0-noble /bin/bash
 ```
 
 [`seccomp_profile.json`](https://github.com/microsoft/playwright/blob/main/utils/docker/seccomp_profile.json) is needed to run Chromium with sandbox. This is a [default Docker seccomp profile](https://github.com/docker/engine/blob/d0d99b04cf6e00ed3fc27e81fc3d94e7eda70af3/profiles/seccomp/default.json) with extra user namespace cloning permissions:
@@ -82,7 +82,7 @@ You can run Playwright Server in Docker while keeping your tests running on the 
 Start the Playwright Server in Docker:
 
 ```bash
-docker run -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.56.0-noble /bin/sh -c "npx -y playwright@1.56.0 run-server --port 3000 --host 0.0.0.0"
+docker run -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.57.0-noble /bin/sh -c "npx -y playwright@1.57.0 run-server --port 3000 --host 0.0.0.0"
 ```
 
 #### Connecting to the Server
@@ -122,7 +122,7 @@ async with async_playwright() as p:
 If you need to access local servers from within the Docker container:
 
 ```bash
-docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.56.0-noble /bin/sh -c "npx -y playwright@1.56.0 run-server --port 3000 --host 0.0.0.0"
+docker run --add-host=hostmachine:host-gateway -p 3000:3000 --rm --init -it --workdir /home/pwuser --user pwuser mcr.microsoft.com/playwright:v1.57.0-noble /bin/sh -c "npx -y playwright@1.57.0 run-server --port 3000 --host 0.0.0.0"
 ```
 
 This makes `hostmachine` point to the host's localhost. Your tests should use `hostmachine` instead of `localhost` when accessing local servers.
@@ -132,14 +132,32 @@ This makes `hostmachine` point to the host's localhost. Your tests should use `h
 When running tests remotely, ensure the Playwright version in your tests matches the version running in the Docker container.
 :::
 
+### Connecting using noVNC and GitHub Codespaces
+
+For Docker and GitHub Codespaces environments, you can view and generate tests using the `noVNC` viewer built into the Docker image. In order for the VNC webviewer to be accessible outside of the container, you can enable the `desktop-lite` feature and specify the `webPort` in your `.devcontainer/devcontainer.json` file: 
+
+```json
+{
+  "image": "mcr.microsoft.com/playwright:v1.57.0",
+  "forwardPorts": [6080],
+  "features": {
+    "desktop-lite": {
+      "webPort": "6080"
+    }
+  }
+}
+```
+
+Once this is enabled you can open the port specified in a new browser tab and you will have access to the `noVNC` web viewer. This will enable you to record tests, pick selectors, and use codegen directly on your container.
+
 ## Image tags
 
 See [all available image tags].
 
 We currently publish images with the following tags:
-- `:v1.56.0` - Playwright v1.56.0 release docker image based on Ubuntu 24.04 LTS (Noble Numbat).
-- `:v1.56.0-noble` - Playwright v1.56.0 release docker image based on Ubuntu 24.04 LTS (Noble Numbat).
-- `:v1.56.0-jammy` - Playwright v1.56.0 release docker image based on Ubuntu 22.04 LTS (Jammy Jellyfish).
+- `:v1.57.0` - Playwright v1.57.0 release docker image based on Ubuntu 24.04 LTS (Noble Numbat).
+- `:v1.57.0-noble` - Playwright v1.57.0 release docker image based on Ubuntu 24.04 LTS (Noble Numbat).
+- `:v1.57.0-jammy` - Playwright v1.57.0 release docker image based on Ubuntu 22.04 LTS (Jammy Jellyfish).
 
 :::note
 
@@ -163,7 +181,7 @@ To run Playwright inside Docker, you need to have Python, [Playwright browsers](
 ```Dockerfile
 FROM python:3.12-bookworm
 
-RUN pip install playwright==@1.56.0 && \
+RUN pip install playwright==@1.57.0 && \
     playwright install --with-deps
 ```
 
