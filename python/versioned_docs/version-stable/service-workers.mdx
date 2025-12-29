@@ -1,0 +1,262 @@
+---
+id: service-workers
+title: "Service Workers"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import HTMLCard from '@site/src/components/HTMLCard';
+
+## Introduction
+
+:::warning
+
+Service workers are only supported on Chromium-based browsers.
+:::
+
+:::note
+If you're looking to do general network mocking, routing, and interception, please see the [Network Guide](./network.mdx) first. Playwright provides built-in APIs for this use case that don't require the information below. However, if you're interested in requests made by Service Workers themselves, please read below.
+:::
+
+[Service Workers](https://developer.mozilla.org/en-US/docs/Web/API/Service_Worker_API) provide a browser-native method of handling requests made by a page with the native [Fetch API (`fetch`)](https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API) along with other network-requested assets (like scripts, css, and images).
+
+They can act as a **network proxy** between the page and the external network to perform caching logic or can provide users with an offline experience if the Service Worker adds a [FetchEvent](https://developer.mozilla.org/en-US/docs/Web/API/FetchEvent#examples) listener.
+
+Many sites that use Service Workers simply use them as a transparent optimization technique. While users might notice a faster experience, the app's implementation is unaware of their existence. Running the app with or without Service Workers enabled appears functionally equivalent.
+
+## How to Disable Service Workers
+
+Playwright allows to disable Service Workers during testing. This makes tests more predictable and performant. However, if your actual page uses a Service Worker, the behavior might be different.
+
+To disable service workers, set `service_workers` context option to `"block"`.
+
+```python title="conftest.py"
+import pytest
+
+@pytest.fixture(scope="session")
+def browser_context_args(browser_context_args):
+    return {
+        **browser_context_args,
+        "service_workers": "block"
+    }
+```
+
+## Accessing Service Workers and Waiting for Activation
+
+You can use [browser_context.service_workers](/api/class-browsercontext.mdx#browser-context-service-workers) to list the Service [Worker]s, or specifically watch for the Service [Worker] if you anticipate a page will trigger its [registration](https://developer.mozilla.org/en-US/docs/Web/API/ServiceWorkerContainer/register):
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+with context.expect_event("serviceworker") as worker_info:
+  page.goto("/example-with-a-service-worker.html")
+service_worker = worker_info.value
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+async with context.expect_event("serviceworker") as worker_info:
+  await page.goto("/example-with-a-service-worker.html")
+service_worker = await worker_info.value
+```
+
+</TabItem>
+</Tabs>
+
+[browser_context.on("serviceworker")](/api/class-browsercontext.mdx#browser-context-event-service-worker) event is fired ***before*** the Service Worker has taken control over the page, so ***before*** evaluating in the worker with [worker.evaluate()](/api/class-worker.mdx#worker-evaluate) you should wait on its activation.
+
+There are more idiomatic methods of waiting for a Service Worker to be activated, but the following is an implementation agnostic method:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+page.evaluate("""async () => {
+  const registration = await window.navigator.serviceWorker.getRegistration();
+  if (registration.active?.state === 'activated')
+    return;
+  await new Promise(resolve => {
+    window.navigator.serviceWorker.addEventListener('controllerchange', resolve);
+  });
+}""")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await page.evaluate("""async () => {
+  const registration = await window.navigator.serviceWorker.getRegistration();
+  if (registration.active?.state === 'activated')
+    return;
+  await new Promise(resolve => {
+    window.navigator.serviceWorker.addEventListener('controllerchange', resolve);
+  });
+}""")
+```
+
+</TabItem>
+</Tabs>
+
+## Network Events and Routing
+
+Any network request made by the **Service Worker** is reported through the [BrowserContext] object:
+* [browser_context.on("request")](/api/class-browsercontext.mdx#browser-context-event-request), [browser_context.on("requestfinished")](/api/class-browsercontext.mdx#browser-context-event-request-finished), [browser_context.on("response")](/api/class-browsercontext.mdx#browser-context-event-response) and [browser_context.on("requestfailed")](/api/class-browsercontext.mdx#browser-context-event-request-failed) are fired
+* [browser_context.route()](/api/class-browsercontext.mdx#browser-context-route) sees the request
+* [request.service_worker](/api/class-request.mdx#request-service-worker) will be set to the Service [Worker] instance, and [request.frame](/api/class-request.mdx#request-frame) will **throw**
+
+Additionally, for any network request made by the **Page**, method [response.from_service_worker](/api/class-response.mdx#response-from-service-worker) return `true` when the request was handled a Service Worker's fetch handler.
+
+Consider a simple service worker that fetches every request made by the page:
+
+If `index.html` registers this service worker, and then fetches `data.json`, the following Request/Response events would be emitted (along with the corresponding network lifecycle events):
+
+| Event                             | Owner            | URL                            | Routed | [response.from_service_worker](/api/class-response.mdx#response-from-service-worker) |
+| -                                 | -                | -                              | -      | -                                      |
+| [browser_context.on("request")](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | index.html                     | Yes    |                                        |
+| [page.on("request")](/api/class-page.mdx#page-event-request)           | [Frame]          | index.html                     | Yes    |                                        |
+| [browser_context.on("request")](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | transparent-service-worker.js  | Yes    |                                        |
+| [browser_context.on("request")](/api/class-browsercontext.mdx#browser-context-event-request) | Service [Worker] | data.json                      | Yes    |                                        |
+| [browser_context.on("request")](/api/class-browsercontext.mdx#browser-context-event-request) | [Frame]          | data.json                      |        | Yes                                    |
+| [page.on("request")](/api/class-page.mdx#page-event-request)           | [Frame]          | data.json                      |        | Yes                                    |
+
+Since the example Service Worker just acts a basic transparent "proxy":
+* There's 2 [browser_context.on("request")](/api/class-browsercontext.mdx#browser-context-event-request) events for `data.json`; one [Frame]-owned, the other Service [Worker]-owned.
+* Only the Service [Worker]-owned request for the resource was routable via [browser_context.route()](/api/class-browsercontext.mdx#browser-context-route); the [Frame]-owned events for `data.json` are not routeable, as they would not have even had the possibility to hit the external network since the Service Worker has a fetch handler registered.
+
+:::caution
+
+It's important to note: calling [request.frame](/api/class-request.mdx#request-frame) or [response.frame](/api/class-response.mdx#response-frame) will **throw** an exception, if called on a [Request]/[Response] that has a non-null [request.service_worker](/api/class-request.mdx#request-service-worker).
+:::
+
+## Routing Service Worker Requests Only
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+def handle_route(route: Route):
+  if route.request.service_worker:
+    # NB: accessing route.request.frame here would THROW
+    route.fulfill(content_type="text/plain", status=200, body="from sw")
+  else:
+    route.continue_()
+
+context.route("**", handle_route)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+async def handle_route(route: Route):
+  if route.request.service_worker:
+    # NB: accessing route.request.frame here would THROW
+    await route.fulfill(content_type="text/plain", status=200, body="from sw")
+  else:
+    await route.continue_()
+
+await context.route("**", handle_route)
+```
+
+</TabItem>
+</Tabs>
+
+## Known Limitations
+
+Requests for updated Service Worker main script code currently cannot be routed (https://github.com/microsoft/playwright/issues/14711).
+
+
+[APIRequest]: /api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
+[Browser]: /api/class-browser.mdx "Browser"
+[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: /api/class-browsertype.mdx "BrowserType"
+[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[Clock]: /api/class-clock.mdx "Clock"
+[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Dialog]: /api/class-dialog.mdx "Dialog"
+[Download]: /api/class-download.mdx "Download"
+[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
+[Error]: /api/class-error.mdx "Error"
+[FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[Frame]: /api/class-frame.mdx "Frame"
+[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: /api/class-jshandle.mdx "JSHandle"
+[Keyboard]: /api/class-keyboard.mdx "Keyboard"
+[Locator]: /api/class-locator.mdx "Locator"
+[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
+[Mouse]: /api/class-mouse.mdx "Mouse"
+[Page]: /api/class-page.mdx "Page"
+[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
+[Playwright]: /api/class-playwright.mdx "Playwright"
+[Request]: /api/class-request.mdx "Request"
+[Response]: /api/class-response.mdx "Response"
+[Route]: /api/class-route.mdx "Route"
+[Selectors]: /api/class-selectors.mdx "Selectors"
+[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: /api/class-tracing.mdx "Tracing"
+[Video]: /api/class-video.mdx "Video"
+[WebError]: /api/class-weberror.mdx "WebError"
+[WebSocket]: /api/class-websocket.mdx "WebSocket"
+[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[Worker]: /api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[Any]: https://docs.python.org/3/library/typing.html#typing.Any "Any"
+[bool]: https://docs.python.org/3/library/stdtypes.html "bool"
+[bytes]: https://docs.python.org/3/library/stdtypes.html#bytes "bytes"
+[Callable]: https://docs.python.org/3/library/typing.html#typing.Callable "Callable"
+[EventContextManager]: https://docs.python.org/3/reference/datamodel.html#context-managers "Event context manager"
+[EventEmitter]: https://pyee.readthedocs.io/en/latest/#pyee.BaseEventEmitter "EventEmitter"
+[Exception]: https://docs.python.org/3/library/exceptions.html#Exception "Exception"
+[Dict]: https://docs.python.org/3/library/typing.html#typing.Dict "Dict"
+[float]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "float"
+[int]: https://docs.python.org/3/library/stdtypes.html#numeric-types-int-float-complex "int"
+[List]: https://docs.python.org/3/library/typing.html#typing.List "List"
+[NoneType]: https://docs.python.org/3/library/constants.html#None "None"
+[Pattern]: https://docs.python.org/3/library/re.html "Pattern"
+[URL]: https://en.wikipedia.org/wiki/URL "URL"
+[pathlib.Path]: https://realpython.com/python-pathlib/ "pathlib.Path"
+[str]: https://docs.python.org/3/library/stdtypes.html#text-sequence-type-str "str"
+[Union]: https://docs.python.org/3/library/typing.html#typing.Union "Union"
+[datetime]: https://docs.python.org/3/library/datetime.html#datetime.datetime "datetime"
+
+[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/python/about "all available image tags"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/python/about "Microsoft Artifact Registry"
+[Dockerfile.noble]: https://github.com/microsoft/playwright-python/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"
