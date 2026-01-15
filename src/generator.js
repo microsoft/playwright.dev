@@ -319,7 +319,11 @@ ${this.documentation.renderLinksInText(member.discouraged)}
 
           sections.arguments.push(...args.map(a => {
             const name = this.formatter.formatParamName?.(a.alias) || a.alias;
-            return this.renderProperty(name, a, a.spec, 'in', false, !a.required);
+            try {
+              return this.renderProperty(name, a, a.spec, 'in', false, !a.required);
+            } catch (e) {
+              throw new Error(`While rendering ${member.clazz.name}.${member.name}, property\n-------\n${md.render(a.spec)}\n------\n ` + e.message);
+            }
           }));
         }
 
@@ -337,7 +341,11 @@ ${this.documentation.renderLinksInText(member.discouraged)}
             text: '**' + name + '**',
           });
 
-          sections.return.push(this.renderProperty('', member, undefined, 'out', member.async, false));
+          try {
+            sections.return.push(this.renderProperty('', member, undefined, 'out', member.async, false));
+          } catch (e) {
+            throw new Error(`While rendering ${member.clazz.name}.${member.name}, property\n-------\n${md.render(member.spec)}\n------\n ` + e.message);
+          }
         }
 
         memberNode.children.push(...this.formatComment(sections.version));
@@ -428,7 +436,7 @@ ${this.documentation.renderLinksInText(member.discouraged)}
   }
 
   /**
-   * @param {string} content 
+   * @param {string} content
    */
   rewriteImageLinks(content) {
     return content.replaceAll(/!\[(.*)\]\((\.\/images\/.*)\)/g, (match, alt, link) => {
