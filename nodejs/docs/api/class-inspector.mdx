@@ -1,37 +1,140 @@
 ---
-id: frames
-title: "Frames"
+id: class-inspector
+title: "Inspector"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## Introduction
 
-A [Page] can have one or more [Frame] objects attached to it. Each page has a main frame and page-level interactions (like `click`) are assumed to operate in the main frame.
+Interface to the Playwright inspector.
 
-A page can have additional frames attached with the `iframe` HTML tag. These frames can be accessed for interactions inside the frame.
+
+---
+
+## Methods
+
+### cancelPickLocator {#inspector-cancel-pick-locator}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>inspector.cancelPickLocator</x-search>
+
+Cancels an ongoing [inspector.pickLocator()](/api/class-inspector.mdx#inspector-pick-locator) call by deactivating pick locator mode. If no pick locator mode is active, this method is a no-op.
+
+**Usage**
 
 ```js
-// Locate element inside frame
-const username = await page.frameLocator('.frame-class').getByLabel('User Name');
-await username.fill('John');
+await inspector.cancelPickLocator();
 ```
 
-## Frame objects
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="inspector-cancel-pick-locator-return"/><a href="#inspector-cancel-pick-locator-return" class="list-anchor">#</a>
 
-One can access frame objects using the [page.frame()](/api/class-page.mdx#page-frame) API:
+---
+
+### pickLocator {#inspector-pick-locator}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>inspector.pickLocator</x-search>
+
+Enters pick locator mode where hovering over page elements highlights them and shows the corresponding locator. Once the user clicks an element, the mode is deactivated and the [Locator] for the picked element is returned.
+
+**Usage**
 
 ```js
-// Get frame using the frame's name attribute
-const frame = page.frame('frame-login');
-
-// Get frame using frame's URL
-const frame = page.frame({ url: /.*domain.*/ });
-
-// Interact with the frame
-await frame.fill('#username-input', 'John');
+const locator = await page.inspector().pickLocator();
+console.log(locator);
 ```
+
+**Returns**
+- [Promise]&lt;[Locator]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="inspector-pick-locator-return"/><a href="#inspector-pick-locator-return" class="list-anchor">#</a>
+
+---
+
+### startScreencast {#inspector-start-screencast}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>inspector.startScreencast</x-search>
+
+Starts capturing screencast frames. Frames are emitted as [inspector.on('screencastframe')](/api/class-inspector.mdx#inspector-event-screencast-frame) events.
+
+**Usage**
+
+```js
+const inspector = page.inspector();
+inspector.on('screencastframe', ({ data, width, height }) => {
+  console.log(`frame ${width}x${height}, size: ${data.length}`);
+});
+await inspector.startScreencast({ size: { width: 800, height: 600 } });
+// ... perform actions ...
+await inspector.stopScreencast();
+```
+
+**Arguments**
+- `options` [Object] *(optional)*
+  - `size` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="inspector-start-screencast-option-size"/><a href="#inspector-start-screencast-option-size" class="list-anchor">#</a>
+    - `width` [number]
+      
+      Frame width in pixels.
+    - `height` [number]
+      
+      Frame height in pixels.
+    
+    Optional dimensions for the screencast frames. If not specified, the current page viewport size is used.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="inspector-start-screencast-return"/><a href="#inspector-start-screencast-return" class="list-anchor">#</a>
+
+---
+
+### stopScreencast {#inspector-stop-screencast}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>inspector.stopScreencast</x-search>
+
+Stops the screencast started with [inspector.startScreencast()](/api/class-inspector.mdx#inspector-start-screencast).
+
+**Usage**
+
+```js
+await inspector.startScreencast();
+// ... perform actions ...
+await inspector.stopScreencast();
+```
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="inspector-stop-screencast-return"/><a href="#inspector-stop-screencast-return" class="list-anchor">#</a>
+
+---
+
+## Events
+
+### on('screencastframe') {#inspector-event-screencast-frame}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>inspector.on('screencastframe')</x-search>
+
+Emitted for each captured JPEG screencast frame while the screencast is running.
+
+**Usage**
+
+```js
+const inspector = page.inspector();
+inspector.on('screencastframe', ({ data, width, height }) => {
+  console.log(`frame ${width}x${height}, jpeg size: ${data.length}`);
+  require('fs').writeFileSync('frame.jpg', data);
+});
+await inspector.startScreencast({ size: { width: 1280, height: 720 } });
+// ... perform actions ...
+await inspector.stopScreencast();
+```
+
+**Event data**
+- [Object]
+  - `data` [Buffer]
+    
+    JPEG-encoded frame data.
+  - `width` [number]
+    
+    Frame width in pixels.
+  - `height` [number]
+    
+    Frame height in pixels.
 
 
 [Android]: /api/class-android.mdx "Android"
