@@ -1,127 +1,92 @@
 ---
-id: class-inspector
-title: "Inspector"
+id: class-screencast
+title: "Screencast"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
 
-Interface to the Playwright inspector.
+Interface for capturing screencast frames from a page.
 
 
 ---
 
 ## Methods
 
-### cancelPickLocator {#inspector-cancel-pick-locator}
+### start {#screencast-start}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>inspector.cancelPickLocator</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>screencast.start</x-search>
 
-Cancels an ongoing [inspector.pickLocator()](/api/class-inspector.mdx#inspector-pick-locator) call by deactivating pick locator mode. If no pick locator mode is active, this method is a no-op.
-
-**Usage**
-
-```js
-await inspector.cancelPickLocator();
-```
-
-**Returns**
-- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="inspector-cancel-pick-locator-return"/><a href="#inspector-cancel-pick-locator-return" class="list-anchor">#</a>
-
----
-
-### pickLocator {#inspector-pick-locator}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>inspector.pickLocator</x-search>
-
-Enters pick locator mode where hovering over page elements highlights them and shows the corresponding locator. Once the user clicks an element, the mode is deactivated and the [Locator] for the picked element is returned.
+Starts capturing screencast frames. Frames are emitted as [screencast.on('screencastframe')](/api/class-screencast.mdx#screencast-event-screencast-frame) events.
 
 **Usage**
 
 ```js
-const locator = await page.inspector().pickLocator();
-console.log(locator);
-```
-
-**Returns**
-- [Promise]&lt;[Locator]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="inspector-pick-locator-return"/><a href="#inspector-pick-locator-return" class="list-anchor">#</a>
-
----
-
-### startScreencast {#inspector-start-screencast}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>inspector.startScreencast</x-search>
-
-Starts capturing screencast frames. Frames are emitted as [inspector.on('screencastframe')](/api/class-inspector.mdx#inspector-event-screencast-frame) events.
-
-**Usage**
-
-```js
-const inspector = page.inspector();
-inspector.on('screencastframe', ({ data, width, height }) => {
+const screencast = page.screencast();
+screencast.on('screencastframe', ({ data, width, height }) => {
   console.log(`frame ${width}x${height}, size: ${data.length}`);
 });
-await inspector.startScreencast({ size: { width: 800, height: 600 } });
+await screencast.start({ maxSize: { width: 800, height: 600 } });
 // ... perform actions ...
-await inspector.stopScreencast();
+await screencast.stop();
 ```
 
 **Arguments**
 - `options` [Object] *(optional)*
-  - `size` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="inspector-start-screencast-option-size"/><a href="#inspector-start-screencast-option-size" class="list-anchor">#</a>
+  - `maxSize` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-start-option-max-size"/><a href="#screencast-start-option-max-size" class="list-anchor">#</a>
     - `width` [number]
       
-      Frame width in pixels.
+      Max frame width in pixels.
     - `height` [number]
       
-      Frame height in pixels.
+      Max frame height in pixels.
     
-    Optional dimensions for the screencast frames. If not specified, the current page viewport size is used.
+    Maximum screencast frame dimensions. The output frame may be smaller to preserve the page aspect ratio. Defaults to 800×800.
 
 **Returns**
-- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="inspector-start-screencast-return"/><a href="#inspector-start-screencast-return" class="list-anchor">#</a>
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-start-return"/><a href="#screencast-start-return" class="list-anchor">#</a>
 
 ---
 
-### stopScreencast {#inspector-stop-screencast}
+### stop {#screencast-stop}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>inspector.stopScreencast</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>screencast.stop</x-search>
 
-Stops the screencast started with [inspector.startScreencast()](/api/class-inspector.mdx#inspector-start-screencast).
+Stops the screencast started with [screencast.start()](/api/class-screencast.mdx#screencast-start).
 
 **Usage**
 
 ```js
-await inspector.startScreencast();
+await screencast.start();
 // ... perform actions ...
-await inspector.stopScreencast();
+await screencast.stop();
 ```
 
 **Returns**
-- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="inspector-stop-screencast-return"/><a href="#inspector-stop-screencast-return" class="list-anchor">#</a>
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-stop-return"/><a href="#screencast-stop-return" class="list-anchor">#</a>
 
 ---
 
 ## Events
 
-### on('screencastframe') {#inspector-event-screencast-frame}
+### on('screencastframe') {#screencast-event-screencast-frame}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>inspector.on('screencastframe')</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>screencast.on('screencastframe')</x-search>
 
 Emitted for each captured JPEG screencast frame while the screencast is running.
 
 **Usage**
 
 ```js
-const inspector = page.inspector();
-inspector.on('screencastframe', ({ data, width, height }) => {
+const screencast = page.screencast();
+screencast.on('screencastframe', ({ data, width, height }) => {
   console.log(`frame ${width}x${height}, jpeg size: ${data.length}`);
   require('fs').writeFileSync('frame.jpg', data);
 });
-await inspector.startScreencast({ size: { width: 1280, height: 720 } });
+await screencast.start({ maxSize: { width: 1200, height: 800 } });
 // ... perform actions ...
-await inspector.stopScreencast();
+await screencast.stop();
 ```
 
 **Event data**
@@ -129,12 +94,6 @@ await inspector.stopScreencast();
   - `data` [Buffer]
     
     JPEG-encoded frame data.
-  - `width` [number]
-    
-    Frame width in pixels.
-  - `height` [number]
-    
-    Frame height in pixels.
 
 
 [Android]: /api/class-android.mdx "Android"
@@ -155,6 +114,7 @@ await inspector.stopScreencast();
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
 [Electron]: /api/class-electron.mdx "Electron"
 [ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
@@ -163,7 +123,6 @@ await inspector.stopScreencast();
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
 [GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
-[Inspector]: /api/class-inspector.mdx "Inspector"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
 [Keyboard]: /api/class-keyboard.mdx "Keyboard"
 [Locator]: /api/class-locator.mdx "Locator"
@@ -178,6 +137,7 @@ await inspector.stopScreencast();
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
