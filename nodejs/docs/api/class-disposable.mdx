@@ -1,140 +1,33 @@
 ---
-id: class-inspector
-title: "Inspector"
+id: class-disposable
+title: "Disposable"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
 
-Interface to the Playwright inspector.
+[Disposable] is returned from various methods to allow undoing the corresponding action. For example, [page.addInitScript()](/api/class-page.mdx#page-add-init-script) returns a [Disposable] that can be used to remove the init script.
 
 
 ---
 
 ## Methods
 
-### cancelPickLocator {#inspector-cancel-pick-locator}
+### dispose {#disposable-dispose}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>inspector.cancelPickLocator</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>disposable.dispose</x-search>
 
-Cancels an ongoing [inspector.pickLocator()](/api/class-inspector.mdx#inspector-pick-locator) call by deactivating pick locator mode. If no pick locator mode is active, this method is a no-op.
+Removes the associated resource. For example, removes the init script installed via [page.addInitScript()](/api/class-page.mdx#page-add-init-script) or [browserContext.addInitScript()](/api/class-browsercontext.mdx#browser-context-add-init-script).
 
 **Usage**
 
 ```js
-await inspector.cancelPickLocator();
+await disposable.dispose();
 ```
 
 **Returns**
-- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="inspector-cancel-pick-locator-return"/><a href="#inspector-cancel-pick-locator-return" class="list-anchor">#</a>
-
----
-
-### pickLocator {#inspector-pick-locator}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>inspector.pickLocator</x-search>
-
-Enters pick locator mode where hovering over page elements highlights them and shows the corresponding locator. Once the user clicks an element, the mode is deactivated and the [Locator] for the picked element is returned.
-
-**Usage**
-
-```js
-const locator = await page.inspector().pickLocator();
-console.log(locator);
-```
-
-**Returns**
-- [Promise]&lt;[Locator]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="inspector-pick-locator-return"/><a href="#inspector-pick-locator-return" class="list-anchor">#</a>
-
----
-
-### startScreencast {#inspector-start-screencast}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>inspector.startScreencast</x-search>
-
-Starts capturing screencast frames. Frames are emitted as [inspector.on('screencastframe')](/api/class-inspector.mdx#inspector-event-screencast-frame) events.
-
-**Usage**
-
-```js
-const inspector = page.inspector();
-inspector.on('screencastframe', ({ data, width, height }) => {
-  console.log(`frame ${width}x${height}, size: ${data.length}`);
-});
-await inspector.startScreencast({ size: { width: 800, height: 600 } });
-// ... perform actions ...
-await inspector.stopScreencast();
-```
-
-**Arguments**
-- `options` [Object] *(optional)*
-  - `size` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="inspector-start-screencast-option-size"/><a href="#inspector-start-screencast-option-size" class="list-anchor">#</a>
-    - `width` [number]
-      
-      Frame width in pixels.
-    - `height` [number]
-      
-      Frame height in pixels.
-    
-    Optional dimensions for the screencast frames. If not specified, the current page viewport size is used.
-
-**Returns**
-- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="inspector-start-screencast-return"/><a href="#inspector-start-screencast-return" class="list-anchor">#</a>
-
----
-
-### stopScreencast {#inspector-stop-screencast}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>inspector.stopScreencast</x-search>
-
-Stops the screencast started with [inspector.startScreencast()](/api/class-inspector.mdx#inspector-start-screencast).
-
-**Usage**
-
-```js
-await inspector.startScreencast();
-// ... perform actions ...
-await inspector.stopScreencast();
-```
-
-**Returns**
-- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="inspector-stop-screencast-return"/><a href="#inspector-stop-screencast-return" class="list-anchor">#</a>
-
----
-
-## Events
-
-### on('screencastframe') {#inspector-event-screencast-frame}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>inspector.on('screencastframe')</x-search>
-
-Emitted for each captured JPEG screencast frame while the screencast is running.
-
-**Usage**
-
-```js
-const inspector = page.inspector();
-inspector.on('screencastframe', ({ data, width, height }) => {
-  console.log(`frame ${width}x${height}, jpeg size: ${data.length}`);
-  require('fs').writeFileSync('frame.jpg', data);
-});
-await inspector.startScreencast({ size: { width: 1280, height: 720 } });
-// ... perform actions ...
-await inspector.stopScreencast();
-```
-
-**Event data**
-- [Object]
-  - `data` [Buffer]
-    
-    JPEG-encoded frame data.
-  - `width` [number]
-    
-    Frame width in pixels.
-  - `height` [number]
-    
-    Frame height in pixels.
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="disposable-dispose-return"/><a href="#disposable-dispose-return" class="list-anchor">#</a>
 
 
 [Android]: /api/class-android.mdx "Android"
@@ -154,7 +47,9 @@ await inspector.stopScreencast();
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
 [Electron]: /api/class-electron.mdx "Electron"
 [ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
@@ -163,7 +58,6 @@ await inspector.stopScreencast();
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
 [GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
-[Inspector]: /api/class-inspector.mdx "Inspector"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
 [Keyboard]: /api/class-keyboard.mdx "Keyboard"
 [Locator]: /api/class-locator.mdx "Locator"
@@ -171,13 +65,13 @@ await inspector.stopScreencast();
 [Logger]: /api/class-logger.mdx "Logger"
 [Mouse]: /api/class-mouse.mdx "Mouse"
 [Page]: /api/class-page.mdx "Page"
-[PageAgent]: /api/class-pageagent.mdx "PageAgent"
 [PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
 [Playwright]: /api/class-playwright.mdx "Playwright"
 [PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"

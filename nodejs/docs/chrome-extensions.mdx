@@ -41,6 +41,23 @@ const { chromium } = require('playwright');
 })();
 ```
 
+## Service worker idle suspension (MV3)
+
+Chrome MV3 service workers are automatically suspended after ~30 seconds of inactivity and restarted on demand. When this happens, Playwright keeps the **same [Worker] object alive** — no new `'serviceworker'` event is emitted. New `evaluate()` calls issued during the restart window are stalled until the new context is ready and then resume automatically:
+
+```js
+const sw = await context.waitForEvent('serviceworker');
+
+// ... SW suspends after 30 s of inactivity and is restarted by the browser ...
+
+// The existing handle is transparent across the restart.
+await sw.evaluate(() => sendMessage({ type: 'ping' })); // just works
+```
+
+:::note
+`evaluate()` calls that were already in-flight at the exact moment of suspension will throw with `"Service worker restarted"`, matching the behaviour of page navigations mid-flight.
+:::
+
 ## Testing
 
 To have the extension loaded when running tests you can use a test fixture to set the context. You can also dynamically retrieve the extension id and use it to load and test the popup page for example.
@@ -116,7 +133,9 @@ test('popup page', async ({ page, extensionId }) => {
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
 [Electron]: /api/class-electron.mdx "Electron"
 [ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
@@ -125,7 +144,6 @@ test('popup page', async ({ page, extensionId }) => {
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
 [GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
-[Inspector]: /api/class-inspector.mdx "Inspector"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
 [Keyboard]: /api/class-keyboard.mdx "Keyboard"
 [Locator]: /api/class-locator.mdx "Locator"
@@ -133,13 +151,13 @@ test('popup page', async ({ page, extensionId }) => {
 [Logger]: /api/class-logger.mdx "Logger"
 [Mouse]: /api/class-mouse.mdx "Mouse"
 [Page]: /api/class-page.mdx "Page"
-[PageAgent]: /api/class-pageagent.mdx "PageAgent"
 [PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
 [Playwright]: /api/class-playwright.mdx "Playwright"
 [PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"

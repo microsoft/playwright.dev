@@ -97,7 +97,7 @@ The order of evaluation of multiple scripts installed via [browserContext.addIni
   Optional argument to pass to [script](/api/class-page.mdx#page-add-init-script-option-script) (only supported when passing a function).
 
 **Returns**
-- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-init-script-return"/><a href="#page-add-init-script-return" class="list-anchor">#</a>
+- [Promise]&lt;[Disposable]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-init-script-return"/><a href="#page-add-init-script-return" class="list-anchor">#</a>
 
 ---
 
@@ -257,72 +257,6 @@ await page.addStyleTag(options);
 
 ---
 
-### agent {#page-agent}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.58</font><x-search>page.agent</x-search>
-
-Initialize page agent with the llm provider and cache.
-
-**Usage**
-
-```js
-await page.agent();
-await page.agent(options);
-```
-
-**Arguments**
-- `options` [Object] *(optional)*
-  - `cache` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-agent-option-cache"/><a href="#page-agent-option-cache" class="list-anchor">#</a>
-    - `cacheFile` [string] *(optional)*
-      
-      Cache file to use/generate code for performed actions into. Cache is not used if not specified (default).
-    - `cacheOutFile` [string] *(optional)*
-      
-      When specified, generated entries are written into the `cacheOutFile` instead of updating the `cacheFile`.
-  - `expect` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-agent-option-expect"/><a href="#page-agent-option-expect" class="list-anchor">#</a>
-    - `timeout` [number] *(optional)*
-      
-      Default timeout for expect calls in milliseconds, defaults to 5000ms.
-  - `limits` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-agent-option-limits"/><a href="#page-agent-option-limits" class="list-anchor">#</a>
-    - `maxTokens` [number] *(optional)*
-      
-      Maximum number of tokens to consume. The agentic loop will stop after input + output tokens exceed this value. Defaults to unlimited.
-    - `maxActions` [number] *(optional)*
-      
-      Maximum number of agentic actions to generate, defaults to 10.
-    - `maxActionRetries` [number] *(optional)*
-      
-      Maximum number retries per action, defaults to 3.
-    
-    Limits to use for the agentic loop.
-  - `provider` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-agent-option-provider"/><a href="#page-agent-option-provider" class="list-anchor">#</a>
-    - `api` "openai" | "openai-compatible" | "anthropic" | "google"
-      
-      API to use.
-    - `apiEndpoint` [string] *(optional)*
-      
-      Endpoint to use if different from default.
-    - `apiKey` [string]
-      
-      API key for the LLM provider.
-    - `apiTimeout` [number] *(optional)*
-      
-      Amount of time to wait for the provider to respond to each request.
-    - `model` [string]
-      
-      Model identifier within the provider. Required in non-cache mode.
-  - `secrets` [Object]&lt;[string], [string]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-agent-option-secrets"/><a href="#page-agent-option-secrets" class="list-anchor">#</a>
-    
-    Secrets to hide from the LLM.
-  - `systemPrompt` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-agent-option-system-prompt"/><a href="#page-agent-option-system-prompt" class="list-anchor">#</a>
-    
-    System prompt for the agent's loop.
-
-**Returns**
-- [Promise]&lt;[PageAgent]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-agent-return"/><a href="#page-agent-return" class="list-anchor">#</a>
-
----
-
 ### bringToFront {#page-bring-to-front}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.bringToFront</x-search>
@@ -337,6 +271,23 @@ await page.bringToFront();
 
 **Returns**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-bring-to-front-return"/><a href="#page-bring-to-front-return" class="list-anchor">#</a>
+
+---
+
+### cancelPickLocator {#page-cancel-pick-locator}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>page.cancelPickLocator</x-search>
+
+Cancels an ongoing [page.pickLocator()](/api/class-page.mdx#page-pick-locator) call by deactivating pick locator mode. If no pick locator mode is active, this method is a no-op.
+
+**Usage**
+
+```js
+await page.cancelPickLocator();
+```
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-cancel-pick-locator-return"/><a href="#page-cancel-pick-locator-return" class="list-anchor">#</a>
 
 ---
 
@@ -418,7 +369,14 @@ Returns up to (currently) 200 last console messages from this page. See [page.on
 
 ```js
 await page.consoleMessages();
+await page.consoleMessages(options);
 ```
+
+**Arguments**
+- `options` [Object] *(optional)*
+  - `filter` "all" | "sinceNavigation" *(optional)* <font size="2">Added in: v1.59</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-console-messages-option-filter"/><a href="#page-console-messages-option-filter" class="list-anchor">#</a>
+    
+    Controls which messages are returned:
 
 **Returns**
 - [Promise]&lt;[Array]&lt;[ConsoleMessage]&gt;&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-console-messages-return"/><a href="#page-console-messages-return" class="list-anchor">#</a>
@@ -742,7 +700,7 @@ const { webkit } = require('playwright');  // Or 'chromium' or 'firefox'.
     Whether to pass the argument as a handle, instead of passing by value. When passing a handle, only one argument is supported. When passing by value, multiple arguments are supported.
 
 **Returns**
-- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-expose-binding-return"/><a href="#page-expose-binding-return" class="list-anchor">#</a>
+- [Promise]&lt;[Disposable]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-expose-binding-return"/><a href="#page-expose-binding-return" class="list-anchor">#</a>
 
 ---
 
@@ -797,7 +755,7 @@ const crypto = require('crypto');
   Callback function which will be called in Playwright's context.
 
 **Returns**
-- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-expose-function-return"/><a href="#page-expose-function-return" class="list-anchor">#</a>
+- [Promise]&lt;[Disposable]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-expose-function-return"/><a href="#page-expose-function-return" class="list-anchor">#</a>
 
 ---
 
@@ -1327,29 +1285,6 @@ await page.goto(url, options);
 
 ---
 
-### inspector {#page-inspector}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>page.inspector</x-search>
-
-Returns the [Inspector] object associated with this page.
-
-**Usage**
-
-```js
-const inspector = page.inspector();
-inspector.on('screencastFrame', data => {
-  console.log('received frame, jpeg size:', data.length);
-});
-await inspector.startScreencast();
-// ... perform actions ...
-await inspector.stopScreencast();
-```
-
-**Returns**
-- [Inspector]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-inspector-return"/><a href="#page-inspector-return" class="list-anchor">#</a>
-
----
-
 ### isClosed {#page-is-closed}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.isClosed</x-search>
@@ -1455,7 +1390,14 @@ Returns up to (currently) 200 last page errors from this page. See [page.on('pag
 
 ```js
 await page.pageErrors();
+await page.pageErrors(options);
 ```
+
+**Arguments**
+- `options` [Object] *(optional)*
+  - `filter` "all" | "sinceNavigation" *(optional)* <font size="2">Added in: v1.59</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-page-errors-option-filter"/><a href="#page-page-errors-option-filter" class="list-anchor">#</a>
+    
+    Controls which errors are returned:
 
 **Returns**
 - [Promise]&lt;[Array]&lt;[Error]&gt;&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-page-errors-return"/><a href="#page-page-errors-return" class="list-anchor">#</a>
@@ -1605,6 +1547,24 @@ The [format](/api/class-page.mdx#page-pdf-option-format) options are:
 
 **Returns**
 - [Promise]&lt;[Buffer]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-pdf-return"/><a href="#page-pdf-return" class="list-anchor">#</a>
+
+---
+
+### pickLocator {#page-pick-locator}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>page.pickLocator</x-search>
+
+Enters pick locator mode where hovering over page elements highlights them and shows the corresponding locator. Once the user clicks an element, the mode is deactivated and the [Locator] for the picked element is returned.
+
+**Usage**
+
+```js
+const locator = await page.pickLocator();
+console.log(locator);
+```
+
+**Returns**
+- [Promise]&lt;[Locator]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-pick-locator-return"/><a href="#page-pick-locator-return" class="list-anchor">#</a>
 
 ---
 
@@ -1820,7 +1780,7 @@ Enabling routing disables http cache.
     How often a route should be used. By default it will be used every time.
 
 **Returns**
-- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-return"/><a href="#page-route-return" class="list-anchor">#</a>
+- [Promise]&lt;[Disposable]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-return"/><a href="#page-route-return" class="list-anchor">#</a>
 
 ---
 
@@ -1898,6 +1858,29 @@ await page.routeWebSocket('/ws', ws => {
 
 **Returns**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-web-socket-return"/><a href="#page-route-web-socket-return" class="list-anchor">#</a>
+
+---
+
+### screencast {#page-screencast}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>page.screencast</x-search>
+
+Returns the [Screencast] object associated with this page.
+
+**Usage**
+
+```js
+const screencast = page.screencast();
+screencast.on('screencastFrame', data => {
+  console.log('received frame, jpeg size:', data.length);
+});
+await screencast.start();
+// ... perform actions ...
+await screencast.stop();
+```
+
+**Returns**
+- [Screencast]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-screencast-return"/><a href="#page-screencast-return" class="list-anchor">#</a>
 
 ---
 
@@ -2125,6 +2108,39 @@ await page.goto('https://example.com');
 
 **Returns**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-set-viewport-size-return"/><a href="#page-set-viewport-size-return" class="list-anchor">#</a>
+
+---
+
+### snapshotForAI {#page-snapshot-for-ai}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>page.snapshotForAI</x-search>
+
+Returns an accessibility snapshot of the page optimized for AI consumption.
+
+**Usage**
+
+```js
+await page.snapshotForAI();
+await page.snapshotForAI(options);
+```
+
+**Arguments**
+- `options` [Object] *(optional)*
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-snapshot-for-ai-option-timeout"/><a href="#page-snapshot-for-ai-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+  - `track` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-snapshot-for-ai-option-track"/><a href="#page-snapshot-for-ai-option-track" class="list-anchor">#</a>
+    
+    When specified, enables incremental snapshots. Subsequent calls with the same track name will return an incremental snapshot containing only changes since the last call.
+
+**Returns**
+- [Promise]&lt;[Object]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-snapshot-for-ai-return"/><a href="#page-snapshot-for-ai-return" class="list-anchor">#</a>
+  - `full` [string]
+    
+    Full accessibility snapshot of the page.
+  - `incremental` [string] *(optional)*
+    
+    Incremental snapshot containing only changes since the last tracked snapshot, when using the [track](/api/class-page.mdx#page-snapshot-for-ai-option-track) option.
 
 ---
 
@@ -4638,7 +4654,9 @@ await page.waitForTimeout(1000);
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
 [Electron]: /api/class-electron.mdx "Electron"
 [ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
@@ -4647,7 +4665,6 @@ await page.waitForTimeout(1000);
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
 [GenericAssertions]: /api/class-genericassertions.mdx "GenericAssertions"
-[Inspector]: /api/class-inspector.mdx "Inspector"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
 [Keyboard]: /api/class-keyboard.mdx "Keyboard"
 [Locator]: /api/class-locator.mdx "Locator"
@@ -4655,13 +4672,13 @@ await page.waitForTimeout(1000);
 [Logger]: /api/class-logger.mdx "Logger"
 [Mouse]: /api/class-mouse.mdx "Mouse"
 [Page]: /api/class-page.mdx "Page"
-[PageAgent]: /api/class-pageagent.mdx "PageAgent"
 [PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
 [Playwright]: /api/class-playwright.mdx "Playwright"
 [PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [SnapshotAssertions]: /api/class-snapshotassertions.mdx "SnapshotAssertions"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
