@@ -1,67 +1,99 @@
 ---
-id: class-location
-title: "Location"
+id: class-screencast
+title: "Screencast"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
 
-Represents a location in the source code where [TestCase] or [Suite] is defined.
+Interface for capturing screencast frames from a page.
 
 
 ---
 
-## Properties
+## Methods
 
-### column {#location-column}
+### start {#screencast-start}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>location.column</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>screencast.start</x-search>
 
-Column number in the source file.
+Starts capturing screencast frames. Frames are emitted as [screencast.on('screencastframe')](/api/class-screencast.mdx#screencast-event-screencast-frame) events.
 
 **Usage**
 
 ```js
-location.column
+const screencast = page.screencast();
+screencast.on('screencastframe', ({ data, width, height }) => {
+  console.log(`frame ${width}x${height}, size: ${data.length}`);
+});
+await screencast.start({ maxSize: { width: 800, height: 600 } });
+// ... perform actions ...
+await screencast.stop();
 ```
 
-**Type**
-- [number]
+**Arguments**
+- `options` [Object] *(optional)*
+  - `maxSize` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-start-option-max-size"/><a href="#screencast-start-option-max-size" class="list-anchor">#</a>
+    - `width` [number]
+      
+      Max frame width in pixels.
+    - `height` [number]
+      
+      Max frame height in pixels.
+    
+    Maximum screencast frame dimensions. The output frame may be smaller to preserve the page aspect ratio. Defaults to 800×800.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-start-return"/><a href="#screencast-start-return" class="list-anchor">#</a>
 
 ---
 
-### file {#location-file}
+### stop {#screencast-stop}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>location.file</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>screencast.stop</x-search>
 
-Path to the source file.
+Stops the screencast started with [screencast.start()](/api/class-screencast.mdx#screencast-start).
 
 **Usage**
 
 ```js
-location.file
+await screencast.start();
+// ... perform actions ...
+await screencast.stop();
 ```
 
-**Type**
-- [string]
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-stop-return"/><a href="#screencast-stop-return" class="list-anchor">#</a>
 
 ---
 
-### line {#location-line}
+## Events
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>location.line</x-search>
+### on('screencastframe') {#screencast-event-screencast-frame}
 
-Line number in the source file.
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>screencast.on('screencastframe')</x-search>
+
+Emitted for each captured JPEG screencast frame while the screencast is running.
 
 **Usage**
 
 ```js
-location.line
+const screencast = page.screencast();
+screencast.on('screencastframe', ({ data, width, height }) => {
+  console.log(`frame ${width}x${height}, jpeg size: ${data.length}`);
+  require('fs').writeFileSync('frame.jpg', data);
+});
+await screencast.start({ maxSize: { width: 1200, height: 800 } });
+// ... perform actions ...
+await screencast.stop();
 ```
 
-**Type**
-- [number]
+**Event data**
+- [Object]
+  - `data` [Buffer]
+    
+    JPEG-encoded frame data.
 
 
 [Android]: /api/class-android.mdx "Android"

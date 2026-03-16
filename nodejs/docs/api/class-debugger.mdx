@@ -1,67 +1,116 @@
 ---
-id: class-location
-title: "Location"
+id: class-debugger
+title: "Debugger"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
 
-Represents a location in the source code where [TestCase] or [Suite] is defined.
+API for controlling the Playwright debugger. The debugger allows pausing script execution and inspecting the page. Obtain the debugger instance via [browserContext.debugger](/api/class-browsercontext.mdx#browser-context-debugger).
+
+See also [page.pause()](/api/class-page.mdx#page-pause) for a simple way to pause script execution.
 
 
 ---
 
-## Properties
+## Methods
 
-### column {#location-column}
+### pausedDetails {#debugger-paused-details}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>location.column</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>debugger.pausedDetails</x-search>
 
-Column number in the source file.
+Returns details about the currently paused calls. Returns an empty array if the debugger is not paused.
 
 **Usage**
 
 ```js
-location.column
+debugger.pausedDetails();
 ```
 
-**Type**
-- [number]
+**Returns**
+- [Array]&lt;[Object]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="debugger-paused-details-return"/><a href="#debugger-paused-details-return" class="list-anchor">#</a>
+  - `location` [Object]
+    - `file` [string]
+      
+      
+    - `line` [number] *(optional)*
+      
+      
+    - `column` [number] *(optional)*
+      
+      
+    
+  - `title` [string]
+    
+    
+---
+
+### resume {#debugger-resume}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>debugger.resume</x-search>
+
+Resumes script execution if the debugger is paused.
+
+**Usage**
+
+```js
+await debugger.resume();
+```
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="debugger-resume-return"/><a href="#debugger-resume-return" class="list-anchor">#</a>
 
 ---
 
-### file {#location-file}
+### setPauseAt {#debugger-set-pause-at}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>location.file</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>debugger.setPauseAt</x-search>
 
-Path to the source file.
+Configures the debugger to pause at the next action or at a specific source location. Call without arguments to reset the pausing behavior.
 
 **Usage**
 
 ```js
-location.file
+await debugger.setPauseAt();
+await debugger.setPauseAt(options);
 ```
 
-**Type**
-- [string]
+**Arguments**
+- `options` [Object] *(optional)*
+  - `location` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="debugger-set-pause-at-option-location"/><a href="#debugger-set-pause-at-option-location" class="list-anchor">#</a>
+    - `file` [string]
+      
+      
+    - `line` [number] *(optional)*
+      
+      
+    - `column` [number] *(optional)*
+      
+      
+    When specified, the debugger will pause when the action originates from the given source location.
+  - `next` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="debugger-set-pause-at-option-next"/><a href="#debugger-set-pause-at-option-next" class="list-anchor">#</a>
+    
+    When `true`, the debugger will pause before the next action.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="debugger-set-pause-at-return"/><a href="#debugger-set-pause-at-return" class="list-anchor">#</a>
 
 ---
 
-### line {#location-line}
+## Events
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>location.line</x-search>
+### on('pausedstatechanged') {#debugger-event-paused-state-changed}
 
-Line number in the source file.
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>debugger.on('pausedstatechanged')</x-search>
+
+Emitted when the debugger pauses or resumes.
 
 **Usage**
 
 ```js
-location.line
+debugger.on('pausedstatechanged', data => {});
 ```
-
-**Type**
-- [number]
 
 
 [Android]: /api/class-android.mdx "Android"
