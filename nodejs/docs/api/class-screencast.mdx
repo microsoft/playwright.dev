@@ -18,23 +18,39 @@ Interface for capturing screencast frames from a page.
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>screencast.start</x-search>
 
-Starts capturing screencast frames. Frames are emitted as [screencast.on('screencastframe')](/api/class-screencast.mdx#screencast-event-screencast-frame) events.
+Starts capturing screencast frames.
 
 **Usage**
 
 ```js
-const screencast = page.screencast;
-screencast.on('screencastframe', ({ data, width, height }) => {
-  console.log(`frame ${width}x${height}, size: ${data.length}`);
-});
-await screencast.start({ maxSize: { width: 800, height: 600 } });
+await page.screencast.start(({ data })  => {
+  console.log(`frame size: ${data.length}`);
+}, { preferredSize: { width: 800, height: 600 } });
 // ... perform actions ...
-await screencast.stop();
+await page.screencast.stop();
 ```
 
 **Arguments**
+- `onFrame` [function]\([Object]\):[Promise]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-start-option-on-frame"/><a href="#screencast-start-option-on-frame" class="list-anchor">#</a>
+  - `data` [Buffer]
+    
+    JPEG-encoded frame data.
+  
+  Callback that receives JPEG-encoded frame data.
 - `options` [Object] *(optional)*
-  - `maxSize` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-start-option-max-size"/><a href="#screencast-start-option-max-size" class="list-anchor">#</a>
+  - `annotate` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-start-option-annotate"/><a href="#screencast-start-option-annotate" class="list-anchor">#</a>
+    - `duration` [number] *(optional)*
+      
+      How long each annotation is displayed in milliseconds. Defaults to `500`.
+    - `position` "top-left" | "top" | "top-right" | "bottom-left" | "bottom" | "bottom-right" *(optional)*
+      
+      Position of the action title overlay. Defaults to `"top-right"`.
+    - `fontSize` [number] *(optional)*
+      
+      Font size of the action title in pixels. Defaults to `24`.
+    
+    If specified, enables visual annotations on interacted elements during screencast. Interacted elements are highlighted with a semi-transparent blue box and click points are shown as red circles.
+  - `preferredSize` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-start-option-preferred-size"/><a href="#screencast-start-option-preferred-size" class="list-anchor">#</a>
     - `width` [number]
       
       Max frame width in pixels.
@@ -42,7 +58,11 @@ await screencast.stop();
       
       Max frame height in pixels.
     
-    Maximum screencast frame dimensions. The output frame may be smaller to preserve the page aspect ratio. Defaults to 800×800.
+    Specifies the preferred maximum dimensions of screencast frames. The actual frame is scaled to preserve the page’s aspect ratio and may be smaller than these bounds.
+    
+    If a screencast is already active (e.g. started by tracing or video recording), the existing configuration takes precedence and the frame size may exceed these bounds or this option may be ignored.
+    
+    Defaults to 800×800.
 
 **Returns**
 - [Promise]&lt;[Disposable]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-start-return"/><a href="#screencast-start-return" class="list-anchor">#</a>
@@ -58,42 +78,11 @@ Stops the screencast started with [screencast.start()](/api/class-screencast.mdx
 **Usage**
 
 ```js
-await screencast.start();
-// ... perform actions ...
 await screencast.stop();
 ```
 
 **Returns**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-stop-return"/><a href="#screencast-stop-return" class="list-anchor">#</a>
-
----
-
-## Events
-
-### on('screencastframe') {#screencast-event-screencast-frame}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>screencast.on('screencastframe')</x-search>
-
-Emitted for each captured JPEG screencast frame while the screencast is running.
-
-**Usage**
-
-```js
-const screencast = page.screencast;
-screencast.on('screencastframe', ({ data, width, height }) => {
-  console.log(`frame ${width}x${height}, jpeg size: ${data.length}`);
-  require('fs').writeFileSync('frame.jpg', data);
-});
-await screencast.start({ maxSize: { width: 1200, height: 800 } });
-// ... perform actions ...
-await screencast.stop();
-```
-
-**Event data**
-- [Object]
-  - `data` [Buffer]
-    
-    JPEG-encoded frame data.
 
 
 [Android]: /api/class-android.mdx "Android"
@@ -130,6 +119,7 @@ await screencast.stop();
 [LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
 [Logger]: /api/class-logger.mdx "Logger"
 [Mouse]: /api/class-mouse.mdx "Mouse"
+[Overlay]: /api/class-overlay.mdx "Overlay"
 [Page]: /api/class-page.mdx "Page"
 [PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
 [Playwright]: /api/class-playwright.mdx "Playwright"

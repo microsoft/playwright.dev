@@ -244,6 +244,35 @@ await Page.AddStyleTagAsync(options);
 
 ---
 
+### AriaSnapshotAsync {#page-aria-snapshot}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>page.AriaSnapshotAsync</x-search>
+
+Captures the aria snapshot of the page. Read more about [aria snapshots](../aria-snapshots.mdx).
+
+**Usage**
+
+```csharp
+await Page.AriaSnapshotAsync(options);
+```
+
+**Arguments**
+- `options` `PageAriaSnapshotOptions?` *(optional)*
+  - `Depth` [int]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-aria-snapshot-option-depth"/><a href="#page-aria-snapshot-option-depth" class="list-anchor">#</a>
+    
+    When specified, limits the depth of the snapshot.
+  - `Mode` `enum AriaSnapshotMode { Ai, Default }?` *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-aria-snapshot-option-mode"/><a href="#page-aria-snapshot-option-mode" class="list-anchor">#</a>
+    
+    When set to `"ai"`, returns a snapshot optimized for AI consumption with element references. Defaults to `"default"`.
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-aria-snapshot-option-timeout"/><a href="#page-aria-snapshot-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Returns**
+- [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-aria-snapshot-return"/><a href="#page-aria-snapshot-return" class="list-anchor">#</a>
+
+---
+
 ### BringToFrontAsync {#page-bring-to-front}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.BringToFrontAsync</x-search>
@@ -258,6 +287,23 @@ await Page.BringToFrontAsync();
 
 **Returns**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-bring-to-front-return"/><a href="#page-bring-to-front-return" class="list-anchor">#</a>
+
+---
+
+### CancelPickLocatorAsync {#page-cancel-pick-locator}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>page.CancelPickLocatorAsync</x-search>
+
+Cancels an ongoing [Page.PickLocatorAsync()](/api/class-page.mdx#page-pick-locator) call by deactivating pick locator mode. If no pick locator mode is active, this method is a no-op.
+
+**Usage**
+
+```csharp
+await Page.CancelPickLocatorAsync();
+```
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-cancel-pick-locator-return"/><a href="#page-cancel-pick-locator-return" class="list-anchor">#</a>
 
 ---
 
@@ -1533,6 +1579,24 @@ The [Format](/api/class-page.mdx#page-pdf-option-format) options are:
 
 ---
 
+### PickLocatorAsync {#page-pick-locator}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>page.PickLocatorAsync</x-search>
+
+Enters pick locator mode where hovering over page elements highlights them and shows the corresponding locator. Once the user clicks an element, the mode is deactivated and the [Locator] for the picked element is returned.
+
+**Usage**
+
+```csharp
+var locator = await page.PickLocatorAsync();
+Console.WriteLine(locator);
+```
+
+**Returns**
+- [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-pick-locator-return"/><a href="#page-pick-locator-return" class="list-anchor">#</a>
+
+---
+
 ### ReloadAsync {#page-reload}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.ReloadAsync</x-search>
@@ -2545,38 +2609,6 @@ await page.GotoAsync("https://www.microsoft.com");
 
 ---
 
-### SnapshotForAIAsync {#page-snapshot-for-ai}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>page.SnapshotForAIAsync</x-search>
-
-Returns an accessibility snapshot of the page optimized for AI consumption.
-
-**Usage**
-
-```csharp
-await Page.SnapshotForAIAsync(options);
-```
-
-**Arguments**
-- `options` `PageSnapshotForAIOptions?` *(optional)*
-  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-snapshot-for-ai-option-timeout"/><a href="#page-snapshot-for-ai-option-timeout" class="list-anchor">#</a>
-    
-    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-  - `Track` [string]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-snapshot-for-ai-option-track"/><a href="#page-snapshot-for-ai-option-track" class="list-anchor">#</a>
-    
-    When specified, enables incremental snapshots. Subsequent calls with the same track name will return an incremental snapshot containing only changes since the last call.
-
-**Returns**
-- SnapshotForAI<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-snapshot-for-ai-return"/><a href="#page-snapshot-for-ai-return" class="list-anchor">#</a>
-  - `full` [string]
-    
-    Full accessibility snapshot of the page.
-  - `incremental` [string]? *(optional)*
-    
-    Incremental snapshot containing only changes since the last tracked snapshot, when using the [Track](/api/class-page.mdx#page-snapshot-for-ai-option-track) option.
-
----
-
 ### TitleAsync {#page-title}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.TitleAsync</x-search>
@@ -2918,6 +2950,21 @@ Page.Mouse
 
 **Type**
 - [Mouse]
+
+---
+
+### Overlay {#page-overlay}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>page.Overlay</x-search>
+
+**Usage**
+
+```csharp
+Page.Overlay
+```
+
+**Type**
+- [Overlay]
 
 ---
 
@@ -4988,6 +5035,7 @@ await page.WaitForTimeoutAsync(1000);
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -5000,6 +5048,7 @@ await page.WaitForTimeoutAsync(1000);
 [Locator]: /api/class-locator.mdx "Locator"
 [LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
 [Mouse]: /api/class-mouse.mdx "Mouse"
+[Overlay]: /api/class-overlay.mdx "Overlay"
 [Page]: /api/class-page.mdx "Page"
 [PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
 [Playwright]: /api/class-playwright.mdx "Playwright"
