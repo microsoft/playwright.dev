@@ -9,12 +9,48 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 API for controlling the Playwright debugger. The debugger allows pausing script execution and inspecting the page. Obtain the debugger instance via [browserContext.debugger](/api/class-browsercontext.mdx#browser-context-debugger).
 
-See also [page.pause()](/api/class-page.mdx#page-pause) for a simple way to pause script execution.
-
 
 ---
 
 ## Methods
+
+### next {#debugger-next}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>debugger.next</x-search>
+
+Resumes script execution and pauses again before the next action. Throws if the debugger is not paused.
+
+**Usage**
+
+```js
+await debugger.next();
+```
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="debugger-next-return"/><a href="#debugger-next-return" class="list-anchor">#</a>
+
+---
+
+### pause {#debugger-pause}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>debugger.pause</x-search>
+
+Configures the debugger to pause before the next action is executed.
+
+Throws if the debugger is already paused. Use [debugger.next()](/api/class-debugger.mdx#debugger-next) or [debugger.runTo()](/api/class-debugger.mdx#debugger-run-to) to step while paused.
+
+Note that [page.pause()](/api/class-page.mdx#page-pause) is equivalent to a "debugger" statement — it pauses execution at the call site immediately. On the contrary, [debugger.pause()](/api/class-debugger.mdx#debugger-pause) is equivalent to "pause on next statement" — it configures the debugger to pause before the next action is executed.
+
+**Usage**
+
+```js
+await debugger.pause();
+```
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="debugger-pause-return"/><a href="#debugger-pause-return" class="list-anchor">#</a>
+
+---
 
 ### pausedDetails {#debugger-paused-details}
 
@@ -50,7 +86,7 @@ debugger.pausedDetails();
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>debugger.resume</x-search>
 
-Resumes script execution if the debugger is paused.
+Resumes script execution. Throws if the debugger is not paused.
 
 **Usage**
 
@@ -63,38 +99,33 @@ await debugger.resume();
 
 ---
 
-### setPauseAt {#debugger-set-pause-at}
+### runTo {#debugger-run-to}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>debugger.setPauseAt</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>debugger.runTo</x-search>
 
-Configures the debugger to pause at the next action or at a specific source location. Call without arguments to reset the pausing behavior.
+Resumes script execution and pauses when an action originates from the given source location. Throws if the debugger is not paused.
 
 **Usage**
 
 ```js
-await debugger.setPauseAt();
-await debugger.setPauseAt(options);
+await debugger.runTo(location);
 ```
 
 **Arguments**
-- `options` [Object] *(optional)*
-  - `location` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="debugger-set-pause-at-option-location"/><a href="#debugger-set-pause-at-option-location" class="list-anchor">#</a>
-    - `file` [string]
-      
-      
-    - `line` [number] *(optional)*
-      
-      
-    - `column` [number] *(optional)*
-      
-      
-    When specified, the debugger will pause when the action originates from the given source location.
-  - `next` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="debugger-set-pause-at-option-next"/><a href="#debugger-set-pause-at-option-next" class="list-anchor">#</a>
+- `location` [Object]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="debugger-run-to-option-location"/><a href="#debugger-run-to-option-location" class="list-anchor">#</a>
+  - `file` [string]
     
-    When `true`, the debugger will pause before the next action.
+    
+  - `line` [number] *(optional)*
+    
+    
+  - `column` [number] *(optional)*
+    
+    
+  The source location to pause at.
 
 **Returns**
-- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="debugger-set-pause-at-return"/><a href="#debugger-set-pause-at-return" class="list-anchor">#</a>
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="debugger-run-to-return"/><a href="#debugger-run-to-return" class="list-anchor">#</a>
 
 ---
 
@@ -147,6 +178,7 @@ debugger.on('pausedstatechanged', data => {});
 [LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
 [Logger]: /api/class-logger.mdx "Logger"
 [Mouse]: /api/class-mouse.mdx "Mouse"
+[Overlay]: /api/class-overlay.mdx "Overlay"
 [Page]: /api/class-page.mdx "Page"
 [PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
 [Playwright]: /api/class-playwright.mdx "Playwright"
