@@ -203,6 +203,10 @@ export default {
               label: "Ambassadors",
               href: "/community/ambassadors",
             },
+            {
+              label: "Microsoft Privacy Statement",
+              href: "https://go.microsoft.com/fwlink/?LinkId=521839",
+            },
           ],
         },
       ],
