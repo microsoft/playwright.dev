@@ -9,6 +9,119 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 import LiteYouTube from '@site/src/components/LiteYouTube';
 
+## Version 1.59
+
+### 🎬 Screencast
+
+New [Page.Screencast](/api/class-page.mdx#page-screencast) API provides a unified interface for capturing page content — both as video recordings and as real-time frame streams.
+
+<img src="https://raw.githubusercontent.com/microsoft/playwright/main/docs/src/images/release-notes-1.59-screencast-demo.gif" alt="Demo" width="500" height="313" />
+
+**Video recording** — record video with precise start/stop control, as an alternative to the [RecordVideoDir](/api/class-browser.mdx#browser-new-context-option-record-video-dir) option:
+
+```csharp
+await page.Screencast.StartAsync(new() { Path = "video.webm" });
+// ... perform actions ...
+await page.Screencast.StopAsync();
+```
+
+**Real-time frame capture** — stream JPEG-encoded frames for custom processing like thumbnails, live previews, AI vision, and more:
+
+```csharp
+await page.Screencast.StartAsync(new() {
+    OnFrame = frame => SendToVisionModel(frame.Data),
+});
+```
+
+**Action annotations** — enable built-in visual annotations that highlight interacted elements and display action titles during recording:
+
+```csharp
+await page.Screencast.StartAsync(new() {
+    Path = "video.webm",
+    Annotate = new() { Position = "top-right" },
+});
+```
+
+The `Annotate` option accepts `Position` (`"top-left"`, `"top"`, `"top-right"`, `"bottom-left"`, `"bottom"`, `"bottom-right"`), `Duration` (ms per annotation), and `FontSize` (px).
+
+**Visual overlays** — add chapter titles and custom HTML overlays on top of the page for richer narration:
+
+```csharp
+await page.Screencast.ShowChapterAsync("Adding TODOs", new() {
+    Description = "Type and press enter for each TODO",
+    Duration = 1000,
+});
+
+await page.Screencast.ShowOverlayAsync("<div style=\"color: red\">Recording</div>");
+```
+
+**Agentic video receipts** — coding agents can produce video evidence of their work. After completing a task, an agent can record a walkthrough video with rich annotations for human review:
+
+```csharp
+await page.Screencast.StartAsync(new() {
+    Path = "receipt.webm",
+    Annotate = new() { Position = "top-right" },
+});
+
+await page.Screencast.ShowChapterAsync("Verifying checkout flow", new() {
+    Description = "Added coupon code support per ticket #1234",
+});
+
+// Agent performs the verification steps...
+await page.Locator("#coupon").FillAsync("SAVE20");
+await page.Locator("#apply-coupon").ClickAsync();
+await Expect(page.Locator(".discount")).ToContainTextAsync("20%");
+
+await page.Screencast.ShowChapterAsync("Done", new() {
+    Description = "Coupon applied, discount reflected in total",
+});
+
+await page.Screencast.StopAsync();
+```
+
+The resulting video serves as a receipt: chapter titles provide context, action annotations highlight each interaction, and the visual walkthrough is faster to review than text logs.
+
+### 🔍 Snapshots and Locators
+- Method [Page.AriaSnapshotAsync()](/api/class-page.mdx#page-aria-snapshot) to capture the aria snapshot of the page — equivalent to `Page.Locator("body").AriaSnapshotAsync()`.
+- Options `Depth` and `Mode` in [Locator.AriaSnapshotAsync()](/api/class-locator.mdx#locator-aria-snapshot).
+- Method [Locator.NormalizeAsync()](/api/class-locator.mdx#locator-normalize) converts a locator to follow best practices like test ids and aria roles.
+- Method [Page.PickLocatorAsync()](/api/class-page.mdx#page-pick-locator) enters an interactive mode where hovering over elements highlights them and shows the corresponding locator. Click an element to get its [Locator] back. Use [Page.CancelPickLocatorAsync()](/api/class-page.mdx#page-cancel-pick-locator) to cancel.
+
+### New APIs
+
+#### Screencast
+- [Page.Screencast](/api/class-page.mdx#page-screencast) provides video recording, real-time frame streaming, and overlay management.
+- Methods [Screencast.StartAsync()](/api/class-screencast.mdx#screencast-start) and [Screencast.StopAsync()](/api/class-screencast.mdx#screencast-stop) for recording and frame capture.
+- Methods [Screencast.ShowChapterAsync()](/api/class-screencast.mdx#screencast-show-chapter) and [Screencast.ShowOverlayAsync()](/api/class-screencast.mdx#screencast-show-overlay) for visual annotations.
+- Methods [Screencast.ShowOverlaysAsync()](/api/class-screencast.mdx#screencast-show-overlays) and [Screencast.HideOverlaysAsync()](/api/class-screencast.mdx#screencast-hide-overlays) for overlay visibility control.
+
+#### Storage, Console and Errors
+- Method [BrowserContext.SetStorageStateAsync()](/api/class-browsercontext.mdx#browser-context-set-storage-state) clears existing cookies, local storage, and IndexedDB for all origins and sets a new storage state — no need to create a new context.
+- Methods [Page.ClearConsoleMessagesAsync()](/api/class-page.mdx#page-clear-console-messages) and [Page.ClearPageErrorsAsync()](/api/class-page.mdx#page-clear-page-errors) to clear stored messages and errors.
+- Option `Filter` in [Page.ConsoleMessagesAsync()](/api/class-page.mdx#page-console-messages) and [Page.PageErrorsAsync()](/api/class-page.mdx#page-page-errors) controls which messages are returned.
+- Method [ConsoleMessage.Timestamp](/api/class-consolemessage.mdx#console-message-timestamp).
+
+#### Miscellaneous
+- [BrowserContext.Debugger](/api/class-browsercontext.mdx#browser-context-debugger) provides programmatic control over the Playwright debugger.
+- Method [BrowserContext.IsClosed](/api/class-browsercontext.mdx#browser-context-is-closed).
+- Method [Request.ExistingResponse](/api/class-request.mdx#request-existing-response) returns the response without waiting.
+- Method [Response.HttpVersionAsync()](/api/class-response.mdx#response-http-version) returns the HTTP version used by the response.
+- Event [CdpSession.Close](/api/class-cdpsession.mdx#cdp-session-event-close) for CDP sessions.
+- Option `Live` in [Tracing.StartAsync()](/api/class-tracing.mdx#tracing-start) for real-time trace updates.
+- Option `ArtifactsDir` in [BrowserType.LaunchAsync()](/api/class-browsertype.mdx#browser-type-launch) to configure the artifacts directory.
+
+### Breaking Changes ⚠️
+- Removed macOS 14 support for WebKit. We recommend upgrading your macOS version, or keeping an older Playwright version.
+
+### Browser Versions
+- Chromium 147.0.7727.15
+- Mozilla Firefox 148.0.2
+- WebKit 26.0
+
+This version was also tested against the following stable channels:
+- Google Chrome 146
+- Microsoft Edge 146
+
 ## Version 1.58
 
 ### UI Mode and Trace Viewer Improvements
@@ -1640,7 +1753,6 @@ This version of Playwright was also tested against the following stable channels
 [Locator]: /api/class-locator.mdx "Locator"
 [LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
 [Mouse]: /api/class-mouse.mdx "Mouse"
-[Overlay]: /api/class-overlay.mdx "Overlay"
 [Page]: /api/class-page.mdx "Page"
 [PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
 [Playwright]: /api/class-playwright.mdx "Playwright"
@@ -1648,6 +1760,7 @@ This version of Playwright was also tested against the following stable channels
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
