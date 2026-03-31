@@ -13,11 +13,15 @@ import LiteYouTube from '@site/src/components/LiteYouTube';
 
 ### 🎬 Screencast
 
-New [Page.screencast()](/api/class-page.mdx#page-screencast) API provides a unified interface for capturing page content — both as video recordings and as real-time frame streams.
+New [Page.screencast()](/api/class-page.mdx#page-screencast) API provides a unified interface for capturing page content — both as video recordings, annotations, overlays, and a real-time frame stream.
+
+<center>
 
 <img src="https://raw.githubusercontent.com/microsoft/playwright/main/docs/src/images/release-notes-1.59-screencast-demo.gif" alt="Demo" width="500" height="313" />
 
-**Video recording** — record video with precise start/stop control, as an alternative to the [setRecordVideoDir](/api/class-browser.mdx#browser-new-context-option-record-video-dir) option:
+</center>
+
+**Screencast recording** — record video with precise start/stop control, as an alternative to the [setRecordVideoDir](/api/class-browser.mdx#browser-new-context-option-record-video-dir) option:
 
 ```java
 page.screencast().start(new Screencast.StartOptions().setPath(Paths.get("video.webm")));
@@ -35,12 +39,10 @@ page.screencast().start(new Screencast.StartOptions()
 **Action annotations** — enable built-in visual annotations that highlight interacted elements and display action titles during recording:
 
 ```java
-page.screencast().start(new Screencast.StartOptions()
-    .setPath(Paths.get("video.webm"))
-    .setAnnotate(new Screencast.Annotate().setPosition("top-right")));
+page.screencast().showActions(new Screencast.ShowActionsOptions().setPosition("top-right"));
 ```
 
-The `annotate` option accepts `position` (`"top-left"`, `"top"`, `"top-right"`, `"bottom-left"`, `"bottom"`, `"bottom-right"`), `duration` (ms per annotation), and `fontSize` (px).
+[Screencast.showActions()](/api/class-screencast.mdx#screencast-show-actions) accepts `position` (`"top-left"`, `"top"`, `"top-right"`, `"bottom-left"`, `"bottom"`, `"bottom-right"`), `duration` (ms per annotation), and `fontSize` (px). Returns a disposable to stop showing actions.
 
 **Visual overlays** — add chapter titles and custom HTML overlays on top of the page for richer narration:
 
@@ -57,8 +59,8 @@ page.screencast().showOverlay("<div style=\"color: red\">Recording</div>");
 
 ```java
 page.screencast().start(new Screencast.StartOptions()
-    .setPath(Paths.get("receipt.webm"))
-    .setAnnotate(new Screencast.Annotate().setPosition("top-right")));
+    .setPath(Paths.get("receipt.webm")));
+page.screencast().showActions(new Screencast.ShowActionsOptions().setPosition("top-right"));
 
 page.screencast().showChapter("Verifying checkout flow",
     new Screencast.ShowChapterOptions()
@@ -89,7 +91,8 @@ The resulting video serves as a receipt: chapter titles provide context, action 
 #### Screencast
 - [Page.screencast()](/api/class-page.mdx#page-screencast) provides video recording, real-time frame streaming, and overlay management.
 - Methods [Screencast.start()](/api/class-screencast.mdx#screencast-start) and [Screencast.stop()](/api/class-screencast.mdx#screencast-stop) for recording and frame capture.
-- Methods [Screencast.showChapter()](/api/class-screencast.mdx#screencast-show-chapter) and [Screencast.showOverlay()](/api/class-screencast.mdx#screencast-show-overlay) for visual annotations.
+- Methods [Screencast.showActions()](/api/class-screencast.mdx#screencast-show-actions) and [Screencast.hideActions()](/api/class-screencast.mdx#screencast-hide-actions) for action annotations.
+- Methods [Screencast.showChapter()](/api/class-screencast.mdx#screencast-show-chapter) and [Screencast.showOverlay()](/api/class-screencast.mdx#screencast-show-overlay) for visual overlays.
 - Methods [Screencast.showOverlays()](/api/class-screencast.mdx#screencast-show-overlays) and [Screencast.hideOverlays()](/api/class-screencast.mdx#screencast-hide-overlays) for overlay visibility control.
 
 #### Storage, Console and Errors
@@ -103,9 +106,60 @@ The resulting video serves as a receipt: chapter titles provide context, action 
 - Method [BrowserContext.isClosed()](/api/class-browsercontext.mdx#browser-context-is-closed).
 - Method [Request.existingResponse()](/api/class-request.mdx#request-existing-response) returns the response without waiting.
 - Method [Response.httpVersion()](/api/class-response.mdx#response-http-version) returns the HTTP version used by the response.
-- Event [CDPSession.onClose(handler)](/api/class-cdpsession.mdx#cdp-session-event-close) for CDP sessions.
 - Option `live` in [Tracing.start()](/api/class-tracing.mdx#tracing-start) for real-time trace updates.
 - Option `artifactsDir` in [BrowserType.launch()](/api/class-browsertype.mdx#browser-type-launch) to configure the artifacts directory.
+
+### 🔗 Interoperability
+
+New [Browser.bind()](/api/class-browser.mdx#browser-bind) API makes a launched browser available for `playwright-cli`, `@playwright/mcp`, and other clients to connect to.
+
+**Bind a browser** — start a browser and bind it so others can connect:
+
+```java
+Browser browser = chromium.launch();
+Browser.BindResult serverInfo = browser.bind("my-session",
+    new Browser.BindOptions().setWorkspaceDir("/my/project"));
+```
+
+**Connect from playwright-cli**
+
+```bash
+playwright-cli attach my-session
+```
+
+**Connect from playwright/mcp**
+
+```bash
+@playwright/mcp --endpoint=my-session
+```
+
+**Connect from another client**
+
+```java
+Browser browser = chromium.connect(serverInfo.endpoint);
+```
+
+Pass `host` and `port` options to bind over WebSocket instead of a named pipe:
+
+```java
+Browser.BindResult serverInfo = browser.bind("my-session",
+    new Browser.BindOptions().setHost("localhost").setPort(0));
+// serverInfo.endpoint is a ws:// URL
+```
+
+Call [Browser.unbind()](/api/class-browser.mdx#browser-unbind) to stop accepting new connections.
+
+### 📊 Observability
+
+Run `playwright-cli show` to open the Dashboard that lists all bound browsers, their status, and workspace.
+
+<center>
+
+<img src="https://raw.githubusercontent.com/microsoft/playwright/main/docs/src/images/release-notes-1.59-dashboard.gif" alt="Demo" width="1169" height="835" />
+
+</center>
+- `playwright-cli` binds all of its browsers automatically, so you can see what your agents are doing.
+- Pass `PLAYWRIGHT_DASHBOARD=1` env variable to see all `@playwright/test` browsers in the dashboard.
 
 ### Breaking Changes ⚠️
 - Removed macOS 14 support for WebKit. We recommend upgrading your macOS version, or keeping an older Playwright version.
@@ -113,7 +167,7 @@ The resulting video serves as a receipt: chapter titles provide context, action 
 ### Browser Versions
 - Chromium 147.0.7727.15
 - Mozilla Firefox 148.0.2
-- WebKit 26.0
+- WebKit 26.4
 
 This version was also tested against the following stable channels:
 - Google Chrome 146
