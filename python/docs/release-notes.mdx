@@ -9,6 +9,119 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 import LiteYouTube from '@site/src/components/LiteYouTube';
 
+## Version 1.59
+
+### 🎬 Screencast
+
+New [page.screencast](/api/class-page.mdx#page-screencast) API provides a unified interface for capturing page content — both as video recordings and as real-time frame streams.
+
+<img src="https://raw.githubusercontent.com/microsoft/playwright/main/docs/src/images/release-notes-1.59-screencast-demo.gif" alt="Demo" width="500" height="313" />
+
+**Video recording** — record video with precise start/stop control, as an alternative to the [record_video_dir](/api/class-browser.mdx#browser-new-context-option-record-video-dir) option:
+
+```python
+page.screencast.start(path="video.webm")
+# ... perform actions ...
+page.screencast.stop()
+```
+
+**Real-time frame capture** — stream JPEG-encoded frames for custom processing like thumbnails, live previews, AI vision, and more:
+
+```python
+page.screencast.start(
+    on_frame=lambda frame: send_to_vision_model(frame["data"]),
+)
+```
+
+**Action annotations** — enable built-in visual annotations that highlight interacted elements and display action titles during recording:
+
+```python
+page.screencast.start(
+    path="video.webm",
+    annotate={"position": "top-right"},
+)
+```
+
+The `annotate` option accepts `position` (`'top-left'`, `'top'`, `'top-right'`, `'bottom-left'`, `'bottom'`, `'bottom-right'`), `duration` (ms per annotation), and `font_size` (px).
+
+**Visual overlays** — add chapter titles and custom HTML overlays on top of the page for richer narration:
+
+```python
+page.screencast.show_chapter("Adding TODOs",
+    description="Type and press enter for each TODO",
+    duration=1000,
+)
+
+page.screencast.show_overlay('<div style="color: red">Recording</div>')
+```
+
+**Agentic video receipts** — coding agents can produce video evidence of their work. After completing a task, an agent can record a walkthrough video with rich annotations for human review:
+
+```python
+page.screencast.start(
+    path="receipt.webm",
+    annotate={"position": "top-right"},
+)
+
+page.screencast.show_chapter("Verifying checkout flow",
+    description="Added coupon code support per ticket #1234",
+)
+
+# Agent performs the verification steps...
+page.locator("#coupon").fill("SAVE20")
+page.locator("#apply-coupon").click()
+expect(page.locator(".discount")).to_contain_text("20%")
+
+page.screencast.show_chapter("Done",
+    description="Coupon applied, discount reflected in total",
+)
+
+page.screencast.stop()
+```
+
+The resulting video serves as a receipt: chapter titles provide context, action annotations highlight each interaction, and the visual walkthrough is faster to review than text logs.
+
+### 🔍 Snapshots and Locators
+- Method [page.aria_snapshot()](/api/class-page.mdx#page-aria-snapshot) to capture the aria snapshot of the page — equivalent to `page.locator('body').aria_snapshot()`.
+- Options `depth` and `mode` in [locator.aria_snapshot()](/api/class-locator.mdx#locator-aria-snapshot).
+- Method [locator.normalize()](/api/class-locator.mdx#locator-normalize) converts a locator to follow best practices like test ids and aria roles.
+- Method [page.pick_locator()](/api/class-page.mdx#page-pick-locator) enters an interactive mode where hovering over elements highlights them and shows the corresponding locator. Click an element to get its [Locator] back. Use [page.cancel_pick_locator()](/api/class-page.mdx#page-cancel-pick-locator) to cancel.
+
+### New APIs
+
+#### Screencast
+- [page.screencast](/api/class-page.mdx#page-screencast) provides video recording, real-time frame streaming, and overlay management.
+- Methods [screencast.start()](/api/class-screencast.mdx#screencast-start) and [screencast.stop()](/api/class-screencast.mdx#screencast-stop) for recording and frame capture.
+- Methods [screencast.show_chapter()](/api/class-screencast.mdx#screencast-show-chapter) and [screencast.show_overlay()](/api/class-screencast.mdx#screencast-show-overlay) for visual annotations.
+- Methods [screencast.show_overlays()](/api/class-screencast.mdx#screencast-show-overlays) and [screencast.hide_overlays()](/api/class-screencast.mdx#screencast-hide-overlays) for overlay visibility control.
+
+#### Storage, Console and Errors
+- Method [browser_context.set_storage_state()](/api/class-browsercontext.mdx#browser-context-set-storage-state) clears existing cookies, local storage, and IndexedDB for all origins and sets a new storage state — no need to create a new context.
+- Methods [page.clear_console_messages()](/api/class-page.mdx#page-clear-console-messages) and [page.clear_page_errors()](/api/class-page.mdx#page-clear-page-errors) to clear stored messages and errors.
+- Option `filter` in [page.console_messages()](/api/class-page.mdx#page-console-messages) and [page.page_errors()](/api/class-page.mdx#page-page-errors) controls which messages are returned.
+- Method [console_message.timestamp](/api/class-consolemessage.mdx#console-message-timestamp).
+
+#### Miscellaneous
+- [browser_context.debugger](/api/class-browsercontext.mdx#browser-context-debugger) provides programmatic control over the Playwright debugger.
+- Method [browser_context.is_closed()](/api/class-browsercontext.mdx#browser-context-is-closed).
+- Method [request.existing_response](/api/class-request.mdx#request-existing-response) returns the response without waiting.
+- Method [response.http_version()](/api/class-response.mdx#response-http-version) returns the HTTP version used by the response.
+- Event [cdp_session.on("close")](/api/class-cdpsession.mdx#cdp-session-event-close) for CDP sessions.
+- Option `live` in [tracing.start()](/api/class-tracing.mdx#tracing-start) for real-time trace updates.
+- Option `artifacts_dir` in [browser_type.launch()](/api/class-browsertype.mdx#browser-type-launch) to configure the artifacts directory.
+
+### Breaking Changes ⚠️
+- Removed macOS 14 support for WebKit. We recommend upgrading your macOS version, or keeping an older Playwright version.
+
+### Browser Versions
+- Chromium 147.0.7727.15
+- Mozilla Firefox 148.0.2
+- WebKit 26.0
+
+This version was also tested against the following stable channels:
+- Google Chrome 146
+- Microsoft Edge 146
+
 ## Version 1.58
 
 ### UI Mode and Trace Viewer Improvements
@@ -1951,13 +2064,13 @@ This version of Playwright was also tested against the following stable channels
 [Locator]: /api/class-locator.mdx "Locator"
 [LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
 [Mouse]: /api/class-mouse.mdx "Mouse"
-[Overlay]: /api/class-overlay.mdx "Overlay"
 [Page]: /api/class-page.mdx "Page"
 [PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
 [Playwright]: /api/class-playwright.mdx "Playwright"
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"

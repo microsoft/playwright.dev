@@ -322,7 +322,7 @@ ${this.documentation.renderLinksInText(member.discouraged)}
             try {
               return this.renderProperty(name, a, a.spec, 'in', false, !a.required);
             } catch (e) {
-              throw new Error(`While rendering ${member.clazz.name}.${member.name}, property\n-------\n${md.render(a.spec)}\n------\n ` + e.message);
+              throw new Error(`While rendering ${member.clazz.name}.${member.name}, property ${a.alias}\n-------\n${md.render(a.spec || [])}\n------\n`, { cause: e });
             }
           }));
         }

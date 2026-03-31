@@ -14,31 +14,137 @@ Interface for capturing screencast frames from a page.
 
 ## Methods
 
-### start {#screencast-start}
+### hideOverlays {#screencast-hide-overlays}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>screencast.start</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>screencast.hideOverlays</x-search>
 
-Starts capturing screencast frames.
+Hides overlays without removing them.
 
 **Usage**
 
 ```js
-await page.screencast.start(({ data })  => {
-  console.log(`frame size: ${data.length}`);
-}, { preferredSize: { width: 800, height: 600 } });
+await screencast.hideOverlays();
+```
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-hide-overlays-return"/><a href="#screencast-hide-overlays-return" class="list-anchor">#</a>
+
+---
+
+### showChapter {#screencast-show-chapter}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>screencast.showChapter</x-search>
+
+Shows a chapter overlay with a title and optional description, centered on the page with a blurred backdrop. Useful for narrating video recordings. The overlay is removed after the specified duration, or 2000ms.
+
+**Usage**
+
+```js
+await screencast.showChapter(title);
+await screencast.showChapter(title, options);
+```
+
+**Arguments**
+- `title` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-show-chapter-option-title"/><a href="#screencast-show-chapter-option-title" class="list-anchor">#</a>
+  
+  Title text displayed prominently in the overlay.
+- `options` [Object] *(optional)*
+  - `description` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-show-chapter-option-description"/><a href="#screencast-show-chapter-option-description" class="list-anchor">#</a>
+    
+    Optional description text displayed below the title.
+  - `duration` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-show-chapter-option-duration"/><a href="#screencast-show-chapter-option-duration" class="list-anchor">#</a>
+    
+    Duration in milliseconds after which the overlay is automatically removed. Defaults to `2000`.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-show-chapter-return"/><a href="#screencast-show-chapter-return" class="list-anchor">#</a>
+
+---
+
+### showOverlay {#screencast-show-overlay}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>screencast.showOverlay</x-search>
+
+Adds an overlay with the given HTML content. The overlay is displayed on top of the page until removed. Returns a disposable that removes the overlay when disposed.
+
+**Usage**
+
+```js
+await screencast.showOverlay(html);
+await screencast.showOverlay(html, options);
+```
+
+**Arguments**
+- `html` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-show-overlay-option-html"/><a href="#screencast-show-overlay-option-html" class="list-anchor">#</a>
+  
+  HTML content for the overlay.
+- `options` [Object] *(optional)*
+  - `duration` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-show-overlay-option-duration"/><a href="#screencast-show-overlay-option-duration" class="list-anchor">#</a>
+    
+    Duration in milliseconds after which the overlay is automatically removed. Overlay stays until dismissed if not provided.
+
+**Returns**
+- [Promise]&lt;[Disposable]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-show-overlay-return"/><a href="#screencast-show-overlay-return" class="list-anchor">#</a>
+
+---
+
+### showOverlays {#screencast-show-overlays}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>screencast.showOverlays</x-search>
+
+Shows overlays.
+
+**Usage**
+
+```js
+await screencast.showOverlays();
+```
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-show-overlays-return"/><a href="#screencast-show-overlays-return" class="list-anchor">#</a>
+
+---
+
+### start {#screencast-start}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>screencast.start</x-search>
+
+Starts the screencast. When [path](/api/class-screencast.mdx#screencast-start-option-path) is provided, it saves video recording to the specified file. When [onFrame](/api/class-screencast.mdx#screencast-start-option-on-frame) is provided, delivers JPEG-encoded frames to the callback. Both can be used together.
+
+**Usage**
+
+```js
+// Record video
+await page.screencast.start({ path: 'video.webm', size: { width: 1280, height: 800 } });
+// ... perform actions ...
+await page.screencast.stop();
+```
+
+```js
+// Capture frames
+await page.screencast.start({
+  onFrame: ({ data }) => console.log(`frame size: ${data.length}`),
+  size: { width: 800, height: 600 },
+});
 // ... perform actions ...
 await page.screencast.stop();
 ```
 
 **Arguments**
-- `onFrame` [function]\([Object]\):[Promise]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-start-option-on-frame"/><a href="#screencast-start-option-on-frame" class="list-anchor">#</a>
-  - `data` [Buffer]
-    
-    JPEG-encoded frame data.
-  
-  Callback that receives JPEG-encoded frame data.
 - `options` [Object] *(optional)*
-  - `preferredSize` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-start-option-preferred-size"/><a href="#screencast-start-option-preferred-size" class="list-anchor">#</a>
+  - `onFrame` [function]\([Object]\):[Promise] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-start-option-on-frame"/><a href="#screencast-start-option-on-frame" class="list-anchor">#</a>
+    - `data` [Buffer]
+      
+      JPEG-encoded frame data.
+    
+    Callback that receives JPEG-encoded frame data.
+  - `path` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-start-option-path"/><a href="#screencast-start-option-path" class="list-anchor">#</a>
+    
+    Path where the video should be saved when the screencast is stopped. When provided, video recording is started.
+  - `quality` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-start-option-quality"/><a href="#screencast-start-option-quality" class="list-anchor">#</a>
+    
+    The quality of the image, between 0-100.
+  - `size` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-start-option-size"/><a href="#screencast-start-option-size" class="list-anchor">#</a>
     - `width` [number]
       
       Max frame width in pixels.
@@ -46,11 +152,7 @@ await page.screencast.stop();
       
       Max frame height in pixels.
     
-    Specifies the preferred maximum dimensions of screencast frames. The actual frame is scaled to preserve the page’s aspect ratio and may be smaller than these bounds.
-    
-    If a screencast is already active (e.g. started by tracing or video recording), the existing configuration takes precedence and the frame size may exceed these bounds or this option may be ignored.
-    
-    Defaults to 800×800.
+    Specifies the dimensions of screencast frames. The actual frame is scaled to preserve the page's aspect ratio and may be smaller than these bounds. If a screencast is already active (e.g. started by tracing or video recording), the existing configuration takes precedence and the frame size may exceed these bounds or this option may be ignored. If not specified the size will be equal to page viewport scaled down to fit into 800×800.
 
 **Returns**
 - [Promise]&lt;[Disposable]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-start-return"/><a href="#screencast-start-return" class="list-anchor">#</a>
@@ -61,7 +163,7 @@ await page.screencast.stop();
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>screencast.stop</x-search>
 
-Stops the screencast started with [screencast.start()](/api/class-screencast.mdx#screencast-start).
+Stops the screencast and video recording if active. If a video was being recorded, saves it to the path specified in [screencast.start()](/api/class-screencast.mdx#screencast-start).
 
 **Usage**
 
@@ -107,7 +209,6 @@ await screencast.stop();
 [LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
 [Logger]: /api/class-logger.mdx "Logger"
 [Mouse]: /api/class-mouse.mdx "Mouse"
-[Overlay]: /api/class-overlay.mdx "Overlay"
 [Page]: /api/class-page.mdx "Page"
 [PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
 [Playwright]: /api/class-playwright.mdx "Playwright"
