@@ -91,10 +91,15 @@ const Home: React.FC = () => {
         <div className="container">
           <h1 className={clsx("hero__title", styles.heroTitle)}>
             <span className={styles.highlight}>Playwright</span> enables reliable
-            web automation for testing, scripting, and AI agents.
+            web automation for testing, scripting, and AI&nbsp;agents.
           </h1>
           <p className={styles.heroSubtitle}>
             One API to drive Chromium, Firefox, and WebKit — in your tests, your scripts, and your agent workflows.
+            Available for{' '}
+            <a href="https://playwright.dev/docs/intro">TypeScript</a>,{' '}
+            <a href="https://playwright.dev/python/docs/intro">Python</a>,{' '}
+            <a href="https://playwright.dev/dotnet/docs/intro">.NET</a>, and{' '}
+            <a href="https://playwright.dev/java/docs/intro">Java</a>.
           </p>
           <div className={styles.buttons}>
             <Link className={styles.getStarted} to="docs/intro">
@@ -118,7 +123,7 @@ const Home: React.FC = () => {
         </section>
 
         {/* Testing features */}
-        <FeatureSection title="Built for testing">
+        <FeatureSection title="Built for testing" reversed>
           <div className="row">
             <div className="col col--6">
               <h4>Auto-wait and web-first assertions</h4>
@@ -152,7 +157,7 @@ const Home: React.FC = () => {
         </FeatureSection>
 
         {/* Agent features */}
-        <FeatureSection title="Built for AI agents" reversed>
+        <FeatureSection title="Built for AI agents">
           <div className="row">
             <div className="col col--6">
               <h4>Accessibility snapshots, not screenshots</h4>
@@ -177,7 +182,7 @@ const Home: React.FC = () => {
               <h4>Session monitoring</h4>
               <p>
                 Visual dashboard with live screencast previews of all running browser sessions.
-                Click any session to zoom in and take remote control.
+                Click any session to zoom in and take control.
               </p>
             </div>
           </div>
