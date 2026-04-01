@@ -86,7 +86,7 @@ The order of evaluation of multiple scripts installed via [BrowserContext.AddIni
   Script to be evaluated in all pages in the browser context.
 
 **Returns**
-- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-init-script-return"/><a href="#page-add-init-script-return" class="list-anchor">#</a>
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-init-script-return"/><a href="#page-add-init-script-return" class="list-anchor">#</a>
 
 ---
 
@@ -244,6 +244,35 @@ await Page.AddStyleTagAsync(options);
 
 ---
 
+### AriaSnapshotAsync {#page-aria-snapshot}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>page.AriaSnapshotAsync</x-search>
+
+Captures the aria snapshot of the page. Read more about [aria snapshots](../aria-snapshots.mdx).
+
+**Usage**
+
+```csharp
+await Page.AriaSnapshotAsync(options);
+```
+
+**Arguments**
+- `options` `PageAriaSnapshotOptions?` *(optional)*
+  - `Depth` [int]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-aria-snapshot-option-depth"/><a href="#page-aria-snapshot-option-depth" class="list-anchor">#</a>
+    
+    When specified, limits the depth of the snapshot.
+  - `Mode` `enum AriaSnapshotMode { Ai, Default }?` *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-aria-snapshot-option-mode"/><a href="#page-aria-snapshot-option-mode" class="list-anchor">#</a>
+    
+    When set to `"ai"`, returns a snapshot optimized for AI consumption: including element references like `[ref=e2]` and snapshots of `<iframe>`s. Defaults to `"default"`.
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-aria-snapshot-option-timeout"/><a href="#page-aria-snapshot-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Returns**
+- [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-aria-snapshot-return"/><a href="#page-aria-snapshot-return" class="list-anchor">#</a>
+
+---
+
 ### BringToFrontAsync {#page-bring-to-front}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.BringToFrontAsync</x-search>
@@ -258,6 +287,57 @@ await Page.BringToFrontAsync();
 
 **Returns**
 - [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-bring-to-front-return"/><a href="#page-bring-to-front-return" class="list-anchor">#</a>
+
+---
+
+### CancelPickLocatorAsync {#page-cancel-pick-locator}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>page.CancelPickLocatorAsync</x-search>
+
+Cancels an ongoing [Page.PickLocatorAsync()](/api/class-page.mdx#page-pick-locator) call by deactivating pick locator mode. If no pick locator mode is active, this method is a no-op.
+
+**Usage**
+
+```csharp
+await Page.CancelPickLocatorAsync();
+```
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-cancel-pick-locator-return"/><a href="#page-cancel-pick-locator-return" class="list-anchor">#</a>
+
+---
+
+### ClearConsoleMessagesAsync {#page-clear-console-messages}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>page.ClearConsoleMessagesAsync</x-search>
+
+Clears all stored console messages from this page. Subsequent calls to [Page.ConsoleMessagesAsync()](/api/class-page.mdx#page-console-messages) will only return messages logged after the clear.
+
+**Usage**
+
+```csharp
+await Page.ClearConsoleMessagesAsync();
+```
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-clear-console-messages-return"/><a href="#page-clear-console-messages-return" class="list-anchor">#</a>
+
+---
+
+### ClearPageErrorsAsync {#page-clear-page-errors}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>page.ClearPageErrorsAsync</x-search>
+
+Clears all stored page errors from this page. Subsequent calls to [Page.PageErrorsAsync()](/api/class-page.mdx#page-page-errors) will only return errors thrown after the clear.
+
+**Usage**
+
+```csharp
+await Page.ClearPageErrorsAsync();
+```
+
+**Returns**
+- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-clear-page-errors-return"/><a href="#page-clear-page-errors-return" class="list-anchor">#</a>
 
 ---
 
@@ -303,8 +383,14 @@ Returns up to (currently) 200 last console messages from this page. See [Page.Co
 **Usage**
 
 ```csharp
-await Page.ConsoleMessagesAsync();
+await Page.ConsoleMessagesAsync(options);
 ```
+
+**Arguments**
+- `options` `PageConsoleMessagesOptions?` *(optional)*
+  - `Filter` `enum ConsoleMessagesFilter { All, SinceNavigation }?` *(optional)* <font size="2">Added in: v1.59</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-console-messages-option-filter"/><a href="#page-console-messages-option-filter" class="list-anchor">#</a>
+    
+    Controls which messages are returned:
 
 **Returns**
 - [IReadOnlyList]&lt;[ConsoleMessage]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-console-messages-return"/><a href="#page-console-messages-return" class="list-anchor">#</a>
@@ -627,7 +713,7 @@ class PageExamples
     Whether to pass the argument as a handle, instead of passing by value. When passing a handle, only one argument is supported. When passing by value, multiple arguments are supported.
 
 **Returns**
-- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-expose-binding-return"/><a href="#page-expose-binding-return" class="list-anchor">#</a>
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-expose-binding-return"/><a href="#page-expose-binding-return" class="list-anchor">#</a>
 
 ---
 
@@ -696,7 +782,7 @@ class PageExamples
   Callback function which will be called in Playwright's context.
 
 **Returns**
-- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-expose-function-return"/><a href="#page-expose-function-return" class="list-anchor">#</a>
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-expose-function-return"/><a href="#page-expose-function-return" class="list-anchor">#</a>
 
 ---
 
@@ -912,7 +998,7 @@ Consider the following DOM structure.
 <button>Submit</button>
 ```
 
-You can locate each element by it's implicit role:
+You can locate each element by its implicit role:
 
 ```csharp
 await Expect(Page
@@ -1008,7 +1094,7 @@ Consider the following DOM structure.
 <button data-testid="directions">Itinéraire</button>
 ```
 
-You can locate the element by it's test id:
+You can locate the element by its test id:
 
 ```csharp
 await page.GetByTestId("directions").ClickAsync();
@@ -1493,6 +1579,24 @@ The [Format](/api/class-page.mdx#page-pdf-option-format) options are:
 
 ---
 
+### PickLocatorAsync {#page-pick-locator}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>page.PickLocatorAsync</x-search>
+
+Enters pick locator mode where hovering over page elements highlights them and shows the corresponding locator. Once the user clicks an element, the mode is deactivated and the [Locator] for the picked element is returned.
+
+**Usage**
+
+```csharp
+var locator = await page.PickLocatorAsync();
+Console.WriteLine(locator);
+```
+
+**Returns**
+- [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-pick-locator-return"/><a href="#page-pick-locator-return" class="list-anchor">#</a>
+
+---
+
 ### ReloadAsync {#page-reload}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.ReloadAsync</x-search>
@@ -1645,6 +1749,8 @@ await page.RouteAsync("/api/**", async r =>
 });
 ```
 
+If a request matches multiple registered routes, the most recently registered route takes precedence.
+
 Page routes take precedence over browser context routes (set up with [BrowserContext.RouteAsync()](/api/class-browsercontext.mdx#browser-context-route)) when request matches both handlers.
 
 To remove a route with its handler you can use [Page.UnrouteAsync()](/api/class-page.mdx#page-unroute).
@@ -1667,7 +1773,7 @@ Enabling routing disables http cache.
     How often a route should be used. By default it will be used every time.
 
 **Returns**
-- [void]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-return"/><a href="#page-route-return" class="list-anchor">#</a>
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-route-return"/><a href="#page-route-return" class="list-anchor">#</a>
 
 ---
 
@@ -2535,7 +2641,7 @@ await Page.UnrouteAsync(url, handler);
 **Arguments**
 - `url` [string] | [Regex] | [Func]&lt;[string], bool&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-unroute-option-url"/><a href="#page-unroute-option-url" class="list-anchor">#</a>
   
-  A glob pattern, regex pattern or predicate receiving [URL] to match while routing.
+  A glob pattern, regex pattern, or predicate receiving [URL] to match while routing.
 - `handler` [Action]&lt;[Route]?&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-unroute-option-handler"/><a href="#page-unroute-option-handler" class="list-anchor">#</a>
   
   Optional handler function to route the request.
@@ -2590,7 +2696,7 @@ Page.Url
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>page.Video</x-search>
 
-Video object associated with this page.
+Video object associated with this page. Can be used to access the video file when using the `recordVideo` context option.
 
 **Usage**
 
@@ -2741,7 +2847,7 @@ await page.WaitForURLAsync("**/target.html");
 **Arguments**
 - `url` [string] | [Regex] | [Func]&lt;[string], bool&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-url-option-url"/><a href="#page-wait-for-url-option-url" class="list-anchor">#</a>
   
-  A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
+  A glob pattern, regex pattern, or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
 - `options` `PageWaitForURLOptions?` *(optional)*
   - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-url-option-timeout"/><a href="#page-wait-for-url-option-timeout" class="list-anchor">#</a>
     
@@ -2844,6 +2950,19 @@ Page.Mouse
 
 **Type**
 - [Mouse]
+
+---
+
+### Screencast {#page-screencast}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>page.Screencast</x-search>
+
+[Screencast] object associated with this page.
+
+**Usage**
+
+**Type**
+- [Screencast]
 
 ---
 
@@ -4315,7 +4434,7 @@ Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/Hist
     Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [Page.SetDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
   - `Url|UrlRegex|UrlFunc` [string]? | [Regex]? | [Func]&lt;[string]?, bool&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-url"/><a href="#page-wait-for-navigation-option-url" class="list-anchor">#</a>
     
-    A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
+    A glob pattern, regex pattern, or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
   - `WaitUntil` `enum WaitUntilState { Load, DOMContentLoaded, NetworkIdle, Commit }?` *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-wait-until"/><a href="#page-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
     
     When to consider operation succeeded, defaults to `load`. Events can be either:
@@ -4367,7 +4486,7 @@ Usage of the [History API](https://developer.mozilla.org/en-US/docs/Web/API/Hist
     Maximum operation time in milliseconds, defaults to 30 seconds, pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultNavigationTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-navigation-timeout), [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout), [Page.SetDefaultNavigationTimeout()](/api/class-page.mdx#page-set-default-navigation-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
   - `Url|UrlRegex|UrlFunc` [string]? | [Regex]? | [Func]&lt;[string]?, bool&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-url"/><a href="#page-wait-for-navigation-option-url" class="list-anchor">#</a>
     
-    A glob pattern, regex pattern or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
+    A glob pattern, regex pattern, or predicate receiving [URL] to match while waiting for the navigation. Note that if the parameter is a string without wildcard characters, the method will wait for navigation to URL that is exactly equal to the string.
   - `WaitUntil` `enum WaitUntilState { Load, DOMContentLoaded, NetworkIdle, Commit }?` *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-navigation-option-wait-until"/><a href="#page-wait-for-navigation-option-wait-until" class="list-anchor">#</a>
     
     When to consider operation succeeded, defaults to `load`. Events can be either:
@@ -4914,6 +5033,7 @@ await page.WaitForTimeoutAsync(1000);
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -4933,6 +5053,7 @@ await page.WaitForTimeoutAsync(1000);
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"

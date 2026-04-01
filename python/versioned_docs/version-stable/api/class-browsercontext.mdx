@@ -183,7 +183,7 @@ The order of evaluation of multiple scripts installed via [browser_context.add_i
   Script to be evaluated in all pages in the browser context. Optional.
 
 **Returns**
-- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-add-init-script-return"/><a href="#browser-context-add-init-script-return" class="list-anchor">#</a>
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-add-init-script-return"/><a href="#browser-context-add-init-script-return" class="list-anchor">#</a>
 
 ---
 
@@ -565,7 +565,7 @@ asyncio.run(main())
   Whether to pass the argument as a handle, instead of passing by value. When passing a handle, only one argument is supported. When passing by value, multiple arguments are supported.
 
 **Returns**
-- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-binding-return"/><a href="#browser-context-expose-binding-return" class="list-anchor">#</a>
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-binding-return"/><a href="#browser-context-expose-binding-return" class="list-anchor">#</a>
 
 ---
 
@@ -673,7 +673,7 @@ asyncio.run(main())
   Callback function that will be called in the Playwright's context.
 
 **Returns**
-- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-function-return"/><a href="#browser-context-expose-function-return" class="list-anchor">#</a>
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-expose-function-return"/><a href="#browser-context-expose-function-return" class="list-anchor">#</a>
 
 ---
 
@@ -718,6 +718,7 @@ browser_context.grant_permissions(permissions, **kwargs)
   * `'notifications'`
   * `'payment-handler'`
   * `'storage-access'`
+  * `'screen-wake-lock'`
 - `origin` [str] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-grant-permissions-option-origin"/><a href="#browser-context-grant-permissions-option-origin" class="list-anchor">#</a>
   
   The [origin] to grant permissions to, e.g. "https://example.com".
@@ -912,7 +913,7 @@ Enabling routing disables http cache.
   How often a route should be used. By default it will be used every time.
 
 **Returns**
-- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-return"/><a href="#browser-context-route-return" class="list-anchor">#</a>
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-return"/><a href="#browser-context-route-return" class="list-anchor">#</a>
 
 ---
 
@@ -1180,6 +1181,92 @@ browser_context.set_offline(offline)
 
 ---
 
+### set_storage_state {#browser-context-set-storage-state}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>browserContext.set_storage_state</x-search>
+
+Clears the existing cookies, local storage and IndexedDB entries for all origins and sets the new storage state.
+
+**Usage**
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Load storage state from a file and apply it to the context.
+context.set_storage_state("state.json")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Load storage state from a file and apply it to the context.
+await context.set_storage_state("state.json")
+```
+
+</TabItem>
+</Tabs>
+
+**Arguments**
+- `storage_state` [Union]\[[str], [pathlib.Path]\] | [Dict]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-storage-state-option-storage-state"/><a href="#browser-context-set-storage-state-option-storage-state" class="list-anchor">#</a>
+  - `cookies` [List]\[[Dict]\]
+    - `name` [str]
+      
+      
+    - `value` [str]
+      
+      
+    - `domain` [str]
+      
+      Domain and path are required. For the cookie to apply to all subdomains as well, prefix domain with a dot, like this: ".example.com"
+    - `path` [str]
+      
+      Domain and path are required
+    - `expires` [float]
+      
+      Unix time in seconds.
+    - `httpOnly` [bool]
+      
+      
+    - `secure` [bool]
+      
+      
+    - `sameSite` "Strict" | "Lax" | "None"
+      
+      sameSite flag
+    
+    Cookies to set for context
+  - `origins` [List]\[[Dict]\]
+    - `origin` [str]
+      
+      
+    - `localStorage` [List]\[[Dict]\]
+      - `name` [str]
+        
+        
+      - `value` [str]
+        
+        
+      localStorage to set for context
+    
+    
+  Learn more about [storage state and auth](../auth.mdx).
+  
+  Populates context with given storage state. This option can be used to initialize context with logged-in information obtained via [browser_context.storage_state()](/api/class-browsercontext.mdx#browser-context-storage-state).
+
+**Returns**
+- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-storage-state-return"/><a href="#browser-context-set-storage-state-return" class="list-anchor">#</a>
+
+---
+
 ### storage_state {#browser-context-storage-state}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.storage_state</x-search>
@@ -1260,7 +1347,7 @@ browser_context.unroute(url, **kwargs)
 **Arguments**
 - `url` [str] | [Pattern] | [Callable]\[[URL]\]:[bool]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-unroute-option-url"/><a href="#browser-context-unroute-option-url" class="list-anchor">#</a>
   
-  A glob pattern, regex pattern or predicate receiving [URL] used to register a routing with [browser_context.route()](/api/class-browsercontext.mdx#browser-context-route).
+  A glob pattern, regex pattern, or predicate receiving [URL] used to register a routing with [browser_context.route()](/api/class-browsercontext.mdx#browser-context-route).
 - `handler` [Callable]\[[Route], [Request]\]:[Promise]\[[Any]\] | [Any] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-unroute-option-handler"/><a href="#browser-context-unroute-option-handler" class="list-anchor">#</a>
   
   Optional handler function used to register a routing with [browser_context.route()](/api/class-browsercontext.mdx#browser-context-route).
@@ -1363,6 +1450,40 @@ browser_context.clock
 
 **Type**
 - [Clock]
+
+---
+
+### debugger {#browser-context-debugger}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>browserContext.debugger</x-search>
+
+Debugger allows to pause and resume the execution.
+
+**Usage**
+
+```python
+browser_context.debugger
+```
+
+**Type**
+- [Debugger]
+
+---
+
+### is_closed {#browser-context-is-closed}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>browserContext.is_closed</x-search>
+
+Indicates that the browser context is in the process of closing or has already been closed.
+
+**Usage**
+
+```python
+browser_context.is_closed()
+```
+
+**Returns**
+- [bool]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-is-closed-return"/><a href="#browser-context-is-closed-return" class="list-anchor">#</a>
 
 ---
 
@@ -1758,6 +1879,7 @@ browser_context.background_pages
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -1776,6 +1898,7 @@ browser_context.background_pages
 [Request]: /api/class-request.mdx "Request"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"

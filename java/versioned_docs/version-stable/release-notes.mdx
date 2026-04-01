@@ -7,6 +7,180 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
+import LiteYouTube from '@site/src/components/LiteYouTube';
+
+## Version 1.59
+
+### 🎬 Screencast
+
+New [Page.screencast()](/api/class-page.mdx#page-screencast) API provides a unified interface for capturing page content with:
+- Screencast recordings
+- Action annotations
+- Visual overlays
+- Real-time frame capture
+- Agentic video receipts
+
+<center>
+
+<img src="https://raw.githubusercontent.com/microsoft/playwright/main/docs/src/images/release-notes-1.59-screencast-demo.gif" alt="Demo" width="500" height="313" />
+
+</center>
+
+**Screencast recording** — record video with precise start/stop control, as an alternative to the [setRecordVideoDir](/api/class-browser.mdx#browser-new-context-option-record-video-dir) option:
+
+```java
+page.screencast().start(new Screencast.StartOptions().setPath(Paths.get("video.webm")));
+// ... perform actions ...
+page.screencast().stop();
+```
+
+**Action annotations** — enable built-in visual annotations that highlight interacted elements and display action titles during recording:
+
+```java
+page.screencast().showActions(new Screencast.ShowActionsOptions().setPosition("top-right"));
+```
+
+[Screencast.showActions()](/api/class-screencast.mdx#screencast-show-actions) accepts `position` (`"top-left"`, `"top"`, `"top-right"`, `"bottom-left"`, `"bottom"`, `"bottom-right"`), `duration` (ms per annotation), and `fontSize` (px). Returns a disposable to stop showing actions.
+
+**Visual overlays** — add chapter titles and custom HTML overlays on top of the page for richer narration:
+
+```java
+page.screencast().showChapter("Adding TODOs",
+    new Screencast.ShowChapterOptions()
+        .setDescription("Type and press enter for each TODO")
+        .setDuration(1000));
+
+page.screencast().showOverlay("<div style=\"color: red\">Recording</div>");
+```
+
+**Real-time frame capture** — stream JPEG-encoded frames for custom processing like thumbnails, live previews, AI vision, and more:
+
+```java
+page.screencast().start(new Screencast.StartOptions()
+    .setOnFrame(frame -> sendToVisionModel(frame.data)));
+```
+
+**Agentic video receipts** — coding agents can produce video evidence of their work. After completing a task, an agent can record a walkthrough video with rich annotations for human review:
+
+```java
+page.screencast().start(new Screencast.StartOptions()
+    .setPath(Paths.get("receipt.webm")));
+page.screencast().showActions(new Screencast.ShowActionsOptions().setPosition("top-right"));
+
+page.screencast().showChapter("Verifying checkout flow",
+    new Screencast.ShowChapterOptions()
+        .setDescription("Added coupon code support per ticket #1234"));
+
+// Agent performs the verification steps...
+page.locator("#coupon").fill("SAVE20");
+page.locator("#apply-coupon").click();
+assertThat(page.locator(".discount")).containsText("20%");
+
+page.screencast().showChapter("Done",
+    new Screencast.ShowChapterOptions()
+        .setDescription("Coupon applied, discount reflected in total"));
+
+page.screencast().stop();
+```
+
+The resulting video serves as a receipt: chapter titles provide context, action annotations highlight each interaction, and the visual walkthrough is faster to review than text logs.
+
+### 🔍 Snapshots and Locators
+- Method [Page.ariaSnapshot()](/api/class-page.mdx#page-aria-snapshot) to capture the aria snapshot of the page — equivalent to `page.locator("body").ariaSnapshot()`.
+- Options `depth` and `mode` in [Locator.ariaSnapshot()](/api/class-locator.mdx#locator-aria-snapshot).
+- Method [Locator.normalize()](/api/class-locator.mdx#locator-normalize) converts a locator to follow best practices like test ids and aria roles.
+- Method [Page.pickLocator()](/api/class-page.mdx#page-pick-locator) enters an interactive mode where hovering over elements highlights them and shows the corresponding locator. Click an element to get its [Locator] back. Use [Page.cancelPickLocator()](/api/class-page.mdx#page-cancel-pick-locator) to cancel.
+
+### New APIs
+
+#### Screencast
+- [Page.screencast()](/api/class-page.mdx#page-screencast) provides video recording, real-time frame streaming, and overlay management.
+- Methods [Screencast.start()](/api/class-screencast.mdx#screencast-start) and [Screencast.stop()](/api/class-screencast.mdx#screencast-stop) for recording and frame capture.
+- Methods [Screencast.showActions()](/api/class-screencast.mdx#screencast-show-actions) and [Screencast.hideActions()](/api/class-screencast.mdx#screencast-hide-actions) for action annotations.
+- Methods [Screencast.showChapter()](/api/class-screencast.mdx#screencast-show-chapter) and [Screencast.showOverlay()](/api/class-screencast.mdx#screencast-show-overlay) for visual overlays.
+- Methods [Screencast.showOverlays()](/api/class-screencast.mdx#screencast-show-overlays) and [Screencast.hideOverlays()](/api/class-screencast.mdx#screencast-hide-overlays) for overlay visibility control.
+
+#### Storage, Console and Errors
+- Method [BrowserContext.setStorageState()](/api/class-browsercontext.mdx#browser-context-set-storage-state) clears existing cookies, local storage, and IndexedDB for all origins and sets a new storage state — no need to create a new context.
+- Methods [Page.clearConsoleMessages()](/api/class-page.mdx#page-clear-console-messages) and [Page.clearPageErrors()](/api/class-page.mdx#page-clear-page-errors) to clear stored messages and errors.
+- Option `filter` in [Page.consoleMessages()](/api/class-page.mdx#page-console-messages) and [Page.pageErrors()](/api/class-page.mdx#page-page-errors) controls which messages are returned.
+- Method [ConsoleMessage.timestamp()](/api/class-consolemessage.mdx#console-message-timestamp).
+
+#### Miscellaneous
+- [BrowserContext.debugger()](/api/class-browsercontext.mdx#browser-context-debugger) provides programmatic control over the Playwright debugger.
+- Method [BrowserContext.isClosed()](/api/class-browsercontext.mdx#browser-context-is-closed).
+- Method [Request.existingResponse()](/api/class-request.mdx#request-existing-response) returns the response without waiting.
+- Method [Response.httpVersion()](/api/class-response.mdx#response-http-version) returns the HTTP version used by the response.
+- Option `live` in [Tracing.start()](/api/class-tracing.mdx#tracing-start) for real-time trace updates.
+- Option `artifactsDir` in [BrowserType.launch()](/api/class-browsertype.mdx#browser-type-launch) to configure the artifacts directory.
+
+### 🔗 Interoperability
+
+New [Browser.bind()](/api/class-browser.mdx#browser-bind) API makes a launched browser available for `playwright-cli`, `@playwright/mcp`, and other clients to connect to.
+
+**Bind a browser** — start a browser and bind it so others can connect:
+
+```java
+Browser.BindResult serverInfo = browser.bind("my-session",
+    new Browser.BindOptions().setWorkspaceDir("/my/project"));
+```
+
+**Connect from playwright-cli** — connect to the running browser from your favorite coding agent.
+
+```bash
+playwright-cli attach my-session
+playwright-cli -s my-session snapshot
+```
+
+**Connect from @playwright/mcp** — or point your MCP server to the running browser.
+
+```bash
+@playwright/mcp --endpoint=my-session
+```
+
+**Connect from a Playwright client** — use API to connect to the browser. Multiple clients at a time are supported!
+
+```java
+Browser browser = chromium.connect(serverInfo.endpoint);
+```
+
+Pass `host` and `port` options to bind over WebSocket instead of a named pipe:
+
+```java
+Browser.BindResult serverInfo = browser.bind("my-session",
+    new Browser.BindOptions().setHost("localhost").setPort(0));
+// serverInfo.endpoint is a ws:// URL
+```
+
+Call [Browser.unbind()](/api/class-browser.mdx#browser-unbind) to stop accepting new connections.
+
+### 📊 Observability
+
+Run `playwright-cli show` to open the Dashboard that lists all the bound browsers, their statuses, and allows interacting with them:
+- See what your agent is doing on the background browsers
+- Click into the sessions for manual interventions
+- Open DevTools to inspect pages from the background browsers.
+
+<center>
+
+<img src="https://raw.githubusercontent.com/microsoft/playwright/main/docs/src/images/release-notes-1.59-dashboard.png" alt="Demo" width="1169" height="835" />
+
+</center>
+- `playwright-cli` binds all of its browsers automatically, so you can see what your agents are doing.
+- Pass `PLAYWRIGHT_DASHBOARD=1` env variable to see all `@playwright/test` browsers in the dashboard.
+
+### Breaking Changes ⚠️
+- Removed macOS 14 support for WebKit. We recommend upgrading your macOS version, or keeping an older Playwright version.
+
+### Browser Versions
+- Chromium 147.0.7727.15
+- Mozilla Firefox 148.0.2
+- WebKit 26.4
+
+This version was also tested against the following stable channels:
+- Google Chrome 146
+- Microsoft Edge 146
+
 ## Version 1.58
 
 ### UI Mode and Trace Viewer Improvements
@@ -125,7 +299,9 @@ This version was also tested against the following stable channels:
 ## Version 1.53
 
 ### Trace Viewer and HTML Reporter Updates
-- New Steps in Trace Viewer: ![New Trace Viewer Steps](https://github.com/user-attachments/assets/1963ff7d-4070-41be-a79b-4333176921a2)
+- New Steps in Trace Viewer:
+  
+  <img src="https://github.com/user-attachments/assets/1963ff7d-4070-41be-a79b-4333176921a2" alt="New Trace Viewer Steps" width="1562" height="1364" />
 - New method [Locator.describe()](/api/class-locator.mdx#locator-describe) to describe a locator. Used for trace viewer.
   
   ```java
@@ -153,7 +329,7 @@ This version was also tested against the following stable channels:
     assertThat(page.getByRole(AriaRole.LISTITEM, new Page.GetByRoleOptions().setName("Ship v1.52"))).containsClass("done");
   ```
   
-- [Aria Snapshots](./aria-snapshots.mdx) got two new properties: [`/children`](./aria-snapshots.mdx#strict-matching) for strict matching and `/url` for links.
+- [Aria Snapshots](./aria-snapshots.mdx) got two new properties: [`/children`](./aria-snapshots.mdx#strict-matching) for strict matching and [`/url`](./aria-snapshots.mdx#links) for links.
   
   ```java
   assertThat(locator).toMatchAriaSnapshot("""
@@ -359,7 +535,7 @@ The Network tab in the trace viewer has several nice improvements:
 - better display of query string parameters
 - preview of font assets
 
-![Network tab now has filters](https://github.com/user-attachments/assets/4bd1b67d-90bd-438b-a227-00b9e86872e2)
+<img src="https://github.com/user-attachments/assets/4bd1b67d-90bd-438b-a227-00b9e86872e2" alt="Network tab now has filters" width="1712" height="418" />
 
 ### Miscellaneous
 - The `mcr.microsoft.com/playwright/java:v1.47.0` now serves a Playwright image based on Ubuntu 24.04 Noble. To use the 22.02 jammy-based image, please use `mcr.microsoft.com/playwright/java:v1.47.0-jammy` instead.
@@ -708,7 +884,7 @@ This version was also tested against the following stable channels:
 
 ### Test Generator Update
 
-![Playwright Test Generator](https://github.com/microsoft/playwright/assets/9881434/e8d67e2e-f36d-4301-8631-023948d3e190)
+<img src="https://github.com/microsoft/playwright/assets/9881434/e8d67e2e-f36d-4301-8631-023948d3e190" alt="Playwright Test Generator" width="2788" height="1824" />
 
 New tools to generate assertions:
 - "Assert visibility" tool generates [assertThat(locator).isVisible()](/api/class-locatorassertions.mdx#locator-assertions-to-be-visible).
@@ -760,7 +936,7 @@ This version was also tested against the following stable channels:
 
 ### Trace Viewer Updates
 
-![Playwright Trace Viewer](https://github.com/microsoft/playwright/assets/746130/0c41e20d-c54b-4600-8ca8-1cbb6393ddef)
+<img src="https://github.com/microsoft/playwright/assets/746130/0c41e20d-c54b-4600-8ca8-1cbb6393ddef" alt="Playwright Trace Viewer" width="1091" height="722" />
 1. Zoom into time range.
 1. Network panel redesign.
 
@@ -1036,7 +1212,7 @@ This version was also tested against the following stable channels:
 ### Playwright Tools
 * **Live Locators in CodeGen.** Generate a locator for any element on the page using "Explore" tool.
 
-![Locator Explorer](https://user-images.githubusercontent.com/9798949/202293631-2f402cc2-35fb-4877-8ea1-82265fbbc232.png)
+<img src="https://user-images.githubusercontent.com/9798949/202293631-2f402cc2-35fb-4877-8ea1-82265fbbc232.png" alt="Locator Explorer" width="1876" height="1096" />
 
 ### New APIs
 - [Locator.blur()](/api/class-locator.mdx#locator-blur)
@@ -1148,11 +1324,7 @@ This version was also tested against the following stable channels:
 
 ## Version 1.24
 
-<div className="embed-youtube">
-
-<iframe width="560" height="315" src="https://www.youtube-nocookie.com/embed/9F05o1shxcY" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-
-</div>
+<LiteYouTube id="9F05o1shxcY" title="Playwright 1.24" />
 
 ### 🐂 Debian 11 Bullseye Support
 
@@ -1401,7 +1573,7 @@ Read more in [our documentation](./test-assertions).
 
 [Tracing](./api/class-tracing.mdx) now can embed Java sources to recorded traces, using new [`setSources`](./api/class-tracing#tracing-start-option-sources) option.
 
-![tracing-java-sources](https://user-images.githubusercontent.com/746130/150180856-40a7df71-370c-4597-8665-40c77a5e06ad.png)
+<img src="https://user-images.githubusercontent.com/746130/150180856-40a7df71-370c-4597-8665-40c77a5e06ad.png" alt="tracing-java-sources" width="1517" height="856" />
 
 ### New APIs & changes
 - [`acceptDownloads`](./api/class-browser#browser-new-context-option-accept-downloads) option now defaults to `true`.
@@ -1421,7 +1593,7 @@ This version was also tested against the following stable channels:
 
 Playwright 1.17 introduces [frame locators](./api/class-framelocator) - a locator to the iframe on the page. Frame locators capture the logic sufficient to retrieve the `iframe` and then locate elements in that iframe. Frame locators are strict by default, will wait for `iframe` to appear and can be used in Web-First assertions.
 
-![Graphics](https://user-images.githubusercontent.com/746130/142082759-2170db38-370d-43ec-8d41-5f9941f57d83.png)
+<img src="https://user-images.githubusercontent.com/746130/142082759-2170db38-370d-43ec-8d41-5f9941f57d83.png" alt="Graphics" width="600" height="237" />
 
 Frame locators can be created with either [Page.frameLocator()](/api/class-page.mdx#page-frame-locator) or [Locator.frameLocator()](/api/class-locator.mdx#locator-frame-locator) method.
 
@@ -1442,13 +1614,13 @@ Playwright Trace Viewer is now **available online** at https://trace.playwright.
 - New trace metadata tab with browser details
 - Snapshots now have URL bar
 
-![image](https://user-images.githubusercontent.com/746130/141877831-29e37cd1-e574-4bd9-aab5-b13a463bb4ae.png)
+<img src="https://user-images.githubusercontent.com/746130/141877831-29e37cd1-e574-4bd9-aab5-b13a463bb4ae.png" alt="image" width="2230" height="1562" />
 
 ### HTML Report Update
 - HTML report now supports dynamic filtering
 - Report is now a **single static HTML file** that could be sent by e-mail or as a slack attachment.
 
-![image](https://user-images.githubusercontent.com/746130/141877402-e486643d-72c7-4db3-8844-ed2072c5d676.png)
+<img src="https://user-images.githubusercontent.com/746130/141877402-e486643d-72c7-4db3-8844-ed2072c5d676.png" alt="image" width="2494" height="1624" />
 
 ### Ubuntu ARM64 support + more
 - Playwright now supports **Ubuntu 20.04 ARM64**. You can now run Playwright tests inside Docker on Apple M1 and on Raspberry Pi.
@@ -1553,7 +1725,7 @@ locator.click();
 
 Learn more in the [documentation](./api/class-locator).
 
-#### 🧩 Experimental [**React**](./other-locators.mdx#react-locator) and [**Vue**](./other-locators.mdx#vue-locator) selector engines
+#### 🧩 Experimental [**React**](./other-locators.mdx) and [**Vue**](./other-locators.mdx) selector engines
 
 React and Vue selectors allow selecting elements by its component name and/or property values. The syntax is very similar to [attribute selectors](https://developer.mozilla.org/en-US/docs/Web/CSS/Attribute_selectors) and supports all attribute selector operators.
 
@@ -1562,7 +1734,7 @@ page.locator("_react=SubmitButton[enabled=true]").click();
 page.locator("_vue=submit-button[enabled=true]").click();
 ```
 
-Learn more in the [react selectors documentation](./other-locators.mdx#react-locator) and the [vue selectors documentation](./other-locators.mdx#vue-locator).
+Learn more in the [react selectors documentation](./other-locators.mdx) and the [vue selectors documentation](./other-locators.mdx).
 
 #### ✨ New [**`nth`**](./other-locators.mdx#n-th-element-locator) and [**`visible`**](./other-locators.mdx#css-matching-only-visible-elements) selector engines
 - [`nth`](./other-locators.mdx#n-th-element-locator) selector engine is equivalent to the `:nth-match` pseudo class, but could be combined with other selector engines.
@@ -1646,7 +1818,7 @@ mvn exec:java -e -D exec.mainClass=com.microsoft.playwright.CLI -D exec.args="sh
 
 That will open the following GUI:
 
-![image](https://user-images.githubusercontent.com/746130/121109654-d66c4480-c7c0-11eb-8d4d-eb70d2b03811.png)
+<img src="https://user-images.githubusercontent.com/746130/121109654-d66c4480-c7c0-11eb-8d4d-eb70d2b03811.png" alt="image" width="2424" height="1544" />
 
 👉 Read more in [trace viewer documentation](./trace-viewer.mdx).
 
@@ -1787,6 +1959,7 @@ This version of Playwright was also tested against the following stable channels
 [CDPSession]: /api/class-cdpsession.mdx "CDPSession"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
@@ -1808,6 +1981,7 @@ This version of Playwright was also tested against the following stable channels
 [RequestOptions]: /api/class-requestoptions.mdx "RequestOptions"
 [Response]: /api/class-response.mdx "Response"
 [Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
 [Selectors]: /api/class-selectors.mdx "Selectors"
 [TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
 [Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
