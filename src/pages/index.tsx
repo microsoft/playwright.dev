@@ -189,7 +189,7 @@ const Home: React.FC = () => {
         </FeatureSection>
 
         {/* Tooling */}
-        <FeatureSection title="Powerful tooling">
+        <FeatureSection title="Powerful tooling" reversed>
           <div className="row">
             <div className="col col--4">
               <h4><a href="docs/codegen">Test generator</a></h4>
