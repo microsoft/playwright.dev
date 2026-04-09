@@ -78,8 +78,11 @@ class JavaFormatter {
   formatFunction(args, ret, type) {
     if (type.args.length !== 1)
       throw new Error('Unsupported number of arguments in function: ' + type);
-    if (!type.returnType || type.returnType.name === 'Promise')
-      return `[Consumer]<${type.args?.[0].structName || type.args?.[0].name}>`;
+    if (!type.returnType || type.returnType.name === 'Promise') {
+      const argType = type.args?.[0];
+      const aliasName = argType?.langAliases?.java || argType?.langAliases?.default || argType?.name;
+      return `[Consumer]<${aliasName}>`;
+    }
     if (type.returnType.name === 'boolean')
       return "[Predicate]<" + args + ">";
     throw new Error('Unknown java type for function: ' + type);
