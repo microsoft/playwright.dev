@@ -11,8 +11,6 @@ module.exports = {
         { type: 'doc', id: 'trace-viewer-intro' },
         { type: 'doc', id: 'ci-intro' },
         { type: 'doc', id: 'getting-started-vscode' },
-        { type: 'doc', id: 'getting-started-cli' },
-        { type: 'doc', id: 'getting-started-mcp' },
       ],
       collapsed: false
     },

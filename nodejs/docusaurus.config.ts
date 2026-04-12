@@ -33,6 +33,26 @@ let plugins = [
       sidebarPath: require.resolve('./sidebarCommunity.js'),
     }),
   ],
+  [
+    'content-docs',
+    /** @type {import('@docusaurus/plugin-content-docs').Options} */
+    ({
+      id: 'mcp',
+      path: 'mcp',
+      routeBasePath: 'mcp',
+      sidebarPath: require.resolve('./sidebarMcp.js'),
+    }),
+  ],
+  [
+    'content-docs',
+    /** @type {import('@docusaurus/plugin-content-docs').Options} */
+    ({
+      id: 'agent-cli',
+      path: 'agent-cli',
+      routeBasePath: 'agent-cli',
+      sidebarPath: require.resolve('./sidebarAgentCli.js'),
+    }),
+  ],
   require.resolve("@docusaurus/plugin-content-pages"),
   [
     require.resolve('@docusaurus/plugin-ideal-image'),
@@ -87,6 +107,18 @@ export default {
           position: "left",
         },
         {
+          to: '/mcp/introduction',
+          label: 'MCP',
+          position: 'left',
+          activeBaseRegex: `/mcp/`,
+        },
+        {
+          to: '/agent-cli/introduction',
+          label: 'CLI',
+          position: 'left',
+          activeBaseRegex: `/agent-cli/`,
+        },
+        {
           type: "doc",
           docId: "api/class-playwright",
           label: "API",
@@ -129,12 +161,6 @@ export default {
               href: '#',
             },
           ],
-        },
-        {
-          to: '/community/welcome',
-          label: 'Community',
-          position: 'left',
-          activeBaseRegex: `/community/`,
         },
       ],
     },
