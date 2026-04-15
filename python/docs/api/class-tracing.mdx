@@ -283,6 +283,65 @@ await context.tracing.stop_chunk(path = "trace2.zip")
 
 ---
 
+### start_har {#tracing-start-har}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.60</font><x-search>tracing.start_har</x-search>
+
+Start recording a HAR (HTTP Archive) of network activity in this context. The HAR file is written to disk when [tracing.stop_har()](/api/class-tracing.mdx#tracing-stop-har) is called, or when the returned [Disposable] is disposed.
+
+Only one HAR recording can be active at a time per [BrowserContext].
+
+**Usage**
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+context.tracing.start_har("trace.har")
+page = context.new_page()
+page.goto("https://playwright.dev")
+context.tracing.stop_har()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+await context.tracing.start_har("trace.har")
+page = await context.new_page()
+await page.goto("https://playwright.dev")
+await context.tracing.stop_har()
+```
+
+</TabItem>
+</Tabs>
+
+**Arguments**
+- `path` [Union]\[[str], [pathlib.Path]\]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-option-path"/><a href="#tracing-start-har-option-path" class="list-anchor">#</a>
+  
+  Path on the filesystem to write the HAR file to. If the file name ends with `.zip`, the HAR is saved as a zip archive with response bodies attached as separate files.
+- `content` "omit" | "embed" | "attach" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-option-content"/><a href="#tracing-start-har-option-content" class="list-anchor">#</a>
+  
+  Optional setting to control resource content management. If `omit` is specified, content is not persisted. If `attach` is specified, resources are persisted as separate files or entries in the ZIP archive. If `embed` is specified, content is stored inline the HAR file as per HAR specification. Defaults to `attach` for `.zip` output files and to `embed` for all other file extensions.
+- `mode` "full" | "minimal" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-option-mode"/><a href="#tracing-start-har-option-mode" class="list-anchor">#</a>
+  
+  When set to `minimal`, only record information necessary for routing from HAR. This omits sizes, timing, page, cookies, security and other types of HAR information that are not used when replaying from HAR. Defaults to `full`.
+- `url_filter` [str] | [Pattern] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-option-url-filter"/><a href="#tracing-start-har-option-url-filter" class="list-anchor">#</a>
+  
+  A glob or regex pattern to filter requests that are stored in the HAR. Defaults to none.
+
+**Returns**
+- [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-start-har-return"/><a href="#tracing-start-har-return" class="list-anchor">#</a>
+
+---
+
 ### stop {#tracing-stop}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.12</font><x-search>tracing.stop</x-search>
@@ -326,6 +385,23 @@ tracing.stop_chunk(**kwargs)
 
 **Returns**
 - [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-stop-chunk-return"/><a href="#tracing-stop-chunk-return" class="list-anchor">#</a>
+
+---
+
+### stop_har {#tracing-stop-har}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.60</font><x-search>tracing.stop_har</x-search>
+
+Stop HAR recording and save the HAR file to the path given to [tracing.start_har()](/api/class-tracing.mdx#tracing-start-har).
+
+**Usage**
+
+```python
+tracing.stop_har()
+```
+
+**Returns**
+- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="tracing-stop-har-return"/><a href="#tracing-stop-har-return" class="list-anchor">#</a>
 
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
