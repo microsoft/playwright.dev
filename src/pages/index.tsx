@@ -54,14 +54,14 @@ const paths: PathCardProps[] = [
     title: "Playwright CLI",
     description: "Token-efficient browser automation for coding agents like Claude Code and GitHub Copilot. Skill-based workflows without large context overhead.",
     install: "npm i -g @playwright/cli@latest",
-    href: "https://github.com/microsoft/playwright-cli",
+    href: "docs/getting-started-cli",
     linkText: "CLI documentation",
   },
   {
     title: "Playwright MCP",
     description: "Model Context Protocol server that gives AI agents full browser control through structured accessibility snapshots.",
     install: "npx @playwright/mcp@latest",
-    href: "https://github.com/microsoft/playwright-mcp",
+    href: "docs/getting-started-mcp",
     linkText: "MCP documentation",
   },
 ];
@@ -167,7 +167,7 @@ const Home: React.FC = () => {
               </p>
               <h4>MCP server</h4>
               <p>
-                Drop-in <a href="https://modelcontextprotocol.io">Model Context Protocol</a> server
+                Drop-in <a href="https://modelcontextprotocol.io" target="_blank" rel="noreferrer noopener">Model Context Protocol</a> server
                 for VS Code, Cursor, Claude Desktop, Windsurf, and any MCP client. Full browser
                 control through standard tool calls.
               </p>
