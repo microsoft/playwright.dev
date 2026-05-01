@@ -105,7 +105,7 @@ const Home: React.FC = () => {
             <Link className={styles.getStarted} to="docs/intro">
               Get started
             </Link>
-            <GitHubStarButton owner="microsoft" repo={siteConfig.customFields.repositoryName as string} />
+            <GitHubStarButton owner="microsoft" repo="playwright" />
           </div>
         </div>
       </header>
