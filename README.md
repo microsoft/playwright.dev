@@ -70,12 +70,6 @@ You can set the `BASE_URL=https://playwright.dev` env var, otherwise `http://loc
 
 ### Publishing Doc Changes After a Release
 
-#### Automatic Cherry-picking (alternatively you can manually cherry-pick in `microsoft/playwright` repo)
-
-1. Go to the [Cherry-picking GitHub Actions workflow](https://github.com/microsoft/playwright/actions/workflows/cherry_pick_into_release_branch.yml)
-1. Execute it with the version number e.g. `1.25` and a comma separate list of commit SHA hashes (from the main branch)
-1. Wait for a PR [getting created](https://github.com/microsoft/playwright/pulls), review it and merge it
-
 #### Stable docs rolling
 
 1. Go to the [Release GitHub Actions workflow](https://github.com/microsoft/playwright.dev/actions/workflows/roll-stable.yml)
