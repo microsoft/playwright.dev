@@ -149,6 +149,9 @@ await page.getByRole('link').ariaSnapshot();
 
 **Arguments**
 - `options` [Object] *(optional)*
+  - `boxes` [boolean] *(optional)* <font size="2">Added in: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-option-boxes"/><a href="#locator-aria-snapshot-option-boxes" class="list-anchor">#</a>
+    
+    When `true`, appends each element's bounding box as `[box=x,y,width,height]` to the snapshot. Defaults to `false`.
   - `depth` [number] *(optional)* <font size="2">Added in: v1.59</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-option-depth"/><a href="#locator-aria-snapshot-option-depth" class="list-anchor">#</a>
     
     When specified, limits the depth of the snapshot.
@@ -732,6 +735,75 @@ This method drags the locator to another target locator or target position. It w
 
 ---
 
+### drop {#locator-drop}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.60</font><x-search>locator.drop</x-search>
+
+Simulate an external drag-and-drop of files or clipboard-like data onto this locator.
+
+**Usage**
+
+Drop a file buffer onto an upload area:
+
+```js
+await page.locator('#dropzone').drop({
+  files: { name: 'note.txt', mimeType: 'text/plain', buffer: Buffer.from('hello') },
+});
+```
+
+Drop plain text and a URL together:
+
+```js
+await page.locator('#dropzone').drop({
+  data: {
+    'text/plain': 'hello world',
+    'text/uri-list': 'https://example.com',
+  },
+});
+```
+
+**Arguments**
+- `payload` [Object]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drop-option-payload"/><a href="#locator-drop-option-payload" class="list-anchor">#</a>
+  - `files` [string] | [Array]&lt;[string]&gt; | [Object] | [Array]&lt;[Object]&gt; *(optional)*
+    - `name` [string]
+      
+      File name
+    - `mimeType` [string]
+      
+      File type
+    - `buffer` [Buffer]
+      
+      File content
+    
+    
+  - `data` [Object]&lt;[string], [string]&gt; *(optional)*
+    
+    
+  Data to drop onto the target. Provide `files` (file paths or in-memory buffers), `data` (a mime-type → string map for clipboard-like content such as `text/plain`, `text/html`, `text/uri-list`), or both.
+- `options` [Object] *(optional)*
+  - `position` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drop-option-position"/><a href="#locator-drop-option-position" class="list-anchor">#</a>
+    - `x` [number]
+      
+      
+    - `y` [number]
+      
+      
+    A point to use relative to the top-left corner of element padding box. If not specified, uses some visible point of the element.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drop-option-timeout"/><a href="#locator-drop-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-drop-return"/><a href="#locator-drop-return" class="list-anchor">#</a>
+
+**Details**
+
+Dispatches the native `dragenter`, `dragover`, and `drop` events at the center of the target element with a synthetic [DataTransfer] carrying the provided files and/or data entries. Works cross-browser by constructing the [DataTransfer] in the page context.
+
+If the target element's `dragover` listener does not call `preventDefault()`, the target is considered to have rejected the drop: Playwright dispatches `dragleave` and this method throws.
+
+---
+
 ### evaluate {#locator-evaluate}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.14</font><x-search>locator.evaluate</x-search>
@@ -1179,6 +1251,11 @@ await page.getByRole('button', { name: /submit/i }).click();
     An attribute that is usually set by `aria-checked` or native `<input type=checkbox>` controls.
     
     Learn more about [`aria-checked`](https://www.w3.org/TR/wai-aria-1.2/#aria-checked).
+  - `description` [string] | [RegExp] *(optional)* <font size="2">Added in: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-role-option-description"/><a href="#locator-get-by-role-option-description" class="list-anchor">#</a>
+    
+    Option to match the [accessible description](https://w3c.github.io/accname/#dfn-accessible-description). By default, matching is case-insensitive and searches for a substring, use [exact](/api/class-locator.mdx#locator-get-by-role-option-exact) to control this behavior.
+    
+    Learn more about [accessible description](https://w3c.github.io/accname/#dfn-accessible-description).
   - `disabled` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-role-option-disabled"/><a href="#locator-get-by-role-option-disabled" class="list-anchor">#</a>
     
     An attribute that is usually set by `aria-disabled` or `disabled`.
@@ -1190,7 +1267,7 @@ await page.getByRole('button', { name: /submit/i }).click();
     
   - `exact` [boolean] *(optional)* <font size="2">Added in: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-role-option-exact"/><a href="#locator-get-by-role-option-exact" class="list-anchor">#</a>
     
-    Whether [name](/api/class-locator.mdx#locator-get-by-role-option-name) is matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when [name](/api/class-locator.mdx#locator-get-by-role-option-name) is a regular expression. Note that exact match still trims whitespace.
+    Whether [name](/api/class-locator.mdx#locator-get-by-role-option-name) and [description](/api/class-locator.mdx#locator-get-by-role-option-description) are matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when the value is a regular expression. Note that exact match still trims whitespace.
   - `expanded` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-get-by-role-option-expanded"/><a href="#locator-get-by-role-option-expanded" class="list-anchor">#</a>
     
     An attribute that is usually set by `aria-expanded`.
@@ -2636,8 +2713,6 @@ To press a special key, like `Control` or `ArrowDown`, use [locator.press()](/ap
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -2667,6 +2742,8 @@ To press a special key, like `Control` or `ArrowDown`, use [locator.press()](/ap
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
