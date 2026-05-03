@@ -7,16 +7,10 @@ import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
 
-Playwright has **experimental** support for Electron automation. You can access electron namespace via:
+Playwright has **experimental** support for Electron automation, exposed as `_electron`. An example of the Electron automation script would be:
 
 ```js
-const { _electron } = require('playwright');
-```
-
-An example of the Electron automation script would be:
-
-```js
-const { _electron: electron } = require('playwright');
+import { _electron as electron } from 'playwright';
 
 (async () => {
   // Launch Electron app.
@@ -55,6 +49,113 @@ const { _electron: electron } = require('playwright');
 If you are not able to launch Electron and it will end up in timeouts during launch, try the following:
 * Ensure that `nodeCliInspect` ([FuseV1Options.EnableNodeCliInspectArguments](https://www.electronjs.org/docs/latest/tutorial/fuses#nodecliinspect)) fuse is **not** set to `false`.
 
+**Migrating from v1.59**
+
+A number of launch options have been removed after v1.59. See below for alternatives.
+* `recordHar` - use [tracing.startHar()](/api/class-tracing.mdx#tracing-start-har).
+  
+  ```js
+  const electronApp = await electron.launch({ args: ['main.js'] });
+  await electronApp.context().tracing.startHar('network.har');
+  // ... drive the app ...
+  await electronApp.context().tracing.stopHar();
+  await electronApp.close();
+  ```
+  
+* `recordVideo` - use [screencast.start()](/api/class-screencast.mdx#screencast-start) on each window.
+  
+  ```js
+  const electronApp = await electron.launch({ args: ['main.js'] });
+  const window = await electronApp.firstWindow();
+  await window.screencast.start({ path: 'video.webm' });
+  // ... drive the window ...
+  await window.screencast.stop();
+  await electronApp.close();
+  ```
+  
+* `colorScheme` - use [page.emulateMedia()](/api/class-page.mdx#page-emulate-media) on each window.
+  
+  ```js
+  const window = await electronApp.firstWindow();
+  await window.emulateMedia({ colorScheme: 'dark' });
+  ```
+  
+* `extraHTTPHeaders` - use [browserContext.setExtraHTTPHeaders()](/api/class-browsercontext.mdx#browser-context-set-extra-http-headers).
+  
+  ```js
+  await electronApp.context().setExtraHTTPHeaders({ 'X-My-Header': 'value' });
+  ```
+  
+* `geolocation` - use [browserContext.setGeolocation()](/api/class-browsercontext.mdx#browser-context-set-geolocation).
+  
+  ```js
+  await electronApp.context().setGeolocation({ latitude: 48.858455, longitude: 2.294474 });
+  ```
+  
+* `httpCredentials` - use [browserContext.setHTTPCredentials()](/api/class-browsercontext.mdx#browser-context-set-http-credentials).
+  
+  ```js
+  await electronApp.context().setHTTPCredentials({ username: 'user', password: 'pass' });
+  ```
+  
+* `offline` - use [browserContext.setOffline()](/api/class-browsercontext.mdx#browser-context-set-offline).
+  
+  ```js
+  await electronApp.context().setOffline(true);
+  ```
+  
+* `bypassCSP` - disable CSP at the `BrowserWindow` level via Electron's [web preferences](https://www.electronjs.org/docs/latest/api/structures/web-preferences). Note that `webSecurity: false` also disables CORS and the Same-Origin Policy.
+  
+  ```js
+  const win = new BrowserWindow({
+    webPreferences: {
+      webSecurity: false,
+    },
+  });
+  ```
+  
+* `ignoreHTTPSErrors`
+  
+  There are several ways to relax HTTPS checks in Electron. Pick the one that matches the scope you need.
+  
+  Per-window, allow mixed content through [web preferences](https://www.electronjs.org/docs/latest/api/structures/web-preferences):
+  
+  ```js
+  const win = new BrowserWindow({
+    webPreferences: {
+      allowRunningInsecureContent: true,
+    },
+  });
+  ```
+  
+  Process-wide, ignore certificate errors via Chromium command-line switches (must run before the `ready` event):
+  
+  ```js
+  const { app } = require('electron');
+  app.commandLine.appendSwitch('ignore-certificate-errors');
+  // Optional: also ignore localhost certificate errors when testing on an IP.
+  app.commandLine.appendSwitch('allow-insecure-localhost', 'true');
+  ```
+  
+  Per-request, accept the certificate manually via the [`certificate-error`](https://www.electronjs.org/docs/latest/api/app#event-certificate-error) event:
+  
+  ```js
+  app.on('certificate-error', (event, webContents, url, error, certificate, callback) => {
+    event.preventDefault();
+    callback(true);
+  });
+  ```
+  
+* `timezoneId` - set an environment variable at the very top of the main file, before any other logic or Chromium windows are initialized.
+  
+  ```js
+  // main.js
+  process.env.TZ = 'Europe/London';
+  
+  const { app } = require('electron');
+  // ... rest of your app logic
+  ```
+  
 
 ---
 
@@ -75,24 +176,12 @@ await electron.launch(options);
 
 **Arguments**
 - `options` [Object] *(optional)*
-  - `acceptDownloads` [boolean] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-accept-downloads"/><a href="#electron-launch-option-accept-downloads" class="list-anchor">#</a>
-    
-    Whether to automatically download all the attachments. Defaults to `true` where all the downloads are accepted.
   - `args` [Array]&lt;[string]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-args"/><a href="#electron-launch-option-args" class="list-anchor">#</a>
     
     Additional arguments to pass to the application when launching. You typically pass the main script name here.
-  - `artifactsDir` [string] *(optional)* <font size="2">Added in: v1.59</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-artifacts-dir"/><a href="#electron-launch-option-artifacts-dir" class="list-anchor">#</a>
-    
-    If specified, artifacts (traces, videos, downloads, HAR files, etc.) are saved into this directory. The directory is not cleaned up when the browser closes. If not specified, a temporary directory is used and cleaned up when the browser closes.
-  - `bypassCSP` [boolean] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-bypass-csp"/><a href="#electron-launch-option-bypass-csp" class="list-anchor">#</a>
-    
-    Toggles bypassing page's Content-Security-Policy. Defaults to `false`.
   - `chromiumSandbox` [boolean] *(optional)* <font size="2">Added in: v1.59</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-chromium-sandbox"/><a href="#electron-launch-option-chromium-sandbox" class="list-anchor">#</a>
     
     Enable Chromium sandboxing. Defaults to `false`.
-  - `colorScheme` [null] | "light" | "dark" | "no-preference" *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-color-scheme"/><a href="#electron-launch-option-color-scheme" class="list-anchor">#</a>
-    
-    Emulates [prefers-colors-scheme](https://developer.mozilla.org/en-US/docs/Web/CSS/@media/prefers-color-scheme) media feature, supported values are `'light'` and `'dark'`. See [page.emulateMedia()](/api/class-page.mdx#page-emulate-media) for more details. Passing `null` resets emulation to system defaults. Defaults to `'light'`.
   - `cwd` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-cwd"/><a href="#electron-launch-option-cwd" class="list-anchor">#</a>
     
     Current working directory to launch application from.
@@ -102,97 +191,9 @@ await electron.launch(options);
   - `executablePath` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-executable-path"/><a href="#electron-launch-option-executable-path" class="list-anchor">#</a>
     
     Launches given Electron application. If not specified, launches the default Electron executable installed in this package, located at `node_modules/.bin/electron`.
-  - `extraHTTPHeaders` [Object]&lt;[string], [string]&gt; *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-extra-http-headers"/><a href="#electron-launch-option-extra-http-headers" class="list-anchor">#</a>
-    
-    An object containing additional HTTP headers to be sent with every request. Defaults to none.
-  - `geolocation` [Object] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-geolocation"/><a href="#electron-launch-option-geolocation" class="list-anchor">#</a>
-    - `latitude` [number]
-      
-      Latitude between -90 and 90.
-    - `longitude` [number]
-      
-      Longitude between -180 and 180.
-    - `accuracy` [number] *(optional)*
-      
-      Non-negative accuracy value. Defaults to `0`.
-  - `httpCredentials` [Object] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-http-credentials"/><a href="#electron-launch-option-http-credentials" class="list-anchor">#</a>
-    - `username` [string]
-      
-      
-    - `password` [string]
-      
-      
-    - `origin` [string] *(optional)*
-      
-      Restrain sending http credentials on specific origin (scheme://host:port).
-    - `send` "unauthorized" | "always" *(optional)*
-      
-      This option only applies to the requests sent from corresponding [APIRequestContext] and does not affect requests sent from the browser. `'always'` - `Authorization` header with basic authentication credentials will be sent with the each API request. `'unauthorized` - the credentials are only sent when 401 (Unauthorized) response with `WWW-Authenticate` header is received. Defaults to `'unauthorized'`.
-    
-    Credentials for [HTTP authentication](https://developer.mozilla.org/en-US/docs/Web/HTTP/Authentication). If no origin is specified, the username and password are sent to any servers upon unauthorized responses.
-  - `ignoreHTTPSErrors` [boolean] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-ignore-https-errors"/><a href="#electron-launch-option-ignore-https-errors" class="list-anchor">#</a>
-    
-    Whether to ignore HTTPS errors when sending network requests. Defaults to `false`.
-  - `locale` [string] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-locale"/><a href="#electron-launch-option-locale" class="list-anchor">#</a>
-    
-    Specify user locale, for example `en-GB`, `de-DE`, etc. Locale will affect `navigator.language` value, `Accept-Language` request header value as well as number and date formatting rules. Defaults to the system default locale. Learn more about emulation in our [emulation guide](../emulation.mdx#locale--timezone).
-  - `offline` [boolean] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-offline"/><a href="#electron-launch-option-offline" class="list-anchor">#</a>
-    
-    Whether to emulate network being offline. Defaults to `false`. Learn more about [network emulation](../emulation.mdx#offline).
-  - `recordHar` [Object] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-record-har"/><a href="#electron-launch-option-record-har" class="list-anchor">#</a>
-    - `omitContent` [boolean] *(optional)*
-      
-      Optional setting to control whether to omit request content from the HAR. Defaults to `false`. Deprecated, use `content` policy instead.
-    - `content` "omit" | "embed" | "attach" *(optional)*
-      
-      Optional setting to control resource content management. If `omit` is specified, content is not persisted. If `attach` is specified, resources are persisted as separate files or entries in the ZIP archive. If `embed` is specified, content is stored inline the HAR file as per HAR specification. Defaults to `attach` for `.zip` output files and to `embed` for all other file extensions.
-    - `path` [string]
-      
-      Path on the filesystem to write the HAR file to. If the file name ends with `.zip`, `content: 'attach'` is used by default.
-    - `mode` "full" | "minimal" *(optional)*
-      
-      When set to `minimal`, only record information necessary for routing from HAR. This omits sizes, timing, page, cookies, security and other types of HAR information that are not used when replaying from HAR. Defaults to `full`.
-    - `urlFilter` [string] | [RegExp] *(optional)*
-      
-      A glob or regex pattern to filter requests that are stored in the HAR. When a [baseURL](/api/class-browser.mdx#browser-new-context-option-base-url) via the context options was provided and the passed URL is a path, it gets merged via the [`new URL()`](https://developer.mozilla.org/en-US/docs/Web/API/URL/URL) constructor. Defaults to none.
-    
-    Enables [HAR](http://www.softwareishard.com/blog/har-12-spec) recording for all pages into `recordHar.path` file. If not specified, the HAR is not recorded. Make sure to await [browserContext.close()](/api/class-browsercontext.mdx#browser-context-close) for the HAR to be saved.
-  - `recordVideo` [Object] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-record-video"/><a href="#electron-launch-option-record-video" class="list-anchor">#</a>
-    - `dir` [string] *(optional)*
-      
-      Path to the directory to put videos into. If not specified, the videos will be stored in `artifactsDir` (see [browserType.launch()](/api/class-browsertype.mdx#browser-type-launch) options).
-    - `size` [Object] *(optional)*
-      - `width` [number]
-        
-        Video frame width.
-      - `height` [number]
-        
-        Video frame height.
-      
-      Optional dimensions of the recorded videos. If not specified the size will be equal to `viewport` scaled down to fit into 800x800. If `viewport` is not configured explicitly the video size defaults to 800x450. Actual picture of each page will be scaled down if necessary to fit the specified size.
-    - `showActions` [Object] *(optional)*
-      - `duration` [number] *(optional)*
-        
-        How long each annotation is displayed in milliseconds. Defaults to `500`.
-      - `position` "top-left" | "top" | "top-right" | "bottom-left" | "bottom" | "bottom-right" *(optional)*
-        
-        Position of the action title overlay. Defaults to `"top-right"`.
-      - `fontSize` [number] *(optional)*
-        
-        Font size of the action title in pixels. Defaults to `24`.
-      
-      If specified, enables visual annotations on interacted elements during video recording.
-    
-    Enables video recording for all pages into `recordVideo.dir` directory. If not specified videos are not recorded. Make sure to await [browserContext.close()](/api/class-browsercontext.mdx#browser-context-close) for videos to be saved.
   - `timeout` [number] *(optional)* <font size="2">Added in: v1.15</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-timeout"/><a href="#electron-launch-option-timeout" class="list-anchor">#</a>
     
     Maximum time in milliseconds to wait for the application to start. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
-  - `timezoneId` [string] *(optional)* <font size="2">Added in: v1.12</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-timezone-id"/><a href="#electron-launch-option-timezone-id" class="list-anchor">#</a>
-    
-    Changes the timezone of the context. See [ICU's metaZones.txt](https://cs.chromium.org/chromium/src/third_party/icu/source/data/misc/metaZones.txt?rcl=faee8bc70570192d82d2978a71e2a615788597d1) for a list of supported timezone IDs. Defaults to the system timezone.
-  - `tracesDir` [string] *(optional)* <font size="2">Added in: v1.36</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-option-traces-dir"/><a href="#electron-launch-option-traces-dir" class="list-anchor">#</a>
-    
-    If specified, traces are saved into this directory.
 
 **Returns**
 - [Promise]&lt;[ElectronApplication]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="electron-launch-return"/><a href="#electron-launch-return" class="list-anchor">#</a>
@@ -219,8 +220,6 @@ await electron.launch(options);
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -250,6 +249,8 @@ await electron.launch(options);
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"

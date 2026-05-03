@@ -119,6 +119,9 @@ const page = defaultContext.pages()[0];
   - `isLocal` [boolean] *(optional)* <font size="2">Added in: v1.58</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-over-cdp-option-is-local"/><a href="#browser-type-connect-over-cdp-option-is-local" class="list-anchor">#</a>
     
     Tells Playwright that it runs on the same host as the CDP server. It will enable certain optimizations that rely upon the file system being the same between Playwright and the Browser.
+  - `noDefaults` [boolean] *(optional)* <font size="2">Added in: v1.53</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-over-cdp-option-no-defaults"/><a href="#browser-type-connect-over-cdp-option-no-defaults" class="list-anchor">#</a>
+    
+    When true, Playwright will not send default overrides to the browser on the default context. This includes `Browser.setDownloadBehavior`, `Emulation.setFocusEmulationEnabled`, and `Emulation.setEmulatedMedia`. Useful when attaching to a user's daily-driver browser where these overrides would interfere with existing browser state. New contexts created via [browser.newContext([options])](https://playwright.dev/docs/api/class-browser#browser-new-context) are not affected. Defaults to `false`.
   - `slowMo` [number] *(optional)* <font size="2">Added in: v1.11</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-over-cdp-option-slow-mo"/><a href="#browser-type-connect-over-cdp-option-slow-mo" class="list-anchor">#</a>
     
     Slows down Playwright operations by the specified amount of milliseconds. Useful so that you can see what is going on. Defaults to 0.
@@ -128,38 +131,6 @@ const page = defaultContext.pages()[0];
 
 **Returns**
 - [Promise]&lt;[Browser]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-over-cdp-return"/><a href="#browser-type-connect-over-cdp-return" class="list-anchor">#</a>
-
----
-
-### connectToWorker {#browser-type-connect-to-worker}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.60</font><x-search>browserType.connectToWorker</x-search>
-
-This method attaches Playwright to an existing JavaScript engine exposing Chrome DevTools Protocol, for example to a Node.js process or an Electron application.
-
-:::note
-
-This is only supported on `chromium`.
-:::
-
-**Usage**
-
-```js
-const worker = await playwright.chromium.connectToWorker('http://localhost:9229');
-const global = await worker.evaluate(() => globalThis);
-```
-
-**Arguments**
-- `endpoint` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-to-worker-option-endpoint"/><a href="#browser-type-connect-to-worker-option-endpoint" class="list-anchor">#</a>
-  
-  A CDP websocket endpoint or http url to connect to. For example `http://localhost:9229/` or `ws://127.0.0.1:9229/something`.
-- `options` [Object] *(optional)*
-  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-to-worker-option-timeout"/><a href="#browser-type-connect-to-worker-option-timeout" class="list-anchor">#</a>
-    
-    Maximum time in milliseconds to wait for the connection to be established. Defaults to `30000` (30 seconds). Pass `0` to disable timeout.
-
-**Returns**
-- [Promise]&lt;[Worker]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-connect-to-worker-return"/><a href="#browser-type-connect-to-worker-return" class="list-anchor">#</a>
 
 ---
 
@@ -628,6 +599,19 @@ const { chromium } = require('playwright');  // Or 'webkit' or 'firefox'.
 
 **Arguments**
 - `options` [Object] *(optional)*
+  - `allowClientNetwork` [string] *(optional)* <font size="2">Added in: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-allow-client-network"/><a href="#browser-type-launch-server-option-allow-client-network" class="list-anchor">#</a>
+    
+    This option allows the connecting client to expose its local network to the browser via [exposeNetwork](/api/class-browsertype.mdx#browser-type-connect-option-expose-network). The value is the maximum set of network rules the server will accept; the client must request a subset of these rules through `exposeNetwork`, otherwise its requests will be served directly from the server. Consists of a list of rules separated by comma.
+    
+    Available rules:
+    1. Hostname pattern, for example: `example.com`, `*.org:99`, `x.*.y.com`, `*foo.org`.
+    1. IP literal, for example: `127.0.0.1`, `0.0.0.0:99`, `[::1]`, `[0:0::1]:99`.
+    1. `<loopback>` that matches local loopback interfaces: `localhost`, `*.localhost`, `127.0.0.1`, `[::1]`.
+    
+    Some common examples:
+    1. `"*"` to allow exposing any network.
+    1. `"<loopback>"` to allow exposing localhost network.
+    1. `"*.test.internal-domain,*.staging.internal-domain,<loopback>"` to allow exposing test/staging deployments and localhost.
   - `args` [Array]&lt;[string]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-args"/><a href="#browser-type-launch-server-option-args" class="list-anchor">#</a>
     
     :::warning
@@ -675,7 +659,7 @@ const { chromium } = require('playwright');  // Or 'webkit' or 'firefox'.
     Whether to run browser in headless mode. More details for [Chromium](https://developers.google.com/web/updates/2017/04/headless-chrome) and [Firefox](https://hacks.mozilla.org/2017/12/using-headless-mode-in-firefox/). Defaults to `true`.
   - `host` [string] *(optional)* <font size="2">Added in: v1.45</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-host"/><a href="#browser-type-launch-server-option-host" class="list-anchor">#</a>
     
-    Host to use for the web socket. It is optional and if it is omitted, the server will accept connections on the unspecified IPv6 address (::) when IPv6 is available, or the unspecified IPv4 address (0.0.0.0) otherwise. Consider hardening it with picking a specific interface.
+    Host to use for the web socket. It is optional and defaults to `localhost`, accepting connections only from the loopback interface. Pass an explicit address (e.g. `0.0.0.0`) to accept connections from the network — be aware this exposes the browser RPC to anything that can reach the listening port.
   - `ignoreDefaultArgs` [boolean] | [Array]&lt;[string]&gt; *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-type-launch-server-option-ignore-default-args"/><a href="#browser-type-launch-server-option-ignore-default-args" class="list-anchor">#</a>
     
     If `true`, Playwright does not pass its own configurations args and only uses the ones from [args](/api/class-browsertype.mdx#browser-type-launch-server-option-args). If an array is given, then filters out the given default arguments. Dangerous option; use with care. Defaults to `false`.
@@ -762,8 +746,6 @@ browserType.name();
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -793,6 +775,8 @@ browserType.name();
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"

@@ -1,13 +1,13 @@
 ---
-id: class-apiresponseassertions
-title: "APIResponseAssertions"
+id: class-formdata
+title: "FormData"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
 
-The [APIResponseAssertions] class provides assertion methods that can be used to make assertions about the [APIResponse] in the tests.
+The [FormData] is used create form data that is sent via [APIRequestContext].
 
 <Tabs
   groupId="python-flavor"
@@ -20,24 +20,22 @@ The [APIResponseAssertions] class provides assertion methods that can be used to
 <TabItem value="sync">
 
 ```py
-from playwright.sync_api import Page, expect
-
-def test_navigates_to_login_page(page: Page) -> None:
-    # ..
-    response = page.request.get('https://playwright.dev')
-    expect(response).to_be_ok()
+form = FormData()
+form.set("firstName", "John")
+form.set("lastName", "Doe")
+form.set("age", 30)
+page.request.post("http://localhost/submit", form=form)
 ```
 
 </TabItem>
 <TabItem value="async">
 
 ```py
-from playwright.async_api import Page, expect
-
-async def test_navigates_to_login_page(page: Page) -> None:
-    # ..
-    response = await page.request.get('https://playwright.dev')
-    await expect(response).to_be_ok()
+form = FormData()
+form.set("firstName", "John")
+form.set("lastName", "Doe")
+form.set("age", 30)
+await page.request.post("http://localhost/submit", form=form)
 ```
 
 </TabItem>
@@ -48,30 +46,13 @@ async def test_navigates_to_login_page(page: Page) -> None:
 
 ## Methods
 
-### not_to_be_ok {#api-response-assertions-not-to-be-ok}
+### append {#form-data-append}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.19</font><x-search>apiResponseAssertions.not_to_be_ok</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.44</font><x-search>formData.append</x-search>
 
-The opposite of [expect(response).to_be_ok()](/api/class-apiresponseassertions.mdx#api-response-assertions-to-be-ok).
+Appends a new value onto an existing key inside a FormData object, or adds the key if it does not already exist. File values can be passed either as `Path` or as `FilePayload`. Multiple fields with the same name can be added.
 
-**Usage**
-
-```python
-expect(response).not_to_be_ok()
-```
-
-**Returns**
-- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-response-assertions-not-to-be-ok-return"/><a href="#api-response-assertions-not-to-be-ok-return" class="list-anchor">#</a>
-
----
-
-### to_be_ok {#api-response-assertions-to-be-ok}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.18</font><x-search>apiResponseAssertions.to_be_ok</x-search>
-
-Ensures the response status code is within `200..299` range.
-
-**Usage**
+The difference between [form_data.set()](/api/class-formdata.mdx#form-data-set) and [form_data.append()](/api/class-formdata.mdx#form-data-append) is that if the specified key already exists, [form_data.set()](/api/class-formdata.mdx#form-data-set) will overwrite all existing values with the new one, whereas [form_data.append()](/api/class-formdata.mdx#form-data-append) will append the new value onto the end of the existing set of values.
 
 <Tabs
   groupId="python-flavor"
@@ -84,28 +65,148 @@ Ensures the response status code is within `200..299` range.
 <TabItem value="sync">
 
 ```py
-import re
-from playwright.sync_api import expect
-
-# ...
-expect(response).to_be_ok()
+form = FormData()
+# Only name and value are set.
+form.append("firstName", "John")
+# Name and value are set, filename and Content-Type are inferred from the file path.
+form.append("attachment", Path("pic.jpg"))
+# Name, value, filename and Content-Type are set.
+form.append("attachment", {
+    "name": "table.csv",
+    "mimeType": "text/csv",
+    "buffer": Path("my-table.csv").read_bytes(),
+})
+page.request.post("http://localhost/submit", multipart=form)
 ```
 
 </TabItem>
 <TabItem value="async">
 
 ```py
-from playwright.async_api import expect
-
-# ...
-await expect(response).to_be_ok()
+form = FormData()
+# Only name and value are set.
+form.append("firstName", "John")
+# Name and value are set, filename and Content-Type are inferred from the file path.
+form.append("attachment", Path("pic.jpg"))
+# Name, value, filename and Content-Type are set.
+form.append("attachment", {
+    "name": "table.csv",
+    "mimeType": "text/csv",
+    "buffer": Path("my-table.csv").read_bytes(),
+})
+await page.request.post("http://localhost/submit", multipart=form)
 ```
 
 </TabItem>
 </Tabs>
 
+**Usage**
+
+```python
+form_data.append(name, value)
+```
+
+**Arguments**
+- `name` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="form-data-append-option-name"/><a href="#form-data-append-option-name" class="list-anchor">#</a>
+  
+  Field name.
+- `value` [str] | [bool] | [int] | [Path] | [Dict]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="form-data-append-option-value"/><a href="#form-data-append-option-value" class="list-anchor">#</a>
+  - `name` [str]
+    
+    File name
+  - `mimeType` [str]
+    
+    File type
+  - `buffer` [bytes]
+    
+    File content
+  
+  Field value.
+
 **Returns**
-- [NoneType]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="api-response-assertions-to-be-ok-return"/><a href="#api-response-assertions-to-be-ok-return" class="list-anchor">#</a>
+- [FormData]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="form-data-append-return"/><a href="#form-data-append-return" class="list-anchor">#</a>
+
+---
+
+### set {#form-data-set}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.18</font><x-search>formData.set</x-search>
+
+Sets a field on the form. File values can be passed either as `Path` or as `FilePayload`.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+form = FormData()
+# Only name and value are set.
+form.set("firstName", "John")
+# Name and value are set, filename and Content-Type are inferred from the file path.
+form.set("profilePicture1", Path("john.jpg"))
+# Name, value, filename and Content-Type are set.
+form.set("profilePicture2", {
+    "name": "john.jpg",
+    "mimeType": "image/jpeg",
+    "buffer": Path("john.jpg").read_bytes(),
+})
+form.set("age", 30)
+page.request.post("http://localhost/submit", multipart=form)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+form = FormData()
+# Only name and value are set.
+form.set("firstName", "John")
+# Name and value are set, filename and Content-Type are inferred from the file path.
+form.set("profilePicture1", Path("john.jpg"))
+# Name, value, filename and Content-Type are set.
+form.set("profilePicture2", {
+    "name": "john.jpg",
+    "mimeType": "image/jpeg",
+    "buffer": Path("john.jpg").read_bytes(),
+})
+form.set("age", 30)
+await page.request.post("http://localhost/submit", multipart=form)
+```
+
+</TabItem>
+</Tabs>
+
+**Usage**
+
+```python
+form_data.set(name, value)
+```
+
+**Arguments**
+- `name` [str]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="form-data-set-option-name"/><a href="#form-data-set-option-name" class="list-anchor">#</a>
+  
+  Field name.
+- `value` [str] | [bool] | [int] | [Path] | [Dict]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="form-data-set-option-value"/><a href="#form-data-set-option-value" class="list-anchor">#</a>
+  - `name` [str]
+    
+    File name
+  - `mimeType` [str]
+    
+    File type
+  - `buffer` [bytes]
+    
+    File content
+  
+  Field value.
+
+**Returns**
+- [FormData]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="form-data-set-return"/><a href="#form-data-set-return" class="list-anchor">#</a>
 
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
