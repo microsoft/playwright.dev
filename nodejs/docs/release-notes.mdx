@@ -9,6 +9,102 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 import LiteYouTube from '@site/src/components/LiteYouTube';
 
+## Version 1.60
+
+### 🌐 HAR recording on Tracing
+
+[tracing.startHar()](/api/class-tracing.mdx#tracing-start-har) / [tracing.stopHar()](/api/class-tracing.mdx#tracing-stop-har) expose HAR recording as a first-class tracing API, with the same `content`, `mode` and `urlFilter` options as `recordHar`. The returned [Disposable] makes it easy to scope a recording with `await using`:
+
+```js
+await using har = await context.tracing.startHar('trace.har');
+const page = await context.newPage();
+await page.goto('https://playwright.dev');
+// HAR is finalized when `har` goes out of scope.
+```
+
+### 🪝 Drop API
+
+New [locator.drop()](/api/class-locator.mdx#locator-drop) simulates an external drag-and-drop of files or clipboard-like data onto an element. Playwright dispatches `dragenter`, `dragover`, and `drop` with a synthetic [DataTransfer] in the page context — works cross-browser and is great for testing upload zones:
+
+```js
+await page.locator('#dropzone').drop({
+  files: { name: 'note.txt', mimeType: 'text/plain', buffer: Buffer.from('hello') },
+});
+
+await page.locator('#dropzone').drop({
+  data: {
+    'text/plain': 'hello world',
+    'text/uri-list': 'https://example.com',
+  },
+});
+```
+
+### 🎯 Aria snapshots
+- [expect(page).toMatchAriaSnapshot()](/api/class-pageassertions.mdx#page-assertions-to-match-aria-snapshot) now works on a [Page], in addition to a [Locator] — equivalent to asserting against `page.locator('body')`.
+- New `boxes` option on [locator.ariaSnapshot()](/api/class-locator.mdx#locator-aria-snapshot) / [page.ariaSnapshot()](/api/class-page.mdx#page-aria-snapshot) appends each element's bounding box as `[box=x,y,width,height]`, useful for AI consumption.
+
+### 🛑 test.abort()
+
+New [test.abort()](/api/class-test.mdx#test-abort) aborts the currently running test from a fixture, hook, or route handler with an optional message. Use it when you have detected an unrecoverable misuse and want to fail the test right away:
+
+```js
+test('does not publish to the shared page', async ({ page }) => {
+  await page.route('**/publish', route => {
+    test.abort('Tests must not publish to the shared page. Use the `clone` option.');
+    return route.abort();
+  });
+  // ...
+});
+```
+
+### New APIs
+
+#### Browser, Context and Page
+- Event [browser.on('context')](/api/class-browser.mdx#browser-event-context) — fired when a new context is created on the browser.
+- [BrowserContext] now mirrors lifecycle events from its pages: [browserContext.on('download')](/api/class-browsercontext.mdx#browser-context-event-download), [browserContext.on('frameattached')](/api/class-browsercontext.mdx#browser-context-event-frame-attached), [browserContext.on('framedetached')](/api/class-browsercontext.mdx#browser-context-event-frame-detached), [browserContext.on('framenavigated')](/api/class-browsercontext.mdx#browser-context-event-frame-navigated), [browserContext.on('pageclose')](/api/class-browsercontext.mdx#browser-context-event-page-close), [browserContext.on('pageload')](/api/class-browsercontext.mdx#browser-context-event-page-load).
+
+#### Locators and Assertions
+- New option `description` in [page.getByRole()](/api/class-page.mdx#page-get-by-role) / [locator.getByRole()](/api/class-locator.mdx#locator-get-by-role) / [frame.getByRole()](/api/class-frame.mdx#frame-get-by-role) / [frameLocator.getByRole()](/api/class-framelocator.mdx#frame-locator-get-by-role) for matching the [accessible description](https://www.w3.org/TR/wai-aria-1.2/#dfn-accessible-description).
+- New option `pseudo` in [expect(locator).toHaveCSS()](/api/class-locatorassertions.mdx#locator-assertions-to-have-css) reads computed styles from `::before` or `::after`.
+- New option `style` in [locator.highlight()](/api/class-locator.mdx#locator-highlight) applies extra inline CSS to the highlight overlay, plus new [page.hideHighlight()](/api/class-page.mdx#page-hide-highlight) to clear all highlights.
+
+#### Network
+- [webSocketRoute.protocols()](/api/class-websocketroute.mdx#web-socket-route-protocols) returns the WebSocket subprotocols requested by the page.
+- New option `noDefaults` in [browserType.connectOverCDP()](/api/class-browsertype.mdx#browser-type-connect-over-cdp) disables Playwright's default overrides on the default context (download behavior, focus emulation, media emulation), so attaching to a user's daily-driver browser doesn't disturb its state.
+
+#### Errors and Reporting
+- New [webError.location()](/api/class-weberror.mdx#web-error-location) mirrors [consoleMessage.location()](/api/class-consolemessage.mdx#console-message-location).
+- [consoleMessage.location()](/api/class-consolemessage.mdx#console-message-location) now exposes `line` / `column` properties (`lineNumber` / `columnNumber` are deprecated).
+- New [testInfoError.errorContext](/api/class-testinfoerror.mdx#test-info-error-error-context) surfaces additional diagnostic context, such as the aria snapshot of the receiver at the time of an `expect(...)` matcher failure.
+- [reporter.onError()](/api/class-reporter.mdx#reporter-on-error) now receives a `workerInfo` argument with details about the worker for fixture teardown errors.
+
+#### Test runner
+- New `{testFileBaseName}` token in [testProject.snapshotPathTemplate](/api/class-testproject.mdx#test-project-snapshot-path-template) — file name without extension.
+- Test runner now errors when a config tries to override a non-option fixture, and rejects `workers: 0` or negative values.
+
+### 🛠️ Other improvements
+- HTML reporter:
+  - `npx playwright show-report` accepts `.zip` files directly — no need to unzip first.
+  - Steps that contain attachments inside nested children show an indicator on the parent step.
+  - The `repeatEachIndex` is shown in the test header when non-zero.
+- Trace Viewer adds a pretty-print toggle for JSON / form request and response bodies in the network details panel.
+
+### Breaking Changes ⚠️
+- Removed long-deprecated APIs:
+  - `Locator.ariaRef()` — use the standard [locator.ariaSnapshot()](/api/class-locator.mdx#locator-aria-snapshot) pipeline.
+  - `handle` option on `BrowserContext.exposeBinding` and `Page.exposeBinding`.
+  - `logger` option on `BrowserType.connect` and `BrowserType.connectOverCDP` — use [tracing](./trace-viewer.mdx) instead.
+  - Context options `videosPath` / `videoSize` — use `recordVideo` instead.
+
+### Browser Versions
+- Chromium 148.0.7778.96
+- Mozilla Firefox 150.0.2
+- WebKit 26.4
+
+This version was also tested against the following stable channels:
+- Google Chrome 147
+- Microsoft Edge 147
+
 ## Version 1.59
 
 ### 🎬 Screencast
@@ -3439,11 +3535,6 @@ This version of Playwright was also tested against the following stable channels
 - WebKit 14.1
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -3491,6 +3582,11 @@ This version of Playwright was also tested against the following stable channels
 [Worker]: /api/class-worker.mdx "Worker"
 [Electron]: /api/class-electron.mdx "Electron"
 [ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
