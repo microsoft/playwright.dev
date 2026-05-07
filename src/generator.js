@@ -74,11 +74,11 @@ class Generator {
     this.generatedFiles = new Set();
     this.formatter = formatter;
 
-    this.documentation = parseApi(path.join(srcDir, 'api'))
-      .mergeWith(parseApi(path.join(srcDir, 'electron-api'), path.join(srcDir, 'api', 'params.md')))
-      .mergeWith(parseApi(path.join(srcDir, 'mobile-api'), path.join(srcDir, 'api', 'params.md')))
-      .mergeWith(parseApi(path.join(srcDir, 'test-api'), path.join(srcDir, 'api', 'params.md')))
-      .mergeWith(parseApi(path.join(srcDir, 'test-reporter-api')));
+    const paramsPath = path.join(srcDir, 'api', 'params.md');
+    const apiDirs = fs.readdirSync(srcDir).filter(name => name === 'api' || name.endsWith('-api'));
+    this.documentation = apiDirs
+      .map(dir => parseApi(path.join(srcDir, dir), dir === 'api' ? undefined : paramsPath))
+      .reduce((acc, doc) => acc.mergeWith(doc));
     this.documentation.filterForLanguage(lang, { csharpOptionOverloadsShortNotation: true });
     this.documentation.setLinkRenderer(item => {
       const { clazz, member, param, option, href } = item;
