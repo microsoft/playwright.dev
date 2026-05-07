@@ -76,6 +76,7 @@ class Generator {
 
     this.documentation = parseApi(path.join(srcDir, 'api'))
       .mergeWith(parseApi(path.join(srcDir, 'electron-api'), path.join(srcDir, 'api', 'params.md')))
+      .mergeWith(parseApi(path.join(srcDir, 'mobile-api'), path.join(srcDir, 'api', 'params.md')))
       .mergeWith(parseApi(path.join(srcDir, 'test-api'), path.join(srcDir, 'api', 'params.md')))
       .mergeWith(parseApi(path.join(srcDir, 'test-reporter-api')));
     this.documentation.filterForLanguage(lang, { csharpOptionOverloadsShortNotation: true });
