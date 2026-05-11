@@ -320,6 +320,57 @@ web_socket_route.connect_to_server
 
 ---
 
+### protocols {#web-socket-route-protocols}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.60</font><x-search>webSocketRoute.protocols</x-search>
+
+The list of WebSocket subprotocols requested by the page, as passed via the second argument to the [`WebSocket` constructor](https://developer.mozilla.org/en-US/docs/Web/API/WebSocket/WebSocket). Corresponds to the `Sec-WebSocket-Protocol` request header.
+
+Returns an empty array if no protocols were specified.
+
+**Usage**
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+def handler(ws: WebSocketRoute):
+  if "chat.v2" in ws.protocols:
+    ws.on_message(lambda message: ws.send(f"v2:{message}"))
+  else:
+    ws.close(code=1002, reason="Unsupported protocol")
+
+page.route_web_socket("wss://example.com/ws", handler)
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+async def handler(ws: WebSocketRoute):
+  if "chat.v2" in ws.protocols:
+    ws.on_message(lambda message: ws.send(f"v2:{message}"))
+  else:
+    await ws.close(code=1002, reason="Unsupported protocol")
+
+await page.route_web_socket("wss://example.com/ws", handler)
+```
+
+</TabItem>
+</Tabs>
+
+**Returns**
+- [List]\[[str]\]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-socket-route-protocols-return"/><a href="#web-socket-route-protocols-return" class="list-anchor">#</a>
+
+---
+
 ### url {#web-socket-route-url}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.48</font><x-search>webSocketRoute.url</x-search>
@@ -352,6 +403,7 @@ web_socket_route.url
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [Error]: /api/class-error.mdx "Error"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[FormData]: /api/class-formdata.mdx "FormData"
 [Frame]: /api/class-frame.mdx "Frame"
 [FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
 [JSHandle]: /api/class-jshandle.mdx "JSHandle"
