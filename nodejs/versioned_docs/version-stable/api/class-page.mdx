@@ -272,6 +272,9 @@ await page.ariaSnapshot(options);
 
 **Arguments**
 - `options` [Object] *(optional)*
+  - `boxes` [boolean] *(optional)* <font size="2">Added in: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-aria-snapshot-option-boxes"/><a href="#page-aria-snapshot-option-boxes" class="list-anchor">#</a>
+    
+    When `true`, appends each element's bounding box as `[box=x,y,width,height]` to the snapshot. Coordinates are relative to the viewport, in CSS pixels, as returned by [`Element.getBoundingClientRect()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect). Defaults to `false`.
   - `depth` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-aria-snapshot-option-depth"/><a href="#page-aria-snapshot-option-depth" class="list-anchor">#</a>
     
     When specified, limits the depth of the snapshot.
@@ -719,15 +722,6 @@ const { webkit } = require('playwright');  // Or 'chromium' or 'firefox'.
 - `callback` [function]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-expose-binding-option-callback"/><a href="#page-expose-binding-option-callback" class="list-anchor">#</a>
   
   Callback function that will be called in the Playwright's context.
-- `options` [Object] *(optional)*
-  - `handle` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-expose-binding-option-handle"/><a href="#page-expose-binding-option-handle" class="list-anchor">#</a>
-    
-    :::warning[Deprecated]
-    This option will be removed in the future.
-    :::
-    
-    
-    Whether to pass the argument as a handle, instead of passing by value. When passing a handle, only one argument is supported. When passing by value, multiple arguments are supported.
 
 **Returns**
 - [Promise]&lt;[Disposable]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-expose-binding-return"/><a href="#page-expose-binding-return" class="list-anchor">#</a>
@@ -1005,6 +999,11 @@ await page.getByRole('button', { name: /submit/i }).click();
     An attribute that is usually set by `aria-checked` or native `<input type=checkbox>` controls.
     
     Learn more about [`aria-checked`](https://www.w3.org/TR/wai-aria-1.2/#aria-checked).
+  - `description` [string] | [RegExp] *(optional)* <font size="2">Added in: v1.60</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-get-by-role-option-description"/><a href="#page-get-by-role-option-description" class="list-anchor">#</a>
+    
+    Option to match the [accessible description](https://w3c.github.io/accname/#dfn-accessible-description). By default, matching is case-insensitive and searches for a substring, use [exact](/api/class-page.mdx#page-get-by-role-option-exact) to control this behavior.
+    
+    Learn more about [accessible description](https://w3c.github.io/accname/#dfn-accessible-description).
   - `disabled` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-get-by-role-option-disabled"/><a href="#page-get-by-role-option-disabled" class="list-anchor">#</a>
     
     An attribute that is usually set by `aria-disabled` or `disabled`.
@@ -1016,7 +1015,7 @@ await page.getByRole('button', { name: /submit/i }).click();
     
   - `exact` [boolean] *(optional)* <font size="2">Added in: v1.28</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-get-by-role-option-exact"/><a href="#page-get-by-role-option-exact" class="list-anchor">#</a>
     
-    Whether [name](/api/class-page.mdx#page-get-by-role-option-name) is matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when [name](/api/class-page.mdx#page-get-by-role-option-name) is a regular expression. Note that exact match still trims whitespace.
+    Whether [name](/api/class-page.mdx#page-get-by-role-option-name) and [description](/api/class-page.mdx#page-get-by-role-option-description) are matched exactly: case-sensitive and whole-string. Defaults to false. Ignored when the value is a regular expression. Note that exact match still trims whitespace.
   - `expanded` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-get-by-role-option-expanded"/><a href="#page-get-by-role-option-expanded" class="list-anchor">#</a>
     
     An attribute that is usually set by `aria-expanded`.
@@ -1312,6 +1311,23 @@ await page.goto(url, options);
 
 **Returns**
 - [Promise]&lt;[null] | [Response]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-goto-return"/><a href="#page-goto-return" class="list-anchor">#</a>
+
+---
+
+### hideHighlight {#page-hide-highlight}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.60</font><x-search>page.hideHighlight</x-search>
+
+Hide all locator highlight overlays previously added by [locator.highlight()](/api/class-locator.mdx#locator-highlight) on this page.
+
+**Usage**
+
+```js
+await page.hideHighlight();
+```
+
+**Returns**
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-hide-highlight-return"/><a href="#page-hide-highlight-return" class="list-anchor">#</a>
 
 ---
 
@@ -4633,11 +4649,6 @@ await page.waitForTimeout(1000);
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-wait-for-timeout-return"/><a href="#page-wait-for-timeout-return" class="list-anchor">#</a>
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -4654,8 +4665,6 @@ await page.waitForTimeout(1000);
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -4685,6 +4694,13 @@ await page.waitForTimeout(1000);
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
