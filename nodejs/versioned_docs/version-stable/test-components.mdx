@@ -253,6 +253,29 @@ Here is how component testing works:
 
 Playwright is using [Vite](https://vitejs.dev/) to create the components bundle and serve it.
 
+## Best practices and pitfalls
+
+Component tests are most reliable when they embrace the fact that the test runs in Node.js while the mounted component runs in the browser.
+
+### Prefer mounting inside each test
+
+Keep `mount()` close to the assertions that use it. Mounting in `beforeEach` makes it harder to see which component state belongs to which test and tends to hide accidental coupling between tests.
+
+```js
+test('renders the product name', async ({ mount }) => {
+  const component = await mount(<ProductCard name="Playwright" />);
+  await expect(component).toContainText('Playwright');
+});
+```
+
+### Module mocks do not cross the Node/browser boundary
+
+Module-level mocks such as `vi.mock()` or `jest.mock()` run in the test process. The component bundle runs in the browser, so those mocks do not automatically affect what the component imports at runtime. Prefer passing test-specific behavior through [`hooksConfig`](#hooks) and configuring it in `playwright/index.{js,ts,jsx,tsx}` with `beforeMount`.
+
+### Reset browser state when a component depends on globals
+
+Component testing may reuse the browser `context` and `page` between tests as a performance optimization. If a component depends on global browser state such as `localStorage`, cookies, singleton services, or router state, reset that state in your test setup or in [`beforeMount`](#hooks) so each test starts from a known baseline.
+
 ## API reference
 
 ### props
@@ -758,11 +781,6 @@ test('override initialState ', async ({ mount }) => {
 Accessing a component's internal methods or its instance within test code is neither recommended nor supported. Instead, focus on observing and interacting with the component from a user's perspective, typically by clicking or verifying if something is visible on the page. Tests become less fragile and more valuable when they avoid interacting with internal implementation details, such as the component instance or its methods. Keep in mind that if a test fails when run from a user’s perspective, it likely means the automated test has uncovered a genuine bug in your code.
 
 
-[Android]: /api/class-android.mdx "Android"
-[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
-[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
-[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
-[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
 [APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
 [APIResponse]: /api/class-apiresponse.mdx "APIResponse"
@@ -779,8 +797,6 @@ Accessing a component's internal methods or its instance within test code is nei
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
-[Electron]: /api/class-electron.mdx "Electron"
-[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [FileChooser]: /api/class-filechooser.mdx "FileChooser"
 [Frame]: /api/class-frame.mdx "Frame"
@@ -810,6 +826,13 @@ Accessing a component's internal methods or its instance within test code is nei
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
 [Worker]: /api/class-worker.mdx "Worker"
+[Electron]: /api/class-electron.mdx "Electron"
+[ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
+[Android]: /api/class-android.mdx "Android"
+[AndroidDevice]: /api/class-androiddevice.mdx "AndroidDevice"
+[AndroidInput]: /api/class-androidinput.mdx "AndroidInput"
+[AndroidSocket]: /api/class-androidsocket.mdx "AndroidSocket"
+[AndroidWebView]: /api/class-androidwebview.mdx "AndroidWebView"
 [Fixtures]: /api/class-fixtures.mdx "Fixtures"
 [FullConfig]: /api/class-fullconfig.mdx "FullConfig"
 [FullProject]: /api/class-fullproject.mdx "FullProject"
