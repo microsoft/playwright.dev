@@ -9,6 +9,77 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 import LiteYouTube from '@site/src/components/LiteYouTube';
 
+## Version 1.60
+
+### 🌐 HAR recording on Tracing
+
+[Tracing.StartHarAsync()](/api/class-tracing.mdx#tracing-start-har) / [Tracing.StopHarAsync()](/api/class-tracing.mdx#tracing-stop-har) expose HAR recording as a first-class tracing API, with the same `Content`, `Mode` and `UrlFilter` options as `RecordHar`:
+
+```csharp
+await context.Tracing.StartHarAsync("trace.har");
+var page = await context.NewPageAsync();
+await page.GotoAsync("https://playwright.dev");
+await context.Tracing.StopHarAsync();
+```
+
+### 🪝 Drop API
+
+New [Locator.DropAsync()](/api/class-locator.mdx#locator-drop) simulates an external drag-and-drop of files or clipboard-like data onto an element. Playwright dispatches `dragenter`, `dragover`, and `drop` with a synthetic [DataTransfer] in the page context — works cross-browser and is great for testing upload zones:
+
+```csharp
+await page.Locator("#dropzone").DropAsync(new() {
+    Files = new FilePayload() {
+        Name = "note.txt",
+        MimeType = "text/plain",
+        Buffer = Encoding.UTF8.GetBytes("hello"),
+    },
+});
+
+await page.Locator("#dropzone").DropAsync(new() {
+    Data = new Dictionary<string, string> {
+        ["text/plain"] = "hello world",
+        ["text/uri-list"] = "https://example.com",
+    },
+});
+```
+
+### 🎯 Aria snapshots
+- [Expect(Page).ToMatchAriaSnapshotAsync()](/api/class-pageassertions.mdx#page-assertions-to-match-aria-snapshot) now works on a [Page], in addition to a [Locator] — equivalent to asserting against `Page.Locator("body")`.
+- New `Boxes` option on [Locator.AriaSnapshotAsync()](/api/class-locator.mdx#locator-aria-snapshot) / [Page.AriaSnapshotAsync()](/api/class-page.mdx#page-aria-snapshot) appends each element's bounding box as `[box=x,y,width,height]`, useful for AI consumption.
+
+### New APIs
+
+#### Browser, Context and Page
+- Event [Browser.Context](/api/class-browser.mdx#browser-event-context) — fired when a new context is created on the browser.
+- [BrowserContext] now mirrors lifecycle events from its pages: [BrowserContext.Download](/api/class-browsercontext.mdx#browser-context-event-download), [BrowserContext.FrameAttached](/api/class-browsercontext.mdx#browser-context-event-frame-attached), [BrowserContext.FrameDetached](/api/class-browsercontext.mdx#browser-context-event-frame-detached), [BrowserContext.FrameNavigated](/api/class-browsercontext.mdx#browser-context-event-frame-navigated), [BrowserContext.PageClose](/api/class-browsercontext.mdx#browser-context-event-page-close), [BrowserContext.PageLoad](/api/class-browsercontext.mdx#browser-context-event-page-load).
+
+#### Locators and Assertions
+- New option `Description` in [Page.GetByRole()](/api/class-page.mdx#page-get-by-role) / [Locator.GetByRole()](/api/class-locator.mdx#locator-get-by-role) / [Frame.GetByRole()](/api/class-frame.mdx#frame-get-by-role) / [FrameLocator.GetByRole()](/api/class-framelocator.mdx#frame-locator-get-by-role) for matching the [accessible description](https://www.w3.org/TR/wai-aria-1.2/#dfn-accessible-description).
+- New option `Pseudo` in [Expect(Locator).ToHaveCSSAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-css) reads computed styles from `::before` or `::after`.
+- New option `Style` in [Locator.HighlightAsync()](/api/class-locator.mdx#locator-highlight) applies extra inline CSS to the highlight overlay, plus new [Page.HideHighlightAsync()](/api/class-page.mdx#page-hide-highlight) to clear all highlights.
+
+#### Network
+- [WebSocketRoute.Protocols](/api/class-websocketroute.mdx#web-socket-route-protocols) returns the WebSocket subprotocols requested by the page.
+- New option `NoDefaults` in [BrowserType.ConnectOverCDPAsync()](/api/class-browsertype.mdx#browser-type-connect-over-cdp) disables Playwright's default overrides on the default context (download behavior, focus emulation, media emulation), so attaching to a user's daily-driver browser doesn't disturb its state.
+
+#### Errors
+- New [WebError.Location](/api/class-weberror.mdx#web-error-location) mirrors [ConsoleMessage.Location](/api/class-consolemessage.mdx#console-message-location).
+
+### 🛠️ Other improvements
+- Trace Viewer adds a pretty-print toggle for JSON / form request and response bodies in the network details panel.
+
+### Breaking Changes ⚠️
+- Removed long-deprecated `Handle` option on `BrowserContext.ExposeBindingAsync` and `Page.ExposeBindingAsync`.
+
+### Browser Versions
+- Chromium 148.0.7778.96
+- Mozilla Firefox 150.0.2
+- WebKit 26.4
+
+This version was also tested against the following stable channels:
+- Google Chrome 147
+- Microsoft Edge 147
+
 ## Version 1.59
 
 ### 🎬 Screencast
