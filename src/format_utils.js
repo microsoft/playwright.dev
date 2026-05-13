@@ -110,6 +110,8 @@ function tabLabel(groupId, value) {
     return 'VS Code';
   if (value === 'claude')
     return 'Claude Code';
+  if (value === 'codex')
+    return 'Codex';
   if (value === 'opencode')
     return 'OpenCode';
   throw new Error(`Unknown label type: ${value}`)
