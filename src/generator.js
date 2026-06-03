@@ -239,7 +239,7 @@ ${this.documentation.renderLinksInText(clazz.deprecated)}
         const memberNode = { type: 'h3', children: [], text: '' };
         if (!this.heading2ExplicitId.has(member))
           throw new Error(`Header ${name} needs to have an explicit ID`)
-        memberNode.text = `${name} {#${this.heading2ExplicitId.get(member)}}`;
+        memberNode.text = `${name} {/* #${this.heading2ExplicitId.get(member)} */}`;
 
         const sections = {
           /** @type {MarkdownNode[]} */
