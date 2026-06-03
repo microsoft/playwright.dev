@@ -9,7 +9,7 @@ jobs:
     name: Build
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/github-script@v7
+      - uses: actions/github-script@v8
         id: determine-version
         with:
           script: |
@@ -25,13 +25,13 @@ jobs:
             });
             return relevantBranches.pop().name.replace(/^release-/, '');
           result-encoding: string
-      - uses: actions/checkout@v4
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+      - uses: actions/checkout@v5
         with:
           repository: 'microsoft/playwright'
           path: playwright
           ref: 'release-${{ steps.determine-version.outputs.result }}'
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v5
         with:
           node-version: 22
       - name: Install dependencies
@@ -72,7 +72,7 @@ jobs:
       - uses: actions/create-github-app-token@v3
         id: app-token
         with:
-          app-id: ${{ vars.PLAYWRIGHT_APP_ID }}
+          client-id: ${{ vars.PLAYWRIGHT_CLIENT_ID }}
           private-key: ${{ secrets.PLAYWRIGHT_PRIVATE_KEY }}
       - name: Check for existing Pull Request
         id: check-pr
