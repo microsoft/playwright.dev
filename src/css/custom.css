@@ -112,6 +112,46 @@ x-search {
 }
 
 
-:root {
-  --docsearch-muted-color: #666c77 !important;
+/* ----------------------------------------------------------------------------
+   Algolia DocSearch — brand colour alignment
+   DocSearch v4 ships Algolia-blue/indigo accents and navy dark-mode surfaces
+   that clash with the Playwright palette. Docusaurus maps
+   --docsearch-primary-color to --ifm-color-primary (green), but the v4 accent
+   variables below are NOT mapped and keep their defaults, so we override them.
+   `:root:root` raises specificity above DocSearch's own later-injected `:root`
+   without needing !important. The Algolia logo stays blue on purpose: its SVG
+   uses hardcoded fills and the free tier requires the mark to stay unmodified.
+---------------------------------------------------------------------------- */
+:root:root {
+  /* Blue -> Playwright green: magnifier, search/back icons, links, hit marks */
+  --docsearch-highlight-color: var(--ifm-color-primary);
+  /* Selected result row + action hover: blue tint -> green tint */
+  --docsearch-hit-highlight-color: rgba(26, 126, 31, 0.1);
+  --docsearch-soft-primary-color: rgba(26, 126, 31, 0.1);
+  /* Indigo-tinted greys -> neutral */
+  --docsearch-muted-color: #666c77;
+  --docsearch-secondary-text-color: #5e6a75;
+  --docsearch-icon-color: #5e6a75;
+  --docsearch-subtle-color: #e3e3e7;
+}
+
+:root[data-theme='dark'] {
+  /* Navy/indigo surfaces -> neutral Playwright dark */
+  --docsearch-modal-background: #242526;
+  --docsearch-hit-background: #1b1b1d;
+  --docsearch-background-color: #1b1b1d;
+  --docsearch-text-color: #e3e3e3;
+  --docsearch-secondary-text-color: #a0a6ad;
+  --docsearch-icon-color: #a0a6ad;
+  --docsearch-subtle-color: #2a2a2c;
+  /* Brighter green tint for the selected row on dark backgrounds */
+  --docsearch-hit-highlight-color: rgba(69, 186, 75, 0.12);
+  --docsearch-soft-primary-color: rgba(69, 186, 75, 0.12);
+}
+
+/* The "no results" magnifier icon ships with a hardcoded indigo stroke
+   attribute (stroke="#5a5e9a") instead of reading a variable, so it ignores
+   the palette above. Neutralise it to match the other DocSearch icons. */
+.DocSearch-NoResults svg {
+  stroke: var(--docsearch-icon-color);
 }
