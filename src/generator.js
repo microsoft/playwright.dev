@@ -278,7 +278,7 @@ ${this.documentation.renderLinksInText(clazz.deprecated)}
         if (member.deprecated) {
           sections.deprecation.push({
             type: 'text',
-            text: `:::warning Deprecated
+            text: `:::warning[Deprecated]
 
 ${this.documentation.renderLinksInText(member.deprecated)}
 
