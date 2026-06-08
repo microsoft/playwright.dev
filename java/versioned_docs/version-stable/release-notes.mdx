@@ -9,6 +9,70 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 import LiteYouTube from '@site/src/components/LiteYouTube';
 
+## Version 1.60
+
+### 🌐 HAR recording on Tracing
+
+[Tracing.startHar()](/api/class-tracing.mdx#tracing-start-har) / [Tracing.stopHar()](/api/class-tracing.mdx#tracing-stop-har) expose HAR recording as a first-class tracing API, with the same `content`, `mode` and `urlFilter` options as `recordHar`:
+
+```java
+context.tracing().startHar(Paths.get("trace.har"));
+Page page = context.newPage();
+page.navigate("https://playwright.dev");
+context.tracing().stopHar();
+```
+
+### 🪝 Drop API
+
+New [Locator.drop()](/api/class-locator.mdx#locator-drop) simulates an external drag-and-drop of files or clipboard-like data onto an element. Playwright dispatches `dragenter`, `dragover`, and `drop` with a synthetic [DataTransfer] in the page context — works cross-browser and is great for testing upload zones:
+
+```java
+page.locator("#dropzone").drop(new Locator.DropPayload()
+    .setFiles(new FilePayload("note.txt", "text/plain", "hello".getBytes(StandardCharsets.UTF_8))));
+
+page.locator("#dropzone").drop(new Locator.DropPayload()
+    .setData(Map.of(
+        "text/plain", "hello world",
+        "text/uri-list", "https://example.com")));
+```
+
+### 🎯 Aria snapshots
+- [assertThat(page).matchesAriaSnapshot()](/api/class-pageassertions.mdx#page-assertions-to-match-aria-snapshot) now works on a [Page], in addition to a [Locator] — equivalent to asserting against `page.locator("body")`.
+- New `boxes` option on [Locator.ariaSnapshot()](/api/class-locator.mdx#locator-aria-snapshot) / [Page.ariaSnapshot()](/api/class-page.mdx#page-aria-snapshot) appends each element's bounding box as `[box=x,y,width,height]`, useful for AI consumption.
+
+### New APIs
+
+#### Browser, Context and Page
+- Event [Browser.onContext(handler)](/api/class-browser.mdx#browser-event-context) — fired when a new context is created on the browser.
+- [BrowserContext] now mirrors lifecycle events from its pages: [BrowserContext.onDownload(handler)](/api/class-browsercontext.mdx#browser-context-event-download), [BrowserContext.onFrameAttached(handler)](/api/class-browsercontext.mdx#browser-context-event-frame-attached), [BrowserContext.onFrameDetached(handler)](/api/class-browsercontext.mdx#browser-context-event-frame-detached), [BrowserContext.onFrameNavigated(handler)](/api/class-browsercontext.mdx#browser-context-event-frame-navigated), [BrowserContext.onPageClose(handler)](/api/class-browsercontext.mdx#browser-context-event-page-close), [BrowserContext.onPageLoad(handler)](/api/class-browsercontext.mdx#browser-context-event-page-load).
+
+#### Locators and Assertions
+- New option `description` in [Page.getByRole()](/api/class-page.mdx#page-get-by-role) / [Locator.getByRole()](/api/class-locator.mdx#locator-get-by-role) / [Frame.getByRole()](/api/class-frame.mdx#frame-get-by-role) / [FrameLocator.getByRole()](/api/class-framelocator.mdx#frame-locator-get-by-role) for matching the [accessible description](https://www.w3.org/TR/wai-aria-1.2/#dfn-accessible-description).
+- New option `pseudo` in [assertThat(locator).hasCSS()](/api/class-locatorassertions.mdx#locator-assertions-to-have-css) reads computed styles from `::before` or `::after`.
+- New option `style` in [Locator.highlight()](/api/class-locator.mdx#locator-highlight) applies extra inline CSS to the highlight overlay, plus new [Page.hideHighlight()](/api/class-page.mdx#page-hide-highlight) to clear all highlights.
+
+#### Network
+- [WebSocketRoute.protocols()](/api/class-websocketroute.mdx#web-socket-route-protocols) returns the WebSocket subprotocols requested by the page.
+- New option `noDefaults` in [BrowserType.connectOverCDP()](/api/class-browsertype.mdx#browser-type-connect-over-cdp) disables Playwright's default overrides on the default context (download behavior, focus emulation, media emulation), so attaching to a user's daily-driver browser doesn't disturb its state.
+
+#### Errors
+- New [WebError.location()](/api/class-weberror.mdx#web-error-location) mirrors [ConsoleMessage.location()](/api/class-consolemessage.mdx#console-message-location).
+
+### 🛠️ Other improvements
+- Trace Viewer adds a pretty-print toggle for JSON / form request and response bodies in the network details panel.
+
+### Breaking Changes ⚠️
+- Removed long-deprecated `handle` option on `BrowserContext.exposeBinding` and `Page.exposeBinding`.
+
+### Browser Versions
+- Chromium 148.0.7778.96
+- Mozilla Firefox 150.0.2
+- WebKit 26.4
+
+This version was also tested against the following stable channels:
+- Google Chrome 147
+- Microsoft Edge 147
+
 ## Version 1.59
 
 ### 🎬 Screencast
