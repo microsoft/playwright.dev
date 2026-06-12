@@ -9,6 +9,131 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 import LiteYouTube from '@site/src/components/LiteYouTube';
 
+## Version 1.61
+
+### 🔑 WebAuthn passkeys
+
+New [Credentials] virtual authenticator, available via [BrowserContext.Credentials](/api/class-browsercontext.mdx#browser-context-credentials), lets tests register passkeys and answer `navigator.credentials.create()` / `navigator.credentials.get()` ceremonies in the page — no real hardware key required, works in all browsers:
+
+```csharp
+var context = await browser.NewContextAsync();
+
+// Seed a passkey your backend provisioned for a test user.
+await context.Credentials.CreateAsync("example.com", new()
+{
+    Id = credentialId,
+    UserHandle = userHandle,
+    PrivateKey = privateKey,
+    PublicKey = publicKey,
+});
+await context.Credentials.InstallAsync();
+
+var page = await context.NewPageAsync();
+await page.GotoAsync("https://example.com/login");
+// The page's navigator.credentials.get() is answered with the seeded passkey.
+```
+
+You can also let the app register a passkey once in a setup test, read it back with [Credentials.GetAsync()](/api/class-credentials.mdx#credentials-get), and seed it into later tests — see [Credentials] for details.
+
+### 🗃️ Web Storage
+
+New [WebStorage] API, available via [Page.LocalStorage](/api/class-page.mdx#page-local-storage) and [Page.SessionStorage](/api/class-page.mdx#page-session-storage), reads and writes the page's storage for the current origin:
+
+```csharp
+await page.LocalStorage.SetItemAsync("token", "abc");
+var token = await page.LocalStorage.GetItemAsync("token");
+var items = await page.SessionStorage.ItemsAsync();
+```
+
+### New APIs
+- [ApiResponse.SecurityDetailsAsync()](/api/class-apiresponse.mdx#api-response-security-details) and [ApiResponse.ServerAddrAsync()](/api/class-apiresponse.mdx#api-response-server-addr) mirror the browser-side [Response.SecurityDetailsAsync()](/api/class-response.mdx#response-security-details) and [Response.ServerAddrAsync()](/api/class-response.mdx#response-server-addr).
+- New option `ArtifactsDir` in [BrowserType.ConnectOverCDPAsync()](/api/class-browsertype.mdx#browser-type-connect-over-cdp) controls where artifacts such as traces and downloads are stored when attached to an existing browser.
+- New option `Cursor` in [Screencast.ShowActionsAsync()](/api/class-screencast.mdx#screencast-show-actions) controls the cursor decoration rendered for pointer actions.
+- The `OnFrame` callback in [Screencast.StartAsync()](/api/class-screencast.mdx#screencast-start) now receives a `Timestamp` of when the frame was presented by the browser.
+
+### 🛠️ Other improvements
+- Playwright now supports Ubuntu 26.04.
+
+### Browser Versions
+- Chromium 149.0.7827.55
+- Mozilla Firefox 151.0
+- WebKit 26.5
+
+This version was also tested against the following stable channels:
+- Google Chrome 149
+- Microsoft Edge 149
+
+## Version 1.60
+
+### 🌐 HAR recording on Tracing
+
+[Tracing.StartHarAsync()](/api/class-tracing.mdx#tracing-start-har) / [Tracing.StopHarAsync()](/api/class-tracing.mdx#tracing-stop-har) expose HAR recording as a first-class tracing API, with the same `Content`, `Mode` and `UrlFilter` options as `RecordHar`:
+
+```csharp
+await context.Tracing.StartHarAsync("trace.har");
+var page = await context.NewPageAsync();
+await page.GotoAsync("https://playwright.dev");
+await context.Tracing.StopHarAsync();
+```
+
+### 🪝 Drop API
+
+New [Locator.DropAsync()](/api/class-locator.mdx#locator-drop) simulates an external drag-and-drop of files or clipboard-like data onto an element. Playwright dispatches `dragenter`, `dragover`, and `drop` with a synthetic [DataTransfer] in the page context — works cross-browser and is great for testing upload zones:
+
+```csharp
+await page.Locator("#dropzone").DropAsync(new() {
+    Files = new FilePayload() {
+        Name = "note.txt",
+        MimeType = "text/plain",
+        Buffer = Encoding.UTF8.GetBytes("hello"),
+    },
+});
+
+await page.Locator("#dropzone").DropAsync(new() {
+    Data = new Dictionary<string, string> {
+        ["text/plain"] = "hello world",
+        ["text/uri-list"] = "https://example.com",
+    },
+});
+```
+
+### 🎯 Aria snapshots
+- [Expect(Page).ToMatchAriaSnapshotAsync()](/api/class-pageassertions.mdx#page-assertions-to-match-aria-snapshot) now works on a [Page], in addition to a [Locator] — equivalent to asserting against `Page.Locator("body")`.
+- New `Boxes` option on [Locator.AriaSnapshotAsync()](/api/class-locator.mdx#locator-aria-snapshot) / [Page.AriaSnapshotAsync()](/api/class-page.mdx#page-aria-snapshot) appends each element's bounding box as `[box=x,y,width,height]`, useful for AI consumption.
+
+### New APIs
+
+#### Browser, Context and Page
+- Event [Browser.Context](/api/class-browser.mdx#browser-event-context) — fired when a new context is created on the browser.
+- [BrowserContext] now mirrors lifecycle events from its pages: [BrowserContext.Download](/api/class-browsercontext.mdx#browser-context-event-download), [BrowserContext.FrameAttached](/api/class-browsercontext.mdx#browser-context-event-frame-attached), [BrowserContext.FrameDetached](/api/class-browsercontext.mdx#browser-context-event-frame-detached), [BrowserContext.FrameNavigated](/api/class-browsercontext.mdx#browser-context-event-frame-navigated), [BrowserContext.PageClose](/api/class-browsercontext.mdx#browser-context-event-page-close), [BrowserContext.PageLoad](/api/class-browsercontext.mdx#browser-context-event-page-load).
+
+#### Locators and Assertions
+- New option `Description` in [Page.GetByRole()](/api/class-page.mdx#page-get-by-role) / [Locator.GetByRole()](/api/class-locator.mdx#locator-get-by-role) / [Frame.GetByRole()](/api/class-frame.mdx#frame-get-by-role) / [FrameLocator.GetByRole()](/api/class-framelocator.mdx#frame-locator-get-by-role) for matching the [accessible description](https://www.w3.org/TR/wai-aria-1.2/#dfn-accessible-description).
+- New option `Pseudo` in [Expect(Locator).ToHaveCSSAsync()](/api/class-locatorassertions.mdx#locator-assertions-to-have-css) reads computed styles from `::before` or `::after`.
+- New option `Style` in [Locator.HighlightAsync()](/api/class-locator.mdx#locator-highlight) applies extra inline CSS to the highlight overlay, plus new [Page.HideHighlightAsync()](/api/class-page.mdx#page-hide-highlight) to clear all highlights.
+
+#### Network
+- [WebSocketRoute.Protocols](/api/class-websocketroute.mdx#web-socket-route-protocols) returns the WebSocket subprotocols requested by the page.
+- New option `NoDefaults` in [BrowserType.ConnectOverCDPAsync()](/api/class-browsertype.mdx#browser-type-connect-over-cdp) disables Playwright's default overrides on the default context (download behavior, focus emulation, media emulation), so attaching to a user's daily-driver browser doesn't disturb its state.
+
+#### Errors
+- New [WebError.Location](/api/class-weberror.mdx#web-error-location) mirrors [ConsoleMessage.Location](/api/class-consolemessage.mdx#console-message-location).
+
+### 🛠️ Other improvements
+- Trace Viewer adds a pretty-print toggle for JSON / form request and response bodies in the network details panel.
+
+### Breaking Changes ⚠️
+- Removed long-deprecated `Handle` option on `BrowserContext.ExposeBindingAsync` and `Page.ExposeBindingAsync`.
+
+### Browser Versions
+- Chromium 148.0.7778.96
+- Mozilla Firefox 150.0.2
+- WebKit 26.4
+
+This version was also tested against the following stable channels:
+- Google Chrome 147
+- Microsoft Edge 147
+
 ## Version 1.59
 
 ### 🎬 Screencast
@@ -1802,6 +1927,7 @@ This version of Playwright was also tested against the following stable channels
 [CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
 [Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Download]: /api/class-download.mdx "Download"
@@ -1832,6 +1958,7 @@ This version of Playwright was also tested against the following stable channels
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
