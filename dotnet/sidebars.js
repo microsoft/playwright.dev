@@ -86,6 +86,7 @@ module.exports = {
             { type: 'doc', id: 'api/class-cdpsessionevent' },
             { type: 'doc', id: 'api/class-clock' },
             { type: 'doc', id: 'api/class-consolemessage' },
+            { type: 'doc', id: 'api/class-credentials' },
             { type: 'doc', id: 'api/class-debugger' },
             { type: 'doc', id: 'api/class-dialog' },
             { type: 'doc', id: 'api/class-download' },
@@ -112,6 +113,7 @@ module.exports = {
             { type: 'doc', id: 'api/class-websocket' },
             { type: 'doc', id: 'api/class-websocketframe' },
             { type: 'doc', id: 'api/class-websocketroute' },
+            { type: 'doc', id: 'api/class-webstorage' },
             { type: 'doc', id: 'api/class-worker' }
           ],
           collapsed: false
