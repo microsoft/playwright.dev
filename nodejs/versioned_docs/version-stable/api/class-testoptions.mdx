@@ -897,7 +897,7 @@ test('not signed in test', async ({ page }) => {
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.27</font><x-search>testOptions.testIdAttribute</x-search>
 
-Custom attribute to be used in [page.getByTestId()](/api/class-page.mdx#page-get-by-test-id). `data-testid` is used by default.
+Custom attribute to be used in [page.getByTestId()](/api/class-page.mdx#page-get-by-test-id). `data-testid` is used by default. To match elements with any of several attributes, pass them as a comma-separated list.
 
 **Usage**
 
@@ -907,6 +907,18 @@ import { defineConfig } from '@playwright/test';
 export default defineConfig({
   use: {
     testIdAttribute: 'pw-test-id',
+  },
+});
+```
+
+Multiple attributes:
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    testIdAttribute: 'data-pw,data-ti',
   },
 });
 ```
@@ -940,14 +952,16 @@ export default defineConfig({
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.trace</x-search>
 
-Whether to record trace for each test. Defaults to `'off'`.
+Whether to record trace for each test. Defaults to `'off'`. The initial run of a test is the "first run"; subsequent runs caused by [retries](../test-retries.mdx) are "retries".
 * `'off'`: Do not record trace.
-* `'on'`: Record trace for each test.
-* `'on-first-retry'`: Record trace only when retrying a test for the first time.
-* `'on-all-retries'`: Record trace only when retrying a test.
-* `'retain-on-failure'`: Record trace for each test. When test run passes, remove the recorded trace.
-* `'retain-on-first-failure'`: Record trace for the first run of each test, but not for retries. When test run passes, remove the recorded trace.
-* `'retain-on-failure-and-retries'`: Record trace for each test run. Retains all traces when an attempt fails.
+* `'on'`: Record and keep a trace for every run.
+* `'on-first-retry'`: Record and keep a trace only for the first retry of a test.
+* `'on-all-retries'`: Record and keep a trace for every retry.
+* `'retain-on-failure'`: Record a trace for every run, but keep it only for runs that failed. A failed run's trace is kept even when a later retry passes.
+* `'retain-on-first-failure'`: Record a trace only for the first run of a test (not for retries), and keep it only if that run failed.
+* `'retain-on-failure-and-retries'`: Record a trace for every run, and keep it for any run that failed or that is a retry.
+
+See [trace modes](../test-use-options.mdx#trace-modes) for a side-by-side comparison of what each mode records and keeps.
 
 For more control, pass an object that specifies `mode` and trace features to enable.
 
@@ -1012,11 +1026,16 @@ export default defineConfig({
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.video</x-search>
 
-Whether to record video for each test. Defaults to `'off'`.
+Whether to record video for each test. Defaults to `'off'`. The initial run of a test is the "first run"; subsequent runs caused by [retries](../test-retries.mdx) are "retries".
 * `'off'`: Do not record video.
-* `'on'`: Record video for each test.
-* `'retain-on-failure'`: Record video for each test, but remove all videos from successful test runs.
-* `'on-first-retry'`: Record video only when retrying a test for the first time.
+* `'on'`: Record and keep a video for every run.
+* `'on-first-retry'`: Record and keep a video only for the first retry of a test.
+* `'on-all-retries'`: Record and keep a video for every retry.
+* `'retain-on-failure'`: Record a video for every run, but keep it only for runs that failed. A failed run's video is kept even when a later retry passes.
+* `'retain-on-first-failure'`: Record a video only for the first run of a test (not for retries), and keep it only if that run failed.
+* `'retain-on-failure-and-retries'`: Record a video for every run, and keep it for any run that failed or that is a retry.
+
+See [video modes](../test-use-options.mdx#video-modes) for a side-by-side comparison of what each mode records and keeps.
 
 To control video size, pass an object with `mode` and `size` properties. If video size is not specified, it will be equal to [testOptions.viewport](/api/class-testoptions.mdx#test-options-viewport) scaled down to fit into 800x800. If `viewport` is not configured explicitly the video size defaults to 800x450. Actual picture of each page will be scaled down if necessary to fit the specified size.
 
@@ -1037,8 +1056,8 @@ export default defineConfig({
 Learn more about [recording video](../test-use-options.mdx#recording-options).
 
 **Type**
-- [Object] | "off" | "on" | "retain-on-failure" | "on-first-retry"
-  - `mode` "off" | "on" | "retain-on-failure" | "on-first-retry"
+- [Object] | "off" | "on" | "retain-on-failure" | "on-first-retry" | "on-all-retries" | "retain-on-first-failure" | "retain-on-failure-and-retries"
+  - `mode` "off" | "on" | "retain-on-failure" | "on-first-retry" | "on-all-retries" | "retain-on-first-failure" | "retain-on-failure-and-retries"
     
     Video recording mode.
   - `size` [Object] *(optional)*
@@ -1124,6 +1143,7 @@ export default defineConfig({
 [Clock]: /api/class-clock.mdx "Clock"
 [ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
 [Coverage]: /api/class-coverage.mdx "Coverage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
 [Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
 [Disposable]: /api/class-disposable.mdx "Disposable"
@@ -1156,6 +1176,7 @@ export default defineConfig({
 [WebError]: /api/class-weberror.mdx "WebError"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
 [Worker]: /api/class-worker.mdx "Worker"
 [Electron]: /api/class-electron.mdx "Electron"
 [ElectronApplication]: /api/class-electronapplication.mdx "ElectronApplication"
