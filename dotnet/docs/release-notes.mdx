@@ -9,6 +9,61 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 import LiteYouTube from '@site/src/components/LiteYouTube';
 
+## Version 1.61
+
+### 🔑 WebAuthn passkeys
+
+New [Credentials] virtual authenticator, available via [BrowserContext.Credentials](/api/class-browsercontext.mdx#browser-context-credentials), lets tests register passkeys and answer `navigator.credentials.create()` / `navigator.credentials.get()` ceremonies in the page — no real hardware key required, works in all browsers:
+
+```csharp
+var context = await browser.NewContextAsync();
+
+// Seed a passkey your backend provisioned for a test user.
+await context.Credentials.CreateAsync("example.com", new()
+{
+    Id = credentialId,
+    UserHandle = userHandle,
+    PrivateKey = privateKey,
+    PublicKey = publicKey,
+});
+await context.Credentials.InstallAsync();
+
+var page = await context.NewPageAsync();
+await page.GotoAsync("https://example.com/login");
+// The page's navigator.credentials.get() is answered with the seeded passkey.
+```
+
+You can also let the app register a passkey once in a setup test, read it back with [Credentials.GetAsync()](/api/class-credentials.mdx#credentials-get), and seed it into later tests — see [Credentials] for details.
+
+### 🗃️ Web Storage
+
+New [WebStorage] API, available via [Page.LocalStorage](/api/class-page.mdx#page-local-storage) and [Page.SessionStorage](/api/class-page.mdx#page-session-storage), reads and writes the page's storage for the current origin:
+
+```csharp
+await page.LocalStorage.SetItemAsync("token", "abc");
+var token = await page.LocalStorage.GetItemAsync("token");
+var items = await page.SessionStorage.ItemsAsync();
+```
+
+### New APIs
+- [ApiResponse.SecurityDetailsAsync()](/api/class-apiresponse.mdx#api-response-security-details) and [ApiResponse.ServerAddrAsync()](/api/class-apiresponse.mdx#api-response-server-addr) mirror the browser-side [Response.SecurityDetailsAsync()](/api/class-response.mdx#response-security-details) and [Response.ServerAddrAsync()](/api/class-response.mdx#response-server-addr).
+- New option `ArtifactsDir` in [BrowserType.ConnectOverCDPAsync()](/api/class-browsertype.mdx#browser-type-connect-over-cdp) controls where artifacts such as traces and downloads are stored when attached to an existing browser.
+- New option `Cursor` in [Screencast.ShowActionsAsync()](/api/class-screencast.mdx#screencast-show-actions) controls the cursor decoration rendered for pointer actions.
+- The `OnFrame` callback in [Screencast.StartAsync()](/api/class-screencast.mdx#screencast-start) now receives a `Timestamp` of when the frame was presented by the browser.
+
+### 🛠️ Other improvements
+- Playwright now supports Ubuntu 26.04.
+- HAR and trace recordings now include WebSocket requests.
+
+### Browser Versions
+- Chromium 149.0.7827.55
+- Mozilla Firefox 151.0
+- WebKit 26.5
+
+This version was also tested against the following stable channels:
+- Google Chrome 149
+- Microsoft Edge 149
+
 ## Version 1.60
 
 ### 🌐 HAR recording on Tracing

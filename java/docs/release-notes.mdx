@@ -9,6 +9,59 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 import LiteYouTube from '@site/src/components/LiteYouTube';
 
+## Version 1.61
+
+### 🔑 WebAuthn passkeys
+
+New [Credentials] virtual authenticator, available via [BrowserContext.credentials()](/api/class-browsercontext.mdx#browser-context-credentials), lets tests register passkeys and answer `navigator.credentials.create()` / `navigator.credentials.get()` ceremonies in the page — no real hardware key required, works in all browsers:
+
+```java
+BrowserContext context = browser.newContext();
+
+// Seed a passkey your backend provisioned for a test user.
+context.credentials().create("example.com", new Credentials.CreateOptions()
+    .setId(credentialId)
+    .setUserHandle(userHandle)
+    .setPrivateKey(privateKey)
+    .setPublicKey(publicKey));
+context.credentials().install();
+
+Page page = context.newPage();
+page.navigate("https://example.com/login");
+// The page's navigator.credentials.get() is answered with the seeded passkey.
+```
+
+You can also let the app register a passkey once in a setup test, read it back with [Credentials.get()](/api/class-credentials.mdx#credentials-get), and seed it into later tests — see [Credentials] for details.
+
+### 🗃️ Web Storage
+
+New [WebStorage] API, available via [Page.localStorage()](/api/class-page.mdx#page-local-storage) and [Page.sessionStorage()](/api/class-page.mdx#page-session-storage), reads and writes the page's storage for the current origin:
+
+```java
+page.localStorage().setItem("token", "abc");
+String token = page.localStorage().getItem("token");
+List<NameValue> items = page.sessionStorage().items();
+```
+
+### New APIs
+- [APIResponse.securityDetails()](/api/class-apiresponse.mdx#api-response-security-details) and [APIResponse.serverAddr()](/api/class-apiresponse.mdx#api-response-server-addr) mirror the browser-side [Response.securityDetails()](/api/class-response.mdx#response-security-details) and [Response.serverAddr()](/api/class-response.mdx#response-server-addr).
+- New option `artifactsDir` in [BrowserType.connectOverCDP()](/api/class-browsertype.mdx#browser-type-connect-over-cdp) controls where artifacts such as traces and downloads are stored when attached to an existing browser.
+- New option `cursor` in [Screencast.showActions()](/api/class-screencast.mdx#screencast-show-actions) controls the cursor decoration rendered for pointer actions.
+- The `onFrame` callback in [Screencast.start()](/api/class-screencast.mdx#screencast-start) now receives a `timestamp` of when the frame was presented by the browser.
+
+### 🛠️ Other improvements
+- Playwright now supports Ubuntu 26.04.
+- HAR and trace recordings now include WebSocket requests.
+
+### Browser Versions
+- Chromium 149.0.7827.55
+- Mozilla Firefox 151.0
+- WebKit 26.5
+
+This version was also tested against the following stable channels:
+- Google Chrome 149
+- Microsoft Edge 149
+
 ## Version 1.60
 
 ### 🌐 HAR recording on Tracing

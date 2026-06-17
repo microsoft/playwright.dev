@@ -9,6 +9,72 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 import LiteYouTube from '@site/src/components/LiteYouTube';
 
+## Version 1.61
+
+### 🔑 WebAuthn passkeys
+
+New [Credentials] virtual authenticator, available via [browserContext.credentials](/api/class-browsercontext.mdx#browser-context-credentials), lets tests register passkeys and answer `navigator.credentials.create()` / `navigator.credentials.get()` ceremonies in the page — no real hardware key required, works in all browsers:
+
+```js
+const context = await browser.newContext();
+
+// Seed a passkey your backend provisioned for a test user.
+await context.credentials.create('example.com', {
+  id: credentialId,
+  userHandle,
+  privateKey,
+  publicKey,
+});
+await context.credentials.install();
+
+const page = await context.newPage();
+await page.goto('https://example.com/login');
+// The page's navigator.credentials.get() is answered with the seeded passkey.
+```
+
+You can also let the app register a passkey once in a setup test, read it back with [credentials.get()](/api/class-credentials.mdx#credentials-get), and seed it into later tests — see [Credentials] for details.
+
+### 🗃️ Web Storage
+
+New [WebStorage] API, available via [page.localStorage](/api/class-page.mdx#page-local-storage) and [page.sessionStorage](/api/class-page.mdx#page-session-storage), reads and writes the page's storage for the current origin:
+
+```js
+await page.localStorage.setItem('token', 'abc');
+const token = await page.localStorage.getItem('token');
+const items = await page.sessionStorage.items();
+```
+
+### New APIs
+
+#### Network
+- [apiResponse.securityDetails()](/api/class-apiresponse.mdx#api-response-security-details) and [apiResponse.serverAddr()](/api/class-apiresponse.mdx#api-response-server-addr) mirror the browser-side [response.securityDetails()](/api/class-response.mdx#response-security-details) and [response.serverAddr()](/api/class-response.mdx#response-server-addr).
+
+#### Browser and Screencast
+- New option `artifactsDir` in [browserType.connectOverCDP()](/api/class-browsertype.mdx#browser-type-connect-over-cdp) controls where artifacts such as traces and downloads are stored when attached to an existing browser.
+- New option `cursor` in [screencast.showActions()](/api/class-screencast.mdx#screencast-show-actions) controls the cursor decoration rendered for pointer actions.
+- The `onFrame` callback in [screencast.start()](/api/class-screencast.mdx#screencast-start) now receives a `timestamp` of when the frame was presented by the browser.
+
+#### Test runner
+- The [testOptions.video](/api/class-testoptions.mdx#test-options-video) option now supports the same set of modes as `trace`: new `'on-all-retries'`, `'retain-on-first-failure'` and `'retain-on-failure-and-retries'` values. See the [video modes table](./test-use-options.mdx#video-modes) for which runs are recorded and kept in each mode.
+- Supported `expect.soft.poll(...)`.
+- New [fullConfig.argv](/api/class-fullconfig.mdx#full-config-argv) — a snapshot of `process.argv` from the runner process, handy for reading custom arguments passed after the `--` separator.
+- New [fullConfig.failOnFlakyTests](/api/class-fullconfig.mdx#full-config-fail-on-flaky-tests) mirrors the config option, so reporters can explain why a flaky run failed.
+- [testInfo.errors](/api/class-testinfo.mdx#test-info-errors) now lists each sub-error of an `AggregateError` as a separate entry.
+- New `-G` command line shorthand for `--grep-invert`.
+
+### 🛠️ Other improvements
+- Playwright now supports Ubuntu 26.04.
+- HAR and trace recordings now include WebSocket requests.
+
+### Browser Versions
+- Chromium 149.0.7827.55
+- Mozilla Firefox 151.0
+- WebKit 26.5
+
+This version was also tested against the following stable channels:
+- Google Chrome 149
+- Microsoft Edge 149
+
 ## Version 1.60
 
 ### 🌐 HAR recording on Tracing
