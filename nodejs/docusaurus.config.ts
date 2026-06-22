@@ -200,8 +200,8 @@ export default {
               href: "https://aka.ms/playwright/discord",
             },
             {
-              label: "Twitter",
-              href: "https://twitter.com/playwrightweb",
+              label: "X",
+              href: "https://x.com/playwrightweb",
             },
             {
               label: "LinkedIn",
