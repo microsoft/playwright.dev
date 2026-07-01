@@ -107,6 +107,8 @@ window.addEventListener("load", () => {
 const kGoToNextToken = ['Shift', 'Shift', 'Shift', 'Shift', 'Shift'];
 let keyPressState = 0;
 document.addEventListener('keydown', (e) => {
+  if (e.repeat)
+    return;
   if (kGoToNextToken[keyPressState] === e.key) {
     keyPressState++;
     if (keyPressState === kGoToNextToken.length) {
