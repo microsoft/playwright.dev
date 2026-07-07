@@ -1,8 +1,12 @@
 # playwright.dev
 
-This website is built using [Docusaurus](https://docusaurus.io/). Content is pulled from the microsoft/playwright repo.
+## Filing issues
+
+If you see a problem on playwright.dev, please [file an issue here](https://github.com/microsoft/playwright/issues/new?template=documentation.yml).
 
 ## Development
+
+This website is built using [Docusaurus](https://docusaurus.io/). Content is pulled from the microsoft/playwright repo.
 
 ### Setup the repo
 
