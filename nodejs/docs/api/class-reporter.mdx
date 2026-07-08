@@ -364,6 +364,38 @@ reporter.onTestEnd(test, result);
 
 ---
 
+### preprocessSuite {/* #reporter-preprocess-suite */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.61</font><x-search>reporter.preprocessSuite</x-search>
+
+Called after the configuration has been resolved and before [reporter.onBegin()](/api/class-reporter.mdx#reporter-on-begin). Allows a reporter to mark individual tests as skipped, excluded, fixed or failing.
+
+**Usage**
+
+```js
+await reporter.preprocessSuite(config, suite);
+```
+
+**Arguments**
+- `config` [FullConfig]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-preprocess-suite-option-config"/><a href="#reporter-preprocess-suite-option-config" class="list-anchor">#</a>
+  
+  Resolved configuration.
+- `suite` [Suite]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-preprocess-suite-option-suite"/><a href="#reporter-preprocess-suite-option-suite" class="list-anchor">#</a>
+  
+  The root suite that contains the projects, files and test cases that will run.
+  
+  The suite reflects `--project`, `--grep`/`--grep-invert` and `.only` filtering, so it only contains tests that match the current invocation. It contains only the top-level projects being run — setup and dependency projects are not included and cannot be excluded from here.
+  
+  The suite ignores the `--shard` argument: it always contains the full, un-sharded corpus. Playwright applies its built-in sharding after [reporter.preprocessSuite()](/api/class-reporter.mdx#reporter-preprocess-suite) returns, unless the returned `implementsSharding` is `true`.
+
+**Returns**
+- [Promise]&lt;[Object]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-preprocess-suite-return"/><a href="#reporter-preprocess-suite-return" class="list-anchor">#</a>
+  - `implementsSharding` [boolean] *(optional)*
+    
+    When `true`, Playwright skips its built-in shard filter for this run, leaving sharding to the reporter (typically implemented by calling [testCase.exclude()](/api/class-testcase.mdx#test-case-exclude) on out-of-shard tests).
+
+---
+
 ### printsToStdio {/* #reporter-prints-to-stdio */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>reporter.printsToStdio</x-search>
