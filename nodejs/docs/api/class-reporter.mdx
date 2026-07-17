@@ -364,35 +364,36 @@ reporter.onTestEnd(test, result);
 
 ---
 
-### preprocessSuite {/* #reporter-preprocess-suite */}
+### preprocess {/* #reporter-preprocess */}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.61</font><x-search>reporter.preprocessSuite</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.62</font><x-search>reporter.preprocess</x-search>
 
 Called after the configuration has been resolved and before [reporter.onBegin()](/api/class-reporter.mdx#reporter-on-begin). Allows a reporter to mark individual tests as skipped, excluded, fixed or failing.
 
 **Usage**
 
 ```js
-await reporter.preprocessSuite(config, suite);
+await reporter.preprocess(params);
 ```
 
 **Arguments**
-- `config` [FullConfig]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-preprocess-suite-option-config"/><a href="#reporter-preprocess-suite-option-config" class="list-anchor">#</a>
+- `params` [Object]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-preprocess-option-params"/><a href="#reporter-preprocess-option-params" class="list-anchor">#</a>
+  - `config` [FullConfig]
+    
+    Resolved configuration.
+  - `suite` [Suite]
+    
+    The root suite that contains the projects, files and test cases that will run.
+  - `testRun` [TestRun]
+    
+    Control which tests will run and their expected status.
   
-  Resolved configuration.
-- `suite` [Suite]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-preprocess-suite-option-suite"/><a href="#reporter-preprocess-suite-option-suite" class="list-anchor">#</a>
+  The suite reflects `--project`, `--grep`/`--grep-invert` and `.only` filtering, so it only contains tests that match the current invocation. Setup and dependency projects are readonly and cannot be changed through [TestRun].
   
-  The root suite that contains the projects, files and test cases that will run.
-  
-  The suite reflects `--project`, `--grep`/`--grep-invert` and `.only` filtering, so it only contains tests that match the current invocation. Setup and dependency projects are readonly and cannot be excluded from here.
-  
-  The suite ignores the `--shard` argument: it always contains the full, un-sharded corpus. Playwright applies its built-in sharding after [reporter.preprocessSuite()](/api/class-reporter.mdx#reporter-preprocess-suite) returns, unless the returned `implementsSharding` is `true`.
+  The suite ignores the `--shard` argument: it always contains the full, un-sharded corpus. Playwright applies its built-in sharding after [reporter.preprocess()](/api/class-reporter.mdx#reporter-preprocess) returns, unless the reporter calls [testRun.skipSharding()](/api/class-testrun.mdx#test-run-skip-sharding).
 
 **Returns**
-- [Promise]&lt;[Object]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-preprocess-suite-return"/><a href="#reporter-preprocess-suite-return" class="list-anchor">#</a>
-  - `implementsSharding` [boolean] *(optional)*
-    
-    When `true`, Playwright skips its built-in shard filter for this run, leaving sharding to the reporter (typically implemented by calling [testCase.exclude()](/api/class-testcase.mdx#test-case-exclude) on out-of-shard tests).
+- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="reporter-preprocess-return"/><a href="#reporter-preprocess-return" class="list-anchor">#</a>
 
 ---
 
@@ -483,6 +484,7 @@ reporter.printsToStdio();
 [TestCase]: /api/class-testcase.mdx "TestCase"
 [TestError]: /api/class-testerror.mdx "TestError"
 [TestResult]: /api/class-testresult.mdx "TestResult"
+[TestRun]: /api/class-testrun.mdx "TestRun"
 [TestStep]: /api/class-teststep.mdx "TestStep"
 [Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
 [EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
