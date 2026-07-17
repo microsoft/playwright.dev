@@ -60,7 +60,11 @@ export default {
   organizationName: "microsoft",
   projectName: "playwright.dev",
   onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "throw",
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: "throw",
+    },
+  },
   scripts: ["/dotnet/js/redirection.js"],
   favicon: "img/playwright-logo.ico",
   themeConfig: {
