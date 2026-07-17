@@ -60,7 +60,11 @@ module.exports = {
   organizationName: "microsoft",
   projectName: "playwright.dev",
   onBrokenLinks: "throw",
-  onBrokenMarkdownLinks: "throw",
+  markdown: {
+    hooks: {
+      onBrokenMarkdownLinks: "throw",
+    },
+  },
   scripts: ["/java/js/redirection.js"],
   favicon: "img/playwright-logo.ico",
   themeConfig: {
