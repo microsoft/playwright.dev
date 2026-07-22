@@ -26,6 +26,54 @@ Playwright Test comes with builtin fixtures listed below, and you can add your o
 
 ---
 
+## Methods
+
+### mount {/* #fixtures-mount */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.62</font><x-search>fixtures.mount</x-search>
+
+Mounts a component story and returns a [Locator] pointing to the root element the story was rendered into. Scope your queries from the returned locator: `component.getByRole('button')`, not `page.getByRole('button')`.
+
+A **story** is a small wrapper component that embeds the component under test in one specific scenario: hard-coded props, mock data, providers, recorded callbacks. Stories are rendered by a **gallery** page that you implement and serve at [testOptions.baseURL](/api/class-testoptions.mdx#test-options-base-url). The gallery exposes `window.mount(params)` and `window.unmount()` functions that render a story into its root element. Each call to [fixtures.mount()](/api/class-fixtures.mdx#fixtures-mount) navigates to [testOptions.baseURL](/api/class-testoptions.mdx#test-options-base-url) and calls `window.mount()` with the story id and props, so tests are fully isolated from each other.
+
+**Usage**
+
+```js
+test('click should expand', async ({ mount }) => {
+  const component = await mount('components/Expandable/Stateful');
+  await component.getByRole('button').click();
+  await expect(component.getByTestId('expanded')).toHaveValue('true');
+});
+```
+
+Pass the story type as a template argument to type-check the props:
+
+```js
+import type { WithTitle } from './Button.story';
+
+test('renders the title', async ({ mount }) => {
+  const component = await mount<typeof WithTitle>('Button/WithTitle', { title: 'Hello' });
+  await expect(component).toContainText('Hello');
+});
+```
+
+The returned locator is augmented with two methods:
+* `update(props)` - re-renders the same story with new props without remounting, preserving component state;
+* `unmount()` - unmounts the story.
+
+**Arguments**
+- `storyId` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="fixtures-mount-option-story-id"/><a href="#fixtures-mount-option-story-id" class="list-anchor">#</a>
+  
+  Identifier of the story to mount, as resolved by the gallery page. Conventionally, the story file path plus the exported story name, for example `'components/Button/Primary'`.
+- `props` [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="fixtures-mount-option-props"/><a href="#fixtures-mount-option-props" class="list-anchor">#</a>
+  
+  Optional plain, serializable props passed to the story.
+
+**Returns**
+- [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="fixtures-mount-return"/><a href="#fixtures-mount-return" class="list-anchor">#</a>
+
+---
+
 ## Properties
 
 ### browser {/* #fixtures-browser */}
