@@ -627,9 +627,6 @@ await browserContext.routeFromHAR(har, options);
   
   Path to a [HAR](http://www.softwareishard.com/blog/har-12-spec) file with prerecorded network data. If `path` is a relative path, then it is resolved relative to the current working directory.
 - `options` [Object] *(optional)*
-  - `interceptAPIRequests` [boolean] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-intercept-api-requests"/><a href="#browser-context-route-from-har-option-intercept-api-requests" class="list-anchor">#</a>
-    
-    If set to `true`, requests made via [APIRequestContext] (such as [browserContext.request](/api/class-browsercontext.mdx#browser-context-request) or [page.request](/api/class-page.mdx#page-request)) are also served from the HAR file. By default these requests are sent to the network, matching the behavior prior to v1.62. Defaults to `false` for backward compatibility.
   - `notFound` "abort" | "fallback" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-route-from-har-option-not-found"/><a href="#browser-context-route-from-har-option-not-found" class="list-anchor">#</a>
     * If set to 'abort' any request not found in the HAR file will be aborted.
     * If set to 'fallback' falls through to the next route handler in the handler chain.
@@ -1226,6 +1223,23 @@ When no [page.on('dialog')](/api/class-page.mdx#page-event-dialog) or [browserCo
 
 ---
 
+### on('dialogclosed') {/* #browser-context-event-dialog-closed */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.63</font><x-search>browserContext.on('dialogclosed')</x-search>
+
+Emitted when a JavaScript dialog in any page belonging to this context has been closed, either by [dialog.accept()](/api/class-dialog.mdx#dialog-accept), by [dialog.dismiss()](/api/class-dialog.mdx#dialog-dismiss), or manually by the user in the headed browser.
+
+**Usage**
+
+```js
+browserContext.on('dialogclosed', data => {});
+```
+
+**Event data**
+- [Dialog]
+
+---
+
 ### on('download') {/* #browser-context-event-download */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.60</font><x-search>browserContext.on('download')</x-search>
@@ -1540,13 +1554,19 @@ await browserContext.setHTTPCredentials(httpCredentials);
 ```
 
 **Arguments**
-- `httpCredentials` [null] | [Object]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-http-credentials-option-http-credentials"/><a href="#browser-context-set-http-credentials-option-http-credentials" class="list-anchor">#</a>
+- `httpCredentials` [null] | [Object] | [Array]&lt;[Object]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-http-credentials-option-http-credentials"/><a href="#browser-context-set-http-credentials-option-http-credentials" class="list-anchor">#</a>
   - `username` [string]
     
     
   - `password` [string]
     
     
+  - `origin` [string] *(optional)*
+    
+    Restrain sending http credentials on specific origin (scheme://host:port).
+  
+  Pass an array to use different credentials for different origins. The first entry that matches the request origin is used, and entries with no origin match any request.
+
 **Returns**
 - [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-set-http-credentials-return"/><a href="#browser-context-set-http-credentials-return" class="list-anchor">#</a>
 

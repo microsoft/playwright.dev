@@ -1216,7 +1216,7 @@ Navigate to the previous page in history.
 
 :::warning
 
-**Testing Back/Forward Cache (BFCache) is not supported.**  By default, Playwright disables the Back/Forward Cache across all browsers. Even if explicitly enabled, Playwright's internal state relies on network-level navigation events. Because BFCache restores unfreeze the DOM without firing these events, using `page.goBack()` or `page.goForward()` to trigger a BFCache restore will result in timeouts and a desynchronized `Page` state.
+**Testing Back/Forward Cache (BFCache) is not supported.** By default, Playwright disables the Back/Forward Cache across all browsers. Even if explicitly enabled, Playwright's internal state relies on network-level navigation events. Because BFCache restores unfreeze the DOM without firing these events, using `page.goBack()` or `page.goForward()` to trigger a BFCache restore will result in timeouts and a desynchronized `Page` state.
 :::
 
 **Usage**
@@ -1253,7 +1253,7 @@ Navigate to the next page in history.
 
 :::warning
 
-**Testing Back/Forward Cache (BFCache) is not supported.**  By default, Playwright disables the Back/Forward Cache across all browsers. Even if explicitly enabled, Playwright's internal state relies on network-level navigation events. Because BFCache restores unfreeze the DOM without firing these events, using `page.goBack()` or `page.goForward()` to trigger a BFCache restore will result in timeouts and a desynchronized `Page` state.
+**Testing Back/Forward Cache (BFCache) is not supported.** By default, Playwright disables the Back/Forward Cache across all browsers. Even if explicitly enabled, Playwright's internal state relies on network-level navigation events. Because BFCache restores unfreeze the DOM without firing these events, using `page.goBack()` or `page.goForward()` to trigger a BFCache restore will result in timeouts and a desynchronized `Page` state.
 :::
 
 **Usage**
@@ -1623,6 +1623,28 @@ Console.WriteLine(locator);
 
 **Returns**
 - [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-pick-locator-return"/><a href="#page-pick-locator-return" class="list-anchor">#</a>
+
+---
+
+### PierceFrames {/* #page-pierce-frames */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.63</font><x-search>page.PierceFrames</x-search>
+
+When working with iframes, you can create a frame locator that will search for elements in the main frame and in all iframes on the page, so that you don't need to locate each iframe first.
+
+Note that all elements matching the locator must belong to a single frame. For example, if the page contains two iframes, each with a `Submit` button, piercing frames and locating a button will throw an error because it matches elements from multiple frames.
+
+**Usage**
+
+Following snippet locates a button, either in the main frame or in one of the iframes:
+
+```csharp
+var locator = page.PierceFrames.GetByRole(AriaRole.Button);
+await locator.ClickAsync();
+```
+
+**Returns**
+- [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-pierce-frames-return"/><a href="#page-pierce-frames-return" class="list-anchor">#</a>
 
 ---
 
@@ -3136,6 +3158,23 @@ page.RequestFailed += (_, request) =>
 :::note
 When no [Page.Dialog](/api/class-page.mdx#page-event-dialog) or [BrowserContext.Dialog](/api/class-browsercontext.mdx#browser-context-event-dialog) listeners are present, all dialogs are automatically dismissed.
 :::
+
+**Event data**
+- [Dialog]
+
+---
+
+### event DialogClosed {/* #page-event-dialog-closed */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.63</font><x-search>page.event DialogClosed</x-search>
+
+Emitted when a JavaScript dialog has been closed, either by [Dialog.AcceptAsync()](/api/class-dialog.mdx#dialog-accept), by [Dialog.DismissAsync()](/api/class-dialog.mdx#dialog-dismiss), or manually by the user in the headed browser.
+
+**Usage**
+
+```csharp
+Page.DialogClosed += async (_, dialog) => {};
+```
 
 **Event data**
 - [Dialog]
