@@ -95,6 +95,23 @@ You can also add annotations during runtime by manipulating [testInfo.annotation
 
 Learn more about [test annotations](../test-annotations.mdx).
 
+**Locks**
+
+You can declare named locks to prevent specific tests from running at the same time, while all other tests continue to run in parallel. Tests that share a lock name never run concurrently, even when they are declared in different files or belong to different [projects](../test-projects.mdx). This is useful when a few tests access a shared resource that does not support concurrent access.
+
+```js
+import { test, expect } from '@playwright/test';
+
+test('update user settings', {
+  lock: 'user-settings',
+}, async ({ page }) => {
+  // This test never runs concurrently with other tests
+  // that declare the 'user-settings' lock.
+});
+```
+
+Learn more about [test locks](../test-parallel.mdx#test-locks).
+
 **Arguments**
 - `title` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-call-option-title"/><a href="#test-call-option-title" class="list-anchor">#</a>
   
@@ -110,6 +127,9 @@ Learn more about [test annotations](../test-annotations.mdx).
     - `description` [string] *(optional)*
       
       Optional annotation description, for example an issue url.
+    
+    
+  - `lock` [string] | [Array]&lt;[string]&gt; *(optional)*
     
     
   Additional test details.
@@ -446,6 +466,26 @@ test.describe('two annotated tests', {
 
 Learn more about [test annotations](../test-annotations.mdx).
 
+**Locks**
+
+You can declare named locks for all tests in a group by providing additional details. Tests that share a lock name never run concurrently. Learn more about [test locks](../test-parallel.mdx#test-locks).
+
+```js
+import { test, expect } from '@playwright/test';
+
+test.describe('two tests with a lock', {
+  lock: 'user-settings',
+}, () => {
+  test('one', async ({ page }) => {
+    // ...
+  });
+
+  test('two', async ({ page }) => {
+    // ...
+  });
+});
+```
+
 **Arguments**
 - `title` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-option-title"/><a href="#test-describe-option-title" class="list-anchor">#</a>
   
@@ -461,6 +501,9 @@ Learn more about [test annotations](../test-annotations.mdx).
     - `description` [string] *(optional)*
       
       
+    
+  - `lock` [string] | [Array]&lt;[string]&gt; *(optional)*
+    
     
   Additional details for all tests in the group.
 - `callback` [function]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-describe-option-callback"/><a href="#test-describe-option-callback" class="list-anchor">#</a>
