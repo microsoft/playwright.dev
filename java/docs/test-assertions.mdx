@@ -6,7 +6,21 @@ import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
-## List of assertions
+## Introduction
+
+Playwright includes web-specific assertions that automatically retry until the expected condition is met.  Consider the following example:
+
+```java
+assertThat(page.getByTestId("status")).hasText("Submitted");
+```
+
+Playwright will re-test the element with the test ID of `status` until it has the `"Submitted"` text.  It will re-fetch the element and check it repeatedly until the condition is met or the timeout is reached.
+
+By default, the timeout for assertions is 5 seconds.
+
+## Auto-retrying assertions
+
+The following assertions will retry until the assertion passes or the assertion timeout is reached.
 
 | Assertion | Description |
 | :- | :- |
@@ -38,6 +52,29 @@ import HTMLCard from '@site/src/components/HTMLCard';
 | [assertThat(page).hasTitle()](/api/class-pageassertions.mdx#page-assertions-to-have-title) | Page has a title |
 | [assertThat(page).hasURL()](/api/class-pageassertions.mdx#page-assertions-to-have-url) | Page has a URL |
 | [assertThat(response).isOK()](/api/class-apiresponseassertions.mdx#api-response-assertions-to-be-ok) | Response has an OK status |
+
+## Setting a custom timeout
+
+You can specify a custom timeout for assertions either globally or per assertion. The default timeout is 5 seconds.
+
+### Global timeout
+
+```java
+import com.microsoft.playwright.assertions.PlaywrightAssertions;
+
+PlaywrightAssertions.setDefaultAssertionTimeout(10_000);
+```
+
+### Per assertion timeout
+
+```java
+import com.microsoft.playwright.assertions.LocatorAssertions;
+
+import static com.microsoft.playwright.assertions.PlaywrightAssertions.assertThat;
+
+assertThat(page.getByText("Name")).isVisible(
+    new LocatorAssertions.IsVisibleOptions().setTimeout(10_000));
+```
 
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"
