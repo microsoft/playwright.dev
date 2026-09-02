@@ -1087,7 +1087,7 @@ await rowLocator
     Matches elements containing specified text somewhere inside, possibly in a child or a descendant element. When passed a [string], matching is case-insensitive and searches for a substring. For example, `"Playwright"` matches `<article><div>Playwright</div></article>`.
   - `visible` [boolean] *(optional)* <font size="2">Added in: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-option-visible"/><a href="#locator-filter-option-visible" class="list-anchor">#</a>
     
-    Only matches visible or invisible elements.
+    Only matches visible or invisible elements. Prefer the [locator.visible()](/api/class-locator.mdx#locator-visible) shortcut when matching only visible elements.
 
 **Returns**
 - [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-return"/><a href="#locator-filter-return" class="list-anchor">#</a>
@@ -2714,6 +2714,36 @@ This method unchecks the element by performing the following steps:
 If the element is detached from the DOM at any moment during the action, this method throws.
 
 When all steps combined have not finished during the specified [timeout](/api/class-locator.mdx#locator-uncheck-option-timeout), this method throws a [TimeoutError]. Passing zero timeout disables this.
+
+---
+
+### visible {/* #locator-visible */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.63</font><x-search>locator.visible</x-search>
+
+Returns a locator that matches only [visible](../actionability.mdx#visible) elements, ignoring the invisible ones. This is the recommended way to distinguish elements by visibility, as opposed to the `:visible` CSS pseudo-class.
+
+Note that visibility is checked every time the locator is used, and not at the moment of the [locator.visible()](/api/class-locator.mdx#locator-visible) call.
+
+**Usage**
+
+Consider a page with two buttons, the first invisible and the second visible.
+
+```html
+<button style='display: none'>Invisible</button>
+<button>Visible</button>
+```
+
+This will only find the second button, because it is visible, and then click it.
+
+```js
+await page.locator('button').visible().click();
+```
+
+To match invisible elements instead, use [locator.filter()](/api/class-locator.mdx#locator-filter) with the [visible](/api/class-locator.mdx#locator-filter-option-visible) option set to `false`.
+
+**Returns**
+- [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-visible-return"/><a href="#locator-visible-return" class="list-anchor">#</a>
 
 ---
 

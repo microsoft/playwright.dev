@@ -330,6 +330,8 @@ System.out.println(frame == contentFrame);  // -> true
 
 When working with iframes, you can create a frame locator that will enter the iframe and allow selecting elements in that iframe.
 
+When called without [selector](/api/class-frame.mdx#frame-frame-locator-option-selector), the search starts in this frame or in any of the iframes inside it, so that you don't need to locate each iframe first. Note that the rest of the locator is resolved inside a single frame, just like any other locator. If it matches elements inside multiple frames, an error is thrown.
+
 **Usage**
 
 Following snippet locates element with text "Submit" in the iframe with id `my-frame`, like `<iframe id="my-frame">`:
@@ -339,10 +341,17 @@ Locator locator = frame.frameLocator("#my-iframe").getByText("Submit");
 locator.click();
 ```
 
+Following snippet locates a button, either in the frame or in one of the iframes inside it:
+
+```java
+Locator locator = frame.frameLocator().getByRole(AriaRole.BUTTON);
+locator.click();
+```
+
 **Arguments**
-- `selector` [String]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-frame-locator-option-selector"/><a href="#frame-frame-locator-option-selector" class="list-anchor">#</a>
+- `selector` [String] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-frame-locator-option-selector"/><a href="#frame-frame-locator-option-selector" class="list-anchor">#</a>
   
-  A selector to use when resolving DOM element.
+  A selector that matches the frame element. When not specified, locator is matched in this frame or in any of the iframes inside it.
 
 **Returns**
 - [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-frame-locator-return"/><a href="#frame-frame-locator-return" class="list-anchor">#</a>
@@ -883,34 +892,6 @@ Frame.parentFrame();
 
 **Returns**
 - [null] | [Frame]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-parent-frame-return"/><a href="#frame-parent-frame-return" class="list-anchor">#</a>
-
----
-
-### pierceFrames {/* #frame-pierce-frames */}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.63</font><x-search>frame.pierceFrames</x-search>
-
-When working with iframes, you can create a frame locator that will search for elements in this frame and in all iframes inside it, so that you don't need to locate each iframe first.
-
-Note that all elements matching the locator must belong to a single frame. For example, if the frame contains two iframes, each with a `Submit` button, piercing frames and locating a button will throw an error because it matches elements from multiple frames.
-
-**Usage**
-
-Following snippet locates a button, either in the frame or in one of the iframes inside it:
-
-```java
-Locator locator = frame.pierceFrames().getByRole(AriaRole.BUTTON);
-locator.click();
-```
-
-**Arguments**
-- `options` `Frame.PierceFramesOptions` *(optional)*
-  - `setPierce` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-pierce-frames-option-pierce"/><a href="#frame-pierce-frames-option-pierce" class="list-anchor">#</a>
-    
-    Whether to pierce frames. Pass `false` to opt out of frame piercing enabled by the [setPierceFrames](/api/class-browser.mdx#browser-new-context-option-pierce-frames) context option. Defaults to `true`.
-
-**Returns**
-- [FrameLocator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="frame-pierce-frames-return"/><a href="#frame-pierce-frames-return" class="list-anchor">#</a>
 
 ---
 

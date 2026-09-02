@@ -113,6 +113,7 @@ Environment.SetEnvironmentVariable("SESSION_STORAGE", sessionStorage);
 
 // Set session storage in a new context
 var loadedSessionStorage = Environment.GetEnvironmentVariable("SESSION_STORAGE");
+var escapedSessionStorage = loadedSessionStorage.Replace("\\", "\\\\").Replace("'", "\\'");
 await context.AddInitScriptAsync(@"(storage => {
     if (window.location.hostname === 'example.com') {
       const entries = JSON.parse(storage);
@@ -120,7 +121,7 @@ await context.AddInitScriptAsync(@"(storage => {
         window.sessionStorage.setItem(key, value);
       }
     }
-  })('" + loadedSessionStorage + "')");
+  })('" + escapedSessionStorage + "')");
 ```
 
 
