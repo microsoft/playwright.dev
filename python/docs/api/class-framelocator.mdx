@@ -71,6 +71,46 @@ await page.locator('.result-frame').first.content_frame.get_by_role('button').cl
 </TabItem>
 </Tabs>
 
+**Any frame**
+
+Calling [page.frame_locator()](/api/class-page.mdx#page-frame-locator) or [frame.frame_locator()](/api/class-frame.mdx#frame-frame-locator) without a selector creates a frame locator that starts the search in any frame of the subtree - so that you don't need to locate the iframe first.
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+# Finds the button in any frame on the page:
+page.frame_locator().get_by_role("button").click()
+
+# Finds the iframe with id "my-frame" anywhere on the page, and clicks the button inside it:
+page.frame_locator().locator("#my-frame").content_frame.get_by_role("button").click()
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+# Finds the button in any frame on the page:
+await page.frame_locator().get_by_role("button").click()
+
+# Finds the iframe with id "my-frame" anywhere on the page, and clicks the button inside it:
+await page.frame_locator().locator("#my-frame").content_frame.get_by_role("button").click()
+```
+
+</TabItem>
+</Tabs>
+
+Only the start of the search is affected - the rest of the locator is resolved inside a single frame, just like any other locator. Following the strictness rules above, an error is thrown when elements are matched in multiple frames.
+
+Such a frame locator does not point to a particular `iframe`, so [frame_locator.owner](/api/class-framelocator.mdx#frame-locator-owner), [frame_locator.first](/api/class-framelocator.mdx#frame-locator-first), [frame_locator.last](/api/class-framelocator.mdx#frame-locator-last) and [frame_locator.nth()](/api/class-framelocator.mdx#frame-locator-nth) are not supported on it.
+
 **Converting Locator to FrameLocator**
 
 If you have a [Locator] object pointing to an `iframe` it can be converted to [FrameLocator] using [locator.content_frame](/api/class-locator.mdx#locator-content-frame).

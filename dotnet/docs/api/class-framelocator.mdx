@@ -26,6 +26,22 @@ await page.Locator(".result-frame").ContentFrame.GetByRole(AriaRole.Button).Clic
 await page.Locator(".result-frame").First.ContentFrame.getByRole(AriaRole.Button).ClickAsync();
 ```
 
+**Any frame**
+
+Calling [Page.FrameLocator()](/api/class-page.mdx#page-frame-locator) or [Frame.FrameLocator()](/api/class-frame.mdx#frame-frame-locator) without a selector creates a frame locator that starts the search in any frame of the subtree - so that you don't need to locate the iframe first.
+
+```csharp
+// Finds the button in any frame on the page:
+await page.FrameLocator().GetByRole(AriaRole.Button).ClickAsync();
+
+// Finds the iframe with id "my-frame" anywhere on the page, and clicks the button inside it:
+await page.FrameLocator().Locator("#my-frame").ContentFrame.GetByRole(AriaRole.Button).ClickAsync();
+```
+
+Only the start of the search is affected - the rest of the locator is resolved inside a single frame, just like any other locator. Following the strictness rules above, an error is thrown when elements are matched in multiple frames.
+
+Such a frame locator does not point to a particular `iframe`, so [FrameLocator.Owner](/api/class-framelocator.mdx#frame-locator-owner), [FrameLocator.First](/api/class-framelocator.mdx#frame-locator-first), [FrameLocator.Last](/api/class-framelocator.mdx#frame-locator-last) and [FrameLocator.Nth()](/api/class-framelocator.mdx#frame-locator-nth) are not supported on it.
+
 **Converting Locator to FrameLocator**
 
 If you have a [Locator] object pointing to an `iframe` it can be converted to [FrameLocator] using [Locator.ContentFrame](/api/class-locator.mdx#locator-content-frame).
