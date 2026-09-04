@@ -175,6 +175,54 @@ An AI-optimized snapshot, controlled by [mode](/api/class-locator.mdx#locator-ar
 
 ---
 
+### ariaSnapshotJSON {/* #locator-aria-snapshot-json */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.63</font><x-search>locator.ariaSnapshotJSON</x-search>
+
+Captures the aria snapshot of the given element as a free form JSON object.
+
+**Usage**
+
+```js
+await page.getByRole('list').ariaSnapshotJSON();
+```
+
+**Arguments**
+- `options` [Object] *(optional)*
+  - `boxes` [boolean] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-json-option-boxes"/><a href="#locator-aria-snapshot-json-option-boxes" class="list-anchor">#</a>
+    
+    When `true`, includes each element's bounding box as a `box` property with `x`, `y`, `width` and `height`. Coordinates are relative to the viewport, in CSS pixels, as returned by [`Element.getBoundingClientRect()`](https://developer.mozilla.org/en-US/docs/Web/API/Element/getBoundingClientRect). Defaults to `false`.
+  - `depth` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-json-option-depth"/><a href="#locator-aria-snapshot-json-option-depth" class="list-anchor">#</a>
+    
+    When specified, limits the depth of the snapshot.
+  - `mode` "ai" | "default" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-json-option-mode"/><a href="#locator-aria-snapshot-json-option-mode" class="list-anchor">#</a>
+    
+    When set to `"ai"`, returns a snapshot optimized for AI consumption. Defaults to `"default"`. See details in [locator.ariaSnapshot()](/api/class-locator.mdx#locator-aria-snapshot).
+  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-json-option-signal"/><a href="#locator-aria-snapshot-json-option-signal" class="list-anchor">#</a>
+    
+    Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-json-option-timeout"/><a href="#locator-aria-snapshot-json-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Returns**
+- [Promise]&lt;[Serializable]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-aria-snapshot-json-return"/><a href="#locator-aria-snapshot-json-return" class="list-anchor">#</a>
+
+**Details**
+
+This method returns the same tree as [locator.ariaSnapshot()](/api/class-locator.mdx#locator-aria-snapshot), serialized as a JSON value instead of YAML markup. The result is a list of nodes, each node being an object with the following properties:
+* `role` Aria role of the element, or `"text"` for a static text fragment.
+* `name` Accessible name of the element, if any.
+* `text` Text content of the element when it is the only child, or the content of a static text fragment.
+* `children` Child nodes and text fragments.
+* Boolean and value properties for element state flags: `checked`, `disabled`, `expanded`, `active`, `invalid`, `level`, `pressed` and `selected`.
+* Additional element properties, for example `url` for links and `placeholder` for text boxes.
+* `ref` Element reference for AI-optimized snapshots.
+* `cursor` Set to `"pointer"` for clickable elements in AI-optimized snapshots.
+* `box` Bounding box of the element when [boxes](/api/class-locator.mdx#locator-aria-snapshot-json-option-boxes) is set.
+
+---
+
 ### blur {/* #locator-blur */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.28</font><x-search>locator.blur</x-search>
@@ -1039,7 +1087,7 @@ await rowLocator
     Matches elements containing specified text somewhere inside, possibly in a child or a descendant element. When passed a [string], matching is case-insensitive and searches for a substring. For example, `"Playwright"` matches `<article><div>Playwright</div></article>`.
   - `visible` [boolean] *(optional)* <font size="2">Added in: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-option-visible"/><a href="#locator-filter-option-visible" class="list-anchor">#</a>
     
-    Only matches visible or invisible elements.
+    Only matches visible or invisible elements. Prefer the [locator.visible()](/api/class-locator.mdx#locator-visible) shortcut when matching only visible elements.
 
 **Returns**
 - [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-filter-return"/><a href="#locator-filter-return" class="list-anchor">#</a>
@@ -2666,6 +2714,36 @@ This method unchecks the element by performing the following steps:
 If the element is detached from the DOM at any moment during the action, this method throws.
 
 When all steps combined have not finished during the specified [timeout](/api/class-locator.mdx#locator-uncheck-option-timeout), this method throws a [TimeoutError]. Passing zero timeout disables this.
+
+---
+
+### visible {/* #locator-visible */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.63</font><x-search>locator.visible</x-search>
+
+Returns a locator that matches only [visible](../actionability.mdx#visible) elements, ignoring the invisible ones. This is the recommended way to distinguish elements by visibility, as opposed to the `:visible` CSS pseudo-class.
+
+Note that visibility is checked every time the locator is used, and not at the moment of the [locator.visible()](/api/class-locator.mdx#locator-visible) call.
+
+**Usage**
+
+Consider a page with two buttons, the first invisible and the second visible.
+
+```html
+<button style='display: none'>Invisible</button>
+<button>Visible</button>
+```
+
+This will only find the second button, because it is visible, and then click it.
+
+```js
+await page.locator('button').visible().click();
+```
+
+To match invisible elements instead, use [locator.filter()](/api/class-locator.mdx#locator-filter) with the [visible](/api/class-locator.mdx#locator-filter-option-visible) option set to `false`.
+
+**Returns**
+- [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-visible-return"/><a href="#locator-visible-return" class="list-anchor">#</a>
 
 ---
 
