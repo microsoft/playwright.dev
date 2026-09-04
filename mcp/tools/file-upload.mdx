@@ -6,22 +6,30 @@ title: "File Upload"
 
 ## browser_file_upload
 
-Handle file chooser dialogs. When a page opens a file picker, provide file paths to upload.
+Handle file chooser dialogs. When a page opens a file picker, the tool response reports the modal
+state and every other tool refuses to run until it is handled:
+
+```txt
+### Modal state
+- [File chooser]: can be handled by browser_file_upload
+```
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `paths` | string[] | yes | Absolute file paths to upload. Omit to cancel. |
+| `paths` | string[] | no | The absolute paths to the files to upload. Can be a single file or multiple files. If omitted, the file chooser is cancelled |
 
 ```txt
-→ browser_click { ref: "e8" }  // clicks "Choose file" button
-  ⚠ File chooser opened
+→ browser_click { target: "e8" }
+
+  ### Modal state
+  - [File chooser]: can be handled by browser_file_upload
 
 → browser_file_upload { paths: ["/home/user/documents/report.pdf"] }
-→ browser_snapshot
-  - text: "report.pdf selected"
+
+  - text: report.pdf selected
   - button "Upload" [ref=e12]
 
-→ browser_click { ref: "e12" }
+→ browser_click { target: "e12" }
 ```
 
 ### Multiple files
@@ -35,12 +43,38 @@ Handle file chooser dialogs. When a page opens a file picker, provide file paths
   }
 ```
 
-### Cancel file chooser
+### Cancel the file chooser
 
 ```txt
-→ browser_file_upload { paths: [] }
+→ browser_file_upload
 ```
 
+## browser_drop
+
+Drop files or MIME-typed data onto an element, as if dragged in from outside the page. Use this for
+drag-and-drop upload zones that never open a file chooser. At least one of `paths` or `data` must be
+provided.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `target` | string | yes | Element ref from the snapshot, or a unique selector |
+| `paths` | string[] | no | Absolute paths to files to drop onto the element |
+| `data` | object | no | Data to drop, as a map of MIME type to string value |
+
+```txt
+→ browser_drop {
+    target: "e7",
+    paths: ["/home/user/photos/image1.jpg"]
+  }
+
+→ browser_drop {
+    target: "e12",
+    data: { "text/plain": "hello", "text/uri-list": "https://example.com" }
+  }
+```
+
+To drag between two elements already on the page, use [`browser_drag`](./interaction.mdx#browser_drag) instead.
+
 :::note
-By default, file uploads are restricted to paths within the MCP workspace roots. Use `--allow-unrestricted-file-access` to allow uploads from anywhere.
+By default, file access is restricted to paths within the MCP workspace roots. Use `--allow-unrestricted-file-access` to allow files from anywhere.
 :::

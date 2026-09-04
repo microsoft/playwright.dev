@@ -8,27 +8,31 @@ title: "Navigation"
 |------|-------------|
 | `browser_navigate` | Navigate to a URL |
 | `browser_navigate_back` | Go back to the previous page |
-| `browser_navigate_forward` | Go forward to the next page |
-| `browser_reload` | Reload the current page |
-| `browser_close` | Close the current page and browser |
+| `browser_close` | Close the page |
 
 ## browser_navigate
 
-Navigate to a URL in the current tab.
+Navigate to a URL in the current tab. If no tab is open yet, one is created.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `url` | string | yes | URL to navigate to |
+| `url` | string | yes | The URL to navigate to |
 
 ```txt
 You: Go to https://demo.playwright.dev/todomvc
 
 → browser_navigate { url: "https://demo.playwright.dev/todomvc" }
-→ Returns snapshot of the loaded page:
 
-  - heading "todos" [level=1]
+  - Page URL: https://demo.playwright.dev/todomvc
+  - Page Title: React • TodoMVC
+
+  - heading "todos" [level=1] [ref=e3]
   - textbox "What needs to be done?" [ref=e5]
 ```
+
+Non-2xx responses are surfaced in the response as `- HTTP status: 402 Payment Required`.
+
+`about:`, `data:` and `javascript:` URLs are allowed. Navigation to `file://` URLs is blocked unless the server is started with `--allow-unrestricted-file-access`, and origins can be restricted further with `--allowed-origins` / `--blocked-origins`.
 
 ## browser_navigate_back
 
@@ -38,36 +42,24 @@ Go back to the previous page in the browser history.
 You: Go back to the previous page.
 
 → browser_navigate_back
-→ Returns snapshot of the previous page
-```
-
-## browser_navigate_forward
-
-Go forward to the next page in the browser history.
-
-```txt
-You: Go forward.
-
-→ browser_navigate_forward
-```
-
-## browser_reload
-
-Reload the current page.
-
-```txt
-You: Reload the page.
-
-→ browser_reload
-→ Returns fresh snapshot after reload
+→ Returns a snapshot of the previous page
 ```
 
 ## browser_close
 
-Close the current page and browser.
+Close the page. Fails when the browser context is shared between clients (`--shared-browser-context`).
 
 ```txt
 → browser_close
+```
+
+## Reloading and going forward
+
+To reload, navigate to the same URL again. To go forward, or to reload without re-resolving the URL, use `browser_run_code_unsafe`:
+
+```txt
+→ browser_run_code_unsafe { code: "async (page) => { await page.reload(); }" }
+→ browser_run_code_unsafe { code: "async (page) => { await page.goForward(); }" }
 ```
 
 ## Workflow example
@@ -77,14 +69,15 @@ You: Open the TodoMVC app, add an item, then go back to see
      if the item persists.
 
 → browser_navigate { url: "https://demo.playwright.dev/todomvc" }
-→ browser_type { ref: "e5", text: "Buy groceries", submit: true }
+→ browser_type { target: "e5", text: "Buy groceries", submit: true }
 → browser_navigate { url: "https://example.com" }
 → browser_navigate_back
 → browser_snapshot
 
-  - heading "todos" [level=1]
+  - heading "todos" [level=1] [ref=e3]
   - textbox "What needs to be done?" [ref=e5]
-  - listitem:
-    - checkbox "Toggle Todo" [ref=e10]
-    - text: "Buy groceries"
+  - list [ref=e8]:
+    - listitem [ref=e9]:
+      - checkbox "Toggle Todo" [ref=e10]
+      - text: Buy groceries
 ```

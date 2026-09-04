@@ -9,43 +9,93 @@ Playwright MCP uses accessibility snapshots instead of screenshots. Every tool t
 ## Snapshot format
 
 ```txt
-- heading "todos" [level=1]
+- heading "todos" [level=1] [ref=e3]
 - textbox "What needs to be done?" [ref=e5]
-- listitem:
-  - checkbox "Toggle Todo" [ref=e10]
-  - text: "Buy groceries"
-- listitem:
-  - checkbox "Toggle Todo" [ref=e14]
-  - text: "Water flowers"
-- contentinfo:
-  - text: "2 items left"
+- list [ref=e8]:
+  - listitem [ref=e9]:
+    - checkbox "Toggle Todo" [ref=e10]
+    - text: Buy groceries
+  - listitem [ref=e13]:
+    - checkbox "Toggle Todo" [ref=e14]
+    - text: Water flowers
+- contentinfo [ref=e18]:
+  - text: 2 items left
   - link "All" [ref=e20]
   - link "Active" [ref=e21]
   - link "Completed" [ref=e22]
 ```
 
-Each interactive element gets a unique **ref** (e.g., `ref=e5`). The LLM uses these refs to interact:
+Each element gets a unique **ref** (e.g., `ref=e5`). Tools that act on an element take that ref as their `target`:
 
+```txt
+browser_type  { target: "e5", text: "headphones" }
+browser_click { target: "e10" }
+browser_click { target: "e20" }
 ```
-browser_type   { ref: "e5", text: "headphones" }    → type into search
-browser_click  { ref: "e10" }                       → check the checkbox
-browser_click  { ref: "e20" }                       → click the "All" link
-```
 
-## Element refs
+## Targeting elements
 
-Refs are **stable within a single snapshot** — the same element always has the same ref until the page changes. After navigation or DOM updates, the tool returns a fresh snapshot with new refs.
+Tools that act on an element take a `target`, which accepts either form:
+
+- **A ref** — `e12`, or `f1e12` for an element inside the first iframe. This is what the snapshot prints, and what you should normally pass.
+- **A selector** — any Playwright selector or locator string, for example `getByRole('button', { name: 'Submit' })`, `#submit`, or `text=Sign in`. Useful when you already know the element and want to skip a snapshot round-trip.
+
+If a ref is stale, the tool fails with `Ref <ref> not found in the current page snapshot. Try capturing new snapshot.`
 
 | Property | Detail |
 |----------|--------|
-| Format | `e` followed by a number (e.g., `e1`, `e15`, `e203`) |
+| Format | `e` followed by a number, optionally prefixed by a frame id (`e1`, `e15`, `f2e7`) |
 | Scope | Unique within a single snapshot |
-| Lifetime | Valid until the next page change |
-| Assignment | Only interactive elements get refs (buttons, links, inputs, etc.) |
+| Lifetime | Valid until the page changes |
+| Assignment | Assigned to every node the accessibility tree exposes, not just interactive ones |
 
 ## On-demand snapshots
 
-Use `browser_snapshot` to capture the page state on demand. Most tools also return a snapshot automatically after each action, so the LLM always has up-to-date page state.
+Most tools return a fresh snapshot automatically after each action, so the LLM always has up-to-date page state. Use `browser_snapshot` to capture it explicitly.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `target` | string | no | Snapshot only this element's subtree |
+| `depth` | number | no | Limit the depth of the snapshot tree |
+| `boxes` | boolean | no | Include each element's bounding box as `[box=x,y,width,height]`, viewport-relative in CSS pixels |
+| `filename` | string | no | Save the snapshot to a file instead of returning it in the response |
+
+```txt
+→ browser_snapshot { depth: 2 }
+→ browser_snapshot { target: "e8" }        // just the todo list subtree
+→ browser_snapshot { boxes: true }         // add bounding boxes
+```
+
+Snapshot mode can also be set globally with `--snapshot-mode=none` to stop tools from attaching snapshots to responses, and `--snapshot-boxes` to always include bounding boxes.
+
+## Searching a snapshot
+
+`browser_find` searches the current page's snapshot and returns only the matching nodes plus a few lines of surrounding context, each shown under its path from the root of the tree. On a large page this is far cheaper than capturing the whole snapshot when you only need to locate one element and its ref.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `text` | string | no | Plain text to search for (case-insensitive substring match) |
+| `regex` | string | no | Regular expression. Case-sensitive by default; wrap in slashes to add flags, e.g. `/error/i` |
+
+Provide exactly one of `text` or `regex`.
+
+```txt
+→ browser_find { text: "Deep Target Link" }
+
+  Found 1 match for "Deep Target Link":
+
+  - main [ref=e2]:
+    - region "Sidebar" [ref=e3]:
+      - navigation "Primary" [ref=e4]:
+        - list [ref=e5]:
+          ...
+          - listitem [ref=e16]:
+            - link "Deep Target Link" [ref=e17]
+
+→ browser_click { target: "e17" }
+```
+
+Gaps in the surrounding context are marked with `...`.
 
 ## Snapshots with screenshots
 
@@ -61,7 +111,7 @@ The LLM gets both the structured accessibility tree for interaction and the visu
 
 | | Snapshots | Screenshots |
 |---|-----------|-------------|
-| **Token cost** | ~200-400 tokens | ~3000-5000 tokens (vision model) |
+| **Token cost** | Low — text only | High — image tokens |
 | **Precision** | Exact — refs point to specific elements | Approximate — requires coordinate guessing |
 | **Speed** | Instant — text parsing | Slower — vision model inference |
 | **Reliability** | Deterministic — same structure = same interaction | Variable — layout changes break coordinates |
@@ -71,5 +121,6 @@ The LLM gets both the structured accessibility tree for interaction and the visu
 
 1. **Use refs, not selectors** — refs from snapshots are more reliable than CSS selectors because they point to the exact element the LLM just saw
 2. **Re-snapshot after navigation** — refs are invalidated when the page changes
-3. **Combine with screenshots** — when visual context is needed alongside structured data
-4. **Check for dialogs** — if a tool reports a dialog is open, handle it before proceeding with other actions
+3. **Use `browser_find` on large pages** — it returns only the matching subtree instead of the entire snapshot
+4. **Combine with screenshots** — when visual context is needed alongside structured data
+5. **Check for dialogs** — if a tool reports a dialog is open, handle it before proceeding with other actions

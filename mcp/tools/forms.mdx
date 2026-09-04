@@ -10,20 +10,33 @@ Type text into an editable element (input, textarea, contenteditable).
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `ref` | string | yes | Element reference |
-| `text` | string | yes | Text to type |
+| `target` | string | yes | Element ref from the snapshot, or a unique selector |
+| `text` | string | yes | Text to type into the element |
 | `submit` | boolean | no | Press Enter after typing |
-| `slowly` | boolean | no | Type one character at a time (triggers key handlers) |
+| `slowly` | boolean | no | Type one character at a time. Useful for triggering key handlers; by default the entire text is filled in at once |
 
 ```txt
-→ browser_type { ref: "e5", text: "Buy groceries" }
-→ browser_type { ref: "e5", text: "Buy groceries", submit: true }  // types + Enter
-→ browser_type { ref: "e8", text: "search query", slowly: true }   // triggers autocomplete
+→ browser_type { target: "e5", text: "Buy groceries" }
+→ browser_type { target: "e5", text: "Buy groceries", submit: true }
+→ browser_type { target: "e8", text: "search query", slowly: true }
 ```
 
 ## browser_fill_form
 
-Fill multiple form fields at once. Supports textboxes, checkboxes, radio buttons, comboboxes, and sliders.
+Fill multiple form fields in one call. Supports textboxes, checkboxes, radio buttons, comboboxes, and sliders. This is more efficient than calling `browser_type` and `browser_click` for each field individually.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `fields` | object[] | yes | Fields to fill in |
+
+Each field is an object:
+
+| Field key | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `name` | string | yes | Human-readable field name |
+| `target` | string | yes | Element ref or selector |
+| `type` | string | yes | `textbox`, `checkbox`, `radio`, `combobox`, or `slider` |
+| `value` | string | yes | Value to fill in. For a checkbox or radio use `"true"` / `"false"`; for a combobox use the option's text |
 
 ```txt
 → browser_snapshot
@@ -32,35 +45,29 @@ Fill multiple form fields at once. Supports textboxes, checkboxes, radio buttons
   - textbox "Email" [ref=e7]
   - checkbox "Accept terms" [ref=e9]
   - combobox "Country" [ref=e11]
-  - radio "Monthly plan" [ref=e13]
   - radio "Annual plan" [ref=e15]
 
 → browser_fill_form {
     fields: [
-      { ref: "e3", value: "Alice" },
-      { ref: "e5", value: "Smith" },
-      { ref: "e7", value: "alice@example.com" },
-      { ref: "e9", value: true },
-      { ref: "e11", value: "United States" },
-      { ref: "e15", value: true }
+      { name: "First name",   target: "e3",  type: "textbox",  value: "Alice" },
+      { name: "Last name",    target: "e5",  type: "textbox",  value: "Smith" },
+      { name: "Email",        target: "e7",  type: "textbox",  value: "alice@example.com" },
+      { name: "Accept terms", target: "e9",  type: "checkbox", value: "true" },
+      { name: "Country",      target: "e11", type: "combobox", value: "United States" },
+      { name: "Annual plan",  target: "e15", type: "radio",    value: "true" }
     ]
   }
 ```
 
-This is more efficient than calling `browser_type` and `browser_click` for each field individually.
+:::note
+To toggle a single checkbox or radio button, either click it with `browser_click`, or use `browser_fill_form` with `type: "checkbox"` (or `"radio"`) and `value: "true"` / `"false"`.
+:::
 
-## browser_check / browser_uncheck
+## Secrets
 
-Check or uncheck a checkbox or radio button.
-
-| Parameter | Type | Required | Description |
-|-----------|------|----------|-------------|
-| `ref` | string | yes | Element reference |
-
-```txt
-→ browser_check { ref: "e9" }     // check the "Accept terms" checkbox
-→ browser_uncheck { ref: "e9" }   // uncheck it
-```
+Values passed to `browser_type` and `browser_fill_form` are matched against the secrets file supplied
+with `--secrets <path>` (dotenv format). A matching placeholder is substituted with the real value
+before it reaches the page, and the generated code shows `SECRET_<name>` instead of the value.
 
 ## Workflow: completing a multi-step form
 
@@ -73,11 +80,10 @@ You: Fill out the registration form on this page.
   - textbox "Password" [ref=e5]
   - button "Next" [ref=e7]
 
-→ browser_type { ref: "e3", text: "alice@example.com" }
-→ browser_type { ref: "e5", text: "s3cureP@ss!" }
-→ browser_click { ref: "e7" }
+→ browser_type { target: "e3", text: "alice@example.com" }
+→ browser_type { target: "e5", text: "s3cureP@ss!" }
+→ browser_click { target: "e7" }
 
-→ browser_snapshot
   // Page 2: Profile
   - textbox "Display name" [ref=e3]
   - combobox "Timezone" [ref=e5]
@@ -86,10 +92,10 @@ You: Fill out the registration form on this page.
 
 → browser_fill_form {
     fields: [
-      { ref: "e3", value: "Alice S." },
-      { ref: "e5", value: "US/Pacific" },
-      { ref: "e7", value: true }
+      { name: "Display name", target: "e3", type: "textbox",  value: "Alice S." },
+      { name: "Timezone",     target: "e5", type: "combobox", value: "US/Pacific" },
+      { name: "Subscribe",    target: "e7", type: "checkbox", value: "true" }
     ]
   }
-→ browser_click { ref: "e9" }
+→ browser_click { target: "e9" }
 ```

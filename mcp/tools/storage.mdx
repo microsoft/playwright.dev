@@ -19,31 +19,36 @@ Manage cookies, localStorage, sessionStorage, and save/restore full browser stat
 
 ## Storage state
 
-Save and restore the full browser state (cookies + localStorage) in a single file. This is the primary way to persist authentication across sessions.
+Save and restore the full browser state (cookies + local storage) in a single file. This is the primary way to persist authentication across sessions.
 
 ### browser_storage_state
 
-Save current state to a JSON file.
+Save the current state to a JSON file.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `filename` | string | no | File to save to. Relative names resolve against the workspace root. Defaults to `storage-state-{timestamp}.json` in the output directory |
 
 ```txt
-→ browser_storage_state
-  State saved to: auth-state.json
+→ browser_storage_state { filename: "auth-state.json" }
+  - [Storage state](auth-state.json)
 ```
 
 ### browser_set_storage_state
 
-Restore a previously saved state.
+Restore a previously saved state. Existing cookies and local storage are cleared first.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `path` | string | yes | Path to state JSON file |
+| `filename` | string | yes | Path to the storage state file. Relative names resolve against the workspace root |
 
 ```txt
-→ browser_set_storage_state { path: "./auth-state.json" }
+→ browser_set_storage_state { filename: "auth-state.json" }
+  Storage state restored from auth-state.json
+
 → browser_navigate { url: "https://app.example.com/dashboard" }
-→ browser_snapshot
   // Already logged in
-  - heading "Dashboard" [level=1]
+  - heading "Dashboard" [level=1] [ref=e2]
 ```
 
 ### Workflow: save login, skip it next time
@@ -51,18 +56,17 @@ Restore a previously saved state.
 ```txt
 // Login once
 → browser_navigate { url: "https://app.example.com/login" }
-→ browser_type { ref: "e3", text: "alice@example.com" }
-→ browser_type { ref: "e5", text: "s3cret!" }
-→ browser_click { ref: "e7" }
-→ browser_snapshot
-  - heading "Dashboard" [level=1]
+→ browser_type { target: "e3", text: "alice@example.com" }
+→ browser_type { target: "e5", text: "s3cret!" }
+→ browser_click { target: "e7" }
+
+  - heading "Dashboard" [level=1] [ref=e2]
 
 // Save
-→ browser_storage_state
-  State saved to: auth-state.json
+→ browser_storage_state { filename: "auth-state.json" }
 
 // Next session: restore instead of logging in
-→ browser_set_storage_state { path: "./auth-state.json" }
+→ browser_set_storage_state { filename: "auth-state.json" }
 → browser_navigate { url: "https://app.example.com/dashboard" }
 ```
 
@@ -78,54 +82,58 @@ Or load state automatically on server startup:
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `domain` | string | no | Filter by domain |
-| `path` | string | no | Filter by path |
+| `domain` | string | no | Filter cookies by domain |
+| `path` | string | no | Filter cookies by path |
 
 ```txt
 → browser_cookie_list
 
-  Name          Value       Domain            HttpOnly  Secure  Expires
-  session_id    abc123      .example.com      true      true    2024-12-31
-  theme         dark        .example.com      false     false   Session
-  _ga           GA1.2...    .example.com      false     false   2026-01-01
+  session_id=abc123 (domain: .example.com, path: /)
+  theme=dark (domain: .example.com, path: /)
 ```
 
 ### browser_cookie_get
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `name` | string | yes | Cookie name |
+| `name` | string | yes | Cookie name to get |
+
+```txt
+→ browser_cookie_get { name: "session_id" }
+
+  session_id=abc123 (domain: .example.com, path: /, httpOnly: true, secure: true, sameSite: Lax)
+```
 
 ### browser_cookie_set
+
+Domain defaults to the current page's hostname and path defaults to `/`.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `name` | string | yes | Cookie name |
 | `value` | string | yes | Cookie value |
 | `domain` | string | no | Cookie domain |
-| `path` | string | no | Cookie path (default: `/`) |
-| `expires` | number | no | Expiration as Unix timestamp |
-| `httpOnly` | boolean | no | HTTP-only flag |
-| `secure` | boolean | no | Secure flag |
+| `path` | string | no | Cookie path |
+| `expires` | number | no | Expiration as a Unix timestamp |
+| `httpOnly` | boolean | no | Whether the cookie is HTTP only |
+| `secure` | boolean | no | Whether the cookie is secure |
 | `sameSite` | string | no | `Strict`, `Lax`, or `None` |
 
 ### browser_cookie_delete / browser_cookie_clear
 
-Delete a specific cookie by name, or clear all cookies.
+Delete a specific cookie by `name`, or clear all cookies.
 
 ### Workflow: test logout by clearing cookies
 
 ```txt
 → browser_cookie_clear
-→ browser_reload
-→ browser_snapshot
-  - heading "Sign in" [level=1]
+→ browser_navigate { url: "https://app.example.com/dashboard" }
+
+  - heading "Sign in" [level=1] [ref=e2]
   - textbox "Email" [ref=e3]
 ```
 
 ## localStorage
-
-### browser_localstorage_list / get / set / delete / clear
 
 Manage localStorage key-value pairs for the current origin.
 
@@ -139,15 +147,15 @@ Manage localStorage key-value pairs for the current origin.
 
 ```txt
 → browser_localstorage_list
-  Key                Value
-  user_preferences   {"theme":"dark","lang":"en"}
-  onboarding_done    true
+
+  user_preferences={"theme":"dark","lang":"en"}
+  onboarding_done=true
 
 → browser_localstorage_set { key: "onboarding_done", value: "false" }
-→ browser_reload
-→ browser_snapshot
+→ browser_navigate { url: "https://app.example.com" }
+
   // Onboarding wizard appears
-  - heading "Welcome! Let's get started" [level=1]
+  - heading "Welcome! Let's get started" [level=1] [ref=e2]
 ```
 
 ## sessionStorage

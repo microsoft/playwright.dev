@@ -21,37 +21,80 @@ Inspect network traffic, mock API responses, and test offline behavior. Inspecti
 
 ### browser_network_requests
 
-List requests made since page load. Part of **core** — no extra capability needed.
+Returns a numbered list of network requests since loading the page. Part of **core** — no extra capability needed.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `filter` | string | no | Regexp pattern to filter URLs |
-| `includeStatic` | boolean | no | Include images, CSS, fonts |
-| `includeBody` | boolean | no | Include request body |
-| `includeHeaders` | boolean | no | Include request headers |
+| `static` | boolean | no | Include successful static resources like images, fonts and scripts. Defaults to false |
+| `filter` | string | no | Only return requests whose URL matches this regexp, e.g. `/api/.*user` |
+| `filename` | string | no | Save the list to a file instead of returning it as text |
 
 ```txt
 → browser_network_requests { filter: "api" }
 
-  GET  200 https://api.example.com/me              8ms   application/json
-  POST 201 https://api.example.com/users/create     45ms  application/json
-  GET  200 https://api.example.com/settings         12ms  application/json
+  1. [GET] https://api.example.com/me => [200] OK
+  2. [POST] https://api.example.com/users/create => [201] Created
+  3. [GET] https://api.example.com/settings => [200] OK
+
+  Note: 14 static requests not shown, run with "static" option to see them.
 ```
+
+### browser_network_request
+
+Returns full details — general info, headers and bodies — of a single request, using the number
+printed by `browser_network_requests`.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `index` | number | yes | 1-based index of the request |
+| `part` | string | no | Return only this part: `request-headers`, `request-body`, `response-headers`, `response-body` |
+| `filename` | string | no | Save the output to a file instead of returning it as text |
+
+```txt
+→ browser_network_request { index: 2 }
+
+  #2 [POST] https://api.example.com/users/create
+
+    General
+      status:    [201] Created
+      duration:  45ms
+      type:      fetch
+      mimeType:  application/json
+
+    Request headers
+      content-type: application/json
+      ...
+
+    Response headers
+      content-type: application/json
+      ...
+
+  Call browser_network_request with part="request-body" to read the request body.
+  Call browser_network_request with part="response-body" to read the response body.
+
+→ browser_network_request { index: 2, part: "response-body" }
+
+  {"id":42,"name":"Alice"}
+```
+
+Binary response bodies are written to the output directory and the tool returns the file path.
 
 ## Mock API responses
 
 ### browser_route
 
-Intercept requests matching a URL pattern and return a custom response.
+Set up a route to mock network requests matching a URL pattern. When `status` or `body` is given the
+request is fulfilled with that response; otherwise the request continues with the header
+modifications applied.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `pattern` | string | yes | URL pattern (`**` glob supported) |
-| `status` | number | no | HTTP status code |
-| `body` | string | no | Response body |
-| `contentType` | string | no | Content-Type header |
-| `headers` | object | no | Additional response headers |
-| `removeHeaders` | string[] | no | Headers to strip from request |
+| `pattern` | string | yes | URL pattern to match, e.g. `**/api/users`, `**/*.{png,jpg}` |
+| `status` | number | no | HTTP status code to return (default 200) |
+| `body` | string | no | Response body (text or JSON string) |
+| `contentType` | string | no | Content-Type header, e.g. `application/json` |
+| `headers` | string[] | no | Headers to add to the request, in `"Name: Value"` format |
+| `removeHeaders` | string | no | Comma-separated list of header names to remove from the request |
 
 ### Mock an API endpoint
 
@@ -64,12 +107,12 @@ You: Mock the /api/users endpoint to return two test users.
     body: "[{\"id\":1,\"name\":\"Alice\"},{\"id\":2,\"name\":\"Bob\"}]",
     contentType: "application/json"
   }
-→ browser_reload
-→ browser_snapshot
-  - heading "Users" [level=1]
-  - list "User list":
-    - listitem: "Alice"
-    - listitem: "Bob"
+→ browser_navigate { url: "https://app.example.com/users" }
+
+  - heading "Users" [level=1] [ref=e2]
+  - list [ref=e4]:
+    - listitem [ref=e5]: Alice
+    - listitem [ref=e6]: Bob
 ```
 
 ### Test error handling
@@ -78,9 +121,9 @@ You: Mock the /api/users endpoint to return two test users.
 You: Test what happens when the API returns a 503 error.
 
 → browser_route { pattern: "**/api/users", status: 503 }
-→ browser_reload
-→ browser_snapshot
-  - heading "Something went wrong" [level=1]
+→ browser_navigate { url: "https://app.example.com/users" }
+
+  - heading "Something went wrong" [level=1] [ref=e2]
   - button "Retry" [ref=e5]
 
 → browser_take_screenshot
@@ -90,12 +133,9 @@ Remove the mock and verify recovery:
 
 ```txt
 → browser_unroute
-→ browser_click { ref: "e5" }
-→ browser_snapshot
-  - heading "Users" [level=1]
-  - list "User list":
-    - listitem: "Alice Johnson"
-    - listitem: "Bob Smith"
+→ browser_click { target: "e5" }
+
+  - heading "Users" [level=1] [ref=e2]
 ```
 
 ### Block resources
@@ -105,20 +145,19 @@ Remove the mock and verify recovery:
 → browser_route { pattern: "**/analytics/**", status: 204 }
 ```
 
-### Strip authentication headers
+### Add or strip request headers
 
 ```txt
-→ browser_route { pattern: "**/api/**", removeHeaders: ["cookie", "authorization"] }
-→ browser_reload
-  // Page shows 401 / login prompt
+→ browser_route { pattern: "**/api/**", headers: ["X-Debug: 1"] }
+→ browser_route { pattern: "**/api/**", removeHeaders: "cookie,authorization" }
 ```
 
 ### Conditional mocking with code
 
-For complex scenarios — delays, conditional responses, request body inspection — use `browser_run_code`:
+For complex scenarios — delays, conditional responses, request body inspection — use `browser_run_code_unsafe`:
 
 ```txt
-→ browser_run_code {
+→ browser_run_code_unsafe {
     code: "async (page) => {
       await page.route('**/api/search', async route => {
         const url = new URL(route.request().url());
@@ -135,24 +174,27 @@ For complex scenarios — delays, conditional responses, request body inspection
 
 ### browser_route_list
 
+Lists all active routes. Takes no parameters.
+
 ```txt
 → browser_route_list
 
-  Pattern              Status  Content-Type
-  **/api/users         200     application/json
-  **/*.jpg             404     -
-  **/analytics/**      204     -
+  1. **/api/users (status=200, body=[{"id":1,"name":"Alice"}]..., contentType=application/json)
+  2. **/*.jpg (status=404)
+  3. **/analytics/** (status=204)
 ```
 
 ### browser_unroute
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `pattern` | string | no | Pattern to remove. Omit to remove all. |
+| `pattern` | string | no | URL pattern to unroute. Omit to remove all routes |
 
 ## Test offline mode
 
 ### browser_network_state_set
+
+Sets the browser network state. When offline, all network requests fail.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
@@ -160,11 +202,21 @@ For complex scenarios — delays, conditional responses, request body inspection
 
 ```txt
 → browser_network_state_set { state: "offline" }
-→ browser_reload
-→ browser_snapshot
-  - heading "No internet connection" [level=1]
+→ browser_navigate { url: "https://app.example.com" }
+
+  - heading "No internet connection" [level=1] [ref=e2]
 
 → browser_network_state_set { state: "online" }
-→ browser_reload
-  // Page loads normally
 ```
+
+## Restricting origins
+
+Independently of mocking, the server can be told which origins the browser may reach at all:
+
+```json
+["@playwright/mcp@latest", "--allowed-origins=https://example.com;http://localhost:*"]
+["@playwright/mcp@latest", "--blocked-origins=https://ads.example.com"]
+```
+
+Both take semicolon-separated lists, and the blocklist is evaluated first. These are convenience
+guardrails, not a security boundary — they do not affect redirects.

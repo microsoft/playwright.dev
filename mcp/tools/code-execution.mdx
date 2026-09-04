@@ -4,20 +4,27 @@ title: "Code Execution"
 
 # Code Execution
 
-Run Playwright code for complex interactions beyond individual tool calls.
+Run Playwright code and evaluate JavaScript for interactions that go beyond individual tool calls.
 
-## browser_run_code
+## browser_run_code_unsafe
 
-Execute a Playwright code snippet. The function receives a `page` object with the full [Playwright API](/docs/api/class-page).
+Run a Playwright code snippet. The code is a JavaScript function invoked with a single `page`
+argument, giving access to the full [Playwright API](/docs/api/class-page). Its return value is
+serialized back into the tool response.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `code` | string | yes | Playwright code to execute |
+| `code` | string | no | A JavaScript function containing Playwright code to execute |
+| `filename` | string | no | Load the code from this file instead. Relative names resolve against the workspace root. If both are provided, `code` is ignored |
+
+:::warning
+This tool executes arbitrary JavaScript in the Playwright server process and is RCE-equivalent.
+:::
 
 ### Verify element content
 
 ```txt
-→ browser_run_code {
+→ browser_run_code_unsafe {
     code: "async (page) => { return await page.getByTestId('todo-count').textContent(); }"
   }
   "3 items left"
@@ -26,15 +33,15 @@ Execute a Playwright code snippet. The function receives a `page` object with th
 ### Set geolocation
 
 ```txt
-→ browser_run_code {
+→ browser_run_code_unsafe {
     code: "async (page) => { await page.context().grantPermissions(['geolocation']); await page.context().setGeolocation({ latitude: 37.7749, longitude: -122.4194 }); }"
   }
 ```
 
-### Wait for specific condition
+### Wait for a specific condition
 
 ```txt
-→ browser_run_code {
+→ browser_run_code_unsafe {
     code: "async (page) => { await page.waitForSelector('.loading', { state: 'hidden' }); return 'Loading complete'; }"
   }
   "Loading complete"
@@ -43,7 +50,7 @@ Execute a Playwright code snippet. The function receives a `page` object with th
 ### Handle iframes
 
 ```txt
-→ browser_run_code {
+→ browser_run_code_unsafe {
     code: "async (page) => { const frame = page.frameLocator('#payment-iframe'); return await frame.locator('.total').textContent(); }"
   }
   "$49.99"
@@ -52,28 +59,36 @@ Execute a Playwright code snippet. The function receives a `page` object with th
 ### Clipboard operations
 
 ```txt
-→ browser_run_code {
+→ browser_run_code_unsafe {
     code: "async (page) => { await page.context().grantPermissions(['clipboard-read', 'clipboard-write']); return await page.evaluate(() => navigator.clipboard.readText()); }"
   }
 ```
 
+### Run a snippet from a file
+
+```txt
+→ browser_run_code_unsafe { filename: "scripts/seed-cart.js" }
+```
+
 ## browser_evaluate
 
-Evaluate JavaScript directly on the page or a specific element.
+Evaluate a JavaScript expression on the page, or on a specific element. Unlike
+`browser_run_code_unsafe`, the code runs inside the page, not in the server process.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `expression` | string | yes | JavaScript to evaluate |
-| `ref` | string | no | Element ref to evaluate on |
+| `function` | string | yes | `() => { /* code */ }`, or `(element) => { /* code */ }` when `target` is provided |
+| `target` | string | no | Element ref or selector to evaluate on |
+| `filename` | string | no | Save the result to a file instead of returning it as text |
 
 ```txt
-→ browser_evaluate { expression: "document.title" }
+→ browser_evaluate { function: "() => document.title" }
   "TodoMVC - React"
 
-→ browser_evaluate { expression: "el => el.getAttribute('data-testid')", ref: "e15" }
+→ browser_evaluate { function: "element => element.getAttribute('data-testid')", target: "e15" }
   "submit-button"
 
-→ browser_evaluate { expression: "window.innerWidth + 'x' + window.innerHeight" }
+→ browser_evaluate { function: "() => window.innerWidth + 'x' + window.innerHeight" }
   "1280x720"
 ```
 
@@ -83,9 +98,9 @@ Evaluate JavaScript directly on the page or a specific element.
 |----------|-----|
 | Click a button | `browser_click` |
 | Fill a form field | `browser_type` or `browser_fill_form` |
-| Read element text | `browser_snapshot` |
+| Read element text | `browser_snapshot` or `browser_find` |
 | Check computed styles | `browser_evaluate` |
-| Complex multi-step logic | `browser_run_code` |
-| Geolocation/permissions | `browser_run_code` |
-| Custom wait conditions | `browser_run_code` |
-| Iframe interactions | `browser_run_code` |
+| Complex multi-step logic | `browser_run_code_unsafe` |
+| Geolocation/permissions | `browser_run_code_unsafe` |
+| Custom wait conditions | `browser_run_code_unsafe` |
+| Iframe interactions | `browser_run_code_unsafe` |

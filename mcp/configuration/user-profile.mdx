@@ -10,13 +10,13 @@ Playwright MCP manages browser state through profiles. By default, login state a
 
 ### Persistent (default)
 
-Login state, cookies, and localStorage are preserved between sessions. Each project gets a separate profile automatically based on the workspace.
+Login state, cookies, and local storage are preserved between sessions. The profile directory name includes the browser channel and a hash of the client's workspace directory, so different projects get separate profiles automatically.
 
 | Platform | Default location |
 |----------|-----------------|
-| macOS | `~/Library/Caches/ms-playwright/mcp-{channel}-profile` |
-| Linux | `~/.cache/ms-playwright/mcp-{channel}-profile` |
-| Windows | `%LOCALAPPDATA%\ms-playwright\mcp-{channel}-profile` |
+| macOS | `~/Library/Caches/ms-playwright-mcp/mcp-{channel}-{workspace-hash}` |
+| Linux | `~/.cache/ms-playwright-mcp/mcp-{channel}-{workspace-hash}` |
+| Windows | `%LOCALAPPDATA%\ms-playwright-mcp\mcp-{channel}-{workspace-hash}` |
 
 Override the profile location:
 
@@ -24,13 +24,15 @@ Override the profile location:
 ["@playwright/mcp@latest", "--user-data-dir=/path/to/profile"]
 ```
 
+A profile can only be used by one browser at a time. If it is already locked, the server fails to start.
+
 :::note
-The CLI uses **in-memory** state by default (cookies persist between commands but are lost when the browser closes). Use `--persistent` to enable disk persistence. See [Sessions & Dashboard](/agent-cli/sessions) for CLI-specific session management.
+The [Playwright CLI](/agent-cli/introduction) defaults to **in-memory** state instead (cookies persist between commands but are lost when the browser closes). Use `--persistent` there to enable disk persistence. See [Sessions & Dashboard](/agent-cli/sessions) for CLI-specific session management.
 :::
 
 ### Isolated
 
-Each session starts fresh with no saved state. Pass `--isolated` to enable:
+Each session starts fresh with no saved state, and nothing is written to disk. Pass `--isolated` to enable:
 
 ```json
 {
@@ -43,7 +45,7 @@ Each session starts fresh with no saved state. Pass `--isolated` to enable:
 }
 ```
 
-Load initial state into an isolated session with `--storage-state`:
+`--isolated` cannot be combined with `--user-data-dir`. Load initial state into an isolated session with `--storage-state`:
 
 ```json
 ["@playwright/mcp@latest", "--isolated", "--storage-state=./auth-state.json"]
@@ -55,15 +57,15 @@ Connect to your existing browser tabs instead of launching a new browser. See [B
 
 ## Saving and restoring state
 
-Save authenticated state for reuse across sessions:
+Save authenticated state for reuse across sessions with the **storage** capability:
 
 ```txt
 // Login, then save
-→ browser_storage_state
-  State saved to: auth-state.json
+→ browser_storage_state { filename: "auth-state.json" }
+  - [Storage state](auth-state.json)
 
 // Later: restore
-→ browser_set_storage_state { path: "./auth-state.json" }
+→ browser_set_storage_state { filename: "auth-state.json" }
 ```
 
 Or load state automatically on server startup with `--storage-state`. See [Storage & Authentication](../tools/storage.mdx) for the full workflow.

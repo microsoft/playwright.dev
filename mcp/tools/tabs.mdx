@@ -6,37 +6,41 @@ title: "Tabs"
 
 ## browser_tabs
 
-Manage browser tabs — list, create, close, or switch between them.
+Manage browser tabs — list, create, close, or select a tab.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
 | `action` | string | yes | `list`, `new`, `close`, or `select` |
-| `url` | string | no | URL for `new` action |
-| `index` | number | no | Tab index for `select` or `close` |
+| `index` | number | no | Tab index, used for `close`/`select`. If omitted for `close`, the current tab is closed |
+| `url` | string | no | URL to navigate to in the new tab, used for `new` |
+
+Every action returns the resulting tab list.
 
 ### List all tabs
 
 ```txt
 → browser_tabs { action: "list" }
 
-  Tab 0: "TodoMVC" - https://demo.playwright.dev/todomvc
-  Tab 1: "Example" - https://example.com
-  Tab 2: "Google" - https://google.com
-  * active: Tab 0
+  - 0: [](about:blank)
+  - 1: (current) [React • TodoMVC](https://demo.playwright.dev/todomvc)
+  - 2: [Example Domain](https://example.com)
 ```
+
+Tabs are numbered from 0, the active one is marked `(current)`, and a crashed tab is marked `[crashed]`.
 
 ### Open a new tab
 
 ```txt
 → browser_tabs { action: "new", url: "https://example.com" }
-→ Returns snapshot of the new tab
+→ Returns a snapshot of the new tab
 ```
+
+Omit `url` to open a blank tab.
 
 ### Switch to a tab
 
 ```txt
 → browser_tabs { action: "select", index: 1 }
-→ Returns snapshot of the selected tab
 ```
 
 ### Close a tab
