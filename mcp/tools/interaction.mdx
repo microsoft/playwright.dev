@@ -10,23 +10,33 @@ Click, hover, drag, and select elements using refs from accessibility snapshots.
 |------|-------------|
 | `browser_click` | Click an element |
 | `browser_hover` | Hover over an element |
-| `browser_drag` | Drag and drop between elements |
+| `browser_drag` | Drag and drop between two elements |
 | `browser_select_option` | Select a dropdown option |
 | `browser_resize` | Resize the browser window |
 
 ## Targeting elements
 
-Every interaction tool takes a `ref` parameter that identifies the target element. Refs come from
-accessibility snapshots returned by `browser_snapshot` or after navigation. Take a snapshot first,
-find the element's `[ref=...]` tag, then pass that ref to the interaction tool.
+Every interaction tool takes a `target` that identifies the element. Targets come from accessibility
+snapshots returned by `browser_snapshot`, `browser_find`, or automatically after each action. Find
+the element's `[ref=...]` tag and pass that ref as `target`.
 
 ```txt
 → browser_snapshot
-  - button "Submit" [ref=e12]       ← ref is "e12"
-  - link "Learn more" [ref=e15]     ← ref is "e15"
+  - button "Submit" [ref=e12]       ← target is "e12"
+  - link "Learn more" [ref=e15]     ← target is "e15"
 
-→ browser_click { ref: "e12" }      // clicks the Submit button
+→ browser_click { target: "e12" }
 ```
+
+`target` also accepts a unique selector or locator string instead of a ref, which is handy when you
+already know the element:
+
+```txt
+→ browser_click { target: "getByRole('button', { name: 'Submit' })" }
+→ browser_click { target: "#submit" }
+```
+
+See [Snapshots](../snapshots.mdx) for details on refs.
 
 ## browser_click
 
@@ -34,11 +44,16 @@ Click an element on the page.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `ref` | string | yes | Element reference from snapshot |
+| `target` | string | yes | Element ref from the snapshot, or a unique selector |
+| `doubleClick` | boolean | no | Perform a double click instead of a single click |
+| `button` | string | no | `left` (default), `right`, or `middle` |
+| `modifiers` | string[] | no | `Alt`, `Control`, `ControlOrMeta`, `Meta`, `Shift` |
 
 ```txt
-→ browser_click { ref: "e12" }       // clicks the Submit button
-→ browser_click { ref: "e15" }       // clicks the Learn more link
+→ browser_click { target: "e12" }
+→ browser_click { target: "e15", doubleClick: true }
+→ browser_click { target: "e20", button: "right" }
+→ browser_click { target: "e22", modifiers: ["Shift"] }
 ```
 
 ## browser_hover
@@ -47,12 +62,11 @@ Hover over an element to trigger tooltips, dropdowns, or hover states.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `ref` | string | yes | Element reference from snapshot |
+| `target` | string | yes | Element ref or selector |
 
 ```txt
-→ browser_hover { ref: "e3" }
-→ browser_snapshot
-  // Snapshot now shows the revealed dropdown menu
+→ browser_hover { target: "e3" }
+
   - menuitem "Profile" [ref=e20]
   - menuitem "Settings" [ref=e21]
   - menuitem "Logout" [ref=e22]
@@ -64,12 +78,14 @@ Drag one element and drop it onto another.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `startRef` | string | yes | Element to drag |
-| `endRef` | string | yes | Element to drop onto |
+| `startTarget` | string | yes | Element to drag |
+| `endTarget` | string | yes | Element to drop onto |
 
 ```txt
-→ browser_drag { startRef: "e5", endRef: "e10" }
+→ browser_drag { startTarget: "e5", endTarget: "e10" }
 ```
+
+To drag files or data in from outside the page, use [`browser_drop`](./file-upload.mdx#browser_drop).
 
 ## browser_select_option
 
@@ -77,14 +93,14 @@ Select one or more options in a `<select>` dropdown.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `ref` | string | yes | The select element ref |
-| `values` | string[] | yes | Values or labels to select |
+| `target` | string | yes | The select element ref or selector |
+| `values` | string[] | yes | Values to select — a single value or multiple values |
 
 ```txt
 → browser_snapshot
   - combobox "Country" [ref=e7]
 
-→ browser_select_option { ref: "e7", values: ["United States"] }
+→ browser_select_option { target: "e7", values: ["United States"] }
 ```
 
 ## browser_resize
@@ -110,12 +126,11 @@ Resize the browser window.
   - combobox "Role" [ref=e7]
   - button "Sign up" [ref=e9]
 
-→ browser_type { ref: "e3", text: "alice@example.com" }
-→ browser_type { ref: "e5", text: "s3cret!" }
-→ browser_select_option { ref: "e7", values: ["Admin"] }
-→ browser_click { ref: "e9" }
+→ browser_type { target: "e3", text: "alice@example.com" }
+→ browser_type { target: "e5", text: "s3cret!" }
+→ browser_select_option { target: "e7", values: ["Admin"] }
+→ browser_click { target: "e9" }
 
-→ browser_snapshot
-  - heading "Welcome, Alice!" [level=1]
-  - text: "Your account has been created."
+  - heading "Welcome, Alice!" [level=1] [ref=e2]
+  - text: Your account has been created.
 ```

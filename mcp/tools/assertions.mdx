@@ -4,7 +4,7 @@ title: "Testing & Assertions"
 
 # Testing & Assertions
 
-Verify page state and generate Playwright test code. Requires the **testing** [capability](../capabilities.mdx).
+Verify page state and generate Playwright locators. Requires the **testing** [capability](../capabilities.mdx).
 
 ```json
 {
@@ -17,59 +17,77 @@ Verify page state and generate Playwright test code. Requires the **testing** [c
 }
 ```
 
+Every verify tool returns `Done` on success and an error message on failure, and records the matching
+`expect(...)` line in the generated code so a passing sequence can be assembled into a test.
+
 ## Verify elements
 
 ### browser_verify_element_visible
 
+Verify an element is visible on the page, matched by role and accessible name across all frames.
+
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `role` | string | yes | ARIA role (`button`, `heading`, `link`, `textbox`, etc.) |
-| `name` | string | yes | Accessible name |
+| `role` | string | yes | ROLE of the element, as printed in the snapshot: `- {ROLE} "Accessible Name":` |
+| `accessibleName` | string | yes | ACCESSIBLE_NAME of the element, as printed in the snapshot: `- role "{ACCESSIBLE_NAME}"` |
 
 ```txt
-→ browser_verify_element_visible { role: "heading", name: "Dashboard" }
-  ✓ Element visible: heading "Dashboard"
+→ browser_verify_element_visible { role: "heading", accessibleName: "Dashboard" }
+  Done
+  // Generated: await expect(page.getByRole('heading', { name: 'Dashboard' })).toBeVisible();
 
-→ browser_verify_element_visible { role: "button", name: "Submit" }
-  ✗ Element not visible: button "Submit"
+→ browser_verify_element_visible { role: "button", accessibleName: "Submit" }
+  Element with role "button" and accessible name "Submit" not found
 ```
 
 ### browser_verify_text_visible
 
+Verify text is visible on the page. Prefer `browser_verify_element_visible` when the element has a role and name.
+
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `text` | string | yes | Text to look for |
+| `text` | string | yes | TEXT to verify, as printed in the snapshot: `- role "Accessible Name": {TEXT}` or `- text: {TEXT}` |
 
 ```txt
 → browser_verify_text_visible { text: "3 items left" }
-  ✓ Text visible: "3 items left"
+  Done
 ```
 
 ### browser_verify_list_visible
 
+Verify a list contains the expected items.
+
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `label` | string | yes | Accessible name of the list |
-| `items` | string[] | yes | Expected list items |
+| `target` | string | yes | Exact element reference that points to the list |
+| `element` | string | yes | Human-readable list description |
+| `items` | string[] | yes | Items to verify |
 
 ```txt
 → browser_verify_list_visible {
-    label: "Todo list",
+    element: "Todo list", target: "e8",
     items: ["Buy groceries", "Walk the dog", "Read a book"]
   }
-  ✓ List "Todo list" visible with 3 matching items
+  Done
 ```
 
 ### browser_verify_value
 
+Verify the value of a form element.
+
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `ref` | string | yes | Element reference |
-| `value` | string | yes | Expected value |
+| `type` | string | yes | `textbox`, `checkbox`, `radio`, `combobox`, or `slider` |
+| `target` | string | yes | Exact element reference from the page snapshot |
+| `element` | string | yes | Human-readable element description |
+| `value` | string | yes | Value to verify. For a checkbox or radio use `"true"` / `"false"` |
 
 ```txt
-→ browser_verify_value { ref: "e3", value: "alice@example.com" }
-  ✓ Value matches: "alice@example.com"
+→ browser_verify_value { type: "textbox", element: "Email", target: "e3", value: "alice@example.com" }
+  Done
+
+→ browser_verify_value { type: "checkbox", element: "Accept terms", target: "e9", value: "true" }
+  Done
 ```
 
 ## Generate test code
@@ -80,28 +98,31 @@ Generate a Playwright locator for an element, useful when converting exploratory
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `ref` | string | yes | Element reference |
+| `target` | string | yes | Element ref or selector |
 
 ```txt
-→ browser_generate_locator { ref: "e15" }
-  page.getByRole('button', { name: 'Submit' })
+→ browser_generate_locator { target: "e15" }
+  getByRole('button', { name: 'Submit' })
 
-→ browser_generate_locator { ref: "e3" }
-  page.getByLabel('Email')
+→ browser_generate_locator { target: "e3" }
+  getByLabel('Email')
 ```
 
 ## Workflow: exploratory testing to test code
 
+Each tool response includes the Playwright code for the action it performed, in the language set by
+`--codegen` (`typescript` by default; also `python`, `java`, `csharp`, or `none`).
+
 ```txt
 → browser_navigate { url: "https://demo.playwright.dev/todomvc" }
-→ browser_type { ref: "e5", text: "Buy groceries", submit: true }
+→ browser_type { target: "e5", text: "Buy groceries", submit: true }
   // Generated: await page.getByPlaceholder('What needs to be done?').fill('Buy groceries');
   // Generated: await page.getByPlaceholder('What needs to be done?').press('Enter');
 
 → browser_verify_text_visible { text: "Buy groceries" }
   // Generated: await expect(page.getByText('Buy groceries')).toBeVisible();
 
-→ browser_click { ref: "e10" }
+→ browser_click { target: "e10" }
   // Generated: await page.getByRole('checkbox', { name: 'Toggle Todo' }).click();
 
 → browser_verify_text_visible { text: "0 items left" }
@@ -125,19 +146,23 @@ test('add and complete todo', async ({ page }) => {
 
 ```txt
 → browser_navigate { url: "https://app.example.com/register" }
-→ browser_click { ref: "e9" }   // Submit empty form
+→ browser_click { target: "e9" }   // Submit empty form
 → browser_verify_text_visible { text: "Email is required" }
-  ✓ Text visible
+  Done
 
-→ browser_type { ref: "e3", text: "not-an-email" }
-→ browser_click { ref: "e9" }
+→ browser_type { target: "e3", text: "not-an-email" }
+→ browser_click { target: "e9" }
 → browser_verify_text_visible { text: "Please enter a valid email" }
-  ✓ Text visible
+  Done
 
-→ browser_type { ref: "e3", text: "alice@example.com" }
-→ browser_type { ref: "e5", text: "password123" }
-→ browser_type { ref: "e7", text: "password456" }
-→ browser_click { ref: "e9" }
+→ browser_fill_form {
+    fields: [
+      { name: "Email",            target: "e3", type: "textbox", value: "alice@example.com" },
+      { name: "Password",         target: "e5", type: "textbox", value: "password123" },
+      { name: "Confirm password", target: "e7", type: "textbox", value: "password456" }
+    ]
+  }
+→ browser_click { target: "e9" }
 → browser_verify_text_visible { text: "Passwords do not match" }
-  ✓ Text visible
+  Done
 ```

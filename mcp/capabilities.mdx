@@ -31,7 +31,7 @@ Via config file:
 
 ```json
 {
-  "capabilities": ["core", "vision", "pdf", "devtools", "network", "storage", "testing"]
+  "capabilities": ["vision", "pdf", "devtools", "network", "storage", "testing"]
 }
 ```
 
@@ -46,24 +46,27 @@ Basic browser automation — always available, cannot be disabled.
 | `browser_navigate` | Navigate to a URL |
 | `browser_navigate_back` | Go back in history |
 | `browser_snapshot` | Capture accessibility snapshot |
+| `browser_find` | Search the snapshot for text or a regexp |
 | `browser_click` | Click an element |
 | `browser_hover` | Hover over an element |
-| `browser_drag` | Drag and drop |
+| `browser_drag` | Drag and drop between two elements |
+| `browser_drop` | Drop files or MIME-typed data onto an element |
 | `browser_select_option` | Select dropdown option |
-| `browser_type` | Type text into element |
+| `browser_type` | Type text into an element |
 | `browser_press_key` | Press a key |
 | `browser_fill_form` | Fill multiple form fields |
 | `browser_take_screenshot` | Take a screenshot |
-| `browser_run_code` | Execute Playwright code |
-| `browser_wait_for` | Wait for text/time |
+| `browser_run_code_unsafe` | Execute a Playwright code snippet |
 | `browser_evaluate` | Evaluate JavaScript |
-| `browser_handle_dialog` | Accept/dismiss dialogs |
-| `browser_file_upload` | Upload files |
+| `browser_wait_for` | Wait for text or time |
+| `browser_handle_dialog` | Accept or dismiss dialogs |
+| `browser_file_upload` | Upload files into a file chooser |
 | `browser_console_messages` | Get console output |
 | `browser_network_requests` | List network requests |
+| `browser_network_request` | Show one request in full detail |
 | `browser_tabs` | Manage tabs |
-| `browser_close` | Close browser |
-| `browser_resize` | Resize window |
+| `browser_close` | Close the page |
+| `browser_resize` | Resize the window |
 
 ### network
 
@@ -89,7 +92,7 @@ Cookie, localStorage, and sessionStorage management plus state persistence.
 | `browser_cookie_list/get/set/delete/clear` | Manage cookies |
 | `browser_localstorage_list/get/set/delete/clear` | Manage localStorage |
 | `browser_sessionstorage_list/get/set/delete/clear` | Manage sessionStorage |
-| `browser_storage_state` | Save cookies + localStorage to file |
+| `browser_storage_state` | Save cookies + local storage to a file |
 | `browser_set_storage_state` | Restore saved state |
 
 ```json
@@ -98,15 +101,15 @@ Cookie, localStorage, and sessionStorage management plus state persistence.
 
 ### testing
 
-Assertions and test generation tools.
+Assertions and locator generation.
 
 | Tool | Description |
 |------|-------------|
-| `browser_verify_element_visible` | Assert element is visible by role and name |
+| `browser_verify_element_visible` | Assert element is visible by role and accessible name |
 | `browser_verify_text_visible` | Assert text is visible |
-| `browser_verify_list_visible` | Assert list with items is visible |
+| `browser_verify_list_visible` | Assert a list and its items are visible |
 | `browser_verify_value` | Assert form field value |
-| `browser_generate_locator` | Generate Playwright locator for test code |
+| `browser_generate_locator` | Generate a Playwright locator for test code |
 
 ```json
 "--caps=testing"
@@ -145,7 +148,7 @@ PDF generation.
 
 ### devtools
 
-Tracing, video recording, and test debugging.
+Tracing, video recording, action recording, highlighting, and debugging.
 
 | Tool | Description |
 |------|-------------|
@@ -153,12 +156,21 @@ Tracing, video recording, and test debugging.
 | `browser_stop_tracing` | Stop trace and save |
 | `browser_start_video` | Start video recording |
 | `browser_stop_video` | Stop video and save |
-| `browser_video_chapter` | Add chapter marker |
-| `browser_resume` | Resume paused execution |
+| `browser_video_chapter` | Add a chapter card |
+| `browser_video_show_actions` | Annotate actions with on-page callouts |
+| `browser_video_hide_actions` | Stop annotating actions |
+| `browser_start_recording` | Record actions the user performs as code |
+| `browser_stop_recording` | Stop recording and return the code |
+| `browser_highlight` | Show a highlight overlay around an element |
+| `browser_hide_highlight` | Remove a highlight overlay |
+| `browser_annotate` | Open the Playwright Dashboard and collect user annotations |
+| `browser_resume` | Resume paused script execution |
 
 ```json
 "--caps=devtools"
 ```
+
+See [Debugging Tools](./tools/devtools.mdx).
 
 ### config
 
@@ -166,7 +178,7 @@ Configuration introspection.
 
 | Tool | Description |
 |------|-------------|
-| `browser_get_config` | Get resolved config |
+| `browser_get_config` | Get the final resolved config |
 
 ```json
 "--caps=config"
@@ -208,7 +220,7 @@ Core + devtools for tracing and video:
 
 ### Data extraction
 
-Core + network for API inspection + storage for cookies:
+Core + network for mocking + storage for cookies:
 
 ```json
 ["@playwright/mcp@latest", "--caps=network,storage"]

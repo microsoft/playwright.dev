@@ -19,23 +19,35 @@ Record execution traces that capture DOM snapshots, screenshots, network activit
 
 ## browser_start_tracing
 
+Start trace recording with screenshots and DOM snapshots enabled. Takes no parameters. Traces are
+written live into `traces/` inside the output directory, so the links are usable while recording.
+
 ```txt
 → browser_start_tracing
-  Tracing started
+
+  Trace recording started
+  - [Action log](traces/trace-1772620500000.trace)
+  - [Network log](traces/trace-1772620500000.network)
+  - [Resources](traces/resources)
 ```
 
 ## browser_stop_tracing
 
+Stop trace recording. Takes no parameters. Fails if tracing was not started.
+
 ```txt
 → browser_stop_tracing
-  Trace saved to: /output/trace-2024-03-15.zip
-  Network log: /output/trace-2024-03-15.network
+
+  Trace recording stopped.
+  - [Trace](traces/trace-1772620500000.trace)
+  - [Network log](traces/trace-1772620500000.network)
+  - [Resources](traces/resources)
 ```
 
 View traces in the [Playwright Trace Viewer](/docs/trace-viewer-intro):
 
 ```bash
-npx playwright show-trace /output/trace-2024-03-15.zip
+npx playwright show-trace traces/trace-1772620500000.trace
 ```
 
 The trace viewer shows a timeline of every action with DOM snapshots (before and after), screenshots, network requests and responses, console messages, and timing.
@@ -47,27 +59,27 @@ You: Something fails during checkout. Record a trace.
 
 → browser_start_tracing
 → browser_navigate { url: "https://store.example.com/cart" }
-→ browser_click { ref: "e15" }    // "Proceed to checkout"
+→ browser_click { target: "e15" }
 → browser_fill_form { fields: [
-    { ref: "e30", value: "Alice Smith" },
-    { ref: "e32", value: "123 Main St" },
-    { ref: "e34", value: "94102" }
+    { name: "Name",    target: "e30", type: "textbox", value: "Alice Smith" },
+    { name: "Address", target: "e32", type: "textbox", value: "123 Main St" },
+    { name: "Zip",     target: "e34", type: "textbox", value: "94102" }
   ]}
-→ browser_click { ref: "e40" }    // "Place order"
-→ browser_snapshot
-  - heading "Error" [level=1]
-  - text: "Payment processing failed"
+→ browser_click { target: "e40" }
+
+  - heading "Error" [level=1] [ref=e2]
+  - text: Payment processing failed
 
 → browser_console_messages { level: "error" }
-  [error] POST /api/payment 422: {"error":"Card number required"}
+  [ERROR] POST /api/payment 422: {"error":"Card number required"}
 
 → browser_stop_tracing
-  // Share trace with the team for full timeline analysis
+  // Share the trace with the team for full timeline analysis
 ```
 
 ## Automatic session recording
 
-Save traces for every session automatically:
+Save a session log for every session automatically:
 
 ```json
 {

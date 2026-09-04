@@ -1,0 +1,123 @@
+---
+title: "Debugging Tools"
+---
+
+# Debugging Tools
+
+Highlighting, action recording, user annotations, and debugger control. All of these require the **devtools** [capability](../capabilities.mdx).
+
+```json
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": ["@playwright/mcp@latest", "--caps=devtools"]
+    }
+  }
+}
+```
+
+Tracing and video recording are also part of this capability — see [Tracing](./tracing.mdx) and
+[Video Recording](./video.mdx).
+
+## Highlighting elements
+
+### browser_highlight
+
+Show a persistent highlight overlay around an element on the page. Useful when you want a human
+watching the headed browser to see which element the agent is talking about.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `target` | string | yes | Element ref or selector |
+| `style` | string | no | Additional inline CSS applied to the overlay, e.g. `outline: 2px dashed red` |
+
+```txt
+→ browser_highlight { target: "e12", style: "outline: 2px dashed red" }
+```
+
+### browser_hide_highlight
+
+Remove a highlight overlay. Pass the same `target` used to add it, or omit `target` to clear the
+page's highlights.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `target` | string | no | Element ref or selector. Omit to clear all highlights on the page |
+
+```txt
+→ browser_hide_highlight { target: "e12" }
+→ browser_hide_highlight     // clear everything
+```
+
+## Recording user actions
+
+Ask the user to demonstrate a flow in the browser, then turn what they did into Playwright code.
+
+### browser_start_recording
+
+Start recording actions the user performs in the browser. Takes no parameters. The page is brought to
+the front so the user can interact with it.
+
+### browser_stop_recording
+
+Stop the recording and return the recorded actions as Playwright code, in the language set by
+`--codegen`. Takes no parameters.
+
+```txt
+You: Let me show you how the discount code is applied.
+
+→ browser_start_recording
+  Recording started. Call browser_stop_recording to retrieve the recorded actions.
+
+  // ... the user clicks through the flow in the browser ...
+
+You: Done.
+
+→ browser_stop_recording
+
+  Recording stopped. Recorded actions:
+
+  await page.getByRole('textbox', { name: 'Discount code' }).fill('SAVE20');
+  await page.getByRole('button', { name: 'Apply' }).click();
+```
+
+## Collecting user annotations
+
+### browser_annotate
+
+Open the Playwright Dashboard in annotation mode for the current page and wait for the user to draw
+annotations on it. Returns the annotated screenshot, the ARIA snapshot, and the list of annotation
+rectangles with their text. Takes no parameters.
+
+```txt
+You: Circle the parts of this page that look wrong.
+
+→ browser_annotate
+
+  The header overlaps the nav on narrow screens.
+  session / Dashboard @ https://app.example.com (1280x720)
+    { x: 24, y: 12, width: 320, height: 48 }: this should not overlap
+  - [Annotation image](annotations-2026-09-04T10-15-00-000Z.png)
+  - [Annotation snapshot](annotations-2026-09-04T10-15-00-000Z.yaml)
+```
+
+If the user closes the dashboard without submitting, the tool returns `No annotations were submitted.`
+
+## Debugger control
+
+### browser_resume
+
+Resume script execution after it was paused — for example by a `page.pause()` in a test being
+debugged.
+
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `step` | boolean | no | When true, execution pauses again before the next action, allowing step-by-step debugging |
+| `location` | string | no | Run to a specific `<file>:<line>`, e.g. `example.spec.ts:42` |
+
+```txt
+→ browser_resume                                     // run to completion
+→ browser_resume { step: true }                      // step one action
+→ browser_resume { location: "checkout.spec.ts:42" } // run to a line
+```

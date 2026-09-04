@@ -6,36 +6,51 @@ title: "Screenshots"
 
 ## browser_take_screenshot
 
-Capture the current page, a specific element, or the full scrollable page.
+Capture the viewport, a specific element, or the full scrollable page. Screenshots are for looking at,
+not for acting on — use `browser_snapshot` to get refs to interact with.
 
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `type` | string | no | `png` (default) or `jpeg` |
-| `ref` | string | no | Element ref to screenshot a specific element |
-| `fullPage` | boolean | no | Capture full scrollable page |
+| `target` | string | no | Element ref or selector, to screenshot a single element |
+| `type` | string | no | `png`, `jpeg`, or `webp`. If unset, inferred from the filename extension, otherwise `png` |
+| `filename` | string | no | File to save to. Relative names resolve against the workspace root. Defaults to `page-{timestamp}.{ext}` in the output directory |
+| `fullPage` | boolean | no | Capture the full scrollable page instead of the viewport. Cannot be combined with `target` |
+| `scale` | string | no | `css` (default) for CSS-pixel sizing, or `device` for a high-resolution image using the device pixel ratio |
+
+When `filename` is omitted the image is also returned inline in the tool response, so the LLM can see
+it. Pass `--image-responses=omit` to keep images out of the response.
 
 ### Page screenshot
 
 ```txt
 You: Take a screenshot of the current page.
+
 → browser_take_screenshot
-→ Returns: PNG image of the viewport
+  - [Screenshot of viewport](page-2026-09-04T10-15-00-000Z.png)
 ```
 
 ### Element screenshot
 
 ```txt
 You: Take a screenshot of just the login form.
-→ browser_take_screenshot { ref: "e12" }
-→ Returns: PNG image cropped to the element
+
+→ browser_take_screenshot { target: "e12" }
+  - [Screenshot of Login form](element-2026-09-04T10-15-04-000Z.png)
 ```
 
 ### Full-page screenshot
 
 ```txt
 You: Take a full-page screenshot including content below the fold.
-→ browser_take_screenshot { fullPage: true }
-→ Returns: PNG image of entire scrollable page
+
+→ browser_take_screenshot { fullPage: true, filename: "homepage.png" }
+  - [Screenshot of full page](homepage.png)
+```
+
+### High-resolution screenshot
+
+```txt
+→ browser_take_screenshot { scale: "device", type: "webp" }
 ```
 
 ## When to use screenshots

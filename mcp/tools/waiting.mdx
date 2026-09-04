@@ -4,35 +4,39 @@ title: "Waiting"
 
 # Waiting
 
+Most tools wait on their own: after an action, the server waits for triggered navigations and network
+activity to settle before returning a snapshot. Use `browser_wait_for` when you need to wait for something specific.
+
 ## browser_wait_for
 
-Wait for a condition before proceeding. Accepts one of three modes:
+Wait for text to appear or disappear, or for a specified time to pass. At least one of `time`, `text`
+or `textGone` must be provided; when several are given, the time elapses first, then `textGone`, then `text`.
 
-| Parameter | Type | Description |
-|-----------|------|-------------|
-| `time` | number | Seconds to wait |
-| `text` | string | Text to appear on the page |
-| `textGone` | string | Text to disappear from the page |
+| Parameter | Type | Required | Description |
+|-----------|------|----------|-------------|
+| `time` | number | no | The time to wait in seconds (capped at 30) |
+| `text` | string | no | The text to wait for |
+| `textGone` | string | no | The text to wait for to disappear |
 
 ### Wait for text to appear
 
 ```txt
 → browser_wait_for { text: "Upload complete" }
-  ✓ Text appeared: "Upload complete"
+  Waited for Upload complete
 ```
 
 ### Wait for text to disappear
 
 ```txt
 → browser_wait_for { textGone: "Loading..." }
-  ✓ Text disappeared: "Loading..."
+  Waited for Loading...
 ```
 
 ### Wait a fixed duration
 
 ```txt
 → browser_wait_for { time: 3 }
-  ✓ Waited 3 seconds
+  Waited for 3
 ```
 
 ## Workflow: waiting for async operations
@@ -40,20 +44,30 @@ Wait for a condition before proceeding. Accepts one of three modes:
 ```txt
 You: Click the upload button and wait for it to finish.
 
-→ browser_click { ref: "e9" }
-→ browser_snapshot
+→ browser_click { target: "e9" }
+
   - progressbar "Uploading..." [ref=e12]
 
 → browser_wait_for { textGone: "Uploading..." }
-→ browser_snapshot
-  - text: "Upload complete! File saved."
+
+  - text: Upload complete! File saved.
   - link "View file" [ref=e15]
 ```
 
-For more complex wait conditions (CSS selectors, JavaScript expressions), use [browser_run_code](./code-execution.mdx):
+## More complex conditions
+
+For waits that text matching can't express — a CSS selector, a JavaScript predicate, a specific
+response — use [`browser_run_code_unsafe`](./code-execution.mdx):
 
 ```txt
-→ browser_run_code {
+→ browser_run_code_unsafe {
     code: "async (page) => { await page.waitForSelector('.data-loaded'); }"
   }
+
+→ browser_run_code_unsafe {
+    code: "async (page) => { await page.waitForResponse(r => r.url().includes('/api/items') && r.ok()); }"
+  }
 ```
+
+Action and navigation timeouts are configurable with `--timeout-action` (5000ms by default) and
+`--timeout-navigation` (60000ms by default).

@@ -4,6 +4,8 @@ title: "Configuration"
 
 # Configuration
 
+Options can be supplied three ways, in increasing order of precedence: a config file, environment variables, and command-line arguments.
+
 ## Headed and headless mode
 
 By default, Playwright MCP runs the browser in **headed mode** so you can see what's happening. To run headless:
@@ -37,6 +39,8 @@ By default, Playwright MCP runs the browser in **headed mode** so you can see wh
 ```json
 ["@playwright/mcp@latest", "--device=iPhone 15"]
 ```
+
+`--mobile` emulates a generic mobile device — Pixel 10 on Chromium, iPhone 17 on WebKit.
 
 ## Viewport size
 
@@ -72,6 +76,16 @@ Then point your MCP client to the HTTP endpoint:
 
 Use `--host 0.0.0.0` to bind to all interfaces (useful in containers). Use `--shared-browser-context` to share a single browser context between multiple connected clients.
 
+## Secrets
+
+Values the LLM should never see in tool responses can be kept in a dotenv file:
+
+```bash
+npx @playwright/mcp@latest --secrets ./.secrets
+```
+
+Matching plain text in tool responses is redacted, and typing a placeholder substitutes the real value in the page. This is a convenience, not a security boundary.
+
 ## Configuration file
 
 For advanced settings, use a JSON config file:
@@ -93,7 +107,7 @@ npx @playwright/mcp@latest --config path/to/config.json
     cdpEndpoint?: string;
     cdpHeaders?: Record<string, string>;
     cdpTimeout?: number;
-    remoteEndpoint?: string;
+    remoteEndpoint?: string | playwright.ConnectOptions & { endpoint: string };
     initPage?: string[];
     initScript?: string[];
   };
@@ -103,16 +117,12 @@ npx @playwright/mcp@latest --config path/to/config.json
     host?: string;
     allowedHosts?: string[];
   };
-  saveVideo?: { width: number; height: number };
-  capabilities?: ('core' | 'core-navigation' | 'core-tabs' | 'core-input'
-    | 'network' | 'storage' | 'testing' | 'vision' | 'pdf' | 'devtools')[];
-  secrets?: Record<string, string>;
+  capabilities?: ('network' | 'storage' | 'testing' | 'vision' | 'pdf' | 'devtools' | 'config')[];
   saveSession?: boolean;
   sharedBrowserContext?: boolean;
-  snapshot?: { mode?: 'full' | 'none' };
-  imageResponses?: 'allow' | 'omit';
+  secrets?: Record<string, string>;
   outputDir?: string;
-  outputMode?: 'file' | 'stdout';
+  outputMaxSize?: number;
   console?: { level?: 'error' | 'warning' | 'info' | 'debug' };
   network?: {
     allowedOrigins?: string[];
@@ -123,11 +133,19 @@ npx @playwright/mcp@latest --config path/to/config.json
     action?: number;      // default: 5000ms
     navigation?: number;  // default: 60000ms
     expect?: number;      // default: 5000ms
+    settle?: number;      // default: 500ms
+  };
+  imageResponses?: 'allow' | 'omit';
+  snapshot?: {
+    mode?: 'full' | 'none';
+    boxes?: boolean;
   };
   allowUnrestrictedFileAccess?: boolean;
-  codegen?: 'typescript' | 'none';
+  codegen?: 'typescript' | 'python' | 'java' | 'csharp' | 'none';
 }
 ```
+
+The authoritative schema lives in [`config.d.ts`](https://github.com/microsoft/playwright/blob/main/packages/playwright-core/src/tools/mcp/config.d.ts).
 
 ### Init scripts
 
@@ -168,38 +186,82 @@ export default async ({ page }) => {
 
 ## All command-line options
 
+### Browser
+
 | Option | Description | Env Variable |
 |--------|-------------|--------------|
-| `--browser <browser>` | Browser to use | `PLAYWRIGHT_MCP_BROWSER` |
-| `--headless` | Run headless | `PLAYWRIGHT_MCP_HEADLESS` |
-| `--caps <caps>` | Enable capabilities (comma-separated) | `PLAYWRIGHT_MCP_CAPS` |
-| `--config <path>` | Config file path | `PLAYWRIGHT_MCP_CONFIG` |
-| `--isolated` | In-memory profile | `PLAYWRIGHT_MCP_ISOLATED` |
-| `--extension` | Connect via browser extension | `PLAYWRIGHT_MCP_EXTENSION` |
-| `--user-data-dir <path>` | Custom profile directory | `PLAYWRIGHT_MCP_USER_DATA_DIR` |
-| `--storage-state <path>` | Initial storage state | `PLAYWRIGHT_MCP_STORAGE_STATE` |
-| `--port <port>` | HTTP transport port | `PLAYWRIGHT_MCP_PORT` |
-| `--host <host>` | Server host | `PLAYWRIGHT_MCP_HOST` |
-| `--device <device>` | Device to emulate | `PLAYWRIGHT_MCP_DEVICE` |
-| `--executable-path <path>` | Custom browser executable | `PLAYWRIGHT_MCP_EXECUTABLE_PATH` |
-| `--viewport-size <size>` | Viewport (e.g., "1280x720") | `PLAYWRIGHT_MCP_VIEWPORT_SIZE` |
-| `--proxy-server <url>` | Proxy server | `PLAYWRIGHT_MCP_PROXY_SERVER` |
-| `--proxy-bypass <hosts>` | Bypass proxy | `PLAYWRIGHT_MCP_PROXY_BYPASS` |
-| `--user-agent <ua>` | Custom user agent | `PLAYWRIGHT_MCP_USER_AGENT` |
+| `--browser <browser>` | Browser or Chrome channel: `chrome`, `firefox`, `webkit`, `msedge` | `PLAYWRIGHT_MCP_BROWSER` |
+| `--headless` | Run headless (headed by default) | `PLAYWRIGHT_MCP_HEADLESS` |
+| `--executable-path <path>` | Path to the browser executable | `PLAYWRIGHT_MCP_EXECUTABLE_PATH` |
+| `--device <device>` | Device to emulate, e.g. `"iPhone 15"` | `PLAYWRIGHT_MCP_DEVICE` |
+| `--mobile` | Emulate a generic mobile device | `PLAYWRIGHT_MCP_MOBILE` |
+| `--viewport-size <size>` | Viewport in pixels, e.g. `"1280x720"` | `PLAYWRIGHT_MCP_VIEWPORT_SIZE` |
+| `--user-agent <ua>` | Custom user agent string | `PLAYWRIGHT_MCP_USER_AGENT` |
 | `--ignore-https-errors` | Ignore HTTPS errors | `PLAYWRIGHT_MCP_IGNORE_HTTPS_ERRORS` |
-| `--timeout-action <ms>` | Action timeout (5000) | `PLAYWRIGHT_MCP_TIMEOUT_ACTION` |
-| `--timeout-navigation <ms>` | Navigation timeout (60000) | `PLAYWRIGHT_MCP_TIMEOUT_NAVIGATION` |
-| `--console-level <level>` | Console level | `PLAYWRIGHT_MCP_CONSOLE_LEVEL` |
-| `--test-id-attribute <attr>` | Test ID attribute | `PLAYWRIGHT_MCP_TEST_ID_ATTRIBUTE` |
-| `--codegen <lang>` | Code generation language | `PLAYWRIGHT_MCP_CODEGEN` |
-| `--init-page <path>` | Page init TypeScript | `PLAYWRIGHT_MCP_INIT_PAGE` |
-| `--init-script <path>` | Page init JavaScript | `PLAYWRIGHT_MCP_INIT_SCRIPT` |
-| `--blocked-origins <origins>` | Block origins | `PLAYWRIGHT_MCP_BLOCKED_ORIGINS` |
-| `--allowed-origins <origins>` | Allow origins | `PLAYWRIGHT_MCP_ALLOWED_ORIGINS` |
-| `--grant-permissions <perms>` | Browser permissions | `PLAYWRIGHT_MCP_GRANT_PERMISSIONS` |
+| `--proxy-server <url>` | Proxy server, e.g. `http://myproxy:3128` | `PLAYWRIGHT_MCP_PROXY_SERVER` |
+| `--proxy-bypass <hosts>` | Comma-separated domains to bypass the proxy | `PLAYWRIGHT_MCP_PROXY_BYPASS` |
+| `--grant-permissions <perms>` | Permissions to grant, e.g. `geolocation` | `PLAYWRIGHT_MCP_GRANT_PERMISSIONS` |
 | `--block-service-workers` | Block service workers | `PLAYWRIGHT_MCP_BLOCK_SERVICE_WORKERS` |
-| `--no-sandbox` | Disable sandbox | `PLAYWRIGHT_MCP_NO_SANDBOX` |
-| `--output-dir <path>` | Output directory | `PLAYWRIGHT_MCP_OUTPUT_DIR` |
-| `--save-session` | Save session data | `PLAYWRIGHT_MCP_SAVE_SESSION` |
-| `--save-video <size>` | Auto-record video (e.g., "800x600") | `PLAYWRIGHT_MCP_SAVE_VIDEO` |
-| `--secrets <path>` | Secrets file (dotenv) | `PLAYWRIGHT_MCP_SECRETS_FILE` |
+| `--sandbox` / `--no-sandbox` | Enable or disable the browser sandbox | `PLAYWRIGHT_MCP_SANDBOX` |
+| `--init-page <path...>` | TypeScript files evaluated on the Playwright page object | `PLAYWRIGHT_MCP_INIT_PAGE` |
+| `--init-script <path...>` | JavaScript files added as page init scripts | `PLAYWRIGHT_MCP_INIT_SCRIPT` |
+
+### Profile and session
+
+| Option | Description | Env Variable |
+|--------|-------------|--------------|
+| `--isolated` | Keep the browser profile in memory, do not save it to disk | `PLAYWRIGHT_MCP_ISOLATED` |
+| `--user-data-dir <path>` | Custom profile directory | `PLAYWRIGHT_MCP_USER_DATA_DIR` |
+| `--storage-state <path>` | Initial storage state for isolated sessions | `PLAYWRIGHT_MCP_STORAGE_STATE` |
+| `--extension` | Connect through the Playwright browser extension | `PLAYWRIGHT_MCP_EXTENSION` |
+| `--profile-dir-name <name>` | Browser profile directory to attach to with `--extension`, e.g. `"Profile 1"` | `PLAYWRIGHT_MCP_PROFILE_DIR_NAME` |
+| `--cdp-endpoint <endpoint>` | CDP endpoint or channel name to connect to | `PLAYWRIGHT_MCP_CDP_ENDPOINT` |
+| `--cdp-header <headers...>` | Headers for the CDP connect request | `PLAYWRIGHT_MCP_CDP_HEADERS` |
+| `--cdp-timeout <ms>` | CDP connect timeout, defaults to 30000 | `PLAYWRIGHT_MCP_CDP_TIMEOUT` |
+| `--endpoint <endpoint>` | Bound browser endpoint to connect to | — |
+| `--save-session` | Save the MCP session into the output directory | — |
+
+### Server
+
+| Option | Description | Env Variable |
+|--------|-------------|--------------|
+| `--port <port>` | Port to listen on for HTTP transport | `PLAYWRIGHT_MCP_PORT` |
+| `--host <host>` | Host to bind to, defaults to localhost | `PLAYWRIGHT_MCP_HOST` |
+| `--allowed-hosts <hosts...>` | Hosts the server may serve from; `*` disables the check | `PLAYWRIGHT_MCP_ALLOWED_HOSTS` |
+| `--shared-browser-context` | Reuse one browser context across HTTP clients | — |
+| `--config <path>` | Config file path | `PLAYWRIGHT_MCP_CONFIG` |
+
+### Tools and output
+
+| Option | Description | Env Variable |
+|--------|-------------|--------------|
+| `--caps <caps>` | Comma-separated capabilities to enable | `PLAYWRIGHT_MCP_CAPS` |
+| `--console-level <level>` | Console level: `error`, `warning`, `info`, `debug` | `PLAYWRIGHT_MCP_CONSOLE_LEVEL` |
+| `--codegen <lang>` | Code generation language: `typescript`, `python`, `java`, `csharp`, `none` | `PLAYWRIGHT_MCP_CODEGEN` |
+| `--test-id-attribute <attr>` | Attribute used for test ids, defaults to `data-testid` | `PLAYWRIGHT_MCP_TEST_ID_ATTRIBUTE` |
+| `--snapshot-mode <mode>` | `full` (default) or `none` | — |
+| `--snapshot-boxes` | Include `[box=x,y,width,height]` in snapshots | — |
+| `--image-responses <mode>` | `allow` (default) or `omit` | `PLAYWRIGHT_MCP_IMAGE_RESPONSES` |
+| `--output-dir <path>` | Directory for automatically named output files | `PLAYWRIGHT_MCP_OUTPUT_DIR` |
+| `--output-max-size <bytes>` | Threshold for evicting old output files | `PLAYWRIGHT_MCP_OUTPUT_MAX_SIZE` |
+| `--secrets <path>` | Secrets file in dotenv format | `PLAYWRIGHT_MCP_SECRETS_FILE` |
+
+### Timeouts
+
+| Option | Description | Env Variable |
+|--------|-------------|--------------|
+| `--timeout-action <ms>` | Action timeout, defaults to 5000 | `PLAYWRIGHT_MCP_TIMEOUT_ACTION` |
+| `--timeout-navigation <ms>` | Navigation timeout, defaults to 60000 | `PLAYWRIGHT_MCP_TIMEOUT_NAVIGATION` |
+| `--timeout-settle <ms>` | How long to wait after each action for triggered work to settle, defaults to 500 | `PLAYWRIGHT_MCP_TIMEOUT_SETTLE` |
+
+### Access control
+
+| Option | Description | Env Variable |
+|--------|-------------|--------------|
+| `--allowed-origins <origins>` | Semicolon-separated origins the browser may request | `PLAYWRIGHT_MCP_ALLOWED_ORIGINS` |
+| `--blocked-origins <origins>` | Semicolon-separated origins to block; evaluated first | `PLAYWRIGHT_MCP_BLOCKED_ORIGINS` |
+| `--allow-unrestricted-file-access` | Allow files outside the workspace roots and `file://` navigation | `PLAYWRIGHT_MCP_ALLOW_UNRESTRICTED_FILE_ACCESS` |
+
+:::note
+Origin lists and the file-access guardrail are convenience defenses to catch unintended access, not a security boundary — they do not affect redirects and can be worked around deliberately. Rely on client-level permissions for real isolation.
+:::

@@ -4,31 +4,39 @@ title: "Console"
 
 # Console
 
-Access browser console output for debugging. Console tools are part of the **core** capability and always available.
+Access browser console output for debugging. `browser_console_messages` is part of the **core** capability and always available.
 
 ## browser_console_messages
 
+Returns the console messages collected for the current tab, preceded by a count summary.
+
 | Parameter | Type | Required | Description |
 |-----------|------|----------|-------------|
-| `level` | string | no | Minimum level: `error`, `warning`, `info`, `debug`. Each level includes more severe levels. |
+| `level` | string | no | Minimum level: `error`, `warning`, `info` (default), `debug`. Each level includes the messages of more severe levels |
+| `all` | boolean | no | Return all messages since the beginning of the session, not just since the last navigation. Defaults to false |
+| `filename` | string | no | Save the messages to a file instead of returning them as text |
 
 ```txt
 → browser_console_messages
 
-  [error] Uncaught TypeError: Cannot read property 'map' of undefined
-    at app.js:42:15
-  [warning] Deprecation: 'window.webkitStorageInfo' is deprecated.
-  [info] App initialized in 234ms
-  [info] User session restored
+  Total messages: 4 (Errors: 1, Warnings: 1)
+
+  [ERROR] Uncaught TypeError: Cannot read property 'map' of undefined @ app.js:42
+  [WARNING] Deprecation: 'window.webkitStorageInfo' is deprecated.
+  [LOG] App initialized in 234ms
+  [LOG] User session restored
 
 → browser_console_messages { level: "error" }
-  [error] Uncaught TypeError: Cannot read property 'map' of undefined
-    at app.js:42:15
+
+  Total messages: 4 (Errors: 1, Warnings: 1)
+  Returning 1 messages for level "error"
+
+  [ERROR] Uncaught TypeError: Cannot read property 'map' of undefined @ app.js:42
 ```
 
-## browser_console_clear
+Tool responses also carry a `- New console entries:` line pointing at the messages logged since the previous response, so the LLM knows when it is worth calling this tool.
 
-Clear the console message buffer.
+The default level for the whole session can be set with `--console-level=<level>`.
 
 ## Workflow: debugging a broken page
 
@@ -36,9 +44,10 @@ Clear the console message buffer.
 You: The page looks broken. Check the console for errors.
 
 → browser_console_messages { level: "error" }
-  [error] Failed to fetch: GET https://api.example.com/data 404
-  [error] Uncaught Error: API returned 404
 
-→ // LLM now knows the API endpoint is returning 404
-→ // Can mock the route or investigate further
+  [ERROR] Failed to fetch: GET https://api.example.com/data 404
+  [ERROR] Uncaught Error: API returned 404
+
+→ browser_network_requests { filter: "api" }
+  // Confirm the failing request, then mock it or investigate further
 ```
