@@ -26,6 +26,22 @@ page.locator(".result-frame").contentFrame().getByRole(AriaRole.BUTTON).click();
 page.locator(".result-frame").first().contentFrame().getByRole(AriaRole.BUTTON).click();
 ```
 
+**Any frame**
+
+Calling [Page.frameLocator()](/api/class-page.mdx#page-frame-locator) or [Frame.frameLocator()](/api/class-frame.mdx#frame-frame-locator) without a selector creates a frame locator that starts the search in any frame of the subtree - so that you don't need to locate the iframe first.
+
+```java
+// Finds the button in any frame on the page:
+page.frameLocator().getByRole(AriaRole.BUTTON).click();
+
+// Finds the iframe with id "my-frame" anywhere on the page, and clicks the button inside it:
+page.frameLocator().locator("#my-frame").contentFrame().getByRole(AriaRole.BUTTON).click();
+```
+
+Only the start of the search is affected - the rest of the locator is resolved inside a single frame, just like any other locator. Following the strictness rules above, an error is thrown when elements are matched in multiple frames.
+
+Such a frame locator does not point to a particular `iframe`, so [FrameLocator.owner()](/api/class-framelocator.mdx#frame-locator-owner), [FrameLocator.first()](/api/class-framelocator.mdx#frame-locator-first), [FrameLocator.last()](/api/class-framelocator.mdx#frame-locator-last) and [FrameLocator.nth()](/api/class-framelocator.mdx#frame-locator-nth) are not supported on it.
+
 **Converting Locator to FrameLocator**
 
 If you have a [Locator] object pointing to an `iframe` it can be converted to [FrameLocator] using [Locator.contentFrame()](/api/class-locator.mdx#locator-content-frame).

@@ -800,7 +800,7 @@ BrowserContext.setOffline(offline);
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.59</font><x-search>browserContext.setStorageState</x-search>
 
-Clears the existing cookies, local storage, IndexedDB entries and virtual WebAuthn credentials, and sets the new storage state. When the storage state contains credentials, the virtual WebAuthn authenticator is installed (equivalent to [Credentials.install()](/api/class-credentials.mdx#credentials-install)), preventing all real authenticators from working in this context.
+Clears the existing cookies, local storage, IndexedDB entries, origin private file system entries and virtual WebAuthn credentials, and sets the new storage state. When the storage state contains credentials, the virtual WebAuthn authenticator is installed (equivalent to [Credentials.install()](/api/class-credentials.mdx#credentials-install)), preventing all real authenticators from working in this context.
 
 **Usage**
 
@@ -823,7 +823,7 @@ context.setStorageState(Paths.get("state.json"));
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added before v1.9</font><x-search>browserContext.storageState</x-search>
 
-Returns storage state for this browser context, contains current cookies, local storage snapshot, IndexedDB snapshot and virtual WebAuthn credentials.
+Returns storage state for this browser context, contains current cookies, local storage snapshot, IndexedDB snapshot, origin private file system snapshot and virtual WebAuthn credentials.
 
 **Usage**
 
@@ -840,6 +840,15 @@ BrowserContext.storageState(options);
   - `setIndexedDB` [boolean] *(optional)* <font size="2">Added in: v1.51</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-indexed-db"/><a href="#browser-context-storage-state-option-indexed-db" class="list-anchor">#</a>
     
     Set to `true` to include [IndexedDB](https://developer.mozilla.org/en-US/docs/Web/API/IndexedDB_API) in the storage state snapshot. If your application uses IndexedDB to store authentication tokens, like Firebase Authentication, enable this.
+  - `setOpfs` [boolean] *(optional)* <font size="2">Added in: v1.63</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-opfs"/><a href="#browser-context-storage-state-option-opfs" class="list-anchor">#</a>
+    
+    Set to `true` to include the [origin private file system](https://developer.mozilla.org/en-US/docs/Web/API/File_System_API/Origin_private_file_system) in the storage state snapshot.
+    
+    :::note
+    
+    OPFS is currently not supported in ephemeral WebKit contexts.
+    :::
+    
   - `setPath` [Path] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="browser-context-storage-state-option-path"/><a href="#browser-context-storage-state-option-path" class="list-anchor">#</a>
     
     The file path to save the storage state to. If [setPath](/api/class-browsercontext.mdx#browser-context-storage-state-option-path) is a relative path, then it is resolved relative to current working directory. If no path is provided, storage state is still returned, but won't be saved to the disk.
@@ -1135,6 +1144,23 @@ context.onDialog(dialog -> {
 :::note
 When no [Page.onDialog(handler)](/api/class-page.mdx#page-event-dialog) or [BrowserContext.onDialog(handler)](/api/class-browsercontext.mdx#browser-context-event-dialog) listeners are present, all dialogs are automatically dismissed.
 :::
+
+**Event data**
+- [Dialog]
+
+---
+
+### onDialogClosed(handler) {/* #browser-context-event-dialog-closed */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.63</font><x-search>browserContext.onDialogClosed(handler)</x-search>
+
+Emitted when a JavaScript dialog in any page belonging to this context has been closed, either by [Dialog.accept()](/api/class-dialog.mdx#dialog-accept), by [Dialog.dismiss()](/api/class-dialog.mdx#dialog-dismiss), or manually by the user in the headed browser.
+
+**Usage**
+
+```java
+BrowserContext.onDialogClosed(handler)
+```
 
 **Event data**
 - [Dialog]

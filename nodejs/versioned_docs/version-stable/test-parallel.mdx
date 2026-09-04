@@ -128,6 +128,43 @@ test('runs second', async () => {
 });
 ```
 
+## Test locks
+
+A few tests in your suite may access a shared resource that does not support concurrent access, for example an external service or a global account setting. You can declare named locks on such tests, so that tests sharing a lock name never run at the same time, while all other tests continue to run in parallel. Locks work across files, worker processes and [projects](./test-projects.mdx).
+
+```js title="settings.spec.ts"
+import { test, expect } from '@playwright/test';
+
+test('update user settings', { lock: 'user-settings' }, async ({ page }) => {
+  // ...
+});
+```
+
+```js title="profile.spec.ts"
+import { test, expect } from '@playwright/test';
+
+// Never runs concurrently with 'update user settings' above,
+// even in a different project.
+test('rename user', { lock: 'user-settings' }, async ({ page }) => {
+  // ...
+});
+```
+
+A test can declare multiple locks and will only run when all of them are available. You can also declare locks on a group with [test.describe()](/api/class-test.mdx#test-describe), applying them to every test inside.
+
+```js
+test('reset the database', { lock: ['database', 'external-api'] }, async () => {
+  // ...
+});
+```
+
+Playwright acquires all the locks of a test before the test starts and releases them when it finishes.
+
+:::note
+
+In the default and [serial](#serial-mode) modes, all tests in a file run together in order, so a lock declared on any test is held for the duration of the whole file.
+:::
+
 ## Opt out of fully parallel mode
 
 If your configuration applies parallel mode to all tests using [testConfig.fullyParallel](/api/class-testconfig.mdx#test-config-fully-parallel), you might still want to run some tests with default settings. You can override the mode per describe: 
