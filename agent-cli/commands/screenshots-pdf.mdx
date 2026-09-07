@@ -9,25 +9,36 @@ title: "Screenshots & PDF"
 | Command | Description |
 |---------|-------------|
 | `screenshot` | Screenshot of the viewport |
-| `screenshot [ref]` | Screenshot of a specific element |
-| `screenshot --filename=f` | Save with custom filename |
-| `screenshot --full-page` | Full scrollable page |
+| `screenshot [target]` | Screenshot of a specific element |
+| `screenshot --filename=<f>` | Save with a custom filename |
+| `screenshot --type=<png\|jpeg\|webp>` | Image format |
+| `screenshot --full-page` | Full scrollable page instead of the viewport |
+| `screenshot --hires` | Capture device pixels instead of CSS pixels |
+
+Without `--filename`, the file is named `page-{timestamp}.{png|jpeg|webp}` in the output directory.
+The format is inferred from the filename extension when `--type` is not given, and defaults to PNG.
 
 ```bash
 $ playwright-cli screenshot
-# Screenshot saved to .playwright-cli/screenshot-2026-03-15.png
+# Screenshot saved to .playwright-cli/page-2026-03-15T10-22-01-118Z.png
 
 $ playwright-cli screenshot e15
 # Screenshot of element e15
 
 $ playwright-cli screenshot --filename=login-page.png
 $ playwright-cli screenshot --full-page --filename=full-page.png
+$ playwright-cli screenshot --filename=preview.jpeg
+$ playwright-cli screenshot --hires --filename=retina.png
 ```
+
+`--hires` accounts for the device pixel ratio, which makes text legible in a captured design
+review — but its pixel coordinates no longer line up with the CSS-pixel coordinates that
+[mouse commands](./keyboard-mouse.mdx) take.
 
 ## PDF export
 
 ```bash
-playwright-cli pdf                      # save with auto-generated name
+playwright-cli pdf                      # save as page-{timestamp}.pdf
 playwright-cli pdf --filename=page.pdf  # save with custom name
 ```
 
@@ -51,8 +62,10 @@ For accessibility tree output (not a visual capture):
 ```bash
 playwright-cli snapshot                 # full page snapshot
 playwright-cli snapshot --filename=f    # custom filename
-playwright-cli snapshot [ref]           # element snapshot
+playwright-cli snapshot [target]        # element snapshot
 playwright-cli snapshot --depth=N       # limit depth
+playwright-cli snapshot --boxes         # include bounding boxes
+playwright-cli find "text"              # search instead of capturing
 ```
 
 See [Snapshots](../snapshots.mdx) for details on the format and usage.

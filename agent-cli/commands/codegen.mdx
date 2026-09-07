@@ -1,0 +1,113 @@
+---
+title: "Codegen & Highlighting"
+---
+
+# Codegen & Highlighting
+
+Every `playwright-cli` action prints the Playwright code it just ran. That generated code is the raw
+material for tests — this page covers it, plus the commands that support authoring: recording a
+flow the user performs by hand, turning a ref into a locator, and highlighting elements on the page.
+
+## Generated code
+
+```bash
+$ playwright-cli fill e1 "user@example.com"
+### Ran Playwright code
+await page.getByRole('textbox', { name: 'Email' }).fill('user@example.com');
+### Page
+- Page URL: https://example.com/login
+...
+
+$ playwright-cli click e3
+### Ran Playwright code
+await page.getByRole('button', { name: 'Sign In' }).click();
+```
+
+Collect those lines into a test and add the assertions:
+
+```typescript
+import { test, expect } from '@playwright/test';
+
+test('login flow', async ({ page }) => {
+  await page.goto('https://example.com/login');
+  await page.getByRole('textbox', { name: 'Email' }).fill('user@example.com');
+  await page.getByRole('textbox', { name: 'Password' }).fill('password123');
+  await page.getByRole('button', { name: 'Sign In' }).click();
+
+  await expect(page).toHaveURL(/.*dashboard/);
+});
+```
+
+The generated code prefers role-based locators, which survive markup changes far better than CSS
+selectors. Set `codegen` in the [config file](../configuration.mdx) to emit `python`, `java` or
+`csharp` instead of TypeScript, or `none` to suppress the code section entirely.
+
+## Recording user actions
+
+When the flow is easier to demonstrate than to describe — a drag interaction, a canvas gesture, a
+login with a hardware key — hand the browser to the user and record what they do.
+
+```bash
+playwright-cli open https://example.com --headed
+playwright-cli recording-start
+# the user performs the flow in the browser window
+playwright-cli recording-stop
+```
+
+`recording-stop` prints everything the user did as Playwright code:
+
+```txt
+Recording stopped. Recorded actions:
+
+await page.getByRole('link', { name: 'Products' }).click();
+await page.getByRole('textbox', { name: 'Search' }).fill('laptop');
+await page.getByRole('textbox', { name: 'Search' }).press('Enter');
+```
+
+`recording-start` brings the browser window to the front, so run it against a headed session.
+
+## Generating a locator
+
+`generate-locator` turns a ref or a selector into the locator you would write in a test:
+
+```bash
+$ playwright-cli generate-locator e5
+# getByRole('button', { name: 'Add to cart' })
+
+$ playwright-cli --raw generate-locator "#checkout button.primary"
+# getByRole('button', { name: 'Checkout' })
+```
+
+Pair it with [`eval`](./console-eval.mdx) when you need the underlying attributes — an `id`,
+a `data-testid`, a class — that the snapshot does not show:
+
+```bash
+playwright-cli eval "el => el.getAttribute('data-testid')" e5
+```
+
+## Highlighting elements
+
+`highlight` draws a persistent overlay around an element. It is useful for showing the user which
+element you mean, and for making a target obvious in a screenshot or a
+[recorded video](./video-recording.mdx).
+
+```bash
+playwright-cli highlight e5
+playwright-cli highlight e5 --style="outline: 3px dashed red"
+
+playwright-cli highlight e5 --hide     # hide one element's highlight
+playwright-cli highlight --hide        # hide every highlight on the page
+```
+
+Highlights are overlays, not page changes: they do not intercept clicks, so you can leave them up
+while interacting with the page.
+
+## Test generation workflow
+
+The installed [skill](../skills.mdx) documents a fuller plan → generate → heal loop, which builds
+on the same mechanic:
+
+1. **Plan** — explore the app with the CLI and write a spec file describing what to test.
+2. **Generate** — replay the spec step by step, collecting the generated code into test files.
+3. **Heal** — run the failing test with `--debug=cli`, [attach](./test-debugging.mdx) to the paused
+   page, and use the freshly generated code to repair the stale locator or expectation.

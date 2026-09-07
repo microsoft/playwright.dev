@@ -13,11 +13,24 @@ Handle browser dialogs (alert, confirm, prompt) that block page interaction.
 | `dialog-accept [prompt]` | Accept a dialog, optionally providing prompt text |
 | `dialog-dismiss` | Dismiss (cancel) a dialog |
 
+## How a dialog is reported
+
+While a dialog is open, every command reports it under a `Modal state` section and tells you which
+command clears it:
+
+```txt
+### Modal state
+- ["confirm" dialog with message "Are you sure you want to delete this?"]: can be handled by dialog-accept or dialog-dismiss
+```
+
+Nothing else can proceed until it is handled.
+
 ## Alert dialogs
 
 ```bash
 $ playwright-cli click e5
-# ⚠ Dialog appeared: [alert] "Item has been deleted."
+### Modal state
+- ["alert" dialog with message "Item has been deleted."]: can be handled by dialog-accept or dialog-dismiss
 
 $ playwright-cli dialog-accept
 ```
@@ -26,7 +39,8 @@ $ playwright-cli dialog-accept
 
 ```bash
 $ playwright-cli click e10
-# ⚠ Dialog appeared: [confirm] "Are you sure you want to delete this?"
+### Modal state
+- ["confirm" dialog with message "Are you sure you want to delete this?"]: can be handled by dialog-accept or dialog-dismiss
 
 # Accept (OK)
 $ playwright-cli dialog-accept
@@ -39,7 +53,8 @@ $ playwright-cli dialog-dismiss
 
 ```bash
 $ playwright-cli click e8
-# ⚠ Dialog appeared: [prompt] "Enter your name:"
+### Modal state
+- ["prompt" dialog with message "Enter your name:"]: can be handled by dialog-accept or dialog-dismiss
 
 # Accept with text
 $ playwright-cli dialog-accept "Alice"
@@ -48,13 +63,26 @@ $ playwright-cli dialog-accept "Alice"
 $ playwright-cli dialog-dismiss
 ```
 
-## Workflow
+## File choosers
 
-When a dialog appears, other commands will report it. Handle the dialog before continuing:
+A file chooser is reported the same way, and is cleared with
+[`upload`](./interaction.mdx) rather than the dialog commands:
+
+```txt
+### Modal state
+- [File chooser]: can be handled by upload
+```
+
+```bash
+playwright-cli upload /abs/path/to/document.pdf
+```
+
+## Workflow
 
 ```bash
 $ playwright-cli click e12
-# ⚠ Dialog appeared: [confirm] "Discard unsaved changes?"
+### Modal state
+- ["confirm" dialog with message "Discard unsaved changes?"]: can be handled by dialog-accept or dialog-dismiss
 
 $ playwright-cli dialog-accept
 

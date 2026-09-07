@@ -14,11 +14,16 @@ playwright-cli console debug            # everything
 playwright-cli console --clear          # clear the message buffer
 ```
 
+Each level includes the messages of more severe levels; the default is `info`. The output starts
+with a count line, so you can tell at a glance whether a page is clean:
+
 ```bash
 $ playwright-cli console error
-# [error] Uncaught TypeError: Cannot read property 'map' of undefined
-#   at app.js:42:15
-# [error] Failed to fetch: GET /api/users 404
+# Total messages: 37 (Errors: 2, Warnings: 5)
+# Returning 2 messages for level "error"
+#
+# [ERROR] Uncaught TypeError: Cannot read property 'map' of undefined @ app.js:42
+# [ERROR] Failed to load resource: 404 (Not Found) @ /api/users
 ```
 
 ### Workflow: debugging a broken page
@@ -26,8 +31,7 @@ $ playwright-cli console error
 ```bash
 # Check the console for errors
 playwright-cli console error
-# [error] Failed to fetch: GET https://api.example.com/data 404
-# [error] Uncaught Error: API returned 404
+# [ERROR] Failed to fetch: GET https://api.example.com/data 404
 
 # Now you know the API endpoint is returning 404
 # Mock the route or investigate further
@@ -39,8 +43,11 @@ playwright-cli reload
 ## JavaScript evaluation
 
 ```bash
-playwright-cli eval <expression> [ref]
+playwright-cli eval <func> [target]
 ```
+
+The argument is a function — `() => { ... }` for the page, `element => { ... }` when a target is
+given. Pass `--filename` to write the result to a file instead of returning it inline.
 
 ### Page-level evaluation
 
@@ -50,16 +57,33 @@ $ playwright-cli eval "() => document.title"
 
 $ playwright-cli eval "() => window.innerWidth + 'x' + window.innerHeight"
 # 1280x720
+
+$ playwright-cli eval "() => JSON.stringify([...document.querySelectorAll('a')].map(a => a.href))" \
+    --filename=links.json
 ```
 
 ### Element evaluation
 
+`eval` is the way to read the attributes a snapshot doesn't show — `id`, `class`, `data-*`,
+computed styles:
+
 ```bash
-$ playwright-cli eval "(el) => el.getAttribute('data-id')" e15
+$ playwright-cli eval "el => el.id" e15
 # item-42
 
-$ playwright-cli eval "(el) => getComputedStyle(el).color" e5
+$ playwright-cli eval "el => el.getAttribute('data-testid')" e15
+# todo-item
+
+$ playwright-cli eval "el => getComputedStyle(el).color" e5
 # rgb(255, 0, 0)
+```
+
+### Piping results
+
+`--raw` strips the page status and snapshot, leaving only the value:
+
+```bash
+playwright-cli --raw eval "JSON.stringify(performance.timing)" | jq '.loadEventEnd - .navigationStart'
 ```
 
 ## Running Playwright code
@@ -71,6 +95,10 @@ playwright-cli run-code <code>
 playwright-cli run-code --filename=script.js
 ```
 
+The code must be a single function expression — it is wrapped in `(...)` and evaluated, so
+`import` / `require` are not available. It receives the current `page`, and whatever it returns is
+printed.
+
 ### Set geolocation
 
 ```bash
@@ -80,12 +108,27 @@ playwright-cli run-code "async (page) => {
 }"
 ```
 
-### Wait for specific condition
+### Wait for a specific condition
 
 ```bash
 playwright-cli run-code "async (page) => {
   await page.waitForSelector('.data-loaded');
   return 'Data loaded successfully';
+}"
+```
+
+### Emulate media
+
+```bash
+playwright-cli run-code "async (page) => page.emulateMedia({ colorScheme: 'dark' })"
+```
+
+### Work inside an iframe
+
+```bash
+playwright-cli run-code "async (page) => {
+  const frame = page.locator('iframe#checkout').contentFrame();
+  await frame.getByRole('button', { name: 'Pay' }).click();
 }"
 ```
 

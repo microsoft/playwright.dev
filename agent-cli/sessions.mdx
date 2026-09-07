@@ -14,12 +14,26 @@ Run multiple isolated browser instances:
 playwright-cli open https://playwright.dev
 playwright-cli -s=example open https://example.com --persistent
 playwright-cli list
-# Active sessions:
-# -> default (https://playwright.dev)
-#    example (https://example.com) [persistent]
 ```
 
-Each session has its own browser instance, cookies, localStorage, navigation history, and console log.
+```txt
+### Browsers
+- default:
+  - status: open
+  - browser-type: chrome
+  - user-data-dir: <in-memory>
+  - headed: false
+- example:
+  - status: open
+  - browser-type: chrome
+  - user-data-dir: /Users/me/Library/Caches/ms-playwright/daemon/8f2c.../ud-example-chrome
+  - headed: false
+```
+
+Each session has its own browser instance, cookies, localStorage, IndexedDB, cache, navigation history, open tabs, and console log.
+
+`playwright-cli list --all` widens the listing to every workspace, and adds the Playwright browser
+servers and the local Chrome/Edge profiles that are available to [attach](./commands/attach.mdx) to.
 
 ## Environment variable
 
@@ -47,13 +61,14 @@ Profile is saved to disk and survives browser restarts. This is equivalent to th
 playwright-cli open https://example.com --persistent
 ```
 
-Default persistent profile locations:
+The profile directory is derived from the workspace and the session name — `ud-<session>-<browser>`
+under a per-workspace directory:
 
 | Platform | Default location |
 |----------|-----------------|
-| macOS | `~/Library/Caches/ms-playwright/mcp-{channel}-profile` |
-| Linux | `~/.cache/ms-playwright/mcp-{channel}-profile` |
-| Windows | `%LOCALAPPDATA%\ms-playwright\mcp-{channel}-profile` |
+| macOS | `~/Library/Caches/ms-playwright/daemon/<workspace-hash>/` |
+| Linux | `$XDG_CACHE_HOME/ms-playwright/daemon/<workspace-hash>/` (defaults to `~/.cache`) |
+| Windows | `%LOCALAPPDATA%\ms-playwright\daemon\<workspace-hash>\` |
 
 ### Custom directory
 
@@ -64,12 +79,17 @@ playwright-cli open https://example.com --profile=./my-profile
 ## Session management
 
 ```bash
-playwright-cli list                     # list all sessions
+playwright-cli list                     # list sessions in this workspace
+playwright-cli list --all               # list sessions across all workspaces
 playwright-cli -s=name close            # close a specific session
+playwright-cli -s=name detach           # detach without closing an attached browser
 playwright-cli close-all                # close all browsers
 playwright-cli kill-all                 # force kill (for unresponsive browsers)
 playwright-cli -s=name delete-data      # delete stored profile data
 ```
+
+`close` stops the browser the CLI launched. For sessions created with `attach`, use `detach` — it
+tears down the session and leaves the external browser running. See [Attach](./commands/attach.mdx).
 
 ## Dashboard
 
@@ -90,6 +110,28 @@ Use cases:
 - Watch coding agents automate browsers in the background
 - Take over when an agent gets stuck on a CAPTCHA or 2FA
 - Close stale sessions or delete data from the UI
+
+### Options
+
+```bash
+playwright-cli show                     # launch the dashboard in the background
+playwright-cli -s=name show             # launch it and reveal a specific session
+playwright-cli show --port=0            # run as a blocking HTTP server on a random port
+playwright-cli show --port=8080 --host=0.0.0.0
+playwright-cli show --kill              # stop the dashboard daemon
+```
+
+### Annotation mode
+
+`show --annotate` turns the dashboard into a feedback tool: the user draws boxes on the live page
+and types comments, and the command returns the annotated screenshot, the snapshot of the marked
+region, and the notes. It blocks until the user is done, which makes it the way to ask for a UI
+review or design feedback mid-automation.
+
+```bash
+playwright-cli open https://example.com
+playwright-cli show --annotate
+```
 
 ## Saving and restoring state
 

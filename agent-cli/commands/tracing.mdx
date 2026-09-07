@@ -21,16 +21,34 @@ playwright-cli goto https://example.com
 playwright-cli click e5
 playwright-cli fill e3 "test"
 playwright-cli tracing-stop
-# Trace saved to .playwright-cli/trace.zip
 ```
 
-View the trace in the [Playwright Trace Viewer](/docs/trace-viewer-intro):
+Both commands print the paths they write to:
+
+```txt
+Trace recording stopped.
+[Trace](.playwright-cli/traces/trace-1771097322679.trace)
+[Network log](.playwright-cli/traces/trace-1771097322679.network)
+[Resources](.playwright-cli/traces/resources)
+```
+
+The trace is written live — the file links appear as soon as `tracing-start` runs, so you can open
+the viewer while the automation is still going.
+
+| File | Contents |
+|------|----------|
+| `trace-{timestamp}.trace` | Actions, DOM snapshots before and after each one, screenshots, console messages, timing |
+| `trace-{timestamp}.network` | Every request and response, with headers, bodies and timing |
+| `resources/` | Cached images, fonts, stylesheets and scripts needed to replay the page |
+
+## Viewing a trace
 
 ```bash
-npx playwright show-trace .playwright-cli/trace.zip
+npx playwright show-trace .playwright-cli/traces/trace-1771097322679.trace
 ```
 
-The Trace Viewer shows a timeline of every action with DOM snapshots (before and after), screenshots, network requests and responses, console messages, and timing.
+The [Trace Viewer](/docs/trace-viewer-intro) shows a timeline of every action with DOM snapshots
+(before and after), screenshots, network requests and responses, console messages, and timing.
 
 ## Workflow: debugging a failing scenario
 
@@ -48,17 +66,16 @@ playwright-cli snapshot
 # - text: "Payment processing failed"
 
 playwright-cli console error
-# [error] POST /api/payment 422: {"error":"Card number must include expiry"}
+# [ERROR] POST /api/payment 422: {"error":"Card number must include expiry"}
 
 # Save trace for analysis
 playwright-cli tracing-stop
-# Share trace with the team for full timeline analysis
 ```
 
-## Automatic session recording
+## Cleaning up
 
-Save traces for every session automatically with the `--save-session` flag:
+Traces can consume significant disk space:
 
 ```bash
-playwright-cli --save-session
+find .playwright-cli/traces -mtime +7 -delete
 ```

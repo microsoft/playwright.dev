@@ -8,20 +8,45 @@ Inspect network traffic, mock API responses, and test offline behavior.
 
 ## Inspect network requests
 
+`requests` prints a numbered list of the requests made since the page loaded. Static resources that
+succeeded (images, fonts, stylesheets, scripts) are hidden by default to keep the list short.
+
 ```bash
-playwright-cli network                  # all requests since page load
-playwright-cli network --filter="api"   # filter by URL pattern
-playwright-cli network --static         # include images, CSS, fonts
-playwright-cli network --request-body   # include request bodies
-playwright-cli network --request-headers # include headers
-playwright-cli network --clear          # clear the log
+playwright-cli requests                      # fetch/XHR and anything that failed
+playwright-cli requests --static             # include successful static resources
+playwright-cli requests --filter="/api/.*"   # only URLs matching this regexp
+playwright-cli requests --clear              # clear the log
 ```
 
 ```bash
-$ playwright-cli network --filter="api"
-# GET  200 https://api.example.com/users        12ms  application/json
-# POST 201 https://api.example.com/users/create  45ms  application/json
+$ playwright-cli requests --filter="/api/"
+# 1. [GET] https://api.example.com/users => [200] OK
+# 2. [POST] https://api.example.com/users/create => [201] Created
+# 3. [GET] https://api.example.com/prefs => [FAILED] net::ERR_ABORTED
+#
+# Note: 14 static requests not shown, run with --static option to see them.
 ```
+
+## Inspect a single request
+
+Use the number from `requests`:
+
+| Command | Description |
+|---------|-------------|
+| `request <index>` | Full details — request headers and body, response headers and body |
+| `request-headers <index>` | Request headers only |
+| `request-body <index>` | Request body only |
+| `response-headers <index>` | Response headers only |
+| `response-body <index>` | Response body only |
+
+```bash
+playwright-cli request 2
+playwright-cli response-body 2
+playwright-cli response-body 2 --filename=users.json
+```
+
+All five accept `--filename` to write the result to a file instead of returning it as text.
+`response-body` inlines textual bodies and saves binary ones to a file, printing the path.
 
 ## Mock API responses
 
@@ -31,11 +56,15 @@ playwright-cli route <pattern> [options]
 
 | Option | Description |
 |--------|-------------|
-| `--status=<code>` | HTTP status code |
+| `--status=<code>` | HTTP status code (default: 200) |
 | `--body=<text>` | Response body (text or JSON string) |
-| `--content-type=<type>` | Content-Type header |
-| `--header=<name:value>` | Additional response headers |
-| `--remove-header=<names>` | Headers to strip from request (comma-separated) |
+| `--content-type=<type>` | Content-Type header of the mocked response |
+| `--header="<name>: <value>"` | Header to add to the outgoing request (repeatable) |
+| `--remove-header=<names>` | Comma-separated header names to strip from the request |
+
+A route either **fulfills** or **rewrites**. Passing `--body` or `--status` fulfills the request
+with a mock response and the page never reaches the network. Passing only `--header` /
+`--remove-header` lets the request continue to the real server with modified headers.
 
 ### Mock an API endpoint
 
@@ -59,10 +88,14 @@ playwright-cli route "**/*.jpg" --status=404
 playwright-cli route "**/analytics/**" --status=204
 ```
 
-### Strip authentication headers
+### Rewrite request headers
 
 ```bash
+# strip credentials from every request
 playwright-cli route "**/*" --remove-header=cookie,authorization
+
+# add a header to API calls
+playwright-cli route "**/api/**" --header="X-Debug: 1"
 ```
 
 ## Manage routes
@@ -71,6 +104,15 @@ playwright-cli route "**/*" --remove-header=cookie,authorization
 playwright-cli route-list               # list active routes
 playwright-cli unroute "**/api/users"   # remove specific route
 playwright-cli unroute                  # remove all routes
+```
+
+## URL patterns
+
+```txt
+**/api/users           - match this path on any origin
+**/api/*/details       - wildcard segment
+**/*.{png,jpg,jpeg}    - match file extensions
+**/search?q=*          - match query parameters
 ```
 
 ## Conditional mocking with code
@@ -122,10 +164,10 @@ playwright-cli snapshot
 
 ```bash
 playwright-cli network-state-set offline   # go offline
-playwright-cli reload                     # page shows offline state
+playwright-cli reload                      # page shows offline state
 playwright-cli snapshot
 # - heading "No internet connection" [level=1]
 
-playwright-cli network-state-set online   # restore connection
-playwright-cli reload                     # page loads normally
+playwright-cli network-state-set online    # restore connection
+playwright-cli reload                      # page loads normally
 ```

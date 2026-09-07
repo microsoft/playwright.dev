@@ -16,19 +16,52 @@ npm install -g @playwright/cli@latest
 playwright-cli --help
 ```
 
-## Local installation (npx)
+## Using the version in your project
+
+If Playwright is already a dependency of the project, the CLI is available through it — no global
+install needed:
 
 ```bash
-npx playwright-cli --help
+npx --no-install playwright --version   # check that a local Playwright exists
+npx playwright cli --help
 ```
+
+Everywhere these docs write `playwright-cli <command>`, `npx playwright cli <command>` works the
+same way.
+
+## Initializing a workspace
+
+```bash
+playwright-cli install
+```
+
+This creates a `.playwright` directory in the current working directory, adds it to `.gitignore`,
+and downloads the configured browser if it is missing.
+
+## Installing skills
+
+Coding agents like Claude Code and GitHub Copilot use locally installed skills for richer context
+about available commands and workflows:
+
+```bash
+playwright-cli install --skills            # same as --skills=claude
+playwright-cli install --skills=claude     # .claude/skills/playwright-cli
+playwright-cli install --skills=agents     # .agents/skills/playwright-cli
+playwright-cli install --skills -g         # install into the home directory
+```
+
+`--global` (alias `-g`) installs the skill into `~/.claude/skills` or `~/.agents/skills` so it is
+available in every project. It requires `--skills` and skips the workspace initialization.
+
+See [Skills](./skills.mdx) for what the skill contains.
 
 ## Installing browsers
 
 The CLI downloads a browser automatically on first use. To install explicitly:
 
 ```bash
-playwright-cli install-browser               # install default (chromium)
-playwright-cli install-browser firefox       # install specific browser
+playwright-cli install-browser               # install the browsers this version needs
+playwright-cli install-browser firefox       # install one specific browser
 playwright-cli install-browser --with-deps   # install with system dependencies
 ```
 
@@ -42,14 +75,6 @@ playwright-cli install-browser --with-deps   # install with system dependencies
 | `--force` | Force reinstall even if already present |
 | `--only-shell` | Only install Chromium headless shell |
 | `--no-shell` | Skip Chromium headless shell |
-
-## Installing skills
-
-Coding agents like Claude Code and GitHub Copilot can use locally installed skills for richer context about available commands:
-
-```bash
-playwright-cli install --skills
-```
 
 ## Skills-less operation
 
@@ -72,5 +97,5 @@ PLAYWRIGHT_CLI_SESSION=todo-app claude .
 
 - [Quick Start](./quick-start.mdx) — try the CLI hands-on
 - [Snapshots](./snapshots.mdx) — how element refs work
-- [Capabilities](./capabilities.mdx) — network mocking, storage, testing, and more
+- [Command Reference](./capabilities.mdx) — every command, grouped
 - [Configuration](./configuration.mdx) — headless mode, browser selection, profiles

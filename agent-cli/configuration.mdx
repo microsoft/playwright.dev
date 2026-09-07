@@ -21,6 +21,19 @@ playwright-cli open --browser=webkit     # WebKit (Safari engine)
 playwright-cli open --browser=msedge     # Microsoft Edge
 ```
 
+## Device emulation
+
+```bash
+# Emulate a generic mobile device: Pixel 10 for Chromium, iPhone 17 for WebKit
+playwright-cli open --mobile
+
+# Emulate a named device from the Playwright device registry
+playwright-cli open --device="iPhone 15"
+```
+
+`--mobile` is worth reaching for by default when a mobile layout is acceptable: mobile pages are
+usually lighter, so their snapshots are smaller and cheaper.
+
 ## Profile modes
 
 ### In-memory (default)
@@ -57,13 +70,18 @@ Explicit in-memory mode — equivalent to the default but can be set in the conf
 
 ## Configuration file
 
-For advanced settings, use a JSON config file:
+For advanced settings, use a config file:
 
 ```bash
-playwright-cli --config path/to/config.json open example.com
+playwright-cli open example.com --config=path/to/config.json
 ```
 
-The CLI automatically loads `.playwright/cli.config.json` if present.
+Configuration is merged from four sources, each overriding the previous one:
+
+1. `~/.playwright/cli.config.json` — global defaults for every workspace
+2. `.playwright/cli.config.json` in the workspace — loaded automatically when present, overridden with explicit `--config`
+3. `PLAYWRIGHT_MCP_*` environment variables
+4. Command-line options such as `--browser`, `--headed`, `--device`, `--profile`
 
 ### Full config schema
 
@@ -71,16 +89,19 @@ The CLI automatically loads `.playwright/cli.config.json` if present.
 {
   browser?: {
     browserName?: 'chromium' | 'firefox' | 'webkit';
-    isolated?: boolean;
+    isolated?: boolean;            // keep the profile in memory
     userDataDir?: string;
     launchOptions?: {
-      channel?: string;           // 'chrome', 'msedge'
+      channel?: string;            // 'chrome', 'msedge', ...
       headless?: boolean;
       executablePath?: string;
       args?: string[];
+      chromiumSandbox?: boolean;
+      slowMo?: number;
+      timeout?: number;
       proxy?: {
-        server: string;           // e.g., "http://myproxy:3128"
-        bypass?: string;          // e.g., ".com,chromium.org"
+        server: string;            // e.g., "http://myproxy:3128"
+        bypass?: string;           // e.g., ".com,chromium.org"
         username?: string;
         password?: string;
       };
@@ -88,40 +109,52 @@ The CLI automatically loads `.playwright/cli.config.json` if present.
     contextOptions?: {
       viewport?: { width: number; height: number };
       locale?: string;
+      timezoneId?: string;
       userAgent?: string;
+      colorScheme?: 'light' | 'dark' | 'no-preference';
       storageState?: string;
-      permissions?: string[];     // e.g., ['geolocation', 'clipboard-read']
+      permissions?: string[];      // e.g., ['geolocation', 'clipboard-read']
+      ignoreHTTPSErrors?: boolean;
       serviceWorkers?: 'allow' | 'block';
     };
     cdpEndpoint?: string;
     cdpHeaders?: Record<string, string>;
-    cdpTimeout?: number;
-    remoteEndpoint?: string;
-    initPage?: string[];          // TypeScript files for page setup
-    initScript?: string[];        // JavaScript files for page init
+    cdpTimeout?: number;           // defaults to 30000, 0 disables
+    remoteEndpoint?: string | { endpoint: string, headers?, slowMo?, timeout? };
+    initPage?: string[];           // TypeScript files for page setup
+    initScript?: string[];         // JavaScript files for page init
   };
   extension?: boolean;
-  saveVideo?: { width: number; height: number };
+  server?: {
+    port?: number;
+    host?: string;
+    allowedHosts?: string[];
+  };
+  capabilities?: string[];         // MCP tool capabilities; the CLI enables all of them
   saveSession?: boolean;
   sharedBrowserContext?: boolean;
-  snapshot?: { mode?: 'full' | 'none' };
-  imageResponses?: 'allow' | 'omit';
   outputDir?: string;
-  outputMode?: 'file' | 'stdout';
+  outputMaxSize?: number;          // eviction threshold for output files, in bytes
   console?: { level?: 'error' | 'warning' | 'info' | 'debug' };
   network?: {
-    allowedOrigins?: string[];    // e.g., ["https://api.example.com"]
-    blockedOrigins?: string[];    // e.g., ["https://analytics.example.com"]
+    allowedOrigins?: string[];     // e.g., ["https://api.example.com", "http://localhost:*"]
+    blockedOrigins?: string[];
   };
   secrets?: Record<string, string>;
-  testIdAttribute?: string;       // default: "data-testid"
+  testIdAttribute?: string;        // default: "data-testid"
   timeouts?: {
-    action?: number;              // default: 5000ms
-    navigation?: number;          // default: 60000ms
-    expect?: number;              // default: 5000ms
+    action?: number;               // default: 5000ms
+    navigation?: number;           // default: 60000ms
+    expect?: number;               // default: 5000ms
+    settle?: number;               // default: 500ms
+  };
+  imageResponses?: 'allow' | 'omit';
+  snapshot?: {
+    mode?: 'full' | 'none';
+    boxes?: boolean;               // include [box=x,y,width,height] in snapshots
   };
   allowUnrestrictedFileAccess?: boolean;
-  codegen?: 'typescript' | 'none';
+  codegen?: 'typescript' | 'python' | 'java' | 'csharp' | 'none';
 }
 ```
 
@@ -185,7 +218,7 @@ The CLI automatically loads `.playwright/cli.config.json` if present.
 
 ## Print resolved config
 
-See the final config after merging CLI options, environment variables, and config file:
+See the final config after merging CLI options, environment variables, and config files:
 
 ```bash
 playwright-cli config-print
@@ -206,49 +239,65 @@ See [Attach](./commands/attach.mdx) for details.
 | Variable | Description |
 |----------|-------------|
 | `PLAYWRIGHT_CLI_SESSION` | Default session name |
-| `PLAYWRIGHT_MCP_BROWSER` | Browser to use (chrome, firefox, webkit, msedge) |
-| `PLAYWRIGHT_MCP_HEADLESS` | Run headless |
+| `PLAYWRIGHT_MCP_ALLOWED_HOSTS` | Allowed hosts for the server (comma-separated) |
+| `PLAYWRIGHT_MCP_ALLOWED_ORIGINS` | Origins the browser may request (semicolon-separated) |
+| `PLAYWRIGHT_MCP_ALLOW_UNRESTRICTED_FILE_ACCESS` | Allow file access outside the workspace |
+| `PLAYWRIGHT_MCP_BLOCKED_ORIGINS` | Origins to block (semicolon-separated) |
+| `PLAYWRIGHT_MCP_BLOCK_SERVICE_WORKERS` | Block service workers |
+| `PLAYWRIGHT_MCP_BROWSER` | Browser to use (chrome, firefox, webkit, msedge, ...) |
 | `PLAYWRIGHT_MCP_CAPS` | Enable capabilities (comma-separated) |
+| `PLAYWRIGHT_MCP_CDP_ENDPOINT` | CDP endpoint |
+| `PLAYWRIGHT_MCP_CDP_HEADERS` | Headers to send with the CDP connect request |
+| `PLAYWRIGHT_MCP_CDP_TIMEOUT` | CDP connect timeout (ms) |
+| `PLAYWRIGHT_MCP_CODEGEN` | Code generation language |
 | `PLAYWRIGHT_MCP_CONFIG` | Config file path |
-| `PLAYWRIGHT_MCP_ISOLATED` | In-memory profile |
-| `PLAYWRIGHT_MCP_EXTENSION` | Connect via browser extension |
-| `PLAYWRIGHT_MCP_USER_DATA_DIR` | Profile directory |
-| `PLAYWRIGHT_MCP_STORAGE_STATE` | Storage state file |
+| `PLAYWRIGHT_MCP_CONSOLE_LEVEL` | Console message level |
 | `PLAYWRIGHT_MCP_DEVICE` | Device to emulate |
 | `PLAYWRIGHT_MCP_EXECUTABLE_PATH` | Custom browser executable |
-| `PLAYWRIGHT_MCP_VIEWPORT_SIZE` | Viewport size (e.g., "1280x720") |
-| `PLAYWRIGHT_MCP_PROXY_SERVER` | Proxy server URL |
-| `PLAYWRIGHT_MCP_PROXY_BYPASS` | Domains to bypass proxy |
-| `PLAYWRIGHT_MCP_USER_AGENT` | Custom user agent |
+| `PLAYWRIGHT_MCP_EXTENSION` | Connect via browser extension |
+| `PLAYWRIGHT_MCP_GRANT_PERMISSIONS` | Browser permissions (comma-separated) |
+| `PLAYWRIGHT_MCP_HEADLESS` | Run headless |
+| `PLAYWRIGHT_MCP_HOST` | Host to bind the server to |
 | `PLAYWRIGHT_MCP_IGNORE_HTTPS_ERRORS` | Ignore HTTPS errors |
-| `PLAYWRIGHT_MCP_TIMEOUT_ACTION` | Action timeout (ms) |
-| `PLAYWRIGHT_MCP_TIMEOUT_NAVIGATION` | Navigation timeout (ms) |
-| `PLAYWRIGHT_MCP_CONSOLE_LEVEL` | Console message level |
-| `PLAYWRIGHT_MCP_TEST_ID_ATTRIBUTE` | Test ID attribute |
-| `PLAYWRIGHT_MCP_CDP_ENDPOINT` | CDP endpoint |
-| `PLAYWRIGHT_MCP_OUTPUT_DIR` | Output directory |
-| `PLAYWRIGHT_MCP_CODEGEN` | Code generation language |
+| `PLAYWRIGHT_MCP_IMAGE_RESPONSES` | `allow` or `omit` |
 | `PLAYWRIGHT_MCP_INIT_PAGE` | Page init TypeScript |
 | `PLAYWRIGHT_MCP_INIT_SCRIPT` | Page init JavaScript |
-| `PLAYWRIGHT_MCP_BLOCKED_ORIGINS` | Block origins |
-| `PLAYWRIGHT_MCP_ALLOWED_ORIGINS` | Allow origins |
-| `PLAYWRIGHT_MCP_GRANT_PERMISSIONS` | Browser permissions |
-| `PLAYWRIGHT_MCP_BLOCK_SERVICE_WORKERS` | Block service workers |
-| `PLAYWRIGHT_MCP_NO_SANDBOX` | Disable sandbox |
-| `PLAYWRIGHT_MCP_SAVE_SESSION` | Save session data |
-| `PLAYWRIGHT_MCP_SAVE_VIDEO` | Auto-record video (e.g., "800x600") |
+| `PLAYWRIGHT_MCP_ISOLATED` | In-memory profile |
+| `PLAYWRIGHT_MCP_MOBILE` | Emulate a generic mobile device |
+| `PLAYWRIGHT_MCP_OUTPUT_DIR` | Output directory |
+| `PLAYWRIGHT_MCP_OUTPUT_MAX_SIZE` | Output eviction threshold (bytes) |
+| `PLAYWRIGHT_MCP_PORT` | Server port |
+| `PLAYWRIGHT_MCP_PROFILE_DIR_NAME` | Profile directory name for extension mode |
+| `PLAYWRIGHT_MCP_PROXY_BYPASS` | Domains to bypass proxy |
+| `PLAYWRIGHT_MCP_PROXY_SERVER` | Proxy server URL |
+| `PLAYWRIGHT_MCP_REMOTE_HEADERS` | Headers for the remote endpoint connect request |
+| `PLAYWRIGHT_MCP_SANDBOX` | Enable or disable the Chromium sandbox |
 | `PLAYWRIGHT_MCP_SECRETS_FILE` | Secrets file (dotenv) |
+| `PLAYWRIGHT_MCP_STORAGE_STATE` | Storage state file |
+| `PLAYWRIGHT_MCP_TEST_ID_ATTRIBUTE` | Test ID attribute |
+| `PLAYWRIGHT_MCP_TIMEOUT_ACTION` | Action timeout (ms) |
+| `PLAYWRIGHT_MCP_TIMEOUT_NAVIGATION` | Navigation timeout (ms) |
+| `PLAYWRIGHT_MCP_TIMEOUT_SETTLE` | Post-action settle timeout (ms) |
+| `PLAYWRIGHT_MCP_USER_AGENT` | Custom user agent |
+| `PLAYWRIGHT_MCP_USER_DATA_DIR` | Profile directory |
+| `PLAYWRIGHT_MCP_VIEWPORT_SIZE` | Viewport size (e.g., "1280x720") |
 
-## All open parameters
+## All open and attach parameters
 
 ```bash
 playwright-cli open [url]                          # open browser
 playwright-cli open --headed                       # show browser window
 playwright-cli open --browser=firefox              # specific browser
+playwright-cli open --mobile                       # generic mobile device
+playwright-cli open --device="iPhone 15"           # named device
 playwright-cli open --persistent                   # persist profile to disk
 playwright-cli open --profile=<path>               # custom profile directory
 playwright-cli open --config=file.json             # use config file
+
+playwright-cli attach [name]                       # attach to a bound browser by name
 playwright-cli attach --extension                  # connect via extension
-playwright-cli attach --cdp <url>                  # connect via CDP
-playwright-cli attach --endpoint <url>             # connect to Playwright server
+playwright-cli attach --cdp=chrome                 # connect to a running channel
+playwright-cli attach --cdp=<url>                  # connect via CDP endpoint
+playwright-cli attach --endpoint=<url>             # connect to a Playwright server
+playwright-cli attach --config=file.json           # use config file
 ```

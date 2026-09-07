@@ -8,57 +8,86 @@ Use the CLI to debug Playwright test failures interactively.
 
 ## Connecting to a paused test
 
-Start a test with the debug flag:
+Run the test with `--debug=cli`. Do it in the background — the test stays paused and holds the
+browser open while you work.
 
 ```bash
-npx playwright test --debug=cli
+PLAYWRIGHT_HTML_OPEN=never npx playwright test tests/checkout.spec.ts --debug=cli
 ```
 
-The test pauses at the start and outputs a session name. Connect to it:
+The test pauses at the start and prints the session name to attach to:
+
+```txt
+### The test is currently paused at the start
+
+### Debugging Instructions
+- Run "playwright-cli attach tw-a3f19c" to attach to this test
+```
 
 ```bash
-playwright-cli attach <session-name>
+playwright-cli attach tw-a3f19c
 ```
 
-Then explore the page state:
+`PLAYWRIGHT_HTML_OPEN=never` keeps the HTML report from popping open when the run finishes.
+
+## Exploring the page
 
 ```bash
 playwright-cli snapshot                 # see current state
-playwright-cli console error           # check for errors
+playwright-cli find "Place order"       # locate one element on a big page
+playwright-cli console error            # check for errors
+playwright-cli requests --filter="/api/"
 playwright-cli eval "() => document.title"
 playwright-cli screenshot --filename=debug-state.png
 ```
 
-And control execution:
+## Controlling execution
+
+| Command | Description |
+|---------|-------------|
+| `resume` | Continue running |
+| `step-over` | Step over the next call in the test |
+| `pause-at <file>:<line>` | Run up to a location and pause there |
 
 ```bash
-playwright-cli resume                   # continue
-playwright-cli step-over                # step to next action
-playwright-cli pause-at test.ts:42      # run to that line and pause
+playwright-cli pause-at checkout.spec.ts:42
+playwright-cli step-over
+playwright-cli resume
 ```
+
+Because the test is paused at the very start, `pause-at` is usually the fastest way in: jump
+straight to the line where the problem is most likely to be.
+
+## Reading the generated code
+
+Every `playwright-cli` action prints the equivalent Playwright TypeScript. That is the fix you paste
+back into the test — most of the time a locator or an expectation needs updating, but it can also be
+a genuine bug in the app. See [Codegen & Highlighting](./codegen.mdx).
 
 ## Workflow: investigating a flaky test
 
 ```bash
-# 1. Run the failing test
-npx playwright test tests/checkout.spec.ts --debug=cli
+# 1. Run the failing test in the background
+PLAYWRIGHT_HTML_OPEN=never npx playwright test tests/checkout.spec.ts --debug=cli
 
 # 2. Connect
-playwright-cli attach playwright-test-1
+playwright-cli attach tw-a3f19c
 
 # 3. Record a trace
 playwright-cli tracing-start
 
-# 4. Step through
-playwright-cli resume
+# 4. Run to the suspect line
+playwright-cli pause-at tests/checkout.spec.ts:42
 playwright-cli snapshot
 playwright-cli console
-playwright-cli network
+playwright-cli requests
 
 # 5. Investigate at the failing step
 playwright-cli screenshot --filename=before-failure.png
 playwright-cli eval "() => document.querySelector('.spinner')?.style.display"
 
-# 6. Save trace
+# 6. Save trace, then stop the background test run and re-run it
 playwright-cli tracing-stop
 ```
+
+Stop the background test run once you are done, then re-run the test to confirm the fix.

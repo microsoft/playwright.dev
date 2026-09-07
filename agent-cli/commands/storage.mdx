@@ -11,9 +11,12 @@ Manage cookies, localStorage, sessionStorage, and save/restore full browser stat
 Save and restore the full browser state (cookies + localStorage) in a single file. This is the primary way to persist authentication across sessions.
 
 ```bash
-playwright-cli state-save [filename]    # save to file (default: auto-named)
-playwright-cli state-load <filename>    # restore from file
+playwright-cli state-save               # save to storage-state-{timestamp}.json
+playwright-cli state-save auth.json     # save to a named file
+playwright-cli state-load auth.json     # restore from file
 ```
+
+The file holds the cookies plus the localStorage of every origin the browser visited. **Never commit these files** — they carry live authentication tokens.
 
 ### Workflow: save login, skip it next time
 
@@ -50,9 +53,9 @@ playwright-cli goto https://app.example.com/dashboard
 | `--domain=<domain>` | Cookie domain |
 | `--path=<path>` | Cookie path (default: `/`) |
 | `--expires=<timestamp>` | Expiration as Unix timestamp |
-| `--http-only` | HTTP-only flag |
+| `--httpOnly` | HTTP-only flag |
 | `--secure` | Secure flag |
-| `--same-site=<value>` | `Strict`, `Lax`, or `None` |
+| `--sameSite=<value>` | `Strict`, `Lax`, or `None` |
 
 ```bash
 $ playwright-cli cookie-list
@@ -63,7 +66,8 @@ $ playwright-cli cookie-list
 $ playwright-cli cookie-list --domain=.github.com
 $ playwright-cli cookie-get session_id
 $ playwright-cli cookie-set theme light
-$ playwright-cli cookie-set session abc123 --domain=.example.com --secure --http-only
+$ playwright-cli cookie-set session abc123 --domain=.example.com --secure --httpOnly
+$ playwright-cli cookie-set remember_me token123 --expires=1893456000 --sameSite=Lax
 $ playwright-cli cookie-delete session_id
 $ playwright-cli cookie-clear
 ```
@@ -112,4 +116,24 @@ playwright-cli sessionstorage-get <key>
 playwright-cli sessionstorage-set <key> <value>
 playwright-cli sessionstorage-delete <key>
 playwright-cli sessionstorage-clear
+```
+
+## Bulk operations
+
+The single-key commands cover the common cases. For anything bulkier — adding several cookies at
+once, or writing a batch of localStorage keys — use `run-code`:
+
+```bash
+playwright-cli run-code "async page => {
+  await page.context().addCookies([
+    { name: 'session_id', value: 'sess_abc123', domain: 'example.com', path: '/', httpOnly: true },
+    { name: 'preferences', value: JSON.stringify({ theme: 'dark' }), domain: 'example.com', path: '/' }
+  ]);
+}"
+```
+
+IndexedDB has no dedicated commands; reach for `run-code` there too:
+
+```bash
+playwright-cli run-code "async page => page.evaluate(() => indexedDB.databases())"
 ```

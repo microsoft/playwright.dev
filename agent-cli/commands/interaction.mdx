@@ -8,17 +8,16 @@ title: "Interaction"
 
 | Command | Description |
 |---------|-------------|
-| `click <ref> [button]` | Click an element (left, right, or middle button) |
-| `dblclick <ref> [button]` | Double-click an element |
-| `fill <ref> <text>` | Clear and fill text into an input |
-| `fill <ref> <text> --submit` | Fill and press Enter |
+| `click <target> [button]` | Click an element (`left`, `right`, or `middle`) |
+| `dblclick <target> [button]` | Double-click an element |
+| `fill <target> <text>` | Clear and fill text into an input |
 | `type <text>` | Type text into the focused element |
-| `select <ref> <value>` | Select a dropdown option |
-| `check <ref>` | Check a checkbox or radio button |
-| `uncheck <ref>` | Uncheck a checkbox |
-| `hover <ref>` | Hover over an element |
-| `drag <startRef> <endRef>` | Drag and drop |
-| `upload <file>` | Upload files |
+| `select <target> <value>` | Select a dropdown option |
+| `check <target>` / `uncheck <target>` | Check or uncheck a checkbox or radio button |
+| `hover <target>` | Hover over an element |
+| `drag <startTarget> <endTarget>` | Drag and drop between two elements |
+| `drop <target>` | Drop files or data onto an element from outside the page |
+| `upload <files...>` | Upload one or more files |
 | `resize <width> <height>` | Resize the browser window |
 
 ## Targeting elements
@@ -29,6 +28,14 @@ title: "Interaction"
 playwright-cli snapshot                 # get element refs
 playwright-cli click e15                # click by ref
 playwright-cli fill e3 "hello"          # fill by ref
+```
+
+On a large page, `find` locates an element without capturing the whole tree:
+
+```bash
+playwright-cli find "Add to cart"
+# - button "Add to cart" [ref=e42]
+playwright-cli click e42
 ```
 
 ### CSS selectors
@@ -48,14 +55,33 @@ playwright-cli click "getByText('Login')"
 playwright-cli fill "getByLabel('Email')" "test@example.com"
 ```
 
+## Clicking
+
+```bash
+playwright-cli click e15                       # left click
+playwright-cli click e15 right                 # right click (context menu)
+playwright-cli click e15 middle                # middle click
+playwright-cli dblclick e15                    # double click
+
+# hold modifier keys: Alt, Control, ControlOrMeta, Meta, Shift
+playwright-cli click e15 --modifiers=Shift
+playwright-cli click e15 --modifiers=ControlOrMeta --modifiers=Shift
+```
+
+`--modifiers` is repeatable — pass it once per key.
+
 ## Form interaction
 
 ```bash
 # Fill a text field
 playwright-cli fill e3 "test@example.com"
 
-# Fill and submit (presses Enter)
+# Fill and submit (presses Enter afterwards)
 playwright-cli fill e3 "search query" --submit
+
+# Type into whatever is focused, optionally submitting
+playwright-cli type "search query"
+playwright-cli type "search query" --submit
 
 # Select from dropdown
 playwright-cli select e7 "United States"
@@ -64,13 +90,35 @@ playwright-cli select e7 "United States"
 playwright-cli check e10                # check
 playwright-cli uncheck e10              # uncheck
 
-# File upload
+# File upload through a file input or file chooser
 playwright-cli upload /path/to/file.pdf
+playwright-cli upload /path/to/a.pdf /path/to/b.pdf
 
 # Resize browser window
 playwright-cli resize 375 812           # mobile viewport
 playwright-cli resize 1920 1080         # desktop
 ```
+
+## Drag and drop
+
+`drag` moves one element in the page onto another. `drop` simulates a drop that originates
+*outside* the page — a file dragged from the desktop, or text dragged from another app.
+
+```bash
+# reorder items within the page
+playwright-cli drag e2 e8
+
+# drop files onto a dropzone
+playwright-cli drop e4 --path=/abs/path/to/image.png
+playwright-cli drop e4 --path=/abs/path/a.png --path=/abs/path/b.png
+
+# drop typed data
+playwright-cli drop e4 --data="text/plain=hello world"
+playwright-cli drop e4 --data='application/json={"id":1}'
+```
+
+Both `--path` and `--data` are repeatable. Paths must be absolute; `--data` entries use
+`mime/type=value` format.
 
 ## Workflow: login form
 

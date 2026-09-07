@@ -15,7 +15,7 @@ Every command returns page info and a link to the snapshot file:
 - Page URL: https://demo.playwright.dev/todomvc/#/
 - Page Title: React - TodoMVC
 ### Snapshot
-[Snapshot](.playwright-cli/page-2026-02-14T19-22-42-679Z.yml)
+- [Snapshot](.playwright-cli/page-2026-02-14T19-22-42-679Z.yml)
 ```
 
 The snapshot file contains the accessibility tree:
@@ -49,13 +49,47 @@ Each interactive element gets a unique ref (e.g., `e5`, `e10`). Refs are **stabl
 
 ## On-demand snapshots
 
+All of these options can be combined.
+
 ```bash
-playwright-cli snapshot                    # full page, timestamped filename
+playwright-cli snapshot                        # full page, timestamped filename
 playwright-cli snapshot --filename=after.yaml  # custom filename
-playwright-cli snapshot "#main"            # scope to CSS selector
-playwright-cli snapshot e34                # scope to element ref
-playwright-cli snapshot --depth=4          # limit tree depth
+playwright-cli snapshot "#main"                # scope to CSS selector
+playwright-cli snapshot e34                    # scope to element ref
+playwright-cli snapshot --depth=4              # limit tree depth
+playwright-cli snapshot --boxes                # include bounding boxes
 ```
+
+`--boxes` appends `[box=x,y,width,height]` to each element. Coordinates are viewport-relative CSS
+pixels, as returned by `Element.getBoundingClientRect()` — useful as input for
+[coordinate-based interaction](./vision-mode.mdx).
+
+A common pattern on a deep page is to take a shallow snapshot first, then a partial one of the
+interesting subtree:
+
+```bash
+playwright-cli snapshot --depth=4
+playwright-cli snapshot e34
+```
+
+## Searching a snapshot
+
+On a large page, `find` is much cheaper than capturing the whole tree. It returns the matching
+nodes with three lines of context around each match — like `grep -C` — under their path from the
+root of the tree.
+
+```bash
+# case-insensitive substring match
+playwright-cli find "Add to cart"
+
+# regular expression, case-sensitive by default
+playwright-cli find --regex "\\$[0-9]+\\.[0-9]{2}"
+
+# wrap the pattern in slashes to add flags
+playwright-cli find --regex "/sign (in|up)/i"
+```
+
+Pass either a text argument or `--regex`, not both.
 
 ## Using refs
 
@@ -82,17 +116,22 @@ playwright-cli click "getByText('Login')"
 
 ## Raw output
 
-Use `--raw` to strip page info and return only command output:
+`--raw` is a global option that strips the page status, generated code, and snapshot sections,
+leaving only the result value. It is what makes the output pipeable:
 
 ```bash
-playwright-cli snapshot --raw | grep "button"
+playwright-cli --raw snapshot > before.yml
+playwright-cli click e5
+playwright-cli --raw snapshot > after.yml
+diff before.yml after.yml
 ```
 
 ## Best practices
 
 1. **Use refs, not selectors** — refs from snapshots are more reliable than CSS selectors because they point to the exact element the agent just saw
 2. **Re-snapshot after navigation** — refs are invalidated when the page changes
-3. **Limit depth** — use `--depth` on complex pages to reduce output size
-4. **Scope to elements** — snapshot a specific section instead of the whole page
-5. **Name snapshot files** — use `--filename` when the snapshot is part of a workflow result
-6. **Check for dialogs** — if a command reports a dialog is open, handle it before proceeding with other actions
+3. **Search instead of capturing** — use `find` when you only need to locate one element
+4. **Limit depth** — use `--depth` on complex pages to reduce output size
+5. **Scope to elements** — snapshot a specific section instead of the whole page
+6. **Name snapshot files** — use `--filename` when the snapshot is part of a workflow result
+7. **Check for dialogs** — if a command reports a dialog is open, handle it before proceeding with other actions

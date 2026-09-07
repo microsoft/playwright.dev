@@ -1,99 +1,174 @@
 ---
-title: "Capabilities"
+title: "Command Reference"
 ---
 
-# Capabilities
+# Command Reference
 
-The CLI and MCP share the same underlying Playwright tools, organized into capability groups. In the CLI all capabilities are always available — there's no gating. This page maps commands to their capability groups for reference.
+Every command below is always available — unlike [MCP](/mcp/introduction), the CLI has no capability
+gating. The groups match the ones printed by `playwright-cli --help`; use
+`playwright-cli --help <command>` for the exact arguments and options of a single command.
+
+Arguments in `<angle brackets>` are required, arguments in `[square brackets]` are optional.
 
 ## Core
 
-Always available. Basic browser automation.
+| Command | Description |
+|---------|-------------|
+| `open [url]` | Open the browser, optionally navigating to a URL |
+| `attach [name]` | Attach to a running Playwright browser |
+| `close` | Close the browser |
+| `detach` | Detach from an attached browser, leaving it running |
+| `goto <url>` | Navigate to a URL |
+| `type <text>` | Type text into the focused editable element |
+| `click <target> [button]` | Click an element |
+| `dblclick <target> [button]` | Double-click an element |
+| `fill <target> <text>` | Fill text into an editable element |
+| `drag <startTarget> <endTarget>` | Drag and drop between two elements |
+| `drop <target>` | Drop files or data onto an element from outside the page |
+| `hover <target>` | Hover over an element |
+| `select <target> <val>` | Select an option in a dropdown |
+| `upload <files...>` | Upload one or more files |
+| `check <target>` / `uncheck <target>` | Check or uncheck a checkbox or radio button |
+| `snapshot [target]` | Capture a page snapshot to obtain element refs |
+| `find [text]` | Search the page snapshot, returning matches with context |
+| `eval <func> [target]` | Evaluate JavaScript on the page or an element |
+| `dialog-accept [prompt]` / `dialog-dismiss` | Handle a dialog |
+| `resize <w> <h>` | Resize the browser window |
+| `delete-data` | Delete the session's user data |
+
+See [Interaction](./commands/interaction.mdx), [Navigation](./commands/navigation.mdx) and
+[Dialogs](./commands/dialogs.mdx).
+
+## Navigation
 
 | Command | Description |
 |---------|-------------|
-| `open`, `goto`, `close` | Open, navigate, close browser |
-| `go-back`, `go-forward`, `reload` | History navigation |
-| `click`, `dblclick`, `hover`, `drag` | Element interaction |
-| `type`, `fill`, `select` | Text input and dropdowns |
-| `check`, `uncheck` | Checkboxes and radio buttons |
-| `press`, `keydown`, `keyup` | Keyboard input |
-| `snapshot` | Capture accessibility tree |
-| `screenshot` | Take screenshot |
-| `upload` | Upload files |
-| `dialog-accept`, `dialog-dismiss` | Handle dialogs |
-| `resize` | Resize browser window |
-| `eval`, `run-code` | Execute JavaScript / Playwright code |
+| `go-back` | Go back to the previous page |
+| `go-forward` | Go forward to the next page |
+| `reload` | Reload the current page |
 
-## Network
-
-Network inspection and mocking.
+## Keyboard
 
 | Command | Description |
 |---------|-------------|
-| `network` | List network requests since page load |
-| `route` | Mock requests matching a URL pattern |
-| `route-list` | List active mocked routes |
-| `unroute` | Remove mocked routes |
-| `network-state-set` | Set online/offline state |
+| `press <key>` | Press a key, e.g. `Enter` or `ArrowLeft` |
+| `keydown <key>` / `keyup <key>` | Press a key down or release it |
 
-See [Network & Mocking](./commands/network-routing.mdx) for usage.
+## Mouse
+
+Coordinate-based interaction using pixel positions from screenshots. Useful for canvas apps, maps,
+and custom widgets without accessible elements.
+
+| Command | Description |
+|---------|-------------|
+| `mousemove <x> <y>` | Move the mouse to coordinates |
+| `mousedown [button]` / `mouseup [button]` | Press or release a mouse button |
+| `mousewheel <dx> <dy>` | Scroll with the mouse wheel |
+
+See [Vision Mode](./vision-mode.mdx).
+
+## Save as
+
+| Command | Description |
+|---------|-------------|
+| `screenshot [target]` | Screenshot of the page or an element |
+| `pdf` | Save the page as PDF |
+
+See [Screenshots & PDF](./commands/screenshots-pdf.mdx).
+
+## Tabs
+
+| Command | Description |
+|---------|-------------|
+| `tab-list` | List all tabs |
+| `tab-new [url]` | Create a new tab |
+| `tab-close [index]` | Close a tab (the current one if no index) |
+| `tab-select <index>` | Switch to a tab |
+
+See [Tabs](./commands/tabs.mdx).
 
 ## Storage
 
-Cookie, localStorage, and sessionStorage management plus state persistence.
-
 | Command | Description |
 |---------|-------------|
-| `state-save`, `state-load` | Save/restore full browser state |
-| `cookie-list/get/set/delete/clear` | Manage cookies |
+| `state-save [filename]` / `state-load <filename>` | Save or restore browser storage state |
+| `cookie-list`, `cookie-get`, `cookie-set`, `cookie-delete`, `cookie-clear` | Manage cookies |
 | `localstorage-list/get/set/delete/clear` | Manage localStorage |
 | `sessionstorage-list/get/set/delete/clear` | Manage sessionStorage |
 
-See [Storage & Authentication](./commands/storage.mdx) for usage.
+See [Storage & Authentication](./commands/storage.mdx).
 
-## Vision
-
-Coordinate-based mouse interaction using pixel positions from screenshots. Useful for canvas apps, maps, and custom widgets without accessible elements.
+## Network
 
 | Command | Description |
 |---------|-------------|
-| `mousemove <x> <y>` | Move mouse to coordinates |
-| `mousedown [button]` | Press mouse button |
-| `mouseup [button]` | Release mouse button |
-| `mousewheel <dx> <dy>` | Scroll with mouse wheel |
-| `screenshot` | Capture viewport for coordinate reference |
+| `requests` | List network requests, numbered for use with `request` |
+| `request <index>` | Full details of a single request |
+| `request-headers <index>` / `request-body <index>` | One part of the request |
+| `response-headers <index>` / `response-body <index>` | One part of the response |
+| `route <pattern>` | Mock requests matching a URL pattern |
+| `route-list` | List active routes |
+| `unroute [pattern]` | Remove matching routes, or all of them |
+| `network-state-set <state>` | Set the browser online or offline |
 
-See [Vision Mode](./vision-mode.mdx) for when and how to use coordinate-based interaction.
+See [Network & Mocking](./commands/network-routing.mdx).
 
 ## DevTools
 
-Tracing, video recording, and test debugging.
+| Command | Description |
+|---------|-------------|
+| `console [min-level]` | List console messages |
+| `run-code [code]` | Run a Playwright code snippet |
+| `recording-start` / `recording-stop` | Record user actions and print them as Playwright code |
+| `tracing-start` / `tracing-stop` | Record an execution trace |
+| `video-start [filename]` / `video-stop` | Record a video |
+| `video-chapter <title>` | Add a chapter marker to the video |
+| `video-show-actions` / `video-hide-actions` | Annotate actions in the recorded video |
+| `show` | Open the Playwright dashboard |
+| `pause-at <location>`, `resume`, `step-over` | Control a paused test |
+| `generate-locator <target>` | Generate a Playwright locator for an element |
+| `highlight [target]` | Show or hide a highlight overlay on the page |
+
+See [Console & Eval](./commands/console-eval.mdx), [Codegen & Highlighting](./commands/codegen.mdx),
+[Tracing](./commands/tracing.mdx), [Video Recording](./commands/video-recording.mdx) and
+[Test Debugging](./commands/test-debugging.mdx).
+
+## Install
 
 | Command | Description |
 |---------|-------------|
-| `console` | View console messages |
-| `tracing-start`, `tracing-stop` | Record execution traces |
-| `video-start`, `video-stop`, `video-chapter` | Record session videos |
-| `show` | Open visual dashboard |
-| `pause-at`, `resume`, `step-over` | Test debugging |
+| `install` | Initialize the workspace, optionally installing skills |
+| `install-browser [browser]` | Install a browser |
 
-## PDF
+See [Installation](./installation.mdx).
 
-PDF generation.
+## Browser sessions
 
 | Command | Description |
 |---------|-------------|
-| `pdf` | Export page as PDF |
+| `list` | List browser sessions |
+| `close-all` | Close all browser sessions |
+| `kill-all` | Forcefully kill stale or zombie browser processes |
 
-## Testing
+See [Sessions & Dashboard](./sessions.mdx).
 
-Assertions and test generation tools.
+## Global options
 
-| Command | Description |
-|---------|-------------|
-| `verify-element-visible` | Assert element is visible by role and name |
-| `verify-text-visible` | Assert text is visible |
-| `verify-list-visible` | Assert list with items is visible |
-| `verify-value` | Assert form field value |
-| `generate-locator` | Generate Playwright locator for test code |
+These apply to every command and can be placed anywhere on the command line.
+
+| Option | Description |
+|--------|-------------|
+| `-s=<name>`, `--session=<name>` | Run against a named browser session |
+| `--raw` | Print only the result value, without page status, generated code, or snapshot |
+| `--json` | Wrap the whole reply as JSON |
+| `--help [command]` | Print help |
+| `--version` | Print the version |
+
+```bash
+# pipe a value straight into another tool
+playwright-cli --raw eval "JSON.stringify(performance.timing)" | jq '.loadEventEnd - .navigationStart'
+playwright-cli --raw snapshot > before.yml
+
+# structured output for scripting
+playwright-cli list --json
+```

@@ -48,6 +48,7 @@ module.exports = {
       items: [
         'commands/console-eval',
         'commands/screenshots-pdf',
+        'commands/codegen',
         'commands/tracing',
         'commands/test-debugging',
       ],
