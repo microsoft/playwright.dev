@@ -61,6 +61,7 @@ module.exports = {
   projectName: "playwright.dev",
   onBrokenLinks: "throw",
   markdown: {
+    mermaid: true,
     hooks: {
       onBrokenMarkdownLinks: "throw",
     },
@@ -230,6 +231,7 @@ module.exports = {
       },
     ],
     '@docusaurus/theme-search-algolia',
+    '@docusaurus/theme-mermaid',
   ],
   plugins,
   customFields: {

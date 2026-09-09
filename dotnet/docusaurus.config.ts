@@ -61,6 +61,7 @@ export default {
   projectName: "playwright.dev",
   onBrokenLinks: "throw",
   markdown: {
+    mermaid: true,
     hooks: {
       onBrokenMarkdownLinks: "throw",
     },
@@ -230,6 +231,7 @@ export default {
       },
     ],
     '@docusaurus/theme-search-algolia',
+    '@docusaurus/theme-mermaid',
   ],
   plugins,
   customFields: {
