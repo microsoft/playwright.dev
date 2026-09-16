@@ -294,6 +294,40 @@ await page.route('**/title.html', async route => {
 });
 ```
 
+## How request interception works
+
+Routes sit between the page and the browser's network stack. The handler runs before the network stack has processed the request: [route.continue()](/api/class-route.mdx#route-continue) passes it on, [route.fulfill()](/api/class-route.mdx#route-fulfill) answers it without touching the network, and [route.abort()](/api/class-route.mdx#route-abort) fails it.
+
+```mermaid
+sequenceDiagram
+  participant Page
+  participant Playwright
+  participant Network as Network stack
+  participant Server
+
+  Page->>Playwright: request
+  Note over Playwright: route handler runs
+  Playwright->>Network: route.continue()
+  Note over Network: adds Cookie, Host, Sec-Fetch-*, ...
+  Network->>Server: request
+  Server-->>Network: response
+  Note over Network: stores cookies
+  Network-->>Playwright: response headers as sent by the server
+  Network-->>Page: response
+```
+
+### Headers owned by the network stack
+
+Some headers are attached by the network stack right before the request is sent: `Cookie`, `Host`, `Accept-Encoding`, `Content-Length`, `Sec-Fetch-*` and a few others. This is a security boundary: an `HttpOnly` cookie, for example, is never exposed to the page. Since the route handler runs before that step, these headers are not reliably present in [request.headers()](/api/class-request.mdx#request-headers) or [request.allHeaders()](/api/class-request.mdx#request-all-headers), and they cannot be overridden. A `cookie` header passed to [route.continue()](/api/class-route.mdx#route-continue) is ignored in favor of the browser's cookie store.
+
+On the response side the network stack has already done its work, so [response.allHeaders()](/api/class-response.mdx#response-all-headers) returns the headers exactly as the server sent them, including `Set-Cookie` for `HttpOnly` cookies. To see the exact request headers that went over the wire, observe the request without routing it: with no routes installed, [request.allHeaders()](/api/class-request.mdx#request-all-headers) includes all of them.
+
+### Redirects
+
+Playwright treats a request and its redirects as a single unit. The handler is called once, for the original request, and the browser follows the redirect on its own. [response.request()](/api/class-response.mdx#response-request) returns the last request in the chain, and [request.redirectedFrom()](/api/class-request.mdx#request-redirected-from) walks it back to the one you intercepted. Headers passed to [route.continue()](/api/class-route.mdx#route-continue) apply to every hop of the chain, except `cookie`, which always comes from the cookie store.
+
+Fulfilling with a `3xx` status does not give you a second chance to intercept. Chromium and Firefox follow the redirect without calling your handler, and WebKit rejects the call. To serve different content, fulfill with that content. To send the request elsewhere, pass `url` to [route.continue()](/api/class-route.mdx#route-continue) or [route.fallback()](/api/class-route.mdx#route-fallback).
+
 ## Glob URL patterns
 
 Playwright uses simplified glob patterns for URL matching in network interception methods like [page.route()](/api/class-page.mdx#page-route) or [page.waitForResponse()](/api/class-page.mdx#page-wait-for-response). These patterns support basic wildcards:
