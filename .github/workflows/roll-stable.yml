@@ -17,13 +17,13 @@ jobs:
               owner: 'microsoft',
               repo: 'playwright',
             });
-            const relevantBranches = allBranches.filter(branch => branch.name.startsWith('release-'));
-            relevantBranches.sort((a, b) => {
-              const aVersion = parseFloat(a.name.split('-')[1]);
-              const bVersion = parseFloat(b.name.split('-')[1]);
-              return aVersion - bVersion;
-            });
-            return relevantBranches.pop().name.replace(/^release-/, '');
+            // Only consider release-<major>.<minor> branches (e.g. skip release-notes-1.63).
+            const versions = allBranches
+              .map(branch => branch.name.match(/^release-(\d+)\.(\d+)$/))
+              .filter(Boolean)
+              .map(match => [Number(match[1]), Number(match[2])]);
+            versions.sort((a, b) => (a[0] - b[0]) || (a[1] - b[1]));
+            return versions.pop().join('.');
           result-encoding: string
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
