@@ -54,6 +54,43 @@ export default defineConfig({
 
 ## Properties
 
+### default {/* #test-project-default */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>testProject.default</x-search>
+
+Whether the project runs when no `--project` command line option is passed. Defaults to `true`.
+
+To run a project with `default: false`, select it with the `--project` command line option.
+
+A project with `default: false` still runs when another running project lists it in [testProject.dependencies](/api/class-testproject.mdx#test-project-dependencies) or [testProject.teardown](/api/class-testproject.mdx#test-project-teardown).
+
+**Usage**
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  projects: [
+    {
+      name: 'chromium',
+      use: devices['Desktop Chrome'],
+    },
+    {
+      name: 'slow',
+      testDir: './slow-tests',
+      default: false,
+    },
+  ],
+});
+```
+
+Now `npx playwright test` only runs `chromium`, while `npx playwright test --project=slow` runs `slow`.
+
+**Type**
+- [boolean]
+
+---
+
 ### dependencies {/* #test-project-dependencies */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.31</font><x-search>testProject.dependencies</x-search>
@@ -138,6 +175,9 @@ testProject.expect
     - `stylePath` [string] | [Array]&lt;[string]&gt; *(optional)*
       
       See [style](/api/class-page.mdx#page-screenshot-option-style) in [page.screenshot()](/api/class-page.mdx#page-screenshot).
+    - `type` "png" | "webp" *(optional)*
+      
+      Format of the screenshots taken when the snapshot name is omitted, defaults to `"png"`. Snapshots with an explicit name use the format matching their `.png` or `.webp` extension.
     - `pathTemplate` [string] *(optional)*
       
       A template controlling location of the screenshots. See [testProject.snapshotPathTemplate](/api/class-testproject.mdx#test-project-snapshot-path-template) for details.
