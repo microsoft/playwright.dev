@@ -98,7 +98,7 @@ The order of evaluation of multiple scripts installed via [browserContext.addIni
 - `options` [Object] *(optional)*
   - `exposeFunctions` [boolean] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-init-script-option-expose-functions"/><a href="#page-add-init-script-option-expose-functions" class="list-anchor">#</a>
     
-    When set to `true`, functions passed inside [arg](/api/class-page.mdx#page-add-init-script-option-arg) are exposed in the page and can be called from the init script. Calling one returns a [Promise] of its result. Under the hood, each function is exposed via [page.exposeFunction()](/api/class-page.mdx#page-expose-function), so it is technically accessible from all frames and worlds of the page. Unlike functions passed to [page.evaluate()](/api/class-page.mdx#page-evaluate), functions passed to an init script are exposed in every new document, so they survive navigations. Defaults to `false`, in which case functions are not serializable and are silently dropped.
+    When set to `true`, functions passed inside [arg](/api/class-page.mdx#page-add-init-script-option-arg) are exposed in the page and can be called from the init script. Calling one returns a [Promise] of its result. Under the hood, each function is exposed via [page.exposeFunction()](/api/class-page.mdx#page-expose-function), so it is technically accessible from all frames of the page. Unlike functions passed to [page.evaluate()](/api/class-page.mdx#page-evaluate), functions passed to an init script are exposed in every new document, so they survive navigations. Defaults to `false`, in which case functions are not serializable and are silently dropped.
 
 **Returns**
 - [Promise]&lt;[Disposable]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-add-init-script-return"/><a href="#page-add-init-script-return" class="list-anchor">#</a>
@@ -469,7 +469,14 @@ Gets the full HTML contents of the page, including the doctype.
 
 ```js
 await page.content();
+await page.content(options);
 ```
+
+**Arguments**
+- `options` [Object] *(optional)*
+  - `includeShadow` [boolean] *(optional)* <font size="2">Added in: v1.64</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-content-option-include-shadow"/><a href="#page-content-option-include-shadow" class="list-anchor">#</a>
+    
+    When true, contents of open shadow roots are included as [declarative shadow DOM](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM#declaratively_with_html), i.e. `<template shadowrootmode="open">` elements nested inside their host elements. Closed shadow roots are never included. Defaults to `false`.
 
 **Returns**
 - [Promise]&lt;[string]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-content-return"/><a href="#page-content-return" class="list-anchor">#</a>
@@ -676,10 +683,13 @@ await bodyHandle.dispose();
 - `options` [Object] *(optional)*
   - `exposeFunctions` [boolean] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-evaluate-option-expose-functions"/><a href="#page-evaluate-option-expose-functions" class="list-anchor">#</a>
     
-    When set to `true`, functions passed inside [arg](/api/class-page.mdx#page-evaluate-option-arg) are exposed in the page and can be called from the page function. Calling one returns a [Promise] of its result. Under the hood, each function is exposed via [page.exposeFunction()](/api/class-page.mdx#page-expose-function), so it is technically accessible from all frames and worlds of the page. Exposed functions are cleared upon the top-level navigation. Defaults to `false`, in which case functions are not serializable and passing one throws an error.
+    When set to `true`, functions passed inside [arg](/api/class-page.mdx#page-evaluate-option-arg) are exposed in the page and can be called from the page function. Calling one returns a [Promise] of its result. Under the hood, each function is exposed via [page.exposeFunction()](/api/class-page.mdx#page-expose-function), so it is technically accessible from all frames of the page. Exposed functions are cleared upon the top-level navigation. Defaults to `false`, in which case functions are not serializable and passing one throws an error.
+  - `serialize` [Array]&lt;"Map" | "Set"&gt; *(optional)* <font size="2">Added in: v1.64</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-evaluate-option-serialize"/><a href="#page-evaluate-option-serialize" class="list-anchor">#</a>
+    
+    Additional built-in types to preserve in the evaluation argument and return value, including nested collections and circular references. Supports `"Map"` and `"Set"`. For example, `serialize: ['Map', 'Set']` preserves both [Map] and [Set] instances. Defaults to an empty array, in which case these types are serialized as plain objects.
   - `world` "main" | "utility" *(optional)* <font size="2">Added in: v1.64</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-evaluate-option-world"/><a href="#page-evaluate-option-world" class="list-anchor">#</a>
     
-    The JavaScript world to evaluate the function in. `"main"` is the world where the page's own scripts run. `"utility"` is an isolated world that shares the DOM with the page, but has a separate JavaScript environment that the page's scripts cannot observe or tamper with. Defaults to `"main"`.
+    The JavaScript world to evaluate the function in. `"main"` is the world where the page's own scripts run. `"utility"` is an isolated world that shares the DOM with the page, but has a separate JavaScript environment that the page's scripts cannot observe or tamper with. Defaults to `"main"`. Exposed functions are only available in the `"main"` world.
 
 **Returns**
 - [Promise]&lt;[Serializable]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-evaluate-return"/><a href="#page-evaluate-return" class="list-anchor">#</a>
@@ -728,7 +738,10 @@ await resultHandle.dispose();
 - `options` [Object] *(optional)*
   - `exposeFunctions` [boolean] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-evaluate-handle-option-expose-functions"/><a href="#page-evaluate-handle-option-expose-functions" class="list-anchor">#</a>
     
-    When set to `true`, functions passed inside [arg](/api/class-page.mdx#page-evaluate-handle-option-arg) are exposed in the page and can be called from the page function. Calling one returns a [Promise] of its result. Under the hood, each function is exposed via [page.exposeFunction()](/api/class-page.mdx#page-expose-function), so it is technically accessible from all frames and worlds of the page. Exposed functions are cleared upon the top-level navigation. Defaults to `false`, in which case functions are not serializable and passing one throws an error.
+    When set to `true`, functions passed inside [arg](/api/class-page.mdx#page-evaluate-handle-option-arg) are exposed in the page and can be called from the page function. Calling one returns a [Promise] of its result. Under the hood, each function is exposed via [page.exposeFunction()](/api/class-page.mdx#page-expose-function), so it is technically accessible from all frames of the page. Exposed functions are cleared upon the top-level navigation. Defaults to `false`, in which case functions are not serializable and passing one throws an error.
+  - `serialize` [Array]&lt;"Map" | "Set"&gt; *(optional)* <font size="2">Added in: v1.64</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-evaluate-handle-option-serialize"/><a href="#page-evaluate-handle-option-serialize" class="list-anchor">#</a>
+    
+    Additional built-in types to preserve in the evaluation argument and return value, including nested collections and circular references. Supports `"Map"` and `"Set"`. For example, `serialize: ['Map', 'Set']` preserves both [Map] and [Set] instances. Defaults to an empty array, in which case these types are serialized as plain objects.
 
 **Returns**
 - [Promise]&lt;[JSHandle]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-evaluate-handle-return"/><a href="#page-evaluate-handle-return" class="list-anchor">#</a>
@@ -3316,7 +3329,7 @@ const preloadHrefTS = await page.$eval('link[rel=preload]', (el: HTMLLinkElement
     When true, the call requires selector to resolve to a single element. If given selector resolves to more than one element, the call throws an exception.
   - `world` "main" | "utility" *(optional)* <font size="2">Added in: v1.64</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-eval-on-selector-option-world"/><a href="#page-eval-on-selector-option-world" class="list-anchor">#</a>
     
-    The JavaScript world to evaluate the function in. `"main"` is the world where the page's own scripts run. `"utility"` is an isolated world that shares the DOM with the page, but has a separate JavaScript environment that the page's scripts cannot observe or tamper with. Defaults to `"main"`.
+    The JavaScript world to evaluate the function in. `"main"` is the world where the page's own scripts run. `"utility"` is an isolated world that shares the DOM with the page, but has a separate JavaScript environment that the page's scripts cannot observe or tamper with. Defaults to `"main"`. Exposed functions are only available in the `"main"` world.
 
 **Returns**
 - [Promise]&lt;[Serializable]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-eval-on-selector-return"/><a href="#page-eval-on-selector-return" class="list-anchor">#</a>
@@ -3357,7 +3370,7 @@ const divCounts = await page.$$eval('div', (divs, min) => divs.length >= min, 10
 - `options` [Object] *(optional)*
   - `world` "main" | "utility" *(optional)* <font size="2">Added in: v1.64</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-eval-on-selector-all-option-world"/><a href="#page-eval-on-selector-all-option-world" class="list-anchor">#</a>
     
-    The JavaScript world to evaluate the function in. `"main"` is the world where the page's own scripts run. `"utility"` is an isolated world that shares the DOM with the page, but has a separate JavaScript environment that the page's scripts cannot observe or tamper with. Defaults to `"main"`.
+    The JavaScript world to evaluate the function in. `"main"` is the world where the page's own scripts run. `"utility"` is an isolated world that shares the DOM with the page, but has a separate JavaScript environment that the page's scripts cannot observe or tamper with. Defaults to `"main"`. Exposed functions are only available in the `"main"` world.
 
 **Returns**
 - [Promise]&lt;[Serializable]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="page-eval-on-selector-all-return"/><a href="#page-eval-on-selector-all-return" class="list-anchor">#</a>
