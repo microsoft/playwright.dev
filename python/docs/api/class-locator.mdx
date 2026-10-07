@@ -2460,9 +2460,43 @@ Returns a new locator that uses best practices for referencing the matched eleme
 
 **Usage**
 
-```python
-locator.normalize()
+An agent can pick an element by its ref from an [page.aria_snapshot()](/api/class-page.mdx#page-aria-snapshot) taken in the `"ai"` mode. Refs only work for the latest snapshot. Normalize the ref locator and convert it to a string to get resilient locator code in your language, the same way `codegen` does.
+
+Consider the following aria snapshot.
+
+```yaml
+- button "Submit" [ref=e2]
 ```
+
+You can turn the ref into locator code:
+
+<Tabs
+  groupId="python-flavor"
+  defaultValue="sync"
+  values={[
+    {label: 'Sync', value: 'sync'},
+    {label: 'Async', value: 'async'}
+  ]
+}>
+<TabItem value="sync">
+
+```py
+normalized = page.get_by_ref("e2").normalize()
+print(str(normalized))
+# get_by_role("button", name="Submit")
+```
+
+</TabItem>
+<TabItem value="async">
+
+```py
+normalized = await page.get_by_ref("e2").normalize()
+print(str(normalized))
+# get_by_role("button", name="Submit")
+```
+
+</TabItem>
+</Tabs>
 
 **Returns**
 - [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-normalize-return"/><a href="#locator-normalize-return" class="list-anchor">#</a>
@@ -3443,7 +3477,7 @@ Passing argument to [expression](/api/class-locator.mdx#locator-wait-for-functio
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>locator.within</x-search>
 
-Returns a locator that matches this locator's elements inside each element matched by [locator](/api/class-locator.mdx#locator-within-option-locator). This is the same as calling [locator.locator()](/api/class-locator.mdx#locator-locator) on [locator](/api/class-locator.mdx#locator-within-option-locator) with this locator as an argument, but reads in the natural order.
+Returns a locator that matches this locator's elements inside each element matched by [locator](/api/class-locator.mdx#locator-within-option-locator).
 
 Note that relative locators, such as [locator.nth()](/api/class-locator.mdx#locator-nth) or [locator.first](/api/class-locator.mdx#locator-first), are resolved separately inside each matched parent. In the example below, `page.getByRole('cell').nth(2)` picks the third cell of every row, not the third cell in the whole table.
 

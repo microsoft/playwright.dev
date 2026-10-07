@@ -7,13 +7,13 @@ import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
 
-[WebMCP] exposes the tools that a frame registers through the experimental [WebMCP](https://webmachinelearning.github.io/webmcp/) browser API, `navigator.modelContext`. It lists the tools, reports when the set of tools changes, and calls the tools.
+[WebMCP] exposes the tools that a frame registers through the experimental [WebMCP](https://webmachinelearning.github.io/webmcp/) browser API, `navigator.modelContext`. It lists the tools and calls them.
 
-Instances are accessed through [frame.webmcp](/api/class-frame.mdx#frame-webmcp). [page.webmcp](/api/class-page.mdx#page-webmcp) is the instance of the main frame. Call [webMCP.enable()](/api/class-webmcp.mdx#web-mcp-enable) before using the other methods.
+Instances are accessed through [frame.webmcp](/api/class-frame.mdx#frame-webmcp). [page.webmcp](/api/class-page.mdx#page-webmcp) is the instance of the main frame.
 
 :::note
 
-WebMCP is an experimental browser feature. Chromium enables it with the `--enable-features=WebMCP` launch argument, Firefox with the `dom.modelcontext.enabled` preference. WebKit does not implement it.
+WebMCP is an experimental browser feature. Chromium enables it with the `--enable-features=WebMCP` launch argument, Firefox with the `dom.modelcontext.enabled` and `dom.modelcontext.testing.enabled` preferences. WebKit does not implement it.
 :::
 
 Tool names, descriptions, input schemas and results are provided by the page, so treat them as untrusted input.
@@ -21,7 +21,6 @@ Tool names, descriptions, input schemas and results are provided by the page, so
 ```js
 const browser = await chromium.launch({ args: ['--enable-features=WebMCP'] });
 const page = await browser.newPage();
-await page.webmcp.enable();
 await page.goto('https://example.com');
 
 for (const tool of await page.webmcp.tools())
@@ -70,55 +69,13 @@ await webMCP.callTool(name, input, options);
 
 ---
 
-### disable {/* #web-mcp-disable */}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>webMCP.disable</x-search>
-
-Stops tracking the tools that the frame registers and stops emitting [webMCP.on('toolschanged')](/api/class-webmcp.mdx#web-mcp-event-tools-changed). Disposing the [Disposable] returned by [webMCP.enable()](/api/class-webmcp.mdx#web-mcp-enable) does the same.
-
-**Usage**
-
-```js
-await webMCP.disable();
-```
-
-**Returns**
-- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-mcp-disable-return"/><a href="#web-mcp-disable-return" class="list-anchor">#</a>
-
----
-
-### enable {/* #web-mcp-enable */}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>webMCP.enable</x-search>
-
-Starts tracking the tools that the frame registers, so that [webMCP.tools()](/api/class-webmcp.mdx#web-mcp-tools), [webMCP.callTool()](/api/class-webmcp.mdx#web-mcp-call-tool) and [webMCP.on('toolschanged')](/api/class-webmcp.mdx#web-mcp-event-tools-changed) work. Throws if the browser was launched without WebMCP support, see the note above for the launch options that enable it. Returns a [Disposable] that disables the tracking again.
-
-Tracking is per frame. [page.webmcp](/api/class-page.mdx#page-webmcp) covers the main frame only, child frames are tracked through their own [frame.webmcp](/api/class-frame.mdx#frame-webmcp).
-
-Chromium reports tool registrations natively. Firefox does not, so Playwright instruments `navigator.modelContext` in the page to observe registrations. Tools registered before the call are picked up as well.
-
-```js
-await page.webmcp.enable();
-await page.goto('https://example.com');
-console.log(await page.webmcp.tools());
-```
-
-**Usage**
-
-```js
-await webMCP.enable();
-```
-
-**Returns**
-- [Promise]&lt;[Disposable]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-mcp-enable-return"/><a href="#web-mcp-enable-return" class="list-anchor">#</a>
-
----
-
 ### tools {/* #web-mcp-tools */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>webMCP.tools</x-search>
 
-Returns the tools currently registered by the frame.
+Returns the tools currently registered by the frame. Throws if the browser was launched without WebMCP support, see the note above for the launch options that enable it.
+
+[page.webmcp](/api/class-page.mdx#page-webmcp) covers the main frame only, child frames list their tools through their own [frame.webmcp](/api/class-frame.mdx#frame-webmcp).
 
 **Usage**
 
@@ -135,97 +92,6 @@ await webMCP.tools(options);
 
 **Returns**
 - [Promise]&lt;[Array]&lt;[Object]&gt;&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-mcp-tools-return"/><a href="#web-mcp-tools-return" class="list-anchor">#</a>
-  - `name` [string]
-    
-    Tool name, unique within the frame.
-  - `description` [string]
-    
-    Tool description.
-  - `inputSchema` [Serializable] *(optional)*
-    
-    JSON Schema of the tool input, when the page provides one.
-  - `annotations` [Object] *(optional)*
-    - `readOnly` [boolean] *(optional)*
-      
-      The tool does not modify any state.
-    - `untrustedContent` [boolean] *(optional)*
-      
-      The tool output may contain third-party content.
-    - `consequential` [boolean] *(optional)*
-      
-      The tool takes a consequential action, such as placing an order.
-    
-    Hints the page provides about the tool.
-
----
-
-### waitForEvent {/* #web-mcp-wait-for-event */}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>webMCP.waitForEvent</x-search>
-
-Waits for the event to fire and passes its value into the predicate function. Returns when the predicate returns a truthy value. Throws if the page is closed before the event is fired. Returns the event data value.
-
-```js
-const toolsPromise = page.webmcp.waitForEvent('toolschanged');
-await page.getByRole('button', { name: 'Sign in' }).click();
-const tools = await toolsPromise;
-```
-
-**Usage**
-
-```js
-await webMCP.waitForEvent(event);
-await webMCP.waitForEvent(event, optionsOrPredicate, options);
-```
-
-**Arguments**
-- `event` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-mcp-wait-for-event-option-event"/><a href="#web-mcp-wait-for-event-option-event" class="list-anchor">#</a>
-  
-  Event name, same one typically passed into `*.on(event)`.
-- `optionsOrPredicate` [function] | [Object] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-mcp-wait-for-event-option-options-or-predicate"/><a href="#web-mcp-wait-for-event-option-options-or-predicate" class="list-anchor">#</a>
-  - `predicate` [function]
-    
-    Receives the event data and resolves to truthy value when the waiting should resolve.
-  - `timeout` [number] *(optional)*
-    
-    Maximum time to wait for in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
-  
-  Either a predicate that receives an event or an options object. Optional.
-- `options` [Object] *(optional)*
-  - `predicate` [function] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-mcp-wait-for-event-option-predicate"/><a href="#web-mcp-wait-for-event-option-predicate" class="list-anchor">#</a>
-    
-    Receives the event data and resolves to truthy value when the waiting should resolve.
-  - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-mcp-wait-for-event-option-signal"/><a href="#web-mcp-wait-for-event-option-signal" class="list-anchor">#</a>
-    
-    Allows to cancel the waiting using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the waiting will be aborted and the operation will throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
-
-**Returns**
-- [Promise]&lt;[Object]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-mcp-wait-for-event-return"/><a href="#web-mcp-wait-for-event-return" class="list-anchor">#</a>
-
----
-
-## Events
-
-### on('toolschanged') {/* #web-mcp-event-tools-changed */}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>webMCP.on('toolschanged')</x-search>
-
-Emitted while WebMCP is enabled, whenever the set of tools registered by the frame changes, for example when the page registers or unregisters a tool, or when the frame navigates away. The argument is the new list of tools, the same one [webMCP.tools()](/api/class-webmcp.mdx#web-mcp-tools) returns.
-
-```js
-page.webmcp.on('toolschanged', tools => {
-  console.log('tools are now', tools.map(tool => tool.name));
-});
-```
-
-**Usage**
-
-```js
-webMCP.on('toolschanged', data => {});
-```
-
-**Event data**
-- [Array]&lt;[Object]&gt;
   - `name` [string]
     
     Tool name, unique within the frame.
