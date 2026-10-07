@@ -247,15 +247,12 @@ export default defineConfig({
   - `passphrase` [string] *(optional)*
     
     Passphrase for the private key (PEM or PFX).
-  - `noCertificate` [boolean] *(optional)*
-    
-    Explicitly send no client certificate for this origin. Must be the only field set besides `origin`.
 
 **Details**
 
 An array of client certificates to be used. Each certificate object must have either both `certPath` and `keyPath`, a single `pfxPath`, or their corresponding direct value equivalents (`cert` and `key`, or `pfx`). Optionally, `passphrase` property should be provided if the certificate is encrypted. The `origin` property should be provided with an exact match to the request origin that the certificate is valid for.
 
-Client certificate authentication is only active when at least one client certificate is provided. If you want to reject all client certificates sent by the server for an origin you visit, set `noCertificate` to `true` for that origin instead of omitting it: omitting the origin entirely leaves the connection unintercepted, so the server's own certificate request still reaches the browser and may trigger a native certificate-selection prompt on some platforms. `noCertificate` forces interception for that origin while still presenting no client certificate.
+Client certificate authentication is only active when at least one client certificate is provided. If you want to reject all client certificates sent by the server, you need to provide a client certificate with an `origin` that does not match any of the domains you plan to visit.
 
 :::note
 
@@ -305,7 +302,7 @@ export default defineConfig({
 });
 ```
 
-When connect options are specified, default [fixtures.browser](/api/class-fixtures.mdx#fixtures-browser), [fixtures.context](/api/class-fixtures.mdx#fixtures-context) and [fixtures.page](/api/class-fixtures.mdx#fixtures-page) use the remote browser instead of launching a browser locally, and any launch options like [testOptions.headless](/api/class-testoptions.mdx#test-options-headless) or [testOptions.channel](/api/class-testoptions.mdx#test-options-channel) are ignored.
+When connect options are specified, default [fixtures.browser](/api/class-fixtures.mdx#fixtures-browser), [fixtures.context](/api/class-fixtures.mdx#fixtures-context) and [fixtures.page](/api/class-fixtures.mdx#fixtures-page) use the remote browser instead of launching a browser locally.
 
 **Type**
 - [void] | [Object]
@@ -542,6 +539,17 @@ export default defineConfig({
       password: 'pass',
     },
   },
+});
+```
+
+When passing an array of credentials to [test.use()](/api/class-test.mdx#test-use), wrap it into an extra array, see [fixture options](../test-fixtures.mdx#fixtures-options).
+
+```js title="example.spec.ts"
+test.use({
+  httpCredentials: [[
+    { username: 'alice', password: 'alice-pass', origin: 'https://a.example.com' },
+    { username: 'bob', password: 'bob-pass', origin: 'https://b.example.com' },
+  ], { scope: 'test' }],
 });
 ```
 
@@ -1106,9 +1114,6 @@ Learn more about [recording trace](../test-use-options.mdx#recording-options).
       Capture a screenshot of the page on every action. Optional.
     
     Which snapshots to capture on every action. Passing `true` is a shortcut for `{ dom: true }`. Defaults to true. Optional.
-  - `coverage` [boolean] *(optional)*
-    
-    Whether to collect coverage from istanbul-instrumented application code into the trace. Defaults to false. Optional.
   - `sources` [boolean] *(optional)*
     
     Whether to include source files for trace actions. Defaults to true. Optional.

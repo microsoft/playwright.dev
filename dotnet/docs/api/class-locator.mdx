@@ -1841,8 +1841,20 @@ Returns a new locator that uses best practices for referencing the matched eleme
 
 **Usage**
 
+An agent can pick an element by its ref from an [Page.AriaSnapshotAsync()](/api/class-page.mdx#page-aria-snapshot) taken in the `"ai"` mode. Refs only work for the latest snapshot. Normalize the ref locator and convert it to a string to get resilient locator code in your language, the same way `codegen` does.
+
+Consider the following aria snapshot.
+
+```yaml
+- button "Submit" [ref=e2]
+```
+
+You can turn the ref into locator code:
+
 ```csharp
-await Locator.NormalizeAsync();
+var normalized = await page.GetByRef("e2").NormalizeAsync();
+Console.WriteLine(normalized.ToString());
+// GetByRole(AriaRole.Button, new() { Name = "Submit" })
 ```
 
 **Returns**
@@ -2613,7 +2625,7 @@ Passing argument to [expression](/api/class-locator.mdx#locator-wait-for-functio
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>locator.Within</x-search>
 
-Returns a locator that matches this locator's elements inside each element matched by [locator](/api/class-locator.mdx#locator-within-option-locator). This is the same as calling [Locator.Locator()](/api/class-locator.mdx#locator-locator) on [locator](/api/class-locator.mdx#locator-within-option-locator) with this locator as an argument, but reads in the natural order.
+Returns a locator that matches this locator's elements inside each element matched by [locator](/api/class-locator.mdx#locator-within-option-locator).
 
 Note that relative locators, such as [Locator.Nth()](/api/class-locator.mdx#locator-nth) or [Locator.First](/api/class-locator.mdx#locator-first), are resolved separately inside each matched parent. In the example below, `page.getByRole('cell').nth(2)` picks the third cell of every row, not the third cell in the whole table.
 
