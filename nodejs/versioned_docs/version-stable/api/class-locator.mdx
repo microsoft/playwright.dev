@@ -897,7 +897,7 @@ console.log(result); // prints "myId text 56"
 - `options` [Object] *(optional)*
   - `exposeFunctions` [boolean] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-option-expose-functions"/><a href="#locator-evaluate-option-expose-functions" class="list-anchor">#</a>
     
-    When set to `true`, functions passed inside [arg](/api/class-locator.mdx#locator-evaluate-option-arg) are exposed in the page and can be called from the page function. Calling one returns a [Promise] of its result. Under the hood, each function is exposed via [page.exposeFunction()](/api/class-page.mdx#page-expose-function), so it is technically accessible from all frames and worlds of the page. Exposed functions are cleared upon the top-level navigation. Defaults to `false`, in which case functions are not serializable and passing one throws an error.
+    When set to `true`, functions passed inside [arg](/api/class-locator.mdx#locator-evaluate-option-arg) are exposed in the page and can be called from the page function. Calling one returns a [Promise] of its result. Under the hood, each function is exposed via [page.exposeFunction()](/api/class-page.mdx#page-expose-function), so it is technically accessible from all frames of the page. Exposed functions are cleared upon the top-level navigation. Defaults to `false`, in which case functions are not serializable and passing one throws an error.
   - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-option-signal"/><a href="#locator-evaluate-option-signal" class="list-anchor">#</a>
     
     Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
@@ -975,7 +975,7 @@ await locator.evaluateHandle(pageFunction, arg, options);
 - `options` [Object] *(optional)*
   - `exposeFunctions` [boolean] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-handle-option-expose-functions"/><a href="#locator-evaluate-handle-option-expose-functions" class="list-anchor">#</a>
     
-    When set to `true`, functions passed inside [arg](/api/class-locator.mdx#locator-evaluate-handle-option-arg) are exposed in the page and can be called from the page function. Calling one returns a [Promise] of its result. Under the hood, each function is exposed via [page.exposeFunction()](/api/class-page.mdx#page-expose-function), so it is technically accessible from all frames and worlds of the page. Exposed functions are cleared upon the top-level navigation. Defaults to `false`, in which case functions are not serializable and passing one throws an error.
+    When set to `true`, functions passed inside [arg](/api/class-locator.mdx#locator-evaluate-handle-option-arg) are exposed in the page and can be called from the page function. Calling one returns a [Promise] of its result. Under the hood, each function is exposed via [page.exposeFunction()](/api/class-page.mdx#page-expose-function), so it is technically accessible from all frames of the page. Exposed functions are cleared upon the top-level navigation. Defaults to `false`, in which case functions are not serializable and passing one throws an error.
   - `signal` [AbortSignal] *(optional)* <font size="2">Added in: v1.62</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-evaluate-handle-option-signal"/><a href="#locator-evaluate-handle-option-signal" class="list-anchor">#</a>
     
     Allows to cancel the operation using an [`AbortSignal`](https://developer.mozilla.org/en-US/docs/Web/API/AbortSignal). If the signal is aborted, the operation will be aborted and throw an error. Note that providing a signal does not disable the default timeout, which can be changed using [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout); pass `timeout: 0` to disable the timeout entirely.
@@ -1992,8 +1992,20 @@ Returns a new locator that uses best practices for referencing the matched eleme
 
 **Usage**
 
+An agent can pick an element by its ref from an [page.ariaSnapshot()](/api/class-page.mdx#page-aria-snapshot) taken in the `"ai"` mode. Refs only work for the latest snapshot. Normalize the ref locator and convert it to a string to get resilient locator code in your language, the same way `codegen` does.
+
+Consider the following aria snapshot.
+
+```yaml
+- button "Submit" [ref=e2]
+```
+
+You can turn the ref into locator code:
+
 ```js
-await locator.normalize();
+const normalized = await page.getByRef('e2').normalize();
+console.log(normalized.toString());
+// getByRole('button', { name: 'Submit' })
 ```
 
 **Returns**
@@ -2833,6 +2845,31 @@ await page.getByTestId('status').waitForFunction((element, value) => {
 
 ---
 
+### within {/* #locator-within */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>locator.within</x-search>
+
+Returns a locator that matches this locator's elements inside each element matched by [locator](/api/class-locator.mdx#locator-within-option-locator).
+
+Note that relative locators, such as [locator.nth()](/api/class-locator.mdx#locator-nth) or [locator.first()](/api/class-locator.mdx#locator-first), are resolved separately inside each matched parent. In the example below, `page.getByRole('cell').nth(2)` picks the third cell of every row, not the third cell in the whole table.
+
+**Usage**
+
+```js
+const thirdColumn = page.getByRole('cell').nth(2).within(page.getByRole('row'));
+await expect(thirdColumn).toHaveText(['Apple', 'Banana', 'Cherry']);
+```
+
+**Arguments**
+- `locator` [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-within-option-locator"/><a href="#locator-within-option-locator" class="list-anchor">#</a>
+  
+  Locator matching the parent elements to search within.
+
+**Returns**
+- [Locator]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="locator-within-return"/><a href="#locator-within-return" class="list-anchor">#</a>
+
+---
+
 ## Deprecated
 
 ### elementHandle {/* #locator-element-handle */}
@@ -2980,6 +3017,7 @@ To press a special key, like `Control` or `ArrowDown`, use [locator.press()](/ap
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
 [WebStorage]: /api/class-webstorage.mdx "WebStorage"

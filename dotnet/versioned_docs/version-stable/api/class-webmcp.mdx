@@ -1,0 +1,178 @@
+---
+id: class-webmcp
+title: "WebMCP"
+---
+import Tabs from '@theme/Tabs';
+import TabItem from '@theme/TabItem';
+import HTMLCard from '@site/src/components/HTMLCard';
+
+
+[WebMCP] exposes the tools that a frame registers through the experimental [WebMCP](https://webmachinelearning.github.io/webmcp/) browser API, `navigator.modelContext`. It lists the tools and calls them.
+
+Instances are accessed through [Frame.Webmcp](/api/class-frame.mdx#frame-webmcp). [Page.Webmcp](/api/class-page.mdx#page-webmcp) is the instance of the main frame.
+
+:::note
+
+WebMCP is an experimental browser feature. Chromium enables it with the `--enable-features=WebMCP` launch argument, Firefox with the `dom.modelcontext.enabled` and `dom.modelcontext.testing.enabled` preferences. WebKit does not implement it.
+:::
+
+Tool names, descriptions, input schemas and results are provided by the page, so treat them as untrusted input.
+
+
+---
+
+## Methods
+
+### CallToolAsync {/* #web-mcp-call-tool */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>webMCP.CallToolAsync</x-search>
+
+Calls a tool registered by the frame and returns its result. The result is whatever the tool's `execute` function resolved to, typically an object with a `content` array. A result with `isError: true` is returned as is. The method throws when the tool is not registered or its `execute` function throws.
+
+**Usage**
+
+```csharp
+await WebMCP.CallToolAsync(name, input, options);
+```
+
+**Arguments**
+- `name` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-mcp-call-tool-option-name"/><a href="#web-mcp-call-tool-option-name" class="list-anchor">#</a>
+  
+  Name of the tool, as reported by [WebMCP.ToolsAsync()](/api/class-webmcp.mdx#web-mcp-tools).
+- `input` [object]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-mcp-call-tool-option-input"/><a href="#web-mcp-call-tool-option-input" class="list-anchor">#</a>
+  
+  Input for the tool, matching its `inputSchema`. Defaults to an empty object.
+- `options` `WebMCPCallToolOptions?` *(optional)*
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-mcp-call-tool-option-timeout"/><a href="#web-mcp-call-tool-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Returns**
+- [object]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-mcp-call-tool-return"/><a href="#web-mcp-call-tool-return" class="list-anchor">#</a>
+
+---
+
+### ToolsAsync {/* #web-mcp-tools */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>webMCP.ToolsAsync</x-search>
+
+Returns the tools currently registered by the frame. Throws if the browser was launched without WebMCP support, see the note above for the launch options that enable it.
+
+[Page.Webmcp](/api/class-page.mdx#page-webmcp) covers the main frame only, child frames list their tools through their own [Frame.Webmcp](/api/class-frame.mdx#frame-webmcp).
+
+**Usage**
+
+```csharp
+await WebMCP.ToolsAsync(options);
+```
+
+**Arguments**
+- `options` `WebMCPToolsOptions?` *(optional)*
+  - `Timeout` [float]? *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-mcp-tools-option-timeout"/><a href="#web-mcp-tools-option-timeout" class="list-anchor">#</a>
+    
+    Maximum time in milliseconds. Defaults to `30000` (30 seconds). Pass `0` to disable timeout. The default value can be changed by using the [BrowserContext.SetDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [Page.SetDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Returns**
+- [IReadOnlyList]&lt;Tools&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-mcp-tools-return"/><a href="#web-mcp-tools-return" class="list-anchor">#</a>
+  - `name` [string]
+    
+    Tool name, unique within the frame.
+  - `description` [string]
+    
+    Tool description.
+  - `inputSchema` [object]? *(optional)*
+    
+    JSON Schema of the tool input, when the page provides one.
+  - `annotations` Annotations? *(optional)*
+    - `readOnly` [bool]? *(optional)*
+      
+      The tool does not modify any state.
+    - `untrustedContent` [bool]? *(optional)*
+      
+      The tool output may contain third-party content.
+    - `consequential` [bool]? *(optional)*
+      
+      The tool takes a consequential action, such as placing an order.
+    
+    Hints the page provides about the tool.
+
+
+[APIRequest]: /api/class-apirequest.mdx "APIRequest"
+[APIRequestContext]: /api/class-apirequestcontext.mdx "APIRequestContext"
+[APIResponse]: /api/class-apiresponse.mdx "APIResponse"
+[APIResponseAssertions]: /api/class-apiresponseassertions.mdx "APIResponseAssertions"
+[Browser]: /api/class-browser.mdx "Browser"
+[BrowserContext]: /api/class-browsercontext.mdx "BrowserContext"
+[BrowserType]: /api/class-browsertype.mdx "BrowserType"
+[CDPSession]: /api/class-cdpsession.mdx "CDPSession"
+[CDPSessionEvent]: /api/class-cdpsessionevent.mdx "CDPSessionEvent"
+[Clock]: /api/class-clock.mdx "Clock"
+[ConsoleMessage]: /api/class-consolemessage.mdx "ConsoleMessage"
+[Credentials]: /api/class-credentials.mdx "Credentials"
+[Debugger]: /api/class-debugger.mdx "Debugger"
+[Dialog]: /api/class-dialog.mdx "Dialog"
+[Download]: /api/class-download.mdx "Download"
+[ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
+[FileChooser]: /api/class-filechooser.mdx "FileChooser"
+[FormData]: /api/class-formdata.mdx "FormData"
+[Frame]: /api/class-frame.mdx "Frame"
+[FrameLocator]: /api/class-framelocator.mdx "FrameLocator"
+[JSHandle]: /api/class-jshandle.mdx "JSHandle"
+[Keyboard]: /api/class-keyboard.mdx "Keyboard"
+[Locator]: /api/class-locator.mdx "Locator"
+[LocatorAssertions]: /api/class-locatorassertions.mdx "LocatorAssertions"
+[Mouse]: /api/class-mouse.mdx "Mouse"
+[Page]: /api/class-page.mdx "Page"
+[PageAssertions]: /api/class-pageassertions.mdx "PageAssertions"
+[Playwright]: /api/class-playwright.mdx "Playwright"
+[PlaywrightAssertions]: /api/class-playwrightassertions.mdx "PlaywrightAssertions"
+[Request]: /api/class-request.mdx "Request"
+[Response]: /api/class-response.mdx "Response"
+[Route]: /api/class-route.mdx "Route"
+[Screencast]: /api/class-screencast.mdx "Screencast"
+[Selectors]: /api/class-selectors.mdx "Selectors"
+[TimeoutError]: /api/class-timeouterror.mdx "TimeoutError"
+[Touchscreen]: /api/class-touchscreen.mdx "Touchscreen"
+[Tracing]: /api/class-tracing.mdx "Tracing"
+[Video]: /api/class-video.mdx "Video"
+[WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
+[WebSocket]: /api/class-websocket.mdx "WebSocket"
+[WebSocketFrame]: /api/class-websocketframe.mdx "WebSocketFrame"
+[WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
+[WebStorage]: /api/class-webstorage.mdx "WebStorage"
+[Worker]: /api/class-worker.mdx "Worker"
+[Element]: https://developer.mozilla.org/en-US/docs/Web/API/element "Element"
+[EvaluationArgument]: /evaluating.mdx#evaluation-argument "EvaluationArgument"
+[Promise]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Promise "Promise"
+[iterator]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Iteration_protocols "Iterator"
+[origin]: https://developer.mozilla.org/en-US/docs/Glossary/Origin "Origin"
+[selector]: https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Selectors "selector"
+[Serializable]: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/JSON/stringify#Description "Serializable"
+[UIEvent.detail]: https://developer.mozilla.org/en-US/docs/Web/API/UIEvent/detail "UIEvent.detail"
+[UnixTime]: https://en.wikipedia.org/wiki/Unix_time "Unix Time"
+[xpath]: https://developer.mozilla.org/en-US/docs/Web/XPath "xpath"
+
+[bool]: https://docs.microsoft.com/en-us/dotnet/api/system.boolean "bool"
+[Date]: https://learn.microsoft.com/en-us/dotnet/api/system.datetime "DateTime"
+[double]: https://docs.microsoft.com/en-us/dotnet/api/system.double "double"
+[byte]: https://docs.microsoft.com/en-us/dotnet/api/system.byte "byte"
+[int]: https://docs.microsoft.com/en-us/dotnet/api/system.int32 "int"
+[long]: https://docs.microsoft.com/en-us/dotnet/api/system.int64 "long"
+[void]: https://docs.microsoft.com/en-us/dotnet/csharp/language-reference/builtin-types/void "void"
+[string]: https://docs.microsoft.com/en-us/dotnet/api/system.string "string"
+[URL]: https://nodejs.org/api/url.html "URL"
+[Regex]: https://docs.microsoft.com/en-us/dotnet/api/system.text.regularexpressions.regex "Regex"
+
+[Action]: https://docs.microsoft.com/en-us/dotnet/api/system.action-1 "Action"
+[Func]: https://docs.microsoft.com/en-us/dotnet/api/system.func-2 "Func"
+[IEnumerable]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.ienumerable "IEnumerable"
+[IReadOnlyList]: https://learn.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlylist-1?view=net-9.0 "IReadOnlyList"
+[IDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.idictionary "IDictionary"
+[Task]: https://docs.microsoft.com/en-us/dotnet/api/system.threading.tasks.task?view=net-5.0 "Task"
+[IReadOnlyDictionary]: https://docs.microsoft.com/en-us/dotnet/api/system.collections.generic.ireadonlydictionary-2 "IReadOnlyDictionary"
+[JsonElement]: https://docs.microsoft.com/en-us/dotnet/api/system.text.json.jsonelement "JsonElement"
+
+[all available image tags]: https://mcr.microsoft.com/en-us/product/playwright/dotnet/about "all available image tags"
+[Microsoft Artifact Registry]: https://mcr.microsoft.com/en-us/product/playwright/dotnet/about "Microsoft Artifact Registry"
+[Dockerfile.noble]: https://github.com/microsoft/playwright-dotnet/blob/main/utils/docker/Dockerfile.noble "Dockerfile.noble"
