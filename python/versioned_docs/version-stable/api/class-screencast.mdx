@@ -70,11 +70,40 @@ screencast.show_actions(**kwargs)
   How long each annotation is displayed in milliseconds. Defaults to `500`.
 - `font_size` [int] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-show-actions-option-font-size"/><a href="#screencast-show-actions-option-font-size" class="list-anchor">#</a>
   
+  :::warning[Deprecated]
+  Use `title` in [style](/api/class-screencast.mdx#screencast-show-actions-option-style) instead, for example `style: { title: 'font-size: 32px' }`.
+  :::
+  
+  
   Font size of the action title in pixels. Defaults to `24`.
 - `position` "top-left" | "top" | "top-right" | "bottom-left" | "bottom" | "bottom-right" *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-show-actions-option-position"/><a href="#screencast-show-actions-option-position" class="list-anchor">#</a>
   
   Position of the action title overlay. Defaults to `"top-right"`.
-
+- `style` [Dict] *(optional)* <font size="2">Added in: v1.64</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-show-actions-option-style"/><a href="#screencast-show-actions-option-style" class="list-anchor">#</a>
+  - `point` [str] *(optional)*
+    
+    CSS declarations for the marker at the action point. The marker is positioned at the action point, has zero size and is centered on the point, so its size and look come from this style. Not shown when omitted.
+  - `highlight` [str] *(optional)*
+    
+    CSS declarations for the box that covers the target element. The box is positioned and sized to the element bounds. Not shown when omitted.
+  - `title` [str] *(optional)*
+    
+    CSS declarations for the action title, for example `'font-size: 32px; background: #333'`. The title is placed according to [position](/api/class-screencast.mdx#screencast-show-actions-option-position).
+  
+  Styles of the action decorations. All decorations fade out over [duration](/api/class-screencast.mdx#screencast-show-actions-option-duration).
+  
+  **Usage**
+  
+  ```js
+  await page.screencast.showActions({
+    style: {
+      point: 'width: 20px; height: 20px; border-radius: 50%; background: red',
+      highlight: 'outline: 2px solid #333; background: rgba(0, 128, 255, .15)',
+      title: 'font-size: 16px',
+    },
+  });
+  ```
+  
 **Returns**
 - [Disposable]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-show-actions-return"/><a href="#screencast-show-actions-return" class="list-anchor">#</a>
 
@@ -161,6 +190,11 @@ Starts the screencast. When [path](/api/class-screencast.mdx#screencast-start-op
 **Usage**
 
 **Arguments**
+- `fps` [int] *(optional)* <font size="2">Added in: v1.64</font><a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-start-option-fps"/><a href="#screencast-start-option-fps" class="list-anchor">#</a>
+  
+  Frame rate of the video recording in frames per second. Only used together with [path](/api/class-screencast.mdx#screencast-start-option-path). Defaults to `25`.
+  
+  Higher frame rates make animations and scrolling smoother at the cost of more CPU spent on encoding. Combine with [size](/api/class-screencast.mdx#screencast-start-option-size) to record high resolution videos. The video can only contain as many distinct frames as the browser produces; Firefox and WebKit currently capture up to 25 frames per second.
 - `on_frame` [Callable]\[[Dict]\]:[Promise] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="screencast-start-option-on-frame"/><a href="#screencast-start-option-on-frame" class="list-anchor">#</a>
   - `data` [bytes]
     

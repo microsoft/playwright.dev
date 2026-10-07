@@ -1,23 +1,32 @@
 ---
-id: class-teststepinfo
-title: "TestStepInfo"
+id: class-webmcp
+title: "WebMCP"
 ---
 import Tabs from '@theme/Tabs';
 import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
 
-`TestStepInfo` contains information about currently running test step. It is passed as an argument to the step function. `TestStepInfo` provides utilities to control test step execution.
+[WebMCP] exposes the tools that a frame registers through the experimental [WebMCP](https://webmachinelearning.github.io/webmcp/) browser API, `navigator.modelContext`. It lists the tools and calls them.
+
+Instances are accessed through [frame.webmcp](/api/class-frame.mdx#frame-webmcp). [page.webmcp](/api/class-page.mdx#page-webmcp) is the instance of the main frame.
+
+:::note
+
+WebMCP is an experimental browser feature. Chromium enables it with the `--enable-features=WebMCP` launch argument, Firefox with the `dom.modelcontext.enabled` and `dom.modelcontext.testing.enabled` preferences. WebKit does not implement it.
+:::
+
+Tool names, descriptions, input schemas and results are provided by the page, so treat them as untrusted input.
 
 ```js
-import { test, expect } from '@playwright/test';
+const browser = await chromium.launch({ args: ['--enable-features=WebMCP'] });
+const page = await browser.newPage();
+await page.goto('https://example.com');
 
-test('basic test', async ({ page, browserName }) => {
-  await test.step('check some behavior', async step => {
-    step.skip(browserName === 'webkit', 'The feature is not available in WebKit');
-    // ... rest of the step code
-  });
-});
+for (const tool of await page.webmcp.tools())
+  console.log(tool.name, tool.description);
+
+const result = await page.webmcp.callTool('add', { a: 2, b: 40 });
 ```
 
 
@@ -25,165 +34,85 @@ test('basic test', async ({ page, browserName }) => {
 
 ## Methods
 
-### attach {/* #test-step-info-attach */}
+### callTool {/* #web-mcp-call-tool */}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.51</font><x-search>testStepInfo.attach</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>webMCP.callTool</x-search>
 
-Attach a value or a file from disk to the current test step. Some reporters show test step attachments. Either [path](/api/class-teststepinfo.mdx#test-step-info-attach-option-path) or [body](/api/class-teststepinfo.mdx#test-step-info-attach-option-body) must be specified, but not both. Calling this method will attribute the attachment to the step, as opposed to [testInfo.attach()](/api/class-testinfo.mdx#test-info-attach) which stores all attachments at the test level.
-
-For example, you can attach a screenshot to the test step:
+Calls a tool registered by the frame and returns its result. The result is whatever the tool's `execute` function resolved to, typically an object with a `content` array. A result with `isError: true` is returned as is. The method throws when the tool is not registered or its `execute` function throws.
 
 ```js
-import { test, expect } from '@playwright/test';
-
-test('basic test', async ({ page }) => {
-  await page.goto('https://playwright.dev');
-  await test.step('check page rendering', async step => {
-    const screenshot = await page.screenshot();
-    await step.attach('screenshot', { body: screenshot, contentType: 'image/png' });
-  });
-});
+const result = await page.webmcp.callTool('add', { a: 2, b: 40 });
+console.log(result.content[0].text); // "42"
 ```
-
-Or you can attach files returned by your APIs:
-
-```js
-import { test, expect } from '@playwright/test';
-import { download } from './my-custom-helpers';
-
-test('basic test', async ({}) => {
-  await test.step('check download behavior', async step => {
-    const tmpPath = await download('a');
-    await step.attach('downloaded', { path: tmpPath });
-  });
-});
-```
-
-:::note
-[testStepInfo.attach()](/api/class-teststepinfo.mdx#test-step-info-attach) automatically takes care of copying attached files to a location that is accessible to reporters. You can safely remove the attachment after awaiting the attach call.
-:::
 
 **Usage**
 
 ```js
-await testStepInfo.attach(name);
-await testStepInfo.attach(name, options);
+await webMCP.callTool(name);
+await webMCP.callTool(name, input, options);
 ```
 
 **Arguments**
-- `name` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-info-attach-option-name"/><a href="#test-step-info-attach-option-name" class="list-anchor">#</a>
+- `name` [string]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-mcp-call-tool-option-name"/><a href="#web-mcp-call-tool-option-name" class="list-anchor">#</a>
   
-  Attachment name. The name will also be sanitized and used as the prefix of file name when saving to disk.
+  Name of the tool, as reported by [webMCP.tools()](/api/class-webmcp.mdx#web-mcp-tools).
+- `input` [Serializable] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-mcp-call-tool-option-input"/><a href="#web-mcp-call-tool-option-input" class="list-anchor">#</a>
+  
+  Input for the tool, matching its `inputSchema`. Defaults to an empty object.
 - `options` [Object] *(optional)*
-  - `body` [string] | [Buffer] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-info-attach-option-body"/><a href="#test-step-info-attach-option-body" class="list-anchor">#</a>
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-mcp-call-tool-option-timeout"/><a href="#web-mcp-call-tool-option-timeout" class="list-anchor">#</a>
     
-    Attachment body. Mutually exclusive with [path](/api/class-teststepinfo.mdx#test-step-info-attach-option-path).
-  - `contentType` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-info-attach-option-content-type"/><a href="#test-step-info-attach-option-content-type" class="list-anchor">#</a>
-    
-    Content type of this attachment to properly present in the report, for example `'application/json'` or `'image/png'`. If omitted, content type is inferred based on the [path](/api/class-teststepinfo.mdx#test-step-info-attach-option-path), or defaults to `text/plain` for [string] attachments and `application/octet-stream` for [Buffer] attachments.
-  - `path` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-info-attach-option-path"/><a href="#test-step-info-attach-option-path" class="list-anchor">#</a>
-    
-    Path on the filesystem to the attached file. Mutually exclusive with [body](/api/class-teststepinfo.mdx#test-step-info-attach-option-body).
+    Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
 
 **Returns**
-- [Promise]&lt;[void]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-info-attach-return"/><a href="#test-step-info-attach-return" class="list-anchor">#</a>
+- [Promise]&lt;[Serializable]&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-mcp-call-tool-return"/><a href="#web-mcp-call-tool-return" class="list-anchor">#</a>
 
 ---
 
-### skip() {/* #test-step-info-skip-1 */}
+### tools {/* #web-mcp-tools */}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.51</font><x-search>testStepInfo.skip()</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>webMCP.tools</x-search>
 
-Abort the currently running step and mark it as skipped. Useful for steps that are currently failing and planned for a near-term fix.
+Returns the tools currently registered by the frame. Throws if the browser was launched without WebMCP support, see the note above for the launch options that enable it.
+
+[page.webmcp](/api/class-page.mdx#page-webmcp) covers the main frame only, child frames list their tools through their own [frame.webmcp](/api/class-frame.mdx#frame-webmcp).
 
 **Usage**
 
 ```js
-import { test, expect } from '@playwright/test';
-
-test('my test', async ({ page }) => {
-  await test.step('check expectations', async step => {
-    step.skip();
-    // step body below will not run
-    // ...
-  });
-});
-```
-
----
-
-### skip(condition) {/* #test-step-info-skip-2 */}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.51</font><x-search>testStepInfo.skip(condition)</x-search>
-
-Conditionally abort the currently running step and mark it as skipped with an optional description. Useful for steps that should not be executed in some cases.
-
-**Usage**
-
-```js
-import { test, expect } from '@playwright/test';
-
-test('my test', async ({ page, isMobile }) => {
-  await test.step('check desktop expectations', async step => {
-    step.skip(isMobile, 'not present in the mobile layout');
-    // step body below will not run
-    // ...
-  });
-});
+await webMCP.tools();
+await webMCP.tools(options);
 ```
 
 **Arguments**
-- `condition` [boolean]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-info-skip-2-option-condition"/><a href="#test-step-info-skip-2-option-condition" class="list-anchor">#</a>
-  
-  A skip condition. Test step is skipped when the condition is `true`.
-- `description` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-step-info-skip-2-option-description"/><a href="#test-step-info-skip-2-option-description" class="list-anchor">#</a>
-  
-  Optional description that will be reflected in a test report.
-
----
-
-## Properties
-
-### annotations {/* #test-step-info-annotations */}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.58</font><x-search>testStepInfo.annotations</x-search>
-
-The list of annotations applicable to the current test step.
-
-**Usage**
-
-```js
-testStepInfo.annotations
-```
-
-**Type**
-- [Array]&lt;[Object]&gt;
-  - `type` [string]
+- `options` [Object] *(optional)*
+  - `timeout` [number] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-mcp-tools-option-timeout"/><a href="#web-mcp-tools-option-timeout" class="list-anchor">#</a>
     
-    Annotation type, for example `'skip'`.
-  - `description` [string] *(optional)*
+    Maximum time in milliseconds. Defaults to `0` - no timeout. The default value can be changed via `actionTimeout` option in the config, or by using the [browserContext.setDefaultTimeout()](/api/class-browsercontext.mdx#browser-context-set-default-timeout) or [page.setDefaultTimeout()](/api/class-page.mdx#page-set-default-timeout) methods.
+
+**Returns**
+- [Promise]&lt;[Array]&lt;[Object]&gt;&gt;<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="web-mcp-tools-return"/><a href="#web-mcp-tools-return" class="list-anchor">#</a>
+  - `name` [string]
     
-    Optional description.
-  - `location` [Location] *(optional)*
+    Tool name, unique within the frame.
+  - `description` [string]
     
-    Optional location in the source where the annotation is added.
-
----
-
-### titlePath {/* #test-step-info-title-path */}
-
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.55</font><x-search>testStepInfo.titlePath</x-search>
-
-The full title path starting with the test file name, including the step titles. See also [testInfo.titlePath](/api/class-testinfo.mdx#test-info-title-path).
-
-**Usage**
-
-```js
-testStepInfo.titlePath
-```
-
-**Type**
-- [Array]&lt;[string]&gt;
+    Tool description.
+  - `inputSchema` [Serializable] *(optional)*
+    
+    JSON Schema of the tool input, when the page provides one.
+  - `annotations` [Object] *(optional)*
+    - `readOnly` [boolean] *(optional)*
+      
+      The tool does not modify any state.
+    - `untrustedContent` [boolean] *(optional)*
+      
+      The tool output may contain third-party content.
+    - `consequential` [boolean] *(optional)*
+      
+      The tool takes a consequential action, such as placing an order.
+    
+    Hints the page provides about the tool.
 
 
 [APIRequest]: /api/class-apirequest.mdx "APIRequest"

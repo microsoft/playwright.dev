@@ -128,10 +128,10 @@ export default defineConfig({
       See [caret](/api/class-page.mdx#page-screenshot-option-caret) in [page.screenshot()](/api/class-page.mdx#page-screenshot). Defaults to `"hide"`.
     - `maxDiffPixels` [number] *(optional)*
       
-      An acceptable amount of pixels that could be different, unset by default.
+      An acceptable amount of pixels that could be different, unset by default. Note that `threshold` defines which pixels are considered different.
     - `maxDiffPixelRatio` [number] *(optional)*
       
-      An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1` , unset by default.
+      An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1` , unset by default. Note that `threshold` defines which pixels are considered different.
     - `scale` "css" | "device" *(optional)*
       
       See [scale](/api/class-page.mdx#page-screenshot-option-scale) in [page.screenshot()](/api/class-page.mdx#page-screenshot). Defaults to `"css"`.
@@ -141,6 +141,9 @@ export default defineConfig({
     - `threshold` [number] *(optional)*
       
       An acceptable perceived color difference between the same pixel in compared images, ranging from `0` (strict) and `1` (lax). `"pixelmatch"` comparator computes color difference in [YIQ color space](https://en.wikipedia.org/wiki/YIQ) and defaults `threshold` value to `0.2`.
+    - `type` "png" | "webp" *(optional)*
+      
+      Format of the screenshots taken when the snapshot name is omitted, defaults to `"png"`. Snapshots with an explicit name use the format matching their `.png` or `.webp` extension.
     - `pathTemplate` [string] *(optional)*
       
       A template controlling location of the screenshots. See [testConfig.snapshotPathTemplate](/api/class-testconfig.mdx#test-config-snapshot-path-template) for details.
@@ -158,10 +161,10 @@ export default defineConfig({
   - `toMatchSnapshot` [Object] *(optional)*
     - `maxDiffPixels` [number] *(optional)*
       
-      An acceptable amount of pixels that could be different, unset by default.
+      An acceptable amount of pixels that could be different, unset by default. Note that `threshold` defines which pixels are considered different.
     - `maxDiffPixelRatio` [number] *(optional)*
       
-      An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1` , unset by default.
+      An acceptable ratio of pixels that are different to the total amount of pixels, between `0` and `1` , unset by default. Note that `threshold` defines which pixels are considered different.
     - `threshold` [number] *(optional)*
       
       An acceptable perceived color difference between the same pixel in compared images, ranging from `0` (strict) and `1` (lax). `"pixelmatch"` comparator computes color difference in [YIQ color space](https://en.wikipedia.org/wiki/YIQ) and defaults `threshold` value to `0.2`.
@@ -626,7 +629,7 @@ export default defineConfig({
 ```
 
 **Type**
-- [string] | [Array]&lt;[Object]&gt; | "list" | "dot" | "line" | "github" | "json" | "junit" | "null" | "html" | "perfetto"
+- [string] | [Array]&lt;[Object]&gt; | "list" | "dot" | "line" | "github" | "json" | "junit" | "null" | "html" | "blob" | "perfetto"
   - `0` [string]
     
     Reporter name or module or file path
@@ -974,11 +977,12 @@ export default defineConfig({
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testConfig.updateSnapshots</x-search>
 
-Whether to update expected snapshots with the actual results produced by the test run. Defaults to `'missing'`.
+Whether to update expected snapshots with the actual results produced by the test run. Defaults to `'default'`.
 * `'all'` - All tests that are executed will update snapshots.
 * `'changed'` - All tests that are executed will update snapshots that did not match. Matching snapshots will not be updated. Also creates missing snapshots.
-* `'missing'` - Missing snapshots are created, for example when authoring a new test and running it for the first time. This is the default.
+* `'missing'` - Missing snapshots are created, for example when authoring a new test and running it for the first time. Tests that only create missing snapshots pass.
 * `'none'` - No snapshots are updated.
+* `'default'` - Missing snapshots are created, but the tests that create them fail, so that the run does not silently pass in CI. This is the default.
 
 Learn more about [snapshots](../test-snapshots.mdx).
 
@@ -988,12 +992,12 @@ Learn more about [snapshots](../test-snapshots.mdx).
 import { defineConfig } from '@playwright/test';
 
 export default defineConfig({
-  updateSnapshots: 'missing',
+  updateSnapshots: 'default',
 });
 ```
 
 **Type**
-- "all" | "changed" | "missing" | "none"
+- "all" | "changed" | "missing" | "none" | "default"
 
 ---
 
@@ -1297,6 +1301,7 @@ This path will serve as the base directory for each test file snapshot directory
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
 [WebStorage]: /api/class-webstorage.mdx "WebStorage"
