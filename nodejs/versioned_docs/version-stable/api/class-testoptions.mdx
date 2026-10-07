@@ -200,7 +200,7 @@ export default defineConfig({
 
 ### clientCertificates {/* #test-options-client-certificates */}
 
-<font size="2" style={{position: "relative", top: "-20px"}}>Added in: 1.46</font><x-search>testOptions.clientCertificates</x-search>
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.46</font><x-search>testOptions.clientCertificates</x-search>
 
 TLS Client Authentication allows the server to request a client certificate and verify it.
 
@@ -302,7 +302,7 @@ export default defineConfig({
 });
 ```
 
-When connect options are specified, default [fixtures.browser](/api/class-fixtures.mdx#fixtures-browser), [fixtures.context](/api/class-fixtures.mdx#fixtures-context) and [fixtures.page](/api/class-fixtures.mdx#fixtures-page) use the remote browser instead of launching a browser locally, and any launch options like [testOptions.headless](/api/class-testoptions.mdx#test-options-headless) or [testOptions.channel](/api/class-testoptions.mdx#test-options-channel) are ignored.
+When connect options are specified, default [fixtures.browser](/api/class-fixtures.mdx#fixtures-browser), [fixtures.context](/api/class-fixtures.mdx#fixtures-context) and [fixtures.page](/api/class-fixtures.mdx#fixtures-page) use the remote browser instead of launching a browser locally.
 
 **Type**
 - [void] | [Object]
@@ -542,6 +542,17 @@ export default defineConfig({
 });
 ```
 
+When passing an array of credentials to [test.use()](/api/class-test.mdx#test-use), wrap it into an extra array, see [fixture options](../test-fixtures.mdx#fixtures-options).
+
+```js title="example.spec.ts"
+test.use({
+  httpCredentials: [[
+    { username: 'alice', password: 'alice-pass', origin: 'https://a.example.com' },
+    { username: 'bob', password: 'bob-pass', origin: 'https://b.example.com' },
+  ], { scope: 'test' }],
+});
+```
+
 **Type**
 - [Object] | [Array]&lt;[Object]&gt;
   - `username` [string]
@@ -586,7 +597,7 @@ export default defineConfig({
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.isMobile</x-search>
 
-Whether the `meta viewport` tag is taken into account and touch events are enabled. isMobile is a part of device, so you don't actually need to set it manually. Defaults to `false` and is not supported in Firefox. Learn more about [mobile emulation](../emulation.mdx#ismobile).
+Whether the `meta viewport` tag is taken into account and touch events are enabled. isMobile is a part of device, so you don't actually need to set it manually. Defaults to `false`. Learn more about [mobile emulation](../emulation.mdx#ismobile).
 
 **Usage**
 
@@ -821,6 +832,36 @@ export default defineConfig({
 
 ---
 
+### screen {/* #test-options-screen */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.64</font><x-search>testOptions.screen</x-search>
+
+Emulates consistent window screen size available inside web page via `window.screen`. Is only used when the [testOptions.viewport](/api/class-testoptions.mdx#test-options-viewport) is set.
+
+**Usage**
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    viewport: { width: 390, height: 664 },
+    screen: { width: 390, height: 844 },
+  },
+});
+```
+
+**Type**
+- [Object]
+  - `width` [number]
+    
+    page width in pixels.
+  - `height` [number]
+    
+    page height in pixels.
+
+---
+
 ### screenshot {/* #test-options-screenshot */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.screenshot</x-search>
@@ -1051,7 +1092,7 @@ export default defineConfig({
 Learn more about [recording trace](../test-use-options.mdx#recording-options).
 
 **Type**
-- [Object] | "off" | "on" | "retain-on-failure" | "on-first-retry" | "retain-on-first-failure" | "retain-on-failure-and-retries"
+- [Object] | "off" | "on" | "on-first-retry" | "on-all-retries" | "retain-on-failure" | "retain-on-first-failure" | "retain-on-failure-and-retries"
   - `mode` "off" | "on" | "retain-on-failure" | "on-first-retry" | "on-all-retries" | "retain-on-first-failure" | "retain-on-failure-and-retries"
     
     Trace recording mode.
@@ -1119,7 +1160,9 @@ See [video modes](../test-use-options.mdx#video-modes) for a side-by-side compar
 
 To control video size, pass an object with `mode` and `size` properties. If video size is not specified, it will be equal to [testOptions.viewport](/api/class-testoptions.mdx#test-options-viewport) scaled down to fit into 800x800. If `viewport` is not configured explicitly the video size defaults to 800x450. Actual picture of each page will be scaled down if necessary to fit the specified size.
 
-To annotate actions in the video, pass `show` with `action` and/or `test` sub-options. The `action` option controls visual highlights on interacted elements with an optional `delay` in milliseconds (defaults to `500`). The `test` option controls which test information is displayed as a status overlay.
+To record smoother video of animations and scrolling, pass `fps`, for example `{ mode: 'on', size: { width: 1920, height: 1080 }, fps: 60 }`. Higher frame rates and sizes use more CPU for encoding. Firefox and WebKit currently capture up to 25 frames per second.
+
+To annotate actions in the video, pass `show` with `actions` and/or `test` sub-options. The `actions` option controls visual highlights on interacted elements, each shown for an optional `duration` in milliseconds (defaults to `500`). The `test` option controls which test information is displayed as a status overlay.
 
 **Usage**
 
@@ -1148,6 +1191,9 @@ Learn more about [recording video](../test-use-options.mdx#recording-options).
       
       
     Size of the recorded video. Optional.
+  - `fps` [number] *(optional)*
+    
+    Frame rate of the recorded video in frames per second. Defaults to `25`.
   - `show` [Object] *(optional)*
     - `actions` [Object] *(optional)*
       - `duration` [number] *(optional)*
@@ -1158,14 +1204,26 @@ Learn more about [recording video](../test-use-options.mdx#recording-options).
         Position of the action title overlay. Defaults to `"top-right"`.
       - `fontSize` [number] *(optional)*
         
-        Font size of the action title in pixels. Defaults to `24`.
+        Font size of the action title in pixels. Defaults to `24`. Deprecated, use `style.title` instead.
       - `cursor` "none" | "pointer" *(optional)*
         
         Cursor decoration shown for pointer actions. `"pointer"` (the default) renders a mouse pointer that animates from the previous action point to the next one. `"none"` disables the cursor decoration.
+      - `style` [Object] *(optional)*
+        - `point` [string] *(optional)*
+          
+          CSS declarations for the zero-sized marker centered on the action point. Not shown when omitted.
+        - `highlight` [string] *(optional)*
+          
+          CSS declarations for the box that covers the target element. Not shown when omitted.
+        - `title` [string] *(optional)*
+          
+          CSS declarations for the action title.
+        
+        Styles of the action decorations.
       
       Controls visual annotations on interacted elements.
     - `test` [Object] *(optional)*
-      - `level` "file" | "test" | "step" *(optional)*
+      - `level` "file" | "title" | "step" *(optional)*
         
         Level of the detail to include about the current test.
       - `position` "top-left" | "top" | "top-right" | "bottom-left" | "bottom" | "bottom-right" *(optional)*
@@ -1306,6 +1364,7 @@ export default defineConfig({
 [Tracing]: /api/class-tracing.mdx "Tracing"
 [Video]: /api/class-video.mdx "Video"
 [WebError]: /api/class-weberror.mdx "WebError"
+[WebMCP]: /api/class-webmcp.mdx "WebMCP"
 [WebSocket]: /api/class-websocket.mdx "WebSocket"
 [WebSocketRoute]: /api/class-websocketroute.mdx "WebSocketRoute"
 [WebStorage]: /api/class-webstorage.mdx "WebStorage"
