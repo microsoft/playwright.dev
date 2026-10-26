@@ -9,6 +9,100 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 import LiteYouTube from '@site/src/components/LiteYouTube';
 
+## Version 1.64
+
+### 🧰 WebMCP
+
+New [Page.webmcp()](/api/class-page.mdx#page-webmcp) and [Frame.webmcp()](/api/class-frame.mdx#frame-webmcp) give access to the tools that a page registers through the experimental [WebMCP](https://webmachinelearning.github.io/webmcp/) browser API, so you can test them like any other part of your app:
+
+```java
+Browser browser = chromium.launch(new BrowserType.LaunchOptions()
+    .setArgs(Arrays.asList("--enable-features=WebMCP")));
+Page page = browser.newPage();
+page.navigate("https://example.com");
+
+for (WebMCPTool tool : page.webmcp().tools())
+  System.out.println(tool.name + ": " + tool.description);
+
+Object result = page.webmcp().callTool("add", Map.of("a", 2, "b", 40));
+System.out.println(result); // {content=[{type=text, text=42}]}
+```
+
+[Playwright MCP](./getting-started-mcp.mdx) also supports WebMCP by default, with page-defined tools offered to the agent as `webmcp_<tool>`. Pass `--no-webmcp` to opt out.
+
+[`playwright-cli`](./getting-started-cli.mdx) exposes them as well:
+
+```bash
+playwright-cli webmcp-list
+playwright-cli webmcp-call search_catalog --params '{"query":"cats"}'
+```
+
+### 🎬 Better videos
+
+Videos can now be recorded at a custom frame rate, and the decorations for actions are styled with plain CSS:
+
+```java
+page.screencast().start(new Screencast.StartOptions()
+    .setPath(Paths.get("video.webm"))
+    .setSize(1920, 1080)
+    .setFps(60));
+page.screencast().showActions(new Screencast.ShowActionsOptions()
+    .setStyle(new ScreencastActionStyle()
+        .setPoint("width: 20px; height: 20px; border-radius: 50%; background: red")
+        .setHighlight("outline: 2px solid #333; background: rgba(0, 128, 255, .15)")
+        .setTitle("font-size: 16px")));
+```
+
+- New [setRecordVideoFps](/api/class-browser.mdx#browser-new-context-option-record-video-fps) option and new [setFps](/api/class-screencast.mdx#screencast-start-option-fps) option in [Screencast.start()](/api/class-screencast.mdx#screencast-start). Firefox and WebKit currently capture up to 25 frames per second.
+- New [setStyle](/api/class-screencast.mdx#screencast-show-actions-option-style) option takes CSS declarations for the `point` marker, the target `highlight` and the action `title`. It replaces the `fontSize` option, which is now deprecated.
+- The cursor stays visible at the last action point, survives navigations and travels along a natural, eased path.
+- Videos are encoded with VP9 instead of VP8, which takes less CPU and produces smaller files of the same or better quality.
+- All video options are also available in [Playwright MCP](./getting-started-mcp.mdx) and [`playwright-cli`](./getting-started-cli.mdx).
+
+### 🪆 Locator.within()
+
+New [Locator.within()](/api/class-locator.mdx#locator-within) combines two locators that you already have, reading in the natural order — "this button, within that dialog":
+
+```java
+Locator saveButton = page.getByRole(AriaRole.BUTTON, new Page.GetByRoleOptions().setName("Save"));
+Locator dialog = page.getByTestId("settings-dialog");
+
+saveButton.within(dialog).click();
+```
+
+Relative locators such as [Locator.nth()](/api/class-locator.mdx#locator-nth) or [Locator.first()](/api/class-locator.mdx#locator-first) are resolved inside each parent separately, which makes column-like queries straightforward:
+
+```java
+// The third cell of every row, not the third cell in the table.
+Locator thirdColumn = page.getByRole(AriaRole.CELL).nth(2).within(page.getByRole(AriaRole.ROW));
+assertThat(thirdColumn).hasText(new String[] {"Apple", "Banana", "Cherry"});
+```
+
+### New APIs
+- New [Page.getByRef()](/api/class-page.mdx#page-get-by-ref) locates an element by its aria ref, such as `e2`, reported by [Page.ariaSnapshot()](/api/class-page.mdx#page-aria-snapshot) in the `"ai"` mode.
+- New option [setIncludeShadow](/api/class-page.mdx#page-content-option-include-shadow) in [Page.content()](/api/class-page.mdx#page-content) and [Frame.content()](/api/class-frame.mdx#frame-content) serializes open shadow roots as [declarative shadow DOM](https://developer.mozilla.org/en-US/docs/Web/API/Web_components/Using_shadow_DOM#declaratively_with_html).
+- New option [setSignCount](/api/class-credentials.mdx#credentials-create-option-sign-count) sets the initial signature counter of a virtual credential. [Credentials.create()](/api/class-credentials.mdx#credentials-create) and [Credentials.get()](/api/class-credentials.mdx#credentials-get) return the current `signCount`, and it is saved and restored together with the credentials in the storage state.
+- New [APIRequestContext.addCookies()](/api/class-apirequestcontext.mdx#api-request-context-add-cookies), [APIRequestContext.cookies()](/api/class-apirequestcontext.mdx#api-request-context-cookies) and [APIRequestContext.clearCookies()](/api/class-apirequestcontext.mdx#api-request-context-clear-cookies) manage cookies of a request context, mirroring the [BrowserContext] methods:
+  
+  ```java
+  request.addCookies(Arrays.asList(
+      new Cookie("session-id", "42").setUrl("https://example.com")));
+  System.out.println(request.cookies("https://example.com"));
+  request.clearCookies(new APIRequestContext.ClearCookiesOptions().setName("session-id"));
+  ```
+  
+### Breaking Changes ⚠️
+- Elements inside hidden iframes are considered hidden. Elements inside an iframe that is not visible, for example with `visibility: hidden`, are now considered hidden by actions, [Locator.isVisible()](/api/class-locator.mdx#locator-is-visible) and [assertThat(locator).isVisible()](/api/class-locatorassertions.mdx#locator-assertions-to-be-visible).
+
+### Browser Versions
+- Chromium 156.0.8078.4
+- Mozilla Firefox 157.0
+- WebKit 27.2
+
+This version was also tested against the following stable channels:
+- Google Chrome 155
+- Microsoft Edge 155
+
 ## Version 1.63
 
 ### 🪟 Locate across frames
