@@ -7,7 +7,7 @@ import TabItem from '@theme/TabItem';
 import HTMLCard from '@site/src/components/HTMLCard';
 
 
-Controls which tests will run and their expected status. A [TestRun] is available during [reporter.preprocess()](/api/class-reporter.mdx#reporter-preprocess). Setup and teardown projects cannot be changed.
+Controls which tests will run and their expected status, and provides information about suite execution modes. A [TestRun] is available during [reporter.preprocess()](/api/class-reporter.mdx#reporter-preprocess). Setup and teardown projects cannot be changed.
 
 
 ---
@@ -76,6 +76,32 @@ testRun.fixme(test, reason);
 - `reason` [string] *(optional)*<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-run-fixme-option-reason"/><a href="#test-run-fixme-option-reason" class="list-anchor">#</a>
   
   Optional explanation surfaced as the annotation description.
+
+---
+
+### mode {/* #test-run-mode */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.65</font><x-search>testRun.mode</x-search>
+
+Returns the execution mode configured for a suite with [test.describe.configure()](/api/class-test.mdx#test-describe-configure), [test.describe.serial()](/api/class-test.mdx#test-describe-serial) or [test.describe.parallel()](/api/class-test.mdx#test-describe-parallel). If the suite does not configure a mode, it inherits its parent's mode. Project suites use `"parallel"` when [testProject.fullyParallel](/api/class-testproject.mdx#test-project-fully-parallel) is enabled, and `"default"` otherwise. The root suite uses `"default"`.
+
+An explicit `"default"` suite does not inherit `"parallel"` from its parent: its tests run in order in the same worker. The mode alone does not describe complete test groups, which also depend on worker fixtures and hooks.
+
+This method can only be called during [reporter.preprocess()](/api/class-reporter.mdx#reporter-preprocess), and can also inspect setup and teardown projects.
+
+**Usage**
+
+```js
+testRun.mode(suite);
+```
+
+**Arguments**
+- `suite` [Suite]<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-run-mode-option-suite"/><a href="#test-run-mode-option-suite" class="list-anchor">#</a>
+  
+  Suite to inspect.
+
+**Returns**
+- "serial" | "parallel" | "default"<a aria-hidden="true" tabIndex="-1" class="list-anchor-link" id="test-run-mode-return"/><a href="#test-run-mode-return" class="list-anchor">#</a>
 
 ---
 
