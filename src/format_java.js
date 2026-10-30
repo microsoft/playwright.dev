@@ -76,8 +76,18 @@ class JavaFormatter {
    * @param {Documentation.Type} type
    */
   formatFunction(args, ret, type) {
+    if (type.args.length === 2 && !type.returnType) {
+      // Nullable primitives are boxed in generics: `null|int` becomes `Integer`.
+      const params = type.args.map(arg => {
+        const nonNull = arg.union ? arg.union.filter(t => t.name !== 'null') : [arg];
+        if (nonNull.length !== 1)
+          throw new Error('Unsupported argument type in function: ' + JSON.stringify(type));
+        return nonNull[0].name === 'int' ? '[Integer]' : this.formatTypeName(nonNull[0], 'in', /** @type {any} */({}));
+      });
+      return `[BiConsumer]<${params.join(', ')}>`;
+    }
     if (type.args.length !== 1)
-      throw new Error('Unsupported number of arguments in function: ' + type);
+      throw new Error('Unsupported number of arguments in function: ' + JSON.stringify(type));
     if (!type.returnType || type.returnType.name === 'Promise') {
       const argType = type.args?.[0];
       const aliasName = argType?.langAliases?.java || argType?.langAliases?.default || argType?.name;
