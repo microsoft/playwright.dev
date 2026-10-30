@@ -1,3 +1,4 @@
+[BiConsumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/BiConsumer.html "BiConsumer"
 [boolean]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "boolean"
 [byte&#91;&#93;]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "byte[]"
 [Consumer]: https://docs.oracle.com/javase/8/docs/api/java/util/function/Consumer.html "Consumer"
@@ -5,6 +6,7 @@
 [double]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "double"
 [InputStream]: https://docs.oracle.com/javase/8/docs/api/java/io/InputStream.html "InputStream"
 [int]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "int"
+[Integer]: https://docs.oracle.com/javase/8/docs/api/java/lang/Integer.html "Integer"
 [long]: https://docs.oracle.com/javase/tutorial/java/nutsandbolts/datatypes.html "long"
 [JsonObject]: https://www.javadoc.io/doc/com.google.code.gson/gson/latest/com.google.gson/com/google/gson/JsonObject.html "JsonObject"
 [List]: https://docs.oracle.com/javase/8/docs/api/java/util/List.html "List"
