@@ -628,13 +628,13 @@ Note that only `WebSocket`s created after this method was called will be routed.
 Below is an example of a simple handler that blocks some websocket messages. See [WebSocketRoute] for more details and examples.
 
 ```csharp
-await context.RouteWebSocketAsync("/ws", async ws => {
-  ws.RouteSend(message => {
-    if (message == "to-be-blocked")
+await context.RouteWebSocketAsync("/ws", ws => {
+  var server = ws.ConnectToServer();
+  ws.OnMessage(frame => {
+    if (frame.Text == "to-be-blocked")
       return;
-    ws.Send(message);
+    server.Send(frame.Text);
   });
-  await ws.ConnectAsync();
 });
 ```
 

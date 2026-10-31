@@ -704,9 +704,13 @@ function parseTypeExpression(type) {
     }
   }
   let union = null;
-  if (type[firstTypeLength] === '|')
+  if (type[firstTypeLength] === '|') {
     union = parseTypeExpression(type.substring(firstTypeLength + 1));
-  else if (type[firstTypeLength] === ',')
+    // In `[A]|[B], [C]`, the union ends at the comma: `[C]` is the next item
+    // of the list, not a part of the union.
+    next = union.next;
+    union.next = null;
+  } else if (type[firstTypeLength] === ',')
     next = parseTypeExpression(type.substring(firstTypeLength + 1));
 
   if (template && !template.unionName && isStringUnion(template)) {
@@ -780,22 +784,23 @@ function patchLinksInText(classOrMember, text, classesMap, membersMap, linkRende
         member = maybeMember;
         name = p2;
       }
-      if (p1 === 'param') {
-        const param = member.argsArray.find(a => a.name === name);
+      const param = member.argsArray.find(a => a.name === name);
+      const options = member.argsArray.find(a => a.name === 'options');
+      const parts = name.split('.');
+      const optionName = parts[0];
+      const option = options?.type?.properties?.find(a => a.name === optionName);
+      // An argument can be a param in one language and an option in another,
+      // so a link of either kind also finds an argument of the other kind.
+      const asParam = p1 === 'param' ? !!param || !option : !option && !!param;
+      if (asParam) {
         if (!param)
           throw new Error(`Referenced parameter ${match} not found in the parent method ${member.name}\n=========\n${text}`);
         return linkRenderer({ member, param: { name, alias: param.alias }, href }) || match;
-      } else {
-        // p1 === 'option'
-        const options = member.argsArray.find(a => a.name === 'options');
-        const parts = name.split('.');
-        const optionName = parts[0];
-        const option = options?.type?.properties?.find(a => a.name === optionName);
-        if (!option)
-          throw new Error(`Referenced option ${match} not found in the parent method ${member.name}\n=========\n${text}`);
-        parts[0] = option.alias;
-        return linkRenderer({ member, option: { name: optionName, alias: parts.join('.') }, href }) || match;
       }
+      if (!option)
+        throw new Error(`Referenced option ${match} not found in the parent method ${member.name}\n=========\n${text}`);
+      parts[0] = option.alias;
+      return linkRenderer({ member, option: { name: optionName, alias: parts.join('.') }, href }) || match;
     }
     throw new Error(`Undefined link prefix, expected event|method|property|param|option, got: ` + match);
   });
