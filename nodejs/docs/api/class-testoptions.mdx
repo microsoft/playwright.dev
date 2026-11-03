@@ -698,6 +698,33 @@ export default defineConfig({
 
 ---
 
+### locatorOmitHidden {/* #test-options-locator-omit-hidden */}
+
+<font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.65</font><x-search>testOptions.locatorOmitHidden</x-search>
+
+Whether locators omit hidden elements by default. Defaults to `false`. If set to `true`, each locator is resolved as if [locator.visible()](/api/class-locator.mdx#locator-visible) were appended: only the final matched element is checked for [visibility](../actionability.mdx#visible), not its intermediate ancestors. This affects actions, assertions, counts and element evaluation, but not selector-based methods such as [page.$()](/api/class-page.mdx#page-query-selector).
+
+Pass `omitHidden: false` when creating a locator to opt out. The override is preserved by `filter()`, `first()`, `last()`, `nth()`, `and()`, `or()` and `describe()`. Creating a descendant locator uses the context default again, unless an override is supplied for that descendant. Explicit visibility filters are never removed. Role locators still apply their accessibility matching rules; use `getByRole(..., { includeHidden: true, omitHidden: false })` to include hidden elements when this context option is enabled.
+
+With `true`, hidden elements are treated as missing by `toBeHidden()` and `waitFor({ state: 'hidden' })`. To check attachment of a hidden element, create the locator with `omitHidden: false`.
+
+**Usage**
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  use: {
+    locatorOmitHidden: true,
+  },
+});
+```
+
+**Type**
+- [boolean]
+
+---
+
 ### navigationTimeout {/* #test-options-navigation-timeout */}
 
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testOptions.navigationTimeout</x-search>
@@ -1117,15 +1144,6 @@ Learn more about [recording trace](../test-use-options.mdx#recording-options).
   - `sources` [boolean] *(optional)*
     
     Whether to include source files for trace actions. Defaults to true. Optional.
-  - `secrets` [Array]&lt;[Object]&gt; *(optional)*
-    - `name` [string] *(optional)*
-      
-      Name of the secret. The trace shows `<secret>NAME</secret>` in place of the value, or `<secret/>` when the name is not set. Optional.
-    - `value` [string]
-      
-      Sensitive text to hide.
-    
-    Sensitive values to hide in the trace. Optional.
 
 ---
 
