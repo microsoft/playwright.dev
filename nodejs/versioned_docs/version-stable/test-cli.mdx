@@ -105,7 +105,7 @@ npx playwright test --ui
 | `--project <project-name...>` | Only run tests from the specified list of projects, supports '*' wildcard (default: run all projects). |
 | `--quiet` | Suppress stdio. |
 | `--repeat-each <N>` | Run each test `N` times (default: 1). |
-| `--reporter <reporter>` | Reporter to use, comma-separated, can be "dot", "line", "list", or others (default: "list" locally and "dot" on CI). You can also pass a path to a custom reporter file. |
+| `--reporter <reporter>` | Reporter to use, comma-separated, can be "dot", "line", "list", "failures", or others (default: "list" locally and "dot" on CI). You can also pass a path to a custom reporter file. |
 | `--retries <retries>` | Maximum retry count for flaky tests, zero for no retries (default: no retries). |
 | `--run-agents <mode>` | Run agents to generate the code for `page.perform`. Possible values are "missing", "all" and "none" (default: "none"). See [test-agents](./test-agents.mdx). |
 | `--shard <shard>` | Shard tests and execute only the selected shard, specified in the form "current/all", 1-based, e.g., "3/5". |
@@ -300,6 +300,8 @@ npx playwright show-trace trace/
 | `-h, --host <host>` | Host to serve trace on |
 | `-p, --port <port>` | Port to serve trace on |
 
+When you pass `--port`, other users on your machine can open the trace on that port. When you pass `--host`, anyone who can reach this address and port can open the trace, for example other machines in your network with `--host=0.0.0.0`.
+
 ## Specialized Commands
 
 ### Merge Reports
@@ -324,7 +326,7 @@ npx playwright merge-reports ./reports
 | Option | Description |
 | :--- | :--- |
 | `-c, --config <file>` | Configuration file. Can be used to specify additional configuration for the output report |
-| `--reporter <reporter>` | Reporter to use, comma-separated, can be "list", "line", "dot", "json", "junit", "null", "github", "html", "blob", "perfetto" (default: "list" locally and "dot" on CI) |
+| `--reporter <reporter>` | Reporter to use, comma-separated, can be "list", "line", "dot", "failures", "json", "junit", "null", "github", "html", "blob", "perfetto" (default: "list" locally and "dot" on CI) |
 
 ### Clear Cache
 
@@ -334,6 +336,12 @@ Clear all Playwright caches.
 
 ```bash
 npx playwright clear-cache
+```
+
+Playwright keeps transpiled test files in the system temporary directory. To keep them in another directory, for example on a Linux machine shared with other users, set the `PLAYWRIGHT_TRANSFORM_CACHE_DIR` environment variable:
+
+```bash
+PLAYWRIGHT_TRANSFORM_CACHE_DIR=~/.cache/playwright-transform npx playwright test
 ```
 
 
