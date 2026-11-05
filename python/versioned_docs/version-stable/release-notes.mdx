@@ -9,6 +9,37 @@ import HTMLCard from '@site/src/components/HTMLCard';
 
 import LiteYouTube from '@site/src/components/LiteYouTube';
 
+## Version 1.65
+
+### 🧾 Locator code in Python
+
+A locator from [locator.normalize()](/api/class-locator.mdx#locator-normalize) now converts to a string as Python code. Use it with [page.get_by_ref()](/api/class-page.mdx#page-get-by-ref) to turn an element that an agent picks from a [page.aria_snapshot()](/api/class-page.mdx#page-aria-snapshot) in the `"ai"` mode into code for your test:
+
+```python
+normalized = page.get_by_ref("e2").normalize()
+print(str(normalized))
+# get_by_role("button", name="Submit")
+```
+
+### New APIs
+- New option [timeout](/api/class-cdpsession.mdx#cdp-session-send-option-timeout) in [cdp_session.send()](/api/class-cdpsession.mdx#cdp-session-send).
+
+### Breaking Changes ⚠️
+- Actions such as [locator.click()](/api/class-locator.mdx#locator-click), [locator.check()](/api/class-locator.mdx#locator-check), [locator.tap()](/api/class-locator.mdx#locator-tap), [locator.fill()](/api/class-locator.mdx#locator-fill), [locator.clear()](/api/class-locator.mdx#locator-clear) and [locator.select_option()](/api/class-locator.mdx#locator-select-option) now wait for the element to be [not inert](./actionability.mdx#not-inert). An action on an element with the `inert` attribute, or inside such an element, now times out if the element stays inert.
+- Cookie matching now follows RFC 6265. With a URL, [browser_context.cookies()](/api/class-browsercontext.mdx#browser-context-cookies) and [api_request_context.cookies()](/api/class-apirequestcontext.mdx#api-request-context-cookies) no longer return host-only cookies for subdomains or `Path=/api` cookies for `/apiv2`, and a `Path=/foo/` cookie does not match `/foo`. [APIRequestContext] sends a cookie without a name as `Cookie: x` instead of `Cookie: =x`, and stores `Set-Cookie: token` as a cookie without a name.
+- Proxy credentials are no longer sent to websites. The credentials in the [proxy](/api/class-browsertype.mdx#browser-type-launch-option-proxy) option now answer only proxy challenges. To authenticate on a website, use [http_credentials](/api/class-browser.mdx#browser-new-context-option-http-credentials).
+- Text that the browser does not render, such as text that is not assigned to a slot or text directly inside a closed `<details>`, is no longer part of accessible names and aria snapshots. This can change the results of [page.get_by_role()](/api/class-page.mdx#page-get-by-role) with a name, [locator.aria_snapshot()](/api/class-locator.mdx#locator-aria-snapshot) and [expect(locator).to_match_aria_snapshot()](/api/class-locatorassertions.mdx#locator-assertions-to-match-aria-snapshot).
+- String values of the `params` option in [APIRequestContext] requests are now appended to the query that the URL already has, instead of replacing it.
+
+### Browser Versions
+- Chromium 158.0.8127.18
+- Mozilla Firefox 159.0
+- WebKit 27.2
+
+This version was also tested against the following stable channels:
+- Google Chrome 157
+- Microsoft Edge 156
+
 ## Version 1.64
 
 ### 🧰 WebMCP
@@ -2414,6 +2445,7 @@ This version of Playwright was also tested against the following stable channels
 [Credentials]: /api/class-credentials.mdx "Credentials"
 [Debugger]: /api/class-debugger.mdx "Debugger"
 [Dialog]: /api/class-dialog.mdx "Dialog"
+[Disposable]: /api/class-disposable.mdx "Disposable"
 [Download]: /api/class-download.mdx "Download"
 [ElementHandle]: /api/class-elementhandle.mdx "ElementHandle"
 [Error]: /api/class-error.mdx "Error"
