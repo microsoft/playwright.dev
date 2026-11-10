@@ -18,16 +18,23 @@ playwright-cli --help
 
 ## Using the version in your project
 
-If Playwright is already a dependency of the project, the CLI is available through it — no global
-install needed:
+If the `playwright` package is already a dependency of the project (directly, or through
+`@playwright/test`), the CLI is available through it — no global install needed for Playwright
+1.59 and newer. Older local versions answer `--version` but have no `cli` subcommand. Run the
+checks from the directory that declares the Playwright dependency (the workspace root in a
+monorepo):
 
 ```bash
 npx --no-install playwright --version   # check that a local Playwright exists
-npx playwright cli --help
+npx --no-install playwright cli list    # capability probe — this one decides
 ```
 
-Everywhere these docs write `playwright-cli <command>`, `npx playwright cli <command>` works the
-same way.
+When `cli list` succeeds, keep using `npx --no-install playwright cli <command>`; on 1.60 and
+newer its `--help` lists the commands the installed version supports. When it fails with
+`error: unknown command 'cli'`, the local Playwright predates 1.59 — and when npx reports that
+no local Playwright exists, there is none to use. Install the global CLI in either case.
+Everywhere these docs write `playwright-cli <command>`, `npx --no-install playwright cli
+<command>` works the same way.
 
 ## Initializing a workspace
 
