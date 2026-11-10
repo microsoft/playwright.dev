@@ -133,6 +133,7 @@ module.exports = {
             { type: 'doc', id: 'api/class-credentials' },
             { type: 'doc', id: 'api/class-debugger' },
             { type: 'doc', id: 'api/class-dialog' },
+            { type: 'doc', id: 'api/class-disposable' },
             { type: 'doc', id: 'api/class-download' },
             { type: 'doc', id: 'api/class-elementhandle' },
             { type: 'doc', id: 'api/class-filechooser' },
@@ -170,6 +171,7 @@ module.exports = {
             { type: 'doc', id: 'api/class-genericassertions' },
             { type: 'doc', id: 'api/class-locatorassertions' },
             { type: 'doc', id: 'api/class-pageassertions' },
+            { type: 'doc', id: 'api/class-playwrightassertions' },
             { type: 'doc', id: 'api/class-snapshotassertions' }
           ],
           collapsed: false
@@ -202,6 +204,7 @@ module.exports = {
             { type: 'doc', id: 'api/class-testcase' },
             { type: 'doc', id: 'api/class-testerror' },
             { type: 'doc', id: 'api/class-testresult' },
+            { type: 'doc', id: 'api/class-testrun' },
             { type: 'doc', id: 'api/class-teststep' }
           ],
           collapsed: false
