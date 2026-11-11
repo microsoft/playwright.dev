@@ -662,6 +662,8 @@ testConfig.respectGitIgnore
 
 The maximum number of retry attempts given to failed tests. By default failing tests are not retried. Learn more about [test retries](../test-retries.mdx#retries).
 
+When set to a list, the number of retries depends on the error. After each failed attempt, Playwright takes the largest `count` among the entries that apply, and retries the test when it has run fewer times than that. The latest failed attempt decides: a test that first fails with a matching error and then with a different one only gets the retries of the latter. Worker crashes and timeouts are matched by their error message like any other failure.
+
 **Usage**
 
 ```js title="playwright.config.ts"
@@ -672,8 +674,27 @@ export default defineConfig({
 });
 ```
 
+Retry any failure once, and up to three times when the browser or the worker crashed:
+
+```js title="playwright.config.ts"
+import { defineConfig } from '@playwright/test';
+
+export default defineConfig({
+  retries: [
+    { count: 1 },
+    { count: 3, condition: /Target crashed|worker process exited unexpectedly/ },
+  ],
+});
+```
+
 **Type**
-- [number]
+- [number] | [Array]&lt;[Object]&gt;
+  - `count` [number]
+    
+    The maximum number of retries given to a failed test when this entry applies.
+  - `condition` [RegExp] *(optional)*
+    
+    Regular expression matched against the error messages of the failed attempt. An entry without a condition always applies.
 
 ---
 
@@ -1049,6 +1070,8 @@ export default defineConfig({
 <font size="2" style={{position: "relative", top: "-20px"}}>Added in: v1.10</font><x-search>testConfig.webServer</x-search>
 
 Launch a development web server (or multiple) during the tests.
+
+Top-level servers start before `globalSetup` and stop after `globalTeardown`, regardless of project selection. To start servers only for particular projects, use [testProject.webServer](/api/class-testproject.mdx#test-project-web-server).
 
 **Usage**
 
