@@ -84,6 +84,7 @@ export default defineConfig({
 - Proxy credentials are no longer sent to websites. The credentials in the [proxy](/api/class-browsertype.mdx#browser-type-launch-option-proxy) option now answer only proxy challenges. To authenticate on a website, use [httpCredentials](/api/class-browser.mdx#browser-new-context-option-http-credentials).
 - Text that the browser does not render, such as text that is not assigned to a slot or text directly inside a closed `<details>`, is no longer part of accessible names and aria snapshots. This can change the results of [page.getByRole()](/api/class-page.mdx#page-get-by-role) with a name, [locator.ariaSnapshot()](/api/class-locator.mdx#locator-aria-snapshot) and [expect(locator).toMatchAriaSnapshot()](/api/class-locatorassertions.mdx#locator-assertions-to-match-aria-snapshot).
 - String and `URLSearchParams` values of the `params` option in [APIRequestContext] requests are now appended to the query that the URL already has, instead of replacing it.
+- [APIRequestContext] now matches `application/json` content types case-insensitively and with parameters, such as `application/json;charset=UTF-8`, when serializing string `data`. Previously, only the exact value `application/json` triggered JSON encoding. With these content types, a string that does not parse as JSON is now JSON-encoded, including quotes and escaping, instead of being sent as is. This changes malformed JSON bodies and can invalidate signatures computed over the original string. Pass `data: Buffer.from(body, 'utf8')` to send exact bytes without JSON encoding. Strings that already parse as JSON and `Buffer` data are unchanged.
 - `.css`, `.less` and `.scss` imports in test files now load as empty modules instead of being removed, so the imported file must exist.
 - The blob reporter again deletes the content of its output directory before it writes the report. Playwright 1.64 kept reports with other names.
 - Test locations of imported calls such as `test(` in CommonJS output now point to the start of the callee, for example `a.spec.ts:3:7` instead of `a.spec.ts:3:11`. This is the same as in ESM.
@@ -93,7 +94,7 @@ export default defineConfig({
 * 🐳 [Docker images](./docker.mdx) now include Node.js 26 instead of Node.js 24, and the latest patch of Chromium on the same branch.
 
 ### Browser Versions
-- Chromium 158.0.8127.2
+- Chromium 158.0.8127.18
 - Mozilla Firefox 159.0
 - WebKit 27.2
 
@@ -119,9 +120,9 @@ const result = await page.webmcp.callTool('add', { a: 2, b: 40 });
 console.log(result.content[0].text); // "42"
 ```
 
-[Playwright MCP](./getting-started-mcp.mdx) also supports WebMCP by default, with page-defined tools offered to the agent as `webmcp_<tool>`. Pass `--no-webmcp` to opt out.
+[Playwright MCP](https://playwright.dev/mcp/introduction) also supports WebMCP by default, with page-defined tools offered to the agent as `webmcp_<tool>`. Pass `--no-webmcp` to opt out.
 
-[`playwright-cli`](./getting-started-cli.mdx) exposes them as well:
+[`playwright-cli`](https://playwright.dev/agent-cli/introduction) exposes them as well:
 
 ```bash
 playwright-cli webmcp-list
@@ -159,7 +160,7 @@ export default defineConfig({
 - New [style](/api/class-screencast.mdx#screencast-show-actions-option-style) option takes CSS declarations for the `point` marker, the target `highlight` and the action `title`. It replaces the `fontSize` option, which is now deprecated.
 - The cursor stays visible at the last action point, survives navigations and travels along a natural, eased path.
 - Videos are encoded with VP9 instead of VP8, which takes less CPU and produces smaller files of the same or better quality.
-- All video options are also available in [Playwright MCP](./getting-started-mcp.mdx) and [`playwright-cli`](./getting-started-cli.mdx).
+- All video options are also available in [Playwright MCP](https://playwright.dev/mcp/introduction) and [`playwright-cli`](https://playwright.dev/agent-cli/introduction).
 
 ### 🎯 Test runner
 - New [testProject.default](/api/class-testproject.mdx#test-project-default) option keeps a project in the config without running it by default. You can configure every browser you care about, and let a plain `npx playwright test` run just your favourite one:
@@ -460,7 +461,7 @@ export default defineConfig({
 - [page.addInitScript()](/api/class-page.mdx#page-add-init-script) / [browserContext.addInitScript()](/api/class-browsercontext.mdx#browser-context-add-init-script) now accept functions as init-script arguments.
 
 #### Command line & MCP
-- Playwright now bundles the [Playwright MCP](./getting-started-mcp.mdx) server and [`playwright-cli`](./getting-started-cli.mdx), runnable via `npx playwright mcp` and `npx playwright cli`.
+- Playwright now bundles the [Playwright MCP](https://playwright.dev/mcp/introduction) server and [`playwright-cli`](https://playwright.dev/agent-cli/introduction), runnable via `npx playwright mcp` and `npx playwright cli`.
 
 #### Reporters
 - The HTML report's **Merge files** grouping — previously only a UI toggle — can now be enabled from the config with the new `mergeFiles` reporter option:
