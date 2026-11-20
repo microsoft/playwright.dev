@@ -216,7 +216,7 @@ class CSharpFormatter {
       return type.union.slice(1).map(t => this.formatTypeName(t, direction, member)).join(' | ') + extraNullable;
     }
     if (type.union.some(v => v.name.startsWith('"'))) {
-      // Keep in sync with microsoft/playwright's utils/doclint/generateDotnetApi.js
+      // Keep in sync with microsoft/playwright-dotnet's utils/generateDotnetApi.js
       const enumValueOverrides = new Map([
         ['domcontentloaded', 'DOMContentLoaded'],
         ['networkidle', 'NetworkIdle'],
