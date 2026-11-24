@@ -21,6 +21,35 @@ test('homepage has Playwright in title and get started link linking to the intro
   await expect(page).toHaveURL(/.*intro/);
 });
 
+test('component testing has separate guides', { annotation: { type: 'issue', description: 'https://github.com/microsoft/playwright/issues/44328' } }, async ({ page }) => {
+  for (const prefix of ['/docs', '/docs/next']) {
+    await page.goto(`${prefix}/test-components-introduction`);
+    const sidebar = page.locator('.theme-doc-sidebar-menu');
+    const category = sidebar.locator('li.theme-doc-sidebar-item-category').filter({
+      has: page.getByRole('button', { name: 'Component testing', exact: true }),
+    });
+    const guides = [
+      ['Introduction', 'test-components-introduction', 'How it works'],
+      ['Getting started', 'test-components-getting-started', 'Step 2: Configure Playwright'],
+      ['Stories and testing patterns', 'test-components-stories', 'Record state for assertions'],
+      ['Migration', 'test-components-migration', 'Migration from the experimental packages'],
+      ['Frequently asked questions', 'test-components-faq', "How do I access the component's methods or its instance?"],
+    ];
+    await expect(category.getByRole('link')).toHaveCount(guides.length);
+    for (const [title, id, heading] of guides) {
+      await category.getByRole('link', { name: title, exact: true }).click();
+      await expect(page).toHaveURL(new RegExp(`${prefix}/${id}$`));
+      await expect(page.getByRole('heading', { name: heading })).toBeVisible();
+      if (id === 'test-components-introduction') {
+        await expect(page.getByRole('heading', { name: 'Step 2: Configure Playwright' })).toHaveCount(0);
+        await expect(page.getByRole('link', { name: 'migration guide', exact: true })).toHaveAttribute('href', `${prefix}/test-components-migration#migration-from-the-experimental-packages`);
+      }
+    }
+    await page.goto(`${prefix}/test-components#handling-network-requests`);
+    await expect(page.getByRole('heading', { name: 'Handling network requests' })).toBeVisible();
+  }
+});
+
 test.describe('next switcher', () => {
   test('home -> next intro', async ({ page, switchToNext }) => {
     const getStarted = page.locator('text=Get Started');

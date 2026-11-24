@@ -43,6 +43,18 @@ module.exports = {
     },
     {
       type: 'category',
+      label: 'Component testing',
+      items: [
+        { type: 'doc', id: 'test-components-introduction' },
+        { type: 'doc', id: 'test-components-getting-started' },
+        { type: 'doc', id: 'test-components-stories' },
+        { type: 'doc', id: 'test-components-migration' },
+        { type: 'doc', id: 'test-components-faq' },
+      ],
+      collapsed: false
+    },
+    {
+      type: 'category',
       label: 'Guides',
       items: [
         { type: 'doc', id: 'library' },
@@ -56,7 +68,6 @@ module.exports = {
         { type: 'doc', id: 'browsers' },
         { type: 'doc', id: 'chrome-extensions' },
         { type: 'doc', id: 'clock' },
-        { type: 'doc', id: 'test-components' },
         { type: 'doc', id: 'debug' },
         { type: 'doc', id: 'dialogs' },
         { type: 'doc', id: 'downloads' },

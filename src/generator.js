@@ -31,6 +31,14 @@ const { generateTabGroups, renderHTMLCard } = require('./format_utils');
 
 const commonSnippets = new Set(['txt', 'html', 'xml', 'yml', 'yaml', 'json', 'groovy', 'html', 'bash', 'sh', 'ini', 'Dockerfile', 'css', 'markdown', 'mermaid']);
 
+const componentTestingGuides = [
+  { id: 'test-components-introduction', title: 'Introduction', sections: ['Introduction', 'Why a framework-agnostic approach', 'How it works'] },
+  { id: 'test-components-getting-started', title: 'Getting started', sections: ['Getting started'] },
+  { id: 'test-components-stories', title: 'Stories and testing patterns', sections: ['Stories as a methodology', 'Testing patterns'] },
+  { id: 'test-components-migration', title: 'Migration', sections: ['Migration from the experimental packages'] },
+  { id: 'test-components-faq', title: 'Frequently asked questions', sections: ['Frequently asked questions'] },
+];
+
 /** @typedef {"header"|"link"|"usage"} FormatMode */
 
 /**
@@ -124,6 +132,11 @@ class Generator {
       const outName = entry.name.replace(new RegExp(`(${supportedLanguages.map(l => '-' + l).join('|')})`, 'g'), '');
       guides.set(entry.name, outName);
       this.generatedFiles.add(`./${outName}`);
+    }
+
+    if (guides.has('test-components-js.md')) {
+      for (const guide of componentTestingGuides)
+        this.generatedFiles.add(`./${guide.id}.md`);
     }
 
     for (const clazz of this.documentation.classesArray)
@@ -434,7 +447,51 @@ ${this.documentation.renderLinksInText(member.discouraged)}
   generateDoc(name, outName) {
     const content = fs.readFileSync(path.join(this.srcDir, name)).toString();
     let nodes = this.filterForLanguage(md.parse(this.rewriteImageLinks(content)));
+    if (name === 'test-components-js.md') {
+      this.generateComponentTestingDocs(structuredClone(nodes));
+      const properties = nodes.find(node => node.type === 'properties');
+      if (properties?.type === 'properties')
+        properties.lines.unshift('unlisted: true');
+    }
     return this.generateDocFromMd(nodes, outName);
+  }
+
+  /**
+   * @param {MarkdownNode[]} nodes
+   */
+  generateComponentTestingDocs(nodes) {
+    const sections = new Map(nodes.filter(node => node.type === 'h2').map(node => [node.text, node]));
+    const sectionTitles = componentTestingGuides.flatMap(guide => guide.sections);
+    if (sections.size !== sectionTitles.length || sectionTitles.some(title => !sections.has(title)))
+      throw new Error('Update componentTestingGuides to match the component testing guide sections');
+
+    const headingPages = new Map();
+    for (const guide of componentTestingGuides) {
+      for (const title of guide.sections) {
+        md.visitAll([sections.get(title)], node => {
+          if (/^h[2-4]$/.test(node.type))
+            headingPages.set(toKebabCase(node.text), guide.id);
+        });
+      }
+    }
+
+    for (const guide of componentTestingGuides) {
+      const guideNodes = structuredClone(guide.sections.map(title => sections.get(title)));
+      md.visitAll(guideNodes, node => {
+        if (node.type !== 'text')
+          return;
+        node.text = node.text.replace(/\]\(#([^)]+)\)/g, (match, hash) => {
+          const target = headingPages.get(hash);
+          if (!target)
+            throw new Error(`Unknown component testing heading: ${hash}`);
+          return target === guide.id ? match : `](./${target}.md#${hash})`;
+        });
+      });
+      this.generateDocFromMd([
+        { type: 'properties', lines: [`id: ${guide.id}`, `title: "${guide.title}"`] },
+        ...guideNodes,
+      ], `${guide.id}.mdx`);
+    }
   }
 
   /**
